@@ -11,7 +11,8 @@
 #define CHIP_TLV_WRITER_BUFFER_SIZE 1024
 
 JNI_METHOD(void, BaseChipCluster, readAttribute)
-(JNIEnv * env, jobject self, jlong callbackHandle, jlong devicePtr, jint jEndpointId, jlong jClusterId, jlong jAttributeId, jboolean isFabricFiltered, jlong imTimeoutMs)
+(JNIEnv * env, jobject self, jlong callbackHandle, jlong devicePtr, jint jEndpointId, jlong jClusterId, jlong jAttributeId,
+ jboolean isFabricFiltered, jlong imTimeoutMs)
 {
     using namespace chip;
     using namespace chip::Controller;
@@ -31,8 +32,8 @@ JNI_METHOD(void, BaseChipCluster, readAttribute)
     }
     chip::app::ReadPrepareParams params(device->GetSecureSession().Value());
 
-    EndpointId endpointId = static_cast<EndpointId>(jEndpointId);
-    ClusterId clusterId = static_cast<ClusterId>(jClusterId);
+    EndpointId endpointId   = static_cast<EndpointId>(jEndpointId);
+    ClusterId clusterId     = static_cast<ClusterId>(jClusterId);
     AttributeId attributeId = static_cast<AttributeId>(jAttributeId);
     attributePathParamsList.push_back(app::AttributePathParams(endpointId, clusterId, attributeId));
 
@@ -71,7 +72,8 @@ exit:
 }
 
 JNI_METHOD(void, BaseChipCluster, writeAttribute)
-(JNIEnv * env, jobject self, jlong callbackHandle, jlong devicePtr, jint jEndpointId, jlong jClusterId, jlong jAttributeId, jbyteArray tlvBytes, jint timedRequestTimeoutMs, jlong imTimeoutMs)
+(JNIEnv * env, jobject self, jlong callbackHandle, jlong devicePtr, jint jEndpointId, jlong jClusterId, jlong jAttributeId,
+ jbyteArray tlvBytes, jint timedRequestTimeoutMs, jlong imTimeoutMs)
 {
     using namespace chip;
     using namespace chip::Controller;
@@ -84,17 +86,18 @@ JNI_METHOD(void, BaseChipCluster, writeAttribute)
 
     ChipLogDetail(Controller, "IM write() called");
 
-    if (tlvBytes == nullptr) {
+    if (tlvBytes == nullptr)
+    {
         err = CHIP_ERROR_INCORRECT_STATE;
         ChipLogError(Controller, "JNI IM Write Error: %s", err.AsString());
         return;
     }
 
-    EndpointId endpointId = 0;
-    ClusterId clusterId = static_cast<ClusterId>(jClusterId);
+    EndpointId endpointId   = 0;
+    ClusterId clusterId     = static_cast<ClusterId>(jClusterId);
     AttributeId attributeId = static_cast<AttributeId>(jAttributeId);
-    bool isGroupSession = false;
-    DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
+    bool isGroupSession     = false;
+    DeviceProxy * device    = reinterpret_cast<DeviceProxy *>(devicePtr);
     TLV::TLVReader reader;
 
     isGroupSession = device->GetSecureSession().Value()->IsGroupSession();
@@ -151,7 +154,8 @@ exit:
 }
 
 JNI_METHOD(void, BaseChipCluster, subscribeAttribute)
-(JNIEnv * env, jobject self, jlong callbackHandle, jlong devicePtr, jint jEndpointId, jlong jClusterId, jlong jAttributeId, jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered, jlong imTimeoutMs)
+(JNIEnv * env, jobject self, jlong callbackHandle, jlong devicePtr, jint jEndpointId, jlong jClusterId, jlong jAttributeId,
+ jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered, jlong imTimeoutMs)
 {
     using namespace chip;
     using namespace chip::Controller;
@@ -175,8 +179,8 @@ JNI_METHOD(void, BaseChipCluster, subscribeAttribute)
     params.mIsFabricFiltered          = (isFabricFiltered != JNI_FALSE);
     params.mTimeout                   = aImTimeoutMs != 0 ? System::Clock::Milliseconds32(aImTimeoutMs) : System::Clock::kZero;
 
-    EndpointId endpointId = static_cast<EndpointId>(jEndpointId);
-    ClusterId clusterId = static_cast<ClusterId>(jClusterId);
+    EndpointId endpointId   = static_cast<EndpointId>(jEndpointId);
+    ClusterId clusterId     = static_cast<ClusterId>(jClusterId);
     AttributeId attributeId = static_cast<AttributeId>(jAttributeId);
 
     std::unique_ptr<chip::app::AttributePathParams[]> attributePaths(new chip::app::AttributePathParams[1]);
@@ -216,7 +220,8 @@ exit:
 }
 
 JNI_METHOD(void, BaseChipCluster, invoke)
-(JNIEnv * env, jobject self, jlong callbackHandle, jlong devicePtr, jint jEndpointId, jlong jClusterId, jlong jCommandId, jbyteArray tlvBytes, jint timedRequestTimeoutMs, jlong imTimeoutMs)
+(JNIEnv * env, jobject self, jlong callbackHandle, jlong devicePtr, jint jEndpointId, jlong jClusterId, jlong jCommandId,
+ jbyteArray tlvBytes, jint timedRequestTimeoutMs, jlong imTimeoutMs)
 {
     using namespace chip;
     using namespace chip::Controller;
@@ -225,9 +230,9 @@ JNI_METHOD(void, BaseChipCluster, invoke)
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     auto callback                           = reinterpret_cast<InvokeCallback *>(callbackHandle);
     app::CommandSender * commandSender      = nullptr;
-    EndpointId endpointId = static_cast<EndpointId>(jEndpointId);
-    ClusterId clusterId = static_cast<ClusterId>(jClusterId);
-    CommandId commandId = static_cast<CommandId>(jCommandId);
+    EndpointId endpointId                   = static_cast<EndpointId>(jEndpointId);
+    ClusterId clusterId                     = static_cast<ClusterId>(jClusterId);
+    CommandId commandId                     = static_cast<CommandId>(jCommandId);
     uint16_t convertedTimedRequestTimeoutMs = static_cast<uint16_t>(timedRequestTimeoutMs);
     ChipLogDetail(Controller, "IM invoke() called");
 
@@ -254,7 +259,10 @@ JNI_METHOD(void, BaseChipCluster, invoke)
                                                          ? Optional<uint16_t>(convertedTimedRequestTimeoutMs)
                                                          : Optional<uint16_t>::Missing()));
 
-    SuccessOrExit(err = commandSender->SendCommandRequest(device->GetSecureSession().Value(), imTimeoutMs != 0 ? MakeOptional(System::Clock::Milliseconds32(imTimeoutMs)) : Optional<System::Clock::Timeout>::Missing()));
+    SuccessOrExit(err =
+                      commandSender->SendCommandRequest(device->GetSecureSession().Value(),
+                                                        imTimeoutMs != 0 ? MakeOptional(System::Clock::Milliseconds32(imTimeoutMs))
+                                                                         : Optional<System::Clock::Timeout>::Missing()));
 
     callback->mCommandSender = commandSender;
 
@@ -279,120 +287,146 @@ exit:
     }
 }
 
-jobject decodeValueFromTLV(JNIEnv *env, chip::TLV::TLVReader * data);
-static CHIP_ERROR encodeTLVFromValue(JNIEnv *env, jobject jObject, chip::TLV::TLVWriter & writer, chip::TLV::Tag tag);
+jobject decodeValueFromTLV(JNIEnv * env, chip::TLV::TLVReader * data);
+static CHIP_ERROR encodeTLVFromValue(JNIEnv * env, jobject jObject, chip::TLV::TLVWriter & writer, chip::TLV::Tag tag);
 
-jobject decodeValueFromTLV(JNIEnv *env, chip::TLV::TLVReader * data)
+jobject decodeValueFromTLV(JNIEnv * env, chip::TLV::TLVReader * data)
 {
     chip::TLV::TLVType dataTLVType = data->GetType();
-    switch (dataTLVType) {
+    switch (dataTLVType)
+    {
     case chip::TLV::kTLVType_SignedInteger: {
         int64_t val;
         CHIP_ERROR err = data->Get(val);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Error: TLV signed integer decoding failed : %" CHIP_ERROR_FORMAT , err.Format()));
-        jclass intTypeCls = env->FindClass("chip/devicecontroller/ChipTLVType$IntType");
-        jmethodID constructor      = env->GetMethodID(intTypeCls, "<init>", "(J)V");
+        VerifyOrReturnValue(
+            err == CHIP_NO_ERROR, nullptr,
+            ChipLogError(Controller, "Error: TLV signed integer decoding failed : %" CHIP_ERROR_FORMAT, err.Format()));
+        jclass intTypeCls     = env->FindClass("chip/devicecontroller/ChipTLVType$IntType");
+        jmethodID constructor = env->GetMethodID(intTypeCls, "<init>", "(J)V");
         return env->NewObject(intTypeCls, constructor, static_cast<jlong>(val));
     }
     case chip::TLV::kTLVType_UnsignedInteger: {
         uint64_t val;
         CHIP_ERROR err = data->Get(val);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Error: TLV unsigned integer decoding failed : %" CHIP_ERROR_FORMAT , err.Format()));
-        jclass uintTypeCls = env->FindClass("chip/devicecontroller/ChipTLVType$UIntType");
-        jmethodID constructor      = env->GetMethodID(uintTypeCls, "<init>", "(J)V");
+        VerifyOrReturnValue(
+            err == CHIP_NO_ERROR, nullptr,
+            ChipLogError(Controller, "Error: TLV unsigned integer decoding failed : %" CHIP_ERROR_FORMAT, err.Format()));
+        jclass uintTypeCls    = env->FindClass("chip/devicecontroller/ChipTLVType$UIntType");
+        jmethodID constructor = env->GetMethodID(uintTypeCls, "<init>", "(J)V");
         return env->NewObject(uintTypeCls, constructor, static_cast<jlong>(val));
     }
     case chip::TLV::kTLVType_Boolean: {
         bool val;
         CHIP_ERROR err = data->Get(val);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Error: TLV boolean decoding failed : %" CHIP_ERROR_FORMAT , err.Format()));
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(Controller, "Error: TLV boolean decoding failed : %" CHIP_ERROR_FORMAT, err.Format()));
         jclass booleanTypeCls = env->FindClass("chip/devicecontroller/ChipTLVType$BooleanType");
-        jmethodID constructor      = env->GetMethodID(booleanTypeCls, "<init>", "(Z)V");
+        jmethodID constructor = env->GetMethodID(booleanTypeCls, "<init>", "(Z)V");
         return env->NewObject(booleanTypeCls, constructor, static_cast<jboolean>(val));
     }
     case chip::TLV::kTLVType_FloatingPointNumber: {
         // Try float first
         float floatValue;
         CHIP_ERROR err = data->Get(floatValue);
-        if (err == CHIP_NO_ERROR) {
-            jclass floatTypeCls = env->FindClass("chip/devicecontroller/ChipTLVType$FloatType");
-            jmethodID constructor      = env->GetMethodID(floatTypeCls, "<init>", "(F)V");
+        if (err == CHIP_NO_ERROR)
+        {
+            jclass floatTypeCls   = env->FindClass("chip/devicecontroller/ChipTLVType$FloatType");
+            jmethodID constructor = env->GetMethodID(floatTypeCls, "<init>", "(F)V");
             return env->NewObject(floatTypeCls, constructor, static_cast<jfloat>(floatValue));
         }
         double val;
         err = data->Get(val);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Error: TLV floating point decoding failed : %" CHIP_ERROR_FORMAT , err.Format()));
-        jclass doubleTypeCls = env->FindClass("chip/devicecontroller/ChipTLVType$DoubleType");
-        jmethodID doubleConstructor      = env->GetMethodID(doubleTypeCls, "<init>", "(D)V");
+        VerifyOrReturnValue(
+            err == CHIP_NO_ERROR, nullptr,
+            ChipLogError(Controller, "Error: TLV floating point decoding failed : %" CHIP_ERROR_FORMAT, err.Format()));
+        jclass doubleTypeCls        = env->FindClass("chip/devicecontroller/ChipTLVType$DoubleType");
+        jmethodID doubleConstructor = env->GetMethodID(doubleTypeCls, "<init>", "(D)V");
         return env->NewObject(doubleTypeCls, doubleConstructor, static_cast<jdouble>(val));
     }
     case chip::TLV::kTLVType_UTF8String: {
         chip::CharSpan stringValue;
         CHIP_ERROR err = data->Get(stringValue);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Error: TLV UTF8String decoding failed : %" CHIP_ERROR_FORMAT , err.Format()));
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(Controller, "Error: TLV UTF8String decoding failed : %" CHIP_ERROR_FORMAT, err.Format()));
         chip::UtfString stringObj(env, stringValue);
-        jclass stringTypeCls = env->FindClass("chip/devicecontroller/ChipTLVType$StringType");
-        jmethodID constructor      = env->GetMethodID(stringTypeCls, "<init>", "(Ljava/lang/String;)V");
+        jclass stringTypeCls  = env->FindClass("chip/devicecontroller/ChipTLVType$StringType");
+        jmethodID constructor = env->GetMethodID(stringTypeCls, "<init>", "(Ljava/lang/String;)V");
         return env->NewObject(stringTypeCls, constructor, stringObj.jniValue());
     }
     case chip::TLV::kTLVType_ByteString: {
         chip::ByteSpan bytesValue;
         CHIP_ERROR err = data->Get(bytesValue);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Error: TLV ByteString decoding failed : %" CHIP_ERROR_FORMAT , err.Format()));
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(Controller, "Error: TLV ByteString decoding failed : %" CHIP_ERROR_FORMAT, err.Format()));
         chip::ByteArray byteArrayObj(env, bytesValue);
-        jclass stringTypeCls = env->FindClass("chip/devicecontroller/ChipTLVType$ByteArrayType");
-        jmethodID constructor      = env->GetMethodID(stringTypeCls, "<init>", "([B)V");
+        jclass stringTypeCls  = env->FindClass("chip/devicecontroller/ChipTLVType$ByteArrayType");
+        jmethodID constructor = env->GetMethodID(stringTypeCls, "<init>", "([B)V");
         return env->NewObject(stringTypeCls, constructor, byteArrayObj.jniValue());
     }
     case chip::TLV::kTLVType_Null: {
-        jclass nullTypeCls = env->FindClass("chip/devicecontroller/ChipTLVType$NullType");
-        jmethodID constructor      = env->GetMethodID(nullTypeCls, "<init>", "()V");
+        jclass nullTypeCls    = env->FindClass("chip/devicecontroller/ChipTLVType$NullType");
+        jmethodID constructor = env->GetMethodID(nullTypeCls, "<init>", "()V");
         return env->NewObject(nullTypeCls, constructor);
     }
     case chip::TLV::kTLVType_Structure:
     case chip::TLV::kTLVType_Array: {
         chip::TLV::TLVType tlvType;
         CHIP_ERROR err = data->EnterContainer(tlvType);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Error: TLV container entering failed : %" CHIP_ERROR_FORMAT , err.Format()));
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(Controller, "Error: TLV container entering failed : %" CHIP_ERROR_FORMAT, err.Format()));
 
         jobject arrayLists;
         err = chip::JniReferences::GetInstance().CreateArrayList(arrayLists);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Error: Create ArrayList object failed : %" CHIP_ERROR_FORMAT , err.Format()));
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(Controller, "Error: Create ArrayList object failed : %" CHIP_ERROR_FORMAT, err.Format()));
 
-        while ((err = data->Next()) == CHIP_NO_ERROR) {
+        while ((err = data->Next()) == CHIP_NO_ERROR)
+        {
             chip::TLV::Tag tag = data->GetTag();
-            jobject value = decodeValueFromTLV(env, data);
-            VerifyOrReturnValue(value != nullptr, nullptr, ChipLogError(Controller, "Error when decoding TLV container of type : %" CHIP_ERROR_FORMAT , err.Format()));
+            jobject value      = decodeValueFromTLV(env, data);
+            VerifyOrReturnValue(
+                value != nullptr, nullptr,
+                ChipLogError(Controller, "Error when decoding TLV container of type : %" CHIP_ERROR_FORMAT, err.Format()));
 
             jobject jValue = nullptr;
-            if (dataTLVType == chip::TLV::kTLVType_Structure) {
+            if (dataTLVType == chip::TLV::kTLVType_Structure)
+            {
                 uint64_t tagNum = TagNumFromTag(tag);
 
                 jclass structElementCls = env->FindClass("chip/devicecontroller/ChipTLVType$StructElement");
-                jmethodID constructor      = env->GetMethodID(structElementCls, "<init>", "(JLchip/devicecontroller/ChipTLVType$BaseTLVType;)V");
+                jmethodID constructor =
+                    env->GetMethodID(structElementCls, "<init>", "(JLchip/devicecontroller/ChipTLVType$BaseTLVType;)V");
 
                 jValue = env->NewObject(structElementCls, constructor, static_cast<jlong>(tagNum), value);
-            } else {
+            }
+            else
+            {
                 jValue = value;
             }
             err = chip::JniReferences::GetInstance().AddToList(arrayLists, jValue);
-            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Error: Add ArrayList object failed : %" CHIP_ERROR_FORMAT , err.Format()));
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                                ChipLogError(Controller, "Error: Add ArrayList object failed : %" CHIP_ERROR_FORMAT, err.Format()));
         }
-        if (err != CHIP_END_OF_TLV) {
+        if (err != CHIP_END_OF_TLV)
+        {
             ChipLogError(Controller, "Error: TLV container decoding failed: %" CHIP_ERROR_FORMAT, err.Format());
             return nullptr;
         }
 
         err = data->ExitContainer(tlvType);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Error: TLV container exiting failed: %" CHIP_ERROR_FORMAT, err.Format()));
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(Controller, "Error: TLV container exiting failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
         jclass typeCls = nullptr;
-        if (dataTLVType == chip::TLV::kTLVType_Structure) {
+        if (dataTLVType == chip::TLV::kTLVType_Structure)
+        {
             typeCls = env->FindClass("chip/devicecontroller/ChipTLVType$StructType");
-        } else {
+        }
+        else
+        {
             typeCls = env->FindClass("chip/devicecontroller/ChipTLVType$ArrayType");
         }
-        jmethodID constructor      = env->GetMethodID(typeCls, "<init>", "(Ljava/util/ArrayList;)V");
+        jmethodID constructor = env->GetMethodID(typeCls, "<init>", "(Ljava/util/ArrayList;)V");
         return env->NewObject(typeCls, constructor, arrayLists);
     }
     default:
@@ -401,7 +435,7 @@ jobject decodeValueFromTLV(JNIEnv *env, chip::TLV::TLVReader * data)
     }
 }
 
-static bool isEqualTLVType(JNIEnv * env, const char *typeName, jobject tlvType)
+static bool isEqualTLVType(JNIEnv * env, const char * typeName, jobject tlvType)
 {
     jclass tlvEnum = env->FindClass("chip/devicecontroller/ChipTLVType$TLVType");
 
@@ -413,18 +447,21 @@ static bool isEqualTLVType(JNIEnv * env, const char *typeName, jobject tlvType)
     return (env->CallBooleanMethod(enumObj, equalsMethodID, tlvType) == JNI_TRUE);
 }
 
-static CHIP_ERROR encodeTLVFromValue(JNIEnv *env, jobject jValue, chip::TLV::TLVWriter & writer, chip::TLV::Tag tag)
+static CHIP_ERROR encodeTLVFromValue(JNIEnv * env, jobject jValue, chip::TLV::TLVWriter & writer, chip::TLV::Tag tag)
 {
-    jmethodID getTypeMethod = nullptr;
+    jmethodID getTypeMethod  = nullptr;
     jmethodID getValueMethod = nullptr;
-    ReturnLogErrorOnFailure(chip::JniReferences::GetInstance().FindMethod(env, jValue, "type", "()Lchip/devicecontroller/ChipTLVType$TLVType;", &getTypeMethod));
+    ReturnLogErrorOnFailure(chip::JniReferences::GetInstance().FindMethod(
+        env, jValue, "type", "()Lchip/devicecontroller/ChipTLVType$TLVType;", &getTypeMethod));
 
     jobject jType = env->CallObjectMethod(jValue, getTypeMethod);
-    if (jType == nullptr) {
+    if (jType == nullptr)
+    {
         ChipLogError(Controller, "Error: Object to encode is corrupt");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (isEqualTLVType(env, "UInt", jType)) {
+    if (isEqualTLVType(env, "UInt", jType))
+    {
         jclass typeClass = env->FindClass("chip/devicecontroller/ChipTLVType$UIntType");
         VerifyOrReturnError(typeClass != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
         getValueMethod = env->GetMethodID(typeClass, "value", "()J");
@@ -435,7 +472,8 @@ static CHIP_ERROR encodeTLVFromValue(JNIEnv *env, jobject jValue, chip::TLV::TLV
 
         return writer.Put(tag, static_cast<uint64_t>(value));
     }
-    if (isEqualTLVType(env, "Int", jType)) {
+    if (isEqualTLVType(env, "Int", jType))
+    {
         jclass typeClass = env->FindClass("chip/devicecontroller/ChipTLVType$IntType");
         VerifyOrReturnError(typeClass != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
         getValueMethod = env->GetMethodID(typeClass, "value", "()J");
@@ -446,7 +484,8 @@ static CHIP_ERROR encodeTLVFromValue(JNIEnv *env, jobject jValue, chip::TLV::TLV
 
         return writer.Put(tag, static_cast<int64_t>(value));
     }
-    if (isEqualTLVType(env, "Boolean", jType)) {
+    if (isEqualTLVType(env, "Boolean", jType))
+    {
         jclass typeClass = env->FindClass("chip/devicecontroller/ChipTLVType$BooleanType");
         VerifyOrReturnError(typeClass != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
         getValueMethod = env->GetMethodID(typeClass, "value", "()Z");
@@ -457,7 +496,8 @@ static CHIP_ERROR encodeTLVFromValue(JNIEnv *env, jobject jValue, chip::TLV::TLV
 
         return writer.Put(tag, static_cast<bool>(value));
     }
-    if (isEqualTLVType(env, "Float", jType)) {
+    if (isEqualTLVType(env, "Float", jType))
+    {
         jclass typeClass = env->FindClass("chip/devicecontroller/ChipTLVType$FloatType");
         VerifyOrReturnError(typeClass != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
         getValueMethod = env->GetMethodID(typeClass, "value", "()F");
@@ -468,7 +508,8 @@ static CHIP_ERROR encodeTLVFromValue(JNIEnv *env, jobject jValue, chip::TLV::TLV
 
         return writer.Put(tag, static_cast<float>(value));
     }
-    if (isEqualTLVType(env, "Double", jType)) {
+    if (isEqualTLVType(env, "Double", jType))
+    {
         jclass typeClass = env->FindClass("chip/devicecontroller/ChipTLVType$DoubleType");
         VerifyOrReturnError(typeClass != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
         getValueMethod = env->GetMethodID(typeClass, "value", "()D");
@@ -479,36 +520,40 @@ static CHIP_ERROR encodeTLVFromValue(JNIEnv *env, jobject jValue, chip::TLV::TLV
 
         return writer.Put(tag, static_cast<double>(value));
     }
-    if (isEqualTLVType(env, "Null", jType)) {
+    if (isEqualTLVType(env, "Null", jType))
+    {
         return writer.PutNull(tag);
     }
-    if (isEqualTLVType(env, "String", jType)) {
+    if (isEqualTLVType(env, "String", jType))
+    {
         jclass typeClass = env->FindClass("chip/devicecontroller/ChipTLVType$StringType");
         VerifyOrReturnError(typeClass != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
         getValueMethod = env->GetMethodID(typeClass, "value", "()Ljava/lang/String;");
         VerifyOrReturnError(getValueMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-        jstring value = (jstring)env->CallObjectMethod(jValue, getValueMethod);
+        jstring value = (jstring) env->CallObjectMethod(jValue, getValueMethod);
         VerifyOrReturnLogError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
         chip::JniUtfString jniString(env, value);
 
         return writer.PutString(tag, jniString.c_str());
     }
-    if (isEqualTLVType(env, "ByteArray", jType)) {
+    if (isEqualTLVType(env, "ByteArray", jType))
+    {
         jclass typeClass = env->FindClass("chip/devicecontroller/ChipTLVType$ByteArrayType");
         VerifyOrReturnError(typeClass != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
         getValueMethod = env->GetMethodID(typeClass, "value", "()[B");
         VerifyOrReturnError(getValueMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-        jbyteArray value = (jbyteArray)env->CallObjectMethod(jValue, getValueMethod);
+        jbyteArray value = (jbyteArray) env->CallObjectMethod(jValue, getValueMethod);
         VerifyOrReturnLogError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
         chip::JniByteArray jniByteArray(env, value);
 
         return writer.Put(tag, jniByteArray.byteSpan());
     }
-    if (isEqualTLVType(env, "Struct", jType)) {
+    if (isEqualTLVType(env, "Struct", jType))
+    {
         jmethodID getSizeMethod = nullptr;
 
         jclass typeClass = env->FindClass("chip/devicecontroller/ChipTLVType$StructType");
@@ -522,7 +567,8 @@ static CHIP_ERROR encodeTLVFromValue(JNIEnv *env, jobject jValue, chip::TLV::TLV
         VerifyOrReturnError(elementClass != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
         jmethodID getcontextTagNumMethod = env->GetMethodID(elementClass, "contextTagNum", "()J");
         VerifyOrReturnError(getcontextTagNumMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
-        jmethodID getElementValueMethod = env->GetMethodID(elementClass, "value", "()Lchip/devicecontroller/ChipTLVType$BaseTLVType;");
+        jmethodID getElementValueMethod =
+            env->GetMethodID(elementClass, "value", "()Lchip/devicecontroller/ChipTLVType$BaseTLVType;");
         VerifyOrReturnError(getElementValueMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
         jint size = env->CallIntMethod(jValue, getSizeMethod);
@@ -530,7 +576,8 @@ static CHIP_ERROR encodeTLVFromValue(JNIEnv *env, jobject jValue, chip::TLV::TLV
 
         chip::TLV::TLVType outer;
         ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
-        for (int i = 0 ; i < static_cast<int>(size) ; i++) {
+        for (int i = 0; i < static_cast<int>(size); i++)
+        {
             jobject eachElement = env->CallObjectMethod(jValue, getValueMethod, static_cast<jint>(i));
             VerifyOrReturnLogError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
@@ -540,14 +587,15 @@ static CHIP_ERROR encodeTLVFromValue(JNIEnv *env, jobject jValue, chip::TLV::TLV
             jobject jEachValue = env->CallObjectMethod(eachElement, getElementValueMethod);
             VerifyOrReturnLogError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
-            uint64_t tagValue = static_cast<uint64_t>(jEachTag);
+            uint64_t tagValue       = static_cast<uint64_t>(jEachTag);
             chip::TLV::Tag innerTag = chip::TLV::ContextTag(static_cast<uint8_t>(tagValue));
             ReturnErrorOnFailure(encodeTLVFromValue(env, jEachValue, writer, innerTag));
         }
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
     }
-    if (isEqualTLVType(env, "Array", jType)) {
+    if (isEqualTLVType(env, "Array", jType))
+    {
         jmethodID getSizeMethod = nullptr;
 
         jclass typeClass = env->FindClass("chip/devicecontroller/ChipTLVType$ArrayType");
@@ -563,7 +611,8 @@ static CHIP_ERROR encodeTLVFromValue(JNIEnv *env, jobject jValue, chip::TLV::TLV
 
         chip::TLV::TLVType outer;
         ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Array, outer));
-        for (int i = 0 ; i < static_cast<int>(size) ; i++) {
+        for (int i = 0; i < static_cast<int>(size); i++)
+        {
             jobject eachValue = env->CallObjectMethod(jValue, getValueMethod, static_cast<jint>(i));
             VerifyOrReturnLogError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
@@ -572,7 +621,8 @@ static CHIP_ERROR encodeTLVFromValue(JNIEnv *env, jobject jValue, chip::TLV::TLV
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
     }
-    if (isEqualTLVType(env, "Empty", jType)) {
+    if (isEqualTLVType(env, "Empty", jType))
+    {
         // For optional Value
         return CHIP_NO_ERROR;
     }
