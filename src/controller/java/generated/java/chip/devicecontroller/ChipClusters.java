@@ -6217,16 +6217,6 @@ public class ChipClusters {
         subscribeTestEventTriggersEnabledAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readAverageWearCountAttribute(
-        LongAttributeCallback callback) {
-        readAverageWearCountAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeAverageWearCountAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
-        subscribeAverageWearCountAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
     public void readGeneratedCommandListAttribute(
         GeneratedCommandListAttributeCallback callback) {
         readGeneratedCommandListAttribute(chipClusterPtr, callback);
@@ -6322,10 +6312,6 @@ public class ChipClusters {
     private native void readTestEventTriggersEnabledAttribute(long chipClusterPtr, BooleanAttributeCallback callback);
 
     private native void subscribeTestEventTriggersEnabledAttribute(long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
-
-    private native void readAverageWearCountAttribute(long chipClusterPtr, LongAttributeCallback callback);
-
-    private native void subscribeAverageWearCountAttribute(long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 

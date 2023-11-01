@@ -186,8 +186,7 @@
             "RebootCount",
             "UpTime",
             "TotalOperationalHours",
-            "BootReason",
-            "AverageWearCount"
+            "BootReason"
         ],
         "Group Key Management": [
             "ClusterRevision",

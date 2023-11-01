@@ -1786,7 +1786,6 @@ client cluster GeneralDiagnostics = 51 {
   readonly attribute optional RadioFaultEnum activeRadioFaults[] = 6;
   readonly attribute optional NetworkFaultEnum activeNetworkFaults[] = 7;
   readonly attribute boolean testEventTriggersEnabled = 8;
-  readonly attribute optional int32u averageWearCount = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

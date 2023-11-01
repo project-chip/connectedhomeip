@@ -3066,7 +3066,6 @@ private:
 | * ActiveRadioFaults                                                 | 0x0006 |
 | * ActiveNetworkFaults                                               | 0x0007 |
 | * TestEventTriggersEnabled                                          | 0x0008 |
-| * AverageWearCount                                                  | 0x0009 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -13520,7 +13519,6 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         make_unique<ReadAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "test-event-triggers-enabled", Attributes::TestEventTriggersEnabled::Id,
                                    credsIssuerConfig),                                                                     //
-        make_unique<ReadAttribute>(Id, "average-wear-count", Attributes::AverageWearCount::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -13551,8 +13549,6 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
             Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "test-event-triggers-enabled", 0, 1, Attributes::TestEventTriggersEnabled::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "average-wear-count", 0, UINT32_MAX, Attributes::AverageWearCount::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -13577,7 +13573,6 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "test-event-triggers-enabled", Attributes::TestEventTriggersEnabled::Id,
                                         credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "average-wear-count", Attributes::AverageWearCount::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //

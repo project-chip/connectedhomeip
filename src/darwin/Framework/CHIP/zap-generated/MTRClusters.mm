@@ -4516,11 +4516,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAverageWearCountWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAverageWearCountID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeGeneratedCommandListID) params:params];
