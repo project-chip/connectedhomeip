@@ -18,10 +18,10 @@
 
 #include "OTAProviderDelegateBridge.h"
 
+#include <app/clusters/ota-provider/ota-provider.h>
 #include <app/data-model/List.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <app/clusters/ota-provider/ota-provider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -48,7 +48,8 @@ OTAProviderDelegateBridge::~OTAProviderDelegateBridge()
 {
     mBdxOTASender->ResetState();
     Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, nullptr);
-    if (mOtaProviderDelegate != nullptr) {
+    if (mOtaProviderDelegate != nullptr)
+    {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
         env->DeleteGlobalRef(mOtaProviderDelegate);
@@ -85,10 +86,11 @@ void OTAProviderDelegateBridge::sendOTAQueryFailure(uint8_t status)
 {
     VerifyOrReturn(mOtaProviderDelegate != nullptr, ChipLogError(Controller, "mOtaProviderDelegate is null"));
 
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jmethodID handleOTAQueryFailureMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mOtaProviderDelegate, "handleOTAQueryFailure", "(I)V", &handleOTAQueryFailureMethod);
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mOtaProviderDelegate, "handleOTAQueryFailure", "(I)V",
+                                                             &handleOTAQueryFailureMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find handleOTAQueryFailure method"));
 
     env->CallVoidMethod(mOtaProviderDelegate, handleOTAQueryFailureMethod, static_cast<jint>(status));
@@ -101,35 +103,39 @@ void OTAProviderDelegateBridge::sendOTAQueryFailure(uint8_t status)
     }
     return;
 }
-void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const QueryImage::DecodableType & commandData)
+void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                 const QueryImage::DecodableType & commandData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     assertChipStackLockedByCurrentThread();
 
-    VerifyOrReturn(mOtaProviderDelegate != nullptr, commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
+    VerifyOrReturn(mOtaProviderDelegate != nullptr,
+                   commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
     VerifyOrReturn(mBdxOTASender != nullptr, commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
 
     NodeId nodeId = commandObj->GetSubjectDescriptor().subject;
 
     FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
-    ScopedNodeId ourNodeId = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetLocalScopedNodeId();
+    ScopedNodeId ourNodeId  = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetLocalScopedNodeId();
 
-    VendorId vendorId = commandData.vendorID;
-    uint16_t productId = commandData.productID;
-    uint32_t softwareVersion = commandData.softwareVersion;
+    VendorId vendorId                                                = commandData.vendorID;
+    uint16_t productId                                               = commandData.productID;
+    uint32_t softwareVersion                                         = commandData.softwareVersion;
     DataModel::DecodableList<OTADownloadProtocol> protocolsSupported = commandData.protocolsSupported;
-    Optional<uint16_t> hardwareVersion = commandData.hardwareVersion;
-    Optional<chip::CharSpan> location = commandData.location;
-    Optional<bool> requestorCanConsent = commandData.requestorCanConsent;
-    Optional<chip::ByteSpan> metadataForProvider = commandData.metadataForProvider;
+    Optional<uint16_t> hardwareVersion                               = commandData.hardwareVersion;
+    Optional<chip::CharSpan> location                                = commandData.location;
+    Optional<bool> requestorCanConsent                               = commandData.requestorCanConsent;
+    Optional<chip::ByteSpan> metadataForProvider                     = commandData.metadataForProvider;
 
     bool isBDXProtocolSupported = false;
 
     auto iterator = commandData.protocolsSupported.begin();
-    while (iterator.Next()) {
+    while (iterator.Next())
+    {
         OTADownloadProtocol protocol = iterator.GetValue();
-        if (protocol == OTADownloadProtocol::kBDXSynchronous) {
+        if (protocol == OTADownloadProtocol::kBDXSynchronous)
+        {
             isBDXProtocolSupported = true;
             break;
         }
@@ -146,7 +152,8 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     // Available
 
     // If the protocol requested is not supported, return status - Protocol Not Supported
-    if (!isBDXProtocolSupported) {
+    if (!isBDXProtocolSupported)
+    {
         Commands::QueryImageResponse::Type response;
         response.status = OTAQueryStatus::kDownloadProtocolNotSupported;
         commandObj->AddResponse(cachedCommandPath, response);
@@ -154,17 +161,20 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
         return;
     }
 
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jmethodID handleQueryImageMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mOtaProviderDelegate, "handleQueryImage", "(IIJLjava/lang/Integer;Ljava/lang/String;Ljava/lang/Boolean;[B)Lchip/devicecontroller/OTAProviderDelegate$QueryImageResponse;",
+    err = JniReferences::GetInstance().FindMethod(env, mOtaProviderDelegate, "handleQueryImage",
+                                                  "(IIJLjava/lang/Integer;Ljava/lang/String;Ljava/lang/Boolean;[B)Lchip/"
+                                                  "devicecontroller/OTAProviderDelegate$QueryImageResponse;",
                                                   &handleQueryImageMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find handleQueryImage method"));
 
     jobject boxedHardwareVersion = nullptr;
     if (hardwareVersion.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", static_cast<jint>(hardwareVersion.Value()), boxedHardwareVersion);
+        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+            "java/lang/Integer", "(I)V", static_cast<jint>(hardwareVersion.Value()), boxedHardwareVersion);
     }
     jobject boxedLocation = nullptr;
     if (location.HasValue())
@@ -174,7 +184,8 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     jobject boxedRequestorCanConsent = nullptr;
     if (requestorCanConsent.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>("java/lang/Boolean", "(Z)V", requestorCanConsent.Value() ? JNI_TRUE : JNI_FALSE, boxedRequestorCanConsent);
+        chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+            "java/lang/Boolean", "(Z)V", requestorCanConsent.Value() ? JNI_TRUE : JNI_FALSE, boxedRequestorCanConsent);
     }
     jobject boxedMetadataForProvider = nullptr;
     if (metadataForProvider.HasValue())
@@ -185,7 +196,10 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
         boxedMetadataForProvider = boxedMetadataForProviderByteArray;
     }
 
-    jobject jResponse = env->CallObjectMethod(mOtaProviderDelegate, handleQueryImageMethod, static_cast<jint>(vendorId), static_cast<jint>(productId), static_cast<jlong>(softwareVersion), boxedHardwareVersion, boxedLocation, boxedRequestorCanConsent, boxedMetadataForProvider);
+    jobject jResponse =
+        env->CallObjectMethod(mOtaProviderDelegate, handleQueryImageMethod, static_cast<jint>(vendorId),
+                              static_cast<jint>(productId), static_cast<jlong>(softwareVersion), boxedHardwareVersion,
+                              boxedLocation, boxedRequestorCanConsent, boxedMetadataForProvider);
     if (env->ExceptionCheck())
     {
         ChipLogError(Support, "Exception in call java method");
@@ -198,7 +212,8 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
 
     Commands::QueryImageResponse::Type response;
     // If update is not available, return the delegate response
-    if (!hasUpdate) {
+    if (!hasUpdate)
+    {
         response.status = OTAQueryStatus::kNotAvailable;
         commandObj->AddResponse(cachedCommandPath, response);
         sendOTAQueryFailure(static_cast<uint8_t>(response.status));
@@ -206,20 +221,22 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     }
 
     jmethodID getSoftwareVersionMethod;
-    err = JniReferences::GetInstance().FindMethod(env, jResponse, "getSoftwareVersion", "()Ljava/lang/Long;", &getSoftwareVersionMethod);
+    err = JniReferences::GetInstance().FindMethod(env, jResponse, "getSoftwareVersion", "()Ljava/lang/Long;",
+                                                  &getSoftwareVersionMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find getSoftwareVersion method"));
 
     jmethodID getSoftwareVersionStringMethod;
-    err = JniReferences::GetInstance().FindMethod(env, jResponse, "getSoftwareVersionString", "()Ljava/lang/String;", &getSoftwareVersionStringMethod);
+    err = JniReferences::GetInstance().FindMethod(env, jResponse, "getSoftwareVersionString", "()Ljava/lang/String;",
+                                                  &getSoftwareVersionStringMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find getSoftwareVersionString method"));
 
     jmethodID getFilePathMethod;
     err = JniReferences::GetInstance().FindMethod(env, jResponse, "getFilePath", "()Ljava/lang/String;", &getFilePathMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find getFilePath method"));
 
-    jobject jSoftwareVersion = env->CallObjectMethod(jResponse, getSoftwareVersionMethod);
+    jobject jSoftwareVersion       = env->CallObjectMethod(jResponse, getSoftwareVersionMethod);
     jstring jSoftwareVersionString = (jstring) env->CallObjectMethod(jResponse, getSoftwareVersionStringMethod);
-    jstring jFilePath = (jstring) env->CallObjectMethod(jResponse, getFilePathMethod);
+    jstring jFilePath              = (jstring) env->CallObjectMethod(jResponse, getFilePathMethod);
 
     response.status = OTAQueryStatus::kUpdateAvailable;
     if (jSoftwareVersion != nullptr)
@@ -245,9 +262,9 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     if (CHIP_NO_ERROR != err)
     {
         // Handle busy error separately as we have a query image response status that maps to busy
-        if (err == CHIP_ERROR_BUSY) {
-            ChipLogError(
-                Controller, "Responding with Busy due to being in the middle of handling another BDX transfer");
+        if (err == CHIP_ERROR_BUSY)
+        {
+            ChipLogError(Controller, "Responding with Busy due to being in the middle of handling another BDX transfer");
             Commands::QueryImageResponse::Type errorResponse;
             errorResponse.status = OTAQueryStatus::kBusy;
             errorResponse.delayedActionTime.SetValue(kDelayedActionTimeSeconds);
@@ -271,7 +288,8 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     char uriBuffer[kMaxBDXURILen];
     MutableCharSpan uri(uriBuffer);
     err = bdx::MakeURI(ourNodeId.GetNodeId(), jniFilePath.c_str() != nullptr ? jniFilePath.charSpan() : CharSpan(), uri);
-    if (CHIP_NO_ERROR != err) {
+    if (CHIP_NO_ERROR != err)
+    {
         LogErrorOnFailure(err);
         commandObj->AddStatus(cachedCommandPath, StatusIB(err).mStatus);
         mBdxOTASender->ResetState();
@@ -281,24 +299,28 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     commandObj->AddResponse(cachedCommandPath, response);
 }
 
-void OTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const ApplyUpdateRequest::DecodableType & commandData)
+void OTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                         const ApplyUpdateRequest::DecodableType & commandData)
 {
     assertChipStackLockedByCurrentThread();
 
-    VerifyOrReturn(mOtaProviderDelegate != nullptr, commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
+    VerifyOrReturn(mOtaProviderDelegate != nullptr,
+                   commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
 
     NodeId nodeId = commandObj->GetSubjectDescriptor().subject;
 
     ConcreteCommandPath cachedCommandPath(commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
 
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jmethodID handleApplyUpdateRequestMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mOtaProviderDelegate, "handleApplyUpdateRequest", "(JJ)Lchip/devicecontroller/OTAProviderDelegate$ApplyUpdateResponse;",
-                                                  &handleApplyUpdateRequestMethod);
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mOtaProviderDelegate, "handleApplyUpdateRequest",
+                                                             "(JJ)Lchip/devicecontroller/OTAProviderDelegate$ApplyUpdateResponse;",
+                                                             &handleApplyUpdateRequestMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find handleApplyUpdateRequest method"));
 
-    jobject jResponse = env->CallObjectMethod(mOtaProviderDelegate, handleApplyUpdateRequestMethod, static_cast<jlong>(nodeId), static_cast<jlong>(commandData.newVersion));
+    jobject jResponse = env->CallObjectMethod(mOtaProviderDelegate, handleApplyUpdateRequestMethod, static_cast<jlong>(nodeId),
+                                              static_cast<jlong>(commandData.newVersion));
     if (env->ExceptionCheck())
     {
         ChipLogError(Support, "Exception in call java method");
@@ -315,16 +337,17 @@ void OTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * comman
     err = JniReferences::GetInstance().FindMethod(env, jResponse, "getDelayedActionTime", "()J", &getDelayedActionTimeMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find getDelayedActionTime method"));
 
-    jint jAction = env->CallIntMethod(jResponse, getActionMethod);
+    jint jAction             = env->CallIntMethod(jResponse, getActionMethod);
     jlong jDelayedActionTime = env->CallLongMethod(jResponse, getDelayedActionTimeMethod);
 
     Commands::ApplyUpdateResponse::Type response;
-    response.action = static_cast<OTAApplyUpdateAction>(jAction);
+    response.action            = static_cast<OTAApplyUpdateAction>(jAction);
     response.delayedActionTime = static_cast<uint32_t>(jDelayedActionTime);
     commandObj->AddResponse(cachedCommandPath, response);
 }
 
-void OTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const NotifyUpdateApplied::DecodableType & commandData)
+void OTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                          const NotifyUpdateApplied::DecodableType & commandData)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -332,11 +355,11 @@ void OTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * comma
 
     ConcreteCommandPath cachedCommandPath(commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
 
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jmethodID handleNotifyUpdateAppliedMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mOtaProviderDelegate, "handleNotifyUpdateApplied", "(J)V",
-                                                  &handleNotifyUpdateAppliedMethod);
+                                                             &handleNotifyUpdateAppliedMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find handleNotifyUpdateApplied method"));
 
     env->CallVoidMethod(mOtaProviderDelegate, handleNotifyUpdateAppliedMethod, static_cast<jlong>(nodeId));

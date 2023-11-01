@@ -240,7 +240,7 @@ private:
     AttestationTrustStoreBridge * mAttestationTrustStoreBridge                = nullptr;
     chip::Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
 #if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
-    OTAProviderDelegateBridge *mOtaProviderBridge = nullptr;
+    OTAProviderDelegateBridge * mOtaProviderBridge = nullptr;
 #endif
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,

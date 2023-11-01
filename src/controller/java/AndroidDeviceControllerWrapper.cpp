@@ -515,7 +515,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::StartOTAProvider(jobject otaProviderD
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     OTAProviderDelegateBridge * otaProviderBridge = new OTAProviderDelegateBridge(otaProviderDelegate);
-    auto systemState = DeviceControllerFactory::GetInstance().GetSystemState();
+    auto systemState                              = DeviceControllerFactory::GetInstance().GetSystemState();
 
     VerifyOrExit(otaProviderBridge != nullptr, err = CHIP_ERROR_NO_MEMORY);
 

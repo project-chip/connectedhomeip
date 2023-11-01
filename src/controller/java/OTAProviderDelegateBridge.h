@@ -18,8 +18,8 @@
 #pragma once
 
 #include <jni.h>
-#include <lib/core/NodeId.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/NodeId.h>
 
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 
@@ -40,22 +40,28 @@ public:
      * Called to handle a QueryImage command and is responsible for sending the response (if success) or status (if error). The
      * caller is responsible for validating fields in the command.
      */
-    void HandleQueryImage(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData) override;
+    void HandleQueryImage(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData) override;
     /**
      * Called to handle an ApplyUpdateRequest command and is responsible for sending the response (if success) or status (if error).
      * The caller is responsible for validating fields in the command.
      */
-    void HandleApplyUpdateRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData) override;
+    void HandleApplyUpdateRequest(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData) override;
     /**
      * Called to handle a NotifyUpdateApplied command and is responsible for sending the status. The caller is responsible for
      * validating fields in the command.
      */
-    void HandleNotifyUpdateApplied(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) override;
+    void HandleNotifyUpdateApplied(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) override;
 
 private:
     void sendOTAQueryFailure(uint8_t status);
 
-    jobject mOtaProviderDelegate = nullptr;
+    jobject mOtaProviderDelegate                = nullptr;
     std::unique_ptr<BdxOTASender> mBdxOTASender = nullptr;
 
     uint8_t mToken[kUpdateTokenLen];

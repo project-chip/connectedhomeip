@@ -36,9 +36,9 @@ constexpr uint32_t kMaxBdxBlockSize = 1024;
 // we just double the timeout to give enough time for the BDX init to come in a reasonable amount of time.
 constexpr System::Clock::Timeout kBdxInitReceivedTimeout = System::Clock::Seconds16(10 * 60);
 
-constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
+constexpr System::Clock::Timeout kBdxTimeout        = System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
 constexpr System::Clock::Timeout kBdxPollIntervalMs = System::Clock::Milliseconds32(50);
-constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
+constexpr bdx::TransferRole kBdxRole                = bdx::TransferRole::kSender;
 
 CHIP_ERROR BdxOTASender::PrepareForTransfer(FabricIndex fabricIndex, NodeId nodeId)
 {
@@ -89,27 +89,33 @@ CHIP_ERROR BdxOTASender::Shutdown()
 void BdxOTASender::ResetState()
 {
     assertChipStackLockedByCurrentThread();
-    if (mNodeId != kUndefinedNodeId && mFabricIndex != kUndefinedFabricIndex) {
+    if (mNodeId != kUndefinedNodeId && mFabricIndex != kUndefinedFabricIndex)
+    {
         ChipLogProgress(Controller,
-            "Resetting state for OTA Provider; no longer providing an update for node id 0x" ChipLogFormatX64
-            ", fabric index %u",
-            ChipLogValueX64(mNodeId), mFabricIndex);
-    } else {
+                        "Resetting state for OTA Provider; no longer providing an update for node id 0x" ChipLogFormatX64
+                        ", fabric index %u",
+                        ChipLogValueX64(mNodeId), mFabricIndex);
+    }
+    else
+    {
         ChipLogProgress(Controller, "Resetting state for OTA Provider");
     }
-    if (mSystemLayer) {
+    if (mSystemLayer)
+    {
         mSystemLayer->CancelTimer(HandleBdxInitReceivedTimeoutExpired, this);
     }
     // TODO: Check if this can be removed. It seems like we can close the exchange context and reset transfer regardless.
-    if (!mInitialized) {
+    if (!mInitialized)
+    {
         return;
     }
     Responder::ResetTransfer();
     ++mTransferGeneration;
     mFabricIndex = kUndefinedFabricIndex;
-    mNodeId = kUndefinedNodeId;
+    mNodeId      = kUndefinedNodeId;
 
-    if (mExchangeCtx != nullptr) {
+    if (mExchangeCtx != nullptr)
+    {
         mExchangeCtx->Close();
         mExchangeCtx = nullptr;
     }
@@ -128,20 +134,24 @@ CHIP_ERROR BdxOTASender::OnMessageToSend(TransferSession::OutputEvent & event)
 
     // All messages sent from the Sender expect a response, except for a StatusReport which would indicate an error and
     // the end of the transfer.
-    if (!event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport)) {
+    if (!event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
+    {
         sendFlags.Set(Messaging::SendMessageFlags::kExpectResponse);
     }
 
     auto & msgTypeData = event.msgTypeData;
     // If there's an error sending the message, close the exchange and call ResetState.
     // TODO: If we can remove the !mInitialized check in ResetState(), just calling ResetState() will suffice here.
-    CHIP_ERROR err
-        = mExchangeCtx->SendMessage(msgTypeData.ProtocolId, msgTypeData.MessageType, std::move(event.MsgData), sendFlags);
-    if (err != CHIP_NO_ERROR) {
+    CHIP_ERROR err =
+        mExchangeCtx->SendMessage(msgTypeData.ProtocolId, msgTypeData.MessageType, std::move(event.MsgData), sendFlags);
+    if (err != CHIP_NO_ERROR)
+    {
         mExchangeCtx->Close();
         mExchangeCtx = nullptr;
         ResetState();
-    } else if (event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport)) {
+    }
+    else if (event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
+    {
         // If the send was successful for a status report, since we are not expecting a response the exchange context is
         // already closed. We need to null out the reference to avoid having a dangling pointer.
         mExchangeCtx = nullptr;
@@ -152,10 +162,12 @@ CHIP_ERROR BdxOTASender::OnMessageToSend(TransferSession::OutputEvent & event)
 
 bdx::StatusCode BdxOTASender::GetBdxStatusCodeFromChipError(CHIP_ERROR err)
 {
-    if (err == CHIP_ERROR_INCORRECT_STATE) {
+    if (err == CHIP_ERROR_INCORRECT_STATE)
+    {
         return bdx::StatusCode::kUnexpectedMessage;
     }
-    if (err == CHIP_ERROR_INVALID_ARGUMENT) {
+    if (err == CHIP_ERROR_INVALID_ARGUMENT)
+    {
         return bdx::StatusCode::kBadMessageContents;
     }
     return bdx::StatusCode::kUnknown;
@@ -165,7 +177,8 @@ CHIP_ERROR BdxOTASender::OnTransferSessionBegin(TransferSession::OutputEvent & e
 {
     assertChipStackLockedByCurrentThread();
     // Once we receive the BDX init, cancel the BDX Init timeout and start the BDX session
-    if (mSystemLayer) {
+    if (mSystemLayer)
+    {
         mSystemLayer->CancelTimer(HandleBdxInitReceivedTimeoutExpired, this);
     }
 
@@ -173,22 +186,23 @@ CHIP_ERROR BdxOTASender::OnTransferSessionBegin(TransferSession::OutputEvent & e
     VerifyOrReturnError(mNodeId != kUndefinedNodeId, CHIP_ERROR_INCORRECT_STATE);
     uint16_t fdl = 0;
 
-    const uint8_t *fd = mTransfer.GetFileDesignator(fdl);
+    const uint8_t * fd = mTransfer.GetFileDesignator(fdl);
     VerifyOrReturnError(fdl <= bdx::kMaxFileDesignatorLen, CHIP_ERROR_INVALID_ARGUMENT);
     CharSpan fileDesignatorSpan(Uint8::to_const_char(fd), fdl);
 
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     UtfString fileDesignator(env, fileDesignatorSpan);
 
     uint64_t offset = mTransfer.GetStartOffset();
 
     jmethodID handleBDXTransferSessionBeginMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mOtaDelegate, "handleBDXTransferSessionBegin", "(JLjava/lang/String;J)V",
-                                                  &handleBDXTransferSessionBeginMethod);
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mOtaDelegate, "handleBDXTransferSessionBegin",
+                                                             "(JLjava/lang/String;J)V", &handleBDXTransferSessionBeginMethod);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(Controller, "Could not find handleBDXTransferSessionBegin method"));
 
-    env->CallVoidMethod(mOtaDelegate, handleBDXTransferSessionBeginMethod, static_cast<jlong>(mNodeId), fileDesignator.jniValue(), static_cast<jlong>(offset));
+    env->CallVoidMethod(mOtaDelegate, handleBDXTransferSessionBeginMethod, static_cast<jlong>(mNodeId), fileDesignator.jniValue(),
+                        static_cast<jlong>(offset));
     if (env->ExceptionCheck())
     {
         ChipLogError(Support, "Exception in call java method");
@@ -198,10 +212,10 @@ CHIP_ERROR BdxOTASender::OnTransferSessionBegin(TransferSession::OutputEvent & e
     }
 
     TransferSession::TransferAcceptData acceptData;
-    acceptData.ControlMode = bdx::TransferControlFlags::kReceiverDrive;
+    acceptData.ControlMode  = bdx::TransferControlFlags::kReceiverDrive;
     acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
-    acceptData.StartOffset = mTransfer.GetStartOffset();
-    acceptData.Length = mTransfer.GetTransferLength();
+    acceptData.StartOffset  = mTransfer.GetStartOffset();
+    acceptData.Length       = mTransfer.GetTransferLength();
 
     LogErrorOnFailure(mTransfer.AcceptTransfer(acceptData));
 
@@ -217,20 +231,24 @@ CHIP_ERROR BdxOTASender::OnTransferSessionEnd(TransferSession::OutputEvent & eve
     VerifyOrReturnError(mOtaDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR error = CHIP_NO_ERROR;
-    if (event.EventType == TransferSession::OutputEventType::kTransferTimeout) {
+    if (event.EventType == TransferSession::OutputEventType::kTransferTimeout)
+    {
         error = CHIP_ERROR_TIMEOUT;
-    } else if (event.EventType != TransferSession::OutputEventType::kAckEOFReceived) {
+    }
+    else if (event.EventType != TransferSession::OutputEventType::kAckEOFReceived)
+    {
         error = CHIP_ERROR_INTERNAL;
     }
 
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jmethodID handleBDXTransferSessionEndMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mOtaDelegate, "handleBDXTransferSessionEnd", "(JJ)V",
-                                                  &handleBDXTransferSessionEndMethod);
+                                                             &handleBDXTransferSessionEndMethod);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(Controller, "Could not find handleBDXTransferSessionEnd method"));
 
-    env->CallVoidMethod(mOtaDelegate, handleBDXTransferSessionEndMethod, static_cast<jlong>(error.AsInteger()), static_cast<jlong>(mNodeId));
+    env->CallVoidMethod(mOtaDelegate, handleBDXTransferSessionEndMethod, static_cast<jlong>(error.AsInteger()),
+                        static_cast<jlong>(mNodeId));
     if (env->ExceptionCheck())
     {
         ChipLogError(Support, "Exception in call java method");
@@ -250,24 +268,27 @@ CHIP_ERROR BdxOTASender::OnBlockQuery(TransferSession::OutputEvent & event)
     VerifyOrReturnError(mFabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mNodeId != kUndefinedNodeId, CHIP_ERROR_INCORRECT_STATE);
 
-    uint16_t blockSize = mTransfer.GetTransferBlockSize();
+    uint16_t blockSize  = mTransfer.GetTransferBlockSize();
     uint32_t blockIndex = mTransfer.GetNextBlockNum();
 
     uint64_t bytesToSkip = 0;
-    if (event.EventType == TransferSession::OutputEventType::kQueryWithSkipReceived) {
+    if (event.EventType == TransferSession::OutputEventType::kQueryWithSkipReceived)
+    {
         bytesToSkip = event.bytesToSkip.BytesToSkip;
     }
 
     // uint64_t transferGeneration = mTransferGeneration;
 
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jmethodID handleBDXQueryMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mOtaDelegate, "handleBDXQuery", "(JIJJ)Lchip/devicecontroller/OTAProviderDelegate$BDXData;",
-                                                  &handleBDXQueryMethod);
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(
+        env, mOtaDelegate, "handleBDXQuery", "(JIJJ)Lchip/devicecontroller/OTAProviderDelegate$BDXData;", &handleBDXQueryMethod);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(Controller, "Could not find handleBDXQuery method"));
 
-    jobject bdxData = env->CallObjectMethod(mOtaDelegate, handleBDXQueryMethod, static_cast<jlong>(mNodeId), static_cast<jint>(blockSize), static_cast<jlong>(blockIndex), static_cast<jlong>(bytesToSkip));
+    jobject bdxData =
+        env->CallObjectMethod(mOtaDelegate, handleBDXQueryMethod, static_cast<jlong>(mNodeId), static_cast<jint>(blockSize),
+                              static_cast<jlong>(blockIndex), static_cast<jlong>(bytesToSkip));
     if (env->ExceptionCheck())
     {
         ChipLogError(Support, "Exception in call java method");
@@ -276,7 +297,8 @@ CHIP_ERROR BdxOTASender::OnBlockQuery(TransferSession::OutputEvent & event)
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
 
-    if (bdxData == nullptr) {
+    if (bdxData == nullptr)
+    {
         LogErrorOnFailure(mTransfer.AbortTransfer(bdx::StatusCode::kUnknown));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -301,17 +323,18 @@ CHIP_ERROR BdxOTASender::OnBlockQuery(TransferSession::OutputEvent & event)
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
     jbyteArray jData = (jbyteArray) env->CallObjectMethod(bdxData, getDataMethod);
-    jboolean jIsEOF = env->CallBooleanMethod(bdxData, isEOFMethod);
+    jboolean jIsEOF  = env->CallBooleanMethod(bdxData, isEOFMethod);
 
     JniByteArray data(env, jData);
 
     TransferSession::BlockData blockData;
-    blockData.Data = static_cast<const uint8_t *>(data.byteSpan().data());
+    blockData.Data   = static_cast<const uint8_t *>(data.byteSpan().data());
     blockData.Length = static_cast<size_t>(data.byteSpan().size());
-    blockData.IsEof = jIsEOF == JNI_TRUE;
+    blockData.IsEof  = jIsEOF == JNI_TRUE;
 
     err = mTransfer.PrepareBlock(blockData);
-    if (CHIP_NO_ERROR != err) {
+    if (CHIP_NO_ERROR != err)
+    {
         LogErrorOnFailure(err);
         LogErrorOnFailure(mTransfer.AbortTransfer(bdx::StatusCode::kUnknown));
     }
@@ -324,10 +347,12 @@ void BdxOTASender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
     VerifyOrReturn(mOtaDelegate != nullptr);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    switch (event.EventType) {
+    switch (event.EventType)
+    {
     case TransferSession::OutputEventType::kInitReceived:
         err = OnTransferSessionBegin(event);
-        if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR)
+        {
             LogErrorOnFailure(mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err)));
         }
         break;
@@ -364,7 +389,8 @@ CHIP_ERROR BdxOTASender::ConfigureState(chip::FabricIndex fabricIndex, chip::Nod
 {
     assertChipStackLockedByCurrentThread();
 
-    if (mInitialized) {
+    if (mInitialized)
+    {
         // Prevent a new node connection since another is active.
         VerifyOrReturnError(mFabricIndex == fabricIndex && mNodeId == nodeId, CHIP_ERROR_BUSY);
 
@@ -377,7 +403,7 @@ CHIP_ERROR BdxOTASender::ConfigureState(chip::FabricIndex fabricIndex, chip::Nod
     LogErrorOnFailure(err);
 
     mFabricIndex = fabricIndex;
-    mNodeId = nodeId;
+    mNodeId      = nodeId;
 
     mInitialized = true;
 

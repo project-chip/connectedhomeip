@@ -24,9 +24,9 @@
 
 constexpr uint32_t kMaxBDXURILen = 256;
 
-class BdxOTASender : public chip::bdx::Responder {
+class BdxOTASender : public chip::bdx::Responder
+{
 public:
-
     BdxOTASender(jobject otaDelegate) : mOtaDelegate(otaDelegate) {}
 
     ~BdxOTASender() {}
@@ -63,9 +63,9 @@ private:
 
     CHIP_ERROR ConfigureState(chip::FabricIndex fabricIndex, chip::NodeId nodeId);
 
-    bool mInitialized = false;
-    chip::FabricIndex mFabricIndex = chip::kUndefinedFabricIndex;
-    chip::NodeId mNodeId = chip::kUndefinedNodeId;
+    bool mInitialized                               = false;
+    chip::FabricIndex mFabricIndex                  = chip::kUndefinedFabricIndex;
+    chip::NodeId mNodeId                            = chip::kUndefinedNodeId;
     chip::Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
     jobject mOtaDelegate = nullptr;
