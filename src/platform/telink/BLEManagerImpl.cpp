@@ -180,7 +180,8 @@ CHIP_ERROR BLEManagerImpl::_Init(void)
 
 void BLEManagerImpl::_Shutdown()
 {
-    if (mBLERadioInitialized) {
+    if (mBLERadioInitialized)
+    {
         bt_disable();
         mBLERadioInitialized = false;
     }
