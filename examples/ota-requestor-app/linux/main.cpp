@@ -168,8 +168,11 @@ void CustomOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
     if (gSkipExecImageFile)
     {
         // Just waiting delay time
-        VerifyOrDie(SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), AppliedNotifyUpdateTimer, this) == CHIP_NO_ERROR);
-    } else {
+        VerifyOrDie(SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), AppliedNotifyUpdateTimer,
+                                             this) == CHIP_NO_ERROR);
+    }
+    else
+    {
         // Let the default driver take further action to apply the image.
         // All member variables will be implicitly reset upon loading into the new image.
         DefaultOTARequestorDriver::UpdateConfirmed(delay);
