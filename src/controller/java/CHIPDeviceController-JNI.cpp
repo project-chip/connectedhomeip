@@ -545,7 +545,7 @@ exit:
     }
 }
 
-JNI_METHOD(void, setOTAProviderDelegate)(JNIEnv * env, jobject self, jlong handle, jobject otaProviderDelegate)
+JNI_METHOD(void, startOTAProvider)(JNIEnv * env, jobject self, jlong handle, jobject otaProviderDelegate)
 {
 #if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     chip::DeviceLayer::StackLock lock;
@@ -554,19 +554,41 @@ JNI_METHOD(void, setOTAProviderDelegate)(JNIEnv * env, jobject self, jlong handl
 
     VerifyOrReturn(wrapper != nullptr, ChipLogError(Controller, "wrapper is null"));
 
-    ChipLogProgress(Controller, "setOTAProviderDelegate() called");
+    ChipLogProgress(Controller, "startOTAProvider() called");
 
     if (otaProviderDelegate != nullptr)
     {
         jobject otaProviderDelegateRef = env->NewGlobalRef(otaProviderDelegate);
-        err                            = wrapper->InitializeOTAProviderBridge(otaProviderDelegateRef);
+        err                            = wrapper->StartOTAProvider(otaProviderDelegateRef);
         SuccessOrExit(err);
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to set OTA Provider delegate.");
+        ChipLogError(Controller, "Failed to start OTA Provider.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+#endif
+}
+
+JNI_METHOD(void, finishOTAProvider)(JNIEnv * env, jobject self, jlong handle)
+{
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturn(wrapper != nullptr, ChipLogError(Controller, "wrapper is null"));
+
+    ChipLogProgress(Controller, "finishOTAProvider() called");
+
+    err = wrapper->FinishOTAProvider();
+    SuccessOrExit(err);
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to finish OTA Provider.");
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
 #endif

@@ -105,7 +105,6 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(Controller, "OTAProviderDelegateBridge-HandleQueryImage");
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturn(mOtaProviderDelegate != nullptr, commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
@@ -284,7 +283,6 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
 
 void OTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const ApplyUpdateRequest::DecodableType & commandData)
 {
-    ChipLogProgress(Controller, "OTAProviderDelegateBridge-HandleApplyUpdateRequest");
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturn(mOtaProviderDelegate != nullptr, commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
@@ -328,7 +326,6 @@ void OTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * comman
 
 void OTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const NotifyUpdateApplied::DecodableType & commandData)
 {
-    ChipLogProgress(Controller, "OTAProviderDelegateBridge-HandleNotifyUpdateApplied");
     assertChipStackLockedByCurrentThread();
 
     NodeId nodeId = commandObj->GetSubjectDescriptor().subject;

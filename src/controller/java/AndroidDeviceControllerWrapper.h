@@ -194,7 +194,9 @@ public:
 
     CHIP_ERROR UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate);
 
-    CHIP_ERROR InitializeOTAProviderBridge(jobject otaProviderDelegate);
+    CHIP_ERROR StartOTAProvider(jobject otaProviderDelegate);
+
+    CHIP_ERROR FinishOTAProvider();
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;

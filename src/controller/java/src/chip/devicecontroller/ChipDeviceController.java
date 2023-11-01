@@ -121,11 +121,20 @@ public class ChipDeviceController {
   }
 
   /**
+   * Set the delegate of OTA Provider for firmware Update
    *
-   * @param aOTAProviderDelegate
+   * @param aOTAProviderDelegate Delegate for OTA Provider
    */
-  public void setOTAProviderDelegate(OTAProviderDelegate aOTAProviderDelegate) {
-    setOTAProviderDelegate(deviceControllerPtr, aOTAProviderDelegate);
+  public void startOTAProvider(OTAProviderDelegate aOTAProviderDelegate) {
+    startOTAProvider(deviceControllerPtr, aOTAProviderDelegate);
+  }
+
+  /**
+   * Disable OTA Provider server cluster
+   *
+   */
+  public void finishOTAProvider() {
+    finishOTAProvider(deviceControllerPtr);
   }
 
   public void pairDevice(
@@ -1160,7 +1169,9 @@ public class ChipDeviceController {
   private native void setAttestationTrustStoreDelegate(
       long deviceControllerPtr, AttestationTrustStoreDelegate delegate);
 
-  private native void setOTAProviderDelegate(long deviceControllerPtr, OTAProviderDelegate delegate);
+  private native void startOTAProvider(long deviceControllerPtr, OTAProviderDelegate delegate);
+
+  private native void finishOTAProvider(long deviceControllerPtr);
 
   private native void pairDevice(
       long deviceControllerPtr,
