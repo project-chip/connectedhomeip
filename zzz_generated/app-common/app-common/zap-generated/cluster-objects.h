@@ -9793,7 +9793,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OperationalDatasetComponents
-namespace ActiveNetworkFaultsList {
+namespace ActiveNetworkFaults {
 struct TypeInfo
 {
     using Type          = chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum>;
@@ -9802,10 +9802,10 @@ struct TypeInfo
         const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveNetworkFaultsList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveNetworkFaults::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace ActiveNetworkFaultsList
+} // namespace ActiveNetworkFaults
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -9914,7 +9914,7 @@ struct TypeInfo
         Attributes::SecurityPolicy::TypeInfo::DecodableType securityPolicy;
         Attributes::ChannelPage0Mask::TypeInfo::DecodableType channelPage0Mask;
         Attributes::OperationalDatasetComponents::TypeInfo::DecodableType operationalDatasetComponents;
-        Attributes::ActiveNetworkFaultsList::TypeInfo::DecodableType activeNetworkFaultsList;
+        Attributes::ActiveNetworkFaults::TypeInfo::DecodableType activeNetworkFaults;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

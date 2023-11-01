@@ -4043,7 +4043,7 @@ public class ClusterIDMapping {
             SecurityPolicy(59L),
             ChannelPage0Mask(60L),
             OperationalDatasetComponents(61L),
-            ActiveNetworkFaultsList(62L),
+            ActiveNetworkFaults(62L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

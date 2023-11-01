@@ -1279,7 +1279,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable SecurityPolicy securityPolicy = 59;
   readonly attribute nullable octet_string<4> channelPage0Mask = 60;
   readonly attribute nullable OperationalDatasetComponents operationalDatasetComponents = 61;
-  readonly attribute NetworkFaultEnum activeNetworkFaultsList[] = 62;
+  readonly attribute NetworkFaultEnum activeNetworkFaults[] = 62;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1287,7 +1287,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  command ResetCounts(): DefaultSuccess = 0;
+  command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -2087,7 +2087,7 @@ endpoint 0 {
     callback attribute securityPolicy;
     callback attribute channelPage0Mask default = "0x0000";
     callback attribute operationalDatasetComponents;
-    callback attribute activeNetworkFaultsList;
+    callback attribute activeNetworkFaults;
     ram      attribute featureMap default = 0x000F;
     ram      attribute clusterRevision default = 1;
 

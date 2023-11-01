@@ -1332,7 +1332,7 @@ static BOOL AttributeIsSpecifiedInThreadNetworkDiagnosticsCluster(AttributeId aA
     case Attributes::OperationalDatasetComponents::Id: {
         return YES;
     }
-    case Attributes::ActiveNetworkFaultsList::Id: {
+    case Attributes::ActiveNetworkFaults::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

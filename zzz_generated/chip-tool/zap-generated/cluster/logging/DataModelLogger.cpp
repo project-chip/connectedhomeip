@@ -7066,10 +7066,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalDatasetComponents", 1, value);
         }
-        case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
+        case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaults::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ActiveNetworkFaultsList", 1, value);
+            return DataModelLogger::LogValue("ActiveNetworkFaults", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

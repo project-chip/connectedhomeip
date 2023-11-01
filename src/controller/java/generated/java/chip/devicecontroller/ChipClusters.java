@@ -6663,7 +6663,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
-    public interface ActiveNetworkFaultsListAttributeCallback {
+    public interface ActiveNetworkFaultsAttributeCallback {
       void onSuccess(List<Integer> value);
       void onError(Exception ex);
       default void onSubscriptionEstablished(long subscriptionId) {}
@@ -7313,14 +7313,14 @@ public class ChipClusters {
         subscribeOperationalDatasetComponentsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readActiveNetworkFaultsListAttribute(
-        ActiveNetworkFaultsListAttributeCallback callback) {
-        readActiveNetworkFaultsListAttribute(chipClusterPtr, callback);
+    public void readActiveNetworkFaultsAttribute(
+        ActiveNetworkFaultsAttributeCallback callback) {
+        readActiveNetworkFaultsAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeActiveNetworkFaultsListAttribute(
-        ActiveNetworkFaultsListAttributeCallback callback, int minInterval, int maxInterval) {
-        subscribeActiveNetworkFaultsListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeActiveNetworkFaultsAttribute(
+        ActiveNetworkFaultsAttributeCallback callback, int minInterval, int maxInterval) {
+        subscribeActiveNetworkFaultsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -7631,9 +7631,9 @@ public class ChipClusters {
 
     private native void subscribeOperationalDatasetComponentsAttribute(long chipClusterPtr, OperationalDatasetComponentsAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readActiveNetworkFaultsListAttribute(long chipClusterPtr, ActiveNetworkFaultsListAttributeCallback callback);
+    private native void readActiveNetworkFaultsAttribute(long chipClusterPtr, ActiveNetworkFaultsAttributeCallback callback);
 
-    private native void subscribeActiveNetworkFaultsListAttribute(long chipClusterPtr, ActiveNetworkFaultsListAttributeCallback callback, int minInterval, int maxInterval);
+    private native void subscribeActiveNetworkFaultsAttribute(long chipClusterPtr, ActiveNetworkFaultsAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
