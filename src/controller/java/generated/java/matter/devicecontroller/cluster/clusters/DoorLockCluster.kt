@@ -17,7 +17,7 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class DoorLockCluster(private val endpointId: UShort) {
   class GetWeekDayScheduleResponse(
@@ -54,7 +54,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     val userStatus: UInt?,
     val userType: UInt?,
     val credentialRule: UInt?,
-    val credentials: ArrayList<ChipStructs.DoorLockClusterCredentialStruct>?,
+    val credentials: List<DoorLockClusterCredentialStruct>?,
     val creatorFabricIndex: UByte?,
     val lastModifiedFabricIndex: UByte?,
     val nextUserIndex: UShort?
@@ -78,13 +78,13 @@ class DoorLockCluster(private val endpointId: UShort) {
 
   class DoorStateAttribute(val value: UInt?)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun lockDoor(PINCode: ByteArray?, timedInvokeTimeoutMs: Int? = null) {
     if (timedInvokeTimeoutMs != null) {
@@ -261,7 +261,7 @@ class DoorLockCluster(private val endpointId: UShort) {
 
   suspend fun setCredential(
     operationType: UInt,
-    credential: ChipStructs.DoorLockClusterCredentialStruct,
+    credential: DoorLockClusterCredentialStruct,
     credentialData: ByteArray,
     userIndex: UShort?,
     userStatus: UInt?,
@@ -276,7 +276,7 @@ class DoorLockCluster(private val endpointId: UShort) {
   }
 
   suspend fun getCredentialStatus(
-    credential: ChipStructs.DoorLockClusterCredentialStruct,
+    credential: DoorLockClusterCredentialStruct,
     timedInvokeTimeoutMs: Int? = null
   ): GetCredentialStatusResponse {
     if (timedInvokeTimeoutMs != null) {
@@ -287,7 +287,7 @@ class DoorLockCluster(private val endpointId: UShort) {
   }
 
   suspend fun clearCredential(
-    credential: ChipStructs.DoorLockClusterCredentialStruct?,
+    credential: DoorLockClusterCredentialStruct?,
     timedInvokeTimeoutMs: Int? = null
   ) {
     if (timedInvokeTimeoutMs != null) {

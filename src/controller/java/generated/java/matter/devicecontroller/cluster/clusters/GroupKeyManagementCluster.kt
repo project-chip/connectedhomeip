@@ -17,31 +17,27 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class GroupKeyManagementCluster(private val endpointId: UShort) {
-  class KeySetReadResponse(val groupKeySet: ChipStructs.GroupKeyManagementClusterGroupKeySetStruct)
+  class KeySetReadResponse(val groupKeySet: GroupKeyManagementClusterGroupKeySetStruct)
 
-  class KeySetReadAllIndicesResponse(val groupKeySetIDs: ArrayList<UShort>)
+  class KeySetReadAllIndicesResponse(val groupKeySetIDs: List<UShort>)
 
-  class GroupKeyMapAttribute(
-    val value: ArrayList<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct>
-  )
+  class GroupKeyMapAttribute(val value: List<GroupKeyManagementClusterGroupKeyMapStruct>)
 
-  class GroupTableAttribute(
-    val value: ArrayList<ChipStructs.GroupKeyManagementClusterGroupInfoMapStruct>
-  )
+  class GroupTableAttribute(val value: List<GroupKeyManagementClusterGroupInfoMapStruct>)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun keySetWrite(
-    groupKeySet: ChipStructs.GroupKeyManagementClusterGroupKeySetStruct,
+    groupKeySet: GroupKeyManagementClusterGroupKeySetStruct,
     timedInvokeTimeoutMs: Int? = null
   ) {
     if (timedInvokeTimeoutMs != null) {
@@ -90,14 +86,12 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeGroupKeyMapAttribute(
-    value: ArrayList<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct>
-  ) {
+  suspend fun writeGroupKeyMapAttribute(value: List<GroupKeyManagementClusterGroupKeyMapStruct>) {
     // Implementation needs to be added here
   }
 
   suspend fun writeGroupKeyMapAttribute(
-    value: ArrayList<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct>,
+    value: List<GroupKeyManagementClusterGroupKeyMapStruct>,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here

@@ -17,22 +17,20 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class TargetNavigatorCluster(private val endpointId: UShort) {
   class NavigateTargetResponse(val status: UInt, val data: String?)
 
-  class TargetListAttribute(
-    val value: ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct>
-  )
+  class TargetListAttribute(val value: List<TargetNavigatorClusterTargetInfoStruct>)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun navigateTarget(
     target: UByte,

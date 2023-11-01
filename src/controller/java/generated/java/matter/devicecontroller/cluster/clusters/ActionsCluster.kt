@@ -17,20 +17,20 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class ActionsCluster(private val endpointId: UShort) {
-  class ActionListAttribute(val value: ArrayList<ChipStructs.ActionsClusterActionStruct>)
+  class ActionListAttribute(val value: List<ActionsClusterActionStruct>)
 
-  class EndpointListsAttribute(val value: ArrayList<ChipStructs.ActionsClusterEndpointListStruct>)
+  class EndpointListsAttribute(val value: List<ActionsClusterEndpointListStruct>)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun instantAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
     if (timedInvokeTimeoutMs != null) {
