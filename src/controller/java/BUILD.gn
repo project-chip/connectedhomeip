@@ -63,7 +63,6 @@ shared_library("jni") {
   ]
 
   deps = [
-    "${chip_root}/src/controller/data_model",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib",
@@ -91,11 +90,15 @@ shared_library("jni") {
       "zap-generated/CHIPReadCallbacks.cpp",
     ]
 
-    deps += [ "${chip_root}/src/controller/data_model:java-jni-sources" ]
+    deps += [
+      "${chip_root}/src/controller/data_model",
+      "${chip_root}/src/controller/data_model:java-jni-sources",
+    ]
   }
 
   if (chip_build_controller_dynamic_server) {
     defines += [ "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER" ]
+    deps += [ "${chip_root}/src/controller:nodatamodel" ]
   }
 
   if (matter_enable_java_compilation) {
@@ -174,7 +177,7 @@ if (chip_link_tests) {
 }
 
 kotlin_library("tlv") {
-  output_name = "libCHIPTlv.jar"
+  output_name = "libMatterTlv.jar"
 
   sources = [
     "src/matter/tlv/Element.kt",
@@ -233,7 +236,7 @@ kotlin_library("tlv_read_write_test") {
 }
 
 kotlin_library("jsontlv") {
-  output_name = "libCHIPJson.jar"
+  output_name = "libMatterJson.jar"
 
   deps = [
     ":tlv",
@@ -325,9 +328,7 @@ kotlin_library("chipcluster") {
 
   deps = [ ":tlv" ]
 
-  sources = [ "src/chip/devicecontroller/cluster/TlvReaderExtension.kt" ]
-
-  sources += structs_sources
+  sources = structs_sources
   sources += eventstructs_sources
 
   kotlinc_flags = [ "-Xlint:deprecation" ]

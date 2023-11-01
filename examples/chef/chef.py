@@ -771,7 +771,7 @@ def main() -> int:
                 shell.run_cmd("make is")
         elif options.build_target == "telink":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/telink")
-            telink_build_cmds = ["west build"]
+            telink_build_cmds = ["west build -b tlsr9518adk80d"]
             if options.do_clean:
                 telink_build_cmds.append("-p always")
             if options.do_rpc:

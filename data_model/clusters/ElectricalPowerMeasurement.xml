@@ -1,0 +1,356 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0090" name="Electrical Power Measurement" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial Release"/>
+  </revisionHistory>
+  <classification hierarchy="base" role="application" picsCode="EMR" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="DIRC" name="DirectCurrent" summary="Measurement of direct current">
+      <optionalConform choice="a" more="true"/>
+    </feature>
+    <feature bit="1" code="ALTC" name="AlternatingCurrent" summary="Measurement of alternating current">
+      <optionalConform choice="a" more="true"/>
+    </feature>
+    <feature bit="2" code="THRP" name="ThreePhasePower" summary="Represents a three-phase connection">
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+    </feature>
+    <feature bit="3" code="HARM" name="Harmonics" summary="Measurement of AC harmonics">
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+    </feature>
+    <feature bit="4" code="PWRQ" name="PowerQuality" summary="Measurement of AC harmonic phases">
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="MeasurementTypeEnum">
+      <item value="0" name="Unspecified">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Voltage">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Current">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="ActivePower">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="RMSCurrent">
+        <mandatoryConform>
+          <feature name="ALTC"/>
+        </mandatoryConform>
+      </item>
+      <item value="5" name="RMSPower">
+        <mandatoryConform>
+          <feature name="ALTC"/>
+        </mandatoryConform>
+      </item>
+      <item value="6" name="ApparentPower">
+        <mandatoryConform>
+          <feature name="ALTC"/>
+        </mandatoryConform>
+      </item>
+      <item value="7" name="ReactivePower">
+        <mandatoryConform>
+          <feature name="ALTC"/>
+        </mandatoryConform>
+      </item>
+      <item value="8" name="Frequency">
+        <mandatoryConform>
+          <feature name="ALTC"/>
+        </mandatoryConform>
+      </item>
+      <item value="9" name="PowerFactor">
+        <mandatoryConform>
+          <feature name="ALTC"/>
+        </mandatoryConform>
+      </item>
+      <item value="10" name="LineCurrent">
+        <mandatoryConform>
+          <feature name="ALTC"/>
+        </mandatoryConform>
+      </item>
+      <item value="11" name="NeutralCurrent">
+        <mandatoryConform>
+          <feature name="THRP"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <enum name="PowerModeEnum">
+      <item value="0" name="Unspecified">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="DC"/>
+      <item value="2" name="AC"/>
+    </enum>
+    <struct name="HarmonicMeasurementStruct">
+      <field id="0" name="Order" type="uint8" default="1">
+        <access read="true"/>
+        <mandatoryConform/>
+        <constraint type="min" value="1"/>
+      </field>
+      <field id="1" name="Measurement" type="int32" default="null">
+        <access read="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="MeasurementAccuracyStruct">
+      <field id="0" name="MeasurementType" type="MeasurementTypeEnum">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Measured" type="bool" default="false">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="PercentTypical" type="percent100ths" default="0">
+        <access read="true"/>
+        <quality nullable="true"/>
+        <optionalConform choice="a"/>
+      </field>
+      <field id="3" name="FixedTypical" type="int64" default="0">
+        <access read="true"/>
+        <quality nullable="true"/>
+        <optionalConform choice="a"/>
+        <constraint type="min" value="0"/>
+      </field>
+      <field id="4" name="PercentMin" type="percent100ths" default="0">
+        <access read="true"/>
+        <optionalConform/>
+      </field>
+      <field id="4" name="FixedMin" type="int64" default="0">
+        <access read="true"/>
+        <optionalConform/>
+        <constraint type="min" value="0"/>
+      </field>
+      <field id="5" name="PercentMax" type="percent100ths" default="0">
+        <access read="true"/>
+        <optionalConform/>
+      </field>
+      <field id="5" name="FixedMax" type="int64" default="0">
+        <access read="true"/>
+        <optionalConform/>
+        <constraint type="min" value="0"/>
+      </field>
+    </struct>
+    <struct name="MeasurementRangeStruct">
+      <field id="0" name="MeasurementType" type="MeasurementTypeEnum" default="0">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Min" type="int64" default="null">
+        <access read="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="MinTimestamp" type="epoch-s" default="null">
+        <access read="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Max" type="int64" default="null">
+        <access read="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="MaxTimestamp" type="epoch-s" default="null">
+        <access read="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="PowerMode" type="PowerModeEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="Accuracy" type="list[MeasurementAccuracyStruct Type]">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="Ranges" type="list[MeasurementRangeStruct Type]">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0003" name="Voltage" type="int64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0004" name="Current" type="int64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0005" name="ActivePower" type="int64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0006" name="RMSCurrent" type="int64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="ALTC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0007" name="RMSPower" type="int64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="ALTC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0008" name="ApparentPower" type="int64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="ALTC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0009" name="ReactivePower" type="int64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="ALTC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x000a" name="Frequency" type="int64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="ALTC"/>
+      </mandatoryConform>
+      <constraint type="between" from="0" to="1000000"/>
+    </attribute>
+    <attribute id="0x000b" name="HarmonicCurrents" type="list[HarmonicMeasurementStruct Type]" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="HARM"/>
+      </mandatoryConform>
+      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x000c" name="HarmonicPhases" type="list[HarmonicMeasurementStruct Type]" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="PWRQ"/>
+      </mandatoryConform>
+      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x000d" name="PowerFactor" type="int64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <optionalConform/>
+      <constraint type="between" from="-10000" to="+10000"/>
+    </attribute>
+    <attribute id="0x000e" name="LineCurrent" type="int64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="ALTC"/>
+      </mandatoryConform>
+      <constraint type="min" value="0"/>
+    </attribute>
+    <attribute id="0x000f" name="NeutralCurrent" type="int64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="THRP"/>
+      </mandatoryConform>
+    </attribute>
+  </attributes>
+  <events>
+    <event id="0x00" name="MeasurementPeriodRange" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="MeasurementType" type="MeasurementTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="PeriodStart" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="PeriodEnd" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Min" type="int64">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="MinTimestamp" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="Max" type="int64">
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="MaxTimestamp" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+    </event>
+  </events>
+</cluster>

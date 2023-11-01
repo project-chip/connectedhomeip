@@ -990,6 +990,15 @@ static BOOL AttributeIsSpecifiedInNetworkCommissioningCluster(AttributeId aAttri
     case Attributes::LastConnectErrorValue::Id: {
         return YES;
     }
+    case Attributes::SupportedWiFiBands::Id: {
+        return YES;
+    }
+    case Attributes::SupportedThreadFeatures::Id: {
+        return YES;
+    }
+    case Attributes::ThreadVersion::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1069,9 +1078,6 @@ static BOOL AttributeIsSpecifiedInGeneralDiagnosticsCluster(AttributeId aAttribu
         return YES;
     }
     case Attributes::TestEventTriggersEnabled::Id: {
-        return YES;
-    }
-    case Attributes::AverageWearCount::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -1863,10 +1869,10 @@ static BOOL AttributeIsSpecifiedInICDManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::IcdManagement;
     switch (aAttributeId) {
-    case Attributes::IdleModeInterval::Id: {
+    case Attributes::IdleModeDuration::Id: {
         return YES;
     }
-    case Attributes::ActiveModeInterval::Id: {
+    case Attributes::ActiveModeDuration::Id: {
         return YES;
     }
     case Attributes::ActiveModeThreshold::Id: {
@@ -1879,6 +1885,12 @@ static BOOL AttributeIsSpecifiedInICDManagementCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::ClientsSupportedPerFabric::Id: {
+        return YES;
+    }
+    case Attributes::UserActiveModeTriggerHint::Id: {
+        return YES;
+    }
+    case Attributes::UserActiveModeTriggerInstruction::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2076,9 +2088,6 @@ static BOOL AttributeIsSpecifiedInRVCRunModeCluster(AttributeId aAttributeId)
     case Attributes::CurrentMode::Id: {
         return YES;
     }
-    case Attributes::StartUpMode::Id: {
-        return YES;
-    }
     case Attributes::OnMode::Id: {
         return YES;
     }
@@ -2113,9 +2122,6 @@ static BOOL AttributeIsSpecifiedInRVCCleanModeCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::CurrentMode::Id: {
-        return YES;
-    }
-    case Attributes::StartUpMode::Id: {
         return YES;
     }
     case Attributes::OnMode::Id: {
@@ -2374,6 +2380,81 @@ static BOOL AttributeIsSpecifiedInDishwasherAlarmCluster(AttributeId aAttributeI
         return YES;
     }
     case Attributes::Supported::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInMicrowaveOvenModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MicrowaveOvenMode;
+    switch (aAttributeId) {
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
+    case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInMicrowaveOvenControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MicrowaveOvenControl;
+    switch (aAttributeId) {
+    case Attributes::CookTime::Id: {
+        return YES;
+    }
+    case Attributes::PowerSetting::Id: {
+        return YES;
+    }
+    case Attributes::MinPower::Id: {
+        return YES;
+    }
+    case Attributes::MaxPower::Id: {
+        return YES;
+    }
+    case Attributes::PowerStep::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5639,6 +5720,12 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::DishwasherAlarm::Id: {
         return AttributeIsSpecifiedInDishwasherAlarmCluster(aAttributeId);
+    }
+    case Clusters::MicrowaveOvenMode::Id: {
+        return AttributeIsSpecifiedInMicrowaveOvenModeCluster(aAttributeId);
+    }
+    case Clusters::MicrowaveOvenControl::Id: {
+        return AttributeIsSpecifiedInMicrowaveOvenControlCluster(aAttributeId);
     }
     case Clusters::OperationalState::Id: {
         return AttributeIsSpecifiedInOperationalStateCluster(aAttributeId);

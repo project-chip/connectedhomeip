@@ -3472,7 +3472,7 @@ server cluster AudioOutput = 1291 {
 }
 
 server cluster ApplicationLauncher = 1292 {
-  enum ApplicationLauncherStatusEnum : ENUM8 {
+  enum StatusEnum : ENUM8 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
