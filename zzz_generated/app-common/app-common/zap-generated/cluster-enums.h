@@ -168,6 +168,7 @@ enum class Feature : uint32_t
 {
     kLighting          = 0x1,
     kDeadFrontBehavior = 0x2,
+    kOffOnly           = 0x4,
 };
 
 // Bitmap for OnOffControlBitmap
