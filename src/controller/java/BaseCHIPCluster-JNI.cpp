@@ -283,7 +283,7 @@ jobject decodeValueFromTLV(JNIEnv *env, chip::TLV::TLVReader * data);
 static CHIP_ERROR encodeTLVFromValue(JNIEnv *env, jobject jObject, chip::TLV::TLVWriter & writer, chip::TLV::Tag tag);
 
 jobject decodeValueFromTLV(JNIEnv *env, chip::TLV::TLVReader * data)
-{    
+{
     chip::TLV::TLVType dataTLVType = data->GetType();
     switch (dataTLVType) {
     case chip::TLV::kTLVType_SignedInteger: {
