@@ -210,7 +210,7 @@ void CommonCheckAbortAllButOneExchange(nlTestSuite * inSuite, TestContext & ctx,
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
         // If running as an ICD, increase waitTimeout to account for the polling interval
         waitTimeout += CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
-#endif 
+#endif
 
         // Account for the retry delay booster, so that we do not timeout our IO processing before the
         // retransmission failure is triggered.
