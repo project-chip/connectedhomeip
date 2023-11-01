@@ -909,28 +909,6 @@ public class ClusterWriteMapping {
     writeLaundryWasherControlsInteractionInfo.put("writeNumberOfRinsesAttribute", writeLaundryWasherControlsNumberOfRinsesAttributeInteractionInfo);
     writeAttributeMap.put("laundryWasherControls", writeLaundryWasherControlsInteractionInfo);
     Map<String, InteractionInfo> writeRvcRunModeInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeRvcRunModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo rvcRunModestartUpModeCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeRvcRunModeStartUpModeCommandParams.put(
-        "value",
-        rvcRunModestartUpModeCommandParameterInfo
-    );
-    InteractionInfo writeRvcRunModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.RvcRunModeCluster) cluster).writeStartUpModeAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeRvcRunModeStartUpModeCommandParams
-    );
-    writeRvcRunModeInteractionInfo.put("writeStartUpModeAttribute", writeRvcRunModeStartUpModeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeRvcRunModeOnModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo rvcRunModeonModeCommandParameterInfo =
         new CommandParameterInfo(
@@ -955,28 +933,6 @@ public class ClusterWriteMapping {
     writeRvcRunModeInteractionInfo.put("writeOnModeAttribute", writeRvcRunModeOnModeAttributeInteractionInfo);
     writeAttributeMap.put("rvcRunMode", writeRvcRunModeInteractionInfo);
     Map<String, InteractionInfo> writeRvcCleanModeInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeRvcCleanModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo rvcCleanModestartUpModeCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeRvcCleanModeStartUpModeCommandParams.put(
-        "value",
-        rvcCleanModestartUpModeCommandParameterInfo
-    );
-    InteractionInfo writeRvcCleanModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.RvcCleanModeCluster) cluster).writeStartUpModeAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeRvcCleanModeStartUpModeCommandParams
-    );
-    writeRvcCleanModeInteractionInfo.put("writeStartUpModeAttribute", writeRvcCleanModeStartUpModeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeRvcCleanModeOnModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo rvcCleanModeonModeCommandParameterInfo =
         new CommandParameterInfo(
@@ -1078,6 +1034,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("smokeCoAlarm", writeSmokeCoAlarmInteractionInfo);
     Map<String, InteractionInfo> writeDishwasherAlarmInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("dishwasherAlarm", writeDishwasherAlarmInteractionInfo);
+    Map<String, InteractionInfo> writeMicrowaveOvenControlInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("microwaveOvenControl", writeMicrowaveOvenControlInteractionInfo);
     Map<String, InteractionInfo> writeOperationalStateInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("operationalState", writeOperationalStateInteractionInfo);
     Map<String, InteractionInfo> writeRvcOperationalStateInteractionInfo = new LinkedHashMap<>();

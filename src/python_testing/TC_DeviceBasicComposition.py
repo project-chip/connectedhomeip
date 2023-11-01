@@ -31,8 +31,11 @@ import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
 from chip.clusters.Attribute import ValueDecodeFailure
-from matter_testing_support import AttributePathLocation, MatterBaseTest, async_test_body, default_matter_test_main
+from conformance_support import ConformanceDecision, conformance_allowed
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
+                                    async_test_body, default_matter_test_main)
 from mobly import asserts
+from spec_parsing_support import CommandType, build_xml_clusters
 
 
 def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
@@ -869,6 +872,129 @@ class TC_DeviceBasicComposition(MatterBaseTest):
 
         if problems or root_problems:
             self.fail_current_test("Problems with tags lists")
+
+    def test_spec_conformance(self):
+        success = True
+        # TODO: provisional needs to be an input parameter
+        allow_provisional = True
+        clusters, problems = build_xml_clusters()
+        self.problems = self.problems + problems
+        for id in sorted(list(clusters.keys())):
+            print(f'{id} 0x{id:02x}: {clusters[id].name}')
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster in endpoint.items():
+                if cluster_id not in clusters.keys():
+                    if (cluster_id & 0xFFFF_0000) != 0:
+                        # manufacturer cluster
+                        continue
+                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
+                    # TODO: update this from a warning once we have all the data
+                    self.record_warning(self.get_test_name(), location=location,
+                                        problem='Standard cluster found on device, but is not present in spec data')
+                    continue
+
+                # TODO: switch to use global FEATURE_MAP_ID etc. once the IDM-10.1 change is merged.
+                FEATURE_MAP_ID = 0xFFFC
+                ATTRIBUTE_LIST_ID = 0xFFFB
+                ACCEPTED_COMMAND_ID = 0xFFF9
+                GENERATED_COMMAND_ID = 0xFFF8
+
+                feature_map = cluster[FEATURE_MAP_ID]
+                attribute_list = cluster[ATTRIBUTE_LIST_ID]
+                all_command_list = cluster[ACCEPTED_COMMAND_ID] + cluster[GENERATED_COMMAND_ID]
+
+                # Feature conformance checking
+                feature_masks = [1 << i for i in range(32) if feature_map & (1 << i)]
+                for f in feature_masks:
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=FEATURE_MAP_ID)
+                    if f not in clusters[cluster_id].features.keys():
+                        self.record_error(self.get_test_name(), location=location, problem=f'Unknown feature with mask 0x{f:02x}')
+                        success = False
+                        continue
+                    xml_feature = clusters[cluster_id].features[f]
+                    conformance_decision = xml_feature.conformance(feature_map, attribute_list, all_command_list)
+                    if not conformance_allowed(conformance_decision, allow_provisional):
+                        self.record_error(self.get_test_name(), location=location,
+                                          problem=f'Disallowed feature with mask 0x{f:02x}')
+                        success = False
+                for feature_mask, xml_feature in clusters[cluster_id].features.items():
+                    conformance_decision = xml_feature.conformance(feature_map, attribute_list, all_command_list)
+                    if conformance_decision == ConformanceDecision.MANDATORY and feature_mask not in feature_masks:
+                        self.record_error(self.get_test_name(), location=location,
+                                          problem=f'Required feature with mask 0x{f:02x} is not present in feature map')
+                        success = False
+
+                # Attribute conformance checking
+                for attribute_id, attribute in cluster.items():
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                    if attribute_id not in clusters[cluster_id].attributes.keys():
+                        # TODO: Consolidate the range checks with IDM-10.1 once that lands
+                        if attribute_id <= 0x4FFF:
+                            # manufacturer attribute
+                            self.record_error(self.get_test_name(), location=location,
+                                              problem='Standard attribute found on device, but not in spec')
+                            success = False
+                        continue
+                    xml_attribute = clusters[cluster_id].attributes[attribute_id]
+                    conformance_decision = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
+                    if not conformance_allowed(conformance_decision, allow_provisional):
+                        location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                        self.record_error(self.get_test_name(), location=location,
+                                          problem=f'Attribute 0x{attribute_id:02x} is included, but is disallowed by conformance')
+                        success = False
+                for attribute_id, xml_attribute in clusters[cluster_id].attributes.items():
+                    conformance_decision = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
+                    if conformance_decision == ConformanceDecision.MANDATORY and attribute_id not in cluster.keys():
+                        location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                        self.record_error(self.get_test_name(), location=location,
+                                          problem=f'Attribute 0x{attribute_id:02x} is required, but is not present on the DUT')
+                        success = False
+
+                def check_spec_conformance_for_commands(command_type: CommandType) -> bool:
+                    success = True
+                    # TODO: once IDM-10.1 lands, use the globals
+                    global_attribute_id = 0xFFF9 if command_type == CommandType.ACCEPTED else 0xFFF8
+                    xml_commands_dict = clusters[cluster_id].accepted_commands if command_type == CommandType.ACCEPTED else clusters[cluster_id].generated_commands
+                    command_list = cluster[global_attribute_id]
+                    for command_id in command_list:
+                        location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=command_id)
+                        if command_id not in xml_commands_dict:
+                            # TODO: Consolidate range checks with IDM-10.1 once that lands
+                            if command_id <= 0xFF:
+                                # manufacturer command
+                                continue
+                            self.record_error(self.get_test_name(), location=location,
+                                              problem='Standard command found on device, but not in spec')
+                            success = False
+                            continue
+                        xml_command = xml_commands_dict[command_id]
+                        conformance_decision = xml_command.conformance(feature_map, attribute_list, all_command_list)
+                        if not conformance_allowed(conformance_decision, allow_provisional):
+                            self.record_error(self.get_test_name(), location=location,
+                                              problem=f'Command 0x{command_id:02x} is included, but disallowed by conformance')
+                            success = False
+                    for command_id, xml_command in xml_commands_dict.items():
+                        conformance_decision = xml_command.conformance(feature_map, attribute_list, all_command_list)
+                        if conformance_decision == ConformanceDecision.MANDATORY and command_id not in command_list:
+                            location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=command_id)
+                            self.record_error(self.get_test_name(), location=location,
+                                              problem=f'Command 0x{command_id:02x} is required, but is not present on the DUT')
+                            success = False
+                    return success
+
+                # Command conformance checking
+                cmd_success = check_spec_conformance_for_commands(CommandType.ACCEPTED)
+                success = False if not cmd_success else success
+                cmd_success = check_spec_conformance_for_commands(CommandType.GENERATED)
+                success = False if not cmd_success else success
+
+        # TODO: Add choice checkers
+
+        if not success:
+            # TODO: Right now, we have failures in all-cluster, so we can't fail this test and keep it in CI. For now, just log.
+            # Issue tracking: #29812
+            # self.fail_current_test("Problems with conformance")
+            logging.error("Problems found with conformance, this should turn into a test failure once #29812 is resolved")
 
 
 if __name__ == "__main__":

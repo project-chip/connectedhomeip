@@ -201,6 +201,8 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
                 mTimeZoneBuf[i].name.SetValue(span);
             }
         }
+        auto list = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>(mTimeZoneBuf, size);
+        mParams.SetTimeZone(list);
     }
 
     return CHIP_NO_ERROR;
@@ -271,12 +273,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             // Per the spec, we restart from after adding the NOC.
             return GetNextCommissioningStage(CommissioningStage::kSendNOC, lastErr);
         }
-        if (mParams.GetCheckForMatchingFabric())
-        {
-            return CommissioningStage::kCheckForMatchingFabric;
-        }
-        return CommissioningStage::kArmFailsafe;
-    case CommissioningStage::kCheckForMatchingFabric:
+        return CommissioningStage::kReadCommissioningInfo2;
+    case CommissioningStage::kReadCommissioningInfo2:
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
@@ -664,11 +662,37 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // Don't send DST unless the device says it needs it
             mNeedsDST = false;
             break;
-        case CommissioningStage::kCheckForMatchingFabric: {
-            chip::NodeId nodeId = report.Get<MatchingFabricInfo>().nodeId;
-            if (nodeId != kUndefinedNodeId)
+        case CommissioningStage::kReadCommissioningInfo2: {
+            bool shouldReadCommissioningInfo2 =
+                mParams.GetCheckForMatchingFabric() || (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore);
+            if (shouldReadCommissioningInfo2)
             {
-                mParams.SetRemoteNodeId(nodeId);
+                if (!report.Is<ReadCommissioningInfo2>())
+                {
+                    ChipLogError(
+                        Controller,
+                        "[BUG] Should read commissioning info (part 2), but report is not ReadCommissioningInfo2. THIS IS A BUG.");
+                }
+
+                ReadCommissioningInfo2 commissioningInfo = report.Get<ReadCommissioningInfo2>();
+
+                if (mParams.GetCheckForMatchingFabric())
+                {
+                    chip::NodeId nodeId = commissioningInfo.nodeId;
+                    if (nodeId != kUndefinedNodeId)
+                    {
+                        mParams.SetRemoteNodeId(nodeId);
+                    }
+                }
+
+                if (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
+                {
+                    if (commissioningInfo.isIcd)
+                    {
+                        mNeedIcdRegistraion = true;
+                        ChipLogDetail(Controller, "AutoCommissioner: Device is ICD");
+                    }
+                }
             }
             break;
         }
