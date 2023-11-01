@@ -240,3 +240,14 @@ restylers:
           - "**/*.py"
       interpreters:
           - python
+    - name:  jdt
+      # NOTE: jdt restyler REQUIRES a pom.xml
+      #       we created a basically empty such file in the chip project
+      #       root just for this purpose
+      image: 'restyled/restyler-jdt:v2.13.0'
+      command:
+        - formatter
+      arguments: []
+      include:
+        - 'src/app/zap-templates/zcl/data-model/**/*.xml'
+      interpreters: []
