@@ -86,6 +86,6 @@ limitations under the License.
     <event side="server" code="0x02" name="ConnectionStatus" priority="info" optional="true">
       <description>Indicate that a Node’s connection status to a Wi-Fi network has changed.</description>
       <field id="0" name="ConnectionStatus" type="ConnectionStatusEnum"/>
-    </event>                  
+    </event>
   </cluster>
 </configurator>
