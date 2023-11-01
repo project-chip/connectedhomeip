@@ -8146,7 +8146,6 @@ public class ClusterInfoMapping {
     }
   }
 
-<<<<<<< HEAD
   public static class DelegatedMicrowaveOvenModeClusterSupportedModesAttributeCallback implements ChipClusters.MicrowaveOvenModeCluster.SupportedModesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -8169,9 +8168,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedMicrowaveOvenModeClusterGeneratedCommandListAttributeCallback implements ChipClusters.MicrowaveOvenModeCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
-=======
-  public static class DelegatedMicrowaveOvenControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.MicrowaveOvenControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
->>>>>>> master
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -8192,11 +8188,7 @@ public class ClusterInfoMapping {
     }
   }
 
-<<<<<<< HEAD
   public static class DelegatedMicrowaveOvenModeClusterAcceptedCommandListAttributeCallback implements ChipClusters.MicrowaveOvenModeCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-=======
-  public static class DelegatedMicrowaveOvenControlClusterAcceptedCommandListAttributeCallback implements ChipClusters.MicrowaveOvenControlCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
->>>>>>> master
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -8217,11 +8209,7 @@ public class ClusterInfoMapping {
     }
   }
 
-<<<<<<< HEAD
   public static class DelegatedMicrowaveOvenModeClusterEventListAttributeCallback implements ChipClusters.MicrowaveOvenModeCluster.EventListAttributeCallback, DelegatedClusterCallback {
-=======
-  public static class DelegatedMicrowaveOvenControlClusterEventListAttributeCallback implements ChipClusters.MicrowaveOvenControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
->>>>>>> master
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -8242,11 +8230,91 @@ public class ClusterInfoMapping {
     }
   }
 
-<<<<<<< HEAD
   public static class DelegatedMicrowaveOvenModeClusterAttributeListAttributeCallback implements ChipClusters.MicrowaveOvenModeCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
-=======
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMicrowaveOvenControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.MicrowaveOvenControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMicrowaveOvenControlClusterAcceptedCommandListAttributeCallback implements ChipClusters.MicrowaveOvenControlCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMicrowaveOvenControlClusterEventListAttributeCallback implements ChipClusters.MicrowaveOvenControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedMicrowaveOvenControlClusterAttributeListAttributeCallback implements ChipClusters.MicrowaveOvenControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
->>>>>>> master
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -17186,15 +17254,13 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.DishwasherAlarmCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("dishwasherAlarm", dishwasherAlarmClusterInfo);
 
-<<<<<<< HEAD
     ClusterInfo microwaveOvenModeClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.MicrowaveOvenModeCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("microwaveOvenMode", microwaveOvenModeClusterInfo);
-=======
+
     ClusterInfo microwaveOvenControlClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.MicrowaveOvenControlCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("microwaveOvenControl", microwaveOvenControlClusterInfo);
->>>>>>> master
 
     ClusterInfo operationalStateClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.OperationalStateCluster(ptr, endpointId), new HashMap<>());
@@ -17433,11 +17499,8 @@ public class ClusterInfoMapping {
     destination.get("airQuality").combineCommands(source.get("airQuality"));
     destination.get("smokeCoAlarm").combineCommands(source.get("smokeCoAlarm"));
     destination.get("dishwasherAlarm").combineCommands(source.get("dishwasherAlarm"));
-<<<<<<< HEAD
     destination.get("microwaveOvenMode").combineCommands(source.get("microwaveOvenMode"));
-=======
     destination.get("microwaveOvenControl").combineCommands(source.get("microwaveOvenControl"));
->>>>>>> master
     destination.get("operationalState").combineCommands(source.get("operationalState"));
     destination.get("rvcOperationalState").combineCommands(source.get("rvcOperationalState"));
     destination.get("hepaFilterMonitoring").combineCommands(source.get("hepaFilterMonitoring"));
@@ -19913,11 +19976,10 @@ public class ClusterInfoMapping {
 
     commandMap.put("dishwasherAlarm", dishwasherAlarmClusterInteractionInfoMap);
 
-<<<<<<< HEAD
     Map<String, InteractionInfo> microwaveOvenModeClusterInteractionInfoMap = new LinkedHashMap<>();
 
     commandMap.put("microwaveOvenMode", microwaveOvenModeClusterInteractionInfoMap);
-=======
+
     Map<String, InteractionInfo> microwaveOvenControlClusterInteractionInfoMap = new LinkedHashMap<>();
 
     Map<String, CommandParameterInfo> microwaveOvenControlsetCookingParametersCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
@@ -19965,7 +20027,6 @@ public class ClusterInfoMapping {
     microwaveOvenControlClusterInteractionInfoMap.put("addMoreTime", microwaveOvenControladdMoreTimeInteractionInfo);
 
     commandMap.put("microwaveOvenControl", microwaveOvenControlClusterInteractionInfoMap);
->>>>>>> master
 
     Map<String, InteractionInfo> operationalStateClusterInteractionInfoMap = new LinkedHashMap<>();
 

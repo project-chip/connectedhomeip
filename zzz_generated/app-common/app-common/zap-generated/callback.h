@@ -457,21 +457,21 @@ void emberAfSmokeCoAlarmClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfDishwasherAlarmClusterInitCallback(chip::EndpointId endpoint);
 
-<<<<<<< HEAD
 /** @brief Microwave Oven Mode Cluster Init
-=======
-/** @brief Microwave Oven Control Cluster Init
->>>>>>> master
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-<<<<<<< HEAD
 void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpoint);
-=======
+
+/** @brief Microwave Oven Control Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfMicrowaveOvenControlClusterInitCallback(chip::EndpointId endpoint);
->>>>>>> master
 
 /** @brief Operational State Cluster Init
  *
@@ -4928,73 +4928,42 @@ void emberAfDishwasherAlarmClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfDishwasherAlarmClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-<<<<<<< HEAD
 // Microwave Oven Mode Cluster
 //
 
 /** @brief Microwave Oven Mode Cluster Server Init
-=======
-// Microwave Oven Control Cluster
-//
-
-/** @brief Microwave Oven Control Cluster Server Init
->>>>>>> master
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-<<<<<<< HEAD
 void emberAfMicrowaveOvenModeClusterServerInitCallback(chip::EndpointId endpoint);
 
 /** @brief Microwave Oven Mode Cluster Server Shutdown
-=======
-void emberAfMicrowaveOvenControlClusterServerInitCallback(chip::EndpointId endpoint);
-
-/** @brief Microwave Oven Control Cluster Server Shutdown
->>>>>>> master
  *
  * Server Shutdown
  *
  * @param endpoint    Endpoint that is being shutdown
  */
-<<<<<<< HEAD
 void MatterMicrowaveOvenModeClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Microwave Oven Mode Cluster Client Init
-=======
-void MatterMicrowaveOvenControlClusterServerShutdownCallback(chip::EndpointId endpoint);
-
-/** @brief Microwave Oven Control Cluster Client Init
->>>>>>> master
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-<<<<<<< HEAD
 void emberAfMicrowaveOvenModeClusterClientInitCallback(chip::EndpointId endpoint);
 
 /** @brief Microwave Oven Mode Cluster Server Attribute Changed
-=======
-void emberAfMicrowaveOvenControlClusterClientInitCallback(chip::EndpointId endpoint);
-
-/** @brief Microwave Oven Control Cluster Server Attribute Changed
->>>>>>> master
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-<<<<<<< HEAD
 void MatterMicrowaveOvenModeClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Microwave Oven Mode Cluster Server Pre Attribute Changed
-=======
-void MatterMicrowaveOvenControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Microwave Oven Control Cluster Server Pre Attribute Changed
->>>>>>> master
  *
  * Server Pre Attribute Changed
  *
@@ -5003,18 +4972,11 @@ void MatterMicrowaveOvenControlClusterServerAttributeChangedCallback(const chip:
  * @param size          Attribute size
  * @param value         Attribute value
  */
-<<<<<<< HEAD
 chip::Protocols::InteractionModel::Status
 MatterMicrowaveOvenModeClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                                 EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Microwave Oven Mode Cluster Client Pre Attribute Changed
-=======
-chip::Protocols::InteractionModel::Status MatterMicrowaveOvenControlClusterServerPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Microwave Oven Control Cluster Client Pre Attribute Changed
->>>>>>> master
  *
  * Client Pre Attribute Changed
  *
@@ -5023,42 +4985,101 @@ chip::Protocols::InteractionModel::Status MatterMicrowaveOvenControlClusterServe
  * @param size          Attribute size
  * @param value         Attribute value
  */
-<<<<<<< HEAD
 chip::Protocols::InteractionModel::Status
 MatterMicrowaveOvenModeClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                                 EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Microwave Oven Mode Cluster Server Tick
-=======
-chip::Protocols::InteractionModel::Status MatterMicrowaveOvenControlClusterClientPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Microwave Oven Control Cluster Server Tick
->>>>>>> master
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-<<<<<<< HEAD
 void emberAfMicrowaveOvenModeClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @brief Microwave Oven Mode Cluster Client Tick
-=======
-void emberAfMicrowaveOvenControlClusterServerTickCallback(chip::EndpointId endpoint);
-
-/** @brief Microwave Oven Control Cluster Client Tick
->>>>>>> master
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-<<<<<<< HEAD
 void emberAfMicrowaveOvenModeClusterClientTickCallback(chip::EndpointId endpoint);
-=======
+
+//
+// Microwave Oven Control Cluster
+//
+
+/** @brief Microwave Oven Control Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfMicrowaveOvenControlClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Microwave Oven Control Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterMicrowaveOvenControlClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Microwave Oven Control Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfMicrowaveOvenControlClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Microwave Oven Control Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterMicrowaveOvenControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Microwave Oven Control Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterMicrowaveOvenControlClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Microwave Oven Control Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterMicrowaveOvenControlClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Microwave Oven Control Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfMicrowaveOvenControlClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Microwave Oven Control Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
 void emberAfMicrowaveOvenControlClusterClientTickCallback(chip::EndpointId endpoint);
->>>>>>> master
 
 //
 // Operational State Cluster

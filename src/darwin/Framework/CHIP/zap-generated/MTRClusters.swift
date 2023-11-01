@@ -369,11 +369,14 @@ extension MTRClusterDishwasherAlarm {
 }
 
 @available(iOS, unavailable) @available(macOS, unavailable) @available(tvOS, unavailable) @available(watchOS, unavailable)
-<<<<<<< HEAD
 extension MTRClusterMicrowaveOvenMode {
-=======
+    public convenience init(device : MTRDevice, endpointID: UInt) {
+        self.init(device: device, endpointID: endpointID as NSNumber, queue: clusterQueue)!
+    }
+}
+
+@available(iOS, unavailable) @available(macOS, unavailable) @available(tvOS, unavailable) @available(watchOS, unavailable)
 extension MTRClusterMicrowaveOvenControl {
->>>>>>> master
     public convenience init(device : MTRDevice, endpointID: UInt) {
         self.init(device: device, endpointID: endpointID as NSNumber, queue: clusterQueue)!
     }

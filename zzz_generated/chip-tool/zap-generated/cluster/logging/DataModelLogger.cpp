@@ -8761,7 +8761,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-<<<<<<< HEAD
     case MicrowaveOvenMode::Id: {
         switch (path.mAttributeId)
         {
@@ -8777,7 +8776,38 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("CurrentMode", 1, value);
         }
         case MicrowaveOvenMode::Attributes::GeneratedCommandList::Id: {
-=======
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case MicrowaveOvenMode::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case MicrowaveOvenMode::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case MicrowaveOvenMode::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case MicrowaveOvenMode::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case MicrowaveOvenMode::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case MicrowaveOvenControl::Id: {
         switch (path.mAttributeId)
         {
@@ -8807,52 +8837,31 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("PowerStep", 1, value);
         }
         case MicrowaveOvenControl::Attributes::GeneratedCommandList::Id: {
->>>>>>> master
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-<<<<<<< HEAD
-        case MicrowaveOvenMode::Attributes::AcceptedCommandList::Id: {
-=======
         case MicrowaveOvenControl::Attributes::AcceptedCommandList::Id: {
->>>>>>> master
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-<<<<<<< HEAD
-        case MicrowaveOvenMode::Attributes::EventList::Id: {
-=======
         case MicrowaveOvenControl::Attributes::EventList::Id: {
->>>>>>> master
             chip::app::DataModel::DecodableList<chip::EventId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EventList", 1, value);
         }
-<<<<<<< HEAD
-        case MicrowaveOvenMode::Attributes::AttributeList::Id: {
-=======
         case MicrowaveOvenControl::Attributes::AttributeList::Id: {
->>>>>>> master
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-<<<<<<< HEAD
-        case MicrowaveOvenMode::Attributes::FeatureMap::Id: {
-=======
         case MicrowaveOvenControl::Attributes::FeatureMap::Id: {
->>>>>>> master
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-<<<<<<< HEAD
-        case MicrowaveOvenMode::Attributes::ClusterRevision::Id: {
-=======
         case MicrowaveOvenControl::Attributes::ClusterRevision::Id: {
->>>>>>> master
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);

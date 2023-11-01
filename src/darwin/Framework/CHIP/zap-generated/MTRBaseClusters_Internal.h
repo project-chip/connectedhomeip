@@ -220,11 +220,11 @@
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @end
 
-<<<<<<< HEAD
 @interface MTRBaseClusterMicrowaveOvenMode ()
-=======
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@end
+
 @interface MTRBaseClusterMicrowaveOvenControl ()
->>>>>>> master
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @end
 

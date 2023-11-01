@@ -1614,11 +1614,17 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace DishwasherAlarm
 
-<<<<<<< HEAD
 namespace MicrowaveOvenMode {
 namespace Attributes {
 
-=======
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace MicrowaveOvenMode
+
 namespace MicrowaveOvenControl {
 namespace Attributes {
 
@@ -1652,18 +1658,13 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace FeatureMap
 
->>>>>>> master
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
 } // namespace Attributes
-<<<<<<< HEAD
-} // namespace MicrowaveOvenMode
-=======
 } // namespace MicrowaveOvenControl
->>>>>>> master
 
 namespace OperationalState {
 namespace Attributes {

@@ -3025,7 +3025,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace DishwasherAlarm
 
-<<<<<<< HEAD
 namespace MicrowaveOvenMode {
 namespace Attributes {
 
@@ -3036,30 +3035,6 @@ static constexpr AttributeId Id = 0x00000000;
 namespace CurrentMode {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
-=======
-namespace MicrowaveOvenControl {
-namespace Attributes {
-
-namespace CookTime {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace CookTime
-
-namespace PowerSetting {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace PowerSetting
-
-namespace MinPower {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace MinPower
-
-namespace MaxPower {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace MaxPower
-
-namespace PowerStep {
-static constexpr AttributeId Id = 0x00000005;
-} // namespace PowerStep
->>>>>>> master
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3086,11 +3061,57 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-<<<<<<< HEAD
 } // namespace MicrowaveOvenMode
-=======
+
+namespace MicrowaveOvenControl {
+namespace Attributes {
+
+namespace CookTime {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CookTime
+
+namespace PowerSetting {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace PowerSetting
+
+namespace MinPower {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace MinPower
+
+namespace MaxPower {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace MaxPower
+
+namespace PowerStep {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace PowerStep
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
 } // namespace MicrowaveOvenControl
->>>>>>> master
 
 namespace OperationalState {
 namespace Attributes {

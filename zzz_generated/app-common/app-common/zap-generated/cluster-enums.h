@@ -1854,7 +1854,6 @@ enum class Feature : uint32_t
 };
 } // namespace DishwasherAlarm
 
-<<<<<<< HEAD
 namespace MicrowaveOvenMode {
 
 // Enum for ModeTag
@@ -1875,9 +1874,8 @@ enum class Feature : uint32_t
     kOnOff = 0x1,
 };
 } // namespace MicrowaveOvenMode
-=======
+
 namespace MicrowaveOvenControl {} // namespace MicrowaveOvenControl
->>>>>>> master
 
 namespace OperationalState {
 

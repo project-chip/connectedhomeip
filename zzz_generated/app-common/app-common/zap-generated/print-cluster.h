@@ -362,18 +362,17 @@
 #define CHIP_PRINTCLUSTER_DISHWASHER_ALARM_CLUSTER
 #endif
 
-<<<<<<< HEAD
 #if defined(ZCL_USING_MICROWAVE_OVEN_MODE_CLUSTER_SERVER) || defined(ZCL_USING_MICROWAVE_OVEN_MODE_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_MICROWAVE_OVEN_MODE_CLUSTER { chip::app::Clusters::MicrowaveOvenMode::Id, "Microwave Oven Mode" },
 #else
 #define CHIP_PRINTCLUSTER_MICROWAVE_OVEN_MODE_CLUSTER
-=======
+#endif
+
 #if defined(ZCL_USING_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_MICROWAVE_OVEN_CONTROL_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_MICROWAVE_OVEN_CONTROL_CLUSTER                                                                           \
     { chip::app::Clusters::MicrowaveOvenControl::Id, "Microwave Oven Control" },
 #else
 #define CHIP_PRINTCLUSTER_MICROWAVE_OVEN_CONTROL_CLUSTER
->>>>>>> master
 #endif
 
 #if defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_CLIENT)
@@ -733,11 +732,8 @@
     CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_DISHWASHER_ALARM_CLUSTER                                                                                     \
-<<<<<<< HEAD
     CHIP_PRINTCLUSTER_MICROWAVE_OVEN_MODE_CLUSTER                                                                                  \
-=======
     CHIP_PRINTCLUSTER_MICROWAVE_OVEN_CONTROL_CLUSTER                                                                               \
->>>>>>> master
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \

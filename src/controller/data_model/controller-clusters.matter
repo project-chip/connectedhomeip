@@ -3358,9 +3358,8 @@ client cluster DishwasherAlarm = 93 {
   command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
 }
 
-<<<<<<< HEAD
 /** Attributes and commands for selecting a mode from a list of supported options. */
-client cluster MicrowaveOvenMode = 94 {
+provisional client cluster MicrowaveOvenMode = 94 {
   enum ModeTag : enum16 {
     kNormal = 16384;
     kDefrost = 16385;
@@ -3383,7 +3382,14 @@ client cluster MicrowaveOvenMode = 94 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-=======
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** Attributes and commands for configuring the microwave oven control, and reporting cooking stats. */
 provisional client cluster MicrowaveOvenControl = 95 {
   readonly attribute elapsed_s cookTime = 1;
@@ -3391,15 +3397,12 @@ provisional client cluster MicrowaveOvenControl = 95 {
   readonly attribute optional int8u minPower = 3;
   readonly attribute optional int8u maxPower = 4;
   readonly attribute optional int8u powerStep = 5;
->>>>>>> master
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-<<<<<<< HEAD
-=======
 
   request struct SetCookingParametersRequest {
     optional int8u cookMode = 0;
@@ -3415,7 +3418,6 @@ provisional client cluster MicrowaveOvenControl = 95 {
   command SetCookingParameters(SetCookingParametersRequest): DefaultSuccess = 0;
   /** Add More Cooking Time */
   command AddMoreTime(AddMoreTimeRequest): DefaultSuccess = 1;
->>>>>>> master
 }
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */

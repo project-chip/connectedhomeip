@@ -18453,28 +18453,15 @@ class DishwasherAlarm(Cluster):
 
 
 @dataclass
-<<<<<<< HEAD
 class MicrowaveOvenMode(Cluster):
     id: typing.ClassVar[int] = 0x0000005E
-=======
-class MicrowaveOvenControl(Cluster):
-    id: typing.ClassVar[int] = 0x0000005F
->>>>>>> master
 
     @ChipUtility.classproperty
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-<<<<<<< HEAD
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[MicrowaveOvenMode.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000001, Type=uint),
-=======
-                ClusterObjectFieldDescriptor(Label="cookTime", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="powerSetting", Tag=0x00000002, Type=uint),
-                ClusterObjectFieldDescriptor(Label="minPower", Tag=0x00000003, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="maxPower", Tag=0x00000004, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="powerStep", Tag=0x00000005, Type=typing.Optional[uint]),
->>>>>>> master
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -18483,16 +18470,8 @@ class MicrowaveOvenControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-<<<<<<< HEAD
     supportedModes: 'typing.List[MicrowaveOvenMode.Structs.ModeOptionStruct]' = None
     currentMode: 'uint' = None
-=======
-    cookTime: 'uint' = None
-    powerSetting: 'uint' = None
-    minPower: 'typing.Optional[uint]' = None
-    maxPower: 'typing.Optional[uint]' = None
-    powerStep: 'typing.Optional[uint]' = None
->>>>>>> master
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -18500,7 +18479,6 @@ class MicrowaveOvenControl(Cluster):
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
 
-<<<<<<< HEAD
     class Enums:
         class ModeTag(MatterIntEnum):
             kNormal = 0x4000
@@ -18518,21 +18496,10 @@ class MicrowaveOvenControl(Cluster):
     class Structs:
         @dataclass
         class ModeTagStruct(ClusterObject):
-=======
-    class Commands:
-        @dataclass
-        class SetCookingParameters(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0000005F
-            command_id: typing.ClassVar[int] = 0x00000000
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
-
->>>>>>> master
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-<<<<<<< HEAD
                         ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="value", Tag=1, Type=uint),
                     ])
@@ -18542,29 +18509,10 @@ class MicrowaveOvenControl(Cluster):
 
         @dataclass
         class ModeOptionStruct(ClusterObject):
-=======
-                        ClusterObjectFieldDescriptor(Label="cookMode", Tag=0, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="cookTime", Tag=1, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="powerSetting", Tag=2, Type=typing.Optional[uint]),
-                    ])
-
-            cookMode: 'typing.Optional[uint]' = None
-            cookTime: 'typing.Optional[uint]' = None
-            powerSetting: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class AddMoreTime(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0000005F
-            command_id: typing.ClassVar[int] = 0x00000001
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
-
->>>>>>> master
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-<<<<<<< HEAD
                         ClusterObjectFieldDescriptor(Label="label", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="mode", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="modeTags", Tag=2, Type=typing.List[MicrowaveOvenMode.Structs.ModeTagStruct]),
@@ -18600,7 +18548,175 @@ class MicrowaveOvenControl(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x00000001
-=======
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000005E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000005E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class EventList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000005E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFA
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000005E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000005E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000005E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+
+@dataclass
+class MicrowaveOvenControl(Cluster):
+    id: typing.ClassVar[int] = 0x0000005F
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="cookTime", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="powerSetting", Tag=0x00000002, Type=uint),
+                ClusterObjectFieldDescriptor(Label="minPower", Tag=0x00000003, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="maxPower", Tag=0x00000004, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="powerStep", Tag=0x00000005, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    cookTime: 'uint' = None
+    powerSetting: 'uint' = None
+    minPower: 'typing.Optional[uint]' = None
+    maxPower: 'typing.Optional[uint]' = None
+    powerStep: 'typing.Optional[uint]' = None
+    generatedCommandList: 'typing.List[uint]' = None
+    acceptedCommandList: 'typing.List[uint]' = None
+    eventList: 'typing.List[uint]' = None
+    attributeList: 'typing.List[uint]' = None
+    featureMap: 'uint' = None
+    clusterRevision: 'uint' = None
+
+    class Commands:
+        @dataclass
+        class SetCookingParameters(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000005F
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="cookMode", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="cookTime", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="powerSetting", Tag=2, Type=typing.Optional[uint]),
+                    ])
+
+            cookMode: 'typing.Optional[uint]' = None
+            cookTime: 'typing.Optional[uint]' = None
+            powerSetting: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class AddMoreTime(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000005F
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
                         ClusterObjectFieldDescriptor(Label="timeToAdd", Tag=0, Type=uint),
                     ])
 
@@ -18632,7 +18748,6 @@ class MicrowaveOvenControl(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x00000002
->>>>>>> master
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -18641,12 +18756,6 @@ class MicrowaveOvenControl(Cluster):
             value: 'uint' = 0
 
         @dataclass
-<<<<<<< HEAD
-        class GeneratedCommandList(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0000005E
-=======
         class MinPower(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -18699,7 +18808,6 @@ class MicrowaveOvenControl(Cluster):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0000005F
->>>>>>> master
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -18715,11 +18823,7 @@ class MicrowaveOvenControl(Cluster):
         class AcceptedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-<<<<<<< HEAD
-                return 0x0000005E
-=======
                 return 0x0000005F
->>>>>>> master
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -18735,11 +18839,7 @@ class MicrowaveOvenControl(Cluster):
         class EventList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-<<<<<<< HEAD
-                return 0x0000005E
-=======
                 return 0x0000005F
->>>>>>> master
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -18755,11 +18855,7 @@ class MicrowaveOvenControl(Cluster):
         class AttributeList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-<<<<<<< HEAD
-                return 0x0000005E
-=======
                 return 0x0000005F
->>>>>>> master
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -18775,11 +18871,7 @@ class MicrowaveOvenControl(Cluster):
         class FeatureMap(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-<<<<<<< HEAD
-                return 0x0000005E
-=======
                 return 0x0000005F
->>>>>>> master
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -18795,11 +18887,7 @@ class MicrowaveOvenControl(Cluster):
         class ClusterRevision(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
-<<<<<<< HEAD
-                return 0x0000005E
-=======
                 return 0x0000005F
->>>>>>> master
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
