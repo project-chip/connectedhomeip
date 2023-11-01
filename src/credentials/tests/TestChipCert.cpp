@@ -2151,7 +2151,7 @@ static void TestChipCert_PDCIdentityValidation(nlTestSuite * inSuite, void * inC
 {
     CHIP_ERROR err;
 
-    err = ValidateChipNI(sTestCert_PDCID01_Chip);
+    err = ValidateChipNetworkIdentity(sTestCert_PDCID01_Chip);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 

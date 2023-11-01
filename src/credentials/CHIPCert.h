@@ -535,8 +535,14 @@ CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac);
  *
  * This function parses the certificate, ensures the rigid fields have the values mandated by the
  * specification, and validates the certificate signature.
+ *
+ * @return CHIP_NO_ERROR on success, CHIP_ERROR_WRONG_CERT_TYPE if the certificate does
+ *         not conform to the requirements for a Network Identity, CHIP_ERROR_INVALID_SIGNATURE
+ *         if the certificate has an invalid signature, or another CHIP_ERROR.
+ *
+ * @see section 11.24 (Wi-Fi Authentication with Per-Device Credentials) of the Matter spec
  */
-CHIP_ERROR ValidateChipNI(const ByteSpan & ni);
+CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert);
 
 struct FutureExtension
 {

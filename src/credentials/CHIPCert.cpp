@@ -1427,10 +1427,10 @@ CHIP_ERROR CertificateValidityPolicy::ApplyDefaultPolicy(const ChipCertificateDa
     }
 }
 
-CHIP_ERROR ValidateChipNI(const ByteSpan & ni)
+CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert)
 {
     ChipCertificateData certData;
-    ReturnErrorOnFailure(DecodeChipCert(ni, certData, CertDecodeFlags::kGenerateTBSHash));
+    ReturnErrorOnFailure(DecodeChipCert(cert, certData, CertDecodeFlags::kGenerateTBSHash));
 
     CertType certType;
     ReturnErrorOnFailure(certData.mSubjectDN.GetCertType(certType));

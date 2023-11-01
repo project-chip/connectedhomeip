@@ -23,6 +23,8 @@
 namespace chip {
 namespace Credentials {
 
+// Constants for Network (Client) Identities as per section 11.24 (Wi-Fi
+// Authentication with Per-Device Credentials) of the Matter spec.
 inline constexpr CharSpan kNetworkIdentityCN           = "*"_span;
 inline constexpr ByteSpan kNetworkIdentitySerialNumber = ByteSpan((uint8_t[1]){ 1 });
 
