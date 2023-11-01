@@ -103,7 +103,12 @@ shared_library("jni") {
       "OTAProviderDelegateBridge.cpp",
       "OTAProviderDelegateBridge.h",
     ]
-    defines += [ "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER" ]
+
+    defines += [
+      "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
+      "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER",
+    ]
+
     deps += [ "${chip_root}/src/controller:nodatamodel" ]
   }
 
@@ -116,6 +121,8 @@ shared_library("jni") {
     ]
 
     include_dirs = java_matter_controller_dependent_paths
+    include_dirs += [ "${chip_root}/zzz_generated/controller-clusters" ]
+
     deps += [ "${chip_root}/third_party/inipp" ]
 
     if (current_os == "mac") {
