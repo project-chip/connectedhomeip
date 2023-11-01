@@ -7730,12 +7730,20 @@
   versions: "future"
   introduced:
       bitmaps:
+          Scenes:
+              - CopyModeBitmap
+              - NameSupportBitmap
           AdministratorCommissioning:
               - Feature
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
                   - SupplyFault
+          Scenes:
+              CopyModeBitmap:
+                  - CopyAllScenes
+              NameSupportBitmap:
+                  - SceneNames
           SoftwareDiagnostics:
               Feature:
                   - Watermarks
@@ -7743,6 +7751,9 @@
               Feature:
                   - Basic
   deprecated:
+      bitmaps:
+          Scenes:
+              - ScenesCopyMode
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7767,6 +7778,9 @@
               # Targeting Spring 2024 Matter release
               - ThreadCapabilitiesBitmap
   renames:
+      bitmaps:
+          Scenes:
+              CopyModeBitmap: ScenesCopyMode
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:

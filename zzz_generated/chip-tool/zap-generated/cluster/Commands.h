@@ -11794,8 +11794,8 @@ void registerClusterScenes(Commands & commands, CredentialIssuerCommands * creds
                                                    WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "scene-valid", 0, 1, Attributes::SceneValid::Id, WriteCommandType::kForceWrite,
                                           credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "name-support", 0, UINT8_MAX, Attributes::NameSupport::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Scenes::NameSupportBitmap>>>(
+            Id, "name-support", 0, UINT8_MAX, Attributes::NameSupport::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::NodeId>>>(
             Id, "last-configured-by", 0, UINT64_MAX, Attributes::LastConfiguredBy::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //

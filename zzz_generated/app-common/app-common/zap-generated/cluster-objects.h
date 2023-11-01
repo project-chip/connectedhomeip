@@ -1739,7 +1739,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CopyScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
-    chip::BitMask<ScenesCopyMode> mode = static_cast<chip::BitMask<ScenesCopyMode>>(0);
+    chip::BitMask<CopyModeBitmap> mode = static_cast<chip::BitMask<CopyModeBitmap>>(0);
     chip::GroupId groupIdentifierFrom  = static_cast<chip::GroupId>(0);
     uint8_t sceneIdentifierFrom        = static_cast<uint8_t>(0);
     chip::GroupId groupIdentifierTo    = static_cast<chip::GroupId>(0);
@@ -1758,7 +1758,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CopyScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
-    chip::BitMask<ScenesCopyMode> mode = static_cast<chip::BitMask<ScenesCopyMode>>(0);
+    chip::BitMask<CopyModeBitmap> mode = static_cast<chip::BitMask<CopyModeBitmap>>(0);
     chip::GroupId groupIdentifierFrom  = static_cast<chip::GroupId>(0);
     uint8_t sceneIdentifierFrom        = static_cast<uint8_t>(0);
     chip::GroupId groupIdentifierTo    = static_cast<chip::GroupId>(0);
@@ -1859,9 +1859,9 @@ struct TypeInfo
 namespace NameSupport {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitMask<chip::app::Clusters::Scenes::NameSupportBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::Scenes::NameSupportBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::Scenes::NameSupportBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NameSupport::Id; }
@@ -1953,7 +1953,8 @@ struct TypeInfo
         Attributes::CurrentScene::TypeInfo::DecodableType currentScene = static_cast<uint8_t>(0);
         Attributes::CurrentGroup::TypeInfo::DecodableType currentGroup = static_cast<chip::GroupId>(0);
         Attributes::SceneValid::TypeInfo::DecodableType sceneValid     = static_cast<bool>(0);
-        Attributes::NameSupport::TypeInfo::DecodableType nameSupport   = static_cast<uint8_t>(0);
+        Attributes::NameSupport::TypeInfo::DecodableType nameSupport =
+            static_cast<chip::BitMask<chip::app::Clusters::Scenes::NameSupportBitmap>>(0);
         Attributes::LastConfiguredBy::TypeInfo::DecodableType lastConfiguredBy;
         Attributes::SceneTableSize::TypeInfo::DecodableType sceneTableSize       = static_cast<uint16_t>(0);
         Attributes::RemainingCapacity::TypeInfo::DecodableType remainingCapacity = static_cast<uint8_t>(0);

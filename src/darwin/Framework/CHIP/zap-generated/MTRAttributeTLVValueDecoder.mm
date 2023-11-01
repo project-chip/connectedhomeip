@@ -286,7 +286,7 @@ static id _Nullable DecodeAttributeValueForScenesCluster(AttributeId aAttributeI
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::LastConfiguredBy::Id: {
