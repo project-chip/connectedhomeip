@@ -525,18 +525,18 @@ class EncodableValue:
         elif isinstance(t, BasicInteger):
             # the >= 3 will include int24_t to be considered "long"
             if t.is_signed:
-                    return "Int"
+                return "Int"
             else:
-                    return "UInt"
+                return "UInt"
         elif isinstance(t, BasicString):
             if t.is_binary:
                 return "ByteArray"
             else:
                 return "String"
         elif isinstance(t, IdlEnumType):
-                return "UInt"
+            return "UInt"
         elif isinstance(t, IdlBitmapType):
-                return "UInt"
+            return "UInt"
         else:
             return "Any"
 
