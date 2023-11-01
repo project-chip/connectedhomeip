@@ -826,6 +826,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRMicrowaveOvenControlClusterSetCookingParametersParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRMicrowaveOvenControlClusterAddMoreTimeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTROperationalStateClusterPauseParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

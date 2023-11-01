@@ -13102,6 +13102,185 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation MTRMicrowaveOvenControlClusterSetCookingParametersParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _cookMode = nil;
+
+        _cookTime = nil;
+
+        _powerSetting = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRMicrowaveOvenControlClusterSetCookingParametersParams alloc] init];
+
+    other.cookMode = self.cookMode;
+    other.cookTime = self.cookTime;
+    other.powerSetting = self.powerSetting;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: cookMode:%@; cookTime:%@; powerSetting:%@; >", NSStringFromClass([self class]), _cookMode, _cookTime, _powerSetting];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMicrowaveOvenControlClusterSetCookingParametersParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::MicrowaveOvenControl::Commands::SetCookingParameters::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        if (self.cookMode != nil) {
+            auto & definedValue_0 = encodableStruct.cookMode.Emplace();
+            definedValue_0 = self.cookMode.unsignedCharValue;
+        }
+    }
+    {
+        if (self.cookTime != nil) {
+            auto & definedValue_0 = encodableStruct.cookTime.Emplace();
+            definedValue_0 = self.cookTime.unsignedIntValue;
+        }
+    }
+    {
+        if (self.powerSetting != nil) {
+            auto & definedValue_0 = encodableStruct.powerSetting.Emplace();
+            definedValue_0 = self.powerSetting.unsignedCharValue;
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRMicrowaveOvenControlClusterAddMoreTimeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _timeToAdd = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRMicrowaveOvenControlClusterAddMoreTimeParams alloc] init];
+
+    other.timeToAdd = self.timeToAdd;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeToAdd:%@; >", NSStringFromClass([self class]), _timeToAdd];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMicrowaveOvenControlClusterAddMoreTimeParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::MicrowaveOvenControl::Commands::AddMoreTime::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.timeToAdd = self.timeToAdd.unsignedIntValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTROperationalStateClusterPauseParams
 - (instancetype)init
 {

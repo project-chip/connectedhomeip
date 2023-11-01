@@ -90,6 +90,12 @@ enum class NameSupportBitmap : uint8_t
 
 namespace Scenes {
 
+// Bitmap for CopyModeBitmap
+enum class CopyModeBitmap : uint8_t
+{
+    kCopyAllScenes = 0x1,
+};
+
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
@@ -99,10 +105,10 @@ enum class Feature : uint32_t
     kFabricScenes = 0x8,
 };
 
-// Bitmap for ScenesCopyMode
-enum class ScenesCopyMode : uint8_t
+// Bitmap for NameSupportBitmap
+enum class NameSupportBitmap : uint8_t
 {
-    kCopyAllScenes = 0x1,
+    kSceneNames = 0x80,
 };
 } // namespace Scenes
 
@@ -1847,6 +1853,8 @@ enum class Feature : uint32_t
     kReset = 0x1,
 };
 } // namespace DishwasherAlarm
+
+namespace MicrowaveOvenControl {} // namespace MicrowaveOvenControl
 
 namespace OperationalState {
 
@@ -4055,8 +4063,8 @@ enum class Feature : uint32_t
 
 namespace ApplicationLauncher {
 
-// Enum for ApplicationLauncherStatusEnum
-enum class ApplicationLauncherStatusEnum : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kAppNotAvailable = 0x01,
