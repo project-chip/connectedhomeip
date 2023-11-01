@@ -1848,7 +1848,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _associationFailure = @(0);
+        _associationFailureCause = @(0);
 
         _status = @(0);
     }
@@ -1859,7 +1859,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRWiFiNetworkDiagnosticsClusterAssociationFailureEvent alloc] init];
 
-    other.associationFailure = self.associationFailure;
+    other.associationFailureCause = self.associationFailureCause;
     other.status = self.status;
 
     return other;
@@ -1867,7 +1867,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: associationFailure:%@; status:%@; >", NSStringFromClass([self class]), _associationFailure, _status];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: associationFailureCause:%@; status:%@; >", NSStringFromClass([self class]), _associationFailureCause, _status];
     return descriptionString;
 }
 
