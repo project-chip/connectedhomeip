@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,12 +17,8 @@
 
 #pragma once
 
-#include <esp_err.h>
-#include <esp_openthread_types.h>
-#include <lib/core/CHIPError.h>
-#include <memory>
+namespace chip {
 
-esp_err_t set_openthread_platform_config(esp_openthread_platform_config_t * config);
-esp_err_t openthread_init_stack(void);
-esp_err_t openthread_launch_task(void);
-CHIP_ERROR cli_transmit_task_post(std::unique_ptr<char[]> && cli_str);
+void RegisterOpenThreadCliCommands();
+
+} // namespace chip
