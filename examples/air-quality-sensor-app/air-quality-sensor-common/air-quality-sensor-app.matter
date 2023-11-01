@@ -2088,6 +2088,19 @@ endpoint 1 {
     handle command Identify;
   }
 
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    callback attribute clusterRevision default = 2;
+  }
+
   server cluster AirQuality {
     callback attribute airQuality default = 0;
     callback attribute generatedCommandList;
