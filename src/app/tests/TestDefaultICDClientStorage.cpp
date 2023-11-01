@@ -1,0 +1,263 @@
+/*
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include <lib/support/UnitTestRegistration.h>
+#include <nlunit-test.h>
+
+#include <app/icd/client/DefaultICDClientStorage.h>
+#include <app/icd/client/DefaultICDStorageKey.h>
+#include <crypto/DefaultSessionKeystore.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::System;
+using TestSessionKeystoreImpl = chip::Crypto::DefaultSessionKeystore;
+
+constexpr uint8_t kKeyBuffer1[] = {
+    0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
+};
+
+constexpr uint8_t kKeyBuffer2[] = {
+    0xf1, 0xe1, 0xd1, 0xc1, 0xb1, 0xa1, 0x91, 0x81, 0x71, 0x61, 0x51, 0x14, 0x31, 0x21, 0x11, 0x01
+};
+constexpr uint8_t kKeyBuffer3[] = {
+    0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f
+};
+
+class DefaultICDClientStorageTest : public DefaultICDClientStorage
+{
+public:
+    CHIP_ERROR TestSave(chip::TLV::TLVWriter & aWriter, ICDClientInfo & aClientInfo) { return Save(aWriter, aClientInfo); }
+
+    static constexpr size_t TestMaxClientInfoSize() { return MaxICDClientInfoSize(); }
+};
+
+struct TestClientInfo : public ICDClientInfo
+{
+    bool operator==(const ICDClientInfo & that) const
+    {
+        if ((mPeerNode != that.mPeerNode))
+        {
+            return false;
+        }
+        return true;
+    }
+};
+
+void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    FabricIndex fabricId = 1;
+    NodeId nodeId1       = 6666;
+    NodeId nodeId2       = 6667;
+    chip::TestPersistentStorageDelegate clientInfoStorage;
+    TestSessionKeystoreImpl keystore;
+    ICDStorage testStorage(fabricId, &clientInfoStorage, &keystore);
+    DefaultICDStorageKey keyDelegate;
+    keyDelegate.Init(256);
+    DefaultICDClientStorageTest manager;
+    manager.Init(&keyDelegate);
+    err = manager.AddStorage(std::move(testStorage));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    // Write some ClientInfos and see the counts are correct
+    ICDClientInfo clientInfo1 = { .mPeerNode = ScopedNodeId(nodeId1, fabricId) };
+    ICDClientInfo clientInfo2 = { .mPeerNode = ScopedNodeId(nodeId2, fabricId) };
+    ICDClientInfo clientInfo3 = { .mPeerNode = ScopedNodeId(nodeId1, fabricId) };
+    err                       = manager.SetKey(clientInfo1, chip::ByteSpan(kKeyBuffer1));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = manager.StoreICDInfoEntry(clientInfo1);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = manager.SetKey(clientInfo2, chip::ByteSpan(kKeyBuffer2));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = manager.StoreICDInfoEntry(clientInfo2);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = manager.SetKey(clientInfo3, chip::ByteSpan(kKeyBuffer3));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = manager.StoreICDInfoEntry(clientInfo3);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    // Make sure iterator counts correctly
+    auto * iterator = manager.IterateICDClientInfo();
+    // same nodeId for clientInfo2 and clientInfo3, so the new one replace old one
+    NL_TEST_ASSERT(apSuite, iterator->Count() == 2);
+
+    ICDClientInfo clientInfo;
+    NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
+    NL_TEST_ASSERT(apSuite, clientInfo.mPeerNode.GetNodeId() == nodeId1);
+    NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
+    NL_TEST_ASSERT(apSuite, clientInfo.mPeerNode.GetNodeId() == nodeId2);
+
+    iterator->Release();
+
+    // Delete all and verify iterator counts 0
+    err = manager.DeleteAllEntries(fabricId);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    iterator = manager.IterateICDClientInfo();
+    NL_TEST_ASSERT(apSuite, iterator->Count() == 0);
+
+    // Verify ClientInfos manually count correctly
+    size_t count = 0;
+    while (iterator->Next(clientInfo))
+    {
+        count++;
+    }
+    iterator->Release();
+    NL_TEST_ASSERT(apSuite, count == 0);
+
+    manager.RemoveStorage(fabricId);
+
+    err = manager.SetKey(clientInfo1, chip::ByteSpan(kKeyBuffer1));
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_FOUND);
+}
+
+void TestClientInfoCountMultipleFabric(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err        = CHIP_NO_ERROR;
+    FabricIndex fabricId1 = 1;
+    FabricIndex fabricId2 = 2;
+    NodeId nodeId1        = 6666;
+    NodeId nodeId2        = 6667;
+    NodeId nodeId3        = 6668;
+    chip::TestPersistentStorageDelegate clientInfoStorage1;
+    TestSessionKeystoreImpl keystore1;
+    ICDStorage testStorage1(fabricId1, &clientInfoStorage1, &keystore1);
+    chip::TestPersistentStorageDelegate clientInfoStorage2;
+    TestSessionKeystoreImpl keystore2;
+    ICDStorage testStorage2(fabricId2, &clientInfoStorage2, &keystore2);
+
+    DefaultICDStorageKey keyDelegate;
+    keyDelegate.Init(256);
+    DefaultICDClientStorageTest manager;
+    manager.Init(&keyDelegate);
+    err = manager.AddStorage(std::move(testStorage1));
+    err = manager.AddStorage(std::move(testStorage2));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    // Write some ClientInfos and see the counts are correct
+    ICDClientInfo clientInfo1 = { .mPeerNode = ScopedNodeId(nodeId1, fabricId1) };
+    ICDClientInfo clientInfo2 = { .mPeerNode = ScopedNodeId(nodeId2, fabricId1) };
+    ICDClientInfo clientInfo3 = { .mPeerNode = ScopedNodeId(nodeId3, fabricId2) };
+
+    err = manager.SetKey(clientInfo1, chip::ByteSpan(kKeyBuffer1));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = manager.StoreICDInfoEntry(clientInfo1);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = manager.SetKey(clientInfo2, chip::ByteSpan(kKeyBuffer2));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = manager.StoreICDInfoEntry(clientInfo2);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = manager.SetKey(clientInfo3, chip::ByteSpan(kKeyBuffer3));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = manager.StoreICDInfoEntry(clientInfo3);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    // Make sure iterator counts correctly
+    auto * iterator = manager.IterateICDClientInfo();
+    NL_TEST_ASSERT(apSuite, iterator->Count() == 3);
+    iterator->Release();
+
+    // Delete all and verify iterator counts 0
+    err = manager.DeleteEntry(ScopedNodeId(nodeId1, fabricId1));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    iterator = manager.IterateICDClientInfo();
+    NL_TEST_ASSERT(apSuite, iterator->Count() == 2);
+
+    err = manager.DeleteEntry(ScopedNodeId(nodeId2, fabricId1));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, iterator->Count() == 1);
+
+    err = manager.DeleteEntry(ScopedNodeId(nodeId3, fabricId2));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, iterator->Count() == 0);
+
+    // Verify ClientInfos manually count correctly
+    size_t count = 0;
+    ICDClientInfo clientInfo;
+    while (iterator->Next(clientInfo))
+    {
+        count++;
+    }
+    iterator->Release();
+    NL_TEST_ASSERT(apSuite, count == 0);
+
+    manager.RemoveStorage(fabricId1);
+    manager.RemoveStorage(fabricId2);
+
+    err = manager.SetKey(clientInfo1, chip::ByteSpan(kKeyBuffer1));
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_FOUND);
+    err = manager.SetKey(clientInfo3, chip::ByteSpan(kKeyBuffer2));
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_FOUND);
+}
+
+/**
+ *  Set up the test suite.
+ */
+int TestClientInfo_Setup(void * apContext)
+{
+    VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
+
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+int TestClientInfo_Teardown(void * apContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
+// Test Suite
+
+/**
+ *  Test Suite that lists all the test functions.
+ */
+// clang-format off
+static const nlTest sTests[] =
+{
+    NL_TEST_DEF("TestClientInfoCount", TestClientInfoCount),
+    NL_TEST_DEF("TestClientInfoCountMultipleFabric", TestClientInfoCountMultipleFabric),
+    NL_TEST_SENTINEL()
+};
+// clang-format on
+
+// clang-format off
+static nlTestSuite sSuite =
+{
+    "TestDefaultICDClientStorage",
+    &sTests[0],
+    &TestClientInfo_Setup, &TestClientInfo_Teardown
+};
+// clang-format on
+
+/**
+ *  Main
+ */
+int TestDefaultICDClientStorage()
+{
+    // Run test suit against one context
+    nlTestRunner(&sSuite, nullptr);
+
+    return (nlTestRunnerStats(&sSuite));
+}
+
+CHIP_REGISTER_TEST_SUITE(TestDefaultICDClientStorage)

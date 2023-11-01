@@ -1,0 +1,56 @@
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/StorageKeyName.h>
+#include <stddef.h>
+
+namespace chip {
+namespace app {
+
+/**
+ * Delegate for providing storage key names and maximum key counter.
+ */
+class ICDStorageKeyDelegate
+{
+public:
+    /**
+     * Allocate the storage key name for the specified index.
+     *
+     * @param[in] aIndex ICD ClientInfo index in persistent storage
+     *
+     * @return The storage key name.
+     */
+    virtual StorageKeyName GetKey(size_t aIndex) = 0;
+
+    /**
+     * @brief Gets the maximum key counter.
+     *
+     * @return The maximum key counter.
+     */
+    virtual size_t MaxKeyCounter() = 0;
+
+    virtual ~ICDStorageKeyDelegate(){};
+};
+
+} // namespace app
+} // namespace chip
