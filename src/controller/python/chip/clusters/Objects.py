@@ -622,14 +622,17 @@ class Scenes(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
+        class CopyModeBitmap(IntFlag):
+            kCopyAllScenes = 0x1
+
         class Feature(IntFlag):
             kSceneNames = 0x1
             kExplicit = 0x2
             kTableSize = 0x4
             kFabricScenes = 0x8
 
-        class ScenesCopyMode(IntFlag):
-            kCopyAllScenes = 0x1
+        class NameSupportBitmap(IntFlag):
+            kSceneNames = 0x80
 
     class Structs:
         @dataclass

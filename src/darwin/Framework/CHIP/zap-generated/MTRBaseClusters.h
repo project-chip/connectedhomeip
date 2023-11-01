@@ -13388,6 +13388,17 @@ typedef NS_OPTIONS(uint8_t, MTRGroupsNameSupportBitmap) {
     MTRGroupsNameSupportBitmapGroupNames MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x80,
 } MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
+typedef NS_OPTIONS(uint8_t, MTRScenesCopyModeBitmap) {
+    MTRScenesCopyModeBitmapCopyAllScenes MTR_NEWLY_AVAILABLE = 0x1,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint8_t, MTRScenesCopyMode) {
+    MTRScenesCopyModeCopyAllScenes MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRScenesCopyModeBitmapCopyAllScenes")
+    = 0x1,
+} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRScenesCopyModeBitmap");
+
 typedef NS_OPTIONS(uint32_t, MTRScenesFeature) {
     MTRScenesFeatureSceneNames MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x1,
     MTRScenesFeatureExplicit MTR_PROVISIONALLY_AVAILABLE = 0x2,
@@ -13395,9 +13406,9 @@ typedef NS_OPTIONS(uint32_t, MTRScenesFeature) {
     MTRScenesFeatureFabricScenes MTR_PROVISIONALLY_AVAILABLE = 0x8,
 } MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
-typedef NS_OPTIONS(uint8_t, MTRScenesCopyMode) {
-    MTRScenesCopyModeCopyAllScenes MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+typedef NS_OPTIONS(uint8_t, MTRScenesNameSupportBitmap) {
+    MTRScenesNameSupportBitmapSceneNames MTR_NEWLY_AVAILABLE = 0x80,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROnOffDelayedAllOffEffectVariant) {
     MTROnOffDelayedAllOffEffectVariantDelayedOffFastFade MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x00,

@@ -177,7 +177,7 @@ if (chip_link_tests) {
 }
 
 kotlin_library("tlv") {
-  output_name = "libCHIPTlv.jar"
+  output_name = "libMatterTlv.jar"
 
   sources = [
     "src/matter/tlv/Element.kt",
@@ -236,7 +236,7 @@ kotlin_library("tlv_read_write_test") {
 }
 
 kotlin_library("jsontlv") {
-  output_name = "libCHIPJson.jar"
+  output_name = "libMatterJson.jar"
 
   deps = [
     ":tlv",
