@@ -71,14 +71,9 @@ class OtaProviderClientFragment : Fragment() {
     return binding.root
   }
 
-  override fun onDestroy() {
-    deviceController.finishOTAProvider()
-    super.onDestroy()
-  }
-
   override fun onStart() {
     super.onStart()
-    if (Build.VERSION.SDK_INT >= 30 && !Environment.isExternalStorageManager()) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
       Toast.makeText(
           requireContext(),
           "Require to Allow management of all files permission",
@@ -88,7 +83,7 @@ class OtaProviderClientFragment : Fragment() {
       startActivity(
         Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
           addCategory("android.intent.category.DEFAULT")
-          data = Uri.parse(String.format("package:%s", requireContext().packageName))
+          data = Uri.parse("package:${requireContext().packageName}")
         }
       )
     } else if (!checkPermissionForReadExternalStorage()) {
@@ -114,36 +109,32 @@ class OtaProviderClientFragment : Fragment() {
       return
     }
 
-    val filename = getRealPathFromURI(intent.data)
+    val filename = getRealPathFromURI(intent.data!!)
 
     requireActivity().runOnUiThread { binding.firmwareFileTv.text = filename }
   }
 
-  private fun getRealPathFromURI(contentUri: Uri?): String? {
-    if (contentUri == null) {
-      return null
-    }
-    if (contentUri.path!!.startsWith("/storage")) {
-      return contentUri.path
-    }
-    val id =
-      DocumentsContract.getDocumentId(contentUri)
-        .split(":".toRegex())
-        .dropLastWhile { it.isEmpty() }
-        .toTypedArray()[1]
-    val columns = arrayOf(MediaStore.Files.FileColumns.DATA)
-    val selection = MediaStore.Files.FileColumns._ID + " = " + id
-    val cursor: Cursor? =
-      requireContext()
-        .contentResolver
-        .query(MediaStore.Files.getContentUri("external"), columns, selection, null, null)
-    cursor.use { c ->
-      val columnIndex = c?.getColumnIndex(columns[0]) ?: return null
-      if (c.moveToFirst()) {
-        return c.getString(columnIndex)
+  private fun getRealPathFromURI(contentUri: Uri): String {
+    if (!contentUri.path!!.startsWith("/storage")) {
+      val id =
+        DocumentsContract.getDocumentId(contentUri)
+          .split(":".toRegex())
+          .dropLastWhile { it.isEmpty() }
+          .toTypedArray()[1]
+      val columns = arrayOf(MediaStore.Files.FileColumns.DATA)
+      val selection = MediaStore.Files.FileColumns._ID + " = " + id
+      val cursor: Cursor? =
+        requireContext()
+          .contentResolver
+          .query(MediaStore.Files.getContentUri("external"), columns, selection, null, null)
+      cursor.use { c ->
+        val columnIndex = c?.getColumnIndex(columns[0]) ?: 0
+        if (c!!.moveToFirst()) {
+          return c.getString(columnIndex)
+        }
       }
     }
-    return null
+    return contentUri.path!!
   }
 
   private suspend fun sendAnnounceOTAProviderBtnClick() {
@@ -158,7 +149,10 @@ class OtaProviderClientFragment : Fragment() {
     }
 
     val otaRequestCluster =
-      ChipClusters.OtaSoftwareUpdateRequestorCluster(getConnectedDevicePointer(), 0)
+      ChipClusters.OtaSoftwareUpdateRequestorCluster(
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+        OTA_REQUESTER_ENDPOINT_ID
+      )
     otaRequestCluster.announceOTAProvider(
       object : DefaultClusterCallback {
         override fun onSuccess() {
@@ -181,6 +175,7 @@ class OtaProviderClientFragment : Fragment() {
 
   override fun onDestroyView() {
     super.onDestroyView()
+    deviceController.finishOTAProvider()
     _binding = null
   }
 
@@ -190,16 +185,11 @@ class OtaProviderClientFragment : Fragment() {
   }
 
   private fun requestPermissionForReadExternalStorage() {
-    try {
-      ActivityCompat.requestPermissions(
-        requireActivity(),
-        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-        READ_STORAGE_PERMISSION_REQUEST_CODE
-      )
-    } catch (e: Exception) {
-      e.printStackTrace()
-      return
-    }
+    ActivityCompat.requestPermissions(
+      requireActivity(),
+      arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+      READ_STORAGE_PERMISSION_REQUEST_CODE
+    )
   }
 
   inner class OtaProviderCallback : OTAProviderDelegate {
@@ -328,8 +318,6 @@ class OtaProviderClientFragment : Fragment() {
   }
 
   inner class ChipControllerCallback : GenericChipDeviceListener() {
-    override fun onConnectDeviceComplete() {}
-
     override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
       Log.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
       showMessage("Address update complete for nodeId $nodeId with code $errorCode")
@@ -348,10 +336,6 @@ class OtaProviderClientFragment : Fragment() {
     }
   }
 
-  private suspend fun getConnectedDevicePointer(): Long {
-    return ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-  }
-
   private fun showMessage(msg: String) {
     requireActivity().runOnUiThread { binding.commandStatusTv.text = msg }
   }
@@ -365,5 +349,6 @@ class OtaProviderClientFragment : Fragment() {
 
     private const val APPLY_WAITING_TIME = 10L
     private const val OTA_PROVIDER_ENDPOINT_ID = 0
+    private const val OTA_REQUESTER_ENDPOINT_ID = 0
   }
 }
