@@ -15,9 +15,9 @@ required_server_cluster: "require" "server" "cluster" id_or_number ";"
 rejected_server_cluster: "reject" "server" "cluster" id_or_number ";"
 
 // Allows deny like:
-//   deny 234;                     // Deny an entire cluster
-//   deny DescriptorCluster::123;  // attribute deny (mix name and number)
-//   deny 11::22;                  // attribute deny
+//   deny cluster 234;                              // Deny an entire cluster
+//   deny cluster DescriptorCluster attribute 123;  // attribute deny (mix name and number)
+//   deny cluster 11 attribute 22;                  // attribute deny
 denylist_cluster_attribute: "deny" "cluster" id_or_number ["attribute" id_or_number] ";"
 
 integer: positive_integer | negative_integer
