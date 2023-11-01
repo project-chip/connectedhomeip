@@ -95,10 +95,12 @@ load "../src/app/zap-templates/zcl/data-model/chip/resource-monitoring-cluster.x
 load "../src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml";
 
 all endpoints {
-    // These attributes follow separate code paths, but should always be present in matter files:
-    require global attribute generatedCommandList = 65528;
-    require global attribute acceptedCommandList = 65529;
-    require global attribute attributeList = 65531;
+    // These attributes follow a different code path and do not have to be
+    // present in the .matter file
+    //
+    // require global attribute generatedCommandList = 65528;
+    // require global attribute acceptedCommandList = 65529;
+    // require global attribute attributeList = 65531;
 
     require global attribute featureMap = 65532;
     require global attribute clusterRevision = 65533;
