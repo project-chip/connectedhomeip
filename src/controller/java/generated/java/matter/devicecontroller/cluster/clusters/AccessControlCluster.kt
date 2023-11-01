@@ -17,24 +17,20 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class AccessControlCluster(private val endpointId: UShort) {
-  class AclAttribute(
-    val value: ArrayList<ChipStructs.AccessControlClusterAccessControlEntryStruct>
-  )
+  class AclAttribute(val value: List<AccessControlClusterAccessControlEntryStruct>)
 
-  class ExtensionAttribute(
-    val value: ArrayList<ChipStructs.AccessControlClusterAccessControlExtensionStruct>?
-  )
+  class ExtensionAttribute(val value: List<AccessControlClusterAccessControlExtensionStruct>?)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readAclAttribute(): AclAttribute {
     // Implementation needs to be added here
@@ -44,14 +40,12 @@ class AccessControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeAclAttribute(
-    value: ArrayList<ChipStructs.AccessControlClusterAccessControlEntryStruct>
-  ) {
+  suspend fun writeAclAttribute(value: List<AccessControlClusterAccessControlEntryStruct>) {
     // Implementation needs to be added here
   }
 
   suspend fun writeAclAttribute(
-    value: ArrayList<ChipStructs.AccessControlClusterAccessControlEntryStruct>,
+    value: List<AccessControlClusterAccessControlEntryStruct>,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here
@@ -72,13 +66,13 @@ class AccessControlCluster(private val endpointId: UShort) {
   }
 
   suspend fun writeExtensionAttribute(
-    value: ArrayList<ChipStructs.AccessControlClusterAccessControlExtensionStruct>
+    value: List<AccessControlClusterAccessControlExtensionStruct>
   ) {
     // Implementation needs to be added here
   }
 
   suspend fun writeExtensionAttribute(
-    value: ArrayList<ChipStructs.AccessControlClusterAccessControlExtensionStruct>,
+    value: List<AccessControlClusterAccessControlExtensionStruct>,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here

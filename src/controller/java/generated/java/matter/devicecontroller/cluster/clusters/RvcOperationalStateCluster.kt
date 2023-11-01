@@ -17,34 +17,32 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class RvcOperationalStateCluster(private val endpointId: UShort) {
   class OperationalCommandResponse(
-    val commandResponseState: ChipStructs.RvcOperationalStateClusterErrorStateStruct
+    val commandResponseState: RvcOperationalStateClusterErrorStateStruct
   )
 
-  class PhaseListAttribute(val value: ArrayList<String>?)
+  class PhaseListAttribute(val value: List<String>?)
 
   class CurrentPhaseAttribute(val value: UByte?)
 
   class CountdownTimeAttribute(val value: UInt?)
 
   class OperationalStateListAttribute(
-    val value: ArrayList<ChipStructs.RvcOperationalStateClusterOperationalStateStruct>
+    val value: List<RvcOperationalStateClusterOperationalStateStruct>
   )
 
-  class OperationalErrorAttribute(
-    val value: ChipStructs.RvcOperationalStateClusterErrorStateStruct
-  )
+  class OperationalErrorAttribute(val value: RvcOperationalStateClusterErrorStateStruct)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun pause(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
     if (timedInvokeTimeoutMs != null) {
