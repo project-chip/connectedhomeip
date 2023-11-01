@@ -1888,7 +1888,7 @@ client cluster AudioOutput = 1291 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 client cluster ApplicationLauncher = 1292 {
-  enum ApplicationLauncherStatusEnum : enum8 {
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
@@ -1909,7 +1909,7 @@ client cluster ApplicationLauncher = 1292 {
   }
 
   readonly attribute optional int16u catalogList[] = 0;
-  attribute optional nullable ApplicationEPStruct currentApp = 1;
+  readonly attribute optional nullable ApplicationEPStruct currentApp = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1931,7 +1931,7 @@ client cluster ApplicationLauncher = 1292 {
   }
 
   response struct LauncherResponse = 3 {
-    ApplicationLauncherStatusEnum status = 0;
+    StatusEnum status = 0;
     optional octet_string data = 1;
   }
 

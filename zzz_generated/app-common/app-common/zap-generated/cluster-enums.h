@@ -4063,8 +4063,8 @@ enum class Feature : uint32_t
 
 namespace ApplicationLauncher {
 
-// Enum for ApplicationLauncherStatusEnum
-enum class ApplicationLauncherStatusEnum : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kAppNotAvailable = 0x01,

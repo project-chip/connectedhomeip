@@ -3572,7 +3572,7 @@ server cluster AudioOutput = 1291 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 server cluster ApplicationLauncher = 1292 {
-  enum ApplicationLauncherStatusEnum : enum8 {
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
@@ -3613,7 +3613,7 @@ server cluster ApplicationLauncher = 1292 {
   }
 
   response struct LauncherResponse = 3 {
-    ApplicationLauncherStatusEnum status = 0;
+    StatusEnum status = 0;
     optional octet_string data = 1;
   }
 
