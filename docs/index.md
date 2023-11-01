@@ -9,6 +9,7 @@ QUICK_START
 PROJECT_FLOW
 VSCODE_DEVELOPMENT
 api/index
+ci-cd/index
 discussion/index
 guides/index
 style/index
