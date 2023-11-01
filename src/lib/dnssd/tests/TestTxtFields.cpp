@@ -653,7 +653,7 @@ void TxtFieldICDoperatesAsLIT(nlTestSuite * inSuite, void * inContext)
     char val[16];
     NodeData nodeData;
 
-    // ICD operates as a LIT device
+    // ICD is operating as a LIT device
     strcpy(key, "ICD");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
@@ -664,7 +664,7 @@ void TxtFieldICDoperatesAsLIT(nlTestSuite * inSuite, void * inContext)
     nodeData.resolutionData.ICDOperatesAsLIT.ClearValue();
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
 
-    // ICD operates as a SIT device
+    // ICD is operating as a SIT device
     strcpy(key, "ICD");
     strcpy(val, "0");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);

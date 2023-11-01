@@ -120,7 +120,8 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
 
         if (dnsSdInfo->resolutionData.ICDOperatesAsLIT.HasValue())
         {
-            ChipLogProgress(Discovery, "\tICD operates as %s", dnsSdInfo->resolutionData.ICDOperatesAsLIT.Value() ? "LIT" : "SIT");
+            ChipLogProgress(Discovery, "\tICD is operating as\t%s",
+                            dnsSdInfo->resolutionData.ICDOperatesAsLIT.Value() ? "LIT" : "SIT");
         }
 
         for (unsigned j = 0; j < dnsSdInfo->resolutionData.numIPs; ++j)

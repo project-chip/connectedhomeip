@@ -175,15 +175,16 @@ void DiscoveryCommands::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData &
         data.mrpRetryIntervalActive.SetValue(nodeData.resolutionData.mrpRetryIntervalActive.Value().count());
     }
 
-    if (nodeData.resolutionData.mrpRetryActiveThreshold.HasValue())
-    {
-        data.mrpRetryActiveThreshold.SetValue(nodeData.resolutionData.mrpRetryActiveThreshold.Value().count());
-    }
+    // TODO need to add new entries for kDefaultResponse in DiscoveryCommands.js (project-chip/zap) before adding this
+    // if (nodeData.resolutionData.mrpRetryActiveThreshold.HasValue())
+    // {
+    //     data.mrpRetryActiveThreshold.SetValue(nodeData.resolutionData.mrpRetryActiveThreshold.Value().count());
+    // }
 
-    if (nodeData.resolutionData.ICDOperatesAsLIT.HasValue())
-    {
-        data.ICDOperatesAsLIT.SetValue(resolutionData.ICDOperatesAsLIT.Value());
-    }
+    // if (nodeData.resolutionData.ICDOperatesAsLIT.HasValue())
+    // {
+    //     data.ICDOperatesAsLIT.SetValue(resolutionData.ICDOperatesAsLIT.Value());
+    // }
 
     chip::app::StatusIB status;
     status.mStatus = chip::Protocols::InteractionModel::Status::Success;
