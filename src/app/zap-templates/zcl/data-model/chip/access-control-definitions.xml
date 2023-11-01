@@ -15,18 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <domain name="CHIP"/>
+	<domain name="CHIP" />
 
-  <!-- Ensure access-control-definitions.xml is first in xmlFile array in zcl.json -->
-  <accessControl>
-    <operation type="read" description="Read operation"/>
-    <operation type="write" description="Write operation"/>
-    <operation type="invoke" description="Invoke operation"/>
-    <modifier type="fabric-scoped" description="Fabric-scoped data"/>
-    <modifier type="fabric-sensitive" description="Fabric-sensitive data"/>
-    <role type="view" description="View privilege"/>
-    <role type="operate" description="Operate privilege"/>
-    <role type="manage" description="Manage privilege"/>
-    <role type="administer" description="Administer privilege"/>
-  </accessControl>
+	<!-- Ensure access-control-definitions.xml is first in xmlFile array in zcl.json -->
+	<accessControl>
+		<operation type="read" description="Read operation" />
+		<operation type="write" description="Write operation" />
+		<operation type="invoke" description="Invoke operation" />
+		<modifier type="fabric-scoped" description="Fabric-scoped data" />
+		<modifier type="fabric-sensitive" description="Fabric-sensitive data" />
+		<role type="view" description="View privilege" />
+		<role type="operate" description="Operate privilege" />
+		<role type="manage" description="Manage privilege" />
+		<role type="administer" description="Administer privilege" />
+	</accessControl>
 </configurator>

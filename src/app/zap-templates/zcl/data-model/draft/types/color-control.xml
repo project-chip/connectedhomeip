@@ -15,14 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <enum name="ColorControlOptions" type="bitmap8">
-    <item name="ExecuteIfOff" value="0x1"/>
-  </enum>
+	<enum name="ColorControlOptions" type="bitmap8">
+		<item name="ExecuteIfOff" value="0x1" />
+	</enum>
 
-  <enum name="EnhancedColorMode" type="enum8">
-    <item name="CurrentHueAndCurrentSaturation" value="0x00"/>
-    <item name="CurrentXAndCurrentY" value="0x01"/>
-    <item name="ColorTemperature" value="0x02"/>
-    <item name="EnhancedCurrentHueAndCurrentSaturation" value="0x03"/>
-  </enum>
+	<enum name="EnhancedColorMode" type="enum8">
+		<item name="CurrentHueAndCurrentSaturation" value="0x00" />
+		<item name="CurrentXAndCurrentY" value="0x01" />
+		<item name="ColorTemperature" value="0x02" />
+		<item name="EnhancedCurrentHueAndCurrentSaturation" value="0x03" />
+	</enum>
 </configurator>

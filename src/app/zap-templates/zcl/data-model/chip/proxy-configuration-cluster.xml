@@ -15,13 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-    <domain name="CHIP" />
+	<domain name="CHIP" />
 
-    <cluster>
-        <domain>General</domain>
-        <name>Proxy Configuration</name>
-        <code>0x0042</code>
-        <define>PROXY_CONFIGURATION_CLUSTER</define>
-        <description>Cluster to control Proxy Configuration</description>
-    </cluster>
+	<cluster>
+		<domain>General</domain>
+		<name>Proxy Configuration</name>
+		<code>0x0042</code>
+		<define>PROXY_CONFIGURATION_CLUSTER</define>
+		<description>Cluster to control Proxy Configuration</description>
+	</cluster>
 </configurator>

@@ -15,38 +15,39 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <domain name="CHIP"/>
-  <cluster>
-    <name>Air Quality</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes for reporting air quality classification</description>
-    <code>0x005B</code>
-    <define>AIR_QUALITY_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
+	<domain name="CHIP" />
+	<cluster>
+		<name>Air Quality</name>
+		<domain>Measurement &amp; Sensing</domain>
+		<description>Attributes for reporting air quality classification</description>
+		<code>0x005B</code>
+		<define>AIR_QUALITY_CLUSTER</define>
+		<client tick="false" init="false">true</client>
+		<server tick="false" init="false">true</server>
 
-    <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="AIR_QUALITY" type="AirQualityEnum" min="0" max="6" writable="false" isNullable="false" default="0" optional="false">AirQuality</attribute>
-  </cluster>
+		<!-- Attributes -->
+		<attribute side="server" code="0x0000" define="AIR_QUALITY" type="AirQualityEnum" min="0" max="6"
+			writable="false" isNullable="false" default="0" optional="false">AirQuality</attribute>
+	</cluster>
 
-  <!-- Feature Map -->
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x005B" />
-    <field name="Fair" mask="0x01" />
-    <field name="Moderate" mask="0x02" />
-    <field name="VeryPoor" mask="0x04" />
-    <field name="ExtremelyPoor" mask="0x08" />
-  </bitmap>
+	<!-- Feature Map -->
+	<bitmap name="Feature" type="bitmap32">
+		<cluster code="0x005B" />
+		<field name="Fair" mask="0x01" />
+		<field name="Moderate" mask="0x02" />
+		<field name="VeryPoor" mask="0x04" />
+		<field name="ExtremelyPoor" mask="0x08" />
+	</bitmap>
 
-  <!-- Cluster Data Types -->
-  <enum name="AirQualityEnum" type="enum8">
-    <cluster code="0x005B" />
-    <item value="0" name="Unknown" />
-    <item value="1" name="Good" />
-    <item value="2" name="Fair" />
-    <item value="3" name="Moderate" />
-    <item value="4" name="Poor" />
-    <item value="5" name="Very poor" />
-    <item value="6" name="Extremely poor" />
-  </enum>
+	<!-- Cluster Data Types -->
+	<enum name="AirQualityEnum" type="enum8">
+		<cluster code="0x005B" />
+		<item value="0" name="Unknown" />
+		<item value="1" name="Good" />
+		<item value="2" name="Fair" />
+		<item value="3" name="Moderate" />
+		<item value="4" name="Poor" />
+		<item value="5" name="Very poor" />
+		<item value="6" name="Extremely poor" />
+	</enum>
 </configurator>

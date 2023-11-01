@@ -15,18 +15,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <domain name="CHIP"/>
+	<domain name="CHIP" />
 
-  <cluster>
-    <domain>General</domain>
-    <name>User Label</name>
-    <code>0x0041</code>
-    <define>USER_LABEL_CLUSTER</define>
-    <description>The User Label Cluster provides a feature to tag an endpoint with zero or more labels.</description>
-    <attribute side="server" code="0x0000" define="LABEL_LIST" type="ARRAY" entryType="LabelStruct" writable="true" optional="false">
-      <description>LabelList</description>
-      <access op="read" privilege="view"/>
-      <access op="write" privilege="manage"/>
-    </attribute>
-  </cluster>
+	<cluster>
+		<domain>General</domain>
+		<name>User Label</name>
+		<code>0x0041</code>
+		<define>USER_LABEL_CLUSTER</define>
+		<description>The User Label Cluster provides a feature to tag an endpoint with zero or more labels.</description>
+		<attribute side="server" code="0x0000" define="LABEL_LIST" type="ARRAY" entryType="LabelStruct" writable="true"
+			optional="false">
+			<description>LabelList</description>
+			<access op="read" privilege="view" />
+			<access op="write" privilege="manage" />
+		</attribute>
+	</cluster>
 </configurator>

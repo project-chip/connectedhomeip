@@ -15,22 +15,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <domain name="CHIP"/>
+	<domain name="CHIP" />
 
-  <struct name="LabelStruct">
-    <cluster code="0x0040"/>
-    <cluster code="0x0041"/>
-    <item name="Label" type="char_string" length="16"/>
-    <item name="Value" type="char_string" length="16"/>
-  </struct>
+	<struct name="LabelStruct">
+		<cluster code="0x0040" />
+		<cluster code="0x0041" />
+		<item name="Label" type="char_string" length="16" />
+		<item name="Value" type="char_string" length="16" />
+	</struct>
 
-  <cluster>
-    <domain>General</domain>
-    <name>Fixed Label</name>
-    <code>0x0040</code>
-    <define>FIXED_LABEL_CLUSTER</define>
-    <description>The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
+	<cluster>
+		<domain>General</domain>
+		<name>Fixed Label</name>
+		<code>0x0040</code>
+		<define>FIXED_LABEL_CLUSTER</define>
+		<description>The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
 labels.</description>
-    <attribute side="server" code="0x0000" define="LABEL_LIST" type="ARRAY" entryType="LabelStruct" writable="false" optional="false">LabelList</attribute>
-  </cluster>
+		<attribute side="server" code="0x0000" define="LABEL_LIST" type="ARRAY" entryType="LabelStruct" writable="false"
+			optional="false">LabelList</attribute>
+	</cluster>
 </configurator>

@@ -15,22 +15,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <domain name="CHIP"/>
+	<domain name="CHIP" />
 
-  <cluster>
-    <name>Boolean State</name>
-    <domain>General</domain>
-    <description>This cluster provides an interface to a boolean state called StateValue.</description>
-    <code>0x0045</code>
-    <define>BOOLEAN_STATE_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="1"/>
-    <attribute side="server" code="0x0000" define="STATE_VALUE" type="boolean" writable="false" reportable="true" optional="false">StateValue</attribute>
+	<cluster>
+		<name>Boolean State</name>
+		<domain>General</domain>
+		<description>This cluster provides an interface to a boolean state called StateValue.</description>
+		<code>0x0045</code>
+		<define>BOOLEAN_STATE_CLUSTER</define>
+		<client tick="false" init="false">true</client>
+		<server tick="false" init="false">true</server>
+		<globalAttribute side="either" code="0xFFFD" value="1" />
+		<attribute side="server" code="0x0000" define="STATE_VALUE" type="boolean" writable="false" reportable="true"
+			optional="false">StateValue</attribute>
 
-    <event code="0x0000" name="StateChange" priority="info" side="server">
-      <description>This event SHALL be generated when the StateValue attribute changes.</description>
-      <field id="0" name="StateValue" type="boolean"/>
-    </event>
-  </cluster>
+		<event code="0x0000" name="StateChange" priority="info" side="server">
+			<description>This event SHALL be generated when the StateValue attribute changes.</description>
+			<field id="0" name="StateValue" type="boolean" />
+		</event>
+	</cluster>
 </configurator>

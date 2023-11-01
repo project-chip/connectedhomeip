@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<!--
+	<?xml version="1.0"?>
+	<!--
 Copyright (c) 2023 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,18 +14,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<configurator>
-  <enum name="TemperatureDisplayMode" type="enum8">
-    <item name="celsius" value="0x0"/>
-    <item name="fahrenheit" value="0x1"/>
-  </enum>
+	<configurator>
+		<enum name="TemperatureDisplayMode" type="enum8">
+			<item name="celsius" value="0x0" />
+			<item name="fahrenheit" value="0x1" />
+		</enum>
 
-  <enum name="KeypadLockout" type="enum8">
-    <item name="noLockout" value="0x0"/>
-    <item name="levelOneLockout" value="0x1"/>
-    <item name="levelTwoLockout" value="0x2"/>
-    <item name="levelThreeLockout" value="0x3"/>
-    <item name="levelFourLockout" value="0x4"/>
-    <item name="levelfiveLockout" value="0x5"/>
-  </enum>
-</configurator>
+		<enum name="KeypadLockout" type="enum8">
+			<item name="noLockout" value="0x0" />
+			<item name="levelOneLockout" value="0x1" />
+			<item name="levelTwoLockout" value="0x2" />
+			<item name="levelThreeLockout" value="0x3" />
+			<item name="levelFourLockout" value="0x4" />
+			<item name="levelfiveLockout" value="0x5" />
+		</enum>
+	</configurator>
