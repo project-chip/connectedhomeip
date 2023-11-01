@@ -378,7 +378,7 @@ exit:
 }
 
 CHIP_ERROR NewChipX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
-                           Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert)
+                           const Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ASN1Writer writer;
@@ -411,7 +411,7 @@ exit:
     return err;
 }
 
-DLL_EXPORT CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, Crypto::P256Keypair & issuerKeypair,
+DLL_EXPORT CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256Keypair & issuerKeypair,
                                       MutableByteSpan & x509Cert)
 {
     CertType certType;
@@ -424,7 +424,7 @@ DLL_EXPORT CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParam
 }
 
 DLL_EXPORT CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
-                                     Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert)
+                                     const Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert)
 {
     CertType certType;
 
@@ -438,8 +438,8 @@ DLL_EXPORT CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams
 }
 
 DLL_EXPORT CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParams,
-                                                 const Crypto::P256PublicKey & subjectPubkey, Crypto::P256Keypair & issuerKeypair,
-                                                 MutableByteSpan & x509Cert)
+                                                 const Crypto::P256PublicKey & subjectPubkey,
+                                                 const Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert)
 {
     CertType certType;
 
