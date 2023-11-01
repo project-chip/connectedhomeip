@@ -6,7 +6,7 @@
 
 ## Tools
 
-### Fail Summarization
+### Daily Fail Summary
 
 Workflow:
 https://github.com/project-chip/connectedhomeip/blob/master/.github/workflows/recent_fail_summary.yaml
