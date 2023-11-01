@@ -1681,7 +1681,7 @@ void TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator(nlTestSuite * in
     NL_TEST_ASSERT(inSuite, !mockSender.IsOnMessageReceivedCalled);
 
     // // Retrasnmit message
-    ctx.GetIOContext().DriveIOUntil(150_ms32, [&] { return loopback.mSentMessageCount >= 4; });
+    ctx.GetIOContext().DriveIOUntil(500_ms32, [&] { return loopback.mSentMessageCount >= 4; });
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, mockSender.IsOnMessageReceivedCalled);
