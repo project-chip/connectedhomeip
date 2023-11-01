@@ -2202,6 +2202,81 @@ void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, LogContent, UTCTimeStamp, TimeSinceBoot);
 }
+CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback::CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback(
+    jobject javaCallback) : Callback::Callback<CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallbackType>(CallbackFn, this)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback::~CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+};
+
+void CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & dataResponse)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+    jmethodID javaMethod;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+
+    std::unique_ptr<CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback,
+                    void (*)(CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback>);
+    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
+
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    // Java callback is allowed to be null, exit early if this is the case.
+    VerifyOrReturn(javaCallbackRef != nullptr);
+
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Long;Ljava/lang/Long;)V",
+                                                  &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+
+    jobject SystemTimeUs;
+    std::string SystemTimeUsClassName     = "java/lang/Long";
+    std::string SystemTimeUsCtorSignature = "(J)V";
+    jlong jniSystemTimeUs                 = static_cast<jlong>(dataResponse.systemTimeUs);
+    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(SystemTimeUsClassName.c_str(), SystemTimeUsCtorSignature.c_str(),
+                                                                jniSystemTimeUs, SystemTimeUs);
+    jobject UTCTimeUs;
+    if (dataResponse.UTCTimeUs.IsNull())
+    {
+        UTCTimeUs = nullptr;
+    }
+    else
+    {
+        std::string UTCTimeUsClassName     = "java/lang/Long";
+        std::string UTCTimeUsCtorSignature = "(J)V";
+        jlong jniUTCTimeUs                 = static_cast<jlong>(dataResponse.UTCTimeUs.Value());
+        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(UTCTimeUsClassName.c_str(), UTCTimeUsCtorSignature.c_str(),
+                                                                    jniUTCTimeUs, UTCTimeUs);
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, SystemTimeUs, UTCTimeUs);
+}
 CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback::CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback(
     jobject javaCallback) : Callback::Callback<CHIPTimeSynchronizationClusterSetTimeZoneResponseCallbackType>(CallbackFn, this)
 {

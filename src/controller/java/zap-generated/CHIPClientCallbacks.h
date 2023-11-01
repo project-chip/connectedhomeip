@@ -595,6 +595,7 @@ typedef void (*DishwasherAlarmEventListListAttributeCallback)(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*DishwasherAlarmAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+<<<<<<< HEAD
 typedef void (*MicrowaveOvenModeSupportedModesListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::MicrowaveOvenMode::Structs::ModeOptionStruct::DecodableType> &
@@ -606,6 +607,15 @@ typedef void (*MicrowaveOvenModeAcceptedCommandListListAttributeCallback)(
 typedef void (*MicrowaveOvenModeEventListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*MicrowaveOvenModeAttributeListListAttributeCallback)(
+=======
+typedef void (*MicrowaveOvenControlGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*MicrowaveOvenControlAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*MicrowaveOvenControlEventListListAttributeCallback)(void * context,
+                                                                   const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*MicrowaveOvenControlAttributeListListAttributeCallback)(
+>>>>>>> master
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*OperationalStatePhaseListListAttributeCallback)(
     void * context, const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> & data);

@@ -187,8 +187,13 @@ public class ClusterIDMapping {
         if (clusterId == DishwasherAlarm.ID) {
             return new DishwasherAlarm();
         }
+<<<<<<< HEAD
         if (clusterId == MicrowaveOvenMode.ID) {
             return new MicrowaveOvenMode();
+=======
+        if (clusterId == MicrowaveOvenControl.ID) {
+            return new MicrowaveOvenControl();
+>>>>>>> master
         }
         if (clusterId == OperationalState.ID) {
             return new OperationalState();
@@ -3803,7 +3808,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            TestEventTrigger(0L),;
+            TestEventTrigger(0L),
+            TimeSnapshot(1L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -7534,15 +7540,28 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
+<<<<<<< HEAD
     public static class MicrowaveOvenMode implements BaseCluster {
         public static final long ID = 94L;
+=======
+    public static class MicrowaveOvenControl implements BaseCluster {
+        public static final long ID = 95L;
+>>>>>>> master
         public long getID() {
             return ID;
         }
 
         public enum Attribute {
+<<<<<<< HEAD
             SupportedModes(0L),
             CurrentMode(1L),
+=======
+            CookTime(1L),
+            PowerSetting(2L),
+            MinPower(3L),
+            MaxPower(4L),
+            PowerStep(5L),
+>>>>>>> master
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -7588,7 +7607,13 @@ public class ClusterIDMapping {
             }
         }
 
+<<<<<<< HEAD
         public enum Command {;
+=======
+        public enum Command {
+            SetCookingParameters(0L),
+            AddMoreTime(1L),;
+>>>>>>> master
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -7606,7 +7631,45 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
+<<<<<<< HEAD
         }@Override
+=======
+        }public enum SetCookingParametersCommandField {CookMode(0),CookTime(1),PowerSetting(2),;
+                    private final int id;
+                    SetCookingParametersCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetCookingParametersCommandField value(int id) throws NoSuchFieldError {
+                        for (SetCookingParametersCommandField field : SetCookingParametersCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum AddMoreTimeCommandField {TimeToAdd(0),;
+                    private final int id;
+                    AddMoreTimeCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static AddMoreTimeCommandField value(int id) throws NoSuchFieldError {
+                        for (AddMoreTimeCommandField field : AddMoreTimeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+>>>>>>> master
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }

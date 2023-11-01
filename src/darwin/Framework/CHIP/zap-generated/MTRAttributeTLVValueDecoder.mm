@@ -286,7 +286,7 @@ static id _Nullable DecodeAttributeValueForScenesCluster(AttributeId aAttributeI
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::LastConfiguredBy::Id: {
@@ -2518,6 +2518,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
         }
         return value;
     }
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::SupportedWiFiBands::Id: {
         using TypeInfo = Attributes::SupportedWiFiBands::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -2544,6 +2545,8 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
         }
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::SupportedThreadFeatures::Id: {
         using TypeInfo = Attributes::SupportedThreadFeatures::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -2555,6 +2558,8 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
         value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::ThreadVersion::Id: {
         using TypeInfo = Attributes::ThreadVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -2566,6 +2571,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
         value = [NSNumber numberWithUnsignedShort:cppValue];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -6453,17 +6459,28 @@ static id _Nullable DecodeAttributeValueForDishwasherAlarmCluster(AttributeId aA
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+<<<<<<< HEAD
 static id _Nullable DecodeAttributeValueForMicrowaveOvenModeCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::MicrowaveOvenMode;
     switch (aAttributeId) {
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
+=======
+static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::MicrowaveOvenControl;
+    switch (aAttributeId) {
+#if MTR_ENABLE_PROVISIONAL
+    case Attributes::CookTime::Id: {
+        using TypeInfo = Attributes::CookTime::TypeInfo;
+>>>>>>> master
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
+<<<<<<< HEAD
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
@@ -6514,6 +6531,15 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenModeCluster(AttributeId 
     }
     case Attributes::CurrentMode::Id: {
         using TypeInfo = Attributes::CurrentMode::TypeInfo;
+=======
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+    case Attributes::PowerSetting::Id: {
+        using TypeInfo = Attributes::PowerSetting::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -6523,6 +6549,50 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenModeCluster(AttributeId 
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+    case Attributes::MinPower::Id: {
+        using TypeInfo = Attributes::MinPower::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+    case Attributes::MaxPower::Id: {
+        using TypeInfo = Attributes::MaxPower::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+    case Attributes::PowerStep::Id: {
+        using TypeInfo = Attributes::PowerStep::TypeInfo;
+>>>>>>> master
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+<<<<<<< HEAD
+=======
+#endif // MTR_ENABLE_PROVISIONAL
+>>>>>>> master
     default: {
         break;
     }
@@ -10030,7 +10100,7 @@ static id _Nullable DecodeAttributeValueForTemperatureMeasurementCluster(Attribu
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithShort:cppValue];
+        value = [NSNumber numberWithUnsignedShort:cppValue];
         return value;
     }
     default: {
@@ -15991,8 +16061,13 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     case Clusters::DishwasherAlarm::Id: {
         return DecodeAttributeValueForDishwasherAlarmCluster(aPath.mAttributeId, aReader, aError);
     }
+<<<<<<< HEAD
     case Clusters::MicrowaveOvenMode::Id: {
         return DecodeAttributeValueForMicrowaveOvenModeCluster(aPath.mAttributeId, aReader, aError);
+=======
+    case Clusters::MicrowaveOvenControl::Id: {
+        return DecodeAttributeValueForMicrowaveOvenControlCluster(aPath.mAttributeId, aReader, aError);
+>>>>>>> master
     }
     case Clusters::OperationalState::Id: {
         return DecodeAttributeValueForOperationalStateCluster(aPath.mAttributeId, aReader, aError);

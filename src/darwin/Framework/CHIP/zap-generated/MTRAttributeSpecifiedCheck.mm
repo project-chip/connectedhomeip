@@ -2408,6 +2408,7 @@ static BOOL AttributeIsSpecifiedInDishwasherAlarmCluster(AttributeId aAttributeI
     }
     }
 }
+<<<<<<< HEAD
 static BOOL AttributeIsSpecifiedInMicrowaveOvenModeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::MicrowaveOvenMode;
@@ -2416,6 +2417,25 @@ static BOOL AttributeIsSpecifiedInMicrowaveOvenModeCluster(AttributeId aAttribut
         return YES;
     }
     case Attributes::CurrentMode::Id: {
+=======
+static BOOL AttributeIsSpecifiedInMicrowaveOvenControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MicrowaveOvenControl;
+    switch (aAttributeId) {
+    case Attributes::CookTime::Id: {
+        return YES;
+    }
+    case Attributes::PowerSetting::Id: {
+        return YES;
+    }
+    case Attributes::MinPower::Id: {
+        return YES;
+    }
+    case Attributes::MaxPower::Id: {
+        return YES;
+    }
+    case Attributes::PowerStep::Id: {
+>>>>>>> master
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5682,8 +5702,13 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::DishwasherAlarm::Id: {
         return AttributeIsSpecifiedInDishwasherAlarmCluster(aAttributeId);
     }
+<<<<<<< HEAD
     case Clusters::MicrowaveOvenMode::Id: {
         return AttributeIsSpecifiedInMicrowaveOvenModeCluster(aAttributeId);
+=======
+    case Clusters::MicrowaveOvenControl::Id: {
+        return AttributeIsSpecifiedInMicrowaveOvenControlCluster(aAttributeId);
+>>>>>>> master
     }
     case Clusters::OperationalState::Id: {
         return AttributeIsSpecifiedInOperationalStateCluster(aAttributeId);

@@ -457,13 +457,21 @@ void emberAfSmokeCoAlarmClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfDishwasherAlarmClusterInitCallback(chip::EndpointId endpoint);
 
+<<<<<<< HEAD
 /** @brief Microwave Oven Mode Cluster Init
+=======
+/** @brief Microwave Oven Control Cluster Init
+>>>>>>> master
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
+<<<<<<< HEAD
 void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpoint);
+=======
+void emberAfMicrowaveOvenControlClusterInitCallback(chip::EndpointId endpoint);
+>>>>>>> master
 
 /** @brief Operational State Cluster Init
  *
@@ -4920,42 +4928,73 @@ void emberAfDishwasherAlarmClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfDishwasherAlarmClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
+<<<<<<< HEAD
 // Microwave Oven Mode Cluster
 //
 
 /** @brief Microwave Oven Mode Cluster Server Init
+=======
+// Microwave Oven Control Cluster
+//
+
+/** @brief Microwave Oven Control Cluster Server Init
+>>>>>>> master
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
+<<<<<<< HEAD
 void emberAfMicrowaveOvenModeClusterServerInitCallback(chip::EndpointId endpoint);
 
 /** @brief Microwave Oven Mode Cluster Server Shutdown
+=======
+void emberAfMicrowaveOvenControlClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Microwave Oven Control Cluster Server Shutdown
+>>>>>>> master
  *
  * Server Shutdown
  *
  * @param endpoint    Endpoint that is being shutdown
  */
+<<<<<<< HEAD
 void MatterMicrowaveOvenModeClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Microwave Oven Mode Cluster Client Init
+=======
+void MatterMicrowaveOvenControlClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Microwave Oven Control Cluster Client Init
+>>>>>>> master
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
+<<<<<<< HEAD
 void emberAfMicrowaveOvenModeClusterClientInitCallback(chip::EndpointId endpoint);
 
 /** @brief Microwave Oven Mode Cluster Server Attribute Changed
+=======
+void emberAfMicrowaveOvenControlClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Microwave Oven Control Cluster Server Attribute Changed
+>>>>>>> master
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
+<<<<<<< HEAD
 void MatterMicrowaveOvenModeClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Microwave Oven Mode Cluster Server Pre Attribute Changed
+=======
+void MatterMicrowaveOvenControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Microwave Oven Control Cluster Server Pre Attribute Changed
+>>>>>>> master
  *
  * Server Pre Attribute Changed
  *
@@ -4964,11 +5003,18 @@ void MatterMicrowaveOvenModeClusterServerAttributeChangedCallback(const chip::ap
  * @param size          Attribute size
  * @param value         Attribute value
  */
+<<<<<<< HEAD
 chip::Protocols::InteractionModel::Status
 MatterMicrowaveOvenModeClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                                 EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Microwave Oven Mode Cluster Client Pre Attribute Changed
+=======
+chip::Protocols::InteractionModel::Status MatterMicrowaveOvenControlClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Microwave Oven Control Cluster Client Pre Attribute Changed
+>>>>>>> master
  *
  * Client Pre Attribute Changed
  *
@@ -4977,25 +5023,42 @@ MatterMicrowaveOvenModeClusterServerPreAttributeChangedCallback(const chip::app:
  * @param size          Attribute size
  * @param value         Attribute value
  */
+<<<<<<< HEAD
 chip::Protocols::InteractionModel::Status
 MatterMicrowaveOvenModeClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                                 EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Microwave Oven Mode Cluster Server Tick
+=======
+chip::Protocols::InteractionModel::Status MatterMicrowaveOvenControlClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Microwave Oven Control Cluster Server Tick
+>>>>>>> master
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
+<<<<<<< HEAD
 void emberAfMicrowaveOvenModeClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @brief Microwave Oven Mode Cluster Client Tick
+=======
+void emberAfMicrowaveOvenControlClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Microwave Oven Control Cluster Client Tick
+>>>>>>> master
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
+<<<<<<< HEAD
 void emberAfMicrowaveOvenModeClusterClientTickCallback(chip::EndpointId endpoint);
+=======
+void emberAfMicrowaveOvenControlClusterClientTickCallback(chip::EndpointId endpoint);
+>>>>>>> master
 
 //
 // Operational State Cluster
@@ -8746,6 +8809,12 @@ bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GeneralDiagnostics::Commands::TestEventTrigger::DecodableType & commandData);
 /**
+ * @brief General Diagnostics Cluster TimeSnapshot Command callback (from client)
+ */
+bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshot::DecodableType & commandData);
+/**
  * @brief Software Diagnostics Cluster ResetWatermarks Command callback (from client)
  */
 bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(
@@ -8937,6 +9006,18 @@ bool emberAfDishwasherAlarmClusterResetCallback(
 bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
+/**
+ * @brief Microwave Oven Control Cluster SetCookingParameters Command callback (from client)
+ */
+bool emberAfMicrowaveOvenControlClusterSetCookingParametersCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MicrowaveOvenControl::Commands::SetCookingParameters::DecodableType & commandData);
+/**
+ * @brief Microwave Oven Control Cluster AddMoreTime Command callback (from client)
+ */
+bool emberAfMicrowaveOvenControlClusterAddMoreTimeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MicrowaveOvenControl::Commands::AddMoreTime::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */

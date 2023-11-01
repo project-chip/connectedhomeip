@@ -3043,8 +3043,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+<<<<<<< HEAD
     case app::Clusters::MicrowaveOvenMode::Id: {
         using namespace app::Clusters::MicrowaveOvenMode;
+=======
+    case app::Clusters::MicrowaveOvenControl::Id: {
+        using namespace app::Clusters::MicrowaveOvenControl;
+>>>>>>> master
         switch (aPath.mEventId)
         {
         default:

@@ -2397,6 +2397,12 @@ class ChipClusters:
                     "eventTrigger": "int",
                 },
             },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "TimeSnapshot",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -5257,6 +5263,7 @@ class ChipClusters:
             },
         },
     }
+<<<<<<< HEAD
     _MICROWAVE_OVEN_MODE_CLUSTER_INFO = {
         "clusterName": "MicrowaveOvenMode",
         "clusterId": 0x0000005E,
@@ -5271,10 +5278,63 @@ class ChipClusters:
             },
             0x00000001: {
                 "attributeName": "CurrentMode",
+=======
+    _MICROWAVE_OVEN_CONTROL_CLUSTER_INFO = {
+        "clusterName": "MicrowaveOvenControl",
+        "clusterId": 0x0000005F,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "SetCookingParameters",
+                "args": {
+                    "cookMode": "int",
+                    "cookTime": "int",
+                    "powerSetting": "int",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "AddMoreTime",
+                "args": {
+                    "timeToAdd": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000001: {
+                "attributeName": "CookTime",
+>>>>>>> master
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
+<<<<<<< HEAD
+=======
+            0x00000002: {
+                "attributeName": "PowerSetting",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "MinPower",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "MaxPower",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "PowerStep",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+>>>>>>> master
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -12298,7 +12358,11 @@ class ChipClusters:
         0x0000005B: _AIR_QUALITY_CLUSTER_INFO,
         0x0000005C: _SMOKE_CO_ALARM_CLUSTER_INFO,
         0x0000005D: _DISHWASHER_ALARM_CLUSTER_INFO,
+<<<<<<< HEAD
         0x0000005E: _MICROWAVE_OVEN_MODE_CLUSTER_INFO,
+=======
+        0x0000005F: _MICROWAVE_OVEN_CONTROL_CLUSTER_INFO,
+>>>>>>> master
         0x00000060: _OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000061: _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000071: _HEPA_FILTER_MONITORING_CLUSTER_INFO,
@@ -12400,7 +12464,11 @@ class ChipClusters:
         "AirQuality": _AIR_QUALITY_CLUSTER_INFO,
         "SmokeCoAlarm": _SMOKE_CO_ALARM_CLUSTER_INFO,
         "DishwasherAlarm": _DISHWASHER_ALARM_CLUSTER_INFO,
+<<<<<<< HEAD
         "MicrowaveOvenMode": _MICROWAVE_OVEN_MODE_CLUSTER_INFO,
+=======
+        "MicrowaveOvenControl": _MICROWAVE_OVEN_CONTROL_CLUSTER_INFO,
+>>>>>>> master
         "OperationalState": _OPERATIONAL_STATE_CLUSTER_INFO,
         "RvcOperationalState": _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         "HepaFilterMonitoring": _HEPA_FILTER_MONITORING_CLUSTER_INFO,

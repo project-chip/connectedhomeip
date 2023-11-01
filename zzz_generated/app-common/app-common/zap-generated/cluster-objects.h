@@ -1739,7 +1739,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CopyScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
-    chip::BitMask<ScenesCopyMode> mode = static_cast<chip::BitMask<ScenesCopyMode>>(0);
+    chip::BitMask<CopyModeBitmap> mode = static_cast<chip::BitMask<CopyModeBitmap>>(0);
     chip::GroupId groupIdentifierFrom  = static_cast<chip::GroupId>(0);
     uint8_t sceneIdentifierFrom        = static_cast<uint8_t>(0);
     chip::GroupId groupIdentifierTo    = static_cast<chip::GroupId>(0);
@@ -1758,7 +1758,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CopyScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
 
-    chip::BitMask<ScenesCopyMode> mode = static_cast<chip::BitMask<ScenesCopyMode>>(0);
+    chip::BitMask<CopyModeBitmap> mode = static_cast<chip::BitMask<CopyModeBitmap>>(0);
     chip::GroupId groupIdentifierFrom  = static_cast<chip::GroupId>(0);
     uint8_t sceneIdentifierFrom        = static_cast<uint8_t>(0);
     chip::GroupId groupIdentifierTo    = static_cast<chip::GroupId>(0);
@@ -1859,9 +1859,9 @@ struct TypeInfo
 namespace NameSupport {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitMask<chip::app::Clusters::Scenes::NameSupportBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::Scenes::NameSupportBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::Scenes::NameSupportBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NameSupport::Id; }
@@ -1953,7 +1953,8 @@ struct TypeInfo
         Attributes::CurrentScene::TypeInfo::DecodableType currentScene = static_cast<uint8_t>(0);
         Attributes::CurrentGroup::TypeInfo::DecodableType currentGroup = static_cast<chip::GroupId>(0);
         Attributes::SceneValid::TypeInfo::DecodableType sceneValid     = static_cast<bool>(0);
-        Attributes::NameSupport::TypeInfo::DecodableType nameSupport   = static_cast<uint8_t>(0);
+        Attributes::NameSupport::TypeInfo::DecodableType nameSupport =
+            static_cast<chip::BitMask<chip::app::Clusters::Scenes::NameSupportBitmap>>(0);
         Attributes::LastConfiguredBy::TypeInfo::DecodableType lastConfiguredBy;
         Attributes::SceneTableSize::TypeInfo::DecodableType sceneTableSize       = static_cast<uint16_t>(0);
         Attributes::RemainingCapacity::TypeInfo::DecodableType remainingCapacity = static_cast<uint8_t>(0);
@@ -8176,6 +8177,16 @@ struct Type;
 struct DecodableType;
 } // namespace TestEventTrigger
 
+namespace TimeSnapshot {
+struct Type;
+struct DecodableType;
+} // namespace TimeSnapshot
+
+namespace TimeSnapshotResponse {
+struct Type;
+struct DecodableType;
+} // namespace TimeSnapshotResponse
+
 } // namespace Commands
 
 namespace Commands {
@@ -8214,6 +8225,69 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestEventTrigger
+namespace TimeSnapshot {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TimeSnapshot::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TimeSnapshot::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TimeSnapshot
+namespace TimeSnapshotResponse {
+enum class Fields : uint8_t
+{
+    kSystemTimeUs = 0,
+    kUTCTimeUs    = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TimeSnapshotResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    uint64_t systemTimeUs = static_cast<uint64_t>(0);
+    DataModel::Nullable<uint64_t> UTCTimeUs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TimeSnapshotResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    uint64_t systemTimeUs = static_cast<uint64_t>(0);
+    DataModel::Nullable<uint64_t> UTCTimeUs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TimeSnapshotResponse
 } // namespace Commands
 
 namespace Attributes {
@@ -16803,6 +16877,7 @@ public:
 } // namespace Notify
 } // namespace Events
 } // namespace DishwasherAlarm
+<<<<<<< HEAD
 namespace MicrowaveOvenMode {
 namespace Structs {
 namespace ModeTagStruct    = Clusters::detail::Structs::ModeTagStruct;
@@ -16826,12 +16901,156 @@ struct TypeInfo
 };
 } // namespace SupportedModes
 namespace CurrentMode {
+=======
+namespace MicrowaveOvenControl {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace SetCookingParameters {
+struct Type;
+struct DecodableType;
+} // namespace SetCookingParameters
+
+namespace AddMoreTime {
+struct Type;
+struct DecodableType;
+} // namespace AddMoreTime
+
+} // namespace Commands
+
+namespace Commands {
+namespace SetCookingParameters {
+enum class Fields : uint8_t
+{
+    kCookMode     = 0,
+    kCookTime     = 1,
+    kPowerSetting = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetCookingParameters::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+
+    Optional<uint8_t> cookMode;
+    Optional<uint32_t> cookTime;
+    Optional<uint8_t> powerSetting;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetCookingParameters::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+
+    Optional<uint8_t> cookMode;
+    Optional<uint32_t> cookTime;
+    Optional<uint8_t> powerSetting;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetCookingParameters
+namespace AddMoreTime {
+enum class Fields : uint8_t
+{
+    kTimeToAdd = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::AddMoreTime::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+
+    uint32_t timeToAdd = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::AddMoreTime::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+
+    uint32_t timeToAdd = static_cast<uint32_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddMoreTime
+} // namespace Commands
+
+namespace Attributes {
+
+namespace CookTime {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CookTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CookTime
+namespace PowerSetting {
 struct TypeInfo
 {
     using Type             = uint8_t;
     using DecodableType    = uint8_t;
     using DecodableArgType = uint8_t;
 
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerSetting::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PowerSetting
+namespace MinPower {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinPower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinPower
+namespace MaxPower {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxPower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxPower
+namespace PowerStep {
+>>>>>>> master
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+<<<<<<< HEAD
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenMode::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
@@ -16841,36 +17060,67 @@ namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenMode::Id; }
+=======
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerStep::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PowerStep
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+>>>>>>> master
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
+<<<<<<< HEAD
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenMode::Id; }
+=======
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+>>>>>>> master
 };
 } // namespace AcceptedCommandList
 namespace EventList {
 struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
 {
+<<<<<<< HEAD
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenMode::Id; }
+=======
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+>>>>>>> master
 };
 } // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
+<<<<<<< HEAD
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenMode::Id; }
+=======
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+>>>>>>> master
 };
 } // namespace AttributeList
 namespace FeatureMap {
 struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
+<<<<<<< HEAD
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenMode::Id; }
+=======
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+>>>>>>> master
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
 struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
+<<<<<<< HEAD
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenMode::Id; }
+=======
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+>>>>>>> master
 };
 } // namespace ClusterRevision
 
@@ -16878,12 +17128,24 @@ struct TypeInfo
 {
     struct DecodableType
     {
+<<<<<<< HEAD
         static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenMode::Id; }
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
+=======
+        static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::CookTime::TypeInfo::DecodableType cookTime         = static_cast<uint32_t>(0);
+        Attributes::PowerSetting::TypeInfo::DecodableType powerSetting = static_cast<uint8_t>(0);
+        Attributes::MinPower::TypeInfo::DecodableType minPower         = static_cast<uint8_t>(0);
+        Attributes::MaxPower::TypeInfo::DecodableType maxPower         = static_cast<uint8_t>(0);
+        Attributes::PowerStep::TypeInfo::DecodableType powerStep       = static_cast<uint8_t>(0);
+>>>>>>> master
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -16893,7 +17155,11 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
+<<<<<<< HEAD
 } // namespace MicrowaveOvenMode
+=======
+} // namespace MicrowaveOvenControl
+>>>>>>> master
 namespace OperationalState {
 namespace Structs {
 namespace ErrorStateStruct       = Clusters::detail::Structs::ErrorStateStruct;
@@ -25083,9 +25349,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -25140,7 +25406,7 @@ struct TypeInfo
         Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
-        Attributes::Tolerance::TypeInfo::DecodableType tolerance = static_cast<int16_t>(0);
+        Attributes::Tolerance::TypeInfo::DecodableType tolerance = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
