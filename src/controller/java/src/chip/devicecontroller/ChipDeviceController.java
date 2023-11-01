@@ -129,10 +129,7 @@ public class ChipDeviceController {
     startOTAProvider(deviceControllerPtr, aOTAProviderDelegate);
   }
 
-  /**
-   * Disable OTA Provider server cluster
-   *
-   */
+  /** Disable OTA Provider server cluster */
   public void finishOTAProvider() {
     finishOTAProvider(deviceControllerPtr);
   }
