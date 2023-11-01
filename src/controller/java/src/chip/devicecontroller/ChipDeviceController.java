@@ -120,6 +120,14 @@ public class ChipDeviceController {
     setAttestationTrustStoreDelegate(deviceControllerPtr, attestationTrustStoreDelegate);
   }
 
+  /**
+   *
+   * @param aOTAProviderDelegate
+   */
+  public void setOTAProviderDelegate(OTAProviderDelegate aOTAProviderDelegate) {
+    setOTAProviderDelegate(deviceControllerPtr, aOTAProviderDelegate);
+  }
+
   public void pairDevice(
       BluetoothGatt bleServer,
       int connId,
@@ -1151,6 +1159,8 @@ public class ChipDeviceController {
 
   private native void setAttestationTrustStoreDelegate(
       long deviceControllerPtr, AttestationTrustStoreDelegate delegate);
+
+  private native void setOTAProviderDelegate(long deviceControllerPtr, OTAProviderDelegate delegate);
 
   private native void pairDevice(
       long deviceControllerPtr,

@@ -509,6 +509,34 @@ exit:
     return err;
 }
 
+CHIP_ERROR AndroidDeviceControllerWrapper::InitializeOTAProviderBridge(jobject otaProviderDelegate)
+{
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    OTAProviderDelegateBridge * otaProviderBridge = new OTAProviderDelegateBridge(otaProviderDelegate);
+    auto systemState = DeviceControllerFactory::GetInstance().GetSystemState();
+
+    VerifyOrExit(otaProviderBridge != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    err = otaProviderBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr());
+
+    mOtaProviderBridge = otaProviderBridge;
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        if (otaProviderBridge != nullptr)
+        {
+            delete otaProviderBridge;
+        }
+    }
+
+    return err;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
+}
+
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
     chip::DeviceLayer::StackUnlock unlock;

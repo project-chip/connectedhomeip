@@ -97,6 +97,12 @@ shared_library("jni") {
   }
 
   if (chip_build_controller_dynamic_server) {
+    sources += [
+      "BdxOTASender.cpp",
+      "BdxOTASender.h",
+      "OTAProviderDelegateBridge.cpp",
+      "OTAProviderDelegateBridge.h",
+    ]
     defines += [ "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER" ]
     deps += [ "${chip_root}/src/controller:nodatamodel" ]
   }
@@ -449,6 +455,7 @@ android_library("java") {
     "src/chip/devicecontroller/KeypairDelegate.java",
     "src/chip/devicecontroller/NetworkCredentials.java",
     "src/chip/devicecontroller/NetworkLocation.java",
+    "src/chip/devicecontroller/OTAProviderDelegate.java",
     "src/chip/devicecontroller/OpenCommissioningCallback.java",
     "src/chip/devicecontroller/OperationalKeyConfig.java",
     "src/chip/devicecontroller/PaseVerifierParams.java",

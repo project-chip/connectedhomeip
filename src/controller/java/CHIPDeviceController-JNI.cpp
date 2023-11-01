@@ -545,6 +545,33 @@ exit:
     }
 }
 
+JNI_METHOD(void, setOTAProviderDelegate)(JNIEnv * env, jobject self, jlong handle, jobject otaProviderDelegate)
+{
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturn(wrapper != nullptr, ChipLogError(Controller, "wrapper is null"));
+
+    ChipLogProgress(Controller, "setOTAProviderDelegate() called");
+
+    if (otaProviderDelegate != nullptr)
+    {
+        jobject otaProviderDelegateRef = env->NewGlobalRef(otaProviderDelegate);
+        err                            = wrapper->InitializeOTAProviderBridge(otaProviderDelegateRef);
+        SuccessOrExit(err);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to set OTA Provider delegate.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+#endif
+}
+
 JNI_METHOD(void, commissionDevice)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jbyteArray csrNonce, jobject networkCredentials)
 {
