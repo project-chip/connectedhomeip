@@ -522,7 +522,7 @@ tests:
     - label: "Step 30: TH reads ActiveNetworkFaults attribute value from DUT"
       PICS: DGTHREAD.S.A003e
       command: "readAttribute"
-      attribute: "ActiveNetworkFaultsList"
+      attribute: "ActiveNetworkFaults"
       response:
           constraints:
               type: list

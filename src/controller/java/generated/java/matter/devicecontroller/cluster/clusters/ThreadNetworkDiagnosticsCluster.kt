@@ -66,7 +66,7 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     val value: ChipStructs.ThreadNetworkDiagnosticsClusterOperationalDatasetComponents?
   )
 
-  class ActiveNetworkFaultsListAttribute(val value: ArrayList<UInt>)
+  class ActiveNetworkFaultsAttribute(val value: ArrayList<UInt>)
 
   class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
 
@@ -637,14 +637,14 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readActiveNetworkFaultsListAttribute(): ActiveNetworkFaultsListAttribute {
+  suspend fun readActiveNetworkFaultsAttribute(): ActiveNetworkFaultsAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActiveNetworkFaultsListAttribute(
+  suspend fun subscribeActiveNetworkFaultsAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): ActiveNetworkFaultsListAttribute {
+  ): ActiveNetworkFaultsAttribute {
     // Implementation needs to be added here
   }
 

@@ -128,7 +128,7 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_WriteThre
     // Encode EmptyList
     case app::Clusters::ThreadNetworkDiagnostics::Attributes::RouteTable::Id:
     case app::Clusters::ThreadNetworkDiagnostics::Attributes::NeighborTable::Id:
-    case app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id:
+    case app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaults::Id:
         err = encoder.EncodeEmptyList();
         break;
     // Encode Null

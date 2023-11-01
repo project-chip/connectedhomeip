@@ -66,7 +66,7 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aP
     case ThreadNetworkDiagnostics::Attributes::RouteTable::Id:
     case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
     case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id:
-    case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id:
+    case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaults::Id:
     case ThreadNetworkDiagnostics::Attributes::Channel::Id:
     case ThreadNetworkDiagnostics::Attributes::RoutingRole::Id:
     case ThreadNetworkDiagnostics::Attributes::NetworkName::Id:

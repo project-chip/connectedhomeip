@@ -274,7 +274,7 @@ typedef void (*GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> & data);
 typedef void (*GeneralDiagnosticsActiveRadioFaultsListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> & data);
-typedef void (*GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback)(
+typedef void (*GeneralDiagnosticsActiveNetworkFaultsAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> & data);
 typedef void (*GeneralDiagnosticsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
@@ -304,7 +304,7 @@ typedef void (*ThreadNetworkDiagnosticsRouteTableListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTableStruct::DecodableType> & data);
-typedef void (*ThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback)(
+typedef void (*ThreadNetworkDiagnosticsActiveNetworkFaultsAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum> & data);
 typedef void (*ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback)(

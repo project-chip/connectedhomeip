@@ -493,7 +493,7 @@
               - SecurityPolicy
               - ChannelPage0Mask
               - OperationalDatasetComponents
-              - ActiveNetworkFaultsList
+              - ActiveNetworkFaults
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
