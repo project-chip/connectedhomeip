@@ -157,8 +157,8 @@ void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSessi
         }
         // Send a response to the RetreiveLogRequest since we got a SendAccept message.
         DiagnosticLogsServer::Instance().HandleBDXResponse(CHIP_NO_ERROR);
+        [[fallthrough]];
     }
-    // Fallthrough
     case TransferSession::OutputEventType::kAckReceived: {
         uint16_t blockSize   = mTransfer.GetTransferBlockSize();
         uint16_t bytesToRead = blockSize;

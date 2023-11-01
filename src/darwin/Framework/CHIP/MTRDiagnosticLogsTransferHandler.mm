@@ -38,7 +38,7 @@ CHIP_ERROR MTRDiagnosticLogsTransferHandler::PrepareForTransfer(System::Layer * 
 
     ReturnErrorOnFailure(ConfigureState(fabricIndex, nodeId));
 
-    BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kReceiverDrive);
+    BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kSenderDrive);
 
     return Responder::PrepareForTransfer(layer, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout);
 }
@@ -85,16 +85,16 @@ CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnTransferSessionBegin(TransferSess
 CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnTransferSessionEnd(TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
-
     VerifyOrReturnError(mFabricIndex.HasValue(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-
     CHIP_ERROR error = CHIP_NO_ERROR;
+
     if (event.EventType == TransferSession::OutputEventType::kTransferTimeout) {
         error = CHIP_ERROR_TIMEOUT;
-    } else if (!isBlockEOFSent) {
+    } else if (event.EventType != TransferSession::OutputEventType::kMsgToSend || !event.msgTypeData.HasMessageType(MessageType::BlockAckEOF)) {
         error = CHIP_ERROR_INTERNAL;
     }
+
     // Notify the MTRDevice via the callback that the BDX transfer has completed with error or success.
     if (mCallback) {
         mCallback(error != CHIP_NO_ERROR ? NO : YES);
@@ -170,7 +170,8 @@ CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnMessageToSend(TransferSession::Ou
 void MTRDiagnosticLogsTransferHandler::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
-    ChipLogError(BDX, "HandleTransferSessionOutput: Got an event %s", event.ToString(event.EventType));
+    ChipLogError(BDX, "Got an event %s", event.ToString(event.EventType));
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     switch (event.EventType) {
     case TransferSession::OutputEventType::kInitReceived:
@@ -181,7 +182,7 @@ void MTRDiagnosticLogsTransferHandler::HandleTransferSessionOutput(TransferSessi
         }
         break;
     case TransferSession::OutputEventType::kStatusReceived:
-        ChipLogError(BDX, "HandleTransferSessionOutput: Got StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
+        ChipLogError(BDX, "Got StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
         [[fallthrough]];
     case TransferSession::OutputEventType::kInternalError:
     case TransferSession::OutputEventType::kTransferTimeout:
@@ -195,21 +196,14 @@ void MTRDiagnosticLogsTransferHandler::HandleTransferSessionOutput(TransferSessi
         }
         break;
     case TransferSession::OutputEventType::kAckEOFReceived:
-        // Need to call OnTransferSessionEnd(event). Need to fix this and remove isBlockEOFSent.
         break;
     case TransferSession::OutputEventType::kMsgToSend:
         err = OnMessageToSend(event);
         if (event.msgTypeData.HasMessageType(MessageType::BlockAckEOF)) {
-            // TODO: This is a hack for determinin that the Ack EOF is sent before cleaning up.
-            // Need to fix this.
-            isBlockEOFSent = true;
+            err = OnTransferSessionEnd(event);
         }
         break;
     case TransferSession::OutputEventType::kNone:
-        if (isBlockEOFSent) {
-            OnTransferSessionEnd(event);
-        }
-        break;
     case TransferSession::OutputEventType::kQueryWithSkipReceived:
     case TransferSession::OutputEventType::kQueryReceived:
     case TransferSession::OutputEventType::kAckReceived:
@@ -225,6 +219,7 @@ void MTRDiagnosticLogsTransferHandler::HandleTransferSessionOutput(TransferSessi
 
 void MTRDiagnosticLogsTransferHandler::AbortTransfer(chip::bdx::StatusCode reason)
 {
+    assertChipStackLockedByCurrentThread();
     mTransfer.AbortTransfer(reason);
 }
 

@@ -86,8 +86,4 @@ private:
     std::function<void(bool)> mCallback;
 
     bool mInitialized = false;
-
-    bool isBlockEOFSent = false;
-
-    uint64_t downloadedBytes = 0;
 };
