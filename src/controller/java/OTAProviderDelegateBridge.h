@@ -28,7 +28,7 @@
 constexpr uint8_t kUpdateTokenLen = 32;
 
 class OTAProviderDelegateBridge : public chip::app::Clusters::OTAProviderDelegate
-{ 
+{
 public:
     OTAProviderDelegateBridge(jobject otaProviderDelegate);
 
