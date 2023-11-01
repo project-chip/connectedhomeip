@@ -156,6 +156,7 @@ limitations under the License.
     <attribute side="server" code="0x3E" define="ACTIVE_THREAD_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFaultEnum" length="4" writable="false" optional="false">ActiveNetworkFaults</attribute>
     <command source="client" code="0x00" name="ResetCounts" optional="true" cli="chip thread_network_diagnostics resetcounts">
       <description>Reception of this command SHALL reset the OverrunCount attributes to 0</description>
+      <access op="invoke" privilege="manage"/>
     </command>
     <event side="server" code="0x00" name="ConnectionStatus" priority="info" optional="true">
       <description>Indicate that a Node’s connection status to a Thread network has changed</description>
