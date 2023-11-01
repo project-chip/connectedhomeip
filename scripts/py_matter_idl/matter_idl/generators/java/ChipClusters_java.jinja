@@ -163,12 +163,14 @@ public class ChipClusters {
 
     protected long devicePtr;
     protected int endpointId;
+    protected long clusterId;
 
     private Optional<Long> timeoutMillis = Optional.empty();
 
-    public BaseChipCluster(long devicePtr, int endpointId) {
+    public BaseChipCluster(long devicePtr, int endpointId, long clusterId) {
       this.devicePtr = devicePtr;
       this.endpointId = endpointId;
+      this.clusterId = clusterId;
     }
 
     /**
@@ -190,7 +192,6 @@ public class ChipClusters {
 
     protected void readAttribute(
         ReportCallbackImpl callback,
-        long clusterId,
         long attributeId,
         boolean isFabricFiltered) {
       ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
@@ -199,7 +200,6 @@ public class ChipClusters {
 
     protected void writeAttribute(
         WriteAttributesCallbackImpl callback,
-        long clusterId,
         long attributeId,
         BaseTLVType value,
         int timedRequestTimeoutMs) {
@@ -210,7 +210,6 @@ public class ChipClusters {
 
     protected void subscribeAttribute(
         ReportCallbackImpl callback,
-        long clusterId,
         long attributeId,
         int minInterval,
         int maxInterval) {
@@ -220,7 +219,6 @@ public class ChipClusters {
 
     protected void invoke(
         InvokeCallbackImpl callback,
-        long clusterId,
         long commandId,
         BaseTLVType value,
         int timedRequestTimeoutMs) {
@@ -367,9 +365,12 @@ public class ChipClusters {
 {%- set typeLookup = idl | createLookupContext(cluster) %}
   public static class {{cluster.name}}Cluster extends BaseChipCluster {
     public static final long CLUSTER_ID = {{cluster.code}}L;
+{% for attribute in cluster.attributes | sort(attribute='code') %}
+    private static final long {{attribute.definition.name | constcase}}_ATTRIBUTE_ID = {{attribute.definition.code}}L;
+{%- endfor %}
 
     public {{cluster.name}}Cluster(long devicePtr, int endpointId) {
-      super(devicePtr, endpointId);
+      super(devicePtr, endpointId, CLUSTER_ID);
     }
 
     @Override
@@ -406,7 +407,6 @@ public class ChipClusters {
 {%- endfor -%}
 {%- endif -%}
     , int timedInvokeTimeoutMs) {
-      final long clusterId = CLUSTER_ID;
       final long commandId = {{command.code}}L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -459,7 +459,7 @@ public class ChipClusters {
 {%- else %}
           callback.onSuccess();
 {%- endif %}
-        }}, clusterId, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, value, timedInvokeTimeoutMs);
     }
 {% endfor %}
 {%- set already_handled_command = [] -%}
@@ -508,9 +508,7 @@ public class ChipClusters {
     public void read{{attribute.definition.name | upfirst}}Attribute(
         {{attribute | javaAttributeCallbackName(typeLookup) }} callback) {
 {%- endif %}
-      final long clusterId = CLUSTER_ID;
-      final long attributeId = {{attribute.definition.code}}L;
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId); 
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, {{attribute.definition.name | constcase}}_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -519,7 +517,7 @@ public class ChipClusters {
             {{encode_value_without_optional(cluster, encodable, 0)}} value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, clusterId, attributeId, {% if attribute | isFabricScopedList(typeLookup) -%}isFabricFiltered{%- else -%}true{%- endif -%});
+        }, {{attribute.definition.name | constcase}}_ATTRIBUTE_ID, {% if attribute | isFabricScopedList(typeLookup) -%}isFabricFiltered{%- else -%}true{%- endif -%});
     }
 {% if attribute.is_writable %}
 {%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
@@ -531,22 +529,18 @@ public class ChipClusters {
     }
 {% endif %}
     public void write{{attribute.definition.name | upfirst}}Attribute(DefaultClusterCallback callback, {{encode_value_without_optional_nullable(cluster, encodable2, 0)}} value, int timedWriteTimeoutMs) {
-      final long clusterId = CLUSTER_ID;
-      final long attributeId = {{attribute.definition.code}}L;
-      {% if encodable3.is_optional %}
+      {%- if encodable3.is_optional %}
       BaseTLVType tlvValue = {{encode_tlv(cluster, encodable3.without_optional(), "value", 0)}};
       {%- else %}
       BaseTLVType tlvValue = {{encode_tlv(cluster, encodable3, "value", 0)}};
       {%- endif %}
-      writeAttribute(new WriteAttributesCallbackImpl(callback), clusterId, attributeId, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), {{attribute.definition.name | constcase}}_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 {% endif %}
 {%- if attribute.is_subscribable %}
     public void subscribe{{attribute.definition.name | upfirst}}Attribute(
         {{attribute | javaAttributeCallbackName(typeLookup) }} callback, int minInterval, int maxInterval) {
-      final long clusterId = CLUSTER_ID;
-      final long attributeId = {{attribute.definition.code}}L;
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId); 
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, {{attribute.definition.name | constcase}}_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -554,7 +548,7 @@ public class ChipClusters {
             {%- set encodable = attribute.definition | asEncodable(typeLookup) %}
             {{encode_value_without_optional(cluster, encodable, 0)}} value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
-        }, clusterId, attributeId, minInterval, maxInterval);
+        }, {{attribute.definition.name | constcase}}_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 {% endif -%}
 {%- endfor -%}
