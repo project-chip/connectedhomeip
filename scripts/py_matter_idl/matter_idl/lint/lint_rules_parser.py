@@ -284,7 +284,7 @@ class LintRulesTransformer(Transformer):
     def instruction(self, instruction):
         return Discard
 
-    def all_endpoint_rule(self, rules: List[AttributeRequirement, ClusterAttributeDeny]):
+    def all_endpoint_rule(self, rules: List[Union[AttributeRequirement, ClusterAttributeDeny]]):
         for rule in rules:
             if type(rule) is AttributeRequirement:
                 self.context.RequireAttribute(rule)
