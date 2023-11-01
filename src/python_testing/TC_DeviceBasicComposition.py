@@ -30,7 +30,6 @@ from typing import Any, Callable, Optional
 import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
-
 from chip.clusters.Attribute import ValueDecodeFailure
 from chip.tlv import uint
 from conformance_support import ConformanceDecision, conformance_allowed
