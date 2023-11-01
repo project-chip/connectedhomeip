@@ -104,6 +104,9 @@ all endpoints {
 
     require global attribute featureMap = 65532;
     require global attribute clusterRevision = 65533;
+
+    // (previously AverageWearCount, see #30002/#29285 in GitHub)
+    deny cluster GeneralDiagnostics attribute 9;
 }
 
 endpoint 0 {
