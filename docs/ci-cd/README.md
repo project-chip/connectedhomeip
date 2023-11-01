@@ -16,4 +16,4 @@ https://github.com/project-chip/connectedhomeip/blob/master/scripts/tools/summar
 
 ## To Do
 
--   Cert image autobuild
+-   Cert image auto build
