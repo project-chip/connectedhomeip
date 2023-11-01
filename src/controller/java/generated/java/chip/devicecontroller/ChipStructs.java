@@ -1831,6 +1831,62 @@ public static class DishwasherModeClusterModeOptionStruct {
     return output.toString();
   }
 }
+public static class MicrowaveOvenModeClusterModeTagStruct {
+  public Optional<Integer> mfgCode;
+  public Integer value;
+  public MicrowaveOvenModeClusterModeTagStruct(
+    Optional<Integer> mfgCode,
+    Integer value
+  ) {
+    this.mfgCode = mfgCode;
+    this.value = value;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MicrowaveOvenModeClusterModeTagStruct {\n");
+    output.append("\tmfgCode: ");
+    output.append(mfgCode);
+    output.append("\n");
+    output.append("\tvalue: ");
+    output.append(value);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class MicrowaveOvenModeClusterModeOptionStruct {
+  public String label;
+  public Integer mode;
+  public ArrayList<ChipStructs.MicrowaveOvenModeClusterModeTagStruct> modeTags;
+  public MicrowaveOvenModeClusterModeOptionStruct(
+    String label,
+    Integer mode,
+    ArrayList<ChipStructs.MicrowaveOvenModeClusterModeTagStruct> modeTags
+  ) {
+    this.label = label;
+    this.mode = mode;
+    this.modeTags = modeTags;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MicrowaveOvenModeClusterModeOptionStruct {\n");
+    output.append("\tlabel: ");
+    output.append(label);
+    output.append("\n");
+    output.append("\tmode: ");
+    output.append(mode);
+    output.append("\n");
+    output.append("\tmodeTags: ");
+    output.append(modeTags);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class OperationalStateClusterErrorStateStruct {
   public Integer errorStateID;
   public Optional<String> errorStateLabel;

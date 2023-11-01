@@ -3357,6 +3357,38 @@ client cluster DishwasherAlarm = 93 {
   command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
 }
 
+/** Attributes and commands for selecting a mode from a list of supported options. */
+provisional client cluster MicrowaveOvenMode = 94 {
+  enum ModeTag : enum16 {
+    kNormal = 16384;
+    kDefrost = 16385;
+  }
+
+  bitmap Feature : bitmap32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** Attributes and commands for configuring the microwave oven control, and reporting cooking stats. */
 provisional client cluster MicrowaveOvenControl = 95 {
   readonly attribute elapsed_s cookTime = 1;
