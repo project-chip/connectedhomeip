@@ -98,6 +98,6 @@ limitations under the License.
   <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0006" />
     <field name="Lighting" mask="0x01" />
-    <field name="DeadFrontBehaviour" mask="0x02" />
+    <field name="DeadFrontBehavior" mask="0x02" />
   </bitmap>
 </configurator>
