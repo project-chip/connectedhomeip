@@ -576,6 +576,8 @@ def BuildQorvoTarget():
         TargetPart('persistent-storage', app=QpgApp.PERSISTENT_STORAGE),
     ])
 
+    target.AppendModifier('updateimage', update_image=True)
+
     return target
 
 

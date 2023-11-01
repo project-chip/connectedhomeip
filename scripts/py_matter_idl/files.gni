@@ -27,6 +27,7 @@ matter_idl_generator_sources = [
   "${chip_root}/scripts/py_matter_idl/matter_idl/data_model_xml/handlers/__init__.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/data_model_xml/handlers/base.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/data_model_xml/handlers/context.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/data_model_xml/handlers/derivation.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/data_model_xml/handlers/handlers.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/data_model_xml/handlers/parsing.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/__init__.py",

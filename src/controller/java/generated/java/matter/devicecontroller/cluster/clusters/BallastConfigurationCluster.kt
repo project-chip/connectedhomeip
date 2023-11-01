@@ -20,439 +20,289 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class BallastConfigurationCluster(private val endpointId: UShort) {
+  class IntrinsicBallastFactorAttribute(val value: UByte?)
+
+  class BallastFactorAdjustmentAttribute(val value: UByte?)
+
+  class LampRatedHoursAttribute(val value: UInt?)
+
+  class LampBurnHoursAttribute(val value: UInt?)
+
+  class LampBurnHoursTripPointAttribute(val value: UInt?)
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun readPhysicalMinLevelAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePhysicalMinLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPhysicalMaxLevelAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePhysicalMaxLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBallastStatusAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBallastStatusAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMinLevelAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeMinLevelAttribute(value: UByte) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeMinLevelAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMinLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMaxLevelAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeMaxLevelAttribute(value: UByte) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeMaxLevelAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMaxLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readIntrinsicBallastFactorAttribute(): IntrinsicBallastFactorAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeIntrinsicBallastFactorAttribute(value: UByte) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeIntrinsicBallastFactorAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeIntrinsicBallastFactorAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): IntrinsicBallastFactorAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBallastFactorAdjustmentAttribute(): BallastFactorAdjustmentAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeBallastFactorAdjustmentAttribute(value: UByte) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeBallastFactorAdjustmentAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBallastFactorAdjustmentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): BallastFactorAdjustmentAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLampQuantityAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLampQuantityAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLampTypeAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLampTypeAttribute(value: String) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLampTypeAttribute(value: String, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLampTypeAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLampManufacturerAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLampManufacturerAttribute(value: String) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLampManufacturerAttribute(value: String, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLampManufacturerAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLampRatedHoursAttribute(): LampRatedHoursAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLampRatedHoursAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLampRatedHoursAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLampRatedHoursAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): LampRatedHoursAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLampBurnHoursAttribute(): LampBurnHoursAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLampBurnHoursAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLampBurnHoursAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLampBurnHoursAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): LampBurnHoursAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLampAlarmModeAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLampAlarmModeAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLampAlarmModeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLampAlarmModeAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLampBurnHoursTripPointAttribute(): LampBurnHoursTripPointAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLampBurnHoursTripPointAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLampBurnHoursTripPointAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLampBurnHoursTripPointAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): LampBurnHoursTripPointAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 769u
-  }
-
-  interface IntrinsicBallastFactorAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface BallastFactorAdjustmentAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface LampRatedHoursAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface LampBurnHoursAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface LampBurnHoursTripPointAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readPhysicalMinLevelAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePhysicalMinLevelAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPhysicalMaxLevelAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePhysicalMaxLevelAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBallastStatusAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBallastStatusAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMinLevelAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeMinLevelAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeMinLevelAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMinLevelAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMaxLevelAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeMaxLevelAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeMaxLevelAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMaxLevelAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readIntrinsicBallastFactorAttribute(callback: IntrinsicBallastFactorAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeIntrinsicBallastFactorAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeIntrinsicBallastFactorAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeIntrinsicBallastFactorAttribute(
-    callback: IntrinsicBallastFactorAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBallastFactorAdjustmentAttribute(callback: BallastFactorAdjustmentAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeBallastFactorAdjustmentAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeBallastFactorAdjustmentAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBallastFactorAdjustmentAttribute(
-    callback: BallastFactorAdjustmentAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLampQuantityAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLampQuantityAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLampTypeAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLampTypeAttribute(callback: DefaultClusterCallback, value: String) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLampTypeAttribute(
-    callback: DefaultClusterCallback,
-    value: String,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLampTypeAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLampManufacturerAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLampManufacturerAttribute(callback: DefaultClusterCallback, value: String) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLampManufacturerAttribute(
-    callback: DefaultClusterCallback,
-    value: String,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLampManufacturerAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLampRatedHoursAttribute(callback: LampRatedHoursAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLampRatedHoursAttribute(callback: DefaultClusterCallback, value: Long) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLampRatedHoursAttribute(
-    callback: DefaultClusterCallback,
-    value: Long,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLampRatedHoursAttribute(
-    callback: LampRatedHoursAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLampBurnHoursAttribute(callback: LampBurnHoursAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLampBurnHoursAttribute(callback: DefaultClusterCallback, value: Long) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLampBurnHoursAttribute(
-    callback: DefaultClusterCallback,
-    value: Long,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLampBurnHoursAttribute(
-    callback: LampBurnHoursAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLampAlarmModeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLampAlarmModeAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLampAlarmModeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLampAlarmModeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLampBurnHoursTripPointAttribute(callback: LampBurnHoursTripPointAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLampBurnHoursTripPointAttribute(callback: DefaultClusterCallback, value: Long) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLampBurnHoursTripPointAttribute(
-    callback: DefaultClusterCallback,
-    value: Long,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLampBurnHoursTripPointAttribute(
-    callback: LampBurnHoursTripPointAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }
