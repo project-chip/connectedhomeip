@@ -38,31 +38,31 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun readPhysicalMinLevelAttribute(): Integer {
+  suspend fun readPhysicalMinLevelAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePhysicalMinLevelAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribePhysicalMinLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readPhysicalMaxLevelAttribute(): Integer {
+  suspend fun readPhysicalMaxLevelAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePhysicalMaxLevelAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribePhysicalMaxLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readBallastStatusAttribute(): Integer {
+  suspend fun readBallastStatusAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBallastStatusAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeBallastStatusAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readMinLevelAttribute(): Integer {
+  suspend fun readMinLevelAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -74,11 +74,11 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMinLevelAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeMinLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readMaxLevelAttribute(): Integer {
+  suspend fun readMaxLevelAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -90,7 +90,7 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxLevelAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeMaxLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -132,11 +132,11 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readLampQuantityAttribute(): Integer {
+  suspend fun readLampQuantityAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLampQuantityAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeLampQuantityAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -210,7 +210,7 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readLampAlarmModeAttribute(): Integer {
+  suspend fun readLampAlarmModeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -222,7 +222,7 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLampAlarmModeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeLampAlarmModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -286,19 +286,19 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

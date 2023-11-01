@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,30 +15,10 @@
  *    limitations under the License.
  */
 
-package chip.devicecontroller.cluster
+#pragma once
 
-import matter.tlv.NullValue
-import matter.tlv.Tag
-import matter.tlv.TlvReader
+namespace chip {
 
-fun TlvReader.getBoolean(tag: Tag): Boolean {
-  return getBool(tag)
-}
+void RegisterOpenThreadCliCommands();
 
-fun TlvReader.getString(tag: Tag): String {
-  return getUtf8String(tag)
-}
-
-fun TlvReader.getByteArray(tag: Tag): ByteArray {
-  return getByteString(tag)
-}
-
-fun TlvReader.isNull(): Boolean {
-  val value = peekElement().value
-  return (value is NullValue)
-}
-
-fun TlvReader.isNextTag(tag: Tag): Boolean {
-  val nextTag = peekElement().tag
-  return (nextTag == tag)
-}
+} // namespace chip

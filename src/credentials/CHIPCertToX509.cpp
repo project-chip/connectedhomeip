@@ -511,11 +511,12 @@ static CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, 
         }
         ASN1_END_CONSTRUCTED;
 
-        ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, ContextTag(kTag_SerialNumber)));
-
         // serialNumber CertificateSerialNumber
         // CertificateSerialNumber ::= INTEGER
-        ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, reader));
+        ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, ContextTag(kTag_SerialNumber)));
+        ReturnErrorOnFailure(reader.Get(certData.mSerialNumber));
+        ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false,
+                                             certData.mSerialNumber.data(), static_cast<uint16_t>(certData.mSerialNumber.size())));
 
         // signature AlgorithmIdentifier
         // AlgorithmIdentifier ::= SEQUENCE

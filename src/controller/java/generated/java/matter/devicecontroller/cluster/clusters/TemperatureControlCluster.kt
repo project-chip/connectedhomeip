@@ -30,58 +30,58 @@ class TemperatureControlCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun setTemperature(targetTemperature: Short?, targetTemperatureLevel: UByte?) {
-    // Implementation needs to be added here
-  }
-
   suspend fun setTemperature(
     targetTemperature: Short?,
     targetTemperatureLevel: UByte?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readTemperatureSetpointAttribute(): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readTemperatureSetpointAttribute(): Integer {
+  suspend fun subscribeTemperatureSetpointAttribute(minInterval: Int, maxInterval: Int): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTemperatureSetpointAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun readMinTemperatureAttribute(): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readMinTemperatureAttribute(): Integer {
+  suspend fun subscribeMinTemperatureAttribute(minInterval: Int, maxInterval: Int): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMinTemperatureAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun readMaxTemperatureAttribute(): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readMaxTemperatureAttribute(): Integer {
+  suspend fun subscribeMaxTemperatureAttribute(minInterval: Int, maxInterval: Int): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxTemperatureAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun readStepAttribute(): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readStepAttribute(): Integer {
+  suspend fun subscribeStepAttribute(minInterval: Int, maxInterval: Int): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeStepAttribute(minInterval: Int, maxInterval: Int): Integer {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readSelectedTemperatureLevelAttribute(): Integer {
+  suspend fun readSelectedTemperatureLevelAttribute(): UByte {
     // Implementation needs to be added here
   }
 
   suspend fun subscribeSelectedTemperatureLevelAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -137,19 +137,19 @@ class TemperatureControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

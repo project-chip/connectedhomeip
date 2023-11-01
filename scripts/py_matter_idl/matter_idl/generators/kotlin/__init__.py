@@ -132,13 +132,25 @@ _KNOWN_DECODABLE_TYPES = {
 
 
 def GlobalNameToJavaName(name: str) -> str:
-    if name in {'Int8u', 'Int8s', 'Int16u', 'Int16s'}:
-        return 'Integer'
+    if name == 'Int8s':
+        return 'Byte'
+    if name == 'Int8u':
+        return 'UByte'
+    if name == 'Int16s':
+        return 'Short'
+    if name == 'Int16u':
+        return 'UShort'
 
-    if name.startswith('Int'):
+    if name == 'Int32s':
+        return 'Int'
+    if name == 'Int32u':
+        return 'UInt'
+    if name == 'Int64s':
         return 'Long'
+    if name == 'Int64u':
+        return 'ULong'
 
-    # Double/Float/Booleans/CharString/OctetString
+    # Double/Float/Boolean/CharString/OctetString
     return name
 
 

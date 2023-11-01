@@ -32,129 +32,125 @@ class ActionsCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun instantAction(actionID: UShort, invokeID: UInt?) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun instantAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun instantActionWithTransition(
-    actionID: UShort,
-    invokeID: UInt?,
-    transitionTime: UShort
-  ) {
-    // Implementation needs to be added here
+  suspend fun instantAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun instantActionWithTransition(
     actionID: UShort,
     invokeID: UInt?,
     transitionTime: UShort,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun startAction(actionID: UShort, invokeID: UInt?) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun startAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun startActionWithDuration(actionID: UShort, invokeID: UInt?, duration: UInt) {
-    // Implementation needs to be added here
+  suspend fun startAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun startActionWithDuration(
     actionID: UShort,
     invokeID: UInt?,
     duration: UInt,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun stopAction(actionID: UShort, invokeID: UInt?) {
-    // Implementation needs to be added here
+  suspend fun stopAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun stopAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun pauseAction(actionID: UShort, invokeID: UInt?) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun pauseAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun pauseActionWithDuration(actionID: UShort, invokeID: UInt?, duration: UInt) {
-    // Implementation needs to be added here
+  suspend fun pauseAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun pauseActionWithDuration(
     actionID: UShort,
     invokeID: UInt?,
     duration: UInt,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun resumeAction(actionID: UShort, invokeID: UInt?) {
-    // Implementation needs to be added here
+  suspend fun resumeAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun resumeAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun enableAction(actionID: UShort, invokeID: UInt?) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun enableAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun enableActionWithDuration(actionID: UShort, invokeID: UInt?, duration: UInt) {
-    // Implementation needs to be added here
+  suspend fun enableAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun enableActionWithDuration(
     actionID: UShort,
     invokeID: UInt?,
     duration: UInt,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun disableAction(actionID: UShort, invokeID: UInt?) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun disableAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun disableActionWithDuration(actionID: UShort, invokeID: UInt?, duration: UInt) {
-    // Implementation needs to be added here
+  suspend fun disableAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun disableActionWithDuration(
     actionID: UShort,
     invokeID: UInt?,
     duration: UInt,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readActionListAttribute(): ActionListAttribute {
@@ -228,19 +224,19 @@ class ActionsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

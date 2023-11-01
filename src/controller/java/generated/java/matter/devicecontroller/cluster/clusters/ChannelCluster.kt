@@ -36,32 +36,35 @@ class ChannelCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun changeChannel(match: String): ChangeChannelResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun changeChannel(match: String, timedInvokeTimeoutMs: Int): ChangeChannelResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun changeChannelByNumber(majorNumber: UShort, minorNumber: UShort) {
-    // Implementation needs to be added here
+  suspend fun changeChannel(
+    match: String,
+    timedInvokeTimeoutMs: Int? = null
+  ): ChangeChannelResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun changeChannelByNumber(
     majorNumber: UShort,
     minorNumber: UShort,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun skipChannel(count: Short) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun skipChannel(count: Short, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun skipChannel(count: Short, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readChannelListAttribute(): ChannelListAttribute {
@@ -135,19 +138,19 @@ class ChannelCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

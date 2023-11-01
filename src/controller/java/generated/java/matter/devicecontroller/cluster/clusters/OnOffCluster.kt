@@ -30,61 +30,61 @@ class OnOffCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun off() {
-    // Implementation needs to be added here
+  suspend fun off(timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun off(timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun on(timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun on() {
-    // Implementation needs to be added here
-  }
-
-  suspend fun on(timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun toggle() {
-    // Implementation needs to be added here
-  }
-
-  suspend fun toggle(timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun offWithEffect(effectIdentifier: UInt, effectVariant: UByte) {
-    // Implementation needs to be added here
+  suspend fun toggle(timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun offWithEffect(
     effectIdentifier: UInt,
     effectVariant: UByte,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun onWithRecallGlobalScene() {
-    // Implementation needs to be added here
-  }
-
-  suspend fun onWithRecallGlobalScene(timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun onWithTimedOff(onOffControl: UInt, onTime: UShort, offWaitTime: UShort) {
-    // Implementation needs to be added here
+  suspend fun onWithRecallGlobalScene(timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun onWithTimedOff(
     onOffControl: UInt,
     onTime: UShort,
     offWaitTime: UShort,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readOnOffAttribute(): Boolean {
@@ -103,7 +103,7 @@ class OnOffCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readOnTimeAttribute(): Integer {
+  suspend fun readOnTimeAttribute(): UShort {
     // Implementation needs to be added here
   }
 
@@ -115,11 +115,11 @@ class OnOffCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOnTimeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeOnTimeAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readOffWaitTimeAttribute(): Integer {
+  suspend fun readOffWaitTimeAttribute(): UShort {
     // Implementation needs to be added here
   }
 
@@ -131,7 +131,7 @@ class OnOffCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOffWaitTimeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeOffWaitTimeAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -195,19 +195,19 @@ class OnOffCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

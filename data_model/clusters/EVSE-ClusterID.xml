@@ -38,7 +38,7 @@ EVSEs at home or a business is managed by backend system and outside scope of
 this cluster.
 
 Note that in many deployments the EVSE may be outside the home and may suffer
-from intermittent network connections (e.g. a weak WiFi signal). It also allows
+from intermittent network connections (e.g. a weak Wi-Fi signal). It also allows
 for a charging profile to be pre-configured, in case there is a temporary
 communications loss during a charging session.
 -->

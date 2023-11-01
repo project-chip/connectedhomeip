@@ -312,9 +312,9 @@ public:
 {{/if}}
 {{/if}}
 {{/zcl_attributes_server}}
-{{/if}}
 {{#if (isProvisional (asUpperCamelCase name preserveAcronyms=true))}}
 #endif // MTR_ENABLE_PROVISIONAL
+{{/if}}
 {{/if}}
 {{/zcl_clusters}}
 

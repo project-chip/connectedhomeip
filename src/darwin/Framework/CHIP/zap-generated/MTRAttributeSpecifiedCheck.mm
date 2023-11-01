@@ -1080,9 +1080,6 @@ static BOOL AttributeIsSpecifiedInGeneralDiagnosticsCluster(AttributeId aAttribu
     case Attributes::TestEventTriggersEnabled::Id: {
         return YES;
     }
-    case Attributes::AverageWearCount::Id: {
-        return YES;
-    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -2383,6 +2380,81 @@ static BOOL AttributeIsSpecifiedInDishwasherAlarmCluster(AttributeId aAttributeI
         return YES;
     }
     case Attributes::Supported::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInMicrowaveOvenModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MicrowaveOvenMode;
+    switch (aAttributeId) {
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
+    case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInMicrowaveOvenControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MicrowaveOvenControl;
+    switch (aAttributeId) {
+    case Attributes::CookTime::Id: {
+        return YES;
+    }
+    case Attributes::PowerSetting::Id: {
+        return YES;
+    }
+    case Attributes::MinPower::Id: {
+        return YES;
+    }
+    case Attributes::MaxPower::Id: {
+        return YES;
+    }
+    case Attributes::PowerStep::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5648,6 +5720,12 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::DishwasherAlarm::Id: {
         return AttributeIsSpecifiedInDishwasherAlarmCluster(aAttributeId);
+    }
+    case Clusters::MicrowaveOvenMode::Id: {
+        return AttributeIsSpecifiedInMicrowaveOvenModeCluster(aAttributeId);
+    }
+    case Clusters::MicrowaveOvenControl::Id: {
+        return AttributeIsSpecifiedInMicrowaveOvenControlCluster(aAttributeId);
     }
     case Clusters::OperationalState::Id: {
         return AttributeIsSpecifiedInOperationalStateCluster(aAttributeId);
