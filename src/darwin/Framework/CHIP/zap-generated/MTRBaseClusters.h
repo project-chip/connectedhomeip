@@ -45,6 +45,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 - (void)identifyWithParams:(MTRIdentifyClusterIdentifyParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
+ * Command IdentifyQuery
+ *
+ * This command allows the sending device to request the target or targets to respond if they are currently identifying themselves.
+ */
+- (void)identifyQueryWithParams:(MTRIdentifyClusterIdentifyQueryParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)identifyQueryWithCompletion:(MTRStatusCompletion)completion
+    MTR_PROVISIONALLY_AVAILABLE;
+/**
  * Command TriggerEffect
  *
  * Command description for TriggerEffect
@@ -13438,6 +13446,10 @@ typedef NS_ENUM(uint8_t, MTRIdentifyType) {
     MTRIdentifyTypeDisplay MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
     MTRIdentifyTypeActuator MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+typedef NS_OPTIONS(uint32_t, MTRIdentifyFeature) {
+    MTRIdentifyFeatureQuery MTR_PROVISIONALLY_AVAILABLE = 0x1,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRGroupsFeature) {
     MTRGroupsFeatureGroupNames MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x1,

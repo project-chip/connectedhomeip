@@ -5444,6 +5444,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 
     // Cluster Identify commands
     MTRCommandIDTypeClusterIdentifyCommandIdentifyID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000000,
+    MTRCommandIDTypeClusterIdentifyCommandIdentifyQueryID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterIdentifyCommandTriggerEffectID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000040,
 
     // Cluster Groups deprecated command id names

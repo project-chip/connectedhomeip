@@ -36,6 +36,14 @@ class IdentifyCluster(private val endpointId: UShort) {
     }
   }
 
+  suspend fun identifyQuery(timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
   suspend fun triggerEffect(
     effectIdentifier: UInt,
     effectVariant: UInt,

@@ -141,6 +141,7 @@
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Identify                                                          |   0x00 |
+| * IdentifyQuery                                                     |   0x01 |
 | * TriggerEffect                                                     |   0x40 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -191,6 +192,42 @@ public:
 
 private:
     chip::app::Clusters::Identify::Commands::Identify::Type mRequest;
+};
+
+/*
+ * Command IdentifyQuery
+ */
+class IdentifyIdentifyQuery : public ClusterCommand
+{
+public:
+    IdentifyIdentifyQuery(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("identify-query", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Identify::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Identify::Commands::IdentifyQuery::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Identify::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Identify::Commands::IdentifyQuery::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::Identify::Commands::IdentifyQuery::Type mRequest;
 };
 
 /*
@@ -11654,6 +11691,7 @@ void registerClusterIdentify(Commands & commands, CredentialIssuerCommands * cre
         //
         make_unique<ClusterCommand>(Id, credsIssuerConfig),    //
         make_unique<IdentifyIdentify>(credsIssuerConfig),      //
+        make_unique<IdentifyIdentifyQuery>(credsIssuerConfig), //
         make_unique<IdentifyTriggerEffect>(credsIssuerConfig), //
         //
         // Attributes

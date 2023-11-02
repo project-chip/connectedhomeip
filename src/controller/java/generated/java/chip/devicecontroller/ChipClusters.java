@@ -133,6 +133,14 @@ public class ChipClusters {
       identify(chipClusterPtr, callback, identifyTime, timedInvokeTimeoutMs);
     }
 
+    public void identifyQuery(DefaultClusterCallback callback) {
+      identifyQuery(chipClusterPtr, callback, null);
+    }
+
+    public void identifyQuery(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+      identifyQuery(chipClusterPtr, callback, timedInvokeTimeoutMs);
+    }
+
     public void triggerEffect(DefaultClusterCallback callback, Integer effectIdentifier, Integer effectVariant) {
       triggerEffect(chipClusterPtr, callback, effectIdentifier, effectVariant, null);
     }
@@ -142,6 +150,8 @@ public class ChipClusters {
     }
 
     private native void identify(long chipClusterPtr, DefaultClusterCallback callback, Integer identifyTime, @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void identifyQuery(long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer timedInvokeTimeoutMs);
 
     private native void triggerEffect(long chipClusterPtr, DefaultClusterCallback callback, Integer effectIdentifier, Integer effectVariant, @Nullable Integer timedInvokeTimeoutMs);
 

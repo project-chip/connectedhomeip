@@ -25,6 +25,10 @@ client cluster Identify = 3 {
     kActuator = 5;
   }
 
+  bitmap Feature : bitmap32 {
+    kQuery = 0x1;
+  }
+
   attribute int16u identifyTime = 0;
   readonly attribute IdentifyTypeEnum identifyType = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -45,6 +49,8 @@ client cluster Identify = 3 {
 
   /** Command description for Identify */
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
+  /** This command allows the sending device to request the target or targets to respond if they are currently identifying themselves. */
+  command access(invoke: manage) IdentifyQuery(): DefaultSuccess = 1;
   /** Command description for TriggerEffect */
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
@@ -71,6 +77,10 @@ server cluster Identify = 3 {
     kAudibleBeep = 3;
     kDisplay = 4;
     kActuator = 5;
+  }
+
+  bitmap Feature : bitmap32 {
+    kQuery = 0x1;
   }
 
   attribute int16u identifyTime = 0;

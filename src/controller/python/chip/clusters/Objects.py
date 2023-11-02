@@ -99,6 +99,10 @@ class Identify(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 6,
 
+    class Bitmaps:
+        class Feature(IntFlag):
+            kQuery = 0x1
+
     class Commands:
         @dataclass
         class Identify(ClusterCommand):
@@ -115,6 +119,19 @@ class Identify(Cluster):
                     ])
 
             identifyTime: 'uint' = 0
+
+        @dataclass
+        class IdentifyQuery(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000003
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
 
         @dataclass
         class TriggerEffect(ClusterCommand):

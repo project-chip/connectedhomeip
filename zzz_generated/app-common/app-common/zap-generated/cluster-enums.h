@@ -71,6 +71,12 @@ enum class IdentifyTypeEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
 };
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kQuery = 0x1,
+};
 } // namespace Identify
 
 namespace Groups {

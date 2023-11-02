@@ -17571,6 +17571,18 @@ public class ClusterInfoMapping {
     );
     identifyClusterInteractionInfoMap.put("identify", identifyidentifyInteractionInfo);
 
+    Map<String, CommandParameterInfo> identifyidentifyQueryCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo identifyidentifyQueryInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.IdentifyCluster) cluster)
+        .identifyQuery((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        identifyidentifyQueryCommandParams
+    );
+    identifyClusterInteractionInfoMap.put("identifyQuery", identifyidentifyQueryInteractionInfo);
+
     Map<String, CommandParameterInfo> identifytriggerEffectCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
     CommandParameterInfo identifytriggerEffecteffectIdentifierCommandParameterInfo = new CommandParameterInfo("effectIdentifier", Integer.class, Integer.class);

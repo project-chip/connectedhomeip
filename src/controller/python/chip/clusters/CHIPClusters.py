@@ -41,6 +41,12 @@ class ChipClusters:
                     "identifyTime": "int",
                 },
             },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "IdentifyQuery",
+                "args": {
+                },
+            },
             0x00000040: {
                 "commandId": 0x00000040,
                 "commandName": "TriggerEffect",

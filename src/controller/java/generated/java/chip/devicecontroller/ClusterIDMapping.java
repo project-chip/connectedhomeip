@@ -385,6 +385,7 @@ public class ClusterIDMapping {
 
         public enum Command {
             Identify(0L),
+            IdentifyQuery(1L),
             TriggerEffect(64L),;
             private final long id;
             Command(long id) {
