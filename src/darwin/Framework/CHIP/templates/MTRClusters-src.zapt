@@ -123,7 +123,8 @@ MTR{{cluster}}Cluster{{command}}Params
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
 }
 
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
@@ -207,7 +208,8 @@ MTR{{cluster}}Cluster{{command}}Params
 {
   return [self readAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithParams:params];
 }
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)writeAttribute{{attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
   [self writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs];

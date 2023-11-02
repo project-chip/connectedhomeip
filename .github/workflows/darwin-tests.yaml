@@ -147,8 +147,8 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: framework-build-log-darwin-${{BUILD_VARIANT_FRAMEWORK_TOOL}}
-                  path: out/darwin-x64-darwin-framework-tool-${{BUILD_VARIANT_FRAMEWORK_TOOL}}/darwin_framework_build.log
+                  name: framework-build-log-darwin-${BUILD_VARIANT_FRAMEWORK_TOOL}
+                  path: out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin_framework_build.log
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}

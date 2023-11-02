@@ -96,6 +96,22 @@ menu "CHIP Core"
             help
                 Link the application against CHIP interactive shell.
 
+        config CHIP_SHELL_CMD_LINE_BUF_MAX_LENGTH
+            int "Maximum command line buffer length of the chip shell"
+            depends on ENABLE_CHIP_SHELL
+            default 256
+            help
+                Maximum command line buffer length of the chip shell. The command strings might be received
+                incompletely in the command handlers if they are longer than this buffer length.
+
+        config CHIP_SHELL_CMD_LINE_ARG_MAX_COUNT
+            int "Maximum command line arguments count of the chip shell"
+            depends on ENABLE_CHIP_SHELL
+            default 32
+            help
+                Maximum command line arguments count of the chip shell. The command arguments might be ignored
+                if they are more than this count.
+
         config ENABLE_CHIP_CONTROLLER_BUILD
             bool "Enable chip-controller build"
             default n

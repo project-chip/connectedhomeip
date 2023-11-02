@@ -90,6 +90,12 @@ enum class NameSupportBitmap : uint8_t
 
 namespace Scenes {
 
+// Bitmap for CopyModeBitmap
+enum class CopyModeBitmap : uint8_t
+{
+    kCopyAllScenes = 0x1,
+};
+
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
@@ -99,10 +105,10 @@ enum class Feature : uint32_t
     kFabricScenes = 0x8,
 };
 
-// Bitmap for ScenesCopyMode
-enum class ScenesCopyMode : uint8_t
+// Bitmap for NameSupportBitmap
+enum class NameSupportBitmap : uint8_t
 {
-    kCopyAllScenes = 0x1,
+    kSceneNames = 0x80,
 };
 } // namespace Scenes
 
@@ -162,6 +168,7 @@ enum class Feature : uint32_t
 {
     kLighting          = 0x1,
     kDeadFrontBehavior = 0x2,
+    kOffOnly           = 0x4,
 };
 
 // Bitmap for OnOffControlBitmap
@@ -1073,7 +1080,7 @@ namespace SoftwareDiagnostics {
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kWaterMarks = 0x1,
+    kWatermarks = 0x1,
 };
 } // namespace SoftwareDiagnostics
 
@@ -1870,6 +1877,29 @@ enum class Feature : uint32_t
     kReset = 0x1,
 };
 } // namespace DishwasherAlarm
+
+namespace MicrowaveOvenMode {
+
+// Enum for ModeTag
+enum class ModeTag : uint16_t
+{
+    kNormal  = 0x4000,
+    kDefrost = 0x4001,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOnOff = 0x1,
+};
+} // namespace MicrowaveOvenMode
+
+namespace MicrowaveOvenControl {} // namespace MicrowaveOvenControl
 
 namespace OperationalState {
 
@@ -4078,8 +4108,8 @@ enum class Feature : uint32_t
 
 namespace ApplicationLauncher {
 
-// Enum for ApplicationLauncherStatusEnum
-enum class ApplicationLauncherStatusEnum : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kAppNotAvailable = 0x01,

@@ -17,198 +17,130 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class OtaSoftwareUpdateProviderCluster(private val endpointId: UShort) {
-  companion object {
-    const val CLUSTER_ID: UInt = 41u
-  }
+  class QueryImageResponse(
+    val status: UInt,
+    val delayedActionTime: UInt?,
+    val imageURI: String?,
+    val softwareVersion: UInt?,
+    val softwareVersionString: String?,
+    val updateToken: ByteArray?,
+    val userConsentNeeded: Boolean?,
+    val metadataForRequestor: ByteArray?
+  )
 
-  fun queryImage(
-    callback: QueryImageResponseCallback,
-    vendorID: Integer,
-    productID: Integer,
-    softwareVersion: Long,
-    protocolsSupported: ArrayList<Integer>,
-    hardwareVersion: Integer?,
-    location: String?,
-    requestorCanConsent: Boolean?,
-    metadataForProvider: ByteArray?
-  ) {
-    // Implementation needs to be added here
-  }
+  class ApplyUpdateResponse(val action: UInt, val delayedActionTime: UInt)
 
-  fun queryImage(
-    callback: QueryImageResponseCallback,
-    vendorID: Integer,
-    productID: Integer,
-    softwareVersion: Long,
-    protocolsSupported: ArrayList<Integer>,
-    hardwareVersion: Integer?,
+  class GeneratedCommandListAttribute(val value: List<UInt>)
+
+  class AcceptedCommandListAttribute(val value: List<UInt>)
+
+  class EventListAttribute(val value: List<UInt>)
+
+  class AttributeListAttribute(val value: List<UInt>)
+
+  suspend fun queryImage(
+    vendorID: UShort,
+    productID: UShort,
+    softwareVersion: UInt,
+    protocolsSupported: List<UInt>,
+    hardwareVersion: UShort?,
     location: String?,
     requestorCanConsent: Boolean?,
     metadataForProvider: ByteArray?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
+    timedInvokeTimeoutMs: Int? = null
+  ): QueryImageResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  fun applyUpdateRequest(
-    callback: ApplyUpdateResponseCallback,
+  suspend fun applyUpdateRequest(
     updateToken: ByteArray,
-    newVersion: Long
-  ) {
-    // Implementation needs to be added here
+    newVersion: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ): ApplyUpdateResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  fun applyUpdateRequest(
-    callback: ApplyUpdateResponseCallback,
+  suspend fun notifyUpdateApplied(
     updateToken: ByteArray,
-    newVersion: Long,
-    timedInvokeTimeoutMs: Int
+    softwareVersion: UInt,
+    timedInvokeTimeoutMs: Int? = null
   ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun notifyUpdateApplied(
-    callback: DefaultClusterCallback,
-    updateToken: ByteArray,
-    softwareVersion: Long
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun notifyUpdateApplied(
-    callback: DefaultClusterCallback,
-    updateToken: ByteArray,
-    softwareVersion: Long,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  interface QueryImageResponseCallback {
-    fun onSuccess(
-      status: Integer,
-      delayedActionTime: Long?,
-      imageURI: String?,
-      softwareVersion: Long?,
-      softwareVersionString: String?,
-      updateToken: ByteArray?,
-      userConsentNeeded: Boolean?,
-      metadataForRequestor: ByteArray?
-    )
-
-    fun onError(error: Exception)
-  }
-
-  interface ApplyUpdateResponseCallback {
-    fun onSuccess(action: Integer, delayedActionTime: Long)
-
-    fun onError(error: Exception)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
+  suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
+  suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
+  suspend fun readEventListAttribute(): EventListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AttributeListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
+  companion object {
+    const val CLUSTER_ID: UInt = 41u
   }
 }
