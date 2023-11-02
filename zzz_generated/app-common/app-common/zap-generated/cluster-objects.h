@@ -9166,9 +9166,9 @@ struct TypeInfo
 namespace Weighting {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Weighting::Id; }
@@ -9178,9 +9178,9 @@ struct TypeInfo
 namespace DataVersion {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DataVersion::Id; }
@@ -9190,9 +9190,9 @@ struct TypeInfo
 namespace StableDataVersion {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StableDataVersion::Id; }
@@ -10304,8 +10304,8 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kAssociationFailure = 0,
-    kStatus             = 1,
+    kAssociationFailureCause = 0,
+    kStatus                  = 1,
 };
 
 struct Type
@@ -10316,8 +10316,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    AssociationFailureCauseEnum associationFailure = static_cast<AssociationFailureCauseEnum>(0);
-    uint16_t status                                = static_cast<uint16_t>(0);
+    AssociationFailureCauseEnum associationFailureCause = static_cast<AssociationFailureCauseEnum>(0);
+    uint16_t status                                     = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -10329,8 +10329,8 @@ public:
     static constexpr EventId GetEventId() { return Events::AssociationFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
-    AssociationFailureCauseEnum associationFailure = static_cast<AssociationFailureCauseEnum>(0);
-    uint16_t status                                = static_cast<uint16_t>(0);
+    AssociationFailureCauseEnum associationFailureCause = static_cast<AssociationFailureCauseEnum>(0);
+    uint16_t status                                     = static_cast<uint16_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

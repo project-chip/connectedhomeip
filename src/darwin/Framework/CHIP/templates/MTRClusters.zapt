@@ -71,7 +71,8 @@ NS_ASSUME_NONNULL_BEGIN
 {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/inline}}
 - (NSDictionary<NSString *, id> * _Nullable)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {{> availability}};
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs {{> availability}};
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params {{> availability}};
 {{/if}}
@@ -130,7 +131,8 @@ NS_ASSUME_NONNULL_BEGIN
 {{~#*inline "attributeDecls"}}
 {{#unless (isStrEqual attribute (asUpperCamelCase name preserveAcronyms=true))}}
 - (NSDictionary<NSString *, id> *)readAttribute{{attribute}}WithParams:(MTRReadParams * _Nullable)params {{availability cluster attribute=attribute deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use readAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithParams on MTRCluster" (asUpperCamelCase parent.name preserveAcronyms=true))}};
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)writeAttribute{{attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs {{availability cluster attribute=attribute deprecationMessage=(concat "Please use writeAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithValue on MTRCluster" (asUpperCamelCase parent.name preserveAcronyms=true))}};
 - (void)writeAttribute{{attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params {{availability cluster attribute=attribute deprecationMessage=(concat "Please use writeAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithValue on MTRCluster" (asUpperCamelCase parent.name preserveAcronyms=true))}};
 {{/if}}

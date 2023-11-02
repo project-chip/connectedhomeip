@@ -83,17 +83,6 @@ class ApplicationLauncherCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeCurrentAppAttribute(value: ApplicationLauncherClusterApplicationEPStruct) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeCurrentAppAttribute(
-    value: ApplicationLauncherClusterApplicationEPStruct,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
   suspend fun subscribeCurrentAppAttribute(
     minInterval: Int,
     maxInterval: Int

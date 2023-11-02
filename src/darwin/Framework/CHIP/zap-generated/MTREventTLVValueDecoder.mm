@@ -1193,8 +1193,8 @@ static id _Nullable DecodeEventPayloadForWiFiNetworkDiagnosticsCluster(EventId a
 
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.associationFailure)];
-            value.associationFailure = memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.associationFailureCause)];
+            value.associationFailureCause = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;

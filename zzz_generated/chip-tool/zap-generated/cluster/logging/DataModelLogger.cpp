@@ -3386,10 +3386,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("AssociationFailure", indent + 1, value.associationFailure);
+        CHIP_ERROR err = DataModelLogger::LogValue("AssociationFailureCause", indent + 1, value.associationFailureCause);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AssociationFailure'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AssociationFailureCause'");
             return err;
         }
     }
@@ -6804,17 +6804,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("PartitionId", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::Weighting::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Weighting", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::DataVersion::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DataVersion", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::StableDataVersion::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StableDataVersion", 1, value);
         }
