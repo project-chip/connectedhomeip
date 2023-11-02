@@ -175,7 +175,8 @@ public:
      */
     CHIP_ERROR Next(Tag expectedTag);
 
-    /* Checks that the TLV reader is position at an element with the expected tag.
+    /**
+     * Checks that the TLV reader is positioned at an element with the expected tag.
      *
      * @retval #CHIP_NO_ERROR              If the reader is positioned on the expected element.
      * @retval #CHIP_ERROR_UNEXPECTED_TLV_ELEMENT
@@ -197,9 +198,7 @@ public:
     CHIP_ERROR Next(TLVType expectedType, Tag expectedTag);
 
     /**
-     * The Next(TLVType expectedType, Tag expectedTag) method is a convenience method that has the
-     * same behavior as Next(), but also verifies that the type and tag of the new TLV element match
-     * the supplied arguments.
+     * Checks that the TLV reader is positioned at an element with the expected type and tag.
      *
      * @param[in] expectedType              The expected data type for the next element.
      * @param[in] expectedTag               The expected tag for the next element.
