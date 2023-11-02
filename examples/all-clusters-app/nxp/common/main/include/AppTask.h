@@ -31,7 +31,7 @@ public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
-    void PostEvent(const AppEvent * event);
+    void PostEvent(const AppEvent & event);
 
     /* Commissioning handlers */
     void StartCommissioningHandler(void);
@@ -42,12 +42,13 @@ public:
     void FactoryResetHandler(void);
 
 private:
+    static AppTask sAppTask;
     DeviceCallbacks deviceCallbacks;
 
     friend AppTask & GetAppTask(void);
 
     CHIP_ERROR Init();
-    void DispatchEvent(AppEvent * event);
+    void DispatchEvent(const AppEvent & event);
     CHIP_ERROR DisplayDeviceInformation(void);
 
     /* Functions that would be called in the Matter task context */
@@ -55,8 +56,6 @@ private:
     static void StopCommissioning(intptr_t arg);
     static void SwitchCommissioningState(intptr_t arg);
     static void InitServer(intptr_t arg);
-
-    static AppTask sAppTask;
 };
 
 inline AppTask & GetAppTask(void)

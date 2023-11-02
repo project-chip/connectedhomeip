@@ -236,6 +236,29 @@ exit:
     }
 }
 
+int NXPWiFiDriver::DisconnectNetwork(void)
+{
+    int ret = 0;
+
+	if (ConnectivityMgrImpl().IsWiFiStationConnected())
+	{
+	    ChipLogProgress(NetworkProvisioning, "Disconnecting from WiFi network.");
+
+	    ret = wlan_disconnect();
+
+	    if (ret != WM_SUCCESS)
+	    {
+	        ChipLogError(NetworkProvisioning, "Failed to disconnect from network with error: %u", (uint8_t)ret);
+	    }
+	}
+	else
+	{
+	    ChipLogError(NetworkProvisioning, "Error: WiFi not connected!");
+	}
+    
+    return ret;
+}
+
 CHIP_ERROR NXPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
     wlan_scan_params_v2_t wlan_scan_param;

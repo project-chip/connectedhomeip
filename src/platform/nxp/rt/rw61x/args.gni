@@ -54,11 +54,6 @@ declare_args() {
   no_mcuboot = true
 }
 
-# As a temporary workaround, we are disabling the session resumption because currently
-# the mbedtls port does not support this.
-# If not disabled, reconnecting to the OTA Provider node will fail.
-chip_enable_session_resumption = false
-
 mbedtls_target = "${nxp_sdk_build_root}:nxp_mbedtls"
 
 openthread_external_mbedtls = mbedtls_target

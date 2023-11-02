@@ -48,6 +48,7 @@ template("bt_ble_target") {
       #edgefast_bluetooth
       "${rt_sdk_root}/middleware/edgefast_bluetooth/include",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting",
+      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform/configs",
 

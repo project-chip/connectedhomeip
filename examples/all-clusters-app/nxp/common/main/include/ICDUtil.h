@@ -1,7 +1,6 @@
 /*
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2021 Nest Labs, Inc.
- *    All rights reserved.
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,32 +17,17 @@
 
 #pragma once
 
-struct AppEvent;
-using EventHandler = void (*)(const AppEvent &);
+#include <app/ReadHandler.h>
 
-struct AppEvent
+class ICDUtil : public chip::app::ReadHandler::ApplicationCallback
 {
-    enum AppEventTypes
-    {
-        kEventType_Timer = 0,
-        kEventType_TurnOn,
-        kEventType_Install,
-    };
-
-    uint16_t Type;
-
-    union
-    {
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } ClusterEvent;
-    };
-
-    EventHandler Handler;
+    CHIP_ERROR OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler,
+                                       chip::Transport::SecureSession & aSecureSession) override;
+    friend ICDUtil & GetICDUtil();
+    static ICDUtil sICDUtil;
 };
+
+inline ICDUtil & GetICDUtil()
+{
+    return ICDUtil::sICDUtil;
+}

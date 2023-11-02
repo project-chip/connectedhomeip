@@ -56,7 +56,7 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 -   Follow instruction in [BUILDING.md](../../../../../docs/guides/BUILDING.md)
     to setup the environment to be able to build Matter.
 
--   Download [RD-RW612 SDK v2.13.1](https://mcuxpresso.nxp.com/en/select).
+-   Download [RD-RW612 SDK v2.13.2](https://mcuxpresso.nxp.com/en/select).
     Creating an nxp.com account is required before being able to download the
     SDK. Once the account is created, login and follow the steps for downloading
     SDK. The SDK Builder UI selection should be similar with the one from the

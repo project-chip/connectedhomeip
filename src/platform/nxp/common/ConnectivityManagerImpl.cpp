@@ -110,12 +110,31 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     }
     else if (event->Type == kPlatformNxpStartWlanConnectEvent)
     {
-        if (wlan_add_network(event->Platform.pNetworkDataEvent) == WM_SUCCESS)
+        bool is_wlan_added = false;
+        struct wlan_network searchedNetwork = {0};
+
+        /* If network was added before on a previous connection call or other API, do not add it again */
+        if (wlan_get_network_byname(event->Platform.pNetworkDataEvent->name, &searchedNetwork) != WM_SUCCESS)
+        {
+            if (wlan_add_network(event->Platform.pNetworkDataEvent) == WM_SUCCESS)
+            {
+                ChipLogProgress(DeviceLayer, "Added WLAN \"%s\"", event->Platform.pNetworkDataEvent->name);
+                is_wlan_added = true;
+            }
+        }
+        else
+        {
+            is_wlan_added = false;
+        }
+
+        /* At this point, the network details should be registered in the wlan driver */
+        if (is_wlan_added == true)
         {
             _SetWiFiStationState(kWiFiStationState_Connecting);
             ChipLogProgress(DeviceLayer, "WLAN connecting to network.name = \"%s\"", event->Platform.pNetworkDataEvent->name);
             wlan_connect(event->Platform.pNetworkDataEvent->name);
         }
+
         if (event->Platform.pNetworkDataEvent != NULL)
         {
             free(event->Platform.pNetworkDataEvent);

@@ -27,6 +27,10 @@
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 
+#if CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
+#include "laundry-washer-controls-delegate-impl.h"
+#endif
+
 using namespace ::chip;
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t type, uint16_t size, uint8_t * value)
@@ -39,3 +43,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         cb->PostAttributeChangeCallback(path.mEndpointId, path.mClusterId, path.mAttributeId, type, size, value);
     }
 }
+
+#if CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
+using namespace chip::app::Clusters::LaundryWasherControls;
+void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
+{
+
+    LaundryWasherControlsServer::SetDefaultDelegate(endpoint, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
+}
+#endif

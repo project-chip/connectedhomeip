@@ -35,17 +35,27 @@ assert(target_os == "freertos")
 assert(nxp_platform == "rt/rw61x")
 
 declare_args() {
-  # This defines the device type as a "thermostat" by default,
+  # This defines the device type as a "laundry-washer" by default,
   # use "all-clusters" in order to build the all-clusters-app
-  nxp_device_type = "thermostat"
+  # use "thermostat" in order to build as a thermostat device type
+  nxp_device_type = "laundry-washer-app"
+
+  # Allows to start the wifi connect test app
+  wifi_connect = false
+
+  # The 2 params below are used only if wifi_connect is true, otherwise they're unused.
+  wifi_ssid = ""
+  wifi_password = ""
 }
 
 example_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
 
-if (nxp_device_type == "thermostat") {
-  app_common_folder = "${nxp_device_type}/nxp/zap"
-} else {
+if (nxp_device_type == "all-clusters") {
   app_common_folder = "${nxp_device_type}-app/${nxp_device_type}-common"
+}
+else {
+  # Use NXP custom zap files for thermostat & laundry-washer device-types
+  app_common_folder = "${nxp_device_type}/nxp/zap"
 }
 
 # Create here the SDK instance.
@@ -97,6 +107,7 @@ rt_executable("all_cluster_app") {
 
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
     "../../common/main/AppFactoryDataDefaultImpl.cpp",
     "../../common/main/AppMatterButtonEmpty.cpp",
@@ -107,22 +118,28 @@ rt_executable("all_cluster_app") {
     "../../common/main/ZclCallbacks.cpp",
     "../../common/main/include/AppEvent.h",
     "../../common/main/include/AppTask.h",
-    "../../common/main/include/CHIPDeviceManager.h",
-    "../../common/main/include/DeviceCallbacks.h",
+    "../../common/main/include/DeviceManager/CHIPDeviceManager.h",
+    "../../common/main/include/DeviceManager/DeviceCallbacks.h",
     "../../common/main/main.cpp",
+    "../../common/main/ICDUtil.cpp",
   ]
 
   deps = [ "${chip_root}/examples/${app_common_folder}" ]
 
-  if (nxp_device_type == "all-clusters") {
-    defines += [ "DEVICE_TYPE_ALL_CLUSTERS" ]
+  if (nxp_device_type != "thermostat") {
+    if (nxp_device_type == "all-clusters") {
+      defines += [ "DEVICE_TYPE_ALL_CLUSTERS" ]
+    }
+    if (nxp_device_type == "laundry-washer-app") {
+      defines += [ "DEVICE_TYPE_LAUNDRY_WASHER" ]
+    }
     sources += [
-      "${chip_root}/examples/${app_common_folder}/src/EnergyEvseDelegateImpl.cpp",
-      "${chip_root}/examples/${app_common_folder}/src/EnergyEvseManager.cpp",
-      "${chip_root}/examples/${app_common_folder}/src/bridged-actions-stub.cpp",
-      "${chip_root}/examples/${app_common_folder}/src/energy-evse-stub.cpp",
-      "${chip_root}/examples/${app_common_folder}/src/smco-stub.cpp",
-      "${chip_root}/examples/${app_common_folder}/src/static-supported-modes-manager.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
+      "../../common/main/operational-state-delegate-impl.cpp",
     ]
   }
 
@@ -140,6 +157,35 @@ rt_executable("all_cluster_app") {
       "${chip_root}/examples/platform/nxp/common/OTARequestorInitiator.h",
     ]
     include_dirs += [ "${chip_root}/examples/platform/nxp/common" ]
+  }
+
+  if (wifi_connect)
+  {
+    defines += [
+      "WIFI_CONNECT_TASK=1",
+      "WIFI_CONNECT=1",
+    ]
+
+    if (!chip_enable_matter_cli)
+    {
+        assert(wifi_ssid != "" && wifi_password != "", "WiFi SSID and password must be specified at build time!")
+    }
+
+    if (wifi_ssid != "")
+    {
+      defines += ["WIFI_SSID=\"${wifi_ssid}\"",]
+    }
+
+    if (wifi_password != "")
+    {
+      defines += ["WIFI_PASSWORD=\"${wifi_password}\"",]
+    }
+
+    include_dirs += [ "../../common/wifi_connect/include" ]
+
+    sources += [
+      "../../common/wifi_connect/source/WifiConnect.cpp",
+    ]
   }
 
   # In case a dedicated assert function needs to be supported the flag sdk_fsl_assert_support should be set to false

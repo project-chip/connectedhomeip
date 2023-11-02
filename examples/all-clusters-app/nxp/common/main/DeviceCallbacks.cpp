@@ -24,9 +24,12 @@
  **/
 #include "DeviceCallbacks.h"
 
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
+#include <laundry-washer-mode.h>
 
 #include <lib/support/CodeUtils.h>
 #if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
@@ -38,20 +41,43 @@
 #include "OTARequestorInitiator.h"
 #endif
 
+using namespace chip::app;
+void OnTriggerEffect(::Identify * identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
+        break;
+    default:
+        ChipLogProgress(Zcl, "No identifier effect");
+        return;
+    }
+}
+
 Identify gIdentify0 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyTriggerEffect"); },
+    chip::app::Clusters::Identify::IdentifyTypeEnum::kNone,
+    OnTriggerEffect,
 };
 
 Identify gIdentify1 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyTriggerEffect"); },
+    chip::app::Clusters::Identify::IdentifyTypeEnum::kNone,
+    OnTriggerEffect,
 };
 
 using namespace ::chip;
@@ -98,6 +124,12 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
                     "endpointId " ChipLogFormatMEI " clusterId " ChipLogFormatMEI " attribute ID: " ChipLogFormatMEI
                     " Type: %u Value: %u, length %u",
                     ChipLogValueMEI(endpointId), ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId), type, *value, size);
+    switch (clusterId)
+    {
+    case Clusters::OnOff::Id:
+        OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
+        break;
+    }
 }
 
 void DeviceCallbacks::OnWiFiConnectivityChange(const ChipDeviceEvent * event)
@@ -153,6 +185,31 @@ void DeviceCallbacks::OnInterfaceIpAddressChanged(const ChipDeviceEvent * event)
         ChipLogProgress(DeviceLayer, "Interface IPv6 address lost");
         break;
     }
+}
+
+using namespace chip::app::Clusters;
+void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId,
+                                                         uint8_t * value)
+{
+#if 0
+    /*
+     * This implementation is try to implementation the handler for TC-LWM-3.1
+     * Since this case is removed in SVE and there is a side-effect in TC-OO-2.4, remove it temporally
+    */
+    switch (attributeId) {
+    case Clusters::OnOff::Attributes::OnOff::Id:
+        if (*value == true) {
+            // Update the current mode to OnMode after device is on
+	    ModeBase::Instance * modeInstance = LaundryWasherMode::Instance();
+	    DataModel::Nullable<uint8_t> mode = modeInstance->GetOnMode();
+	    if (mode.IsNull() == false)
+            {
+	        modeInstance->UpdateCurrentMode(mode.Value());
+	    }
+        }
+        break;
+    }
+#endif //
 }
 
 #if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED

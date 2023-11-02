@@ -45,6 +45,12 @@
 #include "AppFactoryData.h"
 #include "AppMatterButton.h"
 #include "AppMatterCli.h"
+#include "ICDUtil.h"
+#include <app/InteractionModelEngine.h>
+
+#ifdef DEVICE_TYPE_LAUNDRY_WASHER
+#include "static-supported-temperature-levels.h"
+#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include "OTARequestorInitiator.h"
@@ -60,6 +66,10 @@
 
 #if TCP_DOWNLOAD
 #include "TcpDownload.h"
+#endif
+
+#if WIFI_CONNECT_TASK
+#include "WifiConnect.h"
 #endif
 
 #ifndef APP_TASK_STACK_SIZE
@@ -80,6 +90,10 @@ using namespace ::chip::DeviceManager;
 using namespace ::chip::app::Clusters;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+#ifdef DEVICE_TYPE_LAUNDRY_WASHER
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 namespace {
@@ -287,6 +301,11 @@ CHIP_ERROR AppTask::Init()
 #if TCP_DOWNLOAD
     EnableTcpDownloadComponent();
 #endif
+    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&GetICDUtil());
+
+#ifdef DEVICE_TYPE_LAUNDRY_WASHER
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
 
 exit:
     return err;
@@ -312,7 +331,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
         while (eventReceived == pdTRUE)
         {
-            sAppTask.DispatchEvent(&event);
+            sAppTask.DispatchEvent(event);
             eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
         }
     }
@@ -379,22 +398,22 @@ exit:
     return err;
 }
 
-void AppTask::PostEvent(const AppEvent * aEvent)
+void AppTask::PostEvent(const AppEvent & event)
 {
     if (sAppEventQueue != NULL)
     {
-        if (!xQueueSend(sAppEventQueue, aEvent, 0))
+        if (!xQueueSend(sAppEventQueue, &event, 0))
         {
             ChipLogError(DeviceLayer, "Failed to post event to app task event queue");
         }
     }
 }
 
-void AppTask::DispatchEvent(AppEvent * aEvent)
+void AppTask::DispatchEvent(const AppEvent & event)
 {
-    if (aEvent->Handler)
+    if (event.Handler)
     {
-        aEvent->Handler(aEvent);
+        event.Handler(event);
     }
     else
     {

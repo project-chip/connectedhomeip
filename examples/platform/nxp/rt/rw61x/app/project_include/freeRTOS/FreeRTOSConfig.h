@@ -51,7 +51,7 @@
 /* stack size increased for NVM/LITTLE_FS save in idle task */
 #define configMINIMAL_STACK_SIZE ((uint16_t) 2048)
 #ifndef configTOTAL_HEAP_SIZE
-#define configTOTAL_HEAP_SIZE ((size_t) (122 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t) (126 * 1024))
 #endif
 #define configAPPLICATION_ALLOCATED_HEAP 1
 #define configSUPPORT_STATIC_ALLOCATION 0

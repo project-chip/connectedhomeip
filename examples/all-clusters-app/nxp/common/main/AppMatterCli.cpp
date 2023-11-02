@@ -23,6 +23,10 @@
 #include <cstring>
 #include <platform/CHIPDeviceLayer.h>
 
+#ifdef DEVICE_TYPE_LAUNDRY_WASHER
+#include <operational-state-delegate-impl.h>
+#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
+
 #ifdef ENABLE_CHIP_SHELL
 #include "task.h"
 #include <ChipShellCollection.h>
@@ -37,6 +41,9 @@ static bool isShellInitialized = false;
 #else
 #define MATTER_CLI_LOG(...)
 #endif /* ENABLE_CHIP_SHELL */
+
+using namespace chip;
+using namespace chip::app::Clusters;
 
 void AppMatterCliTask(void * args)
 {
@@ -84,6 +91,70 @@ CHIP_ERROR cliReset(int argc, char * argv[])
     return CHIP_NO_ERROR;
 }
 
+#ifdef DEVICE_TYPE_LAUNDRY_WASHER
+CHIP_ERROR cliOpState(int argc, char * argv[])
+{
+    if ((argc != 1) && (argc != 2))
+    {
+        ChipLogError(Shell, "Target State is missing");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (!strcmp(argv[0], "stop"))
+    {
+        ChipLogDetail(Shell, "OpSState : Set to %s state", argv[0]);
+        OperationalState::instance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    }
+    else if (!strcmp(argv[0], "run"))
+    {
+        ChipLogDetail(Shell, "OpSState : Set to %s state", argv[0]);
+        OperationalState::instance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+    }
+    else if (!strcmp(argv[0], "pause"))
+    {
+        ChipLogDetail(Shell, "OpSState : Set to %s state", argv[0]);
+        OperationalState::instance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
+    }
+    else if (!strcmp(argv[0], "error"))
+    {
+        OperationalState::Structs::ErrorStateStruct::Type err;
+        ChipLogDetail(Shell, "OpSState : Set to %s state", argv[0]);
+        if (!strcmp(argv[1], "no_error"))
+        {
+            ChipLogDetail(Shell, "OpSState_error : Error: %s state", argv[1]);
+            err.errorStateID = (uint8_t) OperationalState::ErrorStateEnum::kNoError;
+        }
+        else if (!strcmp(argv[1], "unable_to_start_or_resume"))
+        {
+            ChipLogDetail(Shell, "OpSState_error : Error: %s state", argv[1]);
+            err.errorStateID = (uint8_t) OperationalState::ErrorStateEnum::kUnableToStartOrResume;
+        }
+        else if (!strcmp(argv[1], "unable_to_complete_operation"))
+        {
+            ChipLogDetail(Shell, "OpSState_error : Error: %s state", argv[1]);
+            err.errorStateID = (uint8_t) OperationalState::ErrorStateEnum::kUnableToCompleteOperation;
+        }
+        else if (!strcmp(argv[1], "command_invalid_in_state"))
+        {
+            ChipLogDetail(Shell, "OpSState_error : Error: %s state", argv[1]);
+            err.errorStateID = (uint8_t) OperationalState::ErrorStateEnum::kCommandInvalidInState;
+        }
+        else
+        {
+            ChipLogError(Shell, "Invalid Error State to set");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        OperationalState::instance()->OnOperationalErrorDetected(err);
+        OperationalState::instance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError));
+    }
+    else
+    {
+        ChipLogError(Shell, "Invalid State to set");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    return CHIP_NO_ERROR;
+}
+#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
+
 CHIP_ERROR AppMatterCli_RegisterCommands(void)
 {
 #ifdef ENABLE_CHIP_SHELL
@@ -120,6 +191,9 @@ CHIP_ERROR AppMatterCli_RegisterCommands(void)
                 .cmd_name = "matterreset",
                 .cmd_help = "Reset the device",
             },
+#ifdef DEVICE_TYPE_LAUNDRY_WASHER
+            { .cmd_func = cliOpState, .cmd_name = "opstate", .cmd_help = "Set the Operational State" },
+#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
         };
 
         Engine::Root().RegisterCommands(kCommands, sizeof(kCommands) / sizeof(kCommands[0]));

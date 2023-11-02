@@ -499,6 +499,12 @@ CHIP_ERROR NXPConfig::FactoryResetConfig(void)
         ClearConfigValue(key);
     }
 
+    // Clear RebootCount, TotalOperationalHours, UpTime counters during factory reset
+    for (Key key = kMinConfigKey_ChipCounter; key <= (kMinConfigKey_ChipCounter + 3); key++)
+    {
+        ClearConfigValue(key);
+    }
+
     /* Reset the key string file system as it contains on data that needs to be erased when doing a factoryreset */
     FLib_MemSet((void *) &chipConfigRamStructKeyString, 0, sizeof(chipConfigRamStructKeyString));
 
