@@ -99,7 +99,7 @@ void OTAProviderDelegateBridge::sendOTAQueryFailure(uint8_t status)
 void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                  const QueryImage::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     uint8_t errorStatus = static_cast<uint8_t>(OTAQueryStatus::kNotAvailable);
 
     NodeId nodeId = kUndefinedNodeId;
@@ -107,8 +107,8 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     FabricIndex fabricIndex = kUndefinedFabricIndex;
     ScopedNodeId ourNodeId;
 
-    VendorId vendorId = VendorId::Unspecified;
-    uint16_t productId = 0;
+    VendorId vendorId        = VendorId::Unspecified;
+    uint16_t productId       = 0;
     uint32_t softwareVersion = 0;
     DataModel::DecodableList<OTADownloadProtocol> protocolsSupported;
     Optional<uint16_t> hardwareVersion;
@@ -128,19 +128,19 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     chip::JniLocalReferenceManager manager(env);
     jmethodID handleQueryImageMethod = nullptr;
 
-    jobject boxedHardwareVersion = nullptr;
-    jobject boxedLocation = nullptr;
+    jobject boxedHardwareVersion     = nullptr;
+    jobject boxedLocation            = nullptr;
     jobject boxedRequestorCanConsent = nullptr;
     jobject boxedMetadataForProvider = nullptr;
-    jobject jResponse = nullptr;
+    jobject jResponse                = nullptr;
 
-    jmethodID getSoftwareVersionMethod= nullptr;
+    jmethodID getSoftwareVersionMethod       = nullptr;
     jmethodID getSoftwareVersionStringMethod = nullptr;
-    jmethodID getFilePathMethod = nullptr;
+    jmethodID getFilePathMethod              = nullptr;
 
-    jobject jSoftwareVersion = nullptr;
+    jobject jSoftwareVersion       = nullptr;
     jstring jSoftwareVersionString = nullptr;
-    jstring jFilePath = nullptr;
+    jstring jFilePath              = nullptr;
 
     bool hasUpdate = false;
     Commands::QueryImageResponse::Type response;
@@ -149,22 +149,22 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     MutableCharSpan uri(uriBuffer);
 
     VerifyOrExit(mOtaProviderDelegate.HasValidObjectRef(),
-                   commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
+                 commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
 
     VerifyOrExit(mBdxOTASender != nullptr, commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
 
     nodeId = commandObj->GetSubjectDescriptor().subject;
 
-    fabricIndex = commandObj->GetAccessingFabricIndex();
-    ourNodeId  = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetLocalScopedNodeId();
-    vendorId                                                = commandData.vendorID;
-    productId                                               = commandData.productID;
-    softwareVersion                                         = commandData.softwareVersion;
-    protocolsSupported = commandData.protocolsSupported;
-    hardwareVersion                               = commandData.hardwareVersion;
-    location                                = commandData.location;
-    requestorCanConsent                               = commandData.requestorCanConsent;
-    metadataForProvider                     = commandData.metadataForProvider;
+    fabricIndex         = commandObj->GetAccessingFabricIndex();
+    ourNodeId           = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetLocalScopedNodeId();
+    vendorId            = commandData.vendorID;
+    productId           = commandData.productID;
+    softwareVersion     = commandData.softwareVersion;
+    protocolsSupported  = commandData.protocolsSupported;
+    hardwareVersion     = commandData.hardwareVersion;
+    location            = commandData.location;
+    requestorCanConsent = commandData.requestorCanConsent;
+    metadataForProvider = commandData.metadataForProvider;
 
     {
         auto iterator = commandData.protocolsSupported.begin();
@@ -196,10 +196,10 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     }
 
     otaProviderDelegate = mOtaProviderDelegate.ObjectRef();
-    err = JniReferences::GetInstance().FindMethod(env, otaProviderDelegate, "handleQueryImage",
-                                                  "(IIJLjava/lang/Integer;Ljava/lang/String;Ljava/lang/Boolean;[B)Lchip/"
-                                                  "devicecontroller/OTAProviderDelegate$QueryImageResponse;",
-                                                  &handleQueryImageMethod);
+    err                 = JniReferences::GetInstance().FindMethod(env, otaProviderDelegate, "handleQueryImage",
+                                                                  "(IIJLjava/lang/Integer;Ljava/lang/String;Ljava/lang/Boolean;[B)Lchip/"
+                                                                                  "devicecontroller/OTAProviderDelegate$QueryImageResponse;",
+                                                                  &handleQueryImageMethod);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find handleQueryImage method"));
 
     if (hardwareVersion.HasValue())
@@ -227,10 +227,9 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
         boxedMetadataForProvider = boxedMetadataForProviderByteArray;
     }
 
-    jResponse =
-        env->CallObjectMethod(otaProviderDelegate, handleQueryImageMethod, static_cast<jint>(vendorId),
-                              static_cast<jint>(productId), static_cast<jlong>(softwareVersion), boxedHardwareVersion,
-                              boxedLocation, boxedRequestorCanConsent, boxedMetadataForProvider);
+    jResponse = env->CallObjectMethod(otaProviderDelegate, handleQueryImageMethod, static_cast<jint>(vendorId),
+                                      static_cast<jint>(productId), static_cast<jlong>(softwareVersion), boxedHardwareVersion,
+                                      boxedLocation, boxedRequestorCanConsent, boxedMetadataForProvider);
     if (env->ExceptionCheck())
     {
         ChipLogError(Support, "Exception in call java method");
@@ -253,11 +252,9 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
                                                   &getSoftwareVersionMethod);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find getSoftwareVersion method"));
 
-
     err = JniReferences::GetInstance().FindMethod(env, jResponse, "getSoftwareVersionString", "()Ljava/lang/String;",
                                                   &getSoftwareVersionStringMethod);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find getSoftwareVersionString method"));
-
 
     err = JniReferences::GetInstance().FindMethod(env, jResponse, "getFilePath", "()Ljava/lang/String;", &getFilePathMethod);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find getFilePath method"));
@@ -270,7 +267,8 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
         response.status = OTAQueryStatus::kUpdateAvailable;
         if (jSoftwareVersion != nullptr)
         {
-            response.softwareVersion.SetValue(static_cast<uint32_t>(JniReferences::GetInstance().LongToPrimitive(jSoftwareVersion)));
+            response.softwareVersion.SetValue(
+                static_cast<uint32_t>(JniReferences::GetInstance().LongToPrimitive(jSoftwareVersion)));
         }
 
         JniUtfString jniSoftwareVersionString(env, jSoftwareVersionString);
