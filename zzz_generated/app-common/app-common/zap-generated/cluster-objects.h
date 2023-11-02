@@ -283,6 +283,11 @@ struct Type;
 struct DecodableType;
 } // namespace Identify
 
+namespace IdentifyQueryResponse {
+struct Type;
+struct DecodableType;
+} // namespace IdentifyQueryResponse
+
 namespace IdentifyQuery {
 struct Type;
 struct DecodableType;
@@ -328,6 +333,38 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Identify
+namespace IdentifyQueryResponse {
+enum class Fields : uint8_t
+{
+    kTimeout = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::IdentifyQueryResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
+
+    uint16_t timeout = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::IdentifyQueryResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
+
+    uint16_t timeout = static_cast<uint16_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace IdentifyQueryResponse
 namespace IdentifyQuery {
 enum class Fields : uint8_t
 {
@@ -342,7 +379,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };

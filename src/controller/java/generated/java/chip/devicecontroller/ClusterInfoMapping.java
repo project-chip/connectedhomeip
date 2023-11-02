@@ -213,6 +213,28 @@ public class ClusterInfoMapping {
     }
   }
 
+
+  public static class DelegatedIdentifyClusterIdentifyQueryResponseCallback implements ChipClusters.IdentifyCluster.IdentifyQueryResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer timeout) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo timeoutResponseValue = new CommandResponseInfo("timeout", "Integer");
+      responseValues.put(timeoutResponseValue, timeout);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
   public static class DelegatedIdentifyClusterGeneratedCommandListAttributeCallback implements ChipClusters.IdentifyCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -17575,12 +17597,12 @@ public class ClusterInfoMapping {
     InteractionInfo identifyidentifyQueryInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.IdentifyCluster) cluster)
-        .identifyQuery((DefaultClusterCallback) callback
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
+          .identifyQuery((ChipClusters.IdentifyCluster.IdentifyQueryResponseCallback) callback
+            );
+        },
+        () -> new DelegatedIdentifyClusterIdentifyQueryResponseCallback(),
         identifyidentifyQueryCommandParams
-    );
+      );
     identifyClusterInteractionInfoMap.put("identifyQuery", identifyidentifyQueryInteractionInfo);
 
     Map<String, CommandParameterInfo> identifytriggerEffectCommandParams = new LinkedHashMap<String, CommandParameterInfo>();

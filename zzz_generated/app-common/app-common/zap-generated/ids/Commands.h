@@ -34,6 +34,10 @@ namespace Identify {
 static constexpr CommandId Id = 0x00000000;
 } // namespace Identify
 
+namespace IdentifyQueryResponse {
+static constexpr CommandId Id = 0x00000000;
+} // namespace IdentifyQueryResponse
+
 namespace IdentifyQuery {
 static constexpr CommandId Id = 0x00000001;
 } // namespace IdentifyQuery

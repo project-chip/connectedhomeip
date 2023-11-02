@@ -133,11 +133,11 @@ public class ChipClusters {
       identify(chipClusterPtr, callback, identifyTime, timedInvokeTimeoutMs);
     }
 
-    public void identifyQuery(DefaultClusterCallback callback) {
+    public void identifyQuery(IdentifyQueryResponseCallback callback) {
       identifyQuery(chipClusterPtr, callback, null);
     }
 
-    public void identifyQuery(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+    public void identifyQuery(IdentifyQueryResponseCallback callback, int timedInvokeTimeoutMs) {
       identifyQuery(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
 
@@ -151,9 +151,14 @@ public class ChipClusters {
 
     private native void identify(long chipClusterPtr, DefaultClusterCallback callback, Integer identifyTime, @Nullable Integer timedInvokeTimeoutMs);
 
-    private native void identifyQuery(long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer timedInvokeTimeoutMs);
+    private native void identifyQuery(long chipClusterPtr, IdentifyQueryResponseCallback callback, @Nullable Integer timedInvokeTimeoutMs);
 
     private native void triggerEffect(long chipClusterPtr, DefaultClusterCallback callback, Integer effectIdentifier, Integer effectVariant, @Nullable Integer timedInvokeTimeoutMs);
+
+    public interface IdentifyQueryResponseCallback {
+      void onSuccess(Integer timeout);
+      void onError(Exception error);
+    }
 
     public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> value);

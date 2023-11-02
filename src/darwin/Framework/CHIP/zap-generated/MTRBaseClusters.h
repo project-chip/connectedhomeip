@@ -49,8 +49,8 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * This command allows the sending device to request the target or targets to respond if they are currently identifying themselves.
  */
-- (void)identifyQueryWithParams:(MTRIdentifyClusterIdentifyQueryParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)identifyQueryWithCompletion:(MTRStatusCompletion)completion
+- (void)identifyQueryWithParams:(MTRIdentifyClusterIdentifyQueryParams * _Nullable)params completion:(void (^)(MTRIdentifyClusterIdentifyQueryResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)identifyQueryWithCompletion:(void (^)(MTRIdentifyClusterIdentifyQueryResponseParams * _Nullable data, NSError * _Nullable error))completion
     MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command TriggerEffect

@@ -42,6 +42,10 @@ client cluster Identify = 3 {
     int16u identifyTime = 0;
   }
 
+  response struct IdentifyQueryResponse = 0 {
+    int16u timeout = 0;
+  }
+
   request struct TriggerEffectRequest {
     EffectIdentifierEnum effectIdentifier = 0;
     EffectVariantEnum effectVariant = 1;
@@ -50,7 +54,7 @@ client cluster Identify = 3 {
   /** Command description for Identify */
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
   /** This command allows the sending device to request the target or targets to respond if they are currently identifying themselves. */
-  command access(invoke: manage) IdentifyQuery(): DefaultSuccess = 1;
+  command access(invoke: manage) IdentifyQuery(): IdentifyQueryResponse = 1;
   /** Command description for TriggerEffect */
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }

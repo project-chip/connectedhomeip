@@ -4400,6 +4400,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Identify::Commands::IdentifyQueryResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("timeout", indent + 1, value.timeout));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const Groups::Commands::AddGroupResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -13677,6 +13685,17 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
 
     switch (path.mClusterId)
     {
+    case Identify::Id: {
+        switch (path.mCommandId)
+        {
+        case Identify::Commands::IdentifyQueryResponse::Id: {
+            Identify::Commands::IdentifyQueryResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("IdentifyQueryResponse", 1, value);
+        }
+        }
+        break;
+    }
     case Groups::Id: {
         switch (path.mCommandId)
         {

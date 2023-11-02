@@ -121,11 +121,27 @@ class Identify(Cluster):
             identifyTime: 'uint' = 0
 
         @dataclass
+        class IdentifyQueryResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000003
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="timeout", Tag=0, Type=uint),
+                    ])
+
+            timeout: 'uint' = 0
+
+        @dataclass
         class IdentifyQuery(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000003
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[str] = 'IdentifyQueryResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:

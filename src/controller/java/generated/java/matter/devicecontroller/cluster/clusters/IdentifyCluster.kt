@@ -20,6 +20,8 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class IdentifyCluster(private val endpointId: UShort) {
+  class IdentifyQueryResponse(val timeout: UShort)
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   class AcceptedCommandListAttribute(val value: List<UInt>)
@@ -36,7 +38,7 @@ class IdentifyCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun identifyQuery(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun identifyQuery(timedInvokeTimeoutMs: Int? = null): IdentifyQueryResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

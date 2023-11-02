@@ -28,6 +28,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRIdentifyClusterIdentifyQueryResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRIdentifyClusterIdentifyQueryParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
