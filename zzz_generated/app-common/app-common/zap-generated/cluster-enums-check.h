@@ -1332,6 +1332,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::Sensitivi
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(MicrowaveOvenMode::ModeTag val)
+{
+    using EnumType = MicrowaveOvenMode::ModeTag;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kDefrost:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalState::ErrorStateEnum val)
 {
     using EnumType = OperationalState::ErrorStateEnum;
@@ -2867,9 +2880,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AudioOutput::OutputType
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(ApplicationLauncher::ApplicationLauncherStatusEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ApplicationLauncher::StatusEnum val)
 {
-    using EnumType = ApplicationLauncher::ApplicationLauncherStatusEnum;
+    using EnumType = ApplicationLauncher::StatusEnum;
     switch (val)
     {
     case EnumType::kSuccess:

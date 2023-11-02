@@ -160,6 +160,10 @@ server cluster Groups = 4 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 provisional server cluster Scenes = 5 {
+  bitmap CopyModeBitmap : bitmap8 {
+    kCopyAllScenes = 0x1;
+  }
+
   bitmap Feature : bitmap32 {
     kSceneNames = 0x1;
     kExplicit = 0x2;
@@ -167,8 +171,8 @@ provisional server cluster Scenes = 5 {
     kFabricScenes = 0x8;
   }
 
-  bitmap ScenesCopyMode : bitmap8 {
-    kCopyAllScenes = 0x1;
+  bitmap NameSupportBitmap : bitmap8 {
+    kSceneNames = 0x80;
   }
 
   struct AttributeValuePair {
@@ -185,7 +189,7 @@ provisional server cluster Scenes = 5 {
   readonly attribute int8u currentScene = 1;
   readonly attribute group_id currentGroup = 2;
   readonly attribute boolean sceneValid = 3;
-  readonly attribute bitmap8 nameSupport = 4;
+  readonly attribute NameSupportBitmap nameSupport = 4;
   readonly attribute int16u sceneTableSize = 6;
   readonly attribute int8u remainingCapacity = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1316,7 +1320,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
   }
 
   info event AssociationFailure = 1 {
-    AssociationFailureCauseEnum associationFailure = 0;
+    AssociationFailureCauseEnum associationFailureCause = 0;
     int16u status = 1;
   }
 

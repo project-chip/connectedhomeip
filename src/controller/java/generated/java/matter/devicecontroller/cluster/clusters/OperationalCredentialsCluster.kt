@@ -17,7 +17,7 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class OperationalCredentialsCluster(private val endpointId: UShort) {
   class AttestationResponse(
@@ -31,21 +31,19 @@ class OperationalCredentialsCluster(private val endpointId: UShort) {
 
   class NOCResponse(val statusCode: UInt, val fabricIndex: UByte?, val debugText: String?)
 
-  class NOCsAttribute(val value: ArrayList<ChipStructs.OperationalCredentialsClusterNOCStruct>)
+  class NOCsAttribute(val value: List<OperationalCredentialsClusterNOCStruct>)
 
-  class FabricsAttribute(
-    val value: ArrayList<ChipStructs.OperationalCredentialsClusterFabricDescriptorStruct>
-  )
+  class FabricsAttribute(val value: List<OperationalCredentialsClusterFabricDescriptorStruct>)
 
-  class TrustedRootCertificatesAttribute(val value: ArrayList<ByteArray>)
+  class TrustedRootCertificatesAttribute(val value: List<ByteArray>)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun attestationRequest(
     attestationNonce: ByteArray,

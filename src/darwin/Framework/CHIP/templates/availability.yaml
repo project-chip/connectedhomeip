@@ -3261,7 +3261,10 @@
           AudioOutput:
               - OutputTypeEnum
           ApplicationLauncher:
-              - ApplicationLauncherStatusEnum
+              # StatusEnum was originally named ApplicationLauncherStatusEnum, but we
+              # generate the same API for the names with/without the cluster name at the
+              # beginning, so the name can just change here.
+              - StatusEnum
           ApplicationBasic:
               - ApplicationStatusEnum
           TestCluster:
@@ -4143,7 +4146,10 @@
                   - Internal
                   - Other
           ApplicationLauncher:
-              ApplicationLauncherStatusEnum:
+              # StatusEnum was originally named ApplicationLauncherStatusEnum, but we
+              # generate the same API for the names with/without the cluster name at the
+              # beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - AppNotAvailable
                   - SystemBusy
@@ -7735,13 +7741,25 @@
 - release: "Future"
   versions: "future"
   introduced:
+      event fields:
+          WiFiNetworkDiagnostics:
+              AssociationFailure:
+                  - associationFailureCause
       bitmaps:
+          Scenes:
+              - CopyModeBitmap
+              - NameSupportBitmap
           AdministratorCommissioning:
               - Feature
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
                   - SupplyFault
+          Scenes:
+              CopyModeBitmap:
+                  - CopyAllScenes
+              NameSupportBitmap:
+                  - SceneNames
           SoftwareDiagnostics:
               Feature:
                   - Watermarks
@@ -7749,6 +7767,13 @@
               Feature:
                   - Basic
   deprecated:
+      event fields:
+          WiFiNetworkDiagnostics:
+              AssociationFailure:
+                  - associationFailure
+      bitmaps:
+          Scenes:
+              - ScenesCopyMode
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7757,6 +7782,10 @@
               Feature:
                   - WaterMarks
   provisional:
+      clusters:
+          # Targeting Spring 2024 Matter release
+          - MicrowaveOvenControl
+          - MicrowaveOvenMode
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -7772,7 +7801,19 @@
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
               - ThreadCapabilitiesBitmap
+      bitmap values:
+          OnOff:
+              Feature:
+                  # Targeting Spring 2024 Matter release
+                  - OffOnly
   renames:
+      event fields:
+          WiFiNetworkDiagnostics:
+              AssociationFailure:
+                  associationFailureCause: associationFailure
+      bitmaps:
+          Scenes:
+              CopyModeBitmap: ScenesCopyMode
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:

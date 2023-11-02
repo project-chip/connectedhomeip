@@ -17,18 +17,18 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class BindingCluster(private val endpointId: UShort) {
-  class BindingAttribute(val value: ArrayList<ChipStructs.BindingClusterTargetStruct>)
+  class BindingAttribute(val value: List<BindingClusterTargetStruct>)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readBindingAttribute(): BindingAttribute {
     // Implementation needs to be added here
@@ -38,12 +38,12 @@ class BindingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeBindingAttribute(value: ArrayList<ChipStructs.BindingClusterTargetStruct>) {
+  suspend fun writeBindingAttribute(value: List<BindingClusterTargetStruct>) {
     // Implementation needs to be added here
   }
 
   suspend fun writeBindingAttribute(
-    value: ArrayList<ChipStructs.BindingClusterTargetStruct>,
+    value: List<BindingClusterTargetStruct>,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here

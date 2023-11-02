@@ -126,6 +126,10 @@ client cluster Groups = 4 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 provisional client cluster Scenes = 5 {
+  bitmap CopyModeBitmap : bitmap8 {
+    kCopyAllScenes = 0x1;
+  }
+
   bitmap Feature : bitmap32 {
     kSceneNames = 0x1;
     kExplicit = 0x2;
@@ -133,8 +137,8 @@ provisional client cluster Scenes = 5 {
     kFabricScenes = 0x8;
   }
 
-  bitmap ScenesCopyMode : bitmap8 {
-    kCopyAllScenes = 0x1;
+  bitmap NameSupportBitmap : bitmap8 {
+    kSceneNames = 0x80;
   }
 
   struct AttributeValuePair {
@@ -151,7 +155,7 @@ provisional client cluster Scenes = 5 {
   readonly attribute int8u currentScene = 1;
   readonly attribute group_id currentGroup = 2;
   readonly attribute boolean sceneValid = 3;
-  readonly attribute bitmap8 nameSupport = 4;
+  readonly attribute NameSupportBitmap nameSupport = 4;
   readonly attribute optional nullable node_id lastConfiguredBy = 5;
   readonly attribute int16u sceneTableSize = 6;
   readonly attribute int8u remainingCapacity = 7;
@@ -267,7 +271,7 @@ provisional client cluster Scenes = 5 {
   }
 
   request struct CopySceneRequest {
-    ScenesCopyMode mode = 0;
+    CopyModeBitmap mode = 0;
     group_id groupIdentifierFrom = 1;
     int8u sceneIdentifierFrom = 2;
     group_id groupIdentifierTo = 3;
@@ -328,6 +332,7 @@ client cluster OnOff = 6 {
   bitmap Feature : bitmap32 {
     kLighting = 0x1;
     kDeadFrontBehavior = 0x2;
+    kOffOnly = 0x4;
   }
 
   bitmap OnOffControlBitmap : bitmap8 {
@@ -348,7 +353,7 @@ client cluster OnOff = 6 {
 
   request struct OffWithEffectRequest {
     EffectIdentifierEnum effectIdentifier = 0;
-    int8u effectVariant = 1;
+    enum8 effectVariant = 1;
   }
 
   request struct OnWithTimedOffRequest {
@@ -1782,7 +1787,6 @@ client cluster GeneralDiagnostics = 51 {
   readonly attribute optional RadioFaultEnum activeRadioFaults[] = 6;
   readonly attribute optional NetworkFaultEnum activeNetworkFaults[] = 7;
   readonly attribute boolean testEventTriggersEnabled = 8;
-  readonly attribute optional int32u averageWearCount = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1941,9 +1945,9 @@ client cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute NeighborTableStruct neighborTable[] = 7;
   readonly attribute RouteTableStruct routeTable[] = 8;
   readonly attribute nullable int32u partitionId = 9;
-  readonly attribute nullable int8u weighting = 10;
-  readonly attribute nullable int8u dataVersion = 11;
-  readonly attribute nullable int8u stableDataVersion = 12;
+  readonly attribute nullable int16u weighting = 10;
+  readonly attribute nullable int16u dataVersion = 11;
+  readonly attribute nullable int16u stableDataVersion = 12;
   readonly attribute nullable int8u leaderRouterId = 13;
   readonly attribute optional int16u detachedRoleCount = 14;
   readonly attribute optional int16u childRoleCount = 15;
@@ -2002,7 +2006,7 @@ client cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int16u clusterRevision = 65533;
 
   /** Reception of this command SHALL reset the OverrunCount attributes to 0 */
-  command ResetCounts(): DefaultSuccess = 0;
+  command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -2048,7 +2052,7 @@ client cluster WiFiNetworkDiagnostics = 54 {
   }
 
   info event AssociationFailure = 1 {
-    AssociationFailureCauseEnum associationFailure = 0;
+    AssociationFailureCauseEnum associationFailureCause = 0;
     int16u status = 1;
   }
 
@@ -3352,6 +3356,38 @@ client cluster DishwasherAlarm = 93 {
   command Reset(ResetRequest): DefaultSuccess = 0;
   /** Modify enabled alarms */
   command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
+provisional client cluster MicrowaveOvenMode = 94 {
+  enum ModeTag : enum16 {
+    kNormal = 16384;
+    kDefrost = 16385;
+  }
+
+  bitmap Feature : bitmap32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** Attributes and commands for configuring the microwave oven control, and reporting cooking stats. */
@@ -6365,7 +6401,7 @@ client cluster AudioOutput = 1291 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 client cluster ApplicationLauncher = 1292 {
-  enum ApplicationLauncherStatusEnum : enum8 {
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
@@ -6386,7 +6422,7 @@ client cluster ApplicationLauncher = 1292 {
   }
 
   readonly attribute optional int16u catalogList[] = 0;
-  attribute optional nullable ApplicationEPStruct currentApp = 1;
+  readonly attribute optional nullable ApplicationEPStruct currentApp = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6408,7 +6444,7 @@ client cluster ApplicationLauncher = 1292 {
   }
 
   response struct LauncherResponse = 3 {
-    ApplicationLauncherStatusEnum status = 0;
+    StatusEnum status = 0;
     optional octet_string data = 1;
   }
 
@@ -6473,11 +6509,11 @@ client cluster AccountLogin = 1294 {
   }
 
   /** Upon receipt, the Content App checks if the account associated with the client Temp Account Identifier Rotating ID is the same acount that is active on the given Content App. If the accounts are the same, then the Content App includes the Setup PIN in the GetSetupPIN Response. */
-  timed command GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
+  fabric timed command access(invoke: administer) GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
   /** Upon receipt, the Content App checks if the account associated with the client’s Temp Account Identifier (Rotating ID) has a current active Setup PIN with the given value. If the Setup PIN is valid for the user account associated with the Temp Account Identifier, then the Content App MAY make that user account active. */
-  timed command Login(LoginRequest): DefaultSuccess = 2;
+  fabric timed command access(invoke: administer) Login(LoginRequest): DefaultSuccess = 2;
   /** The purpose of this command is to instruct the Content App to clear the current user account. This command SHOULD be used by clients of a Content App to indicate the end of a user session. */
-  timed command Logout(): DefaultSuccess = 3;
+  fabric timed command Logout(): DefaultSuccess = 3;
 }
 
 /** Attributes related to the electrical properties of a device. This cluster is used by power outlets and other devices that need to provide instantaneous data as opposed to metrology data which should be retrieved from the metering cluster.. */
