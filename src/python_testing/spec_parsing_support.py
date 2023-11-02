@@ -328,22 +328,31 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
             clusters[id] = new
 
     # workaround for aliased clusters not appearing in the xml. Remove this once https://github.com/csa-data-model/projects/issues/373 is addressed
-    aliased_clusters = {0x040C: 'Carbon Monoxide Concentration Measurement',
-                        0x040D: 'Carbon Dioxide Concentration Measurement',
-                        0x0413: 'Nitrogen Dioxide Concentration Measurement',
-                        0x0415: 'Ozone Concentration Measurement',
-                        0x042A: 'PM2.5 Concentration Measurement',
-                        0x042B: 'Formaldehyde Concentration Measurement',
-                        0x042C: 'PM1 Concentration Measurement',
-                        0x042D: 'PM10 Concentration Measurement',
-                        0x042E: 'Total Volatile Organic Compounds Concentration Measurement',
-                        0x042F: 'Radon Concentration Measurement'}
-    alias_base_name = 'Concentration Measurement Clusters'
-    for id, alias_name in aliased_clusters.items():
-        base = derived_clusters[alias_base_name]
-        new = deepcopy(base)
-        new.derived = alias_base_name
-        new.name = alias_name
-        clusters[id] = new
+    conc_clusters = {0x040C: 'Carbon Monoxide Concentration Measurement',
+                     0x040D: 'Carbon Dioxide Concentration Measurement',
+                     0x0413: 'Nitrogen Dioxide Concentration Measurement',
+                     0x0415: 'Ozone Concentration Measurement',
+                     0x042A: 'PM2.5 Concentration Measurement',
+                     0x042B: 'Formaldehyde Concentration Measurement',
+                     0x042C: 'PM1 Concentration Measurement',
+                     0x042D: 'PM10 Concentration Measurement',
+                     0x042E: 'Total Volatile Organic Compounds Concentration Measurement',
+                     0x042F: 'Radon Concentration Measurement'}
+    conc_base_name = 'Concentration Measurement Clusters'
+    resource_clusters = {0x0071: 'HEPA Filter Monitoring',
+                         0x0072: 'Activated Carbon Filter Monitoring'}
+    resource_base_name = 'Resource Monitoring Clusters'
+    water_clusters = {0x0405: 'Relative Humidity Measurement',
+                      0x0407: 'Leaf Wetness Measurement',
+                      0x0408: 'Soil Moisture Measurement'}
+    water_base_name = 'Water Content Measurement Clusters'
+    aliases = {conc_base_name: conc_clusters, resource_base_name: resource_clusters, water_base_name: water_clusters}
+    for alias_base_name, aliased_clusters in aliases.items():
+        for id, alias_name in aliased_clusters.items():
+            base = derived_clusters[alias_base_name]
+            new = deepcopy(base)
+            new.derived = alias_base_name
+            new.name = alias_name
+            clusters[id] = new
 
     return clusters, problems
