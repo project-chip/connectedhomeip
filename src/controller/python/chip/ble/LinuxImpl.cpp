@@ -76,7 +76,8 @@ public:
         mScanCallback(scanCallback), mCompleteCallback(completeCallback), mErrorCallback(errorCallback)
     {}
 
-    void SetScanner(std::unique_ptr<ChipDeviceScanner> scanner) { mScanner = std::move(scanner); }
+    CHIP_ERROR ScannerInit(BluezAdapter1 * adapter) { return mScanner.Init(adapter, this); }
+    CHIP_ERROR ScannerStartScan(System::Clock::Timeout timeout) { return mScanner.StartScan(timeout); }
 
     void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
     {
@@ -106,7 +107,7 @@ public:
     }
 
 private:
-    std::unique_ptr<ChipDeviceScanner> mScanner;
+    ChipDeviceScanner mScanner;
     PyObject * const mContext;
     const DeviceScannedCallback mScanCallback;
     const ScanCompleteCallback mCompleteCallback;
@@ -123,23 +124,19 @@ extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, 
     std::unique_ptr<ScannerDelegateImpl> delegate =
         std::make_unique<ScannerDelegateImpl>(context, scanCallback, completeCallback, errorCallback);
 
-    std::unique_ptr<ChipDeviceScanner> scanner = ChipDeviceScanner::Create(static_cast<BluezAdapter1 *>(adapter), delegate.get());
-
-    if (!scanner)
-    {
-        return nullptr;
-    }
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    err = scanner->StartScan(chip::System::Clock::Milliseconds32(timeoutMs));
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    CHIP_ERROR err = delegate->ScannerInit(static_cast<BluezAdapter1 *>(adapter));
     if (err != CHIP_NO_ERROR)
     {
         return nullptr;
     }
 
-    delegate->SetScanner(std::move(scanner));
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    err = delegate->ScannerStartScan(chip::System::Clock::Milliseconds32(timeoutMs));
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    if (err != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
 
     return delegate.release();
 }
