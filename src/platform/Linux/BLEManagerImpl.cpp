@@ -44,6 +44,8 @@
 
 #include "bluez/BluezEndpoint.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
+
 using namespace ::nl;
 using namespace ::chip::Ble;
 
@@ -667,7 +669,15 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
     bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
     if (!supportsConcurrentConnection)
     {
-        DeviceLayer::ConnectivityMgrImpl().StartNonConcurrentWiFiManagement();
+        // If the breadcrumb is zero the BLE connection has been terminated in error, so
+        // don't start the Wi-Fi yet.
+        uint64_t value;
+        using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
+        Breadcrumb::Get(0, &value);
+        if (value != 0)
+        {
+            DeviceLayer::ConnectivityMgrImpl().StartNonConcurrentWiFiManagement();
+        }
     }
 #endif
 }
