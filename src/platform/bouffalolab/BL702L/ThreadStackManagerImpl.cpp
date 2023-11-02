@@ -18,7 +18,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
@@ -54,9 +54,8 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
-    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
+     err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
     SuccessOrExit(err);
-
     mbedtls_platform_set_calloc_free(pvPortCalloc, vPortFree);
 
 exit:

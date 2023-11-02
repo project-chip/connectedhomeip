@@ -56,6 +56,7 @@
 #include <platform/ThreadStackManager.h>
 #include <platform/bouffalolab/common/ThreadStackManagerImpl.h>
 #include <utils_list.h>
+#include <inet/EndPointStateOpenThread.h>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET || CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -92,7 +93,6 @@ namespace {
 FactoryDataProvider sFactoryDataProvider;
 }
 #endif
-
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
@@ -234,7 +234,13 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 
     static CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = [] { ThreadStackMgr().LockThreadStack(); };
+    nativeParams.unlockCb              = [] { ThreadStackMgr().UnlockThreadStack(); };
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+#endif
     ReturnLogErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());

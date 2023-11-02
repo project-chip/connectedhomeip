@@ -23,9 +23,9 @@
 #include <platform/PlatformManager.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
-
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
-
+#endif
 extern "C" {
 #include <bl_sec.h>
 #include <openthread_port.h>
@@ -67,10 +67,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     ot_radioInit(opt);
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
-
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
-
+#endif
     err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
     SuccessOrExit(err);
 

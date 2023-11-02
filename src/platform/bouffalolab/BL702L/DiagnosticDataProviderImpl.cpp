@@ -22,8 +22,9 @@
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 
 #include "FreeRTOS.h"
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
-
+#endif
 extern "C" {
 #include <bl_sys.h>
 }
