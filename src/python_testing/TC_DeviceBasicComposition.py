@@ -1013,13 +1013,14 @@ class TC_DeviceBasicComposition(MatterBaseTest):
 
             return f'Conformance: {str(conformance)}, implemented features: {",".join(codes)}'
 
+        # This is a manually curated list of attributes that are in-progress in the SDK, but have landed in the spec
+        ignore_in_progress = self.user_params.get("ignore_in_progress", False)
+        in_progress_attributes = {Clusters.BasicInformation.id: [0x15, 0x016]}
+
         success = True
-        # TODO: provisional needs to be an input parameter
-        allow_provisional = True
+        allow_provisional = self.user_params.get("allow_provisional", False)
         clusters, problems = build_xml_clusters()
         self.problems = self.problems + problems
-        for id in sorted(list(clusters.keys())):
-            print(f'{id} 0x{id:02x}: {clusters[id].name}')
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
                 if cluster_id not in clusters.keys():
@@ -1082,6 +1083,8 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                                           problem=f'Attribute 0x{attribute_id:02x} is included, but is disallowed by conformance. {conformance_str(xml_attribute.conformance, feature_map, clusters[cluster_id].features)}')
                         success = False
                 for attribute_id, xml_attribute in clusters[cluster_id].attributes.items():
+                    if ignore_in_progress and cluster_id in in_progress_attributes and attribute_id in in_progress_attributes[cluster_id]:
+                        continue
                     conformance_decision = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
                     if conformance_decision == ConformanceDecision.MANDATORY and attribute_id not in cluster.keys():
                         location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
