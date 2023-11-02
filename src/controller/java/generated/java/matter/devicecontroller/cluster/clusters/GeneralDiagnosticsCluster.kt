@@ -145,14 +145,6 @@ class GeneralDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readAverageWearCountAttribute(): UInt {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeAverageWearCountAttribute(minInterval: Int, maxInterval: Int): UInt {
-    // Implementation needs to be added here
-  }
-
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }

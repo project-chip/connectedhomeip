@@ -31,6 +31,7 @@ import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
 from chip.clusters.Attribute import ValueDecodeFailure
+from chip.tlv import uint
 from conformance_support import ConformanceDecision, conformance_allowed
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
                                     async_test_body, default_matter_test_main)
@@ -1004,6 +1005,14 @@ class TC_DeviceBasicComposition(MatterBaseTest):
             self.fail_current_test("Problems with tags lists")
 
     def test_spec_conformance(self):
+        def conformance_str(conformance: Callable, feature_map: uint, feature_dict: dict[str, uint]) -> str:
+            codes = []
+            for mask, details in feature_dict.items():
+                if mask & feature_map:
+                    codes.append(details.code)
+
+            return f'Conformance: {str(conformance)}, implemented features: {",".join(codes)}'
+
         success = True
         # TODO: provisional needs to be an input parameter
         allow_provisional = True
@@ -1051,7 +1060,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                     conformance_decision = xml_feature.conformance(feature_map, attribute_list, all_command_list)
                     if conformance_decision == ConformanceDecision.MANDATORY and feature_mask not in feature_masks:
                         self.record_error(self.get_test_name(), location=location,
-                                          problem=f'Required feature with mask 0x{f:02x} is not present in feature map')
+                                          problem=f'Required feature with mask 0x{f:02x} is not present in feature map. {conformance_str(xml_feature.conformance, feature_map, clusters[cluster_id].features)}')
                         success = False
 
                 # Attribute conformance checking
@@ -1070,14 +1079,14 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                     if not conformance_allowed(conformance_decision, allow_provisional):
                         location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                         self.record_error(self.get_test_name(), location=location,
-                                          problem=f'Attribute 0x{attribute_id:02x} is included, but is disallowed by conformance')
+                                          problem=f'Attribute 0x{attribute_id:02x} is included, but is disallowed by conformance. {conformance_str(xml_attribute.conformance, feature_map, clusters[cluster_id].features)}')
                         success = False
                 for attribute_id, xml_attribute in clusters[cluster_id].attributes.items():
                     conformance_decision = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
                     if conformance_decision == ConformanceDecision.MANDATORY and attribute_id not in cluster.keys():
                         location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                         self.record_error(self.get_test_name(), location=location,
-                                          problem=f'Attribute 0x{attribute_id:02x} is required, but is not present on the DUT')
+                                          problem=f'Attribute 0x{attribute_id:02x} is required, but is not present on the DUT. {conformance_str(xml_attribute.conformance, feature_map, clusters[cluster_id].features)}')
                         success = False
 
                 def check_spec_conformance_for_commands(command_type: CommandType) -> bool:
@@ -1101,14 +1110,14 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                         conformance_decision = xml_command.conformance(feature_map, attribute_list, all_command_list)
                         if not conformance_allowed(conformance_decision, allow_provisional):
                             self.record_error(self.get_test_name(), location=location,
-                                              problem=f'Command 0x{command_id:02x} is included, but disallowed by conformance')
+                                              problem=f'Command 0x{command_id:02x} is included, but disallowed by conformance. {conformance_str(xml_command.conformance, feature_map, clusters[cluster_id].features)}')
                             success = False
                     for command_id, xml_command in xml_commands_dict.items():
                         conformance_decision = xml_command.conformance(feature_map, attribute_list, all_command_list)
                         if conformance_decision == ConformanceDecision.MANDATORY and command_id not in command_list:
                             location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=command_id)
                             self.record_error(self.get_test_name(), location=location,
-                                              problem=f'Command 0x{command_id:02x} is required, but is not present on the DUT')
+                                              problem=f'Command 0x{command_id:02x} is required, but is not present on the DUT. {conformance_str(xml_command.conformance, feature_map, clusters[cluster_id].features)}')
                             success = False
                     return success
 

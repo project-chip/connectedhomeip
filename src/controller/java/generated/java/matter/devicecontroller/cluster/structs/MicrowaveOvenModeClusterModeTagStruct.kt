@@ -14,50 +14,52 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package chip.devicecontroller.cluster.eventstructs
+package matter.devicecontroller.cluster.structs
 
-import chip.devicecontroller.cluster.*
+import java.util.Optional
+import matter.devicecontroller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
-  val associationFailureCause: UInt,
-  val status: UInt
-) {
+class MicrowaveOvenModeClusterModeTagStruct(val mfgCode: Optional<UShort>, val value: UInt) {
   override fun toString(): String = buildString {
-    append("WiFiNetworkDiagnosticsClusterAssociationFailureEvent {\n")
-    append("\tassociationFailureCause : $associationFailureCause\n")
-    append("\tstatus : $status\n")
+    append("MicrowaveOvenModeClusterModeTagStruct {\n")
+    append("\tmfgCode : $mfgCode\n")
+    append("\tvalue : $value\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_ASSOCIATION_FAILURE_CAUSE), associationFailureCause)
-      put(ContextSpecificTag(TAG_STATUS), status)
+      if (mfgCode.isPresent) {
+        val optmfgCode = mfgCode.get()
+        put(ContextSpecificTag(TAG_MFG_CODE), optmfgCode)
+      }
+      put(ContextSpecificTag(TAG_VALUE), value)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_ASSOCIATION_FAILURE_CAUSE = 0
-    private const val TAG_STATUS = 1
+    private const val TAG_MFG_CODE = 0
+    private const val TAG_VALUE = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MicrowaveOvenModeClusterModeTagStruct {
       tlvReader.enterStructure(tlvTag)
-      val associationFailureCause =
-        tlvReader.getUInt(ContextSpecificTag(TAG_ASSOCIATION_FAILURE_CAUSE))
-      val status = tlvReader.getUInt(ContextSpecificTag(TAG_STATUS))
+      val mfgCode =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MFG_CODE))) {
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MFG_CODE)))
+        } else {
+          Optional.empty()
+        }
+      val value = tlvReader.getUInt(ContextSpecificTag(TAG_VALUE))
 
       tlvReader.exitContainer()
 
-      return WiFiNetworkDiagnosticsClusterAssociationFailureEvent(associationFailureCause, status)
+      return MicrowaveOvenModeClusterModeTagStruct(mfgCode, value)
     }
   }
 }

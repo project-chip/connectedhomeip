@@ -10304,8 +10304,8 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kAssociationFailure = 0,
-    kStatus             = 1,
+    kAssociationFailureCause = 0,
+    kStatus                  = 1,
 };
 
 struct Type
@@ -10316,8 +10316,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    AssociationFailureCauseEnum associationFailure = static_cast<AssociationFailureCauseEnum>(0);
-    uint16_t status                                = static_cast<uint16_t>(0);
+    AssociationFailureCauseEnum associationFailureCause = static_cast<AssociationFailureCauseEnum>(0);
+    uint16_t status                                     = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -10329,8 +10329,8 @@ public:
     static constexpr EventId GetEventId() { return Events::AssociationFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
-    AssociationFailureCauseEnum associationFailure = static_cast<AssociationFailureCauseEnum>(0);
-    uint16_t status                                = static_cast<uint16_t>(0);
+    AssociationFailureCauseEnum associationFailureCause = static_cast<AssociationFailureCauseEnum>(0);
+    uint16_t status                                     = static_cast<uint16_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
