@@ -53,8 +53,8 @@ static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;
 static constexpr uint32_t kMaxCHIPCertLength = 400;
 static constexpr uint32_t kMaxDERCertLength  = 600;
 
-// The decode buffer is used to reconstruct TBS section of X.509 certificate, which doesn't include signature.
-static constexpr uint32_t kMaxCHIPCertDecodeBufLength = kMaxDERCertLength - Crypto::kMax_ECDSA_Signature_Length_Der;
+// As per spec section 11.24 (Wi-Fi Authentication with Per-Device Credentials)
+inline constexpr uint32_t kMaxCHIPCompactNetworkIdentityLength = 140;
 
 /** Data Element Tags for the CHIP Certificate
  */
@@ -542,6 +542,7 @@ CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac);
 
 /**
  * Validates a Network (Client) Identity in TLV-encoded form.
+ * Accepts either a full certificate or the compact-pdc-identity format.
  *
  * This function parses the certificate, ensures the rigid fields have the values mandated by the
  * specification, and validates the certificate signature.
@@ -617,6 +618,17 @@ CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, const Cry
  **/
 CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
                                       const Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
+
+/**
+ * @brief Generates a Network (Client) Identity certificate in TLV-encoded form.
+ *
+ * @param keypair The key pair underlying the identity.
+ * @param cert Buffer to store the signed certificate in compact-pdc-identity TLV format.
+ *             Must be at least `kMaxCHIPCompactNetworkIdentityLength` bytes long.
+ *
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & cert);
 
 /**
  * @brief
