@@ -202,7 +202,8 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
                 params.GetTimeZone().Value()[i].name.Value().size() <= kMaxTimeZoneNameLen)
             {
                 auto span = MutableCharSpan(mTimeZoneNames[i], kMaxTimeZoneNameLen);
-                // The buffer backing "span" is statically allocated and is of size kMaxSupportedTimeZones, so this should never fail.
+                // The buffer backing "span" is statically allocated and is of size kMaxSupportedTimeZones, so this should never
+                // fail.
                 CopyCharSpanToMutableCharSpan(params.GetTimeZone().Value()[i].name.Value(), span);
                 mTimeZoneBuf[i].name.SetValue(span);
             }
