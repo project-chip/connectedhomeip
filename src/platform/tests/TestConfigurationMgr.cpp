@@ -57,6 +57,13 @@ static void TestPlatformMgr_Init(nlTestSuite * inSuite, void * inContext)
 
 static void TestPlatformMgr_RunUnitTest(nlTestSuite * inSuite, void * inContext)
 {
+#if CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK
+    // TODO: Fix RunUnitTests() for Open IOT SDK.
+    // Previously, TestPlatformMgr_RunUnitTest was only run if !NDEBUG while the Open IOT SDK
+    // test runner was built with NDEBUG set.
+    return;
+#endif
+
     ConfigurationMgr().RunUnitTests();
 }
 

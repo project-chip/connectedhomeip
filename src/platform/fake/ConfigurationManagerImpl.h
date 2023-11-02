@@ -86,7 +86,7 @@ private:
     CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #if CHIP_CONFIG_TEST
-    void RunUnitTests() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    void RunUnitTests() override {}
 #endif
     bool IsFullyProvisioned() override { return false; }
     void LogDeviceConfig() override {}
