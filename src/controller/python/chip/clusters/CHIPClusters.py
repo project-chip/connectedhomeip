@@ -2956,7 +2956,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x0000003E: {
-                "attributeName": "ActiveNetworkFaults",
+                "attributeName": "ActiveNetworkFaultsList",
                 "attributeId": 0x0000003E,
                 "type": "int",
                 "reportable": True,

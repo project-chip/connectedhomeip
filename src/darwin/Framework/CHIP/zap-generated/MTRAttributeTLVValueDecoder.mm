@@ -3746,9 +3746,8 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
         }
         return value;
     }
-#if MTR_ENABLE_PROVISIONAL
-    case Attributes::ActiveNetworkFaults::Id: {
-        using TypeInfo = Attributes::ActiveNetworkFaults::TypeInfo;
+    case Attributes::ActiveNetworkFaultsList::Id: {
+        using TypeInfo = Attributes::ActiveNetworkFaultsList::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -3773,7 +3772,6 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
         }
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }

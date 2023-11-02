@@ -1290,7 +1290,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable SecurityPolicy securityPolicy = 59;
   readonly attribute nullable octet_string<4> channelPage0Mask = 60;
   readonly attribute nullable OperationalDatasetComponents operationalDatasetComponents = 61;
-  readonly attribute NetworkFaultEnum activeNetworkFaults[] = 62;
+  readonly attribute NetworkFaultEnum activeNetworkFaultsList[] = 62;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1958,7 +1958,7 @@ endpoint 0 {
     callback attribute securityPolicy;
     callback attribute channelPage0Mask default = "0x0000";
     callback attribute operationalDatasetComponents;
-    callback attribute activeNetworkFaults;
+    callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
     ram      attribute clusterRevision default = 1;
 

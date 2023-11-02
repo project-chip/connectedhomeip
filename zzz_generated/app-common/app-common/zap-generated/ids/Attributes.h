@@ -1648,9 +1648,9 @@ namespace OperationalDatasetComponents {
 static constexpr AttributeId Id = 0x0000003D;
 } // namespace OperationalDatasetComponents
 
-namespace ActiveNetworkFaults {
+namespace ActiveNetworkFaultsList {
 static constexpr AttributeId Id = 0x0000003E;
-} // namespace ActiveNetworkFaults
+} // namespace ActiveNetworkFaultsList
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

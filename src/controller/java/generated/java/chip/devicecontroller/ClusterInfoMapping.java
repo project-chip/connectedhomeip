@@ -4334,7 +4334,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedThreadNetworkDiagnosticsClusterActiveNetworkFaultsAttributeCallback implements ChipClusters.ThreadNetworkDiagnosticsCluster.ActiveNetworkFaultsAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedThreadNetworkDiagnosticsClusterActiveNetworkFaultsListAttributeCallback implements ChipClusters.ThreadNetworkDiagnosticsCluster.ActiveNetworkFaultsListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {

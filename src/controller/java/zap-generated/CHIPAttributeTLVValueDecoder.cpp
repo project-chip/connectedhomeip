@@ -8508,8 +8508,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ActiveNetworkFaults::Id: {
-            using TypeInfo = Attributes::ActiveNetworkFaults::TypeInfo;
+        case Attributes::ActiveNetworkFaultsList::Id: {
+            using TypeInfo = Attributes::ActiveNetworkFaultsList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
