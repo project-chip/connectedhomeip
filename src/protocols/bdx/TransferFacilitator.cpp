@@ -68,11 +68,7 @@ void TransferFacilitator::OnResponseTimeout(Messaging::ExchangeContext * ec)
 void TransferFacilitator::PollTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     VerifyOrReturn(appState != nullptr);
-    VerifyOrReturn(systemLayer != nullptr);
-    if (appState != nullptr)
-    {
-        static_cast<TransferFacilitator *>(appState)->PollForOutput();
-    }
+    static_cast<TransferFacilitator *>(appState)->PollForOutput();
 }
 
 void TransferFacilitator::PollForOutput()
