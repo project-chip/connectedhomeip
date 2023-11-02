@@ -46,6 +46,8 @@ limitations under the License.
     <description>This cluster is used to configure a valve.</description>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
 
+    <!-- min max definition for attribute size larger than 2 bytes is not allowed by zap codegen https://github.com/project-chip/zap/issues/1187 -->
+    <!-- Therefore, this check needs to be done in code. -->
     <attribute side="server" code="0x0000" define="OPEN_DURATION" type="elapsed_s" isNullable="true" writable="true" optional="false">
       <description>OpenDuration</description>
       <access op="read" privilege="view"/>
