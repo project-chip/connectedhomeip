@@ -132,8 +132,6 @@ public:
     static CHIP_ERROR FactoryResetConfig(void);
     static bool ValidConfigKey(Key key);
 
-    static void RunConfigUnitTest(void);
-
 private:
     static CHIP_ERROR MapRamStorageStatus(rsError rsStatus);
     static void FactoryResetConfigInternal(Key firstKey, Key lastKey);

@@ -413,12 +413,6 @@ CHIP_ERROR KVPsaPsStore::FactoryResetConfig()
     return err;
 }
 
-void KVPsaPsStore::RunConfigUnitTest()
-{
-    // Run common unit test.
-    ::chip::DeviceLayer::Internal::RunConfigUnitTest<KVPsaPsStore>();
-}
-
 bool KVPsaPsStore::ValidConfigKey(Key key)
 {
     // Returns true if the key is in the Matter reserved key range.

@@ -157,8 +157,6 @@ public:
     static CHIP_ERROR FactoryResetConfig(void);
     static bool ValidConfigKey(Key key);
 
-    static void RunConfigUnitTest(void);
-
 protected:
     using ForEachRecordFunct = std::function<CHIP_ERROR(const Key & key, const size_t & length)>;
     static CHIP_ERROR ForEachRecord(Key firstKey, Key lastKey, bool addNewRecord, ForEachRecordFunct funct);

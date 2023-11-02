@@ -414,8 +414,6 @@ exit:
     return err;
 }
 
-void AmebaConfig::RunConfigUnitTest() {}
-
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

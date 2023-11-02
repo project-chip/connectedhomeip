@@ -159,8 +159,6 @@ CHIP_ERROR CYW30739Config::FactoryResetConfig(void)
     return CHIP_NO_ERROR;
 }
 
-void CYW30739Config::RunConfigUnitTest(void) {}
-
 bool CYW30739Config::IsDataFromFlash(const void * data)
 {
     return reinterpret_cast<void *>(FLASH_BASE_ADDRESS) <= data && data < reinterpret_cast<void *>(FLASH_BASE_ADDRESS + FLASH_SIZE);

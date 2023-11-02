@@ -124,8 +124,6 @@ public:
     static bool ConfigValueExists(Key key);
     static CHIP_ERROR FactoryResetConfig(void);
 
-    static void RunConfigUnitTest(void);
-
 protected:
     using ForEachRecordFunct = std::function<CHIP_ERROR(const Key & key, const size_t & length)>;
     static CHIP_ERROR ForEachRecord(uint16_t fileId, uint16_t recordKey, bool addNewRecord, ForEachRecordFunct funct);

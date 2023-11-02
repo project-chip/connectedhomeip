@@ -79,8 +79,6 @@ public:
     static bool ConfigValueExists(Key key);
     static CHIP_ERROR FactoryResetConfig(void);
 
-    static void RunConfigUnitTest(void);
-
     // internal to the platform for KeyValueStoreManagerImpl.cpp
     static CHIP_ERROR ReadKVS(const char * key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset_bytes);
     static CHIP_ERROR WriteKVS(const char * key, const void * value, size_t value_size);

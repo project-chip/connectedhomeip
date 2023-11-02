@@ -102,8 +102,6 @@ public:
     static bool ConfigValueExists(Key key);
     static CHIP_ERROR FactoryResetConfig();
 
-    static void RunConfigUnitTest();
-
     static void InitializeWithObject(jobject managerObject);
 
 protected:

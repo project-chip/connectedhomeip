@@ -30,7 +30,6 @@
 #include <platform/mt793x/MT793XConfig.h>
 
 #include <lib/core/CHIPEncoding.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include "FreeRTOS.h"
 #include "nvdm.h"
@@ -463,12 +462,6 @@ CHIP_ERROR MT793XConfig::MapNvdmStatus(nvdm_status_t nvdm_status)
     }
 
     return err;
-}
-
-void MT793XConfig::RunConfigUnitTest()
-{
-    // Run common unit test.
-    ::chip::DeviceLayer::Internal::RunConfigUnitTest<MT793XConfig>();
 }
 
 void MT793XConfig::OnExit()

@@ -28,7 +28,6 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <zephyr/settings/settings.h>
 
@@ -280,12 +279,6 @@ CHIP_ERROR ZephyrConfig::FactoryResetConfig(void)
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
 
     return CHIP_NO_ERROR;
-}
-
-void ZephyrConfig::RunConfigUnitTest()
-{
-    // Run common unit test.
-    ::chip::DeviceLayer::Internal::RunConfigUnitTest<ZephyrConfig>();
 }
 
 bool ZephyrConfig::BuildCounterConfigKey(::chip::Platform::PersistedStorage::Key counterId, char key[SETTINGS_MAX_NAME_LEN])

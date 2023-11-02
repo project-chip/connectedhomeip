@@ -417,8 +417,6 @@ CHIP_ERROR ESP32Config::ClearNamespace(const char * ns)
     return CHIP_NO_ERROR;
 }
 
-void ESP32Config::RunConfigUnitTest() {}
-
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

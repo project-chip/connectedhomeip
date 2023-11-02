@@ -28,7 +28,6 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/PersistedStorage.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <psa/protected_storage.h>
 
@@ -145,7 +144,6 @@ public:
 
     // Additional functions
     static CHIP_ERROR FactoryResetConfig(void);
-    static void RunConfigUnitTest(void);
     static bool ConfigValueExists(Key key);
     static bool ValidKvsKey(Key key);
     static void KVSKeyMapUpdate(void);

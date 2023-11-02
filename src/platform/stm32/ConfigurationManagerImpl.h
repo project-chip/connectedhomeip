@@ -50,6 +50,9 @@ private:
     void InitiateFactoryReset(void) override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
+#if CHIP_CONFIG_TEST
+    void RunUnitTests() override {}
+#endif
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
@@ -65,7 +68,6 @@ private:
     CHIP_ERROR WriteConfigValueStr(Key key, const char * str) override;
     CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen) override;
     CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) override;
-    void RunConfigUnitTest(void) override;
 
     // ===== Private members reserved for use by this class only.
 

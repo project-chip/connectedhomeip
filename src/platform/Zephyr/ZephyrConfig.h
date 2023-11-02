@@ -90,8 +90,6 @@ public:
     static bool ConfigValueExists(Key key);
     static CHIP_ERROR FactoryResetConfig(void);
 
-    static void RunConfigUnitTest(void);
-
 private:
     static bool BuildCounterConfigKey(::chip::Platform::PersistedStorage::Key counterId, char key[]);
 };

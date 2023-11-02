@@ -28,7 +28,6 @@
 #include <platform/nxp/mw320/MW320Config.h>
 
 #include <lib/core/CHIPEncoding.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include "FreeRTOS.h"
 
@@ -231,8 +230,6 @@ CHIP_ERROR MW320Config::ForEachRecord(Key firstKey, Key lastKey, bool addNewReco
 exit:
     return err;
 }
-
-void MW320Config::RunConfigUnitTest() {}
 
 } // namespace Internal
 } // namespace DeviceLayer

@@ -28,7 +28,6 @@
 #include <platform/nxp/k32w/k32w0/K32W0Config.h>
 
 #include <lib/core/CHIPEncoding.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include "FreeRTOS.h"
 

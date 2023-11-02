@@ -29,7 +29,6 @@
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPEncoding.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread-system.h>
@@ -427,8 +426,6 @@ bool K32WConfig::ValidConfigKey(Key key)
 
     return false;
 }
-
-void K32WConfig::RunConfigUnitTest() {}
 
 } // namespace Internal
 } // namespace DeviceLayer

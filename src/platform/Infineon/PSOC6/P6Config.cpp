@@ -249,8 +249,6 @@ CHIP_ERROR P6Config::FactoryResetConfig(void)
     return CHIP_NO_ERROR;
 }
 
-void P6Config::RunConfigUnitTest() {}
-
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

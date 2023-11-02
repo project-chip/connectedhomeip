@@ -53,7 +53,9 @@ private:
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
     CHIP_ERROR GetBootReason(uint32_t & bootReason);
     CHIP_ERROR StoreBootReason(uint32_t bootReason);
-
+#if CHIP_CONFIG_TEST
+    void RunUnitTests() override {}
+#endif
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
     // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
@@ -68,7 +70,6 @@ private:
     CHIP_ERROR WriteConfigValueStr(Key key, const char * str);
     CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);
     CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
-    void RunConfigUnitTest(void);
 
     // ===== Private members reserved for use by this class only.
 

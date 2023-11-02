@@ -174,11 +174,6 @@ CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t 
     return Internal::PosixConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
-void ConfigurationManagerImpl::RunConfigUnitTest()
-{
-    Internal::PosixConfig::RunConfigUnitTest();
-}
-
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
     return ReadConfigValue(PosixConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);

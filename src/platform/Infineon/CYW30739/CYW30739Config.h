@@ -115,7 +115,6 @@ public:
     static CHIP_ERROR ClearConfigValue(Key key);
     static bool ConfigValueExists(Key key);
     static CHIP_ERROR FactoryResetConfig(void);
-    static void RunConfigUnitTest(void);
 
 private:
     static bool IsDataFromFlash(const void * data);

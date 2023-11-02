@@ -167,10 +167,13 @@ CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t 
     return CC32XXConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
-void ConfigurationManagerImpl::RunConfigUnitTest(void)
+#if CHIP_CONFIG_TEST
+void ConfigurationManagerImpl::RunUnitTests(void)
 {
+    ChipLogProgress(DeviceLayer, "Running configuration unit test");
     CC32XXConfig::RunConfigUnitTest();
 }
+#endif
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {

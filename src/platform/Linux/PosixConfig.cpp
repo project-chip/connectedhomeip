@@ -25,7 +25,6 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
@@ -575,12 +574,6 @@ CHIP_ERROR PosixConfig::FactoryResetCounters()
 
 exit:
     return err;
-}
-
-void PosixConfig::RunConfigUnitTest()
-{
-    // Run common unit test.
-    ::chip::DeviceLayer::Internal::RunConfigUnitTest<PosixConfig>();
 }
 
 } // namespace Internal

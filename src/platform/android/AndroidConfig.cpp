@@ -27,7 +27,6 @@
 #include <cstdint>
 #include <cstring>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPJNIError.h>
@@ -458,12 +457,6 @@ CHIP_ERROR AndroidConfig::FactoryResetConfig()
 {
     const AndroidConfig::Key key = { AndroidConfig::kConfigNamespace_ChipConfig, nullptr };
     return AndroidConfig::ClearConfigValue(key);
-}
-
-void AndroidConfig::RunConfigUnitTest()
-{
-    // Run common unit test.
-    ::chip::DeviceLayer::Internal::RunConfigUnitTest<AndroidConfig>();
 }
 
 } // namespace Internal

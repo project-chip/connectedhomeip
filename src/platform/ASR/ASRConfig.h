@@ -111,8 +111,6 @@ public:
     static CHIP_ERROR ReadFactoryConfigValue(asr_matter_partition_t matter_partition, uint32_t & val);
 #endif
     static CHIP_ERROR FactoryResetConfig(void);
-
-    static void RunConfigUnitTest(void);
 };
 
 struct ASRConfig::Key

@@ -24,7 +24,6 @@
 
 #include "OpenIoTSDKArchUtils.h"
 #include "platform/internal/CHIPDeviceLayerInternal.h"
-#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>

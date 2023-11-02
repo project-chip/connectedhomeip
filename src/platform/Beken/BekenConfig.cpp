@@ -317,8 +317,6 @@ CHIP_ERROR BekenConfig::ClearNamespace(const char * ns)
     return CHIP_NO_ERROR;
 }
 
-void BekenConfig::RunConfigUnitTest() {}
-
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

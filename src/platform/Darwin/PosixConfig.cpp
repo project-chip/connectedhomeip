@@ -25,7 +25,6 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
@@ -193,9 +192,7 @@ exit:
     return err;
 }
 
-void PosixConfig::RunConfigUnitTest() {}
-
-#endif // CHIP_DISABLE_PLATFORM_KVS
+#endif // !CHIP_DISABLE_PLATFORM_KVS
 
 } // namespace Internal
 } // namespace DeviceLayer

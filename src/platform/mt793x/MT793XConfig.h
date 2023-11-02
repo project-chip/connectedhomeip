@@ -125,8 +125,6 @@ public:
     static bool ConfigValueExists(Key key);
     static CHIP_ERROR FactoryResetConfig(void);
 
-    static void RunConfigUnitTest(void);
-
 private:
     static CHIP_ERROR MapNvdmStatus(nvdm_status_t nvdm_status);
     static void OnExit(void);

@@ -183,7 +183,6 @@ public:
     static CHIP_ERROR FactoryResetConfig(void);
     static bool ValidConfigKey(Key key);
 
-    static void RunConfigUnitTest(void);
     static void RunSystemIdleTask(void);
 
 private:

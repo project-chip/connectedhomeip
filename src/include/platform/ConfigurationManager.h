@@ -84,8 +84,7 @@ public:
 #else
         kPrimaryMACAddressLength = 6,
 #endif
-        kMaxMACAddressLength  = 8,
-        kMaxLanguageTagLength = 5 // ISO 639-1 standard language codes
+        kMaxMACAddressLength = 8
     };
 
     virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf)                           = 0;
@@ -123,8 +122,9 @@ public:
     virtual CHIP_ERROR SetFailSafeArmed(bool val)                                      = 0;
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
-
-    virtual CHIP_ERROR RunUnitTests() = 0;
+#if CHIP_CONFIG_TEST
+    virtual void RunUnitTests() = 0;
+#endif
 
     virtual bool IsFullyProvisioned()   = 0;
     virtual void InitiateFactoryReset() = 0;

@@ -57,6 +57,9 @@ public:
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override;
     CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override;
+#if CHIP_CONFIG_TEST
+    void RunUnitTests() override {}
+#endif
 
 private:
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
@@ -72,7 +75,6 @@ private:
     CHIP_ERROR WriteConfigValueStr(Key key, const char * str) override;
     CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen) override;
     CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) override;
-    void RunConfigUnitTest(void) override;
 
     // ===== Private members reserved for use by this class only.
     CHIP_ERROR DetermineBootReason(uint8_t rebootCause);

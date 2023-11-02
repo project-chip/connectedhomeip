@@ -293,8 +293,6 @@ CHIP_ERROR ASRConfig::FactoryResetConfig(void)
     return CHIP_NO_ERROR;
 }
 
-void ASRConfig::RunConfigUnitTest() {}
-
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

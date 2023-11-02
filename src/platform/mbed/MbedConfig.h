@@ -26,7 +26,6 @@
 #pragma once
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <string.h>
 
@@ -98,8 +97,6 @@ public:
     static CHIP_ERROR ReadCounter(Key counterId, uint32_t & value);
     static CHIP_ERROR WriteCounter(Key counterId, uint32_t value);
     static CHIP_ERROR ClearNamespace(const char * ns);
-
-    static void RunConfigUnitTest(void);
 };
 
 } // namespace Internal

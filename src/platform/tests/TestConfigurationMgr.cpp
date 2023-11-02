@@ -55,15 +55,10 @@ static void TestPlatformMgr_Init(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-#if !defined(NDEBUG)
 static void TestPlatformMgr_RunUnitTest(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = ConfigurationMgr().RunUnitTests();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ConfigurationMgr().RunUnitTests();
 }
-#endif
 
 static void TestConfigurationMgr_SerialNumber(nlTestSuite * inSuite, void * inContext)
 {
@@ -450,9 +445,7 @@ static void TestConfigurationMgr_GetProductId(nlTestSuite * inSuite, void * inCo
  */
 static const nlTest sTests[] = {
     NL_TEST_DEF("Test PlatformMgr::Init", TestPlatformMgr_Init),
-#if !defined(NDEBUG)
     NL_TEST_DEF("Test PlatformMgr::RunUnitTest", TestPlatformMgr_RunUnitTest),
-#endif
     NL_TEST_DEF("Test ConfigurationMgr::SerialNumber", TestConfigurationMgr_SerialNumber),
     NL_TEST_DEF("Test ConfigurationMgr::UniqueId", TestConfigurationMgr_UniqueId),
     NL_TEST_DEF("Test ConfigurationMgr::ManufacturingDate", TestConfigurationMgr_ManufacturingDate),

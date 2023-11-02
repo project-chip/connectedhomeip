@@ -488,15 +488,6 @@ CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t 
 #endif // CHIP_DISABLE_PLATFORM_KVS
 }
 
-void ConfigurationManagerImpl::RunConfigUnitTest()
-{
-#if CHIP_DISABLE_PLATFORM_KVS
-    return;
-#else  // CHIP_DISABLE_PLATFORM_KVS
-    PosixConfig::RunConfigUnitTest();
-#endif // CHIP_DISABLE_PLATFORM_KVS
-}
-
 ConfigurationManager & ConfigurationMgrImpl()
 {
     return ConfigurationManagerImpl::GetDefaultInstance();

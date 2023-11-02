@@ -45,6 +45,10 @@
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <platform/internal/GenericDeviceInstanceInfoProvider.ipp>
 
+#if CHIP_CONFIG_TEST
+#include <platform/internal/testing/ConfigUnitTest.h>
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
 #endif
@@ -663,15 +667,14 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingInst
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_CONFIG_TEST
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::RunUnitTests()
+void GenericConfigurationManagerImpl<ConfigClass>::RunUnitTests()
 {
-#if !defined(NDEBUG)
     ChipLogProgress(DeviceLayer, "Running configuration unit test");
-    RunConfigUnitTest();
-#endif
-    return CHIP_NO_ERROR;
+    Internal::RunConfigUnitTest<ConfigClass>();
 }
+#endif
 
 template <class ConfigClass>
 void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()

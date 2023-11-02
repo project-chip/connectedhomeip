@@ -103,7 +103,9 @@ public:
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override;
     CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override;
-    CHIP_ERROR RunUnitTests(void) override;
+#if CHIP_CONFIG_TEST
+    void RunUnitTests() override;
+#endif
     bool IsFullyProvisioned() override;
     void InitiateFactoryReset() override;
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -131,7 +133,7 @@ protected:
 
     CHIP_ERROR PersistProvisioningData(ProvisioningDataSet & provData);
 
-    // Methods to read and write configuration values, as well as run the configuration unit test.
+    // Methods to read and write configuration values.
     typedef typename ConfigClass::Key Key;
     virtual CHIP_ERROR ReadConfigValue(Key key, bool & val)                                        = 0;
     virtual CHIP_ERROR ReadConfigValue(Key key, uint32_t & val)                                    = 0;
@@ -144,7 +146,6 @@ protected:
     virtual CHIP_ERROR WriteConfigValueStr(Key key, const char * str)                              = 0;
     virtual CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen)               = 0;
     virtual CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)          = 0;
-    virtual void RunConfigUnitTest(void)                                                           = 0;
 };
 
 } // namespace Internal

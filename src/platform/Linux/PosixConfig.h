@@ -103,7 +103,6 @@ public:
     static bool ConfigValueExists(Key key);
     static CHIP_ERROR FactoryResetConfig();
     static CHIP_ERROR FactoryResetCounters();
-    static void RunConfigUnitTest();
 
     // NVS Namespace helper functions.
     static CHIP_ERROR EnsureNamespace(const char * ns);

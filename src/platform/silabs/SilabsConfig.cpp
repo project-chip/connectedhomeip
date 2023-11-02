@@ -25,7 +25,6 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 #include <platform/silabs/CHIPDevicePlatformConfig.h>
 
 #include <nvm3.h>
@@ -550,12 +549,6 @@ bool SilabsConfig::ValidConfigKey(Key key)
     }
 
     return false;
-}
-
-void SilabsConfig::RunConfigUnitTest()
-{
-    // Run common unit test.
-    ::chip::DeviceLayer::Internal::RunConfigUnitTest<SilabsConfig>();
 }
 
 void SilabsConfig::RepackNvm3Flash(void)

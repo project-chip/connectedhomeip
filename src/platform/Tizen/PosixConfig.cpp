@@ -183,8 +183,6 @@ CHIP_ERROR PosixConfig::FactoryResetConfig()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void PosixConfig::RunConfigUnitTest() {}
-
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

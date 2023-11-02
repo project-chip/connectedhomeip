@@ -337,12 +337,6 @@ CHIP_ERROR MbedConfig::ClearNamespace(const char * ns)
     return err == MBED_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
-void MbedConfig::RunConfigUnitTest()
-{
-    // Run common unit test.
-    ::chip::DeviceLayer::Internal::RunConfigUnitTest<MbedConfig>();
-}
-
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

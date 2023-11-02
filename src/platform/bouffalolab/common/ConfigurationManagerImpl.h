@@ -37,6 +37,9 @@ public:
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
     bool IsFullyProvisioned();
+#if CHIP_CONFIG_TEST
+    void RunUnitTests() override {}
+#endif
 
 private:
     // ===== Members that implement the ConfigurationManager private interface.
@@ -59,7 +62,6 @@ private:
     CHIP_ERROR WriteConfigValueStr(Key key, const char * str) override;
     CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen) override;
     CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) override;
-    void RunConfigUnitTest(void) override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;

@@ -30,7 +30,6 @@
 #include "FunctionLib.h"
 #include "board.h"
 #include <lib/core/CHIPEncoding.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 
 /* FS Writes in Idle task only - LittleFS only , already enabled by default on NVM */
 #ifndef CHIP_PLAT_SAVE_NVM_DATA_ON_IDLE
@@ -544,8 +543,6 @@ CHIP_ERROR NXPConfig::MapRamStorageStatus(rsError rsStatus)
 
     return err;
 }
-
-void NXPConfig::RunConfigUnitTest(void) {}
 
 void NXPConfig::RunSystemIdleTask(void)
 {

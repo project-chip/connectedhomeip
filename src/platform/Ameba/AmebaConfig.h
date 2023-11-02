@@ -91,8 +91,6 @@ public:
 
     static CHIP_ERROR InitNamespace(void);
     static CHIP_ERROR ClearNamespace(void);
-
-    static void RunConfigUnitTest(void);
 };
 
 struct AmebaConfig::Key

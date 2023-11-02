@@ -211,8 +211,6 @@ CHIP_ERROR BLConfig::FactoryResetConfig(void)
     return CHIP_NO_ERROR;
 }
 
-void BLConfig::RunConfigUnitTest() {}
-
 bool BLConfig::ConfigValueExists(const char * key)
 {
     env_node_obj node;

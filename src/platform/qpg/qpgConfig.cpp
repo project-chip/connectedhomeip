@@ -29,7 +29,6 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include "FreeRTOS.h"
 #include "qvCHIP.h"
@@ -266,12 +265,6 @@ CHIP_ERROR QPGConfig::MapNVMError(qvStatus_t aStatus)
         break;
     }
     return CHIP_ERROR_INTERNAL;
-}
-
-void QPGConfig::RunConfigUnitTest()
-{
-    // Run common unit test
-    ::chip::DeviceLayer::Internal::RunConfigUnitTest<QPGConfig>();
 }
 
 } // namespace Internal

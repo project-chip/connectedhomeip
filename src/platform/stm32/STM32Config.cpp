@@ -98,8 +98,6 @@ CHIP_ERROR STM32Config::FactoryResetConfig(void)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-void STM32Config::RunConfigUnitTest(void) {}
-
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
