@@ -1002,8 +1002,16 @@ exit:
 CHIP_ERROR ShutdownBluezBleLayer(BluezEndpoint * apEndpoint)
 {
     VerifyOrReturnError(apEndpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    EndpointCleanup(apEndpoint);
-    return CHIP_NO_ERROR;
+    // Run endpoint cleanup on the CHIPoBluez thread. This is necessary because the
+    // cleanup function releases the D-Bus manager client object, which handles D-Bus
+    // signals. Otherwise, we will face race condition when the D-Bus signal is in
+    // the middle of being processed when the cleanup function is called.
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BluezEndpoint * endpoint) {
+            EndpointCleanup(endpoint);
+            return CHIP_NO_ERROR;
+        },
+        apEndpoint);
 }
 
 // ConnectDevice callbacks
