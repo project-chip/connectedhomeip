@@ -104,6 +104,5 @@ limitations under the License.
       <arg name="Wrap" type="boolean" optional="true"/>
       <arg name="LowestOff" type="boolean" optional="true"/>
     </command>
-
   </cluster>
 </configurator>
