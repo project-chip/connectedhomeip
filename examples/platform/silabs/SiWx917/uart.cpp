@@ -19,8 +19,8 @@
 #include "USART.h"
 #include "matter_shell.h"
 #include "rsi_rom_egpio.h"
-#include "sl_si91x_usart.h"
 #include "silabs_utils.h"
+#include "sl_si91x_usart.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,7 +31,7 @@ extern "C" {
 #include <string.h>
 
 #define USART_BAUDRATE 115200 // Baud rate <9600-7372800>
-#define UART_CONSOLE_ERR -1 // Negative value in case of UART Console action failed. Triggers a failure for PW_RPC
+#define UART_CONSOLE_ERR -1   // Negative value in case of UART Console action failed. Triggers a failure for PW_RPC
 
 sl_usart_handle_t usart_handle;
 
@@ -42,14 +42,15 @@ void callback_event(uint32_t event);
  ******************************************************************************/
 void callback_event(uint32_t event)
 {
-    switch (event) {
-      case SL_USART_EVENT_SEND_COMPLETE:
+    switch (event)
+    {
+    case SL_USART_EVENT_SEND_COMPLETE:
         break;
-      case SL_USART_EVENT_RECEIVE_COMPLETE:
-  #ifdef ENABLE_CHIP_SHELL
-          chip::NotifyShellProcessFromISR();
-  #endif;
-      case SL_USART_EVENT_TRANSFER_COMPLETE:
+    case SL_USART_EVENT_RECEIVE_COMPLETE:
+#ifdef ENABLE_CHIP_SHELL
+        chip::NotifyShellProcessFromISR();
+#endif;
+    case SL_USART_EVENT_TRANSFER_COMPLETE:
         break;
     }
 }
@@ -75,21 +76,24 @@ void uartConsoleInit(void)
     DEBUGINIT();
 
     // Initialize the UART
-    status = sl_si91x_usart_init((usart_peripheral_t)usart_config.usart_module, &usart_handle);
-    if (status != SL_STATUS_OK) {
-      DEBUGOUT("sl_si91x_usart_initialize: Error Code : %lu \n", status);
+    status = sl_si91x_usart_init((usart_peripheral_t) usart_config.usart_module, &usart_handle);
+    if (status != SL_STATUS_OK)
+    {
+        DEBUGOUT("sl_si91x_usart_initialize: Error Code : %lu \n", status);
     }
 
     // Configure the USART configurations
     status = sl_si91x_usart_set_configuration(usart_handle, &usart_config);
-    if (status != SL_STATUS_OK) {
-      DEBUGOUT("sl_si91x_usart_set_configuration: Error Code : %lu \n", status);
+    if (status != SL_STATUS_OK)
+    {
+        DEBUGOUT("sl_si91x_usart_set_configuration: Error Code : %lu \n", status);
     }
 
     // Register user callback function
     status = sl_si91x_usart_register_event_callback(callback_event);
-    if (status != SL_STATUS_OK) {
-      DEBUGOUT("sl_si91x_usart_register_event_callback: Error Code : %lu \n", status);
+    if (status != SL_STATUS_OK)
+    {
+        DEBUGOUT("sl_si91x_usart_register_event_callback: Error Code : %lu \n", status);
     }
 
     NVIC_EnableIRQ(USART0_IRQn);
