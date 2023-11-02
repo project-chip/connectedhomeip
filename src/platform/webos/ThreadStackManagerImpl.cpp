@@ -656,7 +656,7 @@ CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(A
     {
     case ThreadNetworkDiagnostics::Attributes::NeighborTable::Id:
     case ThreadNetworkDiagnostics::Attributes::RouteTable::Id:
-    case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaults::Id:
+    case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id:
         err = encoder.EncodeEmptyList();
         break;
     case ThreadNetworkDiagnostics::Attributes::Channel::Id:

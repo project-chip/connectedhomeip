@@ -1644,7 +1644,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaults::Id: {
+    case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
         err = encoder.EncodeList([](const auto & aEncoder) -> CHIP_ERROR {
             // TODO activeNetworkFaultsList isn't tracked. Encode the list of 4 entries at 0 none the less
             ThreadNetworkDiagnostics::NetworkFaultEnum activeNetworkFaultsList[4] = { ThreadNetworkDiagnostics::NetworkFaultEnum(
