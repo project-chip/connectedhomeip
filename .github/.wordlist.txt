@@ -611,6 +611,7 @@ GPL
 GPLv
 Gradle
 gradlew
+graphviz
 Groupcast
 GroupId
 GroupKeyManagement
@@ -724,6 +725,7 @@ JLink
 JLinkExe
 JLinkRTTClient
 JN
+joaompinto
 jpg
 jre
 js

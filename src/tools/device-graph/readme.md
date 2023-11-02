@@ -16,7 +16,7 @@ source out/python_env/bin/activate
 
 When the python environment is activated the tool can be started as a regular python script. The tool does rely on the "framework" used for python testing, which means it is possible to do the commissioning of the DUT as well.
 
-By adding the appropriate paramaters to the script execution, it will automatically perform a commissioning before running the tool itself. 
+By adding the appropriate parameters to the script execution, it will automatically perform a commissioning before running the tool itself. 
 
 This is an example of running the test including commissioning a Thread based example app device
 ```
@@ -49,7 +49,7 @@ python3 '/Users/renejosefsen/Developer/GitData/connectedhomeip/src/tools/device-
 
 # How to view graph
 
-In order to view the graph, any tool that can render dot/graphviz files should be useable.
+In order to view the graph, any tool that renders dot/graphviz files can be used.
 
 It is possible to open dot files and get them rendered in vscode using this extension:
 https://marketplace.visualstudio.com/items?itemName=joaompinto.vscode-graphviz
