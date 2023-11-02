@@ -159,15 +159,4 @@ typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorOTAUpdateState) {
     = 0x08,
 } MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateState", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2));
 
-/**
- * Content Launcher cluster's StatusEnum got both the enum _and_ one of its
- * fields renamed.  Our auto-generation does not support that, so just snapshot
- * the pre-rename situation here.
- */
-typedef NS_ENUM(uint8_t, MTRContentLauncherContentLaunchStatus) {
-    MTRContentLauncherContentLaunchStatusSuccess MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRContentLauncherStatusSuccess") = 0x00,
-    MTRContentLauncherContentLaunchStatusUrlNotAvailable MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRContentLauncherStatusURLNotAvailable") = 0x01,
-    MTRContentLauncherContentLaunchStatusAuthFailed MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRContentLauncherStatusAuthFailed") = 0x02,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRContentLauncherStatus");
-
 NS_ASSUME_NONNULL_END

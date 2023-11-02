@@ -3252,8 +3252,7 @@
               - CecKeyCode
               - KeypadInputStatusEnum
           ContentLauncher:
-              # ContentLaunchStatusEnum used to be here but was moved to
-              # non-codegen in MTRBackwardsCompatShims.h.
+              - ContentLaunchStatusEnum
               - MetricTypeEnum
               - ParameterEnum
           AudioOutput:
@@ -4111,8 +4110,10 @@
                   - UnsupportedKey
                   - InvalidKeyInCurrentState
           ContentLauncher:
-              # ContentLaunchStatusEnum used to be here but was moved to
-              # non-codegen in MTRBackwardsCompatShims.h.
+              ContentLaunchStatusEnum:
+                  - Success
+                  - UrlNotAvailable
+                  - AuthFailed
               MetricTypeEnum:
                   - PIXELS
                   - PERCENTAGE
@@ -7779,6 +7780,9 @@
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   - associationFailure
+      enums:
+          ContentLauncher:
+              - ContentLaunchStatusEnum
       bitmaps:
           Scenes:
               - ScenesCopyMode
@@ -7821,6 +7825,16 @@
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   associationFailureCause: associationFailure
+      enums:
+          ContentLauncher:
+              StatusEnum: ContentLaunchStatusEnum
+      enum values:
+          ContentLauncher:
+              # The URLNotAvailable value got renamed at the same time
+              # as the enum.  Record the rename here so that the old
+              # value name is generated for the old enum name.
+              ContentLaunchStatusEnum:
+                  URLNotAvailable: UrlNotAvailable
       bitmaps:
           Scenes:
               CopyModeBitmap: ScenesCopyMode
@@ -7833,3 +7847,10 @@
           SoftwareDiagnostics:
               Feature:
                   Watermarks: WaterMarks
+  removed:
+      enum values:
+          ContentLauncher:
+              # The URLNotAvailable value got renamed at the same time
+              # as the enum.  The old enum name never had the new value name.
+              ContentLaunchStatusEnum:
+                  - URLNotAvailable
