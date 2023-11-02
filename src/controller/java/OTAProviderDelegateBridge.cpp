@@ -100,7 +100,6 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
                                                  const QueryImage::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    uint8_t errorStatus = static_cast<uint8_t>(OTAQueryStatus::kNotAvailable);
 
     NodeId nodeId = kUndefinedNodeId;
 
@@ -144,6 +143,8 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
 
     bool hasUpdate = false;
     Commands::QueryImageResponse::Type response;
+    Commands::QueryImageResponse::Type errorResponse;
+    errorResponse.status = OTAQueryStatus::kNotAvailable;
 
     char uriBuffer[kMaxBDXURILen];
     MutableCharSpan uri(uriBuffer);
@@ -190,9 +191,8 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     // If the protocol requested is not supported, return status - Protocol Not Supported
     if (!isBDXProtocolSupported)
     {
-        response.status = OTAQueryStatus::kDownloadProtocolNotSupported;
-        commandObj->AddResponse(cachedCommandPath, response);
-        ExitNow(errorStatus = static_cast<uint8_t>(response.status));
+        errorResponse.status = OTAQueryStatus::kDownloadProtocolNotSupported;
+        ExitNow();
     }
 
     otaProviderDelegate = mOtaProviderDelegate.ObjectRef();
@@ -242,10 +242,8 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     // If update is not available, return the delegate response
     if (!hasUpdate)
     {
-        response.status = OTAQueryStatus::kNotAvailable;
-        commandObj->AddResponse(cachedCommandPath, response);
-        sendOTAQueryFailure(static_cast<uint8_t>(response.status));
-        return;
+        errorResponse.status = OTAQueryStatus::kNotAvailable;
+        ExitNow();
     }
 
     err = JniReferences::GetInstance().FindMethod(env, jResponse, "getSoftwareVersion", "()Ljava/lang/Long;",
@@ -292,22 +290,20 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
             if (err == CHIP_ERROR_BUSY)
             {
                 ChipLogError(Controller, "Responding with Busy due to being in the middle of handling another BDX transfer");
-                Commands::QueryImageResponse::Type errorResponse;
                 errorResponse.status = OTAQueryStatus::kBusy;
                 errorResponse.delayedActionTime.SetValue(kDelayedActionTimeSeconds);
-                commandObj->AddResponse(cachedCommandPath, errorResponse);
                 // We do not reset state when we get the busy error because that means we are locked in a BDX transfer
                 // session with another requestor when we get this query image request. We do not want to interrupt the
                 // ongoing transfer instead just respond to the second requestor with a busy status and a delayedActionTime
                 // in which the requestor can retry.
-                ExitNow(errorStatus = static_cast<uint8_t>(errorResponse.status));
+                ExitNow();
             }
             LogErrorOnFailure(err);
             commandObj->AddStatus(cachedCommandPath, StatusIB(err).mStatus);
             // We need to reset state here to clean up any initialization we might have done including starting the BDX
             // timeout timer while preparing for transfer if any failure occurs afterwards.
             mBdxOTASender->ResetState();
-            ExitNow(errorStatus = static_cast<uint8_t>(OTAQueryStatus::kNotAvailable));
+            ExitNow();
         }
         err = bdx::MakeURI(ourNodeId.GetNodeId(), jniFilePath.c_str() != nullptr ? jniFilePath.charSpan() : CharSpan(), uri);
         if (CHIP_NO_ERROR != err)
@@ -315,7 +311,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
             LogErrorOnFailure(err);
             commandObj->AddStatus(cachedCommandPath, StatusIB(err).mStatus);
             mBdxOTASender->ResetState();
-            ExitNow(errorStatus = static_cast<uint8_t>(OTAQueryStatus::kNotAvailable));
+            ExitNow();
         }
         response.imageURI.SetValue(uri);
         commandObj->AddResponse(cachedCommandPath, response);
@@ -323,8 +319,9 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     return;
 
 exit:
-    ChipLogError(Controller, "OTA Query Failure : %u, %" CHIP_ERROR_FORMAT, errorStatus, err.Format());
-    sendOTAQueryFailure(errorStatus);
+    ChipLogError(Controller, "OTA Query Failure : %u, %" CHIP_ERROR_FORMAT, static_cast<uint8_t>(errorResponse.status), err.Format());
+    commandObj->AddResponse(cachedCommandPath, errorResponse);
+    sendOTAQueryFailure(static_cast<uint8_t>(errorResponse.status));
 }
 
 void OTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
