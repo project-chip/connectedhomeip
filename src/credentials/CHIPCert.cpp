@@ -1095,12 +1095,19 @@ DLL_EXPORT CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1Un
     return CHIP_NO_ERROR;
 }
 
+static CHIP_ERROR ValidateCertificateType(ChipCertificateData const & certData, CertType expectedType)
+{
+    CertType certType;
+    ReturnErrorOnFailure(certData.mSubjectDN.GetCertType(certType));
+    VerifyOrReturnError(certType == expectedType, CHIP_ERROR_WRONG_CERT_TYPE);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac)
 {
     ChipCertificateSet certSet;
     ChipCertificateData certData;
     ValidationContext validContext;
-    CertType certType;
 
     // Note that this function doesn't check RCAC NotBefore / NotAfter time validity.
     // It is assumed that RCAC should be valid at the time of installation by definition.
@@ -1109,8 +1116,7 @@ CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac)
 
     ReturnErrorOnFailure(certSet.LoadCert(rcac, CertDecodeFlags::kGenerateTBSHash));
 
-    ReturnErrorOnFailure(certData.mSubjectDN.GetCertType(certType));
-    VerifyOrReturnError(certType == CertType::kRoot, CHIP_ERROR_WRONG_CERT_TYPE);
+    ReturnErrorOnFailure(ValidateCertificateType(certData, CertType::kRoot));
 
     VerifyOrReturnError(certData.mSubjectDN.IsEqual(certData.mIssuerDN), CHIP_ERROR_WRONG_CERT_TYPE);
 
@@ -1427,14 +1433,17 @@ CHIP_ERROR CertificateValidityPolicy::ApplyDefaultPolicy(const ChipCertificateDa
     }
 }
 
-CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert)
+static void CalculateKeyIdentifierSha256(const P256PublicKeySpan & publicKey, MutableCertificateKeyId keyId)
 {
-    ChipCertificateData certData;
-    ReturnErrorOnFailure(DecodeChipCert(cert, certData, CertDecodeFlags::kGenerateTBSHash));
+    uint8_t hash[kSHA256_Hash_Length];
+    static_assert(keyId.size() <= sizeof(hash)); // truncating 32 bytes down to 20
+    chip::Crypto::Hash_SHA256(publicKey.data(), publicKey.size(), hash);
+    memcpy(keyId.data(), hash, keyId.size());
+}
 
-    CertType certType;
-    ReturnErrorOnFailure(certData.mSubjectDN.GetCertType(certType));
-    VerifyOrReturnError(certType == CertType::kNetworkIdentity, CHIP_ERROR_WRONG_CERT_TYPE);
+static CHIP_ERROR ValidateChipNetworkIdentity(const ChipCertificateData & certData)
+{
+    ReturnErrorOnFailure(ValidateCertificateType(certData, CertType::kNetworkIdentity));
 
     VerifyOrReturnError(certData.mSerialNumber.data_equal(kNetworkIdentitySerialNumber), CHIP_ERROR_WRONG_CERT_TYPE);
     VerifyOrReturnError(certData.mNotBeforeTime == kNetworkIdentityNotBeforeTime, CHIP_ERROR_WRONG_CERT_TYPE);
@@ -1452,6 +1461,32 @@ CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert)
                         CHIP_ERROR_WRONG_CERT_TYPE);
 
     ReturnErrorOnFailure(VerifyCertSignature(certData, certData));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert)
+{
+    ChipCertificateData certData;
+    ReturnErrorOnFailure(DecodeChipCert(cert, certData, CertDecodeFlags::kGenerateTBSHash));
+    ReturnErrorOnFailure(ValidateChipNetworkIdentity(certData));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId keyId)
+{
+    ChipCertificateData certData;
+    ReturnErrorOnFailure(DecodeChipCert(cert, certData, CertDecodeFlags::kGenerateTBSHash));
+    ReturnErrorOnFailure(ValidateChipNetworkIdentity(certData));
+    CalculateKeyIdentifierSha256(certData.mPublicKey, keyId);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractIdentifierFromChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId keyId)
+{
+    ChipCertificateData certData;
+    ReturnErrorOnFailure(DecodeChipCert(cert, certData));
+    ReturnErrorOnFailure(ValidateCertificateType(certData, CertType::kNetworkIdentity));
+    CalculateKeyIdentifierSha256(certData.mPublicKey, keyId);
     return CHIP_NO_ERROR;
 }
 

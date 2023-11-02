@@ -396,6 +396,16 @@ public:
 using CertificateKeyId = FixedByteSpan<kKeyIdentifierLength>;
 
 /**
+ *  @brief  A mutable `CertificateKeyId`.
+ */
+using MutableCertificateKeyId = FixedSpan<uint8_t, kKeyIdentifierLength>;
+
+/**
+ *  @brief  A storage type for `CertificateKeyId` and `MutableCertificateKeyId`.
+ */
+using CertificateKeyIdStorage = std::array<uint8_t, kKeyIdentifierLength>;
+
+/**
  *  @brief  A data structure for holding a P256 ECDSA signature, without the ownership of it.
  */
 using P256ECDSASignatureSpan = FixedByteSpan<Crypto::kP256_ECDSA_Signature_Length_Raw>;
@@ -536,6 +546,8 @@ CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac);
  * This function parses the certificate, ensures the rigid fields have the values mandated by the
  * specification, and validates the certificate signature.
  *
+ * @param cert The network identity certificate to validate.
+ *
  * @return CHIP_NO_ERROR on success, CHIP_ERROR_WRONG_CERT_TYPE if the certificate does
  *         not conform to the requirements for a Network Identity, CHIP_ERROR_INVALID_SIGNATURE
  *         if the certificate has an invalid signature, or another CHIP_ERROR.
@@ -543,6 +555,14 @@ CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac);
  * @see section 11.24 (Wi-Fi Authentication with Per-Device Credentials) of the Matter spec
  */
 CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert);
+
+/**
+ * Convenience variant of `ValidateChipNetworkIdentity` that, upon successful validation, also
+ * calculates the key identifier for the Network (Client) Identity.
+ * @see ValidateChipNetworkIdentity
+ * @see ExtractIdentifierFromChipNetworkIdentity
+ */
+CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId keyId);
 
 struct FutureExtension
 {
@@ -826,6 +846,15 @@ CHIP_ERROR ExtractSubjectDNFromChipCert(const ByteSpan & chipCert, ChipDN & dn);
  * Can return any error that can be returned from converting and parsing the cert.
  */
 CHIP_ERROR ExtractSubjectDNFromX509Cert(const ByteSpan & x509Cert, ChipDN & dn);
+
+/**
+ * Extracts the key identifier from a Network (Client) Identity in TLV-encoded form.
+ * Does NOT perform full validation of the identity certificate.
+ *
+ * @return CHIP_NO_ERROR on success, CHIP_ERROR_WRONG_CERT_TYPE if the certificate is
+ *         not a Network (Client) Identity, or another CHIP_ERROR if parsing fails.
+ */
+CHIP_ERROR ExtractIdentifierFromChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId keyId);
 
 } // namespace Credentials
 } // namespace chip

@@ -2150,9 +2150,23 @@ static void TestChipCert_ExtractPublicKeyAndSKID(nlTestSuite * inSuite, void * i
 static void TestChipCert_PDCIdentityValidation(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
+    CertificateKeyIdStorage keyId;
 
+    // Validate only
     err = ValidateChipNetworkIdentity(sTestCert_PDCID01_Chip);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Validate and calculate identifier
+    keyId.fill(0xaa);
+    err = ValidateChipNetworkIdentity(sTestCert_PDCID01_Chip, keyId);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, CertificateKeyId(keyId).data_equal(sTestCert_PDCID01_KeyId));
+
+    // Extract identifier only
+    keyId.fill(0xaa);
+    err = ExtractIdentifierFromChipNetworkIdentity(sTestCert_PDCID01_Chip, keyId);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, CertificateKeyId(keyId).data_equal(sTestCert_PDCID01_KeyId));
 }
 
 /**
