@@ -62,6 +62,12 @@ limitations under the License.
       <arg name="IdentifyTime" type="int16u"/>
       <access op="invoke" privilege="manage"/>
     </command>
+    <command source="client" code="0x01" name="IdentifyQuery" optional="false">
+      <description>
+        This command allows the sending device to request the target or targets to respond if they are currently identifying themselves.
+      </description>
+      <access op="invoke" privilege="manage"/>
+    </command>
     <command source="client" code="0x40" name="TriggerEffect" optional="true">
       <description>
         Command description for TriggerEffect
@@ -71,4 +77,9 @@ limitations under the License.
       <access op="invoke" privilege="manage"/>
     </command>
   </cluster>
+
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x0003"/>
+    <field name="Query" mask="0x1"/>
+  </bitmap>
 </configurator>
