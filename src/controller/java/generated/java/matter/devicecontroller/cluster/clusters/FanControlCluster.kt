@@ -65,14 +65,6 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeFanModeSequenceAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeFanModeSequenceAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
   suspend fun subscribeFanModeSequenceAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }

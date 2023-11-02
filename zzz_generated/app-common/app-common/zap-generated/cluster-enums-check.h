@@ -1979,8 +1979,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeSequ
     case EnumType::kOffLowHigh:
     case EnumType::kOffLowMedHighAuto:
     case EnumType::kOffLowHighAuto:
-    case EnumType::kOffOnAuto:
-    case EnumType::kOffOn:
+    case EnumType::kOffHighAuto:
+    case EnumType::kOffHigh:
         return val;
     default:
         return static_cast<EnumType>(6);

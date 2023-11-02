@@ -15455,8 +15455,8 @@ typedef NS_ENUM(uint8_t, MTRFanControlFanModeSequence) {
     MTRFanControlFanModeSequenceOffLowHigh MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x01,
     MTRFanControlFanModeSequenceOffLowMedHighAuto MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x02,
     MTRFanControlFanModeSequenceOffLowHighAuto MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x03,
-    MTRFanControlFanModeSequenceOffOnAuto MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x04,
-    MTRFanControlFanModeSequenceOffOn MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x05,
+    MTRFanControlFanModeSequenceOffHighAuto MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRFanControlFanModeSequenceOffHigh MTR_PROVISIONALLY_AVAILABLE = 0x05,
 } MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 typedef NS_ENUM(uint8_t, MTRFanControlFanModeSequenceType) {
@@ -15464,8 +15464,6 @@ typedef NS_ENUM(uint8_t, MTRFanControlFanModeSequenceType) {
     MTRFanControlFanModeSequenceTypeOffLowHigh MTR_DEPRECATED("Please use MTRFanControlFanModeSequenceOffLowHigh", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x01,
     MTRFanControlFanModeSequenceTypeOffLowMedHighAuto MTR_DEPRECATED("Please use MTRFanControlFanModeSequenceOffLowMedHighAuto", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x02,
     MTRFanControlFanModeSequenceTypeOffLowHighAuto MTR_DEPRECATED("Please use MTRFanControlFanModeSequenceOffLowHighAuto", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x03,
-    MTRFanControlFanModeSequenceTypeOffOnAuto MTR_DEPRECATED("Please use MTRFanControlFanModeSequenceOffOnAuto", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x04,
-    MTRFanControlFanModeSequenceTypeOffOn MTR_DEPRECATED("Please use MTRFanControlFanModeSequenceOffOn", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x05,
 } MTR_DEPRECATED("Please use MTRFanControlFanModeSequence", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0));
 
 typedef NS_ENUM(uint8_t, MTRFanControlStepDirection) {
