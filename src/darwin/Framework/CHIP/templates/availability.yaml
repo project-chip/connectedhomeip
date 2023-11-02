@@ -1034,7 +1034,7 @@
               - ClusterRevision
           ContentLauncher:
               - AcceptHeader
-              - SupportedProtocolsBitmaps
+              - SupportedStreamingProtocols
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -4279,7 +4279,7 @@
               # same API for both of those names, so the name can just change
               # here.
               - Feature
-              - SupportedProtocolsBitmap
+              - SupportedStreamingProtocol
           AudioOutput:
               # Feature was originally named AudioOutputFeature, but
               # we generate the same API for both of those names, so the name
@@ -4639,7 +4639,7 @@
               Feature:
                   - ContentSearch
                   - URLPlayback
-              SupportedProtocolsBitmap:
+              SupportedStreamingProtocol:
                   - DASH
                   - HLS
           AudioOutput:
