@@ -17,24 +17,20 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class BasicInformationCluster(private val endpointId: UShort) {
-  class CapabilityMinimaAttribute(
-    val value: ChipStructs.BasicInformationClusterCapabilityMinimaStruct
-  )
+  class CapabilityMinimaAttribute(val value: BasicInformationClusterCapabilityMinimaStruct)
 
-  class ProductAppearanceAttribute(
-    val value: ChipStructs.BasicInformationClusterProductAppearanceStruct?
-  )
+  class ProductAppearanceAttribute(val value: BasicInformationClusterProductAppearanceStruct?)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun mfgSpecificPing(timedInvokeTimeoutMs: Int? = null) {
     if (timedInvokeTimeoutMs != null) {

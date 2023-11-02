@@ -17,22 +17,22 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class LaundryWasherControlsCluster(private val endpointId: UShort) {
-  class SpinSpeedsAttribute(val value: ArrayList<String>?)
+  class SpinSpeedsAttribute(val value: List<String>?)
 
   class SpinSpeedCurrentAttribute(val value: UByte?)
 
-  class SupportedRinsesAttribute(val value: ArrayList<UInt>?)
+  class SupportedRinsesAttribute(val value: List<UInt>?)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readSpinSpeedsAttribute(): SpinSpeedsAttribute {
     // Implementation needs to be added here

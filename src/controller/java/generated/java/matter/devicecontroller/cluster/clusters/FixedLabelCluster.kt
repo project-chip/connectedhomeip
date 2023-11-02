@@ -17,18 +17,18 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class FixedLabelCluster(private val endpointId: UShort) {
-  class LabelListAttribute(val value: ArrayList<ChipStructs.FixedLabelClusterLabelStruct>)
+  class LabelListAttribute(val value: List<FixedLabelClusterLabelStruct>)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readLabelListAttribute(): LabelListAttribute {
     // Implementation needs to be added here

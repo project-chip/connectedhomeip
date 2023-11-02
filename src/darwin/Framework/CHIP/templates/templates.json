@@ -80,11 +80,6 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters.mm"
         },
         {
-            "path": "MTRClusters-swift.zapt",
-            "name": "Swift ZCL synchronous API Header extensions",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters.swift"
-        },
-        {
             "path": "MTRStructsObjc.zapt",
             "name": "Objc reflections of MTR spec structs header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRStructsObjc.h"

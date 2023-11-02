@@ -17,7 +17,7 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class MediaPlaybackCluster(private val endpointId: UShort) {
   class PlaybackResponse(val status: UInt, val data: String?)
@@ -26,21 +26,19 @@ class MediaPlaybackCluster(private val endpointId: UShort) {
 
   class DurationAttribute(val value: ULong?)
 
-  class SampledPositionAttribute(
-    val value: ChipStructs.MediaPlaybackClusterPlaybackPositionStruct?
-  )
+  class SampledPositionAttribute(val value: MediaPlaybackClusterPlaybackPositionStruct?)
 
   class SeekRangeEndAttribute(val value: ULong?)
 
   class SeekRangeStartAttribute(val value: ULong?)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun play(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
     if (timedInvokeTimeoutMs != null) {

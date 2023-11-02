@@ -17,20 +17,20 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class ApplicationBasicCluster(private val endpointId: UShort) {
-  class ApplicationAttribute(val value: ChipStructs.ApplicationBasicClusterApplicationStruct)
+  class ApplicationAttribute(val value: ApplicationBasicClusterApplicationStruct)
 
-  class AllowedVendorListAttribute(val value: ArrayList<UShort>)
+  class AllowedVendorListAttribute(val value: List<UShort>)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readVendorNameAttribute(): CharString {
     // Implementation needs to be added here

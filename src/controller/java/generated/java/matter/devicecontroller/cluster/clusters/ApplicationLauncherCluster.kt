@@ -17,25 +17,25 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class ApplicationLauncherCluster(private val endpointId: UShort) {
   class LauncherResponse(val status: UInt, val data: ByteArray?)
 
-  class CatalogListAttribute(val value: ArrayList<UShort>?)
+  class CatalogListAttribute(val value: List<UShort>?)
 
-  class CurrentAppAttribute(val value: ChipStructs.ApplicationLauncherClusterApplicationEPStruct?)
+  class CurrentAppAttribute(val value: ApplicationLauncherClusterApplicationEPStruct?)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun launchApp(
-    application: ChipStructs.ApplicationLauncherClusterApplicationStruct?,
+    application: ApplicationLauncherClusterApplicationStruct?,
     data: ByteArray?,
     timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
@@ -47,7 +47,7 @@ class ApplicationLauncherCluster(private val endpointId: UShort) {
   }
 
   suspend fun stopApp(
-    application: ChipStructs.ApplicationLauncherClusterApplicationStruct?,
+    application: ApplicationLauncherClusterApplicationStruct?,
     timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
     if (timedInvokeTimeoutMs != null) {
@@ -58,7 +58,7 @@ class ApplicationLauncherCluster(private val endpointId: UShort) {
   }
 
   suspend fun hideApp(
-    application: ChipStructs.ApplicationLauncherClusterApplicationStruct?,
+    application: ApplicationLauncherClusterApplicationStruct?,
     timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
     if (timedInvokeTimeoutMs != null) {
@@ -83,14 +83,12 @@ class ApplicationLauncherCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeCurrentAppAttribute(
-    value: ChipStructs.ApplicationLauncherClusterApplicationEPStruct
-  ) {
+  suspend fun writeCurrentAppAttribute(value: ApplicationLauncherClusterApplicationEPStruct) {
     // Implementation needs to be added here
   }
 
   suspend fun writeCurrentAppAttribute(
-    value: ChipStructs.ApplicationLauncherClusterApplicationEPStruct,
+    value: ApplicationLauncherClusterApplicationEPStruct,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here
