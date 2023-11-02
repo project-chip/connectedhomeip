@@ -293,7 +293,8 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
         completionHandler(static_cast<{{asObjectiveCClass type parent.name compatRemapClusterName=true}} *>(value), error);
       }];
 }
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value completionHandler:(MTRStatusCompletion)completionHandler
 {
   [self writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:value params:nil completion:completionHandler];
