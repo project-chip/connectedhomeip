@@ -1871,6 +1871,15 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (void)setAssociationFailure:(NSNumber * _Nonnull)associationFailure
+{
+    self.associationFailureCause = associationFailure;
+}
+
+- (NSNumber * _Nonnull)associationFailure
+{
+    return self.associationFailureCause;
+}
 @end
 
 @implementation MTRWiFiNetworkDiagnosticsClusterConnectionStatusEvent

@@ -7729,6 +7729,10 @@
 - release: "Future"
   versions: "future"
   introduced:
+      event fields:
+          WiFiNetworkDiagnostics:
+              AssociationFailure:
+                  - associationFailureCause
       bitmaps:
           Scenes:
               - CopyModeBitmap
@@ -7751,6 +7755,10 @@
               Feature:
                   - Basic
   deprecated:
+      event fields:
+          WiFiNetworkDiagnostics:
+              AssociationFailure:
+                  - associationFailure
       bitmaps:
           Scenes:
               - ScenesCopyMode
@@ -7778,6 +7786,10 @@
               # Targeting Spring 2024 Matter release
               - ThreadCapabilitiesBitmap
   renames:
+      event fields:
+          WiFiNetworkDiagnostics:
+              AssociationFailure:
+                  associationFailureCause: associationFailure
       bitmaps:
           Scenes:
               CopyModeBitmap: ScenesCopyMode
