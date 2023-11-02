@@ -1086,8 +1086,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
 
                 def check_spec_conformance_for_commands(command_type: CommandType) -> bool:
                     success = True
-                    # TODO: once IDM-10.1 lands, use the globals
-                    global_attribute_id = 0xFFF9 if command_type == CommandType.ACCEPTED else 0xFFF8
+                    global_attribute_id = ACCEPTED_COMMAND_LIST_ID if command_type == CommandType.ACCEPTED else GENERATED_COMMAND_LIST_ID
                     xml_commands_dict = clusters[cluster_id].accepted_commands if command_type == CommandType.ACCEPTED else clusters[cluster_id].generated_commands
                     command_list = cluster[global_attribute_id]
                     for command_id in command_list:
