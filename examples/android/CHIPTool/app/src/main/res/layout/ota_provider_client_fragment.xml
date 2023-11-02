@@ -11,11 +11,35 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true" />
 
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/vendorIdTv"
+        android:textSize="16sp"
+        android:padding="16dp"
+        android:layout_margin="8dp"
+        android:layout_alignParentStart="true"
+        android:enabled="false"
+        android:text="@string/ota_provider_vendorId_text"
+        android:layout_below="@id/addressUpdateFragment" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/vendorIdEd"
+        android:textSize="16sp"
+        android:padding="16dp"
+        android:layout_margin="8dp"
+        android:layout_toEndOf="@id/vendorIdTv"
+        android:layout_below="@id/addressUpdateFragment"
+        android:autofillHints="@string/ota_provider_vendorId_text"
+        android:inputType="numberDecimal" />
+
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:id="@+id/buttonLayout"
-        android:layout_below="@id/addressUpdateFragment"
+        android:layout_below="@id/vendorIdEd"
         android:layout_height="wrap_content">
         <TextView
             android:id="@+id/selectFirmwareFileBtn"

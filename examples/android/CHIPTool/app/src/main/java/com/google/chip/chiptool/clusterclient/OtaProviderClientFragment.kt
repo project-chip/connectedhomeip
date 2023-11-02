@@ -45,6 +45,9 @@ class OtaProviderClientFragment : Fragment() {
 
   private var _binding: OtaProviderClientFragmentBinding? = null
 
+  private val vendorId: Int
+    get() = binding.vendorIdEd.text.toString().toInt()
+
   private val otaProviderCallback = OtaProviderCallback()
   private val binding
     get() = _binding!!
@@ -66,6 +69,8 @@ class OtaProviderClientFragment : Fragment() {
     binding.announceOTAProviderBtn.setOnClickListener {
       scope.launch { sendAnnounceOTAProviderBtnClick() }
     }
+
+    binding.vendorIdEd.setText(ChipClient.VENDOR_ID.toString())
 
     deviceController.startOTAProvider(otaProviderCallback)
     return binding.root
@@ -168,7 +173,7 @@ class OtaProviderClientFragment : Fragment() {
         }
       },
       deviceController.controllerNodeId.toULong().toLong(),
-      ChipClient.VENDOR_ID.toUInt().toInt(),
+      vendorId,
       0 /* AnnounceReason */,
       Optional.empty(),
       OTA_PROVIDER_ENDPOINT_ID
