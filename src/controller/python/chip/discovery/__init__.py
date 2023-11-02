@@ -87,7 +87,7 @@ class CommissionableNode():
     mrpRetryIntervalActive: int = None
     mrpRetryActiveThreshold: int = None
     supportsTcp: bool = None
-    ICDOperatesAsLIT: bool = None
+    isICDOperatingAsLIT: bool = None
     addresses: List[str] = None
     rotatingId: Optional[str] = None
 

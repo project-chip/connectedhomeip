@@ -145,6 +145,19 @@ CHIP_ERROR DnssdServer::SetEphemeralDiscriminator(Optional<uint16_t> discriminat
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+template <class Derived>
+void DnssdServer::AddICDKeyToAdvertisement(Dnssd::BaseAdvertisingParams<Derived> & advParams)
+{
+    // Only advertise the ICD key if the device can operate as a LIT
+    if (Server::GetInstance().GetICDManager().SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
+    {
+        advParams.SetICDOperatingAsLIT(
+            Optional<bool>(Server::GetInstance().GetICDManager().GetICDMode() == ICDManager::ICDMode::LIT));
+    }
+}
+#endif
+
 /// Set MDNS operational advertisement
 CHIP_ERROR DnssdServer::AdvertiseOperational()
 {
@@ -175,12 +188,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                                        .EnableIpV4(true);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-        // Only advertise the ICD key if the device can be operate as LIT
-        if (Server::GetInstance().GetICDManager().SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
-        {
-            advertiseParameters.SetICDOperatesAsLIT(
-                Optional<bool>(Server::GetInstance().GetICDManager().GetICDMode() == ICDManager::ICDMode::LIT));
-        }
+        AddICDKeyToAdvertisement<Dnssd::OperationalAdvertisingParameters>(advertiseParameters);
 #endif
 
         auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
@@ -253,12 +261,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     advertiseParameters.SetLocalMRPConfig(GetLocalMRPConfig()).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    // Only advertise the ICD key if the device can be operate as LIT
-    if (Server::GetInstance().GetICDManager().SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
-    {
-        advertiseParameters.SetICDOperatesAsLIT(
-            Optional<bool>(Server::GetInstance().GetICDManager().GetICDMode() == ICDManager::ICDMode::LIT));
-    }
+    AddICDKeyToAdvertisement<Dnssd::CommissionAdvertisingParameters>(advertiseParameters);
 #endif
 
     if (commissionableNode)

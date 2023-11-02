@@ -272,7 +272,7 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonRes
         nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
         break;
     case TxtFieldKey::kLongIdleTimeICD:
-        nodeData.ICDOperatesAsLIT = Internal::MakeOptionalBoolFromAsciiDecimal(value);
+        nodeData.isICDOperatingAsLIT = Internal::MakeOptionalBoolFromAsciiDecimal(value);
         break;
     default:
         break;

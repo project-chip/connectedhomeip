@@ -181,9 +181,9 @@ void DiscoveryCommands::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData &
     //     data.mrpRetryActiveThreshold.SetValue(nodeData.resolutionData.mrpRetryActiveThreshold.Value().count());
     // }
 
-    // if (nodeData.resolutionData.ICDOperatesAsLIT.HasValue())
+    // if (nodeData.resolutionData.isICDOperatingAsLIT.HasValue())
     // {
-    //     data.ICDOperatesAsLIT.SetValue(resolutionData.ICDOperatesAsLIT.Value());
+    //     data.isICDOperatingAsLIT.SetValue(resolutionData.isICDOperatingAsLIT.Value());
     // }
 
     chip::app::StatusIB status;

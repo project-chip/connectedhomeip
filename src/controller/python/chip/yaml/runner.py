@@ -913,7 +913,7 @@ class ReplTestRunner:
                 'mrpRetryIntervalActive': response.mrpRetryIntervalActive,
                 'mrpRetryActiveThreshold': response.mrpRetryActiveThreshold,
                 'supportsTcp': response.supportsTcp,
-                'ICDOperatesAsLIT': response.ICDOperatesAsLIT,
+                'isICDOperatingAsLIT': response.isICDOperatingAsLIT,
                 'addresses': response.addresses,
                 'rotatingId': response.rotatingId,
 

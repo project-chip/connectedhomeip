@@ -291,7 +291,7 @@ bool NodeDataIsEmpty(const DiscoveredNodeData & node)
         node.commissionData.commissioningMode != 0 || node.commissionData.deviceType != 0 ||
         node.commissionData.rotatingIdLen != 0 || node.commissionData.pairingHint != 0 ||
         node.resolutionData.mrpRetryIntervalIdle.HasValue() || node.resolutionData.mrpRetryIntervalActive.HasValue() ||
-        node.resolutionData.mrpRetryActiveThreshold.HasValue() || node.resolutionData.ICDOperatesAsLIT.HasValue() ||
+        node.resolutionData.mrpRetryActiveThreshold.HasValue() || node.resolutionData.isICDOperatingAsLIT.HasValue() ||
         node.resolutionData.supportsTcp)
     {
         return false;
@@ -392,7 +392,7 @@ bool NodeDataIsEmpty(const ResolvedNodeData & nodeData)
     return nodeData.operationalData.peerId == PeerId{} && nodeData.resolutionData.numIPs == 0 &&
         nodeData.resolutionData.port == 0 && !nodeData.resolutionData.mrpRetryIntervalIdle.HasValue() &&
         !nodeData.resolutionData.mrpRetryIntervalActive.HasValue() && !nodeData.resolutionData.supportsTcp &&
-        !nodeData.resolutionData.ICDOperatesAsLIT.HasValue();
+        !nodeData.resolutionData.isICDOperatingAsLIT.HasValue();
 }
 
 void ResetRetryIntervalIdle(DiscoveredNodeData & nodeData)
@@ -657,27 +657,27 @@ void TxtFieldICDoperatesAsLIT(nlTestSuite * inSuite, void * inContext)
     strcpy(key, "ICD");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.ICDOperatesAsLIT.HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.ICDOperatesAsLIT.Value());
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.HasValue());
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.Value());
 
     // Test no other fields were populated
-    nodeData.resolutionData.ICDOperatesAsLIT.ClearValue();
+    nodeData.resolutionData.isICDOperatingAsLIT.ClearValue();
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
 
     // ICD is operating as a SIT device
     strcpy(key, "ICD");
     strcpy(val, "0");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.ICDOperatesAsLIT.HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.ICDOperatesAsLIT.Value() == false);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.HasValue());
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.Value() == false);
 
-    nodeData.resolutionData.ICDOperatesAsLIT.ClearValue();
+    nodeData.resolutionData.isICDOperatingAsLIT.ClearValue();
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
     // Invalid value, No key set
     strcpy(key, "ICD");
     strcpy(val, "asdf");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.ICDOperatesAsLIT.HasValue() == false);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.HasValue() == false);
 }
 
 // Test IsDeviceTreatedAsSleepy() with CRI

@@ -143,9 +143,9 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
             }
             jsonVal["addresses"] = addresses;
         }
-        if (dnsSdInfo->resolutionData.ICDOperatesAsLIT.HasValue())
+        if (dnsSdInfo->resolutionData.isICDOperatingAsLIT.HasValue())
         {
-            jsonVal["ICDOperatesAsLIT"] = dnsSdInfo->resolutionData.ICDOperatesAsLIT.Value();
+            jsonVal["isICDOperatingAsLIT"] = dnsSdInfo->resolutionData.isICDOperatingAsLIT.Value();
         }
         if (dnsSdInfo->commissionData.rotatingIdLen > 0)
         {
@@ -204,10 +204,10 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
             ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
         }
         ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->resolutionData.supportsTcp);
-        if (dnsSdInfo->resolutionData.ICDOperatesAsLIT.HasValue())
+        if (dnsSdInfo->resolutionData.isICDOperatingAsLIT.HasValue())
         {
-            ChipLogProgress(Discovery, "\tICD is operating as \t%s",
-                            dnsSdInfo->resolutionData.ICDOperatesAsLIT.Value() ? "LIT" : "SIT");
+            ChipLogProgress(Discovery, "\tICD is operating as a\t%s",
+                            dnsSdInfo->resolutionData.isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
         }
         for (unsigned j = 0; j < dnsSdInfo->resolutionData.numIPs; ++j)
         {

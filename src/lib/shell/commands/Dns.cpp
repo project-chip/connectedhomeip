@@ -62,7 +62,7 @@ public:
         streamer_printf(streamer_get(), "   MRP ACTIVE Threshold time:     %u ms\r\n",
                         result.mrpRemoteConfig.mActiveThresholdTime.count());
 
-        streamer_printf(streamer_get(), "   ICD is operating as :          %s ms\r\n", result.ICDOperatesAsLIT ? "LIT" : "SIT");
+        streamer_printf(streamer_get(), "   ICD is operating as a:         %s ms\r\n", result.isICDOperatingAsLIT ? "LIT" : "SIT");
 
         // Schedule a retry. Not called directly so we do not recurse in OnNodeAddressResolved
         DeviceLayer::SystemLayer().ScheduleLambda([this] {
@@ -125,10 +125,10 @@ public:
         }
         streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.resolutionData.supportsTcp ? "yes" : "no");
 
-        if (nodeData.resolutionData.ICDOperatesAsLIT.HasValue())
+        if (nodeData.resolutionData.isICDOperatingAsLIT.HasValue())
         {
-            streamer_printf(streamer_get(), "   ICD is operating as : %s ms\r\n",
-                            nodeData.resolutionData.ICDOperatesAsLIT.Value() ? "LIT" : "SIT");
+            streamer_printf(streamer_get(), "   ICD is operating as a: %s\r\n",
+                            nodeData.resolutionData.isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
         }
         streamer_printf(streamer_get(), "   IP addresses:\r\n");
         for (uint8_t i = 0; i < nodeData.resolutionData.numIPs; i++)

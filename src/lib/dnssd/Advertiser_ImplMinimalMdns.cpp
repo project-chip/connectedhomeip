@@ -219,7 +219,7 @@ private:
         char sessionActiveThresholdBuf[KeySize(TxtFieldKey::kSessionActiveThreshold) +
                                        ValSize(TxtFieldKey::kSessionActiveThreshold) + 2];
         char tcpSupportedBuf[KeySize(TxtFieldKey::kTcpSupported) + ValSize(TxtFieldKey::kTcpSupported) + 2];
-        char ICDAsLITBuf[KeySize(TxtFieldKey::kLongIdleTimeICD) + ValSize(TxtFieldKey::kLongIdleTimeICD) + 2];
+        char operatingICDAsLITBuf[KeySize(TxtFieldKey::kLongIdleTimeICD) + ValSize(TxtFieldKey::kLongIdleTimeICD) + 2];
     };
     template <class Derived>
     CHIP_ERROR AddCommonTxtEntries(const BaseAdvertisingParams<Derived> & params, CommonTxtEntryStorage & storage,
@@ -281,13 +281,14 @@ private:
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtFields[numTxtFields++] = storage.tcpSupportedBuf;
         }
-        if (params.GetICDOperatesAsLIT().HasValue())
+        if (params.GetICDOperatingAsLIT().HasValue())
         {
-            size_t writtenCharactersNumber = static_cast<size_t>(
-                snprintf(storage.ICDAsLITBuf, sizeof(storage.ICDAsLITBuf), "ICD=%d", params.GetICDOperatesAsLIT().Value()));
-            VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < sizeof(storage.ICDAsLITBuf)),
+            size_t writtenCharactersNumber =
+                static_cast<size_t>(snprintf(storage.operatingICDAsLITBuf, sizeof(storage.operatingICDAsLITBuf), "ICD=%d",
+                                             params.GetICDOperatingAsLIT().Value()));
+            VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < sizeof(storage.operatingICDAsLITBuf)),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
-            txtFields[numTxtFields++] = storage.ICDAsLITBuf;
+            txtFields[numTxtFields++] = storage.operatingICDAsLITBuf;
         }
         return CHIP_NO_ERROR;
     }

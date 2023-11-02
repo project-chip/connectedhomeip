@@ -101,12 +101,12 @@ public:
     }
     Optional<bool> GetTcpSupported() const { return mTcpSupported; }
 
-    Derived & SetICDOperatesAsLIT(Optional<bool> ICDOperatesAsLIT)
+    Derived & SetICDOperatingAsLIT(Optional<bool> operatesAsLIT)
     {
-        mICDOperatesAsLIT = ICDOperatesAsLIT;
+        mICDOperatesAsLIT = operatesAsLIT;
         return *reinterpret_cast<Derived *>(this);
     }
-    Optional<bool> GetICDOperatesAsLIT() const { return mICDOperatesAsLIT; }
+    Optional<bool> GetICDOperatingAsLIT() const { return mICDOperatesAsLIT; }
 
 private:
     uint16_t mPort                   = CHIP_PORT;

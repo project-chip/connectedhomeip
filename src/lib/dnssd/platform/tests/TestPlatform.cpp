@@ -54,7 +54,7 @@ OperationalAdvertisingParameters operationalParams2 =
         .EnableIpV4(true)
         .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(32_ms32, 30_ms32, 10_ms16)) // SII and SAI to match below
         .SetTcpSupported(Optional<bool>(true))
-        .SetICDOperatesAsLIT(Optional<bool>(false));
+        .SetICDOperatingAsLIT(Optional<bool>(false));
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)
                                           .SetServiceName("_matter")
@@ -98,7 +98,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetProductId(Optional<uint16_t>(897))
         .SetRotatingDeviceId(Optional<const char *>("id_that_spins"))
         .SetTcpSupported(Optional<bool>(true))
-        .SetICDOperatesAsLIT(Optional<bool>(true))
+        .SetICDOperatingAsLIT(Optional<bool>(true))
         // 3600005 is over the max, so this should be adjusted by the platform
         .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600005_ms32, 65535_ms16));
 

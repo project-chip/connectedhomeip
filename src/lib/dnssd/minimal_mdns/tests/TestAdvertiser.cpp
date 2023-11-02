@@ -181,7 +181,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetProductId(chip::Optional<uint16_t>(897))
         .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"))
         .SetTcpSupported(chip::Optional<bool>(true))
-        .SetICDOperatesAsLIT(chip::Optional<bool>(true))
+        .SetICDOperatingAsLIT(chip::Optional<bool>(true))
         // 3600005 is more than the max so should be adjusted down
         .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600005_ms32, 65535_ms16));
 QNamePart txtCommissionableNodeParamsLargeEnhancedParts[] = { "D=22",          "VP=555+897",       "CM=2",       "DT=70000",

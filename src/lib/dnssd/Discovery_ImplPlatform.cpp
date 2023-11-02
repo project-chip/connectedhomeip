@@ -228,7 +228,7 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
     case TxtFieldKey::kSessionActiveThreshold:
         return CopyTextRecordValue(buffer, bufferLen, params.GetLocalMRPConfig(), key);
     case TxtFieldKey::kLongIdleTimeICD:
-        return CopyTextRecordValue(buffer, bufferLen, params.GetICDOperatesAsLIT());
+        return CopyTextRecordValue(buffer, bufferLen, params.GetICDOperatingAsLIT());
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
