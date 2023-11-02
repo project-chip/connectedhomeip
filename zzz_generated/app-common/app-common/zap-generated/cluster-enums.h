@@ -3994,19 +3994,6 @@ enum class Feature : uint32_t
 
 namespace ContentLauncher {
 
-// Enum for ContentLaunchStatusEnum
-enum class ContentLaunchStatusEnum : uint8_t
-{
-    kSuccess         = 0x00,
-    kUrlNotAvailable = 0x01,
-    kAuthFailed      = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
-
 // Enum for MetricTypeEnum
 enum class MetricTypeEnum : uint8_t
 {
@@ -4043,6 +4030,21 @@ enum class ParameterEnum : uint8_t
     kUnknownEnumValue = 14,
 };
 
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
+{
+    kSuccess                = 0x00,
+    kURLNotAvailable        = 0x01,
+    kAuthFailed             = 0x02,
+    kTextTrackNotAvailable  = 0x03,
+    kAudioTrackNotAvailable = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
@@ -4050,11 +4052,12 @@ enum class Feature : uint32_t
     kURLPlayback   = 0x2,
 };
 
-// Bitmap for SupportedStreamingProtocol
-enum class SupportedStreamingProtocol : uint32_t
+// Bitmap for SupportedProtocolsBitmap
+enum class SupportedProtocolsBitmap : uint32_t
 {
-    kDash = 0x1,
-    kHls  = 0x2,
+    kDash   = 0x1,
+    kHls    = 0x2,
+    kWebRTC = 0x4,
 };
 } // namespace ContentLauncher
 

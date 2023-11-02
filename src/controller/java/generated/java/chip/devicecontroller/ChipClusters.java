@@ -26864,14 +26864,6 @@ public class ChipClusters {
         readSupportedStreamingProtocolsAttribute(chipClusterPtr, callback);
     }
 
-    public void writeSupportedStreamingProtocolsAttribute(DefaultClusterCallback callback, Long value) {
-        writeSupportedStreamingProtocolsAttribute(chipClusterPtr, callback, value, null);
-    }
-
-    public void writeSupportedStreamingProtocolsAttribute(DefaultClusterCallback callback, Long value, int timedWriteTimeoutMs) {
-        writeSupportedStreamingProtocolsAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
-    }
-
     public void subscribeSupportedStreamingProtocolsAttribute(
         LongAttributeCallback callback, int minInterval, int maxInterval) {
         subscribeSupportedStreamingProtocolsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
@@ -26942,8 +26934,6 @@ public class ChipClusters {
     private native void subscribeAcceptHeaderAttribute(long chipClusterPtr, AcceptHeaderAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readSupportedStreamingProtocolsAttribute(long chipClusterPtr, LongAttributeCallback callback);
-
-    private native void writeSupportedStreamingProtocolsAttribute(long chipClusterPtr, DefaultClusterCallback callback, Long value, @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeSupportedStreamingProtocolsAttribute(long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 

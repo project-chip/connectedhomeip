@@ -73,14 +73,6 @@ class ContentLauncherCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeSupportedStreamingProtocolsAttribute(value: ULong) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeSupportedStreamingProtocolsAttribute(value: ULong, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
   suspend fun subscribeSupportedStreamingProtocolsAttribute(
     minInterval: Int,
     maxInterval: Int

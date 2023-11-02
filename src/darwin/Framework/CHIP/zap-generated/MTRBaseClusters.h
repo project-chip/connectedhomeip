@@ -16119,12 +16119,6 @@ typedef NS_OPTIONS(uint32_t, MTRKeypadInputFeature) {
     MTRKeypadInputFeatureNumberKeys MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-typedef NS_ENUM(uint8_t, MTRContentLauncherContentLaunchStatus) {
-    MTRContentLauncherContentLaunchStatusSuccess MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRContentLauncherContentLaunchStatusUrlNotAvailable MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRContentLauncherContentLaunchStatusAuthFailed MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
 typedef NS_ENUM(uint8_t, MTRContentLauncherMetricType) {
     MTRContentLauncherMetricTypePixels MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,
     MTRContentLauncherMetricTypePIXELS MTR_DEPRECATED("Please use MTRContentLauncherMetricTypePixels", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00,
@@ -16149,15 +16143,24 @@ typedef NS_ENUM(uint8_t, MTRContentLauncherParameter) {
     MTRContentLauncherParameterVideo MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0D,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRContentLauncherStatus) {
+    MTRContentLauncherStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRContentLauncherStatusURLNotAvailable MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRContentLauncherStatusAuthFailed MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRContentLauncherStatusTextTrackNotAvailable MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRContentLauncherStatusAudioTrackNotAvailable MTR_PROVISIONALLY_AVAILABLE = 0x04,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_OPTIONS(uint32_t, MTRContentLauncherFeature) {
     MTRContentLauncherFeatureContentSearch MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
     MTRContentLauncherFeatureURLPlayback MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-typedef NS_OPTIONS(uint32_t, MTRContentLauncherSupportedStreamingProtocol) {
-    MTRContentLauncherSupportedStreamingProtocolDASH MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
-    MTRContentLauncherSupportedStreamingProtocolHLS MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+typedef NS_OPTIONS(uint32_t, MTRContentLauncherSupportedProtocolsBitmap) {
+    MTRContentLauncherSupportedProtocolsBitmapDASH MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRContentLauncherSupportedProtocolsBitmapHLS MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRContentLauncherSupportedProtocolsBitmapWebRTC MTR_PROVISIONALLY_AVAILABLE = 0x4,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRAudioOutputOutputType) {
     MTRAudioOutputOutputTypeHDMI MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,
