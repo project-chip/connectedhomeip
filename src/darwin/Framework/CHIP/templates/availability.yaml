@@ -3252,7 +3252,8 @@
               - CecKeyCode
               - KeypadInputStatusEnum
           ContentLauncher:
-              - ContentLaunchStatusEnum
+              # ContentLaunchStatusEnum used to be here but was moved to
+              # non-codegen in MTRBackwardsCompatShims.h.
               - MetricTypeEnum
               - ParameterEnum
           AudioOutput:
@@ -4110,10 +4111,8 @@
                   - UnsupportedKey
                   - InvalidKeyInCurrentState
           ContentLauncher:
-              ContentLaunchStatusEnum:
-                  - Success
-                  - UrlNotAvailable
-                  - AuthFailed
+              # ContentLaunchStatusEnum used to be here but was moved to
+              # non-codegen in MTRBackwardsCompatShims.h.
               MetricTypeEnum:
                   - PIXELS
                   - PERCENTAGE
@@ -7739,12 +7738,23 @@
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   - associationFailureCause
+      enums:
+          ContentLauncher:
+              - StatusEnum
+      enum values:
+          ContentLauncher:
+              StatusEnum:
+                  - Success
+                  - URLNotAvailable
+                  - AuthFailed
       bitmaps:
           Scenes:
               - CopyModeBitmap
               - NameSupportBitmap
           AdministratorCommissioning:
               - Feature
+          ContentLauncher:
+              - SupportedProtocolsBitmap
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7760,6 +7770,10 @@
           AdministratorCommissioning:
               Feature:
                   - Basic
+          ContentLauncher:
+              SupportedProtocolsBitmap:
+                  - DASH
+                  - HLS
   deprecated:
       event fields:
           WiFiNetworkDiagnostics:
@@ -7768,6 +7782,8 @@
       bitmaps:
           Scenes:
               - ScenesCopyMode
+          ContentLauncher:
+              - SupportedStreamingProtocol
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7808,6 +7824,8 @@
       bitmaps:
           Scenes:
               CopyModeBitmap: ScenesCopyMode
+          ContentLauncher:
+              SupportedProtocolsBitmap: SupportedStreamingProtocol
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
