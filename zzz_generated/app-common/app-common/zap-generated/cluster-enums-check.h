@@ -2857,11 +2857,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::Status
     case EnumType::kSuccess:
     case EnumType::kURLNotAvailable:
     case EnumType::kAuthFailed:
-    case EnumType::kTextTrackNotAvailable:
-    case EnumType::kAudioTrackNotAvailable:
         return val;
     default:
-        return static_cast<EnumType>(5);
+        return static_cast<EnumType>(3);
     }
 }
 

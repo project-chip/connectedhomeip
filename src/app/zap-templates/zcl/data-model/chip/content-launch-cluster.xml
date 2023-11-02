@@ -24,7 +24,7 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
-    <globalAttribure side="either" code="0xFFFD" value="2"/>
+    <globalAttribure side="either" code="0xFFFD" value="1"/>
 
     <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER"                 type="ARRAY" entryType="char_string" length="254" writable="false" optional="true">AcceptHeader</attribute>
     <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="SupportedProtocolsBitmap" default="0"                       writable="false"  optional="true">SupportedStreamingProtocols</attribute>
@@ -118,8 +118,6 @@ limitations under the License.
     <item name="Success" value="0x00"/>
     <item name="URLNotAvailable" value="0x01"/>
     <item name="AuthFailed" value="0x02"/>
-    <item name="TextTrackNotAvailable" value="0x03"/>
-    <item name="AudioTrackNotAvailable" value="0x04"/>
   </enum>
 
   <struct name="ParameterStruct">
@@ -133,7 +131,6 @@ limitations under the License.
     <cluster code="0x050a"/>
     <field name="DASH" mask="0x1"/>
     <field name="HLS" mask="0x2"/>
-    <field name="WebRTC" mask="0x4"/>
   </bitmap>
 
   <bitmap name="Feature" type="bitmap32">

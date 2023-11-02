@@ -16147,8 +16147,6 @@ typedef NS_ENUM(uint8_t, MTRContentLauncherStatus) {
     MTRContentLauncherStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRContentLauncherStatusURLNotAvailable MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRContentLauncherStatusAuthFailed MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRContentLauncherStatusTextTrackNotAvailable MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRContentLauncherStatusAudioTrackNotAvailable MTR_PROVISIONALLY_AVAILABLE = 0x04,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRContentLauncherFeature) {
@@ -16159,7 +16157,6 @@ typedef NS_OPTIONS(uint32_t, MTRContentLauncherFeature) {
 typedef NS_OPTIONS(uint32_t, MTRContentLauncherSupportedProtocolsBitmap) {
     MTRContentLauncherSupportedProtocolsBitmapDASH MTR_PROVISIONALLY_AVAILABLE = 0x1,
     MTRContentLauncherSupportedProtocolsBitmapHLS MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRContentLauncherSupportedProtocolsBitmapWebRTC MTR_PROVISIONALLY_AVAILABLE = 0x4,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRAudioOutputOutputType) {

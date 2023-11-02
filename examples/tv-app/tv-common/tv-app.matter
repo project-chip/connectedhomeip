@@ -2222,8 +2222,6 @@ server cluster ContentLauncher = 1290 {
     kSuccess = 0;
     kURLNotAvailable = 1;
     kAuthFailed = 2;
-    kTextTrackNotAvailable = 3;
-    kAudioTrackNotAvailable = 4;
   }
 
   bitmap Feature : bitmap32 {
@@ -2234,7 +2232,6 @@ server cluster ContentLauncher = 1290 {
   bitmap SupportedProtocolsBitmap : bitmap32 {
     kDASH = 0x1;
     kHLS = 0x2;
-    kWebRTC = 0x4;
   }
 
   struct DimensionStruct {

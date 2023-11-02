@@ -34757,13 +34757,11 @@ class ContentLauncher(Cluster):
             kSuccess = 0x00
             kURLNotAvailable = 0x01
             kAuthFailed = 0x02
-            kTextTrackNotAvailable = 0x03
-            kAudioTrackNotAvailable = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 3,
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -34773,7 +34771,6 @@ class ContentLauncher(Cluster):
         class SupportedProtocolsBitmap(IntFlag):
             kDash = 0x1
             kHls = 0x2
-            kWebRTC = 0x4
 
     class Structs:
         @dataclass
