@@ -202,7 +202,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
                 params.GetTimeZone().Value()[i].name.Value().size() <= kMaxTimeZoneNameLen)
             {
                 auto span = MutableCharSpan(mTimeZoneNames[i], kMaxTimeZoneNameLen);
-                // This buffer is statically allocated and if of size kMaxSupportedTimeZones, so this should never fail
+                // The buffer backing "span" is statically allocated and is of size kMaxSupportedTimeZones, so this should never fail.
                 CopyCharSpanToMutableCharSpan(params.GetTimeZone().Value()[i].name.Value(), span);
                 mTimeZoneBuf[i].name.SetValue(span);
             }
@@ -220,7 +220,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         // This parameter is an optional nullable, so we need to go two levels deep here.
         if (!params.GetDefaultNTP().Value().IsNull() && params.GetDefaultNTP().Value().Value().size() <= kMaxDefaultNtpSize)
         {
-            // This buffer is statically allocated and is of size kMaxDefaultNtpSize.
+            // The buffer backing "span" is statically allocated and is of size kMaxDefaultNtpSize.
             auto span = MutableCharSpan(mDefaultNtp, kMaxDefaultNtpSize);
             CopyCharSpanToMutableCharSpan(params.GetDefaultNTP().Value().Value(), span);
             auto default_ntp = MakeNullable(CharSpan(mDefaultNtp, params.GetDefaultNTP().Value().Value().size()));
