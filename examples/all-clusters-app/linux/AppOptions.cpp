@@ -47,7 +47,6 @@ bool AppOptions::HandleOptions(const char * program, OptionSet * options, int id
     switch (identifier)
     {
     case kOptionDacProviderFilePath:
-        ChipLogError(BDX, "dac provider path");
         mDacProvider.Init(value);
         break;
     case kOptionMinCommissioningTimeout: {
@@ -56,7 +55,6 @@ bool AppOptions::HandleOptions(const char * program, OptionSet * options, int id
         break;
     }
     case kOptionEndUserSupportFilePath: {
-        ChipLogError(BDX, "kOptionEndUserSupportFilePath setting end user fd");
         if (strlen(value) > kLogFileDesignatorMaxLen)
         {
             PrintArgError("%s: Invalid file path length. Must be less that %d: %d\n", program, kLogFileDesignatorMaxLen,
