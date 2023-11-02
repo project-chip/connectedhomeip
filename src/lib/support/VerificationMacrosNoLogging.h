@@ -25,3 +25,20 @@
 #include <nlassert.h>
 
 #define VerifyOrDieWithoutLogging(aCondition) nlABORT(aCondition)
+
+/**
+ *  @def IgnoreUnusedVariable(aVariable)
+ *
+ *  @brief
+ *    This casts the specified @a aVariable to void to quell any
+ *    compiler-issued unused variable warnings or errors.
+ *
+ *  @code
+ *  void foo (int err)
+ *  {
+ *      IgnoreUnusedVariable(err)
+ *  }
+ *  @endcode
+ *
+ */
+#define IgnoreUnusedVariable(aVariable) ((void) (aVariable))

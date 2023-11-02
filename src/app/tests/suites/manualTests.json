@@ -267,19 +267,13 @@
     "OperationalState": ["Test_TC_OPSTATE_2_2"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_2_2"],
     "SmokeCOAlarm": [],
-    "RefrigeratorAlarm": [
-        "Test_TC_REFALM_2_1",
-        "Test_TC_REFALM_2_2",
-        "Test_TC_REFALM_2_3"
-    ],
+    "RefrigeratorAlarm": ["Test_TC_REFALM_2_2", "Test_TC_REFALM_2_3"],
     "RVCCleanMode": ["Test_TC_RVCCLEANM_3_3"],
     "RVCOperationalState": ["Test_TC_RVCOPSTATE_2_2"],
     "RVCRunMode": ["Test_TC_RVCRUNM_3_3"],
     "TemperatureControlledCabinetMode": [
         "Test_TC_TCCM_1_2",
-        "Test_TC_TCCM_2_1",
-        "Test_TC_TCCM_3_2",
-        "Test_TC_TCCM_3_3"
+        "Test_TC_TCCM_2_1"
     ],
     "Switch": ["Test_TC_SWTCH_2_2", "Test_TC_SWTCH_3_2"],
     "TemperatureControl": ["Test_TC_TCTL_3_2", "Test_TC_TCTL_3_3"],
@@ -292,12 +286,7 @@
     "TimeSynchronization": [],
     "UnitLocalization": [],
     "Binding": ["Test_TC_BIND_2_1", "Test_TC_BIND_2_2", "Test_TC_BIND_2_3"],
-    "Scenes": [
-        "Test_TC_S_1_1",
-        "Test_TC_S_2_1",
-        "Test_TC_S_2_5",
-        "Test_TC_S_2_6"
-    ],
+    "Scenes": ["Test_TC_S_2_5", "Test_TC_S_2_6"],
     "PumpConfigurationControl": [],
     "AccessControl": [],
     "UserLabel": [],

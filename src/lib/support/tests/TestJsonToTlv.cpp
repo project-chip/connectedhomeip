@@ -22,6 +22,7 @@
 #include <lib/core/TLVReader.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/jsontlv/JsonToTlv.h>
+#include <lib/support/jsontlv/TextFormat.h>
 #include <lib/support/jsontlv/TlvToJson.h>
 #include <nlunit-test.h>
 
@@ -140,7 +141,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
     jsonString = "{\n"
                  "   \"1:STRING\" : \"hello\"\n"
                  "}\n";
-    ConvertJsonToTlvAndValidate(CharSpan::fromCharString("hello"), jsonString);
+    ConvertJsonToTlvAndValidate("hello"_span, jsonString);
 
     // Validated using https://base64.guru/converter/encode/hex
     const uint8_t byteBuf[] = { 0x01, 0x02, 0x03, 0x04, 0xff, 0xfe, 0x99, 0x88, 0xdd, 0xcd };
@@ -160,7 +161,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
     structVal.a = 20;
     structVal.b = true;
     structVal.d = byteBuf;
-    structVal.e = CharSpan::fromCharString("hello");
+    structVal.e = "hello"_span;
     structVal.g = static_cast<float>(1.0);
     structVal.h = static_cast<double>(1.0);
 

@@ -24,9 +24,8 @@
 
 #include "TextOnlyLogging.h"
 
-#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/CodeUtils.h>
 
 #include <platform/logging/LogV.h>
 
@@ -222,20 +221,6 @@ void SetLogFilter(uint8_t category)
     gLogFilter = category;
 }
 
-#else  // CHIP_LOG_FILTERING
-
-uint8_t GetLogFilter()
-{
-    return kLogCategory_Max;
-}
-
-void SetLogFilter(uint8_t category)
-{
-    IgnoreUnusedVariable(category);
-}
-#endif // CHIP_LOG_FILTERING
-
-#if CHIP_LOG_FILTERING
 bool IsCategoryEnabled(uint8_t category)
 {
     return (category <= gLogFilter);

@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 98,
+  "featureLevel": 99,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -37,14 +37,14 @@
       "id": 1,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "code": 0,
+        "code": 4293984259,
         "profileId": 259,
         "label": "MA-all-clusters-app",
         "name": "MA-all-clusters-app"
       },
       "deviceTypes": [
         {
-          "code": 0,
+          "code": 4293984259,
           "profileId": 259,
           "label": "MA-all-clusters-app",
           "name": "MA-all-clusters-app"
@@ -54,10 +54,10 @@
         1
       ],
       "deviceIdentifiers": [
-        0
+        4293984259
       ],
       "deviceTypeName": "MA-all-clusters-app",
-      "deviceTypeCode": 0,
+      "deviceTypeCode": 4293984259,
       "deviceTypeProfileId": 259,
       "clusters": [
         {
@@ -187,7 +187,7 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
@@ -733,7 +733,7 @@
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 0,
-      "profileId": 598,
+      "profileId": 259,
       "endpointId": 0,
       "networkId": 0
     }

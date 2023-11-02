@@ -46,6 +46,14 @@ class PrefixCppDocComment:
         while content[actual_pos] in ' \t\n\r':
             actual_pos += 1
 
+        # Allow to skip api maturity flags
+        for maturity in ["provisional", "internal", "stable", "deprecated"]:
+            if content[actual_pos:].startswith(maturity):
+                actual_pos += len(maturity)
+
+        while content[actual_pos] in ' \t\n\r':
+            actual_pos += 1
+
         # A doc comment will apply to any supported element assuming it immediately
         # preceeds id (skipping whitespace)
         for item in self.supported_types(idl):
@@ -302,10 +310,10 @@ class MatterIdlTransformer(Transformer):
     # NOTE: awkward inline because the order of 'meta, children' vs 'children, meta' was flipped
     #       between lark versions in https://github.com/lark-parser/lark/pull/993
     @v_args(meta=True, inline=True)
-    def command(self, meta, *args):
+    def command(self, meta, *tuple_args):
         # The command takes 4 arguments if no input argument, 5 if input
         # argument is provided
-        args = list(args)  # convert from tuple
+        args = list(tuple_args)  # convert from tuple
         if len(args) != 5:
             args.insert(2, None)
 
@@ -491,17 +499,17 @@ class MatterIdlTransformer(Transformer):
                          code=code, api_maturity=api_maturity)
 
         for item in content:
-            if type(item) == Enum:
+            if isinstance(item, Enum):
                 result.enums.append(item)
-            elif type(item) == Bitmap:
+            elif isinstance(item, Bitmap):
                 result.bitmaps.append(item)
-            elif type(item) == Event:
+            elif isinstance(item, Event):
                 result.events.append(item)
-            elif type(item) == Attribute:
+            elif isinstance(item, Attribute):
                 result.attributes.append(item)
-            elif type(item) == Struct:
+            elif isinstance(item, Struct):
                 result.structs.append(item)
-            elif type(item) == Command:
+            elif isinstance(item, Command):
                 result.commands.append(item)
             else:
                 raise Exception("UNKNOWN cluster content item: %r" % item)
@@ -513,9 +521,9 @@ class MatterIdlTransformer(Transformer):
         endpoints = []
 
         for item in items:
-            if type(item) == Cluster:
+            if isinstance(item, Cluster):
                 clusters.append(item)
-            elif type(item) == Endpoint:
+            elif isinstance(item, Endpoint):
                 endpoints.append(item)
             else:
                 raise Exception("UNKNOWN idl content item: %r" % item)
@@ -543,6 +551,7 @@ class ParserWithLines:
         # For this reason, every attempt should be made to make the grammar context free
         self.parser = Lark.open(
             'matter_grammar.lark', rel_to=__file__, start='idl', parser='lalr', propagate_positions=True,
+            maybe_placeholders=True,
             # separate callbacks to ignore from regular parsing (no tokens)
             # while still getting notified about them
             lexer_callbacks={

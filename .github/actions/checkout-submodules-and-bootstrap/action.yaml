@@ -15,6 +15,8 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Dump disk info
+      uses: ./.github/actions/dump-disk-info
     - name: Checkout submodules
       uses: ./.github/actions/checkout-submodules
       with:
@@ -24,8 +26,13 @@ runs:
       uses: ./.github/actions/bootstrap-cache
     - name: Bootstrap
       uses: ./.github/actions/bootstrap
+      env:
+        PW_NO_CIPD_CACHE_DIR: Y
       with:
         platform: ${{ inputs.platform }}
+    - name: Dump disk info after checkout submodule & Bootstrap
+      shell: bash
+      run: scripts/dump_diskspace_info.sh
     - name: Upload Bootstrap Logs
       uses: ./.github/actions/upload-bootstrap-logs
       with:

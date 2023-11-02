@@ -48,7 +48,10 @@ limitations under the License.
     <attribute side="server" code="0x0008" define="INTERCONNECT_SMOKE_ALARM" type="AlarmStateEnum" writable="false" optional="true">InterconnectSmokeAlarm</attribute>
     <attribute side="server" code="0x0009" define="INTERCONNECT_CO_ALARM" type="AlarmStateEnum" writable="false" optional="true">InterconnectCOAlarm</attribute>
     <attribute side="server" code="0x000A" define="CONTAMINATION_STATE" type="ContaminationStateEnum" writable="false" optional="true">ContaminationState</attribute>
-    <attribute side="server" code="0x000B" define="SENSITIVITY_LEVEL" type="SensitivityEnum" min="0" max="2" writable="true" optional="true">SmokeSensitivityLevel</attribute>
+    <attribute side="server" code="0x000B" define="SENSITIVITY_LEVEL" type="SensitivityEnum" min="0" max="2" writable="true" optional="true">
+      <description>SmokeSensitivityLevel</description>
+      <access op="write" role="manage"/>
+    </attribute>
     <attribute side="server" code="0x000C" define="EXPIRY_DATE" type="epoch_s" writable="false" optional="true">ExpiryDate</attribute>
 
     <!-- Commands -->
@@ -98,21 +101,21 @@ limitations under the License.
   </cluster>
 
   <!-- Cluster data types -->
-  <enum name="AlarmStateEnum" type="ENUM8">
+  <enum name="AlarmStateEnum" type="enum8">
     <cluster code="0x005C" />
     <item value="0" name="Normal" />
     <item value="1" name="Warning" />
     <item value="2" name="Critical" />
   </enum>
 
-  <enum name="SensitivityEnum" type="ENUM8">
+  <enum name="SensitivityEnum" type="enum8">
     <cluster code="0x005C" />
     <item value="0" name="High" />
     <item value="1" name="Standard" />
     <item value="2" name="Low" />
   </enum>
 
-  <enum name="ExpressedStateEnum" type="ENUM8">
+  <enum name="ExpressedStateEnum" type="enum8">
     <cluster code="0x005C" />
     <item value="0" name="Normal" />
     <item value="1" name="SmokeAlarm" />
@@ -125,19 +128,19 @@ limitations under the License.
     <item value="8" name="InterconnectCO" />
   </enum>
 
-  <enum name="MuteStateEnum" type="ENUM8">
+  <enum name="MuteStateEnum" type="enum8">
     <cluster code="0x005C" />
     <item value="0" name="NotMuted" />
     <item value="1" name="Muted" />
   </enum>
 
-  <enum name="EndOfServiceEnum" type="ENUM8">
+  <enum name="EndOfServiceEnum" type="enum8">
     <cluster code="0x005C" />
     <item value="0" name="Normal" />
     <item value="1" name="Expired" />
   </enum>
 
-  <enum name="ContaminationStateEnum" type="ENUM8">
+  <enum name="ContaminationStateEnum" type="enum8">
     <cluster code="0x005C" />
     <item value="0" name="Normal" />
     <item value="1" name="Low" />
@@ -145,7 +148,7 @@ limitations under the License.
     <item value="3" name="Critical" />
   </enum>
 
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x005C" />
     <field name="Smoke Alarm" mask="0x01" />
     <field name="CO alarm" mask="0x02" />

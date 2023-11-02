@@ -12,6 +12,7 @@
 #import "MTRStructsObjc.h"
 #import "NSStringSpanConversion.h"
 #import "NSDataSpanConversion.h"
+#import "MTRDefines_Internal.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/im-client-callbacks.h>
@@ -97,7 +98,7 @@ MTR{{cluster}}Cluster{{command}}Params
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     {{#if mustUseTimedInvoke}}
     if (timedInvokeTimeoutMs == nil) {
-      timedInvokeTimeoutMs = @(10000);
+      timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
     {{/if}}
 
@@ -150,7 +151,8 @@ MTR{{cluster}}Cluster{{command}}Params
                                         completion:completion];
 }
 
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completion:(MTRStatusCompletion)completion
 {
   [self write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:nil completion:completion];
@@ -175,9 +177,9 @@ MTR{{cluster}}Cluster{{command}}Params
             timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
           }
         }
-        {{#if mustUseTimedInvoke}}
+        {{#if mustUseTimedWrite}}
         if (!timedWriteTimeout.HasValue()) {
-          timedWriteTimeout.SetValue(10000);
+          timedWriteTimeout.SetValue(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
         }
         {{/if}}
 
@@ -291,7 +293,8 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
         completionHandler(static_cast<{{asObjectiveCClass type parent.name compatRemapClusterName=true}} *>(value), error);
       }];
 }
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value completionHandler:(MTRStatusCompletion)completionHandler
 {
   [self writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:value params:nil completion:completionHandler];

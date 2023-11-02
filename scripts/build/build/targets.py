@@ -135,6 +135,7 @@ def BuildHostTarget():
         TargetPart('dishwasher', app=HostApp.DISHWASHER),
         TargetPart('refrigerator', app=HostApp.REFRIGERATOR),
         TargetPart('rvc', app=HostApp.RVC),
+        TargetPart('air-purifier', app=HostApp.AIR_PURIFIER),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -534,6 +535,7 @@ def Buildcc32xxTarget():
     # apps
     target.AppendFixedTargets([
         TargetPart('lock', app=cc32xxApp.LOCK),
+        TargetPart('air-purifier', app=cc32xxApp.AIR_PURIFIER),
 
     ])
 
@@ -573,6 +575,8 @@ def BuildQorvoTarget():
         TargetPart('shell', app=QpgApp.SHELL),
         TargetPart('persistent-storage', app=QpgApp.PERSISTENT_STORAGE),
     ])
+
+    target.AppendModifier('updateimage', update_image=True)
 
     return target
 
@@ -615,6 +619,7 @@ def BuildTizenTarget():
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("asan", use_asan=True)
     target.AppendModifier("ubsan", use_ubsan=True)
+    target.AppendModifier('with-ui', with_ui=True)
 
     return target
 
@@ -655,6 +660,7 @@ def BuildBouffalolabTarget():
     target.AppendModifier('thread', enable_thread=True)
     target.AppendModifier('fp', enable_frame_ptr=True)
     target.AppendModifier('memmonitor', enable_heap_monitoring=True)
+    target.AppendModifier('mot', use_matter_openthread=True)
 
     return target
 
@@ -719,9 +725,12 @@ def BuildTelinkTarget():
         TargetPart('window-covering', app=TelinkApp.WINDOW_COVERING),
     ])
 
+    target.AppendModifier('ota', enable_ota=True)
+    target.AppendModifier('dfu', enable_dfu=True)
     target.AppendModifier('shell', enable_shell=True)
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('factory-data', enable_factory_data=True)
+    target.AppendModifier('4mb', enable_4mb_flash=True)
 
     return target
 

@@ -73,7 +73,7 @@ tests:
       response:
           value: 0x80
           constraints:
-              type: int8u
+              type: bitmap8
 
     - label: "Step 6: TH reads from the DUT the (0x0004) NameSupport attribute"
       PICS: S.S.A0004 && (!S.S.F00)
@@ -82,7 +82,7 @@ tests:
       response:
           value: 0x00
           constraints:
-              type: int8u
+              type: bitmap8
 
     - label:
           "Step 7: TH reads from the DUT the (0x0005) LastConfiguredBy attribute"

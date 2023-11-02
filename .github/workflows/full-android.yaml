@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-android:1
+            image: ghcr.io/project-chip/chip-build-android:22
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -63,6 +63,7 @@ jobs:
               # This should not generally be needed, however android CI runs out of space
               # We do not need pigweed cross compile here because we use android NDK
               # compilers. Removing this package saves a significant amount of space.
+              continue-on-error: true
               run: |
                 du -sh .environment/cipd/packages/arm
                 rm -rf .environment/cipd/packages/arm

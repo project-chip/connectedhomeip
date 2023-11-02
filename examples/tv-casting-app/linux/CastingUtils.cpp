@@ -100,7 +100,8 @@ void InitCommissioningFlow(intptr_t commandArg)
             CastingServer::GetInstance()->GetDiscoveredCommissioner(i, associatedConnectableVideoPlayer);
         if (commissioner != nullptr)
         {
-            ChipLogProgress(AppServer, "Discovered Commissioner #%d", commissionerCount++);
+            ChipLogProgress(AppServer, "Discovered Commissioner #%d", commissionerCount);
+            commissionerCount++;
             commissioner->LogDetail();
             if (associatedConnectableVideoPlayer.HasValue())
             {

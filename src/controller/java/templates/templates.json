@@ -35,16 +35,6 @@
     ],
     "templates": [
         {
-            "path": "ChipStructs-java.zapt",
-            "name": "CHIP structs for Java",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipStructs.java"
-        },
-        {
-            "path": "ChipEventStructs-java.zapt",
-            "name": "CHIP Event structs for Java",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipEventStructs.java"
-        },
-        {
             "path": "CHIPInvokeCallbacks.zapt",
             "name": "CHIP cluster invoke callbacks for Java (native code)",
             "output": "src/controller/java/zap-generated/CHIPInvokeCallbacks.h"
@@ -78,16 +68,6 @@
             "path": "CHIPEventTLVValueDecoder-src.zapt",
             "name": "CHIP cluster event decoder for Java (native code)",
             "output": "src/controller/java/zap-generated/CHIPEventTLVValueDecoder.cpp"
-        },
-        {
-            "path": "ChipClusters-java.zapt",
-            "name": "CHIP ZCL API for Java",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipClusters.java"
-        },
-        {
-            "path": "ClusterInfo-java.zapt",
-            "name": "Cluster information mapping for Java",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterInfoMapping.java"
         }
     ]
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2021 Project CHIP Authors
+Copyright (c) 2021-2023 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,13 +25,13 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
 
-    <attribute side="server" code="0x0000" define="APPLICATION_LAUNCHER_LIST"        type="ARRAY" entryType="INT16U" length="254" reportable="true"  writable="false" optional="true">CatalogList</attribute>
-    <attribute side="server" code="0x0001" define="APPLICATION_LAUNCHER_CURRENT_APP" type="ApplicationEPStruct"      default="0x0" isNullable="true" writable="true"  optional="true">CurrentApp</attribute>
+    <attribute side="server" code="0x0000" define="APPLICATION_LAUNCHER_LIST"        type="ARRAY" entryType="int16u" reportable="true"  writable="false" optional="true">CatalogList</attribute>
+    <attribute side="server" code="0x0001" define="APPLICATION_LAUNCHER_CURRENT_APP" type="ApplicationEPStruct"      isNullable="true" writable="false"  optional="true">CurrentApp</attribute>
 
     <command source="client" code="0x00" name="LaunchApp" response="LauncherResponse" optional="false">
       <description>Upon receipt, this SHALL launch the specified app with optional data. The TV Device SHALL launch and bring to foreground the identified application in the command if the application is not already launched and in foreground. The TV Device SHALL update state attribute on the Application Basic cluster of the Endpoint corresponding to the launched application. This command returns a Launch Response.</description>
       <arg name="Application" type="ApplicationStruct" optional="true"/>
-      <arg name="Data"  type="OCTET_STRING" optional="true"/>
+      <arg name="Data"  type="octet_string" optional="true"/>
     </command>
 
     <command source="client" code="0x01" name="StopApp" response="LauncherResponse" optional="false">
@@ -46,8 +46,8 @@ limitations under the License.
 
     <command source="server" code="0x03" name="LauncherResponse" optional="false">
       <description>This command SHALL be generated in response to LaunchApp commands.</description>
-      <arg name="Status" type="ApplicationLauncherStatusEnum"/>
-      <arg name="Data" type="OCTET_STRING" optional="true"/>
+      <arg name="Status" type="StatusEnum"/>
+      <arg name="Data" type="octet_string" optional="true"/>
     </command>
 
   </cluster>
@@ -55,7 +55,7 @@ limitations under the License.
   <struct name="ApplicationEPStruct">
     <cluster code="0x050c"/>
     <item name="Application" type="ApplicationStruct"/>
-    <item name="Endpoint" type="ENDPOINT_NO" optional="true"/>
+    <item name="Endpoint" type="endpoint_no" optional="true"/>
   </struct>
       
   <struct name="ApplicationStruct">
@@ -65,18 +65,18 @@ limitations under the License.
          definitions are identical, but if that ever stops being the case, we
          will need to stop using a single definition with two cluster codes -->
     <cluster code="0x050d"/>
-    <item name="CatalogVendorID" type="INT16U"/>
-    <item name="ApplicationID" type="CHAR_STRING"/>
+    <item name="CatalogVendorID" type="int16u"/>
+    <item name="ApplicationID" type="char_string"/>
   </struct>
 
-  <enum name="ApplicationLauncherStatusEnum" type="ENUM8">
+  <enum name="StatusEnum" type="enum8">
     <cluster code="0x050c"/>
     <item name="Success" value="0x00"/>
     <item name="AppNotAvailable" value="0x01"/>
     <item name="SystemBusy" value="0x02"/>
   </enum>
 
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x050c"/>
     <field name="ApplicationPlatform" mask="0x1"/>
   </bitmap>

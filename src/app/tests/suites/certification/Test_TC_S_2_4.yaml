@@ -22,12 +22,9 @@ config:
     nodeId: 0x12344321
     cluster: "Scenes"
     endpoint: 1
-
-    GroupKeyManagement.Endpoint: 0
     G1:
-        type: int16u
+        type: group_id
         defaultValue: 0x0001
-    Groups.Endpoint: 1
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -42,7 +39,7 @@ tests:
           "Step 0a: preparation step for using commands from Groups cluster: Add
           KeySet"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: 0
       command: "KeySetWrite"
       arguments:
           values:
@@ -63,7 +60,7 @@ tests:
           "Step 0b: Preparation step for using commands from Groups cluster:
           Write Group Keys"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: 0
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
@@ -72,7 +69,6 @@ tests:
     - label: "Step 0c: TH sends a RemoveAllGroups command to DUT."
       PICS: G.S.C04.Rsp
       cluster: "Groups"
-      endpoint: Groups.Endpoint
       command: "RemoveAllGroups"
 
     - label:
@@ -423,7 +419,7 @@ tests:
           KeySetRemove command to the GroupKeyManagement cluster with the
           GroupKeySetID field set to 0x01a1"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: 0
       command: "KeySetRemove"
       arguments:
           values:

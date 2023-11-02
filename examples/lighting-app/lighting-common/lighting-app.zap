@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 98,
+  "featureLevel": 99,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -293,7 +293,7 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
@@ -658,7 +658,7 @@
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1543,6 +1543,22 @@
               "source": "client",
               "isIncoming": 1,
               "isEnabled": 1
+            },
+            {
+              "name": "TimeSnapshot",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "TimeSnapshotResponse",
+              "code": 2,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
             }
           ],
           "attributes": [
@@ -1716,7 +1732,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "0x0002",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1843,7 +1859,7 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
@@ -2881,7 +2897,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveNetworkFaultsList",
+              "name": "ActiveNetworkFaults",
               "code": 62,
               "mfgCode": null,
               "side": "server",
@@ -3563,7 +3579,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "int16u",
+              "type": "vendor_id",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -3973,7 +3989,7 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
@@ -3989,7 +4005,7 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
@@ -4384,6 +4400,7 @@
           "define": "SCENES_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "AddScene",
@@ -4701,7 +4718,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "7",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

@@ -284,7 +284,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     uint8_t scene_count = 0;
     uint16_t max_scenes_per_fabric;
     uint16_t max_scenes_per_endpoint;
-    SceneStorageId scene_map[kMaxScenesPerFabric];
+    SceneStorageId scene_map[CHIP_CONFIG_MAX_SCENES_TABLE_SIZE];
 
     FabricSceneData(EndpointId endpoint = kInvalidEndpointId, FabricIndex fabric = kUndefinedFabricIndex,
                     uint16_t maxScenesPerFabric = kMaxScenesPerFabric, uint16_t maxScenesPerEndpoint = kMaxScenesPerEndpoint) :
@@ -928,8 +928,9 @@ void DefaultSceneTableImpl::SetEndpoint(EndpointId endpoint)
 void DefaultSceneTableImpl::SetTableSize(uint16_t endpointSceneTableSize)
 {
     // Verify the endpoint passed size respects the limits of the device configuration
+    VerifyOrDie(kMaxScenesPerEndpoint > 0);
     mMaxScenesPerEndpoint = (kMaxScenesPerEndpoint < endpointSceneTableSize) ? kMaxScenesPerEndpoint : endpointSceneTableSize;
-    mMaxScenesPerFabric   = static_cast<uint16_t>(endpointSceneTableSize / 2);
+    mMaxScenesPerFabric   = static_cast<uint16_t>((mMaxScenesPerEndpoint - 1) / 2);
 }
 
 DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntries(FabricIndex fabric)

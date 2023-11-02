@@ -87,6 +87,8 @@ tests:
           SelectedTemperatureLevel attribute"
       PICS: TCTL.S.A0004
       verification: |
+          After a few seconds, please send the below mentioned command to read SelectedTemperatureLevel attribute from TH to DUT
+
           ./chip-tool temperaturecontrol read selected-temperature-level 1 1
           On TH(chip-tool), Verify that the DUT response contains a temperatureValue and the value is the same setLevel value written in step 4
           [1692265713.881978][13985:13987] CHIP:DMG: }
@@ -128,6 +130,8 @@ tests:
           SelectedTemperatureLevel attribute"
       PICS: TCTL.S.M.SupportsInvalidInMode && TCTL.S.A0004
       verification: |
+          After a few seconds, please send the below mentioned command to read SelectedTemperatureLevel attribute from TH to DUT
+
           ./chip-tool temperaturecontrol read selected-temperature-level 1 1
           On TH(chip-tool), Verify that the DUT response contains a temperatureValue and the value is the same setLevel value written in step 4
           [1692265822.762570][14005:14007] CHIP:DMG:         SuppressResponse = true,

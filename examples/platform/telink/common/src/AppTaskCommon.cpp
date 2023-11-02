@@ -31,13 +31,8 @@
 #include <app/util/attribute-storage.h>
 
 #if CONFIG_CHIP_OTA_REQUESTOR
-#include "OTAUtil.h"
-#endif
-
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
-#include <zephyr/dfu/mcuboot.h>
-#endif /* CONFIG_BOOTLOADER_MCUBOOT */
+#endif
 
 #include <zephyr/fs/nvs.h>
 #include <zephyr/settings/settings.h>
@@ -312,30 +307,6 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 #endif
 
-#if CONFIG_CHIP_OTA_REQUESTOR
-    InitBasicOTARequestor();
-#endif
-
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
-#if CONFIG_CHIP_OTA_REQUESTOR
-    if (GetRequestorInstance()->GetCurrentUpdateState() == Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kIdle &&
-        mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
-#else
-    if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
-#endif
-    {
-        int img_confirmation = boot_write_img_confirmed();
-        if (img_confirmation)
-        {
-            LOG_ERR("Image not confirmed %d. Will be reverted!", img_confirmation);
-        }
-        else
-        {
-            LOG_INF("Image confirmed");
-        }
-    }
-#endif /* CONFIG_BOOTLOADER_MCUBOOT */
-
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
@@ -380,18 +351,24 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
 
     switch (btnId)
     {
+#if APP_USE_EXAMPLE_START_BUTTON
     case kButtonId_ExampleAction:
         ExampleActionButtonEventHandler();
         break;
+#endif
     case kButtonId_FactoryReset:
         FactoryResetButtonEventHandler();
         break;
+#if APP_USE_THREAD_START_BUTTON
     case kButtonId_StartThread:
         StartThreadButtonEventHandler();
         break;
+#endif
+#if APP_USE_BLE_START_BUTTON
     case kButtonId_StartBleAdv:
         StartBleAdvButtonEventHandler();
         break;
+#endif
     }
 }
 #endif
@@ -702,11 +679,16 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         UpdateStatusLED();
 #endif
         break;
-    case DeviceEventType::kThreadConnectivityChange:
+    case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
-        if (event->ThreadConnectivityChange.Result == kConnectivity_Established)
+        InitBasicOTARequestor();
+        if (GetRequestorInstance()->GetCurrentUpdateState() == Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kIdle)
         {
-            InitBasicOTARequestor();
+#endif
+#ifdef CONFIG_BOOTLOADER_MCUBOOT
+            OtaConfirmNewImage();
+#endif /* CONFIG_BOOTLOADER_MCUBOOT */
+#if CONFIG_CHIP_OTA_REQUESTOR
         }
 #endif
         break;

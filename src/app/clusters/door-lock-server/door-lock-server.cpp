@@ -202,6 +202,18 @@ bool DoorLockServer::SetPrivacyModeButton(chip::EndpointId endpointId, bool isEn
     return SetAttribute(endpointId, Attributes::EnablePrivacyModeButton::Id, Attributes::EnablePrivacyModeButton::Set, isEnabled);
 }
 
+void DoorLockServer::HandleLocalLockOperationError(chip::EndpointId endpointId, LockOperationTypeEnum opType,
+                                                   OperationSourceEnum opSource, Nullable<uint16_t> userId)
+{
+    SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kInvalidCredential, userId,
+                           Nullable<chip::FabricIndex>(), Nullable<chip::NodeId>(), Nullable<List<const LockOpCredentials>>(),
+                           false);
+
+    HandleWrongCodeEntry(endpointId);
+
+    ChipLogProgress(Zcl, "Handling a local Lock Operation Error: [endpoint=%d, user=%d]", endpointId, userId.Value());
+}
+
 bool DoorLockServer::HandleWrongCodeEntry(chip::EndpointId endpointId)
 {
     auto endpointContext = getContext(endpointId);
@@ -1815,7 +1827,7 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
         return static_cast<EmberAfStatus>(DlStatus::kOccupied);
     }
 
-    const auto & newUserName                = !userName.IsNull() ? userName.Value() : chip::CharSpan::fromCharString("");
+    const auto & newUserName                = !userName.IsNull() ? userName.Value() : ""_span;
     auto newUserUniqueId                    = userUniqueId.IsNull() ? 0xFFFFFFFF : userUniqueId.Value();
     auto newUserStatus                      = userStatus.IsNull() ? UserStatusEnum::kOccupiedEnabled : userStatus.Value();
     auto newUserType                        = userType.IsNull() ? UserTypeEnum::kUnrestrictedUser : userType.Value();
