@@ -47,9 +47,9 @@ Once a commissioning is completed for the device, is is possible to rerun the to
 python3 '/Users/renejosefsen/Developer/GitData/connectedhomeip/src/tools/device-graph/matter-device-graph.py'
 ```
 
-# How to open graph
+# How to view graph
 
-In order to open the graph, any tool that can render dot/graphviz files should be useable.
+In order to view the graph, any tool that can render dot/graphviz files should be useable.
 
 It is possible to open dot files and get them rendered in vscode using this extension:
 https://marketplace.visualstudio.com/items?itemName=joaompinto.vscode-graphviz
