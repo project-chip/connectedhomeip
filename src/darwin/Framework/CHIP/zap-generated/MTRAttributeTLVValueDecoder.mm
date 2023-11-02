@@ -3131,7 +3131,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
         }
         return value;
     }
@@ -3146,7 +3146,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
         }
         return value;
     }
@@ -3161,7 +3161,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
         }
         return value;
     }
