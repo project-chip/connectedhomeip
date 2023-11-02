@@ -77,7 +77,7 @@ public:
     {}
 
     CHIP_ERROR ScannerInit(BluezAdapter1 * adapter) { return mScanner.Init(adapter, this); }
-    CHIP_ERROR ScannerStartScan(System::Clock::Timeout timeout) { return mScanner.StartScan(timeout); }
+    CHIP_ERROR ScannerStartScan(chip::System::Clock::Timeout timeout) { return mScanner.StartScan(timeout); }
 
     void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
     {
