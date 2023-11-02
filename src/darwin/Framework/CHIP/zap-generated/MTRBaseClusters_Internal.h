@@ -172,6 +172,10 @@
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @end
 
+@interface MTRBaseClusterTimer ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@end
+
 @interface MTRBaseClusterModeSelect ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @end

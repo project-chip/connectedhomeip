@@ -1515,6 +1515,29 @@ enum class UserActiveModeTriggerBitmap : uint32_t
 };
 } // namespace IcdManagement
 
+namespace Timer {
+
+// Enum for TimerStatusEnum
+enum class TimerStatusEnum : uint8_t
+{
+    kRunning = 0x00,
+    kPaused  = 0x01,
+    kExpired = 0x02,
+    kReady   = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kReset = 0x1,
+};
+} // namespace Timer
+
 namespace ModeSelect {
 
 // Bitmap for Feature

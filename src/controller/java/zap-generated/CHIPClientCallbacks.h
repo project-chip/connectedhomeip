@@ -471,6 +471,14 @@ typedef void (*IcdManagementEventListListAttributeCallback)(void * context,
                                                             const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*IcdManagementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*TimerGeneratedCommandListListAttributeCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TimerAcceptedCommandListListAttributeCallback)(void * context,
+                                                              const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TimerEventListListAttributeCallback)(void * context,
+                                                    const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*TimerAttributeListListAttributeCallback)(void * context,
+                                                        const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*ModeSelectSupportedModesListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & data);

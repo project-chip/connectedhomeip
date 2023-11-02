@@ -244,6 +244,8 @@ if (current_os == "android" || matter_enable_java_compilation) {
       "jni/TimeFormatLocalizationClient-ReadImpl.cpp",
       "jni/TimeSynchronizationClient-InvokeSubscribeImpl.cpp",
       "jni/TimeSynchronizationClient-ReadImpl.cpp",
+      "jni/TimerClient-InvokeSubscribeImpl.cpp",
+      "jni/TimerClient-ReadImpl.cpp",
       "jni/TotalVolatileOrganicCompoundsConcentrationMeasurementClient-InvokeSubscribeImpl.cpp",
       "jni/TotalVolatileOrganicCompoundsConcentrationMeasurementClient-ReadImpl.cpp",
       "jni/UnitLocalizationClient-InvokeSubscribeImpl.cpp",

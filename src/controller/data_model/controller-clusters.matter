@@ -2792,6 +2792,51 @@ client cluster IcdManagement = 70 {
   command access(invoke: manage) StayActiveRequest(): DefaultSuccess = 3;
 }
 
+/** This cluster supports creating a simple timer functionality. */
+provisional client cluster Timer = 71 {
+  enum TimerStatusEnum : enum8 {
+    kRunning = 0;
+    kPaused = 1;
+    kExpired = 2;
+    kReady = 3;
+  }
+
+  bitmap Feature : bitmap32 {
+    kReset = 0x1;
+  }
+
+  readonly attribute elapsed_s setTime = 0;
+  readonly attribute elapsed_s timeRemaining = 1;
+  readonly attribute TimerStatusEnum timerState = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetTimerRequest {
+    elapsed_s newTime = 0;
+  }
+
+  request struct AddTimeRequest {
+    elapsed_s additionalTime = 0;
+  }
+
+  request struct ReduceTimeRequest {
+    elapsed_s timeReduction = 0;
+  }
+
+  /** This command is used to set the timer. */
+  command SetTimer(SetTimerRequest): DefaultSuccess = 0;
+  /** This command is used to reset the timer to the original value. */
+  command ResetTimer(): DefaultSuccess = 1;
+  /** This command is used to add time to the existing timer. */
+  command AddTime(AddTimeRequest): DefaultSuccess = 2;
+  /** This command is used to reduce time on the existing timer. */
+  command ReduceTime(ReduceTimeRequest): DefaultSuccess = 3;
+}
+
 /** Attributes and commands for selecting a mode from a list of supported options. */
 client cluster ModeSelect = 80 {
   bitmap Feature : bitmap32 {

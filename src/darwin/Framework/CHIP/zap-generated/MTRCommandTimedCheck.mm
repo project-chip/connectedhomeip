@@ -374,6 +374,15 @@ static BOOL CommandNeedsTimedInvokeInICDManagementCluster(AttributeId aAttribute
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInTimerCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Timer;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInModeSelectCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ModeSelect;
@@ -1034,6 +1043,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::IcdManagement::Id: {
         return CommandNeedsTimedInvokeInICDManagementCluster(commandID);
+    }
+    case Clusters::Timer::Id: {
+        return CommandNeedsTimedInvokeInTimerCluster(commandID);
     }
     case Clusters::ModeSelect::Id: {
         return CommandNeedsTimedInvokeInModeSelectCluster(commandID);

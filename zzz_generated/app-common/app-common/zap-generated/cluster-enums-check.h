@@ -1215,6 +1215,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(Timer::TimerStatusEnum val)
+{
+    using EnumType = Timer::TimerStatusEnum;
+    switch (val)
+    {
+    case EnumType::kRunning:
+    case EnumType::kPaused:
+    case EnumType::kExpired:
+    case EnumType::kReady:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherControls::NumberOfRinsesEnum val)
 {
     using EnumType = LaundryWasherControls::NumberOfRinsesEnum;

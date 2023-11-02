@@ -148,6 +148,9 @@ static constexpr ClusterId Id = 0x00000045;
 namespace IcdManagement {
 static constexpr ClusterId Id = 0x00000046;
 } // namespace IcdManagement
+namespace Timer {
+static constexpr ClusterId Id = 0x00000047;
+} // namespace Timer
 namespace ModeSelect {
 static constexpr ClusterId Id = 0x00000050;
 } // namespace ModeSelect
