@@ -329,48 +329,66 @@ void OTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * comman
 {
     assertChipStackLockedByCurrentThread();
 
-    VerifyOrReturn(mOtaProviderDelegate.HasValidObjectRef(),
-                   commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
-
-    NodeId nodeId = commandObj->GetSubjectDescriptor().subject;
-
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    NodeId nodeId = kUndefinedNodeId;
     ConcreteCommandPath cachedCommandPath(commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    jobject otaProviderDelegate = mOtaProviderDelegate.ObjectRef();
-    chip::JniLocalReferenceManager manager(env);
+    jobject otaProviderDelegate = nullptr;
+    jobject jResponse = nullptr;
     jmethodID handleApplyUpdateRequestMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, otaProviderDelegate, "handleApplyUpdateRequest",
+    jmethodID getActionMethod;
+    jmethodID getDelayedActionTimeMethod;
+
+    chip::JniLocalReferenceManager manager(env);
+
+    Commands::ApplyUpdateResponse::Type response;
+    Commands::ApplyUpdateResponse::Type errorResponse;
+    errorResponse.action = ApplyUpdateActionEnum::kDiscontinue;
+    errorResponse.delayedActionTime = 0;
+
+    jint jAction = 0;
+    jlong jDelayedActionTime = 0;
+
+    VerifyOrExit(mOtaProviderDelegate.HasValidObjectRef(),
+                   commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
+
+    nodeId = commandObj->GetSubjectDescriptor().subject;
+
+    otaProviderDelegate = mOtaProviderDelegate.ObjectRef();
+    
+    err = JniReferences::GetInstance().FindMethod(env, otaProviderDelegate, "handleApplyUpdateRequest",
                                                              "(JJ)Lchip/devicecontroller/OTAProviderDelegate$ApplyUpdateResponse;",
                                                              &handleApplyUpdateRequestMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find handleApplyUpdateRequest method"));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find handleApplyUpdateRequest method"));
 
-    jobject jResponse = env->CallObjectMethod(otaProviderDelegate, handleApplyUpdateRequestMethod, static_cast<jlong>(nodeId),
+    jResponse = env->CallObjectMethod(otaProviderDelegate, handleApplyUpdateRequestMethod, static_cast<jlong>(nodeId),
                                               static_cast<jlong>(commandData.newVersion));
     if (env->ExceptionCheck())
     {
         ChipLogError(Support, "Exception in call java method");
         env->ExceptionDescribe();
         env->ExceptionClear();
-        return;
+        ExitNow();
     }
 
-    jmethodID getActionMethod;
     err = JniReferences::GetInstance().FindMethod(env, jResponse, "getAction", "()I", &getActionMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find getAction method"));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find getAction method"));
 
-    jmethodID getDelayedActionTimeMethod;
     err = JniReferences::GetInstance().FindMethod(env, jResponse, "getDelayedActionTime", "()J", &getDelayedActionTimeMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find getDelayedActionTime method"));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find getDelayedActionTime method"));
 
-    jint jAction             = env->CallIntMethod(jResponse, getActionMethod);
-    jlong jDelayedActionTime = env->CallLongMethod(jResponse, getDelayedActionTimeMethod);
+    jAction             = env->CallIntMethod(jResponse, getActionMethod);
+    jDelayedActionTime = env->CallLongMethod(jResponse, getDelayedActionTimeMethod);
 
-    Commands::ApplyUpdateResponse::Type response;
+
     response.action            = static_cast<OTAApplyUpdateAction>(jAction);
     response.delayedActionTime = static_cast<uint32_t>(jDelayedActionTime);
     commandObj->AddResponse(cachedCommandPath, response);
+    return;
+exit:
+    commandObj->AddResponse(cachedCommandPath, errorResponse);
 }
 
 void OTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
