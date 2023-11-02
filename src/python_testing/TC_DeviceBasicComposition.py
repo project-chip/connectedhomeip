@@ -39,6 +39,13 @@ from mobly import asserts
 from spec_parsing_support import CommandType, build_xml_clusters
 
 
+ATTRIBUTE_LIST_ID = 0xFFFB
+ACCEPTED_COMMAND_LIST_ID = 0xFFF9
+GENERATED_COMMAND_LIST_ID = 0xFFF8
+FEATURE_MAP_ID = 0xFFFC
+CLUSTER_REVISION_ID = 0xFFFD
+
+
 def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
     """Given TLV data for a specific cluster instance, convert to the Matter JSON format."""
 
@@ -474,12 +481,6 @@ class TC_DeviceBasicComposition(MatterBaseTest):
             id: int
             name: str
             validators: list[Callable]
-
-        ATTRIBUTE_LIST_ID = 0xFFFB
-        ACCEPTED_COMMAND_LIST_ID = 0xFFF9
-        GENERATED_COMMAND_LIST_ID = 0xFFF8
-        FEATURE_MAP_ID = 0xFFFC
-        CLUSTER_REVISION_ID = 0xFFFD
 
         ATTRIBUTES_TO_CHECK = [
             RequiredMandatoryAttribute(id=CLUSTER_REVISION_ID, name="ClusterRevision", validators=[check_int_in_range(1, 0xFFFF)]),
@@ -1032,15 +1033,9 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                                         problem='Standard cluster found on device, but is not present in spec data')
                     continue
 
-                # TODO: switch to use global FEATURE_MAP_ID etc. once the IDM-10.1 change is merged.
-                FEATURE_MAP_ID = 0xFFFC
-                ATTRIBUTE_LIST_ID = 0xFFFB
-                ACCEPTED_COMMAND_ID = 0xFFF9
-                GENERATED_COMMAND_ID = 0xFFF8
-
                 feature_map = cluster[FEATURE_MAP_ID]
                 attribute_list = cluster[ATTRIBUTE_LIST_ID]
-                all_command_list = cluster[ACCEPTED_COMMAND_ID] + cluster[GENERATED_COMMAND_ID]
+                all_command_list = cluster[ACCEPTED_COMMAND_LIST_ID] + cluster[GENERATED_COMMAND_LIST_ID]
 
                 # Feature conformance checking
                 feature_masks = [1 << i for i in range(32) if feature_map & (1 << i)]
