@@ -46,11 +46,11 @@ CHIP_ERROR ASRFactoryDataProvider::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_ENABLE_ASR_FACTORY_DATA_PROVIDER
-    uint8_t ret = asr_factory_check();
-    if (ret != 0)
+    factory_error_t ret = asr_factory_check();
+    if (ret != FACTORY_NO_ERROR)
     {
         err = CHIP_ERROR_INTERNAL;
-        ChipLogError(DeviceLayer, "ASR factory data check failed.");
+        ChipLogError(DeviceLayer, "ASR factory data check failed. err = %d", ret);
     }
 #endif
     return err;

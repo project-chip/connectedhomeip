@@ -28,7 +28,6 @@ config("asr_sdk_config") {
   _include_dirs = [
     "${asr_sdk_build_root}/asr_sdk/config",
     "${asr_sdk_build_root}/asr_sdk/config/lwip_if",
-    "${asr_sdk_build_root}/asr_sdk/matter",
     "${asr_sdk_build_root}/asr_sdk/at_cmd",
     "${asr_sdk_build_root}/asr_sdk/common/alto/inc",
     "${asr_sdk_build_root}/asr_sdk/common/alto/easylogger",
