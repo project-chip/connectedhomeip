@@ -1680,13 +1680,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
-            jobject value_associationFailure;
-            std::string value_associationFailureClassName     = "java/lang/Integer";
-            std::string value_associationFailureCtorSignature = "(I)V";
-            jint jnivalue_associationFailure                  = static_cast<jint>(cppValue.associationFailure);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_associationFailureClassName.c_str(),
-                                                                       value_associationFailureCtorSignature.c_str(),
-                                                                       jnivalue_associationFailure, value_associationFailure);
+            jobject value_associationFailureCause;
+            std::string value_associationFailureCauseClassName     = "java/lang/Integer";
+            std::string value_associationFailureCauseCtorSignature = "(I)V";
+            jint jnivalue_associationFailureCause                  = static_cast<jint>(cppValue.associationFailureCause);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_associationFailureCauseClassName.c_str(), value_associationFailureCauseCtorSignature.c_str(),
+                jnivalue_associationFailureCause, value_associationFailureCause);
 
             jobject value_status;
             std::string value_statusClassName     = "java/lang/Integer";
@@ -1713,8 +1713,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
 
-            jobject value =
-                env->NewObject(associationFailureStructClass, associationFailureStructCtor, value_associationFailure, value_status);
+            jobject value = env->NewObject(associationFailureStructClass, associationFailureStructCtor,
+                                           value_associationFailureCause, value_status);
 
             return value;
         }

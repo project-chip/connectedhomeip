@@ -7565,7 +7565,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kAssociationFailure), associationFailure));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kAssociationFailureCause), associationFailureCause));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kStatus), status));
     return aWriter.EndContainer(outer);
 }
@@ -7584,9 +7584,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kAssociationFailure))
+        if (__context_tag == to_underlying(Fields::kAssociationFailureCause))
         {
-            err = DataModel::Decode(reader, associationFailure);
+            err = DataModel::Decode(reader, associationFailureCause);
         }
         else if (__context_tag == to_underlying(Fields::kStatus))
         {
