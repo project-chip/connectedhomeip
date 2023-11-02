@@ -33,43 +33,6 @@ namespace Internal {
 
 namespace {
 
-// Helper context for creating GDBusObjectManager with
-// chip::DeviceLayer::GLibMatterContextInvokeSync()
-struct GDBusCreateObjectManagerContext
-{
-    GDBusObjectManager * object = nullptr;
-    // Cancellable passed to g_dbus_object_manager_client_new_for_bus_sync()
-    // which later can be used to cancel the scan operation.
-    GCancellable * cancellable = nullptr;
-
-    GDBusCreateObjectManagerContext() : cancellable(g_cancellable_new()) {}
-    ~GDBusCreateObjectManagerContext()
-    {
-        g_object_unref(cancellable);
-        if (object != nullptr)
-        {
-            g_object_unref(object);
-        }
-    }
-};
-
-CHIP_ERROR MainLoopCreateObjectManager(GDBusCreateObjectManagerContext * context)
-{
-    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
-    // all D-Bus signals will be delivered to the GLib global default main context.
-    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
-
-    GAutoPtr<GError> err;
-    context->object = g_dbus_object_manager_client_new_for_bus_sync(
-        G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
-        bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
-        nullptr /* destroy notify */, context->cancellable, &MakeUniquePointerReceiver(err).Get());
-    VerifyOrReturnError(context->object != nullptr, CHIP_ERROR_INTERNAL,
-                        ChipLogError(Ble, "Failed to get DBUS object manager for device scanning: %s", err->message));
-
-    return CHIP_NO_ERROR;
-}
-
 /// Retrieve CHIP device identification info from the device advertising data
 bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDeviceIdentificationInfo & aDeviceInfo)
 {
@@ -89,18 +52,42 @@ bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDeviceIden
 
 } // namespace
 
-ChipDeviceScanner::ChipDeviceScanner(GDBusObjectManager * manager, BluezAdapter1 * adapter, GCancellable * cancellable,
-                                     ChipDeviceScannerDelegate * delegate) :
-    mManager(manager),
-    mAdapter(adapter), mCancellable(cancellable), mDelegate(delegate)
+CHIP_ERROR ChipDeviceScanner::Init(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate)
 {
-    g_object_ref(mAdapter);
-    g_object_ref(mCancellable);
-    g_object_ref(mManager);
+
+    // Make this function idempotent by shutting down previously initialized state if any.
+    Shutdown();
+
+    mAdapter     = BLUEZ_ADAPTER1(g_object_ref(adapter));
+    mCancellable = g_cancellable_new();
+    mDelegate    = delegate;
+
+    // Create the D-Bus object manager client object on the glib thread, so that all D-Bus signals
+    // will be delivered to the glib thread.
+    ReturnErrorOnFailure(PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](ChipDeviceScanner * self) {
+            // When creating D-Bus proxy object, the thread default context must be initialized.
+            VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+
+            GAutoPtr<GError> err;
+            self->mManager = g_dbus_object_manager_client_new_for_bus_sync(
+                G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
+                bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
+                nullptr /* destroy notify */, self->mCancellable, &MakeUniquePointerReceiver(err).Get());
+            VerifyOrReturnError(self->mManager != nullptr, CHIP_ERROR_INTERNAL,
+                                ChipLogError(Ble, "Failed to get D-Bus object manager for device scanning: %s", err->message));
+            return CHIP_NO_ERROR;
+        },
+        this));
+
+    mIsInitialized = true;
+    return CHIP_NO_ERROR;
 }
 
-ChipDeviceScanner::~ChipDeviceScanner()
+void ChipDeviceScanner::Shutdown()
 {
+    VerifyOrReturn(mIsInitialized);
+
     StopScan();
 
     // mTimerExpired should only be set to true in the TimerExpiredCallback, which means we are in that callback
@@ -110,33 +97,28 @@ ChipDeviceScanner::~ChipDeviceScanner()
         chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
     }
 
-    g_object_unref(mManager);
-    g_object_unref(mCancellable);
-    g_object_unref(mAdapter);
+    // Release resources on the glib thread. This is necessary because the D-Bus manager client
+    // object handles D-Bus signals. Otherwise, we might face a race when the manager object is
+    // released during a D-Bus signal being processed.
+    PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](ChipDeviceScanner * self) {
+            if (self->mManager != nullptr)
+                g_object_unref(self->mManager);
+            if (self->mAdapter != nullptr)
+                g_object_unref(self->mAdapter);
+            if (self->mCancellable != nullptr)
+                g_object_unref(self->mCancellable);
+            return CHIP_NO_ERROR;
+        },
+        this);
 
-    mManager     = nullptr;
-    mAdapter     = nullptr;
-    mCancellable = nullptr;
-    mDelegate    = nullptr;
-}
-
-std::unique_ptr<ChipDeviceScanner> ChipDeviceScanner::Create(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate)
-{
-    GDBusCreateObjectManagerContext context;
-    CHIP_ERROR err;
-
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopCreateObjectManager, &context);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Ble, "Failed to create BLE object manager"));
-
-    return std::make_unique<ChipDeviceScanner>(context.object, adapter, context.cancellable, delegate);
-
-exit:
-    return std::unique_ptr<ChipDeviceScanner>();
+    mIsInitialized = false;
 }
 
 CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
 {
     assertChipStackLockedByCurrentThread();
+    ReturnErrorCodeIf(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
     mIsScanning = true; // optimistic, to allow all callbacks to check this
@@ -169,7 +151,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
 void ChipDeviceScanner::TimerExpiredCallback(chip::System::Layer * layer, void * appState)
 {
     ChipDeviceScanner * chipDeviceScanner = static_cast<ChipDeviceScanner *>(appState);
-    chipDeviceScanner->MarkTimerExpired();
+    chipDeviceScanner->mTimerExpired      = true;
     chipDeviceScanner->mDelegate->OnScanError(CHIP_ERROR_TIMEOUT);
     chipDeviceScanner->StopScan();
 }
