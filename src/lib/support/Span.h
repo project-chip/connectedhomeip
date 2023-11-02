@@ -18,11 +18,13 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
-#include <string.h>
+#include <cstring>
 #include <type_traits>
 
+#include <lib/core/Unchecked.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
@@ -149,7 +151,10 @@ public:
         return Span(reinterpret_cast<T *>(&bytes[1]), length);
     }
 
-    // Allow creating CharSpans from a character string.
+    // Creates a CharSpan from a null-terminated C character string.
+    //
+    // Note that for string literals, the user-defined `_span` string
+    // literal operator should be used instead, e.g. `"Hello"_span`.
     template <class U, typename = std::enable_if_t<std::is_same<T, const U>::value && std::is_same<const char, T>::value>>
     static Span fromCharString(U * chars)
     {
@@ -162,10 +167,30 @@ public:
     template <typename U>
     bool operator==(const Span<U> & other) const = delete;
 
+    // Creates a Span without checking whether databuf is a null pointer.
+    //
+    // Note: The normal (checked) constructor should be used for general use;
+    // this overload exists for special use cases where databuf is guaranteed
+    // to be valid (not null) and a constexpr constructor is required.
+    //
+    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61648 prevents making
+    // operator""_span a friend (and this constructor private).
+
+    constexpr Span(UncheckedType tag, pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
+
 private:
     pointer mDataBuf;
     size_t mDataLen;
 };
+
+inline namespace literals {
+
+inline constexpr Span<const char> operator"" _span(const char * literal, size_t size)
+{
+    return Span<const char>(Unchecked, literal, size);
+}
+
+} // namespace literals
 
 namespace detail {
 

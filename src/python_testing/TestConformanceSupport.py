@@ -53,6 +53,7 @@ class TestConformanceSupport(MatterBaseTest):
         xml_callable = parse_callable_from_xml(et, self.params)
         for f in self.feature_maps:
             asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
+        asserts.assert_equal(str(xml_callable), 'M')
 
     @async_test_body
     async def test_conformance_optional(self):
@@ -61,6 +62,7 @@ class TestConformanceSupport(MatterBaseTest):
         xml_callable = parse_callable_from_xml(et, self.params)
         for f in self.feature_maps:
             asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
+        asserts.assert_equal(str(xml_callable), 'O')
 
     @async_test_body
     async def test_conformance_disallowed(self):
@@ -69,12 +71,14 @@ class TestConformanceSupport(MatterBaseTest):
         xml_callable = parse_callable_from_xml(et, self.params)
         for f in self.feature_maps:
             asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.DISALLOWED)
+        asserts.assert_equal(str(xml_callable), 'X')
 
         xml = '<deprecateConform />'
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
         for f in self.feature_maps:
             asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.DISALLOWED)
+        asserts.assert_equal(str(xml_callable), 'D')
 
     @async_test_body
     async def test_conformance_provisional(self):
@@ -83,6 +87,7 @@ class TestConformanceSupport(MatterBaseTest):
         xml_callable = parse_callable_from_xml(et, self.params)
         for f in self.feature_maps:
             asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.PROVISIONAL)
+        asserts.assert_equal(str(xml_callable), 'P')
 
     @async_test_body
     async def test_conformance_zigbee(self):
@@ -91,6 +96,7 @@ class TestConformanceSupport(MatterBaseTest):
         xml_callable = parse_callable_from_xml(et, self.params)
         for f in self.feature_maps:
             asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), 'Zigbee')
 
     @async_test_body
     async def test_conformance_mandatory_on_condition(self):
@@ -104,6 +110,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), 'AB')
 
         xml = ('<mandatoryConform>'
                '<feature name="CD" />'
@@ -115,6 +122,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), 'CD')
 
         # single attribute mandatory
         xml = ('<mandatoryConform>'
@@ -127,6 +135,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.MANDATORY)
             else:
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), 'attr1')
 
         xml = ('<mandatoryConform>'
                '<attribute name="attr2" />'
@@ -138,6 +147,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.MANDATORY)
             else:
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), 'attr2')
 
         # test command in optional and in boolean - this is the same as attribute essentially, so testing every permutation is overkill
 
@@ -154,6 +164,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '[AB]')
 
         xml = ('<optionalConform>'
                '<feature name="CD" />'
@@ -165,6 +176,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '[CD]')
 
         # single attribute optional
         xml = ('<optionalConform>'
@@ -177,6 +189,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.OPTIONAL)
             else:
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '[attr1]')
 
         xml = ('<optionalConform>'
                '<attribute name="attr2" />'
@@ -188,6 +201,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.OPTIONAL)
             else:
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '[attr2]')
 
         # single command optional
         xml = ('<optionalConform>'
@@ -200,6 +214,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(0x00, [], c), ConformanceDecision.OPTIONAL)
             else:
                 asserts.assert_equal(xml_callable(0x00, [], c), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '[cmd1]')
 
         xml = ('<optionalConform>'
                '<command name="cmd2" />'
@@ -211,6 +226,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(0x00, [], c), ConformanceDecision.OPTIONAL)
             else:
                 asserts.assert_equal(xml_callable(0x00, [], c), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '[cmd2]')
 
     @async_test_body
     async def test_conformance_not_term_mandatory(self):
@@ -227,6 +243,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '!AB')
 
         xml = ('<mandatoryConform>'
                '<notTerm>'
@@ -240,6 +257,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '!CD')
 
         # single attribute not mandatory
         xml = ('<mandatoryConform>'
@@ -254,6 +272,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.MANDATORY)
             else:
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '!attr1')
 
         xml = ('<mandatoryConform>'
                '<notTerm>'
@@ -267,6 +286,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.MANDATORY)
             else:
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '!attr2')
 
     @async_test_body
     async def test_conformance_not_term_optional(self):
@@ -283,6 +303,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '[!AB]')
 
         xml = ('<optionalConform>'
                '<notTerm>'
@@ -296,6 +317,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '[!CD]')
 
     @async_test_body
     async def test_conformance_and_term(self):
@@ -313,6 +335,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), 'AB & CD')
 
         # and term for attributes only
         xml = ('<mandatoryConform>'
@@ -328,6 +351,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.MANDATORY)
             else:
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), 'attr1 & attr2')
 
         # and term for feature and attribute
         xml = ('<mandatoryConform>'
@@ -344,6 +368,7 @@ class TestConformanceSupport(MatterBaseTest):
                     asserts.assert_equal(xml_callable(f, a, []), ConformanceDecision.MANDATORY)
                 else:
                     asserts.assert_equal(xml_callable(f, a, []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), 'AB & attr2')
 
     @async_test_body
     async def test_conformance_or_term(self):
@@ -361,6 +386,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), 'AB | CD')
 
         # or term attribute only
         xml = ('<mandatoryConform>'
@@ -376,6 +402,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.MANDATORY)
             else:
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), 'attr1 | attr2')
 
         # or term feature and attribute
         xml = ('<mandatoryConform>'
@@ -392,6 +419,7 @@ class TestConformanceSupport(MatterBaseTest):
                     asserts.assert_equal(xml_callable(f, a, []), ConformanceDecision.MANDATORY)
                 else:
                     asserts.assert_equal(xml_callable(f, a, []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), 'AB | attr2')
 
     @async_test_body
     async def test_conformance_and_term_with_not(self):
@@ -411,6 +439,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '[!AB & CD]')
 
     @async_test_body
     async def test_conformance_or_term_with_not(self):
@@ -430,6 +459,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), 'AB | !CD')
 
         # not around or term with
         xml = ('<optionalConform>'
@@ -447,6 +477,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '[!(AB | CD)]')
 
     @async_test_body
     async def test_conformance_and_term_with_three_terms(self):
@@ -467,6 +498,7 @@ class TestConformanceSupport(MatterBaseTest):
         asserts.assert_equal(xml_callable(0x01, [], []), ConformanceDecision.NOT_APPLICABLE)
         # all features
         asserts.assert_equal(xml_callable(0x07, [], []), ConformanceDecision.OPTIONAL)
+        asserts.assert_equal(str(xml_callable), '[AB & CD & EF]')
 
         # and term with one of each
         xml = ('<optionalConform>'
@@ -485,6 +517,7 @@ class TestConformanceSupport(MatterBaseTest):
                         asserts.assert_equal(xml_callable(f, a, c), ConformanceDecision.OPTIONAL)
                     else:
                         asserts.assert_equal(xml_callable(f, a, c), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '[AB & attr1 & cmd1]')
 
     @async_test_body
     async def test_conformance_or_term_with_three_terms(self):
@@ -504,6 +537,7 @@ class TestConformanceSupport(MatterBaseTest):
         asserts.assert_equal(xml_callable(0x01, [], []), ConformanceDecision.OPTIONAL)
         # all features
         asserts.assert_equal(xml_callable(0x07, [], []), ConformanceDecision.OPTIONAL)
+        asserts.assert_equal(str(xml_callable), '[AB | CD | EF]')
 
         # or term with one of each
         xml = ('<optionalConform>'
@@ -522,6 +556,7 @@ class TestConformanceSupport(MatterBaseTest):
                         asserts.assert_equal(xml_callable(f, a, c), ConformanceDecision.OPTIONAL)
                     else:
                         asserts.assert_equal(xml_callable(f, a, c), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), '[AB | attr1 | cmd1]')
 
     def test_conformance_otherwise(self):
         # AB, O
@@ -538,6 +573,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
+        asserts.assert_equal(str(xml_callable), 'AB, O')
 
         # AB, [CD]
         xml = ('<otherwiseConform>'
@@ -557,6 +593,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), 'AB, [CD]')
 
         # AB & !CD, P
         xml = ('<otherwiseConform>'
@@ -577,6 +614,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.PROVISIONAL)
+        asserts.assert_equal(str(xml_callable), 'AB & !CD, P')
 
 
 if __name__ == "__main__":

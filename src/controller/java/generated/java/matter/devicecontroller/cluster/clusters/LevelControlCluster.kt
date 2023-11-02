@@ -17,586 +17,384 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class LevelControlCluster(private val endpointId: UShort) {
+  class CurrentLevelAttribute(val value: UByte?)
+
+  class OnLevelAttribute(val value: UByte?)
+
+  class OnTransitionTimeAttribute(val value: UShort?)
+
+  class OffTransitionTimeAttribute(val value: UShort?)
+
+  class DefaultMoveRateAttribute(val value: UByte?)
+
+  class StartUpCurrentLevelAttribute(val value: UByte?)
+
+  class GeneratedCommandListAttribute(val value: List<UInt>)
+
+  class AcceptedCommandListAttribute(val value: List<UInt>)
+
+  class EventListAttribute(val value: List<UInt>)
+
+  class AttributeListAttribute(val value: List<UInt>)
+
+  suspend fun moveToLevel(
+    level: UByte,
+    transitionTime: UShort?,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun move(
+    moveMode: UInt,
+    rate: UByte?,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun step(
+    stepMode: UInt,
+    stepSize: UByte,
+    transitionTime: UShort?,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun stop(optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun moveToLevelWithOnOff(
+    level: UByte,
+    transitionTime: UShort?,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun moveWithOnOff(
+    moveMode: UInt,
+    rate: UByte?,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun stepWithOnOff(
+    stepMode: UInt,
+    stepSize: UByte,
+    transitionTime: UShort?,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun stopWithOnOff(
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun moveToClosestFrequency(frequency: UShort, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readCurrentLevelAttribute(): CurrentLevelAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentLevelAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CurrentLevelAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRemainingTimeAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRemainingTimeAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMinLevelAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMinLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMaxLevelAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMaxLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentFrequencyAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentFrequencyAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMinFrequencyAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMinFrequencyAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMaxFrequencyAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMaxFrequencyAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOptionsAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOptionsAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOptionsAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOptionsAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOnOffTransitionTimeAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOnOffTransitionTimeAttribute(value: UShort) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOnOffTransitionTimeAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOnOffTransitionTimeAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOnLevelAttribute(): OnLevelAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOnLevelAttribute(value: UByte) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOnLevelAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOnLevelAttribute(minInterval: Int, maxInterval: Int): OnLevelAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOnTransitionTimeAttribute(): OnTransitionTimeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOnTransitionTimeAttribute(value: UShort) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOnTransitionTimeAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOnTransitionTimeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): OnTransitionTimeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOffTransitionTimeAttribute(): OffTransitionTimeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOffTransitionTimeAttribute(value: UShort) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOffTransitionTimeAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOffTransitionTimeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): OffTransitionTimeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDefaultMoveRateAttribute(): DefaultMoveRateAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeDefaultMoveRateAttribute(value: UByte) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeDefaultMoveRateAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDefaultMoveRateAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): DefaultMoveRateAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readStartUpCurrentLevelAttribute(): StartUpCurrentLevelAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeStartUpCurrentLevelAttribute(value: UByte) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeStartUpCurrentLevelAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeStartUpCurrentLevelAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): StartUpCurrentLevelAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 8u
-  }
-
-  fun moveToLevel(
-    callback: DefaultClusterCallback,
-    level: Integer,
-    transitionTime: Integer?,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveToLevel(
-    callback: DefaultClusterCallback,
-    level: Integer,
-    transitionTime: Integer?,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun move(
-    callback: DefaultClusterCallback,
-    moveMode: Integer,
-    rate: Integer?,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun move(
-    callback: DefaultClusterCallback,
-    moveMode: Integer,
-    rate: Integer?,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun step(
-    callback: DefaultClusterCallback,
-    stepMode: Integer,
-    stepSize: Integer,
-    transitionTime: Integer?,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun step(
-    callback: DefaultClusterCallback,
-    stepMode: Integer,
-    stepSize: Integer,
-    transitionTime: Integer?,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stop(callback: DefaultClusterCallback, optionsMask: Integer, optionsOverride: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun stop(
-    callback: DefaultClusterCallback,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveToLevelWithOnOff(
-    callback: DefaultClusterCallback,
-    level: Integer,
-    transitionTime: Integer?,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveToLevelWithOnOff(
-    callback: DefaultClusterCallback,
-    level: Integer,
-    transitionTime: Integer?,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveWithOnOff(
-    callback: DefaultClusterCallback,
-    moveMode: Integer,
-    rate: Integer?,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveWithOnOff(
-    callback: DefaultClusterCallback,
-    moveMode: Integer,
-    rate: Integer?,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stepWithOnOff(
-    callback: DefaultClusterCallback,
-    stepMode: Integer,
-    stepSize: Integer,
-    transitionTime: Integer?,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stepWithOnOff(
-    callback: DefaultClusterCallback,
-    stepMode: Integer,
-    stepSize: Integer,
-    transitionTime: Integer?,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stopWithOnOff(
-    callback: DefaultClusterCallback,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stopWithOnOff(
-    callback: DefaultClusterCallback,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveToClosestFrequency(callback: DefaultClusterCallback, frequency: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun moveToClosestFrequency(
-    callback: DefaultClusterCallback,
-    frequency: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  interface CurrentLevelAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface OnLevelAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface OnTransitionTimeAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface OffTransitionTimeAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface DefaultMoveRateAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface StartUpCurrentLevelAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readCurrentLevelAttribute(callback: CurrentLevelAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentLevelAttribute(
-    callback: CurrentLevelAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRemainingTimeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRemainingTimeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMinLevelAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMinLevelAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMaxLevelAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMaxLevelAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCurrentFrequencyAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentFrequencyAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMinFrequencyAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMinFrequencyAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMaxFrequencyAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMaxFrequencyAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOptionsAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOptionsAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOptionsAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOptionsAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOnOffTransitionTimeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOnOffTransitionTimeAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOnOffTransitionTimeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOnOffTransitionTimeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOnLevelAttribute(callback: OnLevelAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOnLevelAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOnLevelAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOnLevelAttribute(
-    callback: OnLevelAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOnTransitionTimeAttribute(callback: OnTransitionTimeAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOnTransitionTimeAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOnTransitionTimeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOnTransitionTimeAttribute(
-    callback: OnTransitionTimeAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOffTransitionTimeAttribute(callback: OffTransitionTimeAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOffTransitionTimeAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOffTransitionTimeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOffTransitionTimeAttribute(
-    callback: OffTransitionTimeAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readDefaultMoveRateAttribute(callback: DefaultMoveRateAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeDefaultMoveRateAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeDefaultMoveRateAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeDefaultMoveRateAttribute(
-    callback: DefaultMoveRateAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readStartUpCurrentLevelAttribute(callback: StartUpCurrentLevelAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeStartUpCurrentLevelAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeStartUpCurrentLevelAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeStartUpCurrentLevelAttribute(
-    callback: StartUpCurrentLevelAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

@@ -17,459 +17,313 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class ScenesCluster(private val endpointId: UShort) {
+  class AddSceneResponse(val status: UShort, val groupID: UShort, val sceneID: UByte)
+
+  class ViewSceneResponse(
+    val status: UShort,
+    val groupID: UShort,
+    val sceneID: UByte,
+    val transitionTime: UShort?,
+    val sceneName: String?,
+    val extensionFieldSets: List<ScenesClusterExtensionFieldSet>?
+  )
+
+  class RemoveSceneResponse(val status: UShort, val groupID: UShort, val sceneID: UByte)
+
+  class RemoveAllScenesResponse(val status: UShort, val groupID: UShort)
+
+  class StoreSceneResponse(val status: UShort, val groupID: UShort, val sceneID: UByte)
+
+  class GetSceneMembershipResponse(
+    val status: UShort,
+    val capacity: UByte?,
+    val groupID: UShort,
+    val sceneList: List<UByte>?
+  )
+
+  class EnhancedAddSceneResponse(val status: UShort, val groupID: UShort, val sceneID: UByte)
+
+  class EnhancedViewSceneResponse(
+    val status: UShort,
+    val groupID: UShort,
+    val sceneID: UByte,
+    val transitionTime: UShort?,
+    val sceneName: String?,
+    val extensionFieldSets: List<ScenesClusterExtensionFieldSet>?
+  )
+
+  class CopySceneResponse(
+    val status: UShort,
+    val groupIdentifierFrom: UShort,
+    val sceneIdentifierFrom: UByte
+  )
+
+  class LastConfiguredByAttribute(val value: ULong?)
+
+  class GeneratedCommandListAttribute(val value: List<UInt>)
+
+  class AcceptedCommandListAttribute(val value: List<UInt>)
+
+  class EventListAttribute(val value: List<UInt>)
+
+  class AttributeListAttribute(val value: List<UInt>)
+
+  suspend fun addScene(
+    groupID: UShort,
+    sceneID: UByte,
+    transitionTime: UShort,
+    sceneName: String,
+    extensionFieldSets: List<ScenesClusterExtensionFieldSet>,
+    timedInvokeTimeoutMs: Int? = null
+  ): AddSceneResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun viewScene(
+    groupID: UShort,
+    sceneID: UByte,
+    timedInvokeTimeoutMs: Int? = null
+  ): ViewSceneResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun removeScene(
+    groupID: UShort,
+    sceneID: UByte,
+    timedInvokeTimeoutMs: Int? = null
+  ): RemoveSceneResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun removeAllScenes(
+    groupID: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ): RemoveAllScenesResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun storeScene(
+    groupID: UShort,
+    sceneID: UByte,
+    timedInvokeTimeoutMs: Int? = null
+  ): StoreSceneResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun recallScene(
+    groupID: UShort,
+    sceneID: UByte,
+    transitionTime: UShort?,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun getSceneMembership(
+    groupID: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ): GetSceneMembershipResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun enhancedAddScene(
+    groupID: UShort,
+    sceneID: UByte,
+    transitionTime: UShort,
+    sceneName: String,
+    extensionFieldSets: List<ScenesClusterExtensionFieldSet>,
+    timedInvokeTimeoutMs: Int? = null
+  ): EnhancedAddSceneResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun enhancedViewScene(
+    groupID: UShort,
+    sceneID: UByte,
+    timedInvokeTimeoutMs: Int? = null
+  ): EnhancedViewSceneResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun copyScene(
+    mode: UInt,
+    groupIdentifierFrom: UShort,
+    sceneIdentifierFrom: UByte,
+    groupIdentifierTo: UShort,
+    sceneIdentifierTo: UByte,
+    timedInvokeTimeoutMs: Int? = null
+  ): CopySceneResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readSceneCountAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSceneCountAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentSceneAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentSceneAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentGroupAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentGroupAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSceneValidAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSceneValidAttribute(minInterval: Int, maxInterval: Int): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNameSupportAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNameSupportAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLastConfiguredByAttribute(): LastConfiguredByAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLastConfiguredByAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): LastConfiguredByAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSceneTableSizeAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSceneTableSizeAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRemainingCapacityAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRemainingCapacityAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 5u
-  }
-
-  fun addScene(
-    callback: AddSceneResponseCallback,
-    groupID: Integer,
-    sceneID: Integer,
-    transitionTime: Integer,
-    sceneName: String,
-    extensionFieldSets: ArrayList<ChipStructs.ScenesClusterExtensionFieldSet>
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun addScene(
-    callback: AddSceneResponseCallback,
-    groupID: Integer,
-    sceneID: Integer,
-    transitionTime: Integer,
-    sceneName: String,
-    extensionFieldSets: ArrayList<ChipStructs.ScenesClusterExtensionFieldSet>,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun viewScene(callback: ViewSceneResponseCallback, groupID: Integer, sceneID: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun viewScene(
-    callback: ViewSceneResponseCallback,
-    groupID: Integer,
-    sceneID: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun removeScene(callback: RemoveSceneResponseCallback, groupID: Integer, sceneID: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun removeScene(
-    callback: RemoveSceneResponseCallback,
-    groupID: Integer,
-    sceneID: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun removeAllScenes(callback: RemoveAllScenesResponseCallback, groupID: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun removeAllScenes(
-    callback: RemoveAllScenesResponseCallback,
-    groupID: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun storeScene(callback: StoreSceneResponseCallback, groupID: Integer, sceneID: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun storeScene(
-    callback: StoreSceneResponseCallback,
-    groupID: Integer,
-    sceneID: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun recallScene(
-    callback: DefaultClusterCallback,
-    groupID: Integer,
-    sceneID: Integer,
-    transitionTime: Integer?
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun recallScene(
-    callback: DefaultClusterCallback,
-    groupID: Integer,
-    sceneID: Integer,
-    transitionTime: Integer?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun getSceneMembership(callback: GetSceneMembershipResponseCallback, groupID: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun getSceneMembership(
-    callback: GetSceneMembershipResponseCallback,
-    groupID: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun enhancedAddScene(
-    callback: EnhancedAddSceneResponseCallback,
-    groupID: Integer,
-    sceneID: Integer,
-    transitionTime: Integer,
-    sceneName: String,
-    extensionFieldSets: ArrayList<ChipStructs.ScenesClusterExtensionFieldSet>
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun enhancedAddScene(
-    callback: EnhancedAddSceneResponseCallback,
-    groupID: Integer,
-    sceneID: Integer,
-    transitionTime: Integer,
-    sceneName: String,
-    extensionFieldSets: ArrayList<ChipStructs.ScenesClusterExtensionFieldSet>,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun enhancedViewScene(
-    callback: EnhancedViewSceneResponseCallback,
-    groupID: Integer,
-    sceneID: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun enhancedViewScene(
-    callback: EnhancedViewSceneResponseCallback,
-    groupID: Integer,
-    sceneID: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun copyScene(
-    callback: CopySceneResponseCallback,
-    mode: Integer,
-    groupIdentifierFrom: Integer,
-    sceneIdentifierFrom: Integer,
-    groupIdentifierTo: Integer,
-    sceneIdentifierTo: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun copyScene(
-    callback: CopySceneResponseCallback,
-    mode: Integer,
-    groupIdentifierFrom: Integer,
-    sceneIdentifierFrom: Integer,
-    groupIdentifierTo: Integer,
-    sceneIdentifierTo: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  interface AddSceneResponseCallback {
-    fun onSuccess(status: Integer, groupID: Integer, sceneID: Integer)
-
-    fun onError(error: Exception)
-  }
-
-  interface ViewSceneResponseCallback {
-    fun onSuccess(
-      status: Integer,
-      groupID: Integer,
-      sceneID: Integer,
-      transitionTime: Integer?,
-      sceneName: String?,
-      extensionFieldSets: ArrayList<ChipStructs.ScenesClusterExtensionFieldSet>?
-    )
-
-    fun onError(error: Exception)
-  }
-
-  interface RemoveSceneResponseCallback {
-    fun onSuccess(status: Integer, groupID: Integer, sceneID: Integer)
-
-    fun onError(error: Exception)
-  }
-
-  interface RemoveAllScenesResponseCallback {
-    fun onSuccess(status: Integer, groupID: Integer)
-
-    fun onError(error: Exception)
-  }
-
-  interface StoreSceneResponseCallback {
-    fun onSuccess(status: Integer, groupID: Integer, sceneID: Integer)
-
-    fun onError(error: Exception)
-  }
-
-  interface GetSceneMembershipResponseCallback {
-    fun onSuccess(
-      status: Integer,
-      capacity: Integer?,
-      groupID: Integer,
-      sceneList: ArrayList<Integer>?
-    )
-
-    fun onError(error: Exception)
-  }
-
-  interface EnhancedAddSceneResponseCallback {
-    fun onSuccess(status: Integer, groupID: Integer, sceneID: Integer)
-
-    fun onError(error: Exception)
-  }
-
-  interface EnhancedViewSceneResponseCallback {
-    fun onSuccess(
-      status: Integer,
-      groupID: Integer,
-      sceneID: Integer,
-      transitionTime: Integer?,
-      sceneName: String?,
-      extensionFieldSets: ArrayList<ChipStructs.ScenesClusterExtensionFieldSet>?
-    )
-
-    fun onError(error: Exception)
-  }
-
-  interface CopySceneResponseCallback {
-    fun onSuccess(status: Integer, groupIdentifierFrom: Integer, sceneIdentifierFrom: Integer)
-
-    fun onError(error: Exception)
-  }
-
-  interface LastConfiguredByAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readSceneCountAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSceneCountAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCurrentSceneAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentSceneAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCurrentGroupAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentGroupAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSceneValidAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSceneValidAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNameSupportAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNameSupportAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLastConfiguredByAttribute(callback: LastConfiguredByAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLastConfiguredByAttribute(
-    callback: LastConfiguredByAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSceneTableSizeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSceneTableSizeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRemainingCapacityAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRemainingCapacityAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }
