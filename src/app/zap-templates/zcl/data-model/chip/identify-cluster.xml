@@ -62,11 +62,17 @@ limitations under the License.
       <arg name="IdentifyTime" type="int16u"/>
       <access op="invoke" privilege="manage"/>
     </command>
-    <command source="client" code="0x01" name="IdentifyQuery" optional="false">
-      <description>
+    <command source="client" code="0x01" name="IdentifyQuery" optional="true" response="IdentifyQueryResponse">
+    <description>
         This command allows the sending device to request the target or targets to respond if they are currently identifying themselves.
-      </description>
-      <access op="invoke" privilege="manage"/>
+    </description>
+    <access op="invoke" privilege="manage"/>
+    </command>
+    <command source="server" code="0x00" name="IdentifyQueryResponse" optional="true">
+    <description>
+        This command is generated in response to receiving an IdentifyQuery Command, in the case that the device is currently identifying itself
+    </description>
+    <arg name="Timeout" type="int16u"/>
     </command>
     <command source="client" code="0x40" name="TriggerEffect" optional="true">
       <description>
