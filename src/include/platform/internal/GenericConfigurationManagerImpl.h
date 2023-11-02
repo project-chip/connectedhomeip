@@ -103,7 +103,9 @@ public:
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override;
     CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override;
-    CHIP_ERROR RunUnitTests(void) override;
+#if CHIP_CONFIG_TEST
+    void RunUnitTests() override;
+#endif
     bool IsFullyProvisioned() override;
     void InitiateFactoryReset() override;
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
