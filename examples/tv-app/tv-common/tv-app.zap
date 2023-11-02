@@ -5500,7 +5500,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap32",
+              "type": "SupportedProtocolsBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -7142,7 +7142,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap32",
+              "type": "SupportedProtocolsBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -7637,5 +7637,6 @@
       "endpointId": 3,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }

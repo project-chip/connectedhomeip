@@ -6156,7 +6156,7 @@
               "code": 4,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "NameSupportBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -11634,7 +11634,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "type": "temperature",
+              "type": "int16u",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -12666,7 +12666,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap32",
+              "type": "SupportedProtocolsBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15403,7 +15403,7 @@
               "code": 4,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "NameSupportBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -16797,5 +16797,6 @@
       "endpointId": 65534,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }
