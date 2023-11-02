@@ -43,6 +43,10 @@ config FLASH
 config FPROTECT
     default y
 
+choice LIBC_IMPLEMENTATION
+    default MINIMAL_LIBC
+endchoice
+
 # nRF7002DK uses SPI NOR external flash
 if BOARD_NRF7002DK_NRF5340_CPUAPP
 
