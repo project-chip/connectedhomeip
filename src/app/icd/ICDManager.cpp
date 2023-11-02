@@ -53,9 +53,9 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     VerifyOrDie(symmetricKeystore != nullptr);
 
     bool supportLIT = SupportsFeature(Feature::kLongIdleTimeSupport);
-    VerifyOrDieWithMsg((supportLIT == false) || (supportLIT && SupportsFeature(Feature::kCheckInProtocolSupport)), AppServer,
+    VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kCheckInProtocolSupport), AppServer,
                        "The CheckIn protocol feature is required for LIT support");
-    VerifyOrDieWithMsg((supportLIT == false) || (supportLIT && SupportsFeature(Feature::kUserActiveModeTrigger)), AppServer,
+    VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kUserActiveModeTrigger), AppServer,
                        "The user ActiveMode trigger feature is required for LIT support");
 
     mStorage       = storage;
