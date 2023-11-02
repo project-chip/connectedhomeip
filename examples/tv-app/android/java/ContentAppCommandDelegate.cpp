@@ -253,7 +253,7 @@ LaunchResponseType ContentAppCommandDelegate::FormatContentLauncherResponse(Json
     }
     else
     {
-        launchResponse.status = static_cast<app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(value[statusFieldId].asInt());
+        launchResponse.status = static_cast<app::Clusters::ContentLauncher::StatusEnum>(value[statusFieldId].asInt());
         std::string dataFieldId =
             std::to_string(to_underlying(app::Clusters::ContentLauncher::Commands::LauncherResponse::Fields::kData));
         if (!value[dataFieldId].empty())

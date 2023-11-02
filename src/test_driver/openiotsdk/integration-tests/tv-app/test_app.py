@@ -373,7 +373,7 @@ def test_tv_ctrl(device, controller):
                                     autoPlay=True, data=None),
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == ContentLauncher.Enums.ContentLaunchStatusEnum.kSuccess
+    assert res.status == ContentLauncher.Enums.StatusEnum.kSuccess
     ret = device.wait_for_output("ContentLauncherManager::HandleLaunchContent")
     assert ret is not None and len(ret) > 0
     ret = device.wait_for_output("TEST CASE found match=TV Show Example type={}".format(TV_CTRL_TEST_CONTENT_PARAMETER_TYPE_1))
@@ -394,7 +394,7 @@ def test_tv_ctrl(device, controller):
                                      )),
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == ContentLauncher.Enums.ContentLaunchStatusEnum.kSuccess
+    assert res.status == ContentLauncher.Enums.StatusEnum.kSuccess
     ret = device.wait_for_output("ContentLauncherManager::HandleLaunchUrl")
     assert ret is not None and len(ret) > 0
     ret = device.wait_for_output("ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL={} DisplayString={} BrandingInformation.ProviderName={}".format(
