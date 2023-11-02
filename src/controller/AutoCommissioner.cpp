@@ -208,7 +208,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
             }
             else
             {
-                mTimeZoneBuf[i].name = NullOptional;
+                mTimeZoneBuf[i].name.ClearValue();
             }
         }
         auto list = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>(mTimeZoneBuf, size);

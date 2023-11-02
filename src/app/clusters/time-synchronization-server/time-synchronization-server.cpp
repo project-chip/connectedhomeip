@@ -1292,7 +1292,7 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
         }
         bool isDomain = GetDelegate()->IsNTPAddressDomain(dNtpChar.Value());
         bool isIPv6   = GetDelegate()->IsNTPAddressValid(dNtpChar.Value());
-        bool useable  = dnsResolve ? (isIPv6 || isDomain) : isIPv6;
+        bool useable  = isIPv6 || (isDomain && dnsResolve);
         if (!useable)
         {
             commandObj->AddStatus(commandPath, Status::InvalidCommand);
