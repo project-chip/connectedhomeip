@@ -357,7 +357,7 @@ void OTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * comman
     nodeId = commandObj->GetSubjectDescriptor().subject;
 
     otaProviderDelegate = mOtaProviderDelegate.ObjectRef();
-    
+
     err = JniReferences::GetInstance().FindMethod(env, otaProviderDelegate, "handleApplyUpdateRequest",
                                                              "(JJ)Lchip/devicecontroller/OTAProviderDelegate$ApplyUpdateResponse;",
                                                              &handleApplyUpdateRequestMethod);
