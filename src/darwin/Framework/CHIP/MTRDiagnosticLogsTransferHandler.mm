@@ -65,10 +65,9 @@ CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnTransferSessionBegin(TransferSess
     mFileHandle = [NSFileHandle fileHandleForWritingToURL:mFileURL error:&error];
 
     if (mFileHandle == nil || error != nil) {
-        // TODO: Map NSError to BDX error
-        CHIP_ERROR error = CHIP_ERROR_INCORRECT_STATE;
-        LogErrorOnFailure(mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(error)));
-        return error;
+        CHIP_ERROR err = [MTRError errorToCHIPErrorCode:error];
+        LogErrorOnFailure(mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err)));
+        return err;
     }
 
     TransferSession::TransferAcceptData acceptData;
@@ -118,8 +117,8 @@ CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnBlockReceived(TransferSession::Ou
         [mFileHandle writeData:AsData(blockData) error:&error];
 
         if (error != nil) {
-            // TODO: Map NSError to BDX error
-            return mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(CHIP_ERROR_INCORRECT_STATE));
+            CHIP_ERROR err = [MTRError errorToCHIPErrorCode:error];
+            return mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err));
         }
     } else {
         return mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(CHIP_ERROR_INCORRECT_STATE));

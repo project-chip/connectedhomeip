@@ -1393,8 +1393,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (bool)_isErrorResponse:(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable)response
 {
-    // TODO: fix the comparision with kNoLogs and kExhausted
-    return (response == nil || (response.status != nil && [response.status intValue] != 0 && [response.status intValue] != 1) || response.logContent.length == 0);
+    chip::app::Clusters::DiagnosticLogs::StatusEnum statusValue = static_cast<chip::app::Clusters::DiagnosticLogs::StatusEnum>(response.status.intValue);
+    return (response == nil || (response.status != nil && statusValue != chip::app::Clusters::DiagnosticLogs::StatusEnum::kNoLogs && statusValue != chip::app::Clusters::DiagnosticLogs::StatusEnum::kExhausted) || response.logContent.length == 0);
 }
 
 - (void)_invokeCompletion:(void (^)(NSURL * _Nullable logResult, NSError * error))completion

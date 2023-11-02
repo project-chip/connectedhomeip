@@ -27,8 +27,6 @@
 #include <lib/support/ScopedBuffer.h>
 #include <messaging/ExchangeContext.h>
 
-#include <fstream>
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::DiagnosticLogs;
