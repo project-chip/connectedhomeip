@@ -207,7 +207,33 @@ class ClusterObject:
         raise NotImplementedError()
 
 
+# The below dictionaries will be filled dynamically
+# and are used for quick lookup/mapping from cluster/attribute id to the correct class
+ALL_CLUSTERS = {}
+ALL_ATTRIBUTES = {}
+# These need to be separate because there can be overlap in command ids for commands and responses.
+ALL_ACCEPTED_COMMANDS = {}
+ALL_GENERATED_COMMANDS = {}
+
+
 class ClusterCommand(ClusterObject):
+    def __init_subclass__(cls, *args, **kwargs) -> None:
+        """Register a subclass."""
+        super().__init_subclass__(*args, **kwargs)
+        try:
+            if cls.is_client:
+                if cls.cluster_id not in ALL_ACCEPTED_COMMANDS:
+                    ALL_ACCEPTED_COMMANDS[cls.cluster_id] = {}
+                ALL_ACCEPTED_COMMANDS[cls.cluster_id][cls.command_id] = cls
+            else:
+                if cls.cluster_id not in ALL_GENERATED_COMMANDS:
+                    ALL_GENERATED_COMMANDS[cls.cluster_id] = {}
+                ALL_GENERATED_COMMANDS[cls.cluster_id][cls.command_id] = cls
+        except NotImplementedError:
+            # handle case where the ClusterAttribute class is not (fully) subclassed
+            # and accessing the id property throws a NotImplementedError.
+            pass
+
     @ChipUtility.classproperty
     def cluster_id(self) -> int:
         raise NotImplementedError()
@@ -219,12 +245,6 @@ class ClusterCommand(ClusterObject):
     @ChipUtility.classproperty
     def must_use_timed_invoke(cls) -> bool:
         return False
-
-
-# The below dictionaries will be filled dynamically
-# and are used for quick lookup/mapping from cluster/attribute id to the correct class
-ALL_CLUSTERS = {}
-ALL_ATTRIBUTES = {}
 
 
 class Cluster(ClusterObject):

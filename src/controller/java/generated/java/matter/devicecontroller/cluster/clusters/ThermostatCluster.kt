@@ -17,14 +17,14 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class ThermostatCluster(private val endpointId: UShort) {
   class GetWeeklyScheduleResponse(
     val numberOfTransitionsForSequence: UByte,
     val dayOfWeekForSequence: UInt,
     val modeForSequence: UInt,
-    val transitions: ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition>
+    val transitions: List<ThermostatClusterThermostatScheduleTransition>
   )
 
   class LocalTemperatureAttribute(val value: Short?)
@@ -49,13 +49,13 @@ class ThermostatCluster(private val endpointId: UShort) {
 
   class ACCoilTemperatureAttribute(val value: Short?)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun setpointRaiseLower(mode: UInt, amount: Byte, timedInvokeTimeoutMs: Int? = null) {
     if (timedInvokeTimeoutMs != null) {
@@ -69,7 +69,7 @@ class ThermostatCluster(private val endpointId: UShort) {
     numberOfTransitionsForSequence: UByte,
     dayOfWeekForSequence: UInt,
     modeForSequence: UInt,
-    transitions: ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition>,
+    transitions: List<ThermostatClusterThermostatScheduleTransition>,
     timedInvokeTimeoutMs: Int? = null
   ) {
     if (timedInvokeTimeoutMs != null) {

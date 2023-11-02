@@ -569,7 +569,7 @@ struct X509CertRequestParams
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, Crypto::P256Keypair & issuerKeypair,
+CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256Keypair & issuerKeypair,
                            MutableByteSpan & x509Cert);
 
 /**
@@ -583,7 +583,7 @@ CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, Crypto::
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
-                          Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
+                          const Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
 
 /**
  * @brief Generate a new X.509 DER encoded Node operational certificate
@@ -596,7 +596,7 @@ CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, const Cry
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
-                                      Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
+                                      const Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
 
 /**
  * @brief

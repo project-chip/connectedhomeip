@@ -17,7 +17,7 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class OtaSoftwareUpdateProviderCluster(private val endpointId: UShort) {
   class QueryImageResponse(
@@ -33,19 +33,19 @@ class OtaSoftwareUpdateProviderCluster(private val endpointId: UShort) {
 
   class ApplyUpdateResponse(val action: UInt, val delayedActionTime: UInt)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun queryImage(
     vendorID: UShort,
     productID: UShort,
     softwareVersion: UInt,
-    protocolsSupported: ArrayList<UInt>,
+    protocolsSupported: List<UInt>,
     hardwareVersion: UShort?,
     location: String?,
     requestorCanConsent: Boolean?,

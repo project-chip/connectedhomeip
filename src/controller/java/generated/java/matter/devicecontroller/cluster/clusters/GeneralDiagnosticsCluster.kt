@@ -17,32 +17,40 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class GeneralDiagnosticsCluster(private val endpointId: UShort) {
-  class NetworkInterfacesAttribute(
-    val value: ArrayList<ChipStructs.GeneralDiagnosticsClusterNetworkInterface>
-  )
+  class TimeSnapshotResponse(val systemTimeUs: ULong, val UTCTimeUs: ULong?)
 
-  class ActiveHardwareFaultsAttribute(val value: ArrayList<UInt>?)
+  class NetworkInterfacesAttribute(val value: List<GeneralDiagnosticsClusterNetworkInterface>)
 
-  class ActiveRadioFaultsAttribute(val value: ArrayList<UInt>?)
+  class ActiveHardwareFaultsAttribute(val value: List<UInt>?)
 
-  class ActiveNetworkFaultsAttribute(val value: ArrayList<UInt>?)
+  class ActiveRadioFaultsAttribute(val value: List<UInt>?)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class ActiveNetworkFaultsAttribute(val value: List<UInt>?)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
+
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun testEventTrigger(
     enableKey: ByteArray,
     eventTrigger: ULong,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun timeSnapshot(timedInvokeTimeoutMs: Int? = null): TimeSnapshotResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

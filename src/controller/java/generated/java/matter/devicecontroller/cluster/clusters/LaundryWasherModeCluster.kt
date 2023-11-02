@@ -17,26 +17,24 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class LaundryWasherModeCluster(private val endpointId: UShort) {
   class ChangeToModeResponse(val status: UInt, val statusText: String?)
 
-  class SupportedModesAttribute(
-    val value: ArrayList<ChipStructs.LaundryWasherModeClusterModeOptionStruct>
-  )
+  class SupportedModesAttribute(val value: List<LaundryWasherModeClusterModeOptionStruct>)
 
   class StartUpModeAttribute(val value: UByte?)
 
   class OnModeAttribute(val value: UByte?)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun changeToMode(
     newMode: UByte,
