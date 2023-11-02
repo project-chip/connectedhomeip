@@ -29,7 +29,7 @@ import javax.management.Query;
 public interface OTAProviderDelegate {
   /**
    * Called to handle a QueryImage command and is responsible for sending the response (if success) or status (if error).
-   * 
+   *
    * @param vendorId Vendor ID applying to the OTA Requestor’s Node.
    * @param productId Product ID applying to the OTA Requestor’s Node.
    * @param softwareVersion Current version running on the OTA Requestor.
@@ -56,29 +56,29 @@ public interface OTAProviderDelegate {
 
   /**
    * The callback will be invoked when BDX Transfer session is begined.
-   * 
+   *
    * @param nodeId OTA Requester's Node ID
    * @param fileDesignator a variable-length identifier chosen by the Initiator to identify the payload to be transferred.
    * @param offset image's offset
    */
   public void handleBDXTransferSessionBegin(long nodeId, String fileDesignator, long offset);
 
-  /** 
+  /**
    * The callback will be invoked when a BDX Query message has been received for some node.
-   * 
+   *
    * @param nodeId OTA Requester's Node ID
    * @param blockSize Max blockSize that can be sent
    * @param blockIndex block Index value
    * @param bytesToSkip Bytes to skip
-   * 
+   *
    * @return BDXData sending packet in image, See detailed in {@link OTAProviderDelegate#BDXData}
-   * 
+   *
    **/
   public BDXData handleBDXQuery(long nodeId, int blockSize, long blockIndex, long bytesToSkip);
 
     /**
    * The callback will be invoked when BDX Transfer session is ended.
-   * 
+   *
    * @param nodeId errorCode if transfer is failed.
    * @param nodeId OTA Requester's Node ID
    */
@@ -86,17 +86,17 @@ public interface OTAProviderDelegate {
 
   /**
    * Called to handle an ApplyUpdateRequest command and is responsible for sending the response (if success) or status (if error).
-   * 
+   *
    * @param nodeId OTA Requester's Node ID
    * @param newVersion New version to update
-   * 
+   *
    * @return ApplyUpdateResponse response for future action. See detailed in {@link OTAProvider#ApplyUpdateResponse}
    */
   public ApplyUpdateResponse handleApplyUpdateRequest(long nodeId, long newVersion);
 
   /**
    * Called to handle a NotifyUpdateApplied command and is responsible for sending the status.
-   * 
+   *
    * @param nodeId OTA Requester's Node ID
    */
   public default void handleNotifyUpdateApplied(long nodeId) {}
