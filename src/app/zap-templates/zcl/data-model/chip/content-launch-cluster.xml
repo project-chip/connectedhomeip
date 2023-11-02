@@ -58,33 +58,35 @@ limitations under the License.
 
   <struct name="AdditionalInfoStruct">
     <cluster code="0x050a"/>
-    <item name="Name" type="char_string"/>
-    <item name="Value" type="char_string"/>
+    <item name="Name" type="char_string" length="256" />
+    <!-- TODO: spec sets this max size, but seems impossible given UDP size limits -->
+    <item name="Value" type="char_string" length="8192" />
   </struct>
 
   <enum name="MetricTypeEnum" type="enum8">
-    <cluster code="0x050a"/>
-    <item name="Pixels" value="0x00"/>
-    <item name="Percentage" value="0x01"/>
+      <cluster code="0x050a"/>
+      <item name="Pixels" value="0x00"/>
+      <item name="Percentage" value="0x01"/>
   </enum>
 
   <struct name="DimensionStruct">
-    <cluster code="0x050a"/>
-    <item name="Width" type="double" optional="false"/>
-    <item name="Height" type="double" optional="false"/>
-    <item name="Metric" type="MetricTypeEnum"/>
+      <cluster code="0x050a"/>
+      <item name="Width" type="double" optional="false"/>
+      <item name="Height" type="double" optional="false"/>
+      <item name="Metric" type="MetricTypeEnum"/>
   </struct>
 
   <struct name="StyleInformationStruct">
-    <cluster code="0x050a"/>
-    <item name="ImageURL" type="char_string" optional="true"/>
-    <item name="Color" type="char_string" optional="true"/>
+      <cluster code="0x050a"/>
+      <!-- TODO: spec sets this max size, but seems impossible given UDP size limits -->
+    <item name="ImageURL" type="char_string" length="8192" optional="true"/>
+    <item name="Color" type="char_string" length="9" optional="true"/>
     <item name="Size" type="DimensionStruct" optional="true"/>
   </struct>
 
   <struct name="BrandingInformationStruct">
     <cluster code="0x050a"/>
-    <item name="ProviderName" type="char_string"/>
+    <item name="ProviderName" type="char_string" length="256" />
     <item name="Background" type="StyleInformationStruct" optional="true"/>
     <item name="Logo" type="StyleInformationStruct" optional="true"/>
     <item name="ProgressBar" type="StyleInformationStruct" optional="true"/>
@@ -123,7 +125,7 @@ limitations under the License.
   <struct name="ParameterStruct">
     <cluster code="0x050a"/>
     <item name="Type" type="ParameterEnum"/>
-    <item name="Value" type="char_string"/>
+    <item name="Value" type="char_string" length="1024" />
     <item name="ExternalIDList" type="AdditionalInfoStruct" array="true" optional="true"/>
   </struct>
 
