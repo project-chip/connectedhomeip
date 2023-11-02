@@ -15,17 +15,17 @@
 #    limitations under the License.
 #
 
-import sys
 import os
-import chip.clusters as Clusters
-from rich.console import Console
-import graphviz
 import pprint
+import sys
 
+import chip.clusters as Clusters
+import graphviz
+from rich.console import Console
 
 # Add the path to python_testing folder, in order to be able to import from matter_testing_support
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
-from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body  # noqa: E402
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
 
 
 console = None
@@ -88,7 +88,8 @@ deviceTypeDict = {
 
 
 def AddServerOrClientNode(graphSection, endpoint, clusterName, color, nodeRef):
-    graphSection.node(f"ep{endpoint}_{clusterName}", label=f"{clusterName}", style="filled,rounded", color=color, shape="box", fixedsize="true", width="3", height="0.5")
+    graphSection.node(f"ep{endpoint}_{clusterName}", label=f"{clusterName}", style="filled,rounded",
+                      color=color, shape="box", fixedsize="true", width="3", height="0.5")
     graphSection.edge(nodeRef, f"ep{endpoint}_{clusterName}", style="invis")
 
 
@@ -113,7 +114,8 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
     nodeRef = f"ep{endpoint}"
     clusterColumnCount = 0
 
-    graphSection.node(f"ep{endpoint}", label=endpointLabel, style="filled,rounded", color="dodgerblue", shape="box", fixedsize="true", width="4", height="1")
+    graphSection.node(f"ep{endpoint}", label=endpointLabel, style="filled,rounded",
+                      color="dodgerblue", shape="box", fixedsize="true", width="4", height="1")
 
     for clusterId in wildcardResponse[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.ServerList]:
         clusterColumnCount += 1
