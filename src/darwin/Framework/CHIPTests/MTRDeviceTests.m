@@ -2649,7 +2649,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (NSError *)generateLogFile:(NSString *)outFile
 {
-    NSTask * appTask = [self createTaskForPath:@"out/debug/all-clusters-app/chip-all-clusters-app"];
+    NSTask * appTask = [self createTaskForPath:@"out/debug/chip-all-clusters-app"];
 
     // Remove the file if one exists
     [[NSFileManager defaultManager] removeItemAtPath:outFile error:nil];
