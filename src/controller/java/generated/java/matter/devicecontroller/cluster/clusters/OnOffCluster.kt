@@ -56,7 +56,7 @@ class OnOffCluster(private val endpointId: UShort) {
 
   suspend fun offWithEffect(
     effectIdentifier: UInt,
-    effectVariant: UByte,
+    effectVariant: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
     if (timedInvokeTimeoutMs != null) {

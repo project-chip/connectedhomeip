@@ -19,12 +19,8 @@ package matter.devicecontroller.cluster.clusters
 
 import matter.devicecontroller.cluster.structs.*
 
-class ApplicationLauncherCluster(private val endpointId: UShort) {
-  class LauncherResponse(val status: UInt, val data: ByteArray?)
-
-  class CatalogListAttribute(val value: List<UShort>?)
-
-  class CurrentAppAttribute(val value: ApplicationLauncherClusterApplicationEPStruct?)
+class MicrowaveOvenModeCluster(private val endpointId: UShort) {
+  class SupportedModesAttribute(val value: List<MicrowaveOvenModeClusterModeOptionStruct>)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
@@ -34,59 +30,22 @@ class ApplicationLauncherCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun launchApp(
-    application: ApplicationLauncherClusterApplicationStruct?,
-    data: ByteArray?,
-    timedInvokeTimeoutMs: Int? = null
-  ): LauncherResponse {
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }
-  }
-
-  suspend fun stopApp(
-    application: ApplicationLauncherClusterApplicationStruct?,
-    timedInvokeTimeoutMs: Int? = null
-  ): LauncherResponse {
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }
-  }
-
-  suspend fun hideApp(
-    application: ApplicationLauncherClusterApplicationStruct?,
-    timedInvokeTimeoutMs: Int? = null
-  ): LauncherResponse {
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }
-  }
-
-  suspend fun readCatalogListAttribute(): CatalogListAttribute {
+  suspend fun readSupportedModesAttribute(): SupportedModesAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCatalogListAttribute(
+  suspend fun subscribeSupportedModesAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): CatalogListAttribute {
+  ): SupportedModesAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun readCurrentAppAttribute(): CurrentAppAttribute {
+  suspend fun readCurrentModeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentAppAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): CurrentAppAttribute {
+  suspend fun subscribeCurrentModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -148,6 +107,6 @@ class ApplicationLauncherCluster(private val endpointId: UShort) {
   }
 
   companion object {
-    const val CLUSTER_ID: UInt = 1292u
+    const val CLUSTER_ID: UInt = 94u
   }
 }
