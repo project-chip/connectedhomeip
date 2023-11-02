@@ -520,7 +520,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::StartOTAProvider(jobject otaProviderD
     VerifyOrExit(otaProviderBridge != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     err = otaProviderBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr(), otaProviderDelegate);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "OTA Provider Initialize Error : %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(Controller, "OTA Provider Initialize Error : %" CHIP_ERROR_FORMAT, err.Format()));
 
     mOtaProviderBridge = otaProviderBridge;
 exit:

@@ -46,7 +46,8 @@ OTAProviderDelegateBridge::~OTAProviderDelegateBridge()
     mBdxOTASender = nullptr;
 }
 
-CHIP_ERROR OTAProviderDelegateBridge::Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeManager, jobject otaProviderDelegate)
+CHIP_ERROR OTAProviderDelegateBridge::Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeManager,
+                                           jobject otaProviderDelegate)
 {
     ReturnLogErrorOnFailure(mOtaProviderDelegate.Init(otaProviderDelegate));
 

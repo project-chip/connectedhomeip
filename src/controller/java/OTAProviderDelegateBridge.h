@@ -32,7 +32,8 @@ class OTAProviderDelegateBridge : public chip::app::Clusters::OTAProviderDelegat
 {
 public:
     ~OTAProviderDelegateBridge() override;
-    CHIP_ERROR Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeManager, jobject OTAProviderDelegate);
+    CHIP_ERROR Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeManager,
+                    jobject OTAProviderDelegate);
     void Shutdown();
 
     /**
