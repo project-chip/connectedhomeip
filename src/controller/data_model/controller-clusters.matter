@@ -1945,9 +1945,9 @@ client cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute NeighborTableStruct neighborTable[] = 7;
   readonly attribute RouteTableStruct routeTable[] = 8;
   readonly attribute nullable int32u partitionId = 9;
-  readonly attribute nullable int8u weighting = 10;
-  readonly attribute nullable int8u dataVersion = 11;
-  readonly attribute nullable int8u stableDataVersion = 12;
+  readonly attribute nullable int16u weighting = 10;
+  readonly attribute nullable int16u dataVersion = 11;
+  readonly attribute nullable int16u stableDataVersion = 12;
   readonly attribute nullable int8u leaderRouterId = 13;
   readonly attribute optional int16u detachedRoleCount = 14;
   readonly attribute optional int16u childRoleCount = 15;
@@ -2006,7 +2006,7 @@ client cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int16u clusterRevision = 65533;
 
   /** Reception of this command SHALL reset the OverrunCount attributes to 0 */
-  command ResetCounts(): DefaultSuccess = 0;
+  command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */

@@ -3702,7 +3702,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveNetworkFaultsList",
+              "name": "ActiveNetworkFaults",
               "code": 62,
               "mfgCode": null,
               "side": "server",

@@ -11854,7 +11854,7 @@ CHIPThreadNetworkDiagnosticsWeightingAttributeCallback::~CHIPThreadNetworkDiagno
 }
 
 void CHIPThreadNetworkDiagnosticsWeightingAttributeCallback::CallbackFn(void * context,
-                                                                        const chip::app::DataModel::Nullable<uint8_t> & value)
+                                                                        const chip::app::DataModel::Nullable<uint16_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11922,7 +11922,7 @@ CHIPThreadNetworkDiagnosticsDataVersionAttributeCallback::~CHIPThreadNetworkDiag
 }
 
 void CHIPThreadNetworkDiagnosticsDataVersionAttributeCallback::CallbackFn(void * context,
-                                                                          const chip::app::DataModel::Nullable<uint8_t> & value)
+                                                                          const chip::app::DataModel::Nullable<uint16_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11990,7 +11990,7 @@ CHIPThreadNetworkDiagnosticsStableDataVersionAttributeCallback::~CHIPThreadNetwo
 }
 
 void CHIPThreadNetworkDiagnosticsStableDataVersionAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+    void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;

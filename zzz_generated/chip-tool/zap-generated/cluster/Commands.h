@@ -13976,13 +13976,13 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssu
             Id, "route-table", Attributes::RouteTable::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(
             Id, "partition-id", 0, UINT32_MAX, Attributes::PartitionId::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(
-            Id, "weighting", 0, UINT8_MAX, Attributes::Weighting::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(
-            Id, "data-version", 0, UINT8_MAX, Attributes::DataVersion::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "stable-data-version", 0, UINT8_MAX,
-                                                                             Attributes::StableDataVersion::Id,
-                                                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(
+            Id, "weighting", 0, UINT16_MAX, Attributes::Weighting::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(
+            Id, "data-version", 0, UINT16_MAX, Attributes::DataVersion::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "stable-data-version", 0, UINT16_MAX,
+                                                                              Attributes::StableDataVersion::Id,
+                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "leader-router-id", 0, UINT8_MAX,
                                                                              Attributes::LeaderRouterId::Id,
                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
