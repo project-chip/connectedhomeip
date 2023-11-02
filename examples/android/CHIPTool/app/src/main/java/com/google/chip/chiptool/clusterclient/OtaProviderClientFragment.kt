@@ -109,32 +109,34 @@ class OtaProviderClientFragment : Fragment() {
       return
     }
 
-    val filename = getRealPathFromURI(intent.data!!)
+    val filename = getRealPathFromURI(uri)
 
     requireActivity().runOnUiThread { binding.firmwareFileTv.text = filename }
   }
 
-  private fun getRealPathFromURI(contentUri: Uri): String {
-    if (!contentUri.path!!.startsWith("/storage")) {
-      val id =
-        DocumentsContract.getDocumentId(contentUri)
-          .split(":".toRegex())
-          .dropLastWhile { it.isEmpty() }
-          .toTypedArray()[1]
-      val columns = arrayOf(MediaStore.Files.FileColumns.DATA)
-      val selection = MediaStore.Files.FileColumns._ID + " = " + id
-      val cursor: Cursor? =
-        requireContext()
-          .contentResolver
-          .query(MediaStore.Files.getContentUri("external"), columns, selection, null, null)
-      cursor.use { c ->
-        val columnIndex = c?.getColumnIndex(columns[0]) ?: 0
-        if (c!!.moveToFirst()) {
-          return c.getString(columnIndex)
-        }
+  private fun getRealPathFromURI(contentUri: Uri): String? {
+    var path = contentUri.path
+    if (path == null || path.startsWith("/storage")) {
+      return path
+    }
+    val id =
+      DocumentsContract.getDocumentId(contentUri)
+        .split(":".toRegex())
+        .dropLastWhile { it.isEmpty() }
+        .toTypedArray()[1]
+    val columns = arrayOf(MediaStore.Files.FileColumns.DATA)
+    val selection = MediaStore.Files.FileColumns._ID + " = " + id
+    val cursor: Cursor? =
+      requireContext()
+        .contentResolver
+        .query(MediaStore.Files.getContentUri("external"), columns, selection, null, null)
+    cursor.use { c ->
+      val columnIndex = c?.getColumnIndex(columns[0]) ?: 0
+      if (c!!.moveToFirst()) {
+        path = c.getString(columnIndex)
       }
     }
-    return contentUri.path!!
+    return path
   }
 
   private suspend fun sendAnnounceOTAProviderBtnClick() {
@@ -262,28 +264,20 @@ class OtaProviderClientFragment : Fragment() {
         bufferedInputStream = BufferedInputStream(fileInputStream)
       } catch (e: IOException) {
         Log.d(TAG, "exception", e)
-        if (fileInputStream != null) {
-          fileInputStream!!.close()
-          fileInputStream = null
-        }
-        if (bufferedInputStream != null) {
-          bufferedInputStream!!.close()
-          bufferedInputStream = null
-        }
+        fileInputStream?.close()
+        bufferedInputStream?.close()
+        fileInputStream = null
+        bufferedInputStream = null
         return
       }
     }
 
     override fun handleBDXTransferSessionEnd(errorCode: Long, nodeId: Long) {
       Log.d(TAG, "handleBDXTransferSessionEnd, $errorCode, $nodeId")
-      if (bufferedInputStream != null) {
-        bufferedInputStream!!.close()
-        bufferedInputStream = null
-      }
-      if (fileInputStream != null) {
-        fileInputStream!!.close()
-        fileInputStream = null
-      }
+      fileInputStream?.close()
+      bufferedInputStream?.close()
+      fileInputStream = null
+      bufferedInputStream = null
     }
 
     override fun handleBDXQuery(

@@ -555,15 +555,8 @@ JNI_METHOD(void, startOTAProvider)(JNIEnv * env, jobject self, jlong handle, job
     VerifyOrReturn(wrapper != nullptr, ChipLogError(Controller, "wrapper is null"));
 
     ChipLogProgress(Controller, "startOTAProvider() called");
+    err = wrapper->StartOTAProvider(otaProviderDelegate);
 
-    if (otaProviderDelegate != nullptr)
-    {
-        jobject otaProviderDelegateRef = env->NewGlobalRef(otaProviderDelegate);
-        err                            = wrapper->StartOTAProvider(otaProviderDelegateRef);
-        SuccessOrExit(err);
-    }
-
-exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to start OTA Provider.");
@@ -584,8 +577,7 @@ JNI_METHOD(void, finishOTAProvider)(JNIEnv * env, jobject self, jlong handle)
     ChipLogProgress(Controller, "finishOTAProvider() called");
 
     err = wrapper->FinishOTAProvider();
-    SuccessOrExit(err);
-exit:
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to finish OTA Provider.");

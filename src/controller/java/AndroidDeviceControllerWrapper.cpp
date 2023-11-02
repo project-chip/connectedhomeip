@@ -514,12 +514,13 @@ CHIP_ERROR AndroidDeviceControllerWrapper::StartOTAProvider(jobject otaProviderD
 #if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    OTAProviderDelegateBridge * otaProviderBridge = new OTAProviderDelegateBridge(otaProviderDelegate);
+    OTAProviderDelegateBridge * otaProviderBridge = new OTAProviderDelegateBridge();
     auto systemState                              = DeviceControllerFactory::GetInstance().GetSystemState();
 
     VerifyOrExit(otaProviderBridge != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    err = otaProviderBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr());
+    err = otaProviderBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr(), otaProviderDelegate);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "OTA Provider Initialize Error : %" CHIP_ERROR_FORMAT, err.Format()));
 
     mOtaProviderBridge = otaProviderBridge;
 exit:
@@ -528,9 +529,9 @@ exit:
         if (otaProviderBridge != nullptr)
         {
             delete otaProviderBridge;
+            otaProviderBridge = nullptr;
         }
     }
-
     return err;
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;

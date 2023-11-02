@@ -20,6 +20,7 @@
 #include <jni.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/NodeId.h>
+#include <lib/support/JniTypeWrappers.h>
 
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 
@@ -30,10 +31,8 @@ constexpr uint8_t kUpdateTokenLen = 32;
 class OTAProviderDelegateBridge : public chip::app::Clusters::OTAProviderDelegate
 {
 public:
-    OTAProviderDelegateBridge(jobject otaProviderDelegate);
-
     ~OTAProviderDelegateBridge() override;
-    CHIP_ERROR Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeManager);
+    CHIP_ERROR Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeManager, jobject OTAProviderDelegate);
     void Shutdown();
 
     /**
@@ -61,7 +60,7 @@ public:
 private:
     void sendOTAQueryFailure(uint8_t status);
 
-    jobject mOtaProviderDelegate                = nullptr;
+    chip::JniGlobalReference mOtaProviderDelegate;
     std::unique_ptr<BdxOTASender> mBdxOTASender = nullptr;
 
     uint8_t mToken[kUpdateTokenLen];
