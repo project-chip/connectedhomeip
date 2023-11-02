@@ -14,7 +14,7 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import List, MutableMapping, Optional
+from typing import List, MutableMapping, Optional, Union
 
 from matter_idl.matter_idl_types import ClusterSide, Idl, ParseMetaData
 
@@ -73,6 +73,12 @@ class AttributeRequirement:
 
     # Optional filters to apply to specific locations
     filter_cluster: Optional[int] = field(default=None)
+
+
+@dataclass
+class ClusterAttributeDeny:
+    cluster_id: Union[str, int]
+    attribute_id: Union[str, int]
 
 
 @dataclass
@@ -202,6 +208,7 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
     def __init__(self, name):
         super().__init__(name)
         self._mandatory_attributes: List[AttributeRequirement] = []
+        self._deny_attributes: List[ClusterAttributeDeny] = []
 
     def __repr__(self):
         result = "RequiredAttributesRule{\n"
@@ -211,12 +218,21 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
             for attr in self._mandatory_attributes:
                 result += "    - %r\n" % attr
 
+        if self._deny_attributes:
+            result += "  deny_attributes:\n"
+            for attr in self._deny_attributes:
+                result += "    - %r\n" % attr
+
         result += "}"
         return result
 
     def RequireAttribute(self, attr: AttributeRequirement):
         """Mark an attribute required"""
         self._mandatory_attributes.append(attr)
+
+    def Deny(self, what: ClusterAttributeDeny):
+        """Mark a cluster (or cluster/attribute) as denied"""
+        self._deny_attributes.append(what)
 
     def _ServerClusterDefinition(self, name: str, location: Optional[LocationInFile]):
         """Finds the server cluster definition with the given name.
@@ -275,7 +291,7 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
 
                     attribute_codes.add(name_to_code_map[attr.name])
 
-                # Linting codes now
+                # Linting required attributes
                 for check in self._mandatory_attributes:
                     if check.filter_cluster is not None and check.filter_cluster != cluster_definition.code:
                         continue
@@ -285,6 +301,27 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
                                            (endpoint.number, cluster.name,
                                             check.name, check.code),
                                            self._ParseLocation(cluster.parse_meta))
+
+                # Lint rejected attributes
+                for check in self._deny_attributes:
+                    if check.cluster_id not in [cluster_definition.name, cluster_definition.code]:
+                        continue  # different cluster
+
+                    if check.attribute_id is None:
+                        self._AddLintError(
+                            f"EP{endpoint.number}: cluster {cluster_definition.name}({cluster_definition.code}) is DENIED!",
+                            self._ParseLocation(cluster.parse_meta))
+                        continue
+
+                    # figure out every attribute that may be denied
+                    # We already know every attribute name and have codes
+                    for attr in cluster.attributes:
+                        if check.attribute_id in [attr.name, name_to_code_map[attr.name]]:
+                            cluster_str = f"{cluster_definition.name}({cluster_definition.code})"
+                            attribute_str = f"{attr.name}({name_to_code_map[attr.name]})"
+                            self._AddLintError(
+                                f"EP{endpoint.number}: attribute {cluster_str}::{attribute_str} is DENIED!",
+                                self._ParseLocation(cluster.parse_meta))
 
 
 @dataclass
