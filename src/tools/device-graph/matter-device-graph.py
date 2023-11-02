@@ -27,7 +27,6 @@ from rich.console import Console
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
 
-
 console = None
 
 
