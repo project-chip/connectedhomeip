@@ -236,6 +236,7 @@ matter_clusters_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/clusters/ThermostatUserInterfaceConfigurationCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/clusters/ThreadNetworkDiagnosticsCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/clusters/TimeFormatLocalizationCluster.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/clusters/TimerCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/clusters/TimeSynchronizationCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/clusters/TotalVolatileOrganicCompoundsConcentrationMeasurementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/clusters/UnitLocalizationCluster.kt",

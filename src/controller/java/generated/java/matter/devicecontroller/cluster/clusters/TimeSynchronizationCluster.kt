@@ -20,34 +20,51 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class TimeSynchronizationCluster(private val endpointId: UShort) {
-  class SetTimeZoneResponse(val DSTOffsetRequired: Boolean)
+  class SetTimeZoneResponse(
+    val DSTOffsetRequired: Boolean
+  )
 
-  class UTCTimeAttribute(val value: ULong?)
+  class UTCTimeAttribute(
+    val value: ULong?
+  )
 
-  class TrustedTimeSourceAttribute(val value: TimeSynchronizationClusterTrustedTimeSourceStruct?)
+  class TrustedTimeSourceAttribute(
+    val value: TimeSynchronizationClusterTrustedTimeSourceStruct?
+  )
 
-  class DefaultNTPAttribute(val value: String?)
+  class DefaultNTPAttribute(
+    val value: String?
+  )
 
-  class TimeZoneAttribute(val value: List<TimeSynchronizationClusterTimeZoneStruct>?)
+  class TimeZoneAttribute(
+    val value: List<TimeSynchronizationClusterTimeZoneStruct>?
+  )
 
-  class DSTOffsetAttribute(val value: List<TimeSynchronizationClusterDSTOffsetStruct>?)
+  class DSTOffsetAttribute(
+    val value: List<TimeSynchronizationClusterDSTOffsetStruct>?
+  )
 
-  class LocalTimeAttribute(val value: ULong?)
+  class LocalTimeAttribute(
+    val value: ULong?
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
-  suspend fun setUTCTime(
-    UTCTime: ULong,
-    granularity: UInt,
-    timeSource: UInt?,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun setUTCTime(UTCTime: ULong, granularity: UInt, timeSource: UInt?, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -55,10 +72,7 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun setTrustedTimeSource(
-    trustedTimeSource: TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct?,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun setTrustedTimeSource(trustedTimeSource: TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct?, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -66,10 +80,7 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun setTimeZone(
-    timeZone: List<TimeSynchronizationClusterTimeZoneStruct>,
-    timedInvokeTimeoutMs: Int? = null
-  ): SetTimeZoneResponse {
+  suspend fun setTimeZone(timeZone: List<TimeSynchronizationClusterTimeZoneStruct>, timedInvokeTimeoutMs: Int? = null): SetTimeZoneResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -77,10 +88,7 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun setDSTOffset(
-    DSTOffset: List<TimeSynchronizationClusterDSTOffsetStruct>,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun setDSTOffset(DSTOffset: List<TimeSynchronizationClusterDSTOffsetStruct>, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -88,7 +96,7 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun setDefaultNTP(defaultNTP: String?, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun setDefaultNTP(defaultNTP: String?, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -100,7 +108,10 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeUTCTimeAttribute(minInterval: Int, maxInterval: Int): UTCTimeAttribute {
+  suspend fun subscribeUTCTimeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UTCTimeAttribute {
     // Implementation needs to be added here
   }
 
@@ -108,7 +119,10 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeGranularityAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeGranularityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -116,7 +130,10 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTimeSourceAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeTimeSourceAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -146,7 +163,10 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTimeZoneAttribute(minInterval: Int, maxInterval: Int): TimeZoneAttribute {
+  suspend fun subscribeTimeZoneAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): TimeZoneAttribute {
     // Implementation needs to be added here
   }
 
@@ -154,7 +174,10 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDSTOffsetAttribute(minInterval: Int, maxInterval: Int): DSTOffsetAttribute {
+  suspend fun subscribeDSTOffsetAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): DSTOffsetAttribute {
     // Implementation needs to be added here
   }
 
@@ -162,7 +185,10 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLocalTimeAttribute(minInterval: Int, maxInterval: Int): LocalTimeAttribute {
+  suspend fun subscribeLocalTimeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): LocalTimeAttribute {
     // Implementation needs to be added here
   }
 
@@ -170,7 +196,10 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTimeZoneDatabaseAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeTimeZoneDatabaseAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -178,7 +207,10 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNTPServerAvailableAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeNTPServerAvailableAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -186,7 +218,10 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTimeZoneListMaxSizeAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeTimeZoneListMaxSizeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -194,7 +229,10 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDSTOffsetListMaxSizeAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeDSTOffsetListMaxSizeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -202,7 +240,10 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSupportsDNSResolveAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeSupportsDNSResolveAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -232,7 +273,10 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -251,7 +295,10 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -259,7 +306,10 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

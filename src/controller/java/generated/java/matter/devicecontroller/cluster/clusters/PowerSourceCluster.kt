@@ -20,43 +20,78 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class PowerSourceCluster(private val endpointId: UShort) {
-  class WiredAssessedInputVoltageAttribute(val value: UInt?)
+  class WiredAssessedInputVoltageAttribute(
+    val value: UInt?
+  )
 
-  class WiredAssessedInputFrequencyAttribute(val value: UShort?)
+  class WiredAssessedInputFrequencyAttribute(
+    val value: UShort?
+  )
 
-  class WiredAssessedCurrentAttribute(val value: UInt?)
+  class WiredAssessedCurrentAttribute(
+    val value: UInt?
+  )
 
-  class ActiveWiredFaultsAttribute(val value: List<UInt>?)
+  class ActiveWiredFaultsAttribute(
+    val value: List<UInt>?
+  )
 
-  class BatVoltageAttribute(val value: UInt?)
+  class BatVoltageAttribute(
+    val value: UInt?
+  )
 
-  class BatPercentRemainingAttribute(val value: UByte?)
+  class BatPercentRemainingAttribute(
+    val value: UByte?
+  )
 
-  class BatTimeRemainingAttribute(val value: UInt?)
+  class BatTimeRemainingAttribute(
+    val value: UInt?
+  )
 
-  class ActiveBatFaultsAttribute(val value: List<UInt>?)
+  class ActiveBatFaultsAttribute(
+    val value: List<UInt>?
+  )
 
-  class BatTimeToFullChargeAttribute(val value: UInt?)
+  class BatTimeToFullChargeAttribute(
+    val value: UInt?
+  )
 
-  class BatChargingCurrentAttribute(val value: UInt?)
+  class BatChargingCurrentAttribute(
+    val value: UInt?
+  )
 
-  class ActiveBatChargeFaultsAttribute(val value: List<UInt>?)
+  class ActiveBatChargeFaultsAttribute(
+    val value: List<UInt>?
+  )
 
-  class EndpointListAttribute(val value: List<UShort>)
+  class EndpointListAttribute(
+    val value: List<UShort>
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
   suspend fun readStatusAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeStatusAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeStatusAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -64,7 +99,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOrderAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeOrderAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -72,7 +110,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDescriptionAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeDescriptionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -102,7 +143,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeWiredCurrentTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeWiredCurrentTypeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -121,7 +165,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeWiredNominalVoltageAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeWiredNominalVoltageAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -129,7 +176,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeWiredMaximumCurrentAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeWiredMaximumCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -137,7 +187,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeWiredPresentAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeWiredPresentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -189,7 +242,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBatChargeLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeBatChargeLevelAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -197,7 +253,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBatReplacementNeededAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeBatReplacementNeededAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -205,7 +264,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBatReplaceabilityAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeBatReplaceabilityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -213,7 +275,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBatPresentAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeBatPresentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -243,7 +308,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBatCommonDesignationAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeBatCommonDesignationAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -251,7 +319,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBatANSIDesignationAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeBatANSIDesignationAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -259,7 +330,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBatIECDesignationAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeBatIECDesignationAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -267,7 +341,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBatApprovedChemistryAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeBatApprovedChemistryAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -275,7 +352,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBatCapacityAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeBatCapacityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -283,7 +363,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBatQuantityAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeBatQuantityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -291,7 +374,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBatChargeStateAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeBatChargeStateAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -376,7 +462,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -395,7 +484,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -403,7 +495,10 @@ class PowerSourceCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

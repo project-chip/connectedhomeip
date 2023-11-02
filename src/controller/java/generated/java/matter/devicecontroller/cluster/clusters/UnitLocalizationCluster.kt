@@ -20,27 +20,43 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class UnitLocalizationCluster(private val endpointId: UShort) {
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
   suspend fun readTemperatureUnitAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun writeTemperatureUnitAttribute(value: UInt) {
+  suspend fun writeTemperatureUnitAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeTemperatureUnitAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeTemperatureUnitAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTemperatureUnitAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeTemperatureUnitAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -70,7 +86,10 @@ class UnitLocalizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -89,7 +108,10 @@ class UnitLocalizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -97,7 +119,10 @@ class UnitLocalizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

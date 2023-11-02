@@ -20,27 +20,43 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class BinaryInputBasicCluster(private val endpointId: UShort) {
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
   suspend fun readActiveTextAttribute(): CharString {
     // Implementation needs to be added here
   }
 
-  suspend fun writeActiveTextAttribute(value: String) {
+  suspend fun writeActiveTextAttribute(
+    value: String
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeActiveTextAttribute(value: String, timedWriteTimeoutMs: Int) {
+  suspend fun writeActiveTextAttribute(
+    value: String,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActiveTextAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeActiveTextAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -48,15 +64,23 @@ class BinaryInputBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeDescriptionAttribute(value: String) {
+  suspend fun writeDescriptionAttribute(
+    value: String
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeDescriptionAttribute(value: String, timedWriteTimeoutMs: Int) {
+  suspend fun writeDescriptionAttribute(
+    value: String,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDescriptionAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeDescriptionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -64,15 +88,23 @@ class BinaryInputBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInactiveTextAttribute(value: String) {
+  suspend fun writeInactiveTextAttribute(
+    value: String
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInactiveTextAttribute(value: String, timedWriteTimeoutMs: Int) {
+  suspend fun writeInactiveTextAttribute(
+    value: String,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInactiveTextAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeInactiveTextAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -80,15 +112,23 @@ class BinaryInputBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOutOfServiceAttribute(value: Boolean) {
+  suspend fun writeOutOfServiceAttribute(
+    value: Boolean
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOutOfServiceAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeOutOfServiceAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOutOfServiceAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeOutOfServiceAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -96,7 +136,10 @@ class BinaryInputBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePolarityAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribePolarityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -104,15 +147,23 @@ class BinaryInputBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePresentValueAttribute(value: Boolean) {
+  suspend fun writePresentValueAttribute(
+    value: Boolean
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePresentValueAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writePresentValueAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePresentValueAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribePresentValueAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -120,15 +171,23 @@ class BinaryInputBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeReliabilityAttribute(value: UInt) {
+  suspend fun writeReliabilityAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeReliabilityAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeReliabilityAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeReliabilityAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeReliabilityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -136,7 +195,10 @@ class BinaryInputBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeStatusFlagsAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeStatusFlagsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -144,7 +206,10 @@ class BinaryInputBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeApplicationTypeAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeApplicationTypeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -174,7 +239,10 @@ class BinaryInputBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -193,7 +261,10 @@ class BinaryInputBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -201,7 +272,10 @@ class BinaryInputBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

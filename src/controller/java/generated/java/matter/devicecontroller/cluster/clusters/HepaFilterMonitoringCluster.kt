@@ -20,21 +20,31 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class HepaFilterMonitoringCluster(private val endpointId: UShort) {
-  class LastChangedTimeAttribute(val value: UInt?)
+  class LastChangedTimeAttribute(
+    val value: UInt?
+  )
 
   class ReplacementProductListAttribute(
     val value: List<HepaFilterMonitoringClusterReplacementProductStruct>?
   )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
-  suspend fun resetCondition(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun resetCondition(timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -46,7 +56,10 @@ class HepaFilterMonitoringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeConditionAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeConditionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -54,7 +67,10 @@ class HepaFilterMonitoringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDegradationDirectionAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeDegradationDirectionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -62,7 +78,10 @@ class HepaFilterMonitoringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeChangeIndicationAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeChangeIndicationAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -70,7 +89,10 @@ class HepaFilterMonitoringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInPlaceIndicatorAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeInPlaceIndicatorAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -78,11 +100,16 @@ class HepaFilterMonitoringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLastChangedTimeAttribute(value: UInt) {
+  suspend fun writeLastChangedTimeAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLastChangedTimeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeLastChangedTimeAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -130,7 +157,10 @@ class HepaFilterMonitoringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -149,7 +179,10 @@ class HepaFilterMonitoringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -157,7 +190,10 @@ class HepaFilterMonitoringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

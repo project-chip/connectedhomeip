@@ -20,24 +20,36 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class RvcCleanModeCluster(private val endpointId: UShort) {
-  class ChangeToModeResponse(val status: UInt, val statusText: String?)
+  class ChangeToModeResponse(
+    val status: UInt, 
+    val statusText: String?
+  )
 
-  class SupportedModesAttribute(val value: List<RvcCleanModeClusterModeOptionStruct>)
+  class SupportedModesAttribute(
+    val value: List<RvcCleanModeClusterModeOptionStruct>
+  )
 
-  class OnModeAttribute(val value: UByte?)
+  class OnModeAttribute(
+    val value: UByte?
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
-  suspend fun changeToMode(
-    newMode: UByte,
-    timedInvokeTimeoutMs: Int? = null
-  ): ChangeToModeResponse {
+  suspend fun changeToMode(newMode: UByte, timedInvokeTimeoutMs: Int? = null): ChangeToModeResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -60,7 +72,10 @@ class RvcCleanModeCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentModeAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeCurrentModeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -68,15 +83,23 @@ class RvcCleanModeCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOnModeAttribute(value: UByte) {
+  suspend fun writeOnModeAttribute(
+    value: UByte
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOnModeAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+  suspend fun writeOnModeAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOnModeAttribute(minInterval: Int, maxInterval: Int): OnModeAttribute {
+  suspend fun subscribeOnModeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): OnModeAttribute {
     // Implementation needs to be added here
   }
 
@@ -106,7 +129,10 @@ class RvcCleanModeCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -125,7 +151,10 @@ class RvcCleanModeCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -133,7 +162,10 @@ class RvcCleanModeCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

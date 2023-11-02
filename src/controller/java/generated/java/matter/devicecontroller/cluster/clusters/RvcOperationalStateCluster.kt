@@ -24,27 +24,43 @@ class RvcOperationalStateCluster(private val endpointId: UShort) {
     val commandResponseState: RvcOperationalStateClusterErrorStateStruct
   )
 
-  class PhaseListAttribute(val value: List<String>?)
+  class PhaseListAttribute(
+    val value: List<String>?
+  )
 
-  class CurrentPhaseAttribute(val value: UByte?)
+  class CurrentPhaseAttribute(
+    val value: UByte?
+  )
 
-  class CountdownTimeAttribute(val value: UInt?)
+  class CountdownTimeAttribute(
+    val value: UInt?
+  )
 
   class OperationalStateListAttribute(
     val value: List<RvcOperationalStateClusterOperationalStateStruct>
   )
 
-  class OperationalErrorAttribute(val value: RvcOperationalStateClusterErrorStateStruct)
+  class OperationalErrorAttribute(
+    val value: RvcOperationalStateClusterErrorStateStruct
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
-  suspend fun pause(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
+  suspend fun pause(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -52,7 +68,7 @@ class RvcOperationalStateCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun stop(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
+  suspend fun stop(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -60,7 +76,7 @@ class RvcOperationalStateCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun start(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
+  suspend fun start(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -68,7 +84,7 @@ class RvcOperationalStateCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun resume(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
+  suspend fun resume(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -80,7 +96,10 @@ class RvcOperationalStateCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePhaseListAttribute(minInterval: Int, maxInterval: Int): PhaseListAttribute {
+  suspend fun subscribePhaseListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): PhaseListAttribute {
     // Implementation needs to be added here
   }
 
@@ -121,7 +140,10 @@ class RvcOperationalStateCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOperationalStateAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeOperationalStateAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -162,7 +184,10 @@ class RvcOperationalStateCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -181,7 +206,10 @@ class RvcOperationalStateCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -189,7 +217,10 @@ class RvcOperationalStateCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

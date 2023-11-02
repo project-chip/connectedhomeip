@@ -17,16 +17,19 @@
 package matter.devicecontroller.cluster.structs
 
 import matter.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ApplicationBasicClusterApplicationStruct(
-  val catalogVendorID: UShort,
-  val applicationID: String
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ApplicationBasicClusterApplicationStruct (
+    val catalogVendorID: UShort,
+    val applicationID: String) {
+  override fun toString(): String  = buildString {
     append("ApplicationBasicClusterApplicationStruct {\n")
     append("\tcatalogVendorID : $catalogVendorID\n")
     append("\tapplicationID : $applicationID\n")
@@ -46,11 +49,11 @@ class ApplicationBasicClusterApplicationStruct(
     private const val TAG_CATALOG_VENDOR_I_D = 0
     private const val TAG_APPLICATION_I_D = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ApplicationBasicClusterApplicationStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ApplicationBasicClusterApplicationStruct {
       tlvReader.enterStructure(tlvTag)
       val catalogVendorID = tlvReader.getUShort(ContextSpecificTag(TAG_CATALOG_VENDOR_I_D))
       val applicationID = tlvReader.getString(ContextSpecificTag(TAG_APPLICATION_I_D))
-
+      
       tlvReader.exitContainer()
 
       return ApplicationBasicClusterApplicationStruct(catalogVendorID, applicationID)

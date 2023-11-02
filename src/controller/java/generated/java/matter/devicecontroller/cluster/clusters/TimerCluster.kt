@@ -19,7 +19,7 @@ package matter.devicecontroller.cluster.clusters
 
 import matter.devicecontroller.cluster.structs.*
 
-class FaultInjectionCluster(private val endpointId: UShort) {
+class TimerCluster(private val endpointId: UShort) {
   class GeneratedCommandListAttribute(
     val value: List<UInt>
   )
@@ -36,7 +36,7 @@ class FaultInjectionCluster(private val endpointId: UShort) {
     val value: List<UInt>
   )
 
-  suspend fun failAtFault(type: UInt, id: UInt, numCallsToSkip: UInt, numCallsToFail: UInt, takeMutex: Boolean, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun setTimer(newTime: UInt, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -44,12 +44,61 @@ class FaultInjectionCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun failRandomlyAtFault(type: UInt, id: UInt, percentage: UByte, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun resetTimer(timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
     }
+  }
+
+  suspend fun addTime(additionalTime: UInt, timedInvokeTimeoutMs: Int? = null) {  
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun reduceTime(timeReduction: UInt, timedInvokeTimeoutMs: Int? = null) {  
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readSetTimeAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSetTimeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTimeRemainingAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTimeRemainingAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTimerStateAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTimerStateAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
+    // Implementation needs to be added here
   }
 
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
@@ -119,6 +168,6 @@ class FaultInjectionCluster(private val endpointId: UShort) {
   }
 
   companion object {
-    const val CLUSTER_ID: UInt = 4294048774u
+    const val CLUSTER_ID: UInt = 71u
   }
 }

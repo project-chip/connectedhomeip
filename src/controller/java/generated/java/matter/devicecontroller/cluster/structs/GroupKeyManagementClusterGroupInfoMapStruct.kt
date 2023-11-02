@@ -16,21 +16,22 @@
  */
 package matter.devicecontroller.cluster.structs
 
-import java.util.Optional
 import matter.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class GroupKeyManagementClusterGroupInfoMapStruct(
-  val groupId: UShort,
-  val endpoints: List<UShort>,
-  val groupName: Optional<String>,
-  val fabricIndex: UByte
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class GroupKeyManagementClusterGroupInfoMapStruct (
+    val groupId: UShort,
+    val endpoints: List<UShort>,
+    val groupName: Optional<String>,
+    val fabricIndex: UByte) {
+  override fun toString(): String  = buildString {
     append("GroupKeyManagementClusterGroupInfoMapStruct {\n")
     append("\tgroupId : $groupId\n")
     append("\tendpoints : $endpoints\n")
@@ -49,9 +50,9 @@ class GroupKeyManagementClusterGroupInfoMapStruct(
       }
       endArray()
       if (groupName.isPresent) {
-        val optgroupName = groupName.get()
-        put(ContextSpecificTag(TAG_GROUP_NAME), optgroupName)
-      }
+      val optgroupName = groupName.get()
+      put(ContextSpecificTag(TAG_GROUP_NAME), optgroupName)
+    }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -63,25 +64,23 @@ class GroupKeyManagementClusterGroupInfoMapStruct(
     private const val TAG_GROUP_NAME = 3
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GroupKeyManagementClusterGroupInfoMapStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : GroupKeyManagementClusterGroupInfoMapStruct {
       tlvReader.enterStructure(tlvTag)
       val groupId = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_ID))
-      val endpoints =
-        buildList<UShort> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_ENDPOINTS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUShort(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-      val groupName =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_GROUP_NAME))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_GROUP_NAME)))
-        } else {
-          Optional.empty()
-        }
+      val endpoints = buildList<UShort> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_ENDPOINTS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUShort(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      val groupName = if (tlvReader.isNextTag(ContextSpecificTag(TAG_GROUP_NAME))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_GROUP_NAME)))
+    } else {
+      Optional.empty()
+    }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
       return GroupKeyManagementClusterGroupInfoMapStruct(groupId, endpoints, groupName, fabricIndex)

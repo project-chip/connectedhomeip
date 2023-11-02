@@ -20,19 +20,33 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class TemperatureMeasurementCluster(private val endpointId: UShort) {
-  class MeasuredValueAttribute(val value: Short?)
+  class MeasuredValueAttribute(
+    val value: Short?
+  )
 
-  class MinMeasuredValueAttribute(val value: Short?)
+  class MinMeasuredValueAttribute(
+    val value: Short?
+  )
 
-  class MaxMeasuredValueAttribute(val value: Short?)
+  class MaxMeasuredValueAttribute(
+    val value: Short?
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
   suspend fun readMeasuredValueAttribute(): MeasuredValueAttribute {
     // Implementation needs to be added here
@@ -71,7 +85,10 @@ class TemperatureMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeToleranceAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeToleranceAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -101,7 +118,10 @@ class TemperatureMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -120,7 +140,10 @@ class TemperatureMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -128,7 +151,10 @@ class TemperatureMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

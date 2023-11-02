@@ -21,72 +21,84 @@ import matter.devicecontroller.cluster.structs.*
 
 class DoorLockCluster(private val endpointId: UShort) {
   class GetWeekDayScheduleResponse(
-    val weekDayIndex: UByte,
-    val userIndex: UShort,
-    val status: UInt,
-    val daysMask: UInt?,
-    val startHour: UByte?,
-    val startMinute: UByte?,
-    val endHour: UByte?,
+    val weekDayIndex: UByte, 
+    val userIndex: UShort, 
+    val status: UInt, 
+    val daysMask: UInt?, 
+    val startHour: UByte?, 
+    val startMinute: UByte?, 
+    val endHour: UByte?, 
     val endMinute: UByte?
   )
 
   class GetYearDayScheduleResponse(
-    val yearDayIndex: UByte,
-    val userIndex: UShort,
-    val status: UInt,
-    val localStartTime: UInt?,
+    val yearDayIndex: UByte, 
+    val userIndex: UShort, 
+    val status: UInt, 
+    val localStartTime: UInt?, 
     val localEndTime: UInt?
   )
 
   class GetHolidayScheduleResponse(
-    val holidayIndex: UByte,
-    val status: UInt,
-    val localStartTime: UInt?,
-    val localEndTime: UInt?,
+    val holidayIndex: UByte, 
+    val status: UInt, 
+    val localStartTime: UInt?, 
+    val localEndTime: UInt?, 
     val operatingMode: UInt?
   )
 
   class GetUserResponse(
-    val userIndex: UShort,
-    val userName: String?,
-    val userUniqueID: UInt?,
-    val userStatus: UInt?,
-    val userType: UInt?,
-    val credentialRule: UInt?,
-    val credentials: List<DoorLockClusterCredentialStruct>?,
-    val creatorFabricIndex: UByte?,
-    val lastModifiedFabricIndex: UByte?,
+    val userIndex: UShort, 
+    val userName: String?, 
+    val userUniqueID: UInt?, 
+    val userStatus: UInt?, 
+    val userType: UInt?, 
+    val credentialRule: UInt?, 
+    val credentials: List<DoorLockClusterCredentialStruct>?, 
+    val creatorFabricIndex: UByte?, 
+    val lastModifiedFabricIndex: UByte?, 
     val nextUserIndex: UShort?
   )
 
   class SetCredentialResponse(
-    val status: UInt,
-    val userIndex: UShort?,
+    val status: UInt, 
+    val userIndex: UShort?, 
     val nextCredentialIndex: UShort?
   )
 
   class GetCredentialStatusResponse(
-    val credentialExists: Boolean,
-    val userIndex: UShort?,
-    val creatorFabricIndex: UByte?,
-    val lastModifiedFabricIndex: UByte?,
+    val credentialExists: Boolean, 
+    val userIndex: UShort?, 
+    val creatorFabricIndex: UByte?, 
+    val lastModifiedFabricIndex: UByte?, 
     val nextCredentialIndex: UShort?
   )
 
-  class LockStateAttribute(val value: UInt?)
+  class LockStateAttribute(
+    val value: UInt?
+  )
 
-  class DoorStateAttribute(val value: UInt?)
+  class DoorStateAttribute(
+    val value: UInt?
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
-  suspend fun lockDoor(PINCode: ByteArray?, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun lockDoor(PINCode: ByteArray?, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -94,7 +106,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun unlockDoor(PINCode: ByteArray?, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun unlockDoor(PINCode: ByteArray?, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -102,11 +114,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun unlockWithTimeout(
-    timeout: UShort,
-    PINCode: ByteArray?,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun unlockWithTimeout(timeout: UShort, PINCode: ByteArray?, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -114,16 +122,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun setWeekDaySchedule(
-    weekDayIndex: UByte,
-    userIndex: UShort,
-    daysMask: UInt,
-    startHour: UByte,
-    startMinute: UByte,
-    endHour: UByte,
-    endMinute: UByte,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun setWeekDaySchedule(weekDayIndex: UByte, userIndex: UShort, daysMask: UInt, startHour: UByte, startMinute: UByte, endHour: UByte, endMinute: UByte, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -131,11 +130,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun getWeekDaySchedule(
-    weekDayIndex: UByte,
-    userIndex: UShort,
-    timedInvokeTimeoutMs: Int? = null
-  ): GetWeekDayScheduleResponse {
+  suspend fun getWeekDaySchedule(weekDayIndex: UByte, userIndex: UShort, timedInvokeTimeoutMs: Int? = null): GetWeekDayScheduleResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -143,11 +138,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun clearWeekDaySchedule(
-    weekDayIndex: UByte,
-    userIndex: UShort,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun clearWeekDaySchedule(weekDayIndex: UByte, userIndex: UShort, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -155,13 +146,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun setYearDaySchedule(
-    yearDayIndex: UByte,
-    userIndex: UShort,
-    localStartTime: UInt,
-    localEndTime: UInt,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun setYearDaySchedule(yearDayIndex: UByte, userIndex: UShort, localStartTime: UInt, localEndTime: UInt, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -169,11 +154,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun getYearDaySchedule(
-    yearDayIndex: UByte,
-    userIndex: UShort,
-    timedInvokeTimeoutMs: Int? = null
-  ): GetYearDayScheduleResponse {
+  suspend fun getYearDaySchedule(yearDayIndex: UByte, userIndex: UShort, timedInvokeTimeoutMs: Int? = null): GetYearDayScheduleResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -181,11 +162,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun clearYearDaySchedule(
-    yearDayIndex: UByte,
-    userIndex: UShort,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun clearYearDaySchedule(yearDayIndex: UByte, userIndex: UShort, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -193,13 +170,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun setHolidaySchedule(
-    holidayIndex: UByte,
-    localStartTime: UInt,
-    localEndTime: UInt,
-    operatingMode: UInt,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun setHolidaySchedule(holidayIndex: UByte, localStartTime: UInt, localEndTime: UInt, operatingMode: UInt, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -207,10 +178,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun getHolidaySchedule(
-    holidayIndex: UByte,
-    timedInvokeTimeoutMs: Int? = null
-  ): GetHolidayScheduleResponse {
+  suspend fun getHolidaySchedule(holidayIndex: UByte, timedInvokeTimeoutMs: Int? = null): GetHolidayScheduleResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -218,7 +186,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun clearHolidaySchedule(holidayIndex: UByte, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun clearHolidaySchedule(holidayIndex: UByte, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -226,16 +194,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun setUser(
-    operationType: UInt,
-    userIndex: UShort,
-    userName: String?,
-    userUniqueID: UInt?,
-    userStatus: UInt?,
-    userType: UInt?,
-    credentialRule: UInt?,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun setUser(operationType: UInt, userIndex: UShort, userName: String?, userUniqueID: UInt?, userStatus: UInt?, userType: UInt?, credentialRule: UInt?, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -243,7 +202,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun getUser(userIndex: UShort, timedInvokeTimeoutMs: Int? = null): GetUserResponse {
+  suspend fun getUser(userIndex: UShort, timedInvokeTimeoutMs: Int? = null): GetUserResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -251,7 +210,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun clearUser(userIndex: UShort, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun clearUser(userIndex: UShort, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -259,15 +218,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun setCredential(
-    operationType: UInt,
-    credential: DoorLockClusterCredentialStruct,
-    credentialData: ByteArray,
-    userIndex: UShort?,
-    userStatus: UInt?,
-    userType: UInt?,
-    timedInvokeTimeoutMs: Int? = null
-  ): SetCredentialResponse {
+  suspend fun setCredential(operationType: UInt, credential: DoorLockClusterCredentialStruct, credentialData: ByteArray, userIndex: UShort?, userStatus: UInt?, userType: UInt?, timedInvokeTimeoutMs: Int? = null): SetCredentialResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -275,10 +226,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun getCredentialStatus(
-    credential: DoorLockClusterCredentialStruct,
-    timedInvokeTimeoutMs: Int? = null
-  ): GetCredentialStatusResponse {
+  suspend fun getCredentialStatus(credential: DoorLockClusterCredentialStruct, timedInvokeTimeoutMs: Int? = null): GetCredentialStatusResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -286,10 +234,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun clearCredential(
-    credential: DoorLockClusterCredentialStruct?,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun clearCredential(credential: DoorLockClusterCredentialStruct?, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -297,7 +242,7 @@ class DoorLockCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun unboltDoor(PINCode: ByteArray?, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun unboltDoor(PINCode: ByteArray?, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -309,7 +254,10 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLockStateAttribute(minInterval: Int, maxInterval: Int): LockStateAttribute {
+  suspend fun subscribeLockStateAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): LockStateAttribute {
     // Implementation needs to be added here
   }
 
@@ -317,7 +265,10 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLockTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeLockTypeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -325,7 +276,10 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActuatorEnabledAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeActuatorEnabledAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -333,7 +287,10 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDoorStateAttribute(minInterval: Int, maxInterval: Int): DoorStateAttribute {
+  suspend fun subscribeDoorStateAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): DoorStateAttribute {
     // Implementation needs to be added here
   }
 
@@ -341,15 +298,23 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeDoorOpenEventsAttribute(value: UInt) {
+  suspend fun writeDoorOpenEventsAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeDoorOpenEventsAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeDoorOpenEventsAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDoorOpenEventsAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeDoorOpenEventsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -357,15 +322,23 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeDoorClosedEventsAttribute(value: UInt) {
+  suspend fun writeDoorClosedEventsAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeDoorClosedEventsAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeDoorClosedEventsAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDoorClosedEventsAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeDoorClosedEventsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -373,15 +346,23 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOpenPeriodAttribute(value: UShort) {
+  suspend fun writeOpenPeriodAttribute(
+    value: UShort
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOpenPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+  suspend fun writeOpenPeriodAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOpenPeriodAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeOpenPeriodAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -455,7 +436,10 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxPINCodeLengthAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeMaxPINCodeLengthAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -463,7 +447,10 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMinPINCodeLengthAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeMinPINCodeLengthAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -471,7 +458,10 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxRFIDCodeLengthAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeMaxRFIDCodeLengthAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -479,7 +469,10 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMinRFIDCodeLengthAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeMinRFIDCodeLengthAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -487,7 +480,10 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCredentialRulesSupportAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeCredentialRulesSupportAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -506,15 +502,23 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLanguageAttribute(value: String) {
+  suspend fun writeLanguageAttribute(
+    value: String
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLanguageAttribute(value: String, timedWriteTimeoutMs: Int) {
+  suspend fun writeLanguageAttribute(
+    value: String,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLanguageAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeLanguageAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -522,15 +526,23 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLEDSettingsAttribute(value: UByte) {
+  suspend fun writeLEDSettingsAttribute(
+    value: UByte
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLEDSettingsAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+  suspend fun writeLEDSettingsAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLEDSettingsAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeLEDSettingsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -538,15 +550,23 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeAutoRelockTimeAttribute(value: UInt) {
+  suspend fun writeAutoRelockTimeAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeAutoRelockTimeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeAutoRelockTimeAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAutoRelockTimeAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeAutoRelockTimeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -554,15 +574,23 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeSoundVolumeAttribute(value: UByte) {
+  suspend fun writeSoundVolumeAttribute(
+    value: UByte
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeSoundVolumeAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+  suspend fun writeSoundVolumeAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSoundVolumeAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeSoundVolumeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -570,15 +598,23 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOperatingModeAttribute(value: UInt) {
+  suspend fun writeOperatingModeAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOperatingModeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeOperatingModeAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOperatingModeAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeOperatingModeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -608,11 +644,16 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEnableLocalProgrammingAttribute(value: Boolean) {
+  suspend fun writeEnableLocalProgrammingAttribute(
+    value: Boolean
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEnableLocalProgrammingAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeEnableLocalProgrammingAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -627,15 +668,23 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEnableOneTouchLockingAttribute(value: Boolean) {
+  suspend fun writeEnableOneTouchLockingAttribute(
+    value: Boolean
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEnableOneTouchLockingAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeEnableOneTouchLockingAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEnableOneTouchLockingAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeEnableOneTouchLockingAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -643,15 +692,23 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEnableInsideStatusLEDAttribute(value: Boolean) {
+  suspend fun writeEnableInsideStatusLEDAttribute(
+    value: Boolean
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEnableInsideStatusLEDAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeEnableInsideStatusLEDAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEnableInsideStatusLEDAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeEnableInsideStatusLEDAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -659,11 +716,16 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEnablePrivacyModeButtonAttribute(value: Boolean) {
+  suspend fun writeEnablePrivacyModeButtonAttribute(
+    value: Boolean
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEnablePrivacyModeButtonAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeEnablePrivacyModeButtonAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -678,11 +740,16 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLocalProgrammingFeaturesAttribute(value: UInt) {
+  suspend fun writeLocalProgrammingFeaturesAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLocalProgrammingFeaturesAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeLocalProgrammingFeaturesAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -697,15 +764,23 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeWrongCodeEntryLimitAttribute(value: UByte) {
+  suspend fun writeWrongCodeEntryLimitAttribute(
+    value: UByte
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeWrongCodeEntryLimitAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+  suspend fun writeWrongCodeEntryLimitAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeWrongCodeEntryLimitAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeWrongCodeEntryLimitAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -713,11 +788,16 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeUserCodeTemporaryDisableTimeAttribute(value: UByte) {
+  suspend fun writeUserCodeTemporaryDisableTimeAttribute(
+    value: UByte
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeUserCodeTemporaryDisableTimeAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+  suspend fun writeUserCodeTemporaryDisableTimeAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -732,15 +812,23 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeSendPINOverTheAirAttribute(value: Boolean) {
+  suspend fun writeSendPINOverTheAirAttribute(
+    value: Boolean
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeSendPINOverTheAirAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeSendPINOverTheAirAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSendPINOverTheAirAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeSendPINOverTheAirAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -748,11 +836,16 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRequirePINforRemoteOperationAttribute(value: Boolean) {
+  suspend fun writeRequirePINforRemoteOperationAttribute(
+    value: Boolean
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRequirePINforRemoteOperationAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeRequirePINforRemoteOperationAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -767,15 +860,23 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeExpiringUserTimeoutAttribute(value: UShort) {
+  suspend fun writeExpiringUserTimeoutAttribute(
+    value: UShort
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeExpiringUserTimeoutAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+  suspend fun writeExpiringUserTimeoutAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeExpiringUserTimeoutAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeExpiringUserTimeoutAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -805,7 +906,10 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -824,7 +928,10 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -832,7 +939,10 @@ class DoorLockCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

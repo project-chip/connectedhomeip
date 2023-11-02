@@ -20,162 +20,267 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class UnitTestingCluster(private val endpointId: UShort) {
-  class TestSpecificResponse(val returnValue: UByte)
+  class TestSpecificResponse(
+    val returnValue: UByte
+  )
 
-  class TestAddArgumentsResponse(val returnValue: UByte)
+  class TestAddArgumentsResponse(
+    val returnValue: UByte
+  )
 
-  class TestSimpleArgumentResponse(val returnValue: Boolean)
+  class TestSimpleArgumentResponse(
+    val returnValue: Boolean
+  )
 
   class TestStructArrayArgumentResponse(
-    val arg1: List<UnitTestingClusterNestedStructList>,
-    val arg2: List<UnitTestingClusterSimpleStruct>,
-    val arg3: List<UInt>,
-    val arg4: List<Boolean>,
-    val arg5: UInt,
+    val arg1: List<UnitTestingClusterNestedStructList>, 
+    val arg2: List<UnitTestingClusterSimpleStruct>, 
+    val arg3: List<UInt>, 
+    val arg4: List<Boolean>, 
+    val arg5: UInt, 
     val arg6: Boolean
   )
 
-  class BooleanResponse(val value: Boolean)
+  class BooleanResponse(
+    val value: Boolean
+  )
 
-  class TestListInt8UReverseResponse(val arg1: List<UByte>)
+  class TestListInt8UReverseResponse(
+    val arg1: List<UByte>
+  )
 
-  class TestEnumsResponse(val arg1: UShort, val arg2: UInt)
+  class TestEnumsResponse(
+    val arg1: UShort, 
+    val arg2: UInt
+  )
 
   class TestNullableOptionalResponse(
-    val wasPresent: Boolean,
-    val wasNull: Boolean?,
-    val value: UByte?,
+    val wasPresent: Boolean, 
+    val wasNull: Boolean?, 
+    val value: UByte?, 
     val originalValue: UByte?
   )
 
   class TestComplexNullableOptionalResponse(
-    val nullableIntWasNull: Boolean,
-    val nullableIntValue: UShort?,
-    val optionalIntWasPresent: Boolean,
-    val optionalIntValue: UShort?,
-    val nullableOptionalIntWasPresent: Boolean,
-    val nullableOptionalIntWasNull: Boolean?,
-    val nullableOptionalIntValue: UShort?,
-    val nullableStringWasNull: Boolean,
-    val nullableStringValue: String?,
-    val optionalStringWasPresent: Boolean,
-    val optionalStringValue: String?,
-    val nullableOptionalStringWasPresent: Boolean,
-    val nullableOptionalStringWasNull: Boolean?,
-    val nullableOptionalStringValue: String?,
-    val nullableStructWasNull: Boolean,
-    val nullableStructValue: UnitTestingClusterSimpleStruct?,
-    val optionalStructWasPresent: Boolean,
-    val optionalStructValue: UnitTestingClusterSimpleStruct?,
-    val nullableOptionalStructWasPresent: Boolean,
-    val nullableOptionalStructWasNull: Boolean?,
-    val nullableOptionalStructValue: UnitTestingClusterSimpleStruct?,
-    val nullableListWasNull: Boolean,
-    val nullableListValue: List<UInt>?,
-    val optionalListWasPresent: Boolean,
-    val optionalListValue: List<UInt>?,
-    val nullableOptionalListWasPresent: Boolean,
-    val nullableOptionalListWasNull: Boolean?,
+    val nullableIntWasNull: Boolean, 
+    val nullableIntValue: UShort?, 
+    val optionalIntWasPresent: Boolean, 
+    val optionalIntValue: UShort?, 
+    val nullableOptionalIntWasPresent: Boolean, 
+    val nullableOptionalIntWasNull: Boolean?, 
+    val nullableOptionalIntValue: UShort?, 
+    val nullableStringWasNull: Boolean, 
+    val nullableStringValue: String?, 
+    val optionalStringWasPresent: Boolean, 
+    val optionalStringValue: String?, 
+    val nullableOptionalStringWasPresent: Boolean, 
+    val nullableOptionalStringWasNull: Boolean?, 
+    val nullableOptionalStringValue: String?, 
+    val nullableStructWasNull: Boolean, 
+    val nullableStructValue: UnitTestingClusterSimpleStruct?, 
+    val optionalStructWasPresent: Boolean, 
+    val optionalStructValue: UnitTestingClusterSimpleStruct?, 
+    val nullableOptionalStructWasPresent: Boolean, 
+    val nullableOptionalStructWasNull: Boolean?, 
+    val nullableOptionalStructValue: UnitTestingClusterSimpleStruct?, 
+    val nullableListWasNull: Boolean, 
+    val nullableListValue: List<UInt>?, 
+    val optionalListWasPresent: Boolean, 
+    val optionalListValue: List<UInt>?, 
+    val nullableOptionalListWasPresent: Boolean, 
+    val nullableOptionalListWasNull: Boolean?, 
     val nullableOptionalListValue: List<UInt>?
   )
 
-  class SimpleStructResponse(val arg1: UnitTestingClusterSimpleStruct)
+  class SimpleStructResponse(
+    val arg1: UnitTestingClusterSimpleStruct
+  )
 
-  class TestEmitTestEventResponse(val value: ULong)
+  class TestEmitTestEventResponse(
+    val value: ULong
+  )
 
-  class TestEmitTestFabricScopedEventResponse(val value: ULong)
+  class TestEmitTestFabricScopedEventResponse(
+    val value: ULong
+  )
 
-  class ListInt8uAttribute(val value: List<UByte>)
+  class ListInt8uAttribute(
+    val value: List<UByte>
+  )
 
-  class ListOctetStringAttribute(val value: List<ByteArray>)
+  class ListOctetStringAttribute(
+    val value: List<ByteArray>
+  )
 
-  class ListStructOctetStringAttribute(val value: List<UnitTestingClusterTestListStructOctet>)
+  class ListStructOctetStringAttribute(
+    val value: List<UnitTestingClusterTestListStructOctet>
+  )
 
   class ListNullablesAndOptionalsStructAttribute(
     val value: List<UnitTestingClusterNullablesAndOptionalsStruct>
   )
 
-  class StructAttrAttribute(val value: UnitTestingClusterSimpleStruct)
+  class StructAttrAttribute(
+    val value: UnitTestingClusterSimpleStruct
+  )
 
-  class ListLongOctetStringAttribute(val value: List<ByteArray>)
+  class ListLongOctetStringAttribute(
+    val value: List<ByteArray>
+  )
 
-  class ListFabricScopedAttribute(val value: List<UnitTestingClusterTestFabricScoped>)
+  class ListFabricScopedAttribute(
+    val value: List<UnitTestingClusterTestFabricScoped>
+  )
 
-  class NullableBooleanAttribute(val value: Boolean?)
+  class NullableBooleanAttribute(
+    val value: Boolean?
+  )
 
-  class NullableBitmap8Attribute(val value: UInt?)
+  class NullableBitmap8Attribute(
+    val value: UInt?
+  )
 
-  class NullableBitmap16Attribute(val value: UInt?)
+  class NullableBitmap16Attribute(
+    val value: UInt?
+  )
 
-  class NullableBitmap32Attribute(val value: ULong?)
+  class NullableBitmap32Attribute(
+    val value: ULong?
+  )
 
-  class NullableBitmap64Attribute(val value: ULong?)
+  class NullableBitmap64Attribute(
+    val value: ULong?
+  )
 
-  class NullableInt8uAttribute(val value: UByte?)
+  class NullableInt8uAttribute(
+    val value: UByte?
+  )
 
-  class NullableInt16uAttribute(val value: UShort?)
+  class NullableInt16uAttribute(
+    val value: UShort?
+  )
 
-  class NullableInt24uAttribute(val value: UInt?)
+  class NullableInt24uAttribute(
+    val value: UInt?
+  )
 
-  class NullableInt32uAttribute(val value: UInt?)
+  class NullableInt32uAttribute(
+    val value: UInt?
+  )
 
-  class NullableInt40uAttribute(val value: ULong?)
+  class NullableInt40uAttribute(
+    val value: ULong?
+  )
 
-  class NullableInt48uAttribute(val value: ULong?)
+  class NullableInt48uAttribute(
+    val value: ULong?
+  )
 
-  class NullableInt56uAttribute(val value: ULong?)
+  class NullableInt56uAttribute(
+    val value: ULong?
+  )
 
-  class NullableInt64uAttribute(val value: ULong?)
+  class NullableInt64uAttribute(
+    val value: ULong?
+  )
 
-  class NullableInt8sAttribute(val value: Byte?)
+  class NullableInt8sAttribute(
+    val value: Byte?
+  )
 
-  class NullableInt16sAttribute(val value: Short?)
+  class NullableInt16sAttribute(
+    val value: Short?
+  )
 
-  class NullableInt24sAttribute(val value: Int?)
+  class NullableInt24sAttribute(
+    val value: Int?
+  )
 
-  class NullableInt32sAttribute(val value: Int?)
+  class NullableInt32sAttribute(
+    val value: Int?
+  )
 
-  class NullableInt40sAttribute(val value: Long?)
+  class NullableInt40sAttribute(
+    val value: Long?
+  )
 
-  class NullableInt48sAttribute(val value: Long?)
+  class NullableInt48sAttribute(
+    val value: Long?
+  )
 
-  class NullableInt56sAttribute(val value: Long?)
+  class NullableInt56sAttribute(
+    val value: Long?
+  )
 
-  class NullableInt64sAttribute(val value: Long?)
+  class NullableInt64sAttribute(
+    val value: Long?
+  )
 
-  class NullableEnum8Attribute(val value: UInt?)
+  class NullableEnum8Attribute(
+    val value: UInt?
+  )
 
-  class NullableEnum16Attribute(val value: UInt?)
+  class NullableEnum16Attribute(
+    val value: UInt?
+  )
 
-  class NullableFloatSingleAttribute(val value: Float?)
+  class NullableFloatSingleAttribute(
+    val value: Float?
+  )
 
-  class NullableFloatDoubleAttribute(val value: Double?)
+  class NullableFloatDoubleAttribute(
+    val value: Double?
+  )
 
-  class NullableOctetStringAttribute(val value: ByteArray?)
+  class NullableOctetStringAttribute(
+    val value: ByteArray?
+  )
 
-  class NullableCharStringAttribute(val value: String?)
+  class NullableCharStringAttribute(
+    val value: String?
+  )
 
-  class NullableEnumAttrAttribute(val value: UInt?)
+  class NullableEnumAttrAttribute(
+    val value: UInt?
+  )
 
-  class NullableStructAttribute(val value: UnitTestingClusterSimpleStruct?)
+  class NullableStructAttribute(
+    val value: UnitTestingClusterSimpleStruct?
+  )
 
-  class NullableRangeRestrictedInt8uAttribute(val value: UByte?)
+  class NullableRangeRestrictedInt8uAttribute(
+    val value: UByte?
+  )
 
-  class NullableRangeRestrictedInt8sAttribute(val value: Byte?)
+  class NullableRangeRestrictedInt8sAttribute(
+    val value: Byte?
+  )
 
-  class NullableRangeRestrictedInt16uAttribute(val value: UShort?)
+  class NullableRangeRestrictedInt16uAttribute(
+    val value: UShort?
+  )
 
-  class NullableRangeRestrictedInt16sAttribute(val value: Short?)
+  class NullableRangeRestrictedInt16sAttribute(
+    val value: Short?
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
-  suspend fun test(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun test(timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -183,7 +288,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testNotHandled(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun testNotHandled(timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -191,7 +296,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testSpecific(timedInvokeTimeoutMs: Int? = null): TestSpecificResponse {
+  suspend fun testSpecific(timedInvokeTimeoutMs: Int? = null): TestSpecificResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -199,7 +304,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testUnknownCommand(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun testUnknownCommand(timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -207,11 +312,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testAddArguments(
-    arg1: UByte,
-    arg2: UByte,
-    timedInvokeTimeoutMs: Int? = null
-  ): TestAddArgumentsResponse {
+  suspend fun testAddArguments(arg1: UByte, arg2: UByte, timedInvokeTimeoutMs: Int? = null): TestAddArgumentsResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -219,10 +320,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testSimpleArgumentRequest(
-    arg1: Boolean,
-    timedInvokeTimeoutMs: Int? = null
-  ): TestSimpleArgumentResponse {
+  suspend fun testSimpleArgumentRequest(arg1: Boolean, timedInvokeTimeoutMs: Int? = null): TestSimpleArgumentResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -230,15 +328,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testStructArrayArgumentRequest(
-    arg1: List<UnitTestingClusterNestedStructList>,
-    arg2: List<UnitTestingClusterSimpleStruct>,
-    arg3: List<UInt>,
-    arg4: List<Boolean>,
-    arg5: UInt,
-    arg6: Boolean,
-    timedInvokeTimeoutMs: Int? = null
-  ): TestStructArrayArgumentResponse {
+  suspend fun testStructArrayArgumentRequest(arg1: List<UnitTestingClusterNestedStructList>, arg2: List<UnitTestingClusterSimpleStruct>, arg3: List<UInt>, arg4: List<Boolean>, arg5: UInt, arg6: Boolean, timedInvokeTimeoutMs: Int? = null): TestStructArrayArgumentResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -246,10 +336,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testStructArgumentRequest(
-    arg1: UnitTestingClusterSimpleStruct,
-    timedInvokeTimeoutMs: Int? = null
-  ): BooleanResponse {
+  suspend fun testStructArgumentRequest(arg1: UnitTestingClusterSimpleStruct, timedInvokeTimeoutMs: Int? = null): BooleanResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -257,10 +344,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testNestedStructArgumentRequest(
-    arg1: UnitTestingClusterNestedStruct,
-    timedInvokeTimeoutMs: Int? = null
-  ): BooleanResponse {
+  suspend fun testNestedStructArgumentRequest(arg1: UnitTestingClusterNestedStruct, timedInvokeTimeoutMs: Int? = null): BooleanResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -268,10 +352,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testListStructArgumentRequest(
-    arg1: List<UnitTestingClusterSimpleStruct>,
-    timedInvokeTimeoutMs: Int? = null
-  ): BooleanResponse {
+  suspend fun testListStructArgumentRequest(arg1: List<UnitTestingClusterSimpleStruct>, timedInvokeTimeoutMs: Int? = null): BooleanResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -279,10 +360,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testListInt8UArgumentRequest(
-    arg1: List<UByte>,
-    timedInvokeTimeoutMs: Int? = null
-  ): BooleanResponse {
+  suspend fun testListInt8UArgumentRequest(arg1: List<UByte>, timedInvokeTimeoutMs: Int? = null): BooleanResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -290,10 +368,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testNestedStructListArgumentRequest(
-    arg1: UnitTestingClusterNestedStructList,
-    timedInvokeTimeoutMs: Int? = null
-  ): BooleanResponse {
+  suspend fun testNestedStructListArgumentRequest(arg1: UnitTestingClusterNestedStructList, timedInvokeTimeoutMs: Int? = null): BooleanResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -301,10 +376,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testListNestedStructListArgumentRequest(
-    arg1: List<UnitTestingClusterNestedStructList>,
-    timedInvokeTimeoutMs: Int? = null
-  ): BooleanResponse {
+  suspend fun testListNestedStructListArgumentRequest(arg1: List<UnitTestingClusterNestedStructList>, timedInvokeTimeoutMs: Int? = null): BooleanResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -312,10 +384,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testListInt8UReverseRequest(
-    arg1: List<UByte>,
-    timedInvokeTimeoutMs: Int? = null
-  ): TestListInt8UReverseResponse {
+  suspend fun testListInt8UReverseRequest(arg1: List<UByte>, timedInvokeTimeoutMs: Int? = null): TestListInt8UReverseResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -323,11 +392,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testEnumsRequest(
-    arg1: UShort,
-    arg2: UInt,
-    timedInvokeTimeoutMs: Int? = null
-  ): TestEnumsResponse {
+  suspend fun testEnumsRequest(arg1: UShort, arg2: UInt, timedInvokeTimeoutMs: Int? = null): TestEnumsResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -335,10 +400,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testNullableOptionalRequest(
-    arg1: UByte?,
-    timedInvokeTimeoutMs: Int? = null
-  ): TestNullableOptionalResponse {
+  suspend fun testNullableOptionalRequest(arg1: UByte?, timedInvokeTimeoutMs: Int? = null): TestNullableOptionalResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -346,21 +408,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testComplexNullableOptionalRequest(
-    nullableInt: UShort?,
-    optionalInt: UShort?,
-    nullableOptionalInt: UShort?,
-    nullableString: String?,
-    optionalString: String?,
-    nullableOptionalString: String?,
-    nullableStruct: UnitTestingClusterSimpleStruct?,
-    optionalStruct: UnitTestingClusterSimpleStruct?,
-    nullableOptionalStruct: UnitTestingClusterSimpleStruct?,
-    nullableList: List<UInt>?,
-    optionalList: List<UInt>?,
-    nullableOptionalList: List<UInt>?,
-    timedInvokeTimeoutMs: Int? = null
-  ): TestComplexNullableOptionalResponse {
+  suspend fun testComplexNullableOptionalRequest(nullableInt: UShort?, optionalInt: UShort?, nullableOptionalInt: UShort?, nullableString: String?, optionalString: String?, nullableOptionalString: String?, nullableStruct: UnitTestingClusterSimpleStruct?, optionalStruct: UnitTestingClusterSimpleStruct?, nullableOptionalStruct: UnitTestingClusterSimpleStruct?, nullableList: List<UInt>?, optionalList: List<UInt>?, nullableOptionalList: List<UInt>?, timedInvokeTimeoutMs: Int? = null): TestComplexNullableOptionalResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -368,10 +416,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun simpleStructEchoRequest(
-    arg1: UnitTestingClusterSimpleStruct,
-    timedInvokeTimeoutMs: Int? = null
-  ): SimpleStructResponse {
+  suspend fun simpleStructEchoRequest(arg1: UnitTestingClusterSimpleStruct, timedInvokeTimeoutMs: Int? = null): SimpleStructResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -379,7 +424,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun timedInvokeRequest(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun timedInvokeRequest(timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -387,7 +432,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testSimpleOptionalArgumentRequest(arg1: Boolean?, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun testSimpleOptionalArgumentRequest(arg1: Boolean?, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -395,12 +440,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testEmitTestEventRequest(
-    arg1: UByte,
-    arg2: UInt,
-    arg3: Boolean,
-    timedInvokeTimeoutMs: Int? = null
-  ): TestEmitTestEventResponse {
+  suspend fun testEmitTestEventRequest(arg1: UByte, arg2: UInt, arg3: Boolean, timedInvokeTimeoutMs: Int? = null): TestEmitTestEventResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -408,10 +448,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun testEmitTestFabricScopedEventRequest(
-    arg1: UByte,
-    timedInvokeTimeoutMs: Int? = null
-  ): TestEmitTestFabricScopedEventResponse {
+  suspend fun testEmitTestFabricScopedEventRequest(arg1: UByte, timedInvokeTimeoutMs: Int? = null): TestEmitTestFabricScopedEventResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -423,15 +460,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeBooleanAttribute(value: Boolean) {
+  suspend fun writeBooleanAttribute(
+    value: Boolean
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeBooleanAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeBooleanAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBooleanAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeBooleanAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -439,15 +484,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeBitmap8Attribute(value: UInt) {
+  suspend fun writeBitmap8Attribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeBitmap8Attribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeBitmap8Attribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBitmap8Attribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeBitmap8Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -455,15 +508,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeBitmap16Attribute(value: UInt) {
+  suspend fun writeBitmap16Attribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeBitmap16Attribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeBitmap16Attribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBitmap16Attribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeBitmap16Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -471,15 +532,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeBitmap32Attribute(value: ULong) {
+  suspend fun writeBitmap32Attribute(
+    value: ULong
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeBitmap32Attribute(value: ULong, timedWriteTimeoutMs: Int) {
+  suspend fun writeBitmap32Attribute(
+    value: ULong,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBitmap32Attribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeBitmap32Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -487,15 +556,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeBitmap64Attribute(value: ULong) {
+  suspend fun writeBitmap64Attribute(
+    value: ULong
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeBitmap64Attribute(value: ULong, timedWriteTimeoutMs: Int) {
+  suspend fun writeBitmap64Attribute(
+    value: ULong,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBitmap64Attribute(minInterval: Int, maxInterval: Int): ULong {
+  suspend fun subscribeBitmap64Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ULong {
     // Implementation needs to be added here
   }
 
@@ -503,15 +580,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt8uAttribute(value: UByte) {
+  suspend fun writeInt8uAttribute(
+    value: UByte
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt8uAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt8uAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt8uAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeInt8uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -519,15 +604,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt16uAttribute(value: UShort) {
+  suspend fun writeInt16uAttribute(
+    value: UShort
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt16uAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt16uAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt16uAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeInt16uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -535,15 +628,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt24uAttribute(value: UInt) {
+  suspend fun writeInt24uAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt24uAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt24uAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt24uAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeInt24uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -551,15 +652,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt32uAttribute(value: UInt) {
+  suspend fun writeInt32uAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt32uAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt32uAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt32uAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeInt32uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -567,15 +676,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt40uAttribute(value: ULong) {
+  suspend fun writeInt40uAttribute(
+    value: ULong
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt40uAttribute(value: ULong, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt40uAttribute(
+    value: ULong,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt40uAttribute(minInterval: Int, maxInterval: Int): ULong {
+  suspend fun subscribeInt40uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ULong {
     // Implementation needs to be added here
   }
 
@@ -583,15 +700,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt48uAttribute(value: ULong) {
+  suspend fun writeInt48uAttribute(
+    value: ULong
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt48uAttribute(value: ULong, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt48uAttribute(
+    value: ULong,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt48uAttribute(minInterval: Int, maxInterval: Int): ULong {
+  suspend fun subscribeInt48uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ULong {
     // Implementation needs to be added here
   }
 
@@ -599,15 +724,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt56uAttribute(value: ULong) {
+  suspend fun writeInt56uAttribute(
+    value: ULong
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt56uAttribute(value: ULong, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt56uAttribute(
+    value: ULong,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt56uAttribute(minInterval: Int, maxInterval: Int): ULong {
+  suspend fun subscribeInt56uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ULong {
     // Implementation needs to be added here
   }
 
@@ -615,15 +748,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt64uAttribute(value: ULong) {
+  suspend fun writeInt64uAttribute(
+    value: ULong
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt64uAttribute(value: ULong, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt64uAttribute(
+    value: ULong,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt64uAttribute(minInterval: Int, maxInterval: Int): ULong {
+  suspend fun subscribeInt64uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ULong {
     // Implementation needs to be added here
   }
 
@@ -631,15 +772,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt8sAttribute(value: Byte) {
+  suspend fun writeInt8sAttribute(
+    value: Byte
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt8sAttribute(value: Byte, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt8sAttribute(
+    value: Byte,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt8sAttribute(minInterval: Int, maxInterval: Int): Byte {
+  suspend fun subscribeInt8sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Byte {
     // Implementation needs to be added here
   }
 
@@ -647,15 +796,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt16sAttribute(value: Short) {
+  suspend fun writeInt16sAttribute(
+    value: Short
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt16sAttribute(value: Short, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt16sAttribute(
+    value: Short,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt16sAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeInt16sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -663,15 +820,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt24sAttribute(value: Int) {
+  suspend fun writeInt24sAttribute(
+    value: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt24sAttribute(value: Int, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt24sAttribute(
+    value: Int,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt24sAttribute(minInterval: Int, maxInterval: Int): Int {
+  suspend fun subscribeInt24sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Int {
     // Implementation needs to be added here
   }
 
@@ -679,15 +844,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt32sAttribute(value: Int) {
+  suspend fun writeInt32sAttribute(
+    value: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt32sAttribute(value: Int, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt32sAttribute(
+    value: Int,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt32sAttribute(minInterval: Int, maxInterval: Int): Int {
+  suspend fun subscribeInt32sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Int {
     // Implementation needs to be added here
   }
 
@@ -695,15 +868,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt40sAttribute(value: Long) {
+  suspend fun writeInt40sAttribute(
+    value: Long
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt40sAttribute(value: Long, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt40sAttribute(
+    value: Long,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt40sAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeInt40sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Long {
     // Implementation needs to be added here
   }
 
@@ -711,15 +892,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt48sAttribute(value: Long) {
+  suspend fun writeInt48sAttribute(
+    value: Long
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt48sAttribute(value: Long, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt48sAttribute(
+    value: Long,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt48sAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeInt48sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Long {
     // Implementation needs to be added here
   }
 
@@ -727,15 +916,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt56sAttribute(value: Long) {
+  suspend fun writeInt56sAttribute(
+    value: Long
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt56sAttribute(value: Long, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt56sAttribute(
+    value: Long,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt56sAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeInt56sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Long {
     // Implementation needs to be added here
   }
 
@@ -743,15 +940,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt64sAttribute(value: Long) {
+  suspend fun writeInt64sAttribute(
+    value: Long
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInt64sAttribute(value: Long, timedWriteTimeoutMs: Int) {
+  suspend fun writeInt64sAttribute(
+    value: Long,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInt64sAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeInt64sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Long {
     // Implementation needs to be added here
   }
 
@@ -759,15 +964,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEnum8Attribute(value: UInt) {
+  suspend fun writeEnum8Attribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEnum8Attribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeEnum8Attribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEnum8Attribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeEnum8Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -775,15 +988,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEnum16Attribute(value: UInt) {
+  suspend fun writeEnum16Attribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEnum16Attribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeEnum16Attribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEnum16Attribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeEnum16Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -791,15 +1012,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeFloatSingleAttribute(value: Float) {
+  suspend fun writeFloatSingleAttribute(
+    value: Float
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeFloatSingleAttribute(value: Float, timedWriteTimeoutMs: Int) {
+  suspend fun writeFloatSingleAttribute(
+    value: Float,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFloatSingleAttribute(minInterval: Int, maxInterval: Int): Float {
+  suspend fun subscribeFloatSingleAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Float {
     // Implementation needs to be added here
   }
 
@@ -807,15 +1036,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeFloatDoubleAttribute(value: Double) {
+  suspend fun writeFloatDoubleAttribute(
+    value: Double
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeFloatDoubleAttribute(value: Double, timedWriteTimeoutMs: Int) {
+  suspend fun writeFloatDoubleAttribute(
+    value: Double,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFloatDoubleAttribute(minInterval: Int, maxInterval: Int): Double {
+  suspend fun subscribeFloatDoubleAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Double {
     // Implementation needs to be added here
   }
 
@@ -823,15 +1060,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOctetStringAttribute(value: ByteArray) {
+  suspend fun writeOctetStringAttribute(
+    value: ByteArray
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOctetStringAttribute(value: ByteArray, timedWriteTimeoutMs: Int) {
+  suspend fun writeOctetStringAttribute(
+    value: ByteArray,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOctetStringAttribute(minInterval: Int, maxInterval: Int): OctetString {
+  suspend fun subscribeOctetStringAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): OctetString {
     // Implementation needs to be added here
   }
 
@@ -839,15 +1084,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeListInt8uAttribute(value: List<UByte>) {
+  suspend fun writeListInt8uAttribute(
+    value: List<UByte>
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeListInt8uAttribute(value: List<UByte>, timedWriteTimeoutMs: Int) {
+  suspend fun writeListInt8uAttribute(
+    value: List<UByte>,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeListInt8uAttribute(minInterval: Int, maxInterval: Int): ListInt8uAttribute {
+  suspend fun subscribeListInt8uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ListInt8uAttribute {
     // Implementation needs to be added here
   }
 
@@ -855,11 +1108,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeListOctetStringAttribute(value: List<ByteArray>) {
+  suspend fun writeListOctetStringAttribute(
+    value: List<ByteArray>
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeListOctetStringAttribute(value: List<ByteArray>, timedWriteTimeoutMs: Int) {
+  suspend fun writeListOctetStringAttribute(
+    value: List<ByteArray>,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -898,15 +1156,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLongOctetStringAttribute(value: ByteArray) {
+  suspend fun writeLongOctetStringAttribute(
+    value: ByteArray
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLongOctetStringAttribute(value: ByteArray, timedWriteTimeoutMs: Int) {
+  suspend fun writeLongOctetStringAttribute(
+    value: ByteArray,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLongOctetStringAttribute(minInterval: Int, maxInterval: Int): OctetString {
+  suspend fun subscribeLongOctetStringAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): OctetString {
     // Implementation needs to be added here
   }
 
@@ -914,15 +1180,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeCharStringAttribute(value: String) {
+  suspend fun writeCharStringAttribute(
+    value: String
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeCharStringAttribute(value: String, timedWriteTimeoutMs: Int) {
+  suspend fun writeCharStringAttribute(
+    value: String,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCharStringAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeCharStringAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -930,15 +1204,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLongCharStringAttribute(value: String) {
+  suspend fun writeLongCharStringAttribute(
+    value: String
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLongCharStringAttribute(value: String, timedWriteTimeoutMs: Int) {
+  suspend fun writeLongCharStringAttribute(
+    value: String,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLongCharStringAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeLongCharStringAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -946,15 +1228,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEpochUsAttribute(value: ULong) {
+  suspend fun writeEpochUsAttribute(
+    value: ULong
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEpochUsAttribute(value: ULong, timedWriteTimeoutMs: Int) {
+  suspend fun writeEpochUsAttribute(
+    value: ULong,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEpochUsAttribute(minInterval: Int, maxInterval: Int): ULong {
+  suspend fun subscribeEpochUsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ULong {
     // Implementation needs to be added here
   }
 
@@ -962,15 +1252,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEpochSAttribute(value: UInt) {
+  suspend fun writeEpochSAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEpochSAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeEpochSAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEpochSAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeEpochSAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -978,20 +1276,27 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeVendorIdAttribute(value: UShort) {
+  suspend fun writeVendorIdAttribute(
+    value: UShort
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeVendorIdAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+  suspend fun writeVendorIdAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeVendorIdAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeVendorIdAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readListNullablesAndOptionalsStructAttribute():
-    ListNullablesAndOptionalsStructAttribute {
+  suspend fun readListNullablesAndOptionalsStructAttribute(): ListNullablesAndOptionalsStructAttribute {
     // Implementation needs to be added here
   }
 
@@ -1019,15 +1324,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEnumAttrAttribute(value: UInt) {
+  suspend fun writeEnumAttrAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEnumAttrAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeEnumAttrAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEnumAttrAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeEnumAttrAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -1035,7 +1348,9 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeStructAttrAttribute(value: UnitTestingClusterSimpleStruct) {
+  suspend fun writeStructAttrAttribute(
+    value: UnitTestingClusterSimpleStruct
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1057,15 +1372,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRangeRestrictedInt8uAttribute(value: UByte) {
+  suspend fun writeRangeRestrictedInt8uAttribute(
+    value: UByte
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRangeRestrictedInt8uAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+  suspend fun writeRangeRestrictedInt8uAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRangeRestrictedInt8uAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeRangeRestrictedInt8uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -1073,15 +1396,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRangeRestrictedInt8sAttribute(value: Byte) {
+  suspend fun writeRangeRestrictedInt8sAttribute(
+    value: Byte
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRangeRestrictedInt8sAttribute(value: Byte, timedWriteTimeoutMs: Int) {
+  suspend fun writeRangeRestrictedInt8sAttribute(
+    value: Byte,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRangeRestrictedInt8sAttribute(minInterval: Int, maxInterval: Int): Byte {
+  suspend fun subscribeRangeRestrictedInt8sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Byte {
     // Implementation needs to be added here
   }
 
@@ -1089,15 +1420,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRangeRestrictedInt16uAttribute(value: UShort) {
+  suspend fun writeRangeRestrictedInt16uAttribute(
+    value: UShort
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRangeRestrictedInt16uAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+  suspend fun writeRangeRestrictedInt16uAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRangeRestrictedInt16uAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRangeRestrictedInt16uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -1105,15 +1444,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRangeRestrictedInt16sAttribute(value: Short) {
+  suspend fun writeRangeRestrictedInt16sAttribute(
+    value: Short
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRangeRestrictedInt16sAttribute(value: Short, timedWriteTimeoutMs: Int) {
+  suspend fun writeRangeRestrictedInt16sAttribute(
+    value: Short,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRangeRestrictedInt16sAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeRangeRestrictedInt16sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -1121,11 +1468,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeListLongOctetStringAttribute(value: List<ByteArray>) {
+  suspend fun writeListLongOctetStringAttribute(
+    value: List<ByteArray>
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeListLongOctetStringAttribute(value: List<ByteArray>, timedWriteTimeoutMs: Int) {
+  suspend fun writeListLongOctetStringAttribute(
+    value: List<ByteArray>,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1146,7 +1498,10 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeListFabricScopedAttribute(value: List<UnitTestingClusterTestFabricScoped>) {
+
+  suspend fun writeListFabricScopedAttribute(
+    value: List<UnitTestingClusterTestFabricScoped>
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1168,11 +1523,17 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeTimedWriteBooleanAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeTimedWriteBooleanAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTimedWriteBooleanAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeTimedWriteBooleanAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -1180,15 +1541,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeGeneralErrorBooleanAttribute(value: Boolean) {
+  suspend fun writeGeneralErrorBooleanAttribute(
+    value: Boolean
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeGeneralErrorBooleanAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeGeneralErrorBooleanAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeGeneralErrorBooleanAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeGeneralErrorBooleanAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -1196,15 +1565,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeClusterErrorBooleanAttribute(value: Boolean) {
+  suspend fun writeClusterErrorBooleanAttribute(
+    value: Boolean
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeClusterErrorBooleanAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeClusterErrorBooleanAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterErrorBooleanAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeClusterErrorBooleanAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -1212,15 +1589,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeUnsupportedAttribute(value: Boolean) {
+  suspend fun writeUnsupportedAttribute(
+    value: Boolean
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeUnsupportedAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeUnsupportedAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeUnsupportedAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeUnsupportedAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -1228,11 +1613,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableBooleanAttribute(value: Boolean) {
+  suspend fun writeNullableBooleanAttribute(
+    value: Boolean
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableBooleanAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableBooleanAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1247,11 +1637,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableBitmap8Attribute(value: UInt) {
+  suspend fun writeNullableBitmap8Attribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableBitmap8Attribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableBitmap8Attribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1266,11 +1661,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableBitmap16Attribute(value: UInt) {
+  suspend fun writeNullableBitmap16Attribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableBitmap16Attribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableBitmap16Attribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1285,11 +1685,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableBitmap32Attribute(value: ULong) {
+  suspend fun writeNullableBitmap32Attribute(
+    value: ULong
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableBitmap32Attribute(value: ULong, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableBitmap32Attribute(
+    value: ULong,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1304,11 +1709,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableBitmap64Attribute(value: ULong) {
+  suspend fun writeNullableBitmap64Attribute(
+    value: ULong
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableBitmap64Attribute(value: ULong, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableBitmap64Attribute(
+    value: ULong,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1323,11 +1733,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt8uAttribute(value: UByte) {
+  suspend fun writeNullableInt8uAttribute(
+    value: UByte
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt8uAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt8uAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1342,11 +1757,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt16uAttribute(value: UShort) {
+  suspend fun writeNullableInt16uAttribute(
+    value: UShort
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt16uAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt16uAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1361,11 +1781,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt24uAttribute(value: UInt) {
+  suspend fun writeNullableInt24uAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt24uAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt24uAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1380,11 +1805,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt32uAttribute(value: UInt) {
+  suspend fun writeNullableInt32uAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt32uAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt32uAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1399,11 +1829,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt40uAttribute(value: ULong) {
+  suspend fun writeNullableInt40uAttribute(
+    value: ULong
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt40uAttribute(value: ULong, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt40uAttribute(
+    value: ULong,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1418,11 +1853,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt48uAttribute(value: ULong) {
+  suspend fun writeNullableInt48uAttribute(
+    value: ULong
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt48uAttribute(value: ULong, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt48uAttribute(
+    value: ULong,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1437,11 +1877,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt56uAttribute(value: ULong) {
+  suspend fun writeNullableInt56uAttribute(
+    value: ULong
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt56uAttribute(value: ULong, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt56uAttribute(
+    value: ULong,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1456,11 +1901,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt64uAttribute(value: ULong) {
+  suspend fun writeNullableInt64uAttribute(
+    value: ULong
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt64uAttribute(value: ULong, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt64uAttribute(
+    value: ULong,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1475,11 +1925,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt8sAttribute(value: Byte) {
+  suspend fun writeNullableInt8sAttribute(
+    value: Byte
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt8sAttribute(value: Byte, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt8sAttribute(
+    value: Byte,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1494,11 +1949,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt16sAttribute(value: Short) {
+  suspend fun writeNullableInt16sAttribute(
+    value: Short
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt16sAttribute(value: Short, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt16sAttribute(
+    value: Short,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1513,11 +1973,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt24sAttribute(value: Int) {
+  suspend fun writeNullableInt24sAttribute(
+    value: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt24sAttribute(value: Int, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt24sAttribute(
+    value: Int,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1532,11 +1997,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt32sAttribute(value: Int) {
+  suspend fun writeNullableInt32sAttribute(
+    value: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt32sAttribute(value: Int, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt32sAttribute(
+    value: Int,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1551,11 +2021,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt40sAttribute(value: Long) {
+  suspend fun writeNullableInt40sAttribute(
+    value: Long
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt40sAttribute(value: Long, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt40sAttribute(
+    value: Long,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1570,11 +2045,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt48sAttribute(value: Long) {
+  suspend fun writeNullableInt48sAttribute(
+    value: Long
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt48sAttribute(value: Long, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt48sAttribute(
+    value: Long,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1589,11 +2069,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt56sAttribute(value: Long) {
+  suspend fun writeNullableInt56sAttribute(
+    value: Long
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt56sAttribute(value: Long, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt56sAttribute(
+    value: Long,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1608,11 +2093,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt64sAttribute(value: Long) {
+  suspend fun writeNullableInt64sAttribute(
+    value: Long
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableInt64sAttribute(value: Long, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableInt64sAttribute(
+    value: Long,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1627,11 +2117,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableEnum8Attribute(value: UInt) {
+  suspend fun writeNullableEnum8Attribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableEnum8Attribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableEnum8Attribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1646,11 +2141,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableEnum16Attribute(value: UInt) {
+  suspend fun writeNullableEnum16Attribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableEnum16Attribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableEnum16Attribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1665,11 +2165,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableFloatSingleAttribute(value: Float) {
+  suspend fun writeNullableFloatSingleAttribute(
+    value: Float
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableFloatSingleAttribute(value: Float, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableFloatSingleAttribute(
+    value: Float,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1684,11 +2189,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableFloatDoubleAttribute(value: Double) {
+  suspend fun writeNullableFloatDoubleAttribute(
+    value: Double
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableFloatDoubleAttribute(value: Double, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableFloatDoubleAttribute(
+    value: Double,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1703,11 +2213,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableOctetStringAttribute(value: ByteArray) {
+  suspend fun writeNullableOctetStringAttribute(
+    value: ByteArray
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableOctetStringAttribute(value: ByteArray, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableOctetStringAttribute(
+    value: ByteArray,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1722,11 +2237,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableCharStringAttribute(value: String) {
+  suspend fun writeNullableCharStringAttribute(
+    value: String
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableCharStringAttribute(value: String, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableCharStringAttribute(
+    value: String,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1741,11 +2261,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableEnumAttrAttribute(value: UInt) {
+  suspend fun writeNullableEnumAttrAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableEnumAttrAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableEnumAttrAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1760,7 +2285,9 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableStructAttribute(value: UnitTestingClusterSimpleStruct) {
+  suspend fun writeNullableStructAttribute(
+    value: UnitTestingClusterSimpleStruct
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1782,11 +2309,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableRangeRestrictedInt8uAttribute(value: UByte) {
+  suspend fun writeNullableRangeRestrictedInt8uAttribute(
+    value: UByte
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableRangeRestrictedInt8uAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableRangeRestrictedInt8uAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1801,11 +2333,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableRangeRestrictedInt8sAttribute(value: Byte) {
+  suspend fun writeNullableRangeRestrictedInt8sAttribute(
+    value: Byte
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableRangeRestrictedInt8sAttribute(value: Byte, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableRangeRestrictedInt8sAttribute(
+    value: Byte,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1820,11 +2357,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableRangeRestrictedInt16uAttribute(value: UShort) {
+  suspend fun writeNullableRangeRestrictedInt16uAttribute(
+    value: UShort
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableRangeRestrictedInt16uAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableRangeRestrictedInt16uAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1839,11 +2381,16 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableRangeRestrictedInt16sAttribute(value: Short) {
+  suspend fun writeNullableRangeRestrictedInt16sAttribute(
+    value: Short
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableRangeRestrictedInt16sAttribute(value: Short, timedWriteTimeoutMs: Int) {
+  suspend fun writeNullableRangeRestrictedInt16sAttribute(
+    value: Short,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -1858,15 +2405,23 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeWriteOnlyInt8uAttribute(value: UByte) {
+  suspend fun writeWriteOnlyInt8uAttribute(
+    value: UByte
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeWriteOnlyInt8uAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+  suspend fun writeWriteOnlyInt8uAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeWriteOnlyInt8uAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeWriteOnlyInt8uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -1896,7 +2451,10 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -1915,7 +2473,10 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -1923,7 +2484,10 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

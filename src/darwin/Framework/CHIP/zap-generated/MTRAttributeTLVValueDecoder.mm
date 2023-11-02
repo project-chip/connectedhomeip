@@ -5235,6 +5235,7 @@ static id _Nullable DecodeAttributeValueForTimerCluster(AttributeId aAttributeId
 {
     using namespace Clusters::Timer;
     switch (aAttributeId) {
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::SetTime::Id: {
         using TypeInfo = Attributes::SetTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -5246,6 +5247,8 @@ static id _Nullable DecodeAttributeValueForTimerCluster(AttributeId aAttributeId
         value = [NSNumber numberWithUnsignedInt:cppValue];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::TimeRemaining::Id: {
         using TypeInfo = Attributes::TimeRemaining::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -5257,6 +5260,8 @@ static id _Nullable DecodeAttributeValueForTimerCluster(AttributeId aAttributeId
         value = [NSNumber numberWithUnsignedInt:cppValue];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::TimerState::Id: {
         using TypeInfo = Attributes::TimerState::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -5268,6 +5273,7 @@ static id _Nullable DecodeAttributeValueForTimerCluster(AttributeId aAttributeId
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }

@@ -20,24 +20,32 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class ContentLauncherCluster(private val endpointId: UShort) {
-  class LauncherResponse(val status: UInt, val data: String?)
+  class LauncherResponse(
+    val status: UInt, 
+    val data: String?
+  )
 
-  class AcceptHeaderAttribute(val value: List<String>?)
+  class AcceptHeaderAttribute(
+    val value: List<String>?
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
-  suspend fun launchContent(
-    search: ContentLauncherClusterContentSearchStruct,
-    autoPlay: Boolean,
-    data: String?,
-    timedInvokeTimeoutMs: Int? = null
-  ): LauncherResponse {
+  suspend fun launchContent(search: ContentLauncherClusterContentSearchStruct, autoPlay: Boolean, data: String?, timedInvokeTimeoutMs: Int? = null): LauncherResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -45,12 +53,7 @@ class ContentLauncherCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun launchURL(
-    contentURL: String,
-    displayString: String?,
-    brandingInformation: ContentLauncherClusterBrandingInformationStruct?,
-    timedInvokeTimeoutMs: Int? = null
-  ): LauncherResponse {
+  suspend fun launchURL(contentURL: String, displayString: String?, brandingInformation: ContentLauncherClusterBrandingInformationStruct?, timedInvokeTimeoutMs: Int? = null): LauncherResponse {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -73,11 +76,16 @@ class ContentLauncherCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeSupportedStreamingProtocolsAttribute(value: ULong) {
+  suspend fun writeSupportedStreamingProtocolsAttribute(
+    value: ULong
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeSupportedStreamingProtocolsAttribute(value: ULong, timedWriteTimeoutMs: Int) {
+  suspend fun writeSupportedStreamingProtocolsAttribute(
+    value: ULong,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -114,7 +122,10 @@ class ContentLauncherCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -133,7 +144,10 @@ class ContentLauncherCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -141,7 +155,10 @@ class ContentLauncherCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

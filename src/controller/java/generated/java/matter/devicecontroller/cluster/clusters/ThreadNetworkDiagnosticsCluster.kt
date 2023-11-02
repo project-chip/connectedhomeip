@@ -20,57 +20,103 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
-  class ChannelAttribute(val value: UShort?)
+  class ChannelAttribute(
+    val value: UShort?
+  )
 
-  class RoutingRoleAttribute(val value: UInt?)
+  class RoutingRoleAttribute(
+    val value: UInt?
+  )
 
-  class NetworkNameAttribute(val value: String?)
+  class NetworkNameAttribute(
+    val value: String?
+  )
 
-  class PanIdAttribute(val value: UShort?)
+  class PanIdAttribute(
+    val value: UShort?
+  )
 
-  class ExtendedPanIdAttribute(val value: ULong?)
+  class ExtendedPanIdAttribute(
+    val value: ULong?
+  )
 
-  class MeshLocalPrefixAttribute(val value: ByteArray?)
+  class MeshLocalPrefixAttribute(
+    val value: ByteArray?
+  )
 
-  class NeighborTableAttribute(val value: List<ThreadNetworkDiagnosticsClusterNeighborTableStruct>)
+  class NeighborTableAttribute(
+    val value: List<ThreadNetworkDiagnosticsClusterNeighborTableStruct>
+  )
 
-  class RouteTableAttribute(val value: List<ThreadNetworkDiagnosticsClusterRouteTableStruct>)
+  class RouteTableAttribute(
+    val value: List<ThreadNetworkDiagnosticsClusterRouteTableStruct>
+  )
 
-  class PartitionIdAttribute(val value: UInt?)
+  class PartitionIdAttribute(
+    val value: UInt?
+  )
 
-  class WeightingAttribute(val value: UByte?)
+  class WeightingAttribute(
+    val value: UByte?
+  )
 
-  class DataVersionAttribute(val value: UByte?)
+  class DataVersionAttribute(
+    val value: UByte?
+  )
 
-  class StableDataVersionAttribute(val value: UByte?)
+  class StableDataVersionAttribute(
+    val value: UByte?
+  )
 
-  class LeaderRouterIdAttribute(val value: UByte?)
+  class LeaderRouterIdAttribute(
+    val value: UByte?
+  )
 
-  class ActiveTimestampAttribute(val value: ULong?)
+  class ActiveTimestampAttribute(
+    val value: ULong?
+  )
 
-  class PendingTimestampAttribute(val value: ULong?)
+  class PendingTimestampAttribute(
+    val value: ULong?
+  )
 
-  class DelayAttribute(val value: UInt?)
+  class DelayAttribute(
+    val value: UInt?
+  )
 
-  class SecurityPolicyAttribute(val value: ThreadNetworkDiagnosticsClusterSecurityPolicy?)
+  class SecurityPolicyAttribute(
+    val value: ThreadNetworkDiagnosticsClusterSecurityPolicy?
+  )
 
-  class ChannelPage0MaskAttribute(val value: ByteArray?)
+  class ChannelPage0MaskAttribute(
+    val value: ByteArray?
+  )
 
   class OperationalDatasetComponentsAttribute(
     val value: ThreadNetworkDiagnosticsClusterOperationalDatasetComponents?
   )
 
-  class ActiveNetworkFaultsListAttribute(val value: List<UInt>)
+  class ActiveNetworkFaultsListAttribute(
+    val value: List<UInt>
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
-  suspend fun resetCounts(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun resetCounts(timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -82,7 +128,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeChannelAttribute(minInterval: Int, maxInterval: Int): ChannelAttribute {
+  suspend fun subscribeChannelAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ChannelAttribute {
     // Implementation needs to be added here
   }
 
@@ -112,7 +161,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePanIdAttribute(minInterval: Int, maxInterval: Int): PanIdAttribute {
+  suspend fun subscribePanIdAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): PanIdAttribute {
     // Implementation needs to be added here
   }
 
@@ -142,7 +194,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOverrunCountAttribute(minInterval: Int, maxInterval: Int): ULong {
+  suspend fun subscribeOverrunCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ULong {
     // Implementation needs to be added here
   }
 
@@ -183,7 +238,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeWeightingAttribute(minInterval: Int, maxInterval: Int): WeightingAttribute {
+  suspend fun subscribeWeightingAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): WeightingAttribute {
     // Implementation needs to be added here
   }
 
@@ -224,7 +282,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDetachedRoleCountAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeDetachedRoleCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -232,7 +293,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeChildRoleCountAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeChildRoleCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -240,7 +304,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRouterRoleCountAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRouterRoleCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -248,7 +315,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLeaderRoleCountAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeLeaderRoleCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -256,7 +326,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAttachAttemptCountAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeAttachAttemptCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -264,7 +337,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePartitionIdChangeCountAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribePartitionIdChangeCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -283,7 +359,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeParentChangeCountAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeParentChangeCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -291,7 +370,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxTotalCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTxTotalCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -299,7 +381,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxUnicastCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTxUnicastCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -307,7 +392,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxBroadcastCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTxBroadcastCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -315,7 +403,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxAckRequestedCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTxAckRequestedCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -323,7 +414,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxAckedCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTxAckedCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -331,7 +425,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxNoAckRequestedCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTxNoAckRequestedCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -339,7 +436,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxDataCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTxDataCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -347,7 +447,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxDataPollCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTxDataPollCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -355,7 +458,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxBeaconCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTxBeaconCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -363,7 +469,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxBeaconRequestCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTxBeaconRequestCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -371,7 +480,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxOtherCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTxOtherCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -379,7 +491,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxRetryCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTxRetryCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -409,7 +524,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxErrCcaCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTxErrCcaCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -417,7 +535,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxErrAbortCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTxErrAbortCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -425,7 +546,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxErrBusyChannelCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTxErrBusyChannelCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -433,7 +557,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxTotalCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxTotalCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -441,7 +568,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxUnicastCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxUnicastCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -449,7 +579,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxBroadcastCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxBroadcastCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -457,7 +590,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxDataCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxDataCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -465,7 +601,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxDataPollCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxDataPollCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -473,7 +612,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxBeaconCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxBeaconCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -481,7 +623,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxBeaconRequestCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxBeaconRequestCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -489,7 +634,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxOtherCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxOtherCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -497,7 +645,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxAddressFilteredCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxAddressFilteredCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -505,7 +656,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxDestAddrFilteredCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxDestAddrFilteredCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -513,7 +667,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxDuplicatedCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxDuplicatedCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -521,7 +678,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxErrNoFrameCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxErrNoFrameCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -540,7 +700,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxErrInvalidSrcAddrCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxErrInvalidSrcAddrCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -548,7 +711,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxErrSecCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxErrSecCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -556,7 +722,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxErrFcsCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxErrFcsCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -564,7 +733,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxErrOtherCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeRxErrOtherCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -594,7 +766,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDelayAttribute(minInterval: Int, maxInterval: Int): DelayAttribute {
+  suspend fun subscribeDelayAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): DelayAttribute {
     // Implementation needs to be added here
   }
 
@@ -668,7 +843,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -687,7 +865,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -695,7 +876,10 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

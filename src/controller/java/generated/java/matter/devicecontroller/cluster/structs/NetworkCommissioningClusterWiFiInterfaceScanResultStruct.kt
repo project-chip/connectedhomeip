@@ -17,20 +17,23 @@
 package matter.devicecontroller.cluster.structs
 
 import matter.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
-  val security: UInt,
-  val ssid: ByteArray,
-  val bssid: ByteArray,
-  val channel: UShort,
-  val wiFiBand: UInt,
-  val rssi: Byte
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class NetworkCommissioningClusterWiFiInterfaceScanResultStruct (
+    val security: UInt,
+    val ssid: ByteArray,
+    val bssid: ByteArray,
+    val channel: UShort,
+    val wiFiBand: UInt,
+    val rssi: Byte) {
+  override fun toString(): String  = buildString {
     append("NetworkCommissioningClusterWiFiInterfaceScanResultStruct {\n")
     append("\tsecurity : $security\n")
     append("\tssid : $ssid\n")
@@ -62,10 +65,7 @@ class NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
     private const val TAG_WI_FI_BAND = 4
     private const val TAG_RSSI = 5
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): NetworkCommissioningClusterWiFiInterfaceScanResultStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : NetworkCommissioningClusterWiFiInterfaceScanResultStruct {
       tlvReader.enterStructure(tlvTag)
       val security = tlvReader.getUInt(ContextSpecificTag(TAG_SECURITY))
       val ssid = tlvReader.getByteArray(ContextSpecificTag(TAG_SSID))
@@ -73,17 +73,10 @@ class NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
       val channel = tlvReader.getUShort(ContextSpecificTag(TAG_CHANNEL))
       val wiFiBand = tlvReader.getUInt(ContextSpecificTag(TAG_WI_FI_BAND))
       val rssi = tlvReader.getByte(ContextSpecificTag(TAG_RSSI))
-
+      
       tlvReader.exitContainer()
 
-      return NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
-        security,
-        ssid,
-        bssid,
-        channel,
-        wiFiBand,
-        rssi
-      )
+      return NetworkCommissioningClusterWiFiInterfaceScanResultStruct(security, ssid, bssid, channel, wiFiBand, rssi)
     }
   }
 }

@@ -20,15 +20,23 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class ElectricalMeasurementCluster(private val endpointId: UShort) {
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
-  suspend fun getProfileInfoCommand(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun getProfileInfoCommand(timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -36,12 +44,7 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun getMeasurementProfileCommand(
-    attributeId: UShort,
-    startTime: UInt,
-    numberOfIntervals: UInt,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun getMeasurementProfileCommand(attributeId: UShort, startTime: UInt, numberOfIntervals: UInt, timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -53,7 +56,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMeasurementTypeAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeMeasurementTypeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -61,7 +67,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDcVoltageAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeDcVoltageAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -69,7 +78,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDcVoltageMinAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeDcVoltageMinAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -77,7 +89,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDcVoltageMaxAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeDcVoltageMaxAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -85,7 +100,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDcCurrentAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeDcCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -93,7 +111,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDcCurrentMinAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeDcCurrentMinAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -101,7 +122,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDcCurrentMaxAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeDcCurrentMaxAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -109,7 +133,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDcPowerAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeDcPowerAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -117,7 +144,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDcPowerMinAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeDcPowerMinAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -125,7 +155,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDcPowerMaxAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeDcPowerMaxAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -133,7 +166,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDcVoltageMultiplierAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeDcVoltageMultiplierAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -141,7 +177,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDcVoltageDivisorAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeDcVoltageDivisorAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -149,7 +188,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDcCurrentMultiplierAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeDcCurrentMultiplierAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -157,7 +199,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDcCurrentDivisorAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeDcCurrentDivisorAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -165,7 +210,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDcPowerMultiplierAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeDcPowerMultiplierAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -173,7 +221,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDcPowerDivisorAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeDcPowerDivisorAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -181,7 +232,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcFrequencyAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeAcFrequencyAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -189,7 +243,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcFrequencyMinAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeAcFrequencyMinAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -197,7 +254,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcFrequencyMaxAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeAcFrequencyMaxAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -205,7 +265,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNeutralCurrentAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeNeutralCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -213,7 +276,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTotalActivePowerAttribute(minInterval: Int, maxInterval: Int): Int {
+  suspend fun subscribeTotalActivePowerAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Int {
     // Implementation needs to be added here
   }
 
@@ -221,7 +287,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTotalReactivePowerAttribute(minInterval: Int, maxInterval: Int): Int {
+  suspend fun subscribeTotalReactivePowerAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Int {
     // Implementation needs to be added here
   }
 
@@ -229,7 +298,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTotalApparentPowerAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTotalApparentPowerAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -369,7 +441,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcFrequencyMultiplierAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeAcFrequencyMultiplierAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -377,7 +452,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcFrequencyDivisorAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeAcFrequencyDivisorAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -385,7 +463,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePowerMultiplierAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribePowerMultiplierAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -393,7 +474,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePowerDivisorAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribePowerDivisorAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -423,7 +507,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInstantaneousVoltageAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeInstantaneousVoltageAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -464,7 +551,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInstantaneousPowerAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeInstantaneousPowerAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -472,7 +562,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsVoltageAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsVoltageAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -480,7 +573,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsVoltageMinAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsVoltageMinAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -488,7 +584,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsVoltageMaxAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsVoltageMaxAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -496,7 +595,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsCurrentAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -504,7 +606,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsCurrentMinAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsCurrentMinAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -512,7 +617,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsCurrentMaxAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsCurrentMaxAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -520,7 +628,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActivePowerAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeActivePowerAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -528,7 +639,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActivePowerMinAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeActivePowerMinAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -536,7 +650,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActivePowerMaxAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeActivePowerMaxAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -544,7 +661,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeReactivePowerAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeReactivePowerAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -552,7 +672,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeApparentPowerAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeApparentPowerAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -560,7 +683,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePowerFactorAttribute(minInterval: Int, maxInterval: Int): Byte {
+  suspend fun subscribePowerFactorAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Byte {
     // Implementation needs to be added here
   }
 
@@ -568,7 +694,9 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeAverageRmsVoltageMeasurementPeriodAttribute(value: UShort) {
+  suspend fun writeAverageRmsVoltageMeasurementPeriodAttribute(
+    value: UShort
+  ) {
     // Implementation needs to be added here
   }
 
@@ -590,11 +718,16 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeAverageRmsUnderVoltageCounterAttribute(value: UShort) {
+  suspend fun writeAverageRmsUnderVoltageCounterAttribute(
+    value: UShort
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeAverageRmsUnderVoltageCounterAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+  suspend fun writeAverageRmsUnderVoltageCounterAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -609,11 +742,16 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRmsExtremeOverVoltagePeriodAttribute(value: UShort) {
+  suspend fun writeRmsExtremeOverVoltagePeriodAttribute(
+    value: UShort
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRmsExtremeOverVoltagePeriodAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+  suspend fun writeRmsExtremeOverVoltagePeriodAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -628,11 +766,16 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRmsExtremeUnderVoltagePeriodAttribute(value: UShort) {
+  suspend fun writeRmsExtremeUnderVoltagePeriodAttribute(
+    value: UShort
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRmsExtremeUnderVoltagePeriodAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+  suspend fun writeRmsExtremeUnderVoltagePeriodAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
@@ -647,15 +790,23 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRmsVoltageSagPeriodAttribute(value: UShort) {
+  suspend fun writeRmsVoltageSagPeriodAttribute(
+    value: UShort
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRmsVoltageSagPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+  suspend fun writeRmsVoltageSagPeriodAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsVoltageSagPeriodAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsVoltageSagPeriodAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -663,15 +814,23 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRmsVoltageSwellPeriodAttribute(value: UShort) {
+  suspend fun writeRmsVoltageSwellPeriodAttribute(
+    value: UShort
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRmsVoltageSwellPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+  suspend fun writeRmsVoltageSwellPeriodAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsVoltageSwellPeriodAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsVoltageSwellPeriodAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -679,7 +838,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcVoltageMultiplierAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeAcVoltageMultiplierAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -687,7 +849,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcVoltageDivisorAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeAcVoltageDivisorAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -695,7 +860,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcCurrentMultiplierAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeAcCurrentMultiplierAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -703,7 +871,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcCurrentDivisorAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeAcCurrentDivisorAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -711,7 +882,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcPowerMultiplierAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeAcPowerMultiplierAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -719,7 +893,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcPowerDivisorAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeAcPowerDivisorAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -727,15 +904,23 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOverloadAlarmsMaskAttribute(value: UInt) {
+  suspend fun writeOverloadAlarmsMaskAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOverloadAlarmsMaskAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeOverloadAlarmsMaskAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOverloadAlarmsMaskAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeOverloadAlarmsMaskAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -743,7 +928,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeVoltageOverloadAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeVoltageOverloadAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -751,7 +939,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentOverloadAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeCurrentOverloadAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -759,15 +950,23 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeAcOverloadAlarmsMaskAttribute(value: UInt) {
+  suspend fun writeAcOverloadAlarmsMaskAttribute(
+    value: UInt
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeAcOverloadAlarmsMaskAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+  suspend fun writeAcOverloadAlarmsMaskAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcOverloadAlarmsMaskAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeAcOverloadAlarmsMaskAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -775,7 +974,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcVoltageOverloadAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeAcVoltageOverloadAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -783,7 +985,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcCurrentOverloadAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeAcCurrentOverloadAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -791,7 +996,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcActivePowerOverloadAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeAcActivePowerOverloadAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -799,7 +1007,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAcReactivePowerOverloadAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeAcReactivePowerOverloadAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -807,7 +1018,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAverageRmsOverVoltageAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeAverageRmsOverVoltageAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -815,7 +1029,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAverageRmsUnderVoltageAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeAverageRmsUnderVoltageAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -823,7 +1040,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsExtremeOverVoltageAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeRmsExtremeOverVoltageAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -831,7 +1051,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsExtremeUnderVoltageAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeRmsExtremeUnderVoltageAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -839,7 +1062,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsVoltageSagAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeRmsVoltageSagAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -847,7 +1073,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsVoltageSwellAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeRmsVoltageSwellAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -855,7 +1084,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLineCurrentPhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeLineCurrentPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -863,7 +1095,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActiveCurrentPhaseBAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeActiveCurrentPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -871,7 +1106,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeReactiveCurrentPhaseBAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeReactiveCurrentPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -879,7 +1117,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsVoltagePhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsVoltagePhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -887,7 +1128,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsVoltageMinPhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsVoltageMinPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -895,7 +1139,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsVoltageMaxPhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsVoltageMaxPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -903,7 +1150,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsCurrentPhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsCurrentPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -911,7 +1161,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsCurrentMinPhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsCurrentMinPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -919,7 +1172,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsCurrentMaxPhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsCurrentMaxPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -927,7 +1183,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActivePowerPhaseBAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeActivePowerPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -935,7 +1194,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActivePowerMinPhaseBAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeActivePowerMinPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -943,7 +1205,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActivePowerMaxPhaseBAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeActivePowerMaxPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -951,7 +1216,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeReactivePowerPhaseBAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeReactivePowerPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -959,7 +1227,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeApparentPowerPhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeApparentPowerPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -967,7 +1238,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePowerFactorPhaseBAttribute(minInterval: Int, maxInterval: Int): Byte {
+  suspend fun subscribePowerFactorPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Byte {
     // Implementation needs to be added here
   }
 
@@ -1052,7 +1326,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLineCurrentPhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeLineCurrentPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -1060,7 +1337,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActiveCurrentPhaseCAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeActiveCurrentPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -1068,7 +1348,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeReactiveCurrentPhaseCAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeReactiveCurrentPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -1076,7 +1359,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsVoltagePhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsVoltagePhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -1084,7 +1370,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsVoltageMinPhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsVoltageMinPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -1092,7 +1381,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsVoltageMaxPhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsVoltageMaxPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -1100,7 +1392,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsCurrentPhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsCurrentPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -1108,7 +1403,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsCurrentMinPhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsCurrentMinPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -1116,7 +1414,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRmsCurrentMaxPhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRmsCurrentMaxPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -1124,7 +1425,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActivePowerPhaseCAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeActivePowerPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -1132,7 +1436,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActivePowerMinPhaseCAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeActivePowerMinPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -1140,7 +1447,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActivePowerMaxPhaseCAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeActivePowerMaxPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -1148,7 +1458,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeReactivePowerPhaseCAttribute(minInterval: Int, maxInterval: Int): Short {
+  suspend fun subscribeReactivePowerPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
     // Implementation needs to be added here
   }
 
@@ -1156,7 +1469,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeApparentPowerPhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeApparentPowerPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -1164,7 +1480,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePowerFactorPhaseCAttribute(minInterval: Int, maxInterval: Int): Byte {
+  suspend fun subscribePowerFactorPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Byte {
     // Implementation needs to be added here
   }
 
@@ -1271,7 +1590,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -1290,7 +1612,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -1298,7 +1623,10 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

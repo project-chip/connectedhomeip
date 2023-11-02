@@ -20,19 +20,31 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class BasicInformationCluster(private val endpointId: UShort) {
-  class CapabilityMinimaAttribute(val value: BasicInformationClusterCapabilityMinimaStruct)
+  class CapabilityMinimaAttribute(
+    val value: BasicInformationClusterCapabilityMinimaStruct
+  )
 
-  class ProductAppearanceAttribute(val value: BasicInformationClusterProductAppearanceStruct?)
+  class ProductAppearanceAttribute(
+    val value: BasicInformationClusterProductAppearanceStruct?
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
-  suspend fun mfgSpecificPing(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun mfgSpecificPing(timedInvokeTimeoutMs: Int? = null) {  
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -44,7 +56,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDataModelRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeDataModelRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -52,7 +67,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeVendorNameAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeVendorNameAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -60,7 +78,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeVendorIDAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeVendorIDAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -68,7 +89,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeProductNameAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeProductNameAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -76,7 +100,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeProductIDAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeProductIDAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -84,15 +111,23 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNodeLabelAttribute(value: String) {
+  suspend fun writeNodeLabelAttribute(
+    value: String
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNodeLabelAttribute(value: String, timedWriteTimeoutMs: Int) {
+  suspend fun writeNodeLabelAttribute(
+    value: String,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNodeLabelAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeNodeLabelAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -100,15 +135,23 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLocationAttribute(value: String) {
+  suspend fun writeLocationAttribute(
+    value: String
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLocationAttribute(value: String, timedWriteTimeoutMs: Int) {
+  suspend fun writeLocationAttribute(
+    value: String,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLocationAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeLocationAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -116,7 +159,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeHardwareVersionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeHardwareVersionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -135,7 +181,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSoftwareVersionAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeSoftwareVersionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -154,7 +203,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeManufacturingDateAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeManufacturingDateAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -162,7 +214,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePartNumberAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribePartNumberAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -170,7 +225,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeProductURLAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeProductURLAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -178,7 +236,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeProductLabelAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeProductLabelAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -186,7 +247,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSerialNumberAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeSerialNumberAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -194,15 +258,23 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLocalConfigDisabledAttribute(value: Boolean) {
+  suspend fun writeLocalConfigDisabledAttribute(
+    value: Boolean
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLocalConfigDisabledAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeLocalConfigDisabledAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int
+  ) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLocalConfigDisabledAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeLocalConfigDisabledAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -210,7 +282,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeReachableAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeReachableAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -218,7 +293,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeUniqueIDAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeUniqueIDAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -270,7 +348,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -289,7 +370,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -297,7 +381,10 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

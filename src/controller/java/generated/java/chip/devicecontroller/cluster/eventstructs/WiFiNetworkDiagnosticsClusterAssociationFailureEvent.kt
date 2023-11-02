@@ -24,11 +24,12 @@ import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
-  val associationFailureCause: UInt,
-  val status: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class WiFiNetworkDiagnosticsClusterAssociationFailureEvent (
+    val associationFailureCause: UInt,
+    val status: UInt) {
+  override fun toString(): String  = buildString {
     append("WiFiNetworkDiagnosticsClusterAssociationFailureEvent {\n")
     append("\tassociationFailureCause : $associationFailureCause\n")
     append("\tstatus : $status\n")
@@ -50,8 +51,7 @@ class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
       tlvReader.enterStructure(tlvTag)
-      val associationFailureCause =
-        tlvReader.getUInt(ContextSpecificTag(TAG_ASSOCIATION_FAILURE_CAUSE))
+      val associationFailureCause = tlvReader.getUInt(ContextSpecificTag(TAG_ASSOCIATION_FAILURE_CAUSE))
       val status = tlvReader.getUInt(ContextSpecificTag(TAG_STATUS))
       
       tlvReader.exitContainer()
