@@ -38,7 +38,7 @@
 #import <XCTest/XCTest.h>
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
-static const uint16_t kDownloadLogTimeoutInSeconds = 120;
+static const uint16_t kDownloadLogTimeoutInSeconds = 50;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
@@ -2771,7 +2771,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:kDownloadLogTimeoutInSeconds];
 }
 
-/*- (void)test900_SubscribeAllAttributes
+- (void)test900_SubscribeAllAttributes
 {
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -2942,7 +2942,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
-}*/
+}
 
 - (void)test999_TearDown
 {
