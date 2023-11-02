@@ -38,7 +38,6 @@ from matter_testing_support import (AttributePathLocation, ClusterPathLocation, 
 from mobly import asserts
 from spec_parsing_support import CommandType, build_xml_clusters
 
-
 ATTRIBUTE_LIST_ID = 0xFFFB
 ACCEPTED_COMMAND_LIST_ID = 0xFFF9
 GENERATED_COMMAND_LIST_ID = 0xFFF8
