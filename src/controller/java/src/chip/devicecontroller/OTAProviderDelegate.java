@@ -19,8 +19,27 @@
 package chip.devicecontroller;
 
 import javax.annotation.Nullable;
+import javax.management.Query;
 
+/**
+ * Delegate for OTA Provider.
+ *
+ * See detailed in {@link ChipDeviceController#startOTAProvider(OTAProviderDelegate)}
+ */
 public interface OTAProviderDelegate {
+  /**
+   * Called to handle a QueryImage command and is responsible for sending the response (if success) or status (if error).
+   * 
+   * @param vendorId Vendor ID applying to the OTA Requestor’s Node.
+   * @param productId Product ID applying to the OTA Requestor’s Node.
+   * @param softwareVersion Current version running on the OTA Requestor.
+   * @param hardwareVersion OTA Requestor’s hardware version. Can be set null.
+   * @param location OTA Requestor's current location. Can be set null.
+   * @param requestorCanConsent Variable for whether user consent is required. Can be set null.
+   * @param metadataForProvider Manufacturer-specific payload. Can be set null.
+   *
+   * @return QueryImageResponse Send Firmware image information, See detailed in {@link OTAProviderDelegate#QueryImageResponse}
+   */
   public QueryImageResponse handleQueryImage(
       int vendorId,
       int productId,
@@ -30,18 +49,62 @@ public interface OTAProviderDelegate {
       @Nullable Boolean requestorCanConsent,
       @Nullable byte[] metadataForProvider);
 
+  /**
+   * The callback will be invoked when receiving or responding to a QueryImage, it is called with an ErrorCode.
+   */
   public void handleOTAQueryFailure(int error);
 
+  /**
+   * The callback will be invoked when BDX Transfer session is begined.
+   * 
+   * @param nodeId OTA Requester's Node ID
+   * @param fileDesignator a variable-length identifier chosen by the Initiator to identify the payload to be transferred.
+   * @param offset image's offset
+   */
   public void handleBDXTransferSessionBegin(long nodeId, String fileDesignator, long offset);
 
+  /** 
+   * The callback will be invoked when a BDX Query message has been received for some node.
+   * 
+   * @param nodeId OTA Requester's Node ID
+   * @param blockSize Max blockSize that can be sent
+   * @param blockIndex block Index value
+   * @param bytesToSkip Bytes to skip
+   * 
+   * @return BDXData sending packet in image, See detailed in {@link OTAProviderDelegate#BDXData}
+   * 
+   **/
   public BDXData handleBDXQuery(long nodeId, int blockSize, long blockIndex, long bytesToSkip);
 
+    /**
+   * The callback will be invoked when BDX Transfer session is ended.
+   * 
+   * @param nodeId errorCode if transfer is failed.
+   * @param nodeId OTA Requester's Node ID
+   */
   public void handleBDXTransferSessionEnd(long errorCode, long nodeId);
 
+  /**
+   * Called to handle an ApplyUpdateRequest command and is responsible for sending the response (if success) or status (if error).
+   * 
+   * @param nodeId OTA Requester's Node ID
+   * @param newVersion New version to update
+   * 
+   * @return ApplyUpdateResponse response for future action. See detailed in {@link OTAProvider#ApplyUpdateResponse}
+   */
   public ApplyUpdateResponse handleApplyUpdateRequest(long nodeId, long newVersion);
 
+  /**
+   * Called to handle a NotifyUpdateApplied command and is responsible for sending the status.
+   * 
+   * @param nodeId OTA Requester's Node ID
+   */
   public default void handleNotifyUpdateApplied(long nodeId) {}
 
+/**
+ * This is a class used when transmitting using the BDX Protocol.
+ * If isEOF value set true, OTA Requester treats the data transfer as finished.
+ */
   public class BDXData {
     @Nullable private byte[] data;
     private boolean isEOF;
@@ -60,6 +123,9 @@ public interface OTAProviderDelegate {
     }
   }
 
+  /**
+ * This is a class used to send Image information.
+ */
   public class QueryImageResponse {
     @Nullable Long softwareVersion;
     @Nullable String softwareVersionString;
@@ -85,6 +151,10 @@ public interface OTAProviderDelegate {
     }
   }
 
+/**
+ * This class is used to inform whether the OTA Requester starts updating.
+ * Class can set Delay Time and Enum value for next action. See {@link OTAProviderDelegate#ApplyUpdateActionEnum} for more information.
+ */
   public class ApplyUpdateResponse {
     private ApplyUpdateActionEnum action;
     private long delayedActionTime;
@@ -102,10 +172,21 @@ public interface OTAProviderDelegate {
       return delayedActionTime;
     }
   }
-
+/**
+ * The Action field SHALL express the action that the OTA Provider requests from the OTA Requestor.
+ */
   public enum ApplyUpdateActionEnum {
+    /**
+     *  Apply the update.
+     */
     Proceed(0),
+    /**
+     * Wait at least the given delay time.
+     */
     AwaitNextAction(1),
+    /**
+     * The OTA Provider is conveying a desire to rescind a previously provided Software Image.
+     */
     Discontinue(2);
 
     private int value;
