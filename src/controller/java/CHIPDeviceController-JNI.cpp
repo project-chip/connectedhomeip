@@ -2050,7 +2050,7 @@ exit:
 }
 
 JNI_METHOD(void, subscribe)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
  jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
 {
     chip::DeviceLayer::StackLock lock;
@@ -2159,7 +2159,7 @@ exit:
 }
 
 JNI_METHOD(void, read)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
  jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
 {
     chip::DeviceLayer::StackLock lock;
@@ -2253,7 +2253,7 @@ CHIP_ERROR PutPreencodedWriteAttribute(app::WriteClient & writeClient, app::Conc
 }
 
 JNI_METHOD(void, write)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs,
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs,
  jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
@@ -2419,7 +2419,7 @@ CHIP_ERROR PutPreencodedInvokeRequest(app::CommandSender & commandSender, app::C
 }
 
 JNI_METHOD(void, invoke)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs,
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs,
  jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;

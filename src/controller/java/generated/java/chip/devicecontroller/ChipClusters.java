@@ -18,6 +18,7 @@
 package chip.devicecontroller;
 
 import chip.devicecontroller.model.AttributeState;
+import chip.devicecontroller.model.AttributeWriteRequest;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
 import chip.devicecontroller.model.ClusterState;
@@ -118,7 +119,8 @@ public class ChipClusters {
         long attributeId,
         boolean isFabricFiltered) {
       ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-      readAttribute(jniCallback.getCallbackHandle(), devicePtr, endpointId, clusterId, attributeId, isFabricFiltered, timeoutMillis.orElse(0L));
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId);
+      ChipDeviceController.read(0, jniCallback.getCallbackHandle(), devicePtr, List.of(path), null, isFabricFiltered, timeoutMillis.orElse(0L).intValue(), null);
     }
 
     protected void writeAttribute(
@@ -128,7 +130,8 @@ public class ChipClusters {
         int timedRequestTimeoutMs) {
       WriteAttributesCallbackJni jniCallback = new WriteAttributesCallbackJni(callback);
       byte[] tlv = encodeToTlv(value);
-      writeAttribute(jniCallback.getCallbackHandle(), devicePtr, endpointId, clusterId, attributeId, tlv, timedRequestTimeoutMs, timeoutMillis.orElse(0L));
+      AttributeWriteRequest writeRequest = AttributeWriteRequest.newInstance(endpointId, clusterId, attributeId, tlv);
+      ChipDeviceController.write(0, jniCallback.getCallbackHandle(), devicePtr, List.of(writeRequest), timedRequestTimeoutMs, timeoutMillis.orElse(0L).intValue());
     }
 
     protected void subscribeAttribute(
@@ -137,7 +140,8 @@ public class ChipClusters {
         int minInterval,
         int maxInterval) {
       ReportCallbackJni jniCallback = new ReportCallbackJni(callback, callback, null);
-      subscribeAttribute(jniCallback.getCallbackHandle(), devicePtr, endpointId, clusterId, attributeId, minInterval, maxInterval, false, true, timeoutMillis.orElse(0L));
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId);
+      ChipDeviceController.subscribe(0, jniCallback.getCallbackHandle(), devicePtr, List.of(path), null, minInterval, maxInterval, false, true, timeoutMillis.orElse(0L).intValue(), null);
     }
 
     protected void invoke(
@@ -147,16 +151,9 @@ public class ChipClusters {
         int timedRequestTimeoutMs) {
       InvokeCallbackJni jniCallback = new InvokeCallbackJni(callback);
       byte[] tlv = encodeToTlv(value);
-      invoke(jniCallback.getCallbackHandle(), devicePtr, endpointId, clusterId, commandId, tlv, timedRequestTimeoutMs, timeoutMillis.orElse(0L));
+      InvokeElement element = InvokeElement.newInstance(endpointId, clusterId, commandId, tlv, null);
+      ChipDeviceController.invoke(0, jniCallback.getCallbackHandle(), devicePtr, element, timedRequestTimeoutMs, timeoutMillis.orElse(0L).intValue());
     }
-
-    private native void readAttribute(long callbackHandle, long devicePtr, int endpointId, long clusterId, long attributeId, boolean isFabricFiltered, long imTimeoutMs);
-
-    private native void writeAttribute(long callbackHandle, long devicePtr, int endpointId, long clusterId, long attributeId, byte[] tlv, int timedRequestTimeoutMs, long imTimeoutMs);
-
-    private native void subscribeAttribute(long callbackHaandle, long devicePtr, int endpointId, long clusterId, long attributeId, int minInterval, int maxInterval, boolean keepSubscriptions, boolean isFabricFiltered, long imTimeoutMs);
-
-    private native void invoke(long callbackHaandle, long devicePtr, int endpointId, long clusterId, long commandId, byte[] tlv, int timedRequestTimeoutMs, long imTimeoutMs);
 
     private static native byte[] encodeToTlv(BaseTLVType value);
 
