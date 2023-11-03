@@ -64,8 +64,7 @@ if (chip_enable_wifi) {
 
   if (use_rs9116) {
     import("rs911x/rs911x.gni")
-  }
-  if (use_SiWx917) {
+  } else if (use_SiWx917) {
     import("rs911x/rs9117.gni")
   }
   if (use_wf200) {

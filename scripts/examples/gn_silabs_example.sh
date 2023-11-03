@@ -227,6 +227,8 @@ else
                 ;;
             --docker)
                 optArgs+="efr32_sdk_root=\"$GSDK_ROOT\" "
+                optArgs+="wiseconnect_sdk_root=\"$WISECONNECT_SDK_ROOT\" "
+                optArgs+="wiseconnect_sdk_root=\"$WISECONNECT_SDK_ROOT\" "
                 USE_DOCKER=true
                 shift
                 ;;
@@ -320,14 +322,6 @@ else
     if [ "$USE_DOCKER" == true ] && [ "$USE_WIFI" == false ]; then
         echo "Switching OpenThread ROOT"
         optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
-    fi
-
-    if [ "$USE_DOCKER" == true ] && [ "$USE_WIFI" == true ]; then
-        echo "Switching WiseConnect 2 SDK ROOT"
-        optArgs+="wiseconnect_sdk_root=\"$WISECONNECT_SDK_ROOT\" "
-
-        echo "Switching WiseConnect 3 SDK ROOT"
-        optArgs+="wifi_sdk_root=\"$WIFI_SDK_ROOT\" "
     fi
 
     "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
