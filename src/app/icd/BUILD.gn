@@ -57,6 +57,7 @@ source_set("cluster") {
   ]
 
   public_deps = [
+    ":notifier",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform:platform",
     "${chip_root}/src/protocols:im_status",
