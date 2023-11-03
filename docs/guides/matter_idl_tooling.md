@@ -62,6 +62,9 @@ As such one can run compares such as:
   && diff out/{spec,sdk}.matter
 ```
 
+NOTE: due to specification data scraper still being in development, the diff
+should be human-validated (e.g. for tool errors or Zigbee-only markers in the spec).
+
 ## Linting `.matter` files for devices
 
 For device validation, `./scripts/idl_lint.py` provides the ability to validate
