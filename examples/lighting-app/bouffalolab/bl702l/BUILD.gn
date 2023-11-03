@@ -98,7 +98,7 @@ bl_iot_sdk("sdk") {
 }
 
 chip_data_model("bouffalolab-lighting") {
-  zap_file = "${example_dir}/data_model/lighting-app-wifi.zap"
+  zap_file = "${example_dir}/data_model/lighting-app-thread.zap"
 
   zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
   is_server = true
@@ -170,14 +170,14 @@ bouffalolab_executable("lighting_app") {
     if (chip_openthread_ftd) {
       defines += [ "CHIP_DEVICE_CONFIG_THREAD_FTD=1" ]
       deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+        "${openthread_root}:libopenthread-cli-ftd",
+        "${openthread_root}:libopenthread-ftd",
       ]
     } else {
       defines += [ "CHIP_DEVICE_CONFIG_THREAD_FTD=0" ]
       deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+        "${openthread_root}:libopenthread-cli-mtd",
+        "${openthread_root}:libopenthread-mtd",
       ]
     }
   }

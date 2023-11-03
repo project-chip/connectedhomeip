@@ -45,7 +45,7 @@ void TestStrdupSplitter(nlTestSuite * inSuite, void * inContext)
         StringSplitter splitter("single", ',');
 
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("single")));
+        NL_TEST_ASSERT(inSuite, out.data_equal("single"_span));
 
         // next stays at nullptr also after valid data
         NL_TEST_ASSERT(inSuite, !splitter.Next(out));
@@ -59,11 +59,11 @@ void TestStrdupSplitter(nlTestSuite * inSuite, void * inContext)
         StringSplitter splitter("one,two,three", ',');
 
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("one")));
+        NL_TEST_ASSERT(inSuite, out.data_equal("one"_span));
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("two")));
+        NL_TEST_ASSERT(inSuite, out.data_equal("two"_span));
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("three")));
+        NL_TEST_ASSERT(inSuite, out.data_equal("three"_span));
         NL_TEST_ASSERT(inSuite, !splitter.Next(out));
         NL_TEST_ASSERT(inSuite, out.data() == nullptr);
     }
@@ -73,15 +73,15 @@ void TestStrdupSplitter(nlTestSuite * inSuite, void * inContext)
         StringSplitter splitter("a**bc*d,e*f", '*');
 
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("a")));
+        NL_TEST_ASSERT(inSuite, out.data_equal("a"_span));
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, out.data_equal(""_span));
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("bc")));
+        NL_TEST_ASSERT(inSuite, out.data_equal("bc"_span));
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("d,e")));
+        NL_TEST_ASSERT(inSuite, out.data_equal("d,e"_span));
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("f")));
+        NL_TEST_ASSERT(inSuite, out.data_equal("f"_span));
         NL_TEST_ASSERT(inSuite, !splitter.Next(out));
     }
 
@@ -90,37 +90,37 @@ void TestStrdupSplitter(nlTestSuite * inSuite, void * inContext)
         StringSplitter splitter(",", ',');
         // Note that even though "" is nullptr right away, "," becomes two empty strings
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, out.data_equal(""_span));
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, out.data_equal(""_span));
         NL_TEST_ASSERT(inSuite, !splitter.Next(out));
     }
     {
         StringSplitter splitter("log,", ',');
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("log")));
+        NL_TEST_ASSERT(inSuite, out.data_equal("log"_span));
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, out.data_equal(""_span));
         NL_TEST_ASSERT(inSuite, !splitter.Next(out));
     }
     {
         StringSplitter splitter(",log", ',');
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, out.data_equal(""_span));
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("log")));
+        NL_TEST_ASSERT(inSuite, out.data_equal("log"_span));
         NL_TEST_ASSERT(inSuite, !splitter.Next(out));
     }
     {
         StringSplitter splitter(",,,", ',');
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, out.data_equal(""_span));
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, out.data_equal(""_span));
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, out.data_equal(""_span));
         NL_TEST_ASSERT(inSuite, splitter.Next(out));
-        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, out.data_equal(""_span));
         NL_TEST_ASSERT(inSuite, !splitter.Next(out));
     }
 }

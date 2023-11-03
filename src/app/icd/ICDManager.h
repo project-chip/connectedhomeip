@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/ICDMonitoringTable.h>
 #include <app/icd/ICDNotifier.h>
 #include <app/icd/ICDStateObserver.h>
@@ -58,6 +59,7 @@ public:
     void UpdateOperationState(OperationalState state);
     void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
     bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
+    bool SupportsFeature(Clusters::IcdManagement::Feature feature);
     ICDMode GetICDMode() { return mICDMode; }
     OperationalState GetOperationalState() { return mOperationalState; }
 
@@ -93,11 +95,9 @@ private:
     static constexpr System::Clock::Milliseconds32 kFastPollingInterval = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
 
     // Minimal constraint value of the the ICD attributes.
-    static constexpr uint32_t kMinIdleModeInterval    = 500;
-    static constexpr uint32_t kMinActiveModeInterval  = 300;
+    static constexpr uint32_t kMinIdleModeDuration    = 500;
+    static constexpr uint32_t kMinActiveModeDuration  = 300;
     static constexpr uint16_t kMinActiveModeThreshold = 300;
-
-    bool SupportsCheckInProtocol();
 
     BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
 

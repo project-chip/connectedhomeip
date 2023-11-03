@@ -112,6 +112,7 @@ enum class CertType : uint8_t
                                   firmware image signing is manufacturer-specific. The CHIP
                                   certificate format supports encoding of firmware signing
                                   certificates if chosen by the manufacturer to use them. */
+    kNetworkIdentity = 0x05, /**< A CHIP Network (Client) Identity. */
 };
 
 /** X.509 Certificate Key Purpose Flags
@@ -428,7 +429,7 @@ struct ChipCertificateData
     void Clear();
     bool IsEqual(const ChipCertificateData & other) const;
 
-    ByteSpan mCertificate;                      /**< Original raw buffer data. */
+    ByteSpan mSerialNumber;                     /**< Certificate Serial Number. */
     ChipDN mSubjectDN;                          /**< Certificate Subject DN. */
     ChipDN mIssuerDN;                           /**< Certificate Issuer DN. */
     CertificateKeyId mSubjectKeyId;             /**< Certificate Subject public key identifier. */
@@ -458,7 +459,7 @@ struct ChipCertificateData
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR DecodeChipCert(const ByteSpan chipCert, ChipCertificateData & certData);
+CHIP_ERROR DecodeChipCert(const ByteSpan chipCert, ChipCertificateData & certData, BitFlags<CertDecodeFlags> decodeFlags = {});
 
 /**
  * @brief Decode CHIP certificate.
@@ -470,7 +471,8 @@ CHIP_ERROR DecodeChipCert(const ByteSpan chipCert, ChipCertificateData & certDat
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR DecodeChipCert(chip::TLV::TLVReader & reader, ChipCertificateData & certData);
+CHIP_ERROR DecodeChipCert(chip::TLV::TLVReader & reader, ChipCertificateData & certData,
+                          BitFlags<CertDecodeFlags> decodeFlags = {});
 
 /**
  * @brief Decode CHIP Distinguished Name (DN).
@@ -505,6 +507,21 @@ CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, MutableByteSpan & 
 CHIP_ERROR ConvertChipCertToX509Cert(const ByteSpan chipCert, MutableByteSpan & x509Cert);
 
 /**
+ * @brief Verifies the signature of a certificate.
+ *
+ * @param cert    The certificate to be verified.
+ * @param signer  The certificate containing the public key used to verify the signature.
+ *
+ * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
+ *
+ * The certificate to be verified must have been decoded with TBS hash calculation enabled.
+ *
+ * Note that this function performs ONLY signature verification. No Subject and Issuer DN
+ * comparison, Key Usage extension checks or similar validation is performed.
+ **/
+CHIP_ERROR VerifyCertSignature(const ChipCertificateData & cert, const ChipCertificateData & signer);
+
+/**
  * Validate CHIP Root CA Certificate (RCAC) in ByteSpan TLV-encoded form.
  * This function performs RCAC parsing, checks SubjectDN validity, verifies that SubjectDN
  * and IssuerDN are equal, verifies that SKID and AKID are equal, validates certificate signature.
@@ -512,6 +529,20 @@ CHIP_ERROR ConvertChipCertToX509Cert(const ByteSpan chipCert, MutableByteSpan & 
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  */
 CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac);
+
+/**
+ * Validates a Network (Client) Identity in TLV-encoded form.
+ *
+ * This function parses the certificate, ensures the rigid fields have the values mandated by the
+ * specification, and validates the certificate signature.
+ *
+ * @return CHIP_NO_ERROR on success, CHIP_ERROR_WRONG_CERT_TYPE if the certificate does
+ *         not conform to the requirements for a Network Identity, CHIP_ERROR_INVALID_SIGNATURE
+ *         if the certificate has an invalid signature, or another CHIP_ERROR.
+ *
+ * @see section 11.24 (Wi-Fi Authentication with Per-Device Credentials) of the Matter spec
+ */
+CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert);
 
 struct FutureExtension
 {
@@ -538,7 +569,7 @@ struct X509CertRequestParams
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, Crypto::P256Keypair & issuerKeypair,
+CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256Keypair & issuerKeypair,
                            MutableByteSpan & x509Cert);
 
 /**
@@ -552,7 +583,7 @@ CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, Crypto::
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
-                          Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
+                          const Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
 
 /**
  * @brief Generate a new X.509 DER encoded Node operational certificate
@@ -565,7 +596,7 @@ CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, const Cry
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
-                                      Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
+                                      const Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
 
 /**
  * @brief

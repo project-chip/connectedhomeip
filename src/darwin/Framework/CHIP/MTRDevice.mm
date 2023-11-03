@@ -910,9 +910,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // 1. The attribute is not in the specification (so we don't know whether hasChangesOmittedQuality can be trusted).
     // 2. Subscription not in a state we can expect reports
     // 3. There is subscription but attribute has Changes Omitted quality
-    // 4. Cache has no entry
     // TODO: add option for BaseSubscriptionCallback to report during priming, to reduce when case 4 is hit
-    if (!attributeIsSpecified || ![self _subscriptionAbleToReport] || hasChangesOmittedQuality || !attributeValueToReturn) {
+    if (!attributeIsSpecified || ![self _subscriptionAbleToReport] || hasChangesOmittedQuality) {
         // Read requests container will be a mutable array of items, each being an array containing:
         //   [attribute request path, params]
         // Batching handler should only coalesce when params are equal.
@@ -1092,12 +1091,19 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
                           commandID:(NSNumber *)commandID
-                      commandFields:(id)commandFields
+                      commandFields:(NSDictionary<NSString *, id> * _Nullable)commandFields
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
+    if (commandFields == nil) {
+        commandFields = @{
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[],
+        };
+    }
+
     [self invokeCommandWithEndpointID:endpointID
                             clusterID:clusterID
                             commandID:commandID

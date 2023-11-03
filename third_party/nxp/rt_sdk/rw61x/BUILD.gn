@@ -1,0 +1,53 @@
+# Copyright (c) 2022 Project CHIP Authors
+# Copyright 2023 NXP
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/nxp_sdk.gni")
+
+#allows to get common NXP SDK gn options
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+# Allows to get various RT gn options
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+
+#allows to get common NXP SDK gn options
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+group("nxp_mbedtls") {
+  public_deps = []
+
+  # mbedtls port
+  if (rw610_mbedtls_port_els_pkc) {
+    public_deps +=
+        [ "${nxp_sdk_build_root}/${nxp_sdk_name}:nxp_els_pkc_mbedtls" ]
+  } else {
+    public_deps += [ "${nxp_sdk_build_root}/${nxp_sdk_name}:nxp_ksdk_mbedtls" ]
+  }
+}
+
+group("nxp_sdk_mbedtls_config") {
+  public_configs = []
+
+  # mbedtls port
+  if (rw610_mbedtls_port_els_pkc) {
+    public_configs +=
+        [ "${nxp_sdk_build_root}/${nxp_sdk_name}:nxp_els_pkc_mbedtls_config" ]
+    public_configs +=
+        [ "${nxp_sdk_build_root}/${nxp_sdk_name}:mbedtls_els_pkc_config" ]
+  } else {
+    public_configs +=
+        [ "${nxp_sdk_build_root}/${nxp_sdk_name}:nxp_ksdk_mbedtls_config" ]
+    public_configs +=
+        [ "${nxp_sdk_build_root}/${nxp_sdk_name}:mbedtls_ksdk_config" ]
+  }
+}

@@ -1332,6 +1332,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::Sensitivi
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(MicrowaveOvenMode::ModeTag val)
+{
+    using EnumType = MicrowaveOvenMode::ModeTag;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kDefrost:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalState::ErrorStateEnum val)
 {
     using EnumType = OperationalState::ErrorStateEnum;
@@ -1358,38 +1371,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalState::Opera
         return val;
     default:
         return static_cast<EnumType>(4);
-    }
-}
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(RvcOperationalState::ErrorStateEnum val)
-{
-    using EnumType = RvcOperationalState::ErrorStateEnum;
-    switch (val)
-    {
-    case EnumType::kFailedToFindChargingDock:
-    case EnumType::kStuck:
-    case EnumType::kDustBinMissing:
-    case EnumType::kDustBinFull:
-    case EnumType::kWaterTankEmpty:
-    case EnumType::kWaterTankMissing:
-    case EnumType::kWaterTankLidOpen:
-    case EnumType::kMopCleaningPadMissing:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(RvcOperationalState::OperationalStateEnum val)
-{
-    using EnumType = RvcOperationalState::OperationalStateEnum;
-    switch (val)
-    {
-    case EnumType::kSeekingCharger:
-    case EnumType::kCharging:
-    case EnumType::kDocked:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
     }
 }
 
@@ -2899,9 +2880,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AudioOutput::OutputType
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(ApplicationLauncher::ApplicationLauncherStatusEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ApplicationLauncher::StatusEnum val)
 {
-    using EnumType = ApplicationLauncher::ApplicationLauncherStatusEnum;
+    using EnumType = ApplicationLauncher::StatusEnum;
     switch (val)
     {
     case EnumType::kSuccess:

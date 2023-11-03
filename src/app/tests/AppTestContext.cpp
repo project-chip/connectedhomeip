@@ -41,6 +41,7 @@ namespace Test {
 CHIP_ERROR AppContext::Init()
 {
     ReturnErrorOnFailure(Super::Init());
+    ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().InitChipStack());
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
                                                                                 app::reporting::GetDefaultReportScheduler()));
 
@@ -57,6 +58,7 @@ void AppContext::Shutdown()
     Access::ResetAccessControlToDefault();
 
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
     Super::Shutdown();
 }
 

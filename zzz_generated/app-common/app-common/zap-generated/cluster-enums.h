@@ -90,6 +90,12 @@ enum class NameSupportBitmap : uint8_t
 
 namespace Scenes {
 
+// Bitmap for CopyModeBitmap
+enum class CopyModeBitmap : uint8_t
+{
+    kCopyAllScenes = 0x1,
+};
+
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
@@ -99,10 +105,10 @@ enum class Feature : uint32_t
     kFabricScenes = 0x8,
 };
 
-// Bitmap for ScenesCopyMode
-enum class ScenesCopyMode : uint8_t
+// Bitmap for NameSupportBitmap
+enum class NameSupportBitmap : uint8_t
 {
-    kCopyAllScenes = 0x1,
+    kSceneNames = 0x80,
 };
 } // namespace Scenes
 
@@ -162,6 +168,7 @@ enum class Feature : uint32_t
 {
     kLighting          = 0x1,
     kDeadFrontBehavior = 0x2,
+    kOffOnly           = 0x4,
 };
 
 // Bitmap for OnOffControlBitmap
@@ -917,6 +924,16 @@ enum class Feature : uint32_t
     kEthernetNetworkInterface = 0x4,
 };
 
+// Bitmap for ThreadCapabilitiesBitmap
+enum class ThreadCapabilitiesBitmap : uint16_t
+{
+    kIsBorderRouterCapable                = 0x1,
+    kIsRouterCapable                      = 0x2,
+    kIsSleepyEndDeviceCapable             = 0x4,
+    kIsFullThreadDevice                   = 0x8,
+    kIsSynchronizedSleepyEndDeviceCapable = 0x10,
+};
+
 // Bitmap for WiFiSecurityBitmap
 enum class WiFiSecurityBitmap : uint8_t
 {
@@ -1063,7 +1080,7 @@ namespace SoftwareDiagnostics {
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kWaterMarks = 0x1,
+    kWatermarks = 0x1,
 };
 } // namespace SoftwareDiagnostics
 
@@ -1396,6 +1413,12 @@ enum class StatusCode : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
 };
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kBasic = 0x1,
+};
 } // namespace AdministratorCommissioning
 
 namespace OperationalCredentials {
@@ -1472,6 +1495,30 @@ namespace IcdManagement {
 enum class Feature : uint32_t
 {
     kCheckInProtocolSupport = 0x1,
+    kUserActiveModeTrigger  = 0x2,
+    kLongIdleTimeSupport    = 0x4,
+};
+
+// Bitmap for UserActiveModeTriggerBitmap
+enum class UserActiveModeTriggerBitmap : uint32_t
+{
+    kPowerCycle               = 0x1,
+    kSettingsMenu             = 0x2,
+    kCustomInstruction        = 0x4,
+    kDeviceManual             = 0x8,
+    kActuateSensor            = 0x10,
+    kActuateSensorSeconds     = 0x20,
+    kActuateSensorTimes       = 0x40,
+    kActuateSensorLightsBlink = 0x80,
+    kResetButton              = 0x100,
+    kResetButtonLightsBlink   = 0x200,
+    kResetButtonSeconds       = 0x400,
+    kResetButtonTimes         = 0x800,
+    kSetupButton              = 0x1000,
+    kSetupButtonSeconds       = 0x2000,
+    kSetupButtonLightsBlink   = 0x4000,
+    kSetupButtonTimes         = 0x8000,
+    kAppDefinedButton         = 0x10000,
 };
 } // namespace IcdManagement
 
@@ -1808,6 +1855,29 @@ enum class Feature : uint32_t
 };
 } // namespace DishwasherAlarm
 
+namespace MicrowaveOvenMode {
+
+// Enum for ModeTag
+enum class ModeTag : uint16_t
+{
+    kNormal  = 0x4000,
+    kDefrost = 0x4001,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOnOff = 0x1,
+};
+} // namespace MicrowaveOvenMode
+
+namespace MicrowaveOvenControl {} // namespace MicrowaveOvenControl
+
 namespace OperationalState {
 
 // Enum for ErrorStateEnum
@@ -1852,11 +1922,11 @@ enum class ErrorStateEnum : uint8_t
     kWaterTankMissing         = 0x45,
     kWaterTankLidOpen         = 0x46,
     kMopCleaningPadMissing    = 0x47,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
+    // kUnknownEnumValue intentionally not defined. This enum never goes
+    // through DataModel::Decode, likely because it is a part of a derived
+    // cluster. As a result having kUnknownEnumValue in this enum is error
+    // prone, and was removed. See
+    // src/app/common/templates/config-data.yaml.
 };
 
 // Enum for OperationalStateEnum
@@ -1865,11 +1935,11 @@ enum class OperationalStateEnum : uint8_t
     kSeekingCharger = 0x40,
     kCharging       = 0x41,
     kDocked         = 0x42,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
+    // kUnknownEnumValue intentionally not defined. This enum never goes
+    // through DataModel::Decode, likely because it is a part of a derived
+    // cluster. As a result having kUnknownEnumValue in this enum is error
+    // prone, and was removed. See
+    // src/app/common/templates/config-data.yaml.
 };
 } // namespace RvcOperationalState
 
@@ -2664,7 +2734,7 @@ enum class Feature : uint32_t
 enum class PumpStatusBitmap : uint16_t
 {
     kDeviceFault       = 0x1,
-    kSupplyfault       = 0x2,
+    kSupplyFault       = 0x2,
     kSpeedLow          = 0x4,
     kSpeedHigh         = 0x8,
     kLocalOverride     = 0x10,
@@ -4015,8 +4085,8 @@ enum class Feature : uint32_t
 
 namespace ApplicationLauncher {
 
-// Enum for ApplicationLauncherStatusEnum
-enum class ApplicationLauncherStatusEnum : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kAppNotAvailable = 0x01,

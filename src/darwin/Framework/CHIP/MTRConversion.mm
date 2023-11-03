@@ -18,6 +18,7 @@
 #import "MTRLogging_Internal.h"
 
 #include <lib/support/SafeInt.h>
+#include <lib/support/TimeUtils.h>
 
 CHIP_ERROR SetToCATValues(NSSet<NSNumber *> * catSet, chip::CATValues & values)
 {
@@ -58,4 +59,22 @@ NSSet<NSNumber *> * CATValuesToSet(const chip::CATValues & values)
         }
     }
     return [NSSet setWithSet:catSet];
+}
+
+bool DateToMatterEpochSeconds(NSDate * date, uint32_t & matterEpochSeconds)
+{
+    auto timeSinceUnixEpoch = date.timeIntervalSince1970;
+    if (timeSinceUnixEpoch < static_cast<NSTimeInterval>(chip::kChipEpochSecondsSinceUnixEpoch)) {
+        // This is a pre-Matter-epoch time, and cannot be represented in epoch-s.
+        return false;
+    }
+
+    auto timeSinceMatterEpoch = timeSinceUnixEpoch - chip::kChipEpochSecondsSinceUnixEpoch;
+    if (timeSinceMatterEpoch > UINT32_MAX) {
+        // Too far into the future.
+        return false;
+    }
+
+    matterEpochSeconds = static_cast<uint32_t>(timeSinceMatterEpoch);
+    return true;
 }
