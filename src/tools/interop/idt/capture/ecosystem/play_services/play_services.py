@@ -59,10 +59,6 @@ class PlayServices(EcosystemCapture):
                             '168',  # mDNS
                             ]
 
-        if config.test_error_init:
-            self.logger.critical("Throwing exception in init for test!")
-            raise Exception("Test init exception from Play Services!")
-
     def _write_standard_info_file(self) -> None:
         for k, v in self.standard_info_data.items():
             self.logger.info(f"{k}: {v}")
@@ -97,9 +93,6 @@ class PlayServices(EcosystemCapture):
             verbose_command = f"shell setprop log.tag.gms_svc_id:{service_id} VERBOSE"
             self.platform.run_adb_command(verbose_command)
         self._get_standard_info()
-        if config.test_error_execution:
-            self.logger.critical("Throwing exception in execution for test!")
-            raise Exception("Test exe exception from Play Services!")
 
     async def stop_capture(self) -> None:
         self.analysis.show_analysis()
