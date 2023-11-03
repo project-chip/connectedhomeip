@@ -30,11 +30,11 @@ in `.matter` format. For example:
 
 The tool supports several options that are useful for development:
 
-| Argument(s)             | Description                                           |
-| ----------------------- | ----------------------------------------------------- |
-| `-o/--output PATH`      | Output the matter file into a path instead of STDOUT. |
-| `--compare PATH`        | Also read another `.matter` file for compare          |
-| `--compare-output PATH` | Output a subset of `--compare` data into PATH         |
+| Argument(s)             | Description                                                                         |
+| ----------------------- | ----------------------------------------------------------------------------------- |
+| `-o/--output PATH`      | Output the matter file into a path instead of STDOUT.                               |
+| `--compare PATH`        | Also read another `.matter` file for compare. MUST be used with `--compare-output`. |
+| `--compare-output PATH` | Output the subset of `--compare` clusters that matches XML into PATH.               |
 
 Using `--compare` AND `--compare-output` produce output that is easier to
 compare as opposed to using existing zap-generated matter files because it
