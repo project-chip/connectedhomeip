@@ -48,7 +48,7 @@ LogSessionHandle LogProvider::StartLogCollection(IntentEnum logType)
     }
     else
     {
-       mLogSessionHandle = kInvalidLogSessionHandle;
+        mLogSessionHandle = kInvalidLogSessionHandle;
     }
     return mLogSessionHandle;
 }
