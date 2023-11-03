@@ -20,12 +20,13 @@ import ipaddress
 import os.path
 from abc import ABC, abstractmethod
 
-from utils.artifact import create_standard_log_name
-from utils.shell import Bash
 from discovery import MatterDnssdListener
 from discovery.dnssd import ServiceInfo
+from utils.artifact import create_standard_log_name
 from utils.log import get_logger
-from . import config, ProbeTarget
+from utils.shell import Bash
+
+from . import ProbeTarget, config
 
 logger = get_logger(__file__)
 

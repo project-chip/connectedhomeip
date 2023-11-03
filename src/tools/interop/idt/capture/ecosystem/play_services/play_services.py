@@ -25,8 +25,8 @@ from capture.platform.android import Android
 from utils.artifact import create_standard_log_name, log
 
 from . import config
-from .play_services_analysis import PlayServicesAnalysis
 from .command_map import dumpsys, getprop
+from .play_services_analysis import PlayServicesAnalysis
 from .prober import PlayServicesProber
 
 logger = log.get_logger(__file__)

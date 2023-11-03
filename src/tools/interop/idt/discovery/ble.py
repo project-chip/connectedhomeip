@@ -21,10 +21,9 @@ import os
 import sys
 import time
 
-from utils import log
 from bleak import AdvertisementData, BleakScanner, BLEDevice
 from bleak.exc import BleakDBusError
-
+from utils import log
 from utils.log import border_print
 
 logger = log.get_logger(__file__)

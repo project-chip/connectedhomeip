@@ -20,16 +20,15 @@ import asyncio
 import os
 import shutil
 import sys
-
-import probe.runner as probe_runner
 from pathlib import Path
 
+import probe.runner as probe_runner
 from capture import EcosystemController, EcosystemFactory, PacketCaptureRunner, PlatformFactory
+from discovery import MatterBleScanner, MatterDnssdListener
 from utils.artifact import create_file_timestamp, safe_mkdir
 from utils.host_platform import get_available_interfaces
-from utils.shell import Bash
-from discovery import MatterBleScanner, MatterDnssdListener
 from utils.log import border_print
+from utils.shell import Bash
 
 import config
 

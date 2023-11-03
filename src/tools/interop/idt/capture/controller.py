@@ -24,8 +24,9 @@ import typing
 
 import capture
 from capture.base import EcosystemCapture, PlatformLogStreamer, UnsupportedCapturePlatformException
-from utils.artifact import create_standard_log_name, safe_mkdir, log
+from utils.artifact import create_standard_log_name, log, safe_mkdir
 from utils.log import border_print
+
 from . import config
 
 _PLATFORM_MAP: typing.Dict[str, PlatformLogStreamer] = {}

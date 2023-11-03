@@ -16,8 +16,9 @@
 #
 
 from utils.host_platform import is_mac
-from .mac import ProberMacHost
+
 from .linux import ProberLinuxHost
+from .mac import ProberMacHost
 
 
 def run_probes(artifact_dir: str, dnssd_dir: str) -> None:

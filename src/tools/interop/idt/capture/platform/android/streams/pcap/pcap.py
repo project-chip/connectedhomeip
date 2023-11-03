@@ -19,9 +19,9 @@ import asyncio
 import os
 from typing import TYPE_CHECKING
 
-from utils.artifact import create_standard_log_name, safe_mkdir, log
-from utils.shell import Bash
+from utils.artifact import create_standard_log_name, log, safe_mkdir
 from utils.host_platform import is_mac
+from utils.shell import Bash
 
 from ... import config
 from ..base import AndroidStream

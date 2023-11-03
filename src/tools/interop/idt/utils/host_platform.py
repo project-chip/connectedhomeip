@@ -20,7 +20,6 @@ import platform as host_platform
 import sys
 
 import psutil
-
 from utils import log
 from utils.log import border_print
 from utils.shell import Bash

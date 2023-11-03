@@ -17,8 +17,9 @@
 
 import probe.probe as p
 from utils.host_platform import get_ll_interface
-from . import config
 from utils.log import get_logger
+
+from . import config
 
 logger = get_logger(__file__)
 

@@ -18,9 +18,9 @@
 import asyncio
 import os
 
-from zeroconf import ServiceBrowser, ServiceInfo, ServiceListener, Zeroconf
 from utils.artifact import create_standard_log_name, log
 from utils.log import border_print
+from zeroconf import ServiceBrowser, ServiceInfo, ServiceListener, Zeroconf
 
 logger = log.get_logger(__file__)
 

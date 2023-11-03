@@ -18,7 +18,8 @@
 import probe.probe as p
 from utils.host_platform import get_ll_interface
 from utils.log import get_logger
-from . import config, ProbeTarget
+
+from . import ProbeTarget, config
 
 logger = get_logger(__file__)
 
