@@ -41,7 +41,7 @@ tests:
           T_ACCESSPOINT_CRE DENTIALS 3. Breadcrumb field set to 1"
       PICS: CNET.S.C02.Rsp
       verification: |
-          ./chip-tool networkcommissioning add-or-update-wi-fi-network  hex:<your network id in hex> 1 0
+          ./chip-tool networkcommissioning add-or-update-wi-fi-network  hex:<your network id in hex> <password> 1 0
 
           Below is an example:
 
@@ -58,9 +58,9 @@ tests:
           "Step 2: TH sends RemoveNetwork command to the DUT with NetworkID
           field set to PIXIT.CNET.WIFI_1ST_ACCE SSPOINT_SSID and Breadcrumb
           field set to 1"
-      PICS: CNET.S.C02.Rsp
+      PICS: CNET.S.C04.Rsp
       verification: |
-          ./chip-tool networkcommissioning remove hex:<your network id in hex> 1 0
+          ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
 
           Below is an example:
 
@@ -79,7 +79,7 @@ tests:
           field set to 1"
       PICS: CNET.S.C06.Rsp
       verification: |
-          ./chip-tool networkcommissioning connect hex:<your network id in hex> 1 0
+          ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
 
           Below is an example:
 
