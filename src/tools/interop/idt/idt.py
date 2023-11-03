@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 import probe.runner as probe_runner
-from capture import Orchestrator, EcosystemFactory, PacketCaptureRunner, PlatformFactory
+from capture import EcosystemFactory, Orchestrator, PacketCaptureRunner, PlatformFactory
 from discovery import MatterBleScanner, MatterDnssdListener
 from utils.artifact import create_file_timestamp, safe_mkdir
 from utils.host_platform import get_available_interfaces
