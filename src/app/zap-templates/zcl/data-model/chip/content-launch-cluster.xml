@@ -79,9 +79,9 @@ limitations under the License.
   <struct name="StyleInformationStruct">
       <cluster code="0x050a"/>
       <!-- TODO: spec sets this max size, but seems impossible given UDP size limits -->
-    <item name="ImageURL" type="char_string" length="8192" optional="true"/>
-    <item name="Color" type="char_string" length="9" optional="true"/>
-    <item name="Size" type="DimensionStruct" optional="true"/>
+      <item name="ImageURL" type="char_string" length="8192" optional="true"/>
+      <item name="Color" type="char_string" length="9" optional="true"/>
+      <item name="Size" type="DimensionStruct" optional="true"/>
   </struct>
 
   <struct name="BrandingInformationStruct">
