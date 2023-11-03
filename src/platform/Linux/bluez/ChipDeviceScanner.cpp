@@ -118,8 +118,8 @@ void ChipDeviceScanner::Shutdown()
 CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
 {
     assertChipStackLockedByCurrentThread();
-    ReturnErrorCodeIf(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
     mIsScanning = true; // optimistic, to allow all callbacks to check this
     if (PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopStartScan, this) != CHIP_NO_ERROR)
@@ -158,8 +158,9 @@ void ChipDeviceScanner::TimerExpiredCallback(chip::System::Layer * layer, void *
 
 CHIP_ERROR ChipDeviceScanner::StopScan()
 {
-    ReturnErrorCodeIf(!mIsScanning, CHIP_NO_ERROR);
-    ReturnErrorCodeIf(mIsStopping, CHIP_NO_ERROR);
+    VerifyOrReturnError(mIsScanning, CHIP_NO_ERROR);
+    VerifyOrReturnError(!mIsStopping, CHIP_NO_ERROR);
+
     mIsStopping = true;
     g_cancellable_cancel(mCancellable); // in case we are currently running a scan
 
