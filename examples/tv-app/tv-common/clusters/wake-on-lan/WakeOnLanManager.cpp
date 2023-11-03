@@ -24,7 +24,7 @@
 #include <string>
 
 static_assert(chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength == 6, "Spec mandates only 64-bit mac addresses");
-constexpr const char *kNullHexMACAddress = "000000000000";
+constexpr const char * kNullHexMACAddress = "000000000000";
 
 using namespace chip;
 using namespace chip::app::Clusters::WakeOnLan;
