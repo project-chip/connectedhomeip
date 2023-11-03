@@ -45,12 +45,12 @@ LogSessionHandle LogProvider::StartLogCollection(IntentEnum logType)
         }
         sLogSessionHandle++;
         mLogSessionHandle = sLogSessionHandle;
-        return mLogSessionHandle;
     }
     else
     {
-        return kInvalidLogSessionHandle;
+       mLogSessionHandle = kInvalidLogSessionHandle;
     }
+    return mLogSessionHandle;
 }
 
 uint64_t LogProvider::GetNextChunk(LogSessionHandle logSessionHandle, chip::MutableByteSpan & outBuffer, bool & outIsEOF)
