@@ -43,7 +43,7 @@ Follow the steps below to execute capture and discovery without a Raspberry Pi:
 -   After `idt` aliases are available in your environment, calling any `idt`
     command will automatically create a new virtual environment and install
     python dependencies. 
-    - If you're missing non Python dependencies, you'll be prompted to install them until they're available. 
+    - If you're missing non-Python dependencies, you'll be prompted to install them until they're available. 
 -   Bluetooth discovery on macOS will require granting the program where `idt` is run, e.g. terminal emulator or IDE 
     permission to access bluetooth in macOS settings. 
     - Failure to do so will result in errors / `abort` upon ble discovery execution.

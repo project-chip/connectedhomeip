@@ -59,13 +59,13 @@ class Bash:
             else self.proc.stdout.decode().strip()
 
     def start_command(self) -> None:
-        if self.sync:
-            self.proc = subprocess.run(self.args, capture_output=self.capture_output, cwd=self.cwd)
-            return
-        if not self.command_is_running():
-            self.proc = subprocess.Popen(self.args, cwd=self.cwd, stdin=subprocess.PIPE)
+        if self.proc is None:
+            if self.sync:
+                self.proc = subprocess.run(self.args, capture_output=self.capture_output, cwd=self.cwd)
+            else:
+                self.proc = subprocess.Popen(self.args, cwd=self.cwd, stdin=subprocess.PIPE)
         else:
-            self.logger.warning(f'{self.command} start requested while running')
+            self.logger.warning(f'"{self.command}" start requested more than once for same Bash instance!')
 
     def term_with_sudo(self, proc: multiprocessing.Process) -> None:
         self.logger.debug(f"SIGTERM {proc.pid} with sudo")
