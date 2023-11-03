@@ -66,7 +66,7 @@ used.
 
 It is possible to open dot files and get them rendered in vscode using this
 extension:
-https://marketplace.visualstudio.com/items?itemName=joaompinto.vscode-graphviz
+[vscode-graphviz](https://marketplace.visualstudio.com/items?itemName=joaompinto.vscode-graphviz)
 
 # Example of output
 

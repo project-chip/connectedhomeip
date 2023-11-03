@@ -725,7 +725,6 @@ JLink
 JLinkExe
 JLinkRTTClient
 JN
-joaompinto
 jpg
 jre
 js
