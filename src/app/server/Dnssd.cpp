@@ -146,8 +146,8 @@ CHIP_ERROR DnssdServer::SetEphemeralDiscriminator(Optional<uint16_t> discriminat
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-template <class Derived>
-void DnssdServer::AddICDKeyToAdvertisement(Dnssd::BaseAdvertisingParams<Derived> & advParams)
+template <class AdvertisingParams>
+void DnssdServer::AddICDKeyToAdvertisement(AdvertisingParams & advParams)
 {
     // Only advertise the ICD key if the device can operate as a LIT
     if (Server::GetInstance().GetICDManager().SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
@@ -188,7 +188,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                                        .EnableIpV4(true);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-        AddICDKeyToAdvertisement<Dnssd::OperationalAdvertisingParameters>(advertiseParameters);
+        AddICDKeyToAdvertisement(advertiseParameters);
 #endif
 
         auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
@@ -261,7 +261,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     advertiseParameters.SetLocalMRPConfig(GetLocalMRPConfig()).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    AddICDKeyToAdvertisement<Dnssd::CommissionAdvertisingParameters>(advertiseParameters);
+    AddICDKeyToAdvertisement(advertiseParameters);
 #endif
 
     if (commissionableNode)
