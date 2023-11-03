@@ -207,6 +207,10 @@ options:
                         Specify packet capture interface (default any)
 ```
 
+For packet capture interface (`-i`/`--interface`:
+- On macOS, the only available interface is `any`.
+- On Linux, `idt` checks available interfaces from `/sys/class/net/` as well as allowing `any`.
+
 #### Artifacts
 
 Each ecosystem and platform involved in the capture will have their own
