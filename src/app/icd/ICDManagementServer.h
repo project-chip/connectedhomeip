@@ -53,6 +53,8 @@ public:
     Status UnregisterClient(PersistentStorageDelegate & storage, FabricIndex fabric_index, chip::NodeId node_id,
                             Optional<chip::ByteSpan> verificationKey, bool is_admin);
 
+    void TableIsEmptyForFabric();
+
     Status StayActiveRequest(FabricIndex fabric_index);
 
     static ICDManagementServer & GetInstance() { return mInstance; }
@@ -75,6 +77,8 @@ private:
 
     uint16_t mActiveThreshold_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS;
 
+    // TODO : Implement ICD counter
+    // https://github.com/project-chip/connectedhomeip/issues/29184
     uint32_t mICDCounter = 0;
 
     static_assert((CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC) >= 1,
