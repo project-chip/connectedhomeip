@@ -2610,19 +2610,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RadonConcentrationMeasu
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::ChannelStatusEnum val)
-{
-    using EnumType = Channel::ChannelStatusEnum;
-    switch (val)
-    {
-    case EnumType::kSuccess:
-    case EnumType::kMultipleMatches:
-    case EnumType::kNoMatches:
-        return val;
-    default:
-        return static_cast<EnumType>(3);
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::LineupInfoTypeEnum val)
 {
     using EnumType = Channel::LineupInfoTypeEnum;
@@ -2632,6 +2619,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::LineupInfoType
         return val;
     default:
         return static_cast<EnumType>(1);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::StatusEnum val)
+{
+    using EnumType = Channel::StatusEnum;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kMultipleMatches:
+    case EnumType::kNoMatches:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
     }
 }
 

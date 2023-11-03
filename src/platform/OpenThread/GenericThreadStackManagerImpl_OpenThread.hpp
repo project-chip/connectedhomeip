@@ -499,9 +499,13 @@ ConnectivityManager::ThreadDeviceType GenericThreadStackManagerImpl_OpenThread<I
         ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 
 #if CHIP_DEVICE_CONFIG_THREAD_SSED
+#if OPENTHREAD_API_VERSION >= 347
+    if (otLinkGetCslPeriod(mOTInst) != 0)
+#else
     if (otLinkCslGetPeriod(mOTInst) != 0)
+#endif // OPENTHREAD_API_VERSION
         ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice);
-#endif
+#endif // CHIP_DEVICE_CONFIG_THREAD_SSED
 
     ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 
@@ -1765,8 +1769,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetPollingInter
 // * poll period for SED devices that poll the parent for data
 // * CSL period for SSED devices that listen for messages in scheduled time slots.
 #if CHIP_DEVICE_CONFIG_THREAD_SSED
+#if OPENTHREAD_API_VERSION >= 347
+    // Get CSL period in units of us and divide by 1000 to get milliseconds.
+    uint32_t curIntervalMS = otLinkGetCslPeriod(mOTInst) / 1000;
+#else
     // Get CSL period in units of 10 symbols, convert it to microseconds and divide by 1000 to get milliseconds.
     uint32_t curIntervalMS = otLinkCslGetPeriod(mOTInst) * OT_US_PER_TEN_SYMBOLS / 1000;
+#endif // OPENTHREAD_API_VERSION
 #else
     uint32_t curIntervalMS = otLinkGetPollPeriod(mOTInst);
 #endif
@@ -1774,9 +1783,15 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetPollingInter
     if (pollingInterval.count() != curIntervalMS)
     {
 #if CHIP_DEVICE_CONFIG_THREAD_SSED
+#if OPENTHREAD_API_VERSION >= 347
+        // Set CSL period in units of us and divide by 1000 to get milliseconds.
+        otErr         = otLinkSetCslPeriod(mOTInst, pollingInterval.count() * 1000);
+        curIntervalMS = otLinkGetCslPeriod(mOTInst) / 1000;
+#else
         // Set CSL period in units of 10 symbols, convert it to microseconds and divide by 1000 to get milliseconds.
         otErr         = otLinkCslSetPeriod(mOTInst, pollingInterval.count() * 1000 / OT_US_PER_TEN_SYMBOLS);
         curIntervalMS = otLinkCslGetPeriod(mOTInst) * OT_US_PER_TEN_SYMBOLS / 1000;
+#endif // OPENTHREAD_API_VERSION
 #else
         otErr         = otLinkSetPollPeriod(mOTInst, pollingInterval.count());
         curIntervalMS = otLinkGetPollPeriod(mOTInst);

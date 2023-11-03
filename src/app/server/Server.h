@@ -349,6 +349,10 @@ public:
 
     app::reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    app::ICDManager & GetICDManager() { return mICDManager; }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     /**
      * This function causes the ShutDown event to be generated async on the
      * Matter event loop.  Should be called before stopping the event loop.

@@ -49,6 +49,10 @@ using SupportedStreamingProtocol = SupportedProtocolsBitmap;
 using ContentLaunchStatusEnum    = StatusEnum;
 } // namespace ContentLauncher
 
+namespace Channel {
+using ChannelStatusEnum = StatusEnum;
+} // namespace Channel
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip
