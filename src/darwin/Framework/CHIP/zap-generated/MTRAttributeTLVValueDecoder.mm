@@ -12300,6 +12300,19 @@ static id _Nullable DecodeAttributeValueForWakeOnLANCluster(AttributeId aAttribu
         }
         return value;
     }
+#if MTR_ENABLE_PROVISIONAL
+    case Attributes::LinkLocalAddress::Id: {
+        using TypeInfo = Attributes::LinkLocalAddress::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSData * _Nonnull value;
+        value = AsData(cppValue);
+        return value;
+    }
+#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }

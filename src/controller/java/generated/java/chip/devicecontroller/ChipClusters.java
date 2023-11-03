@@ -25495,6 +25495,16 @@ public class ChipClusters {
         subscribeMACAddressAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readLinkLocalAddressAttribute(
+        OctetStringAttributeCallback callback) {
+        readLinkLocalAddressAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLinkLocalAddressAttribute(
+        OctetStringAttributeCallback callback, int minInterval, int maxInterval) {
+        subscribeLinkLocalAddressAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(
         GeneratedCommandListAttributeCallback callback) {
         readGeneratedCommandListAttribute(chipClusterPtr, callback);
@@ -25558,6 +25568,10 @@ public class ChipClusters {
     private native void readMACAddressAttribute(long chipClusterPtr, CharStringAttributeCallback callback);
 
     private native void subscribeMACAddressAttribute(long chipClusterPtr, CharStringAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLinkLocalAddressAttribute(long chipClusterPtr, OctetStringAttributeCallback callback);
+
+    private native void subscribeLinkLocalAddressAttribute(long chipClusterPtr, OctetStringAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
