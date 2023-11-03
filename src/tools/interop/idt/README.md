@@ -342,7 +342,8 @@ usage: idt capture [-h] [--platform {Android}] [--ecosystem {DemoExtEcosystem...
 ```
 
 > **IMPORTANT:** Note the following runtime expectations of ecosystems:  
-> `analyze_capture` must be async aware and not interact with standard in
+> `analyze_capture()` must not block the async event loop excessively and must not interact
+> with standard in
 
 The platform loader functions the same as `capture/ecosystem`.
 
