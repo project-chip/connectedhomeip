@@ -3072,6 +3072,34 @@ server cluster DishwasherAlarm = 93 {
   command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
 }
 
+/** Attributes and commands for configuring the microwave oven control, and reporting cooking stats. */
+provisional server cluster MicrowaveOvenControl = 95 {
+  readonly attribute elapsed_s cookTime = 1;
+  readonly attribute int8u powerSetting = 2;
+  readonly attribute int8u minPower = 3;
+  readonly attribute int8u maxPower = 4;
+  readonly attribute int8u powerStep = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetCookingParametersRequest {
+    optional int8u cookMode = 0;
+    optional elapsed_s cookTime = 1;
+    optional int8u powerSetting = 2;
+  }
+
+  request struct AddMoreTimeRequest {
+    elapsed_s timeToAdd = 0;
+  }
+
+  command SetCookingParameters(SetCookingParametersRequest): DefaultSuccess = 0;
+  command AddMoreTime(AddMoreTimeRequest): DefaultSuccess = 1;
+}
+
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
 server cluster OperationalState = 96 {
   enum ErrorStateEnum : enum8 {
@@ -6079,6 +6107,23 @@ endpoint 1 {
 
     handle command Reset;
     handle command ModifyEnabledAlarms;
+  }
+
+  server cluster MicrowaveOvenControl {
+    ram      attribute cookTime default = 30;
+    ram      attribute powerSetting default = 100;
+    ram      attribute minPower default = 10;
+    ram      attribute maxPower default = 100;
+    ram      attribute powerStep default = 10;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    callback attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command SetCookingParameters;
+    handle command AddMoreTime;
   }
 
   server cluster OperationalState {
