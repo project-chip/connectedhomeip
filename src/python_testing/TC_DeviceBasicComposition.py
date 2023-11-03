@@ -1029,8 +1029,6 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                 Clusters.NetworkCommissioning.Attributes.ScanMaxTimeSeconds.attribute_id, Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds.attribute_id]}
             ignore_attributes.update(ci_ignore_attributes)
 
-        print(ignore_attributes)
-
         success = True
         allow_provisional = self.user_params.get("allow_provisional", False)
         clusters, problems = build_xml_clusters()
