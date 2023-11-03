@@ -102,7 +102,7 @@ exit:
 void BLEManagerImpl::_Shutdown()
 {
     // ensure scan resources are cleared (e.g. timeout timers)
-    mDeviceScanner.reset();
+    mDeviceScanner.Shutdown();
     // Release BLE connection resources (unregister from BlueZ).
     ShutdownBluezBleLayer(mpEndpoint);
     mFlags.Clear(Flags::kBluezBLELayerInitialized);
@@ -689,10 +689,10 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
         return;
     }
 
-    mDeviceScanner               = Internal::ChipDeviceScanner::Create(mpEndpoint->mpAdapter, this);
     mBLEScanConfig.mBleScanState = scanType;
 
-    if (!mDeviceScanner)
+    CHIP_ERROR err = mDeviceScanner.Init(mpEndpoint->mpAdapter, this);
+    if (err != CHIP_NO_ERROR)
     {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INTERNAL);
@@ -700,7 +700,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
         return;
     }
 
-    CHIP_ERROR err = mDeviceScanner->StartScan(kNewConnectionScanTimeout);
+    err = mDeviceScanner.StartScan(kNewConnectionScanTimeout);
     if (err != CHIP_NO_ERROR)
     {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
@@ -738,7 +738,7 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
         CancelConnect(mpEndpoint);
     // If in discovery mode, stop scan.
     else if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
-        mDeviceScanner->StopScan();
+        mDeviceScanner.StopScan();
     return CHIP_NO_ERROR;
 }
 
@@ -811,7 +811,7 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
     DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimeout, mpEndpoint);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    mDeviceScanner->StopScan();
+    mDeviceScanner.StopScan();
 
     ConnectDevice(device, mpEndpoint);
 }
