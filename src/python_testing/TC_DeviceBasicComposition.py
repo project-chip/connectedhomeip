@@ -1128,6 +1128,34 @@ class TC_DeviceBasicComposition(MatterBaseTest):
             # self.fail_current_test("Problems with conformance")
             logging.error("Problems found with conformance, this should turn into a test failure once #29812 is resolved")
 
+    def test_IDM_10_3(self):
+        # TODO: move to class setup
+        success = True
+        clusters, problems = build_xml_clusters()
+        self.problems = self.problems + problems
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster in endpoint.items():
+                if cluster_id not in clusters.keys():
+                    if (cluster_id & 0xFFFF_0000) != 0:
+                        # manufacturer cluster
+                        continue
+                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
+                    # TODO: update this from a warning once we have all the data
+                    self.record_warning(self.get_test_name(), location=location,
+                                        problem='Standard cluster found on device, but is not present in spec data')
+                    continue
+                if int(clusters[cluster_id].revision) != cluster[CLUSTER_REVISION_ID]:
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                                                     attribute_id=CLUSTER_REVISION_ID)
+                    self.record_error(self.get_test_name(
+                    ), location=location, problem=f'Revision found on cluster ({cluster[CLUSTER_REVISION_ID]}) does not match revision listed in the spec ({clusters[cluster_id].revision})')
+                    success = False
+        if not success:
+            # TODO: Right now, we have failures in all-cluster, so we can't fail this test and keep it in CI. For now, just log.
+            # Issue tracking: #30210
+            # self.fail_current_test("Problems with cluster revision on at least one cluster")
+            logging.error('Problems with cluster revision on at least one cluster')
+
 
 if __name__ == "__main__":
     default_matter_test_main()

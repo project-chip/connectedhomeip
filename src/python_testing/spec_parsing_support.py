@@ -264,7 +264,11 @@ class ClusterParser:
         return events
 
     def create_cluster(self) -> XmlCluster:
-        return XmlCluster(revision=self._cluster.attrib['revision'], derived=self._derived,
+        try:
+            revision = int(self._cluster.attrib['revision'], 0)
+        except ValueError:
+            revision = 0
+        return XmlCluster(revision=revision, derived=self._derived,
                           name=self._name, feature_map=self.params.feature_map,
                           attribute_map=self.params.attribute_map, command_map=self.params.command_map,
                           features=self.parse_features(),
