@@ -42,6 +42,10 @@ using OTAChangeReasonEnum   = ChangeReasonEnum;
 using OTAUpdateStateEnum    = UpdateStateEnum;
 } // namespace OtaSoftwareUpdateRequestor
 
+namespace Channel {
+using ChannelStatusEnum = StatusEnum;
+} // namespace Channel
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -54,7 +54,7 @@ tests:
       attribute: "ApplicationName"
       response:
           constraints:
-              type: char_string
+              type: long_char_string
               maxLength: 256
 
     - label: "Step 4: Reads the ProductID attribute"

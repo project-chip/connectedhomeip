@@ -17,24 +17,24 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class GroupsCluster(private val endpointId: UShort) {
   class AddGroupResponse(val status: UInt, val groupID: UShort)
 
   class ViewGroupResponse(val status: UInt, val groupID: UShort, val groupName: String)
 
-  class GetGroupMembershipResponse(val capacity: UByte?, val groupList: ArrayList<UShort>)
+  class GetGroupMembershipResponse(val capacity: UByte?, val groupList: List<UShort>)
 
   class RemoveGroupResponse(val status: UInt, val groupID: UShort)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun addGroup(
     groupID: UShort,
@@ -57,7 +57,7 @@ class GroupsCluster(private val endpointId: UShort) {
   }
 
   suspend fun getGroupMembership(
-    groupList: ArrayList<UShort>,
+    groupList: List<UShort>,
     timedInvokeTimeoutMs: Int? = null
   ): GetGroupMembershipResponse {
     if (timedInvokeTimeoutMs != null) {

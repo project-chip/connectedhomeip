@@ -128,7 +128,7 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 
     // Set FeatureMap to (kUser|kPinCredential), default is:
     // (kUser|kAccessSchedules|kRfidCredential|kPinCredential) 0x113
-    logOnFailure(DoorLock::Attributes::FeatureMap::Set(endpoint, 0x101), "feature map");
+    logOnFailure(DoorLock::Attributes::FeatureMap::Set(endpoint, 0x181), "feature map");
 
     AppTask::Instance().UpdateClusterState(BoltLockMgr().GetState(), BoltLockManager::OperationSource::kUnspecified);
 }

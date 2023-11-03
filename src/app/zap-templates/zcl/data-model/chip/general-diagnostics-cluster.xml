@@ -93,8 +93,15 @@ limitations under the License.
     <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="ARRAY" entryType="RadioFaultEnum" writable="false" optional="true">ActiveRadioFaults</attribute>
     <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFaultEnum" writable="false" optional="true">ActiveNetworkFaults</attribute>
     <attribute side="server" code="0x08" define="TEST_EVENT_TRIGGERS_ENABLED" type="boolean" writable="false" optional="false">TestEventTriggersEnabled</attribute>
-    <!-- TODO(#30002): Remove AverageWearCount -->
-    <attribute side="server" code="0x09" define="AVERAGE_WEAR_COUNT" type="int32u" writable="false" default="0x00000000" optional="true">AverageWearCount</attribute>
+    <!--
+        WARNING !!!!! Attribute 0x0009 (previously AverageWearCount, see #30002/#29285)
+        was previously mistakenly added in SDK without being in spec and WAS REMOVED.
+
+        Previously (disallowed):
+        <attribute side="server" code="0x09" define="AVERAGE_WEAR_COUNT" type="int32u" writable="false" default="0x00000000" optional="true">AverageWearCount</attribute>
+
+         ====== ID 0x0009 is reserved, do not use ======
+    -->
 
     <command source="client" code="0x00" name="TestEventTrigger" optional="false">
       <description>Provide a means for certification tests to trigger some test-plan-specific events</description>

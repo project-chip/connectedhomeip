@@ -1193,8 +1193,8 @@ static id _Nullable DecodeEventPayloadForWiFiNetworkDiagnosticsCluster(EventId a
 
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.associationFailure)];
-            value.associationFailure = memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.associationFailureCause)];
+            value.associationFailureCause = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
@@ -2031,6 +2031,18 @@ static id _Nullable DecodeEventPayloadForDishwasherAlarmCluster(EventId aEventId
         return value;
     }
 #endif // MTR_ENABLE_PROVISIONAL
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForMicrowaveOvenModeCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::MicrowaveOvenMode;
+    switch (aEventId) {
     default: {
         break;
     }
@@ -3464,6 +3476,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::DishwasherAlarm::Id: {
         return DecodeEventPayloadForDishwasherAlarmCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::MicrowaveOvenMode::Id: {
+        return DecodeEventPayloadForMicrowaveOvenModeCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::MicrowaveOvenControl::Id: {
         return DecodeEventPayloadForMicrowaveOvenControlCluster(aPath.mEventId, aReader, aError);

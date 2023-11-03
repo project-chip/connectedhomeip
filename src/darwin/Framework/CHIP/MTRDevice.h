@@ -107,11 +107,15 @@ typedef NS_ENUM(NSInteger, MTRDiagnosticLogType) {
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 /**
- * Read attribute in a designated attribute path
+ * Read attribute in a designated attribute path.  If there is no value available
+ * for the attribute, whether because the device does not implement it or
+ * because the subscription priming read has not yet gotten to this attribute,
+ * nil will be returned.
  *
- * TODO: Need to document that this returns "the system's best guess" of attribute values.
+ * TODO: Need to fully document that this returns "the system's best guess" of attribute values.
  *
- * @return a data-value dictionary of the attribute as described in MTRDeviceResponseHandler
+ * @return a data-value dictionary of the attribute as described in MTRDeviceResponseHandler,
+ *         or nil if there is no value.
  */
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeWithEndpointID:(NSNumber *)endpointID
                                                               clusterID:(NSNumber *)clusterID

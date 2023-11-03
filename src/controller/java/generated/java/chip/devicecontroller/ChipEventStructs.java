@@ -596,13 +596,13 @@ public static class WiFiNetworkDiagnosticsClusterDisconnectionEvent {
   }
 }
 public static class WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
-  public Integer associationFailure;
+  public Integer associationFailureCause;
   public Integer status;
   public WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
-    Integer associationFailure,
+    Integer associationFailureCause,
     Integer status
   ) {
-    this.associationFailure = associationFailure;
+    this.associationFailureCause = associationFailureCause;
     this.status = status;
   }
 
@@ -610,8 +610,8 @@ public static class WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("WiFiNetworkDiagnosticsClusterAssociationFailureEvent {\n");
-    output.append("\tassociationFailure: ");
-    output.append(associationFailure);
+    output.append("\tassociationFailureCause: ");
+    output.append(associationFailureCause);
     output.append("\n");
     output.append("\tstatus: ");
     output.append(status);

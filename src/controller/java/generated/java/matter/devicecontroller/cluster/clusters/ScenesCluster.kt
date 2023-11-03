@@ -17,7 +17,7 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class ScenesCluster(private val endpointId: UShort) {
   class AddSceneResponse(val status: UShort, val groupID: UShort, val sceneID: UByte)
@@ -28,7 +28,7 @@ class ScenesCluster(private val endpointId: UShort) {
     val sceneID: UByte,
     val transitionTime: UShort?,
     val sceneName: String?,
-    val extensionFieldSets: ArrayList<ChipStructs.ScenesClusterExtensionFieldSet>?
+    val extensionFieldSets: List<ScenesClusterExtensionFieldSet>?
   )
 
   class RemoveSceneResponse(val status: UShort, val groupID: UShort, val sceneID: UByte)
@@ -41,7 +41,7 @@ class ScenesCluster(private val endpointId: UShort) {
     val status: UShort,
     val capacity: UByte?,
     val groupID: UShort,
-    val sceneList: ArrayList<UByte>?
+    val sceneList: List<UByte>?
   )
 
   class EnhancedAddSceneResponse(val status: UShort, val groupID: UShort, val sceneID: UByte)
@@ -52,7 +52,7 @@ class ScenesCluster(private val endpointId: UShort) {
     val sceneID: UByte,
     val transitionTime: UShort?,
     val sceneName: String?,
-    val extensionFieldSets: ArrayList<ChipStructs.ScenesClusterExtensionFieldSet>?
+    val extensionFieldSets: List<ScenesClusterExtensionFieldSet>?
   )
 
   class CopySceneResponse(
@@ -63,20 +63,20 @@ class ScenesCluster(private val endpointId: UShort) {
 
   class LastConfiguredByAttribute(val value: ULong?)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun addScene(
     groupID: UShort,
     sceneID: UByte,
     transitionTime: UShort,
     sceneName: String,
-    extensionFieldSets: ArrayList<ChipStructs.ScenesClusterExtensionFieldSet>,
+    extensionFieldSets: List<ScenesClusterExtensionFieldSet>,
     timedInvokeTimeoutMs: Int? = null
   ): AddSceneResponse {
     if (timedInvokeTimeoutMs != null) {
@@ -162,7 +162,7 @@ class ScenesCluster(private val endpointId: UShort) {
     sceneID: UByte,
     transitionTime: UShort,
     sceneName: String,
-    extensionFieldSets: ArrayList<ChipStructs.ScenesClusterExtensionFieldSet>,
+    extensionFieldSets: List<ScenesClusterExtensionFieldSet>,
     timedInvokeTimeoutMs: Int? = null
   ): EnhancedAddSceneResponse {
     if (timedInvokeTimeoutMs != null) {
