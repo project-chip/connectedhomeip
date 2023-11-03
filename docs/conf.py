@@ -32,10 +32,6 @@ exclude_patterns = [
     "examples/thermostat/nxp/linux-se05x/README.md",
     "examples/common/m5stack-tft/repo",
     "docs/guides/README.md",
-    "scripts/tools/memory/memdf/README.md",
-    "scripts/tools/memory/platform/README.md",
-    "scripts/tools/memory/README-GitHub-CI.md",
-    "data_model/README.md",
 ]
 
 
