@@ -5177,6 +5177,7 @@ static id _Nullable DecodeAttributeValueForLaundryDryerControlsCluster(Attribute
 {
     using namespace Clusters::LaundryDryerControls;
     switch (aAttributeId) {
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::SupportedDrynessLevels::Id: {
         using TypeInfo = Attributes::SupportedDrynessLevels::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -5203,6 +5204,8 @@ static id _Nullable DecodeAttributeValueForLaundryDryerControlsCluster(Attribute
         }
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::SelectedDrynessLevel::Id: {
         using TypeInfo = Attributes::SelectedDrynessLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -5218,6 +5221,7 @@ static id _Nullable DecodeAttributeValueForLaundryDryerControlsCluster(Attribute
         }
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }

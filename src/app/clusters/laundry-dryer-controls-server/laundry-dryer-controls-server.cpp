@@ -85,8 +85,8 @@ LaundryDryerControlsServer & LaundryDryerControlsServer::Instance()
 
 EmberAfStatus LaundryDryerControlsServer::SetSelectedDrynessLevel(EndpointId endpointId, DrynessLevelEnum newSelectedDrynessLevel)
 {
-    DrynessLevelEnum selectedDrynessLevel;
-    EmberAfStatus res = SelectedDrynessLevel::Get(endpointId, &selectedDrynessLevel);
+    DataModel::Nullable<DrynessLevelEnum> selectedDrynessLevel;
+    EmberAfStatus res = SelectedDrynessLevel::Get(endpointId, selectedDrynessLevel);
 
     if ((res == EMBER_ZCL_STATUS_SUCCESS) && (selectedDrynessLevel != newSelectedDrynessLevel))
     {
@@ -96,9 +96,9 @@ EmberAfStatus LaundryDryerControlsServer::SetSelectedDrynessLevel(EndpointId end
     return res;
 }
 
-EmberAfStatus LaundryDryerControlsServer::GetSelectedDrynessLevel(EndpointId endpointId, DrynessLevelEnum & selectedDrynessLevel)
+EmberAfStatus LaundryDryerControlsServer::GetSelectedDrynessLevel(EndpointId endpointId, DataModel::Nullable<DrynessLevelEnum>  & selectedDrynessLevel)
 {
-    return SelectedDrynessLevel::Get(endpointId, &selectedDrynessLevel);
+    return SelectedDrynessLevel::Get(endpointId, selectedDrynessLevel);
 }
 
 /**********************************************************
