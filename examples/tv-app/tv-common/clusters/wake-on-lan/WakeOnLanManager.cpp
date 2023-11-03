@@ -23,6 +23,9 @@
 #include <platform/ConfigurationManager.h>
 #include <string>
 
+static_assert(chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength == 6, "Spec mandates only 64-bit mac addresses");
+constexpr const char *kNullHexMACAddress = "000000000000";
+
 using namespace chip;
 using namespace chip::app::Clusters::WakeOnLan;
 
@@ -33,7 +36,7 @@ std::string getMacAddress()
     if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
     {
         ChipLogProgress(Zcl, "WakeOnLanManager::getMacAddress no primary MAC configured by DeviceLayer");
-        return "0000000000";
+        return kNullHexMACAddress;
     }
 
     char macStr[chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength * 2 + 1] = { 0 }; // added null char
@@ -41,7 +44,7 @@ std::string getMacAddress()
         CHIP_NO_ERROR)
     {
         ChipLogProgress(Zcl, "WakeOnLanManager::getMacAddress hex conversion failed");
-        return "0000000000";
+        return kNullHexMACAddress;
     }
 
     return std::string(macStr);
