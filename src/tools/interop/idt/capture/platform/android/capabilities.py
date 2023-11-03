@@ -49,9 +49,9 @@ class Capabilities:
         if not self.c_hci_snoop_enabled:
             self.logger.info("HCI not enabled, attempting to enable!")
             self.platform.run_adb_command(
-                f"shell setprop persist.bluetooth.btsnooplogmode {config.hci_log_level}").start_command()
-            self.platform.run_adb_command("shell svc bluetooth disable").start_command()
-            self.platform.run_adb_command("shell svc bluetooth enable").start_command()
+                f"shell setprop persist.bluetooth.btsnooplogmode {config.hci_log_level}")
+            self.platform.run_adb_command("shell svc bluetooth disable")
+            self.platform.run_adb_command("shell svc bluetooth enable")
             self.c_hci_snoop_enabled = self.check_snoop_log()
             if not self.c_hci_snoop_enabled:
                 self.logger.error("Failed to enabled HCI snoop log")

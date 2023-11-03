@@ -25,6 +25,8 @@ from utils import log
 from bleak import AdvertisementData, BleakScanner, BLEDevice
 from bleak.exc import BleakDBusError
 
+from utils.log import border_print
+
 logger = log.get_logger(__file__)
 
 
@@ -109,7 +111,8 @@ class MatterBleScanner:
     async def browse_interactive(self) -> None:
         scanner = BleakScanner()
         self.logger.warning(
-            "Scanning BLE\nDCL Lookup: https://webui.dcl.csa-iot.org/\nPress enter to stop!\n")
+            "Scanning BLE\nDCL Lookup: https://webui.dcl.csa-iot.org/\n")
+        border_print("Press enter to stop!", important=True)
         task = asyncio.create_task(self.browser_task(scanner))
         await asyncio.get_event_loop().run_in_executor(
             None, sys.stdin.readline)

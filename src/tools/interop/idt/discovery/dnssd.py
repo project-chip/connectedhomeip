@@ -20,6 +20,7 @@ import os
 
 from zeroconf import ServiceBrowser, ServiceInfo, ServiceListener, Zeroconf
 from utils.artifact import create_standard_log_name, log
+from utils.log import border_print
 
 logger = log.get_logger(__file__)
 
@@ -105,7 +106,10 @@ class MatterDnssdListener(ServiceListener):
         zc = Zeroconf()
         ServiceBrowser(zc, list(_MDNS_TYPES.keys()), self)
         try:
-            input("Browsing Matter DNS-SD, press enter to stop\nDCL Lookup: https://webui.dcl.csa-iot.org/\n")
+            self.logger.warning(
+                "Browsing Matter DNS-SD\nDCL Lookup: https://webui.dcl.csa-iot.org/\n")
+            border_print("Press enter to stop!", important=True)
+            input("")
         finally:
             zc.close()
 
