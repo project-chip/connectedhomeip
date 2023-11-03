@@ -52,9 +52,9 @@ Follow the steps below to execute capture and discovery without a Raspberry Pi:
     is run, e.g. terminal emulator or IDE permission to access bluetooth in
     macOS settings.
     -   Failure to do so may result in any of the following:
-        - A single `abort` message and no further output in the terminal.
-        - Failure with a relevant stack trace in the terminal.
-        - A prompt to allow the application access to bluetooth.
+        -   A single `abort` message and no further output in the terminal.
+        -   Failure with a relevant stack trace in the terminal.
+        -   A prompt to allow the application access to bluetooth.
 
 ## Raspberry Pi installation
 
@@ -210,8 +210,10 @@ options:
 ```
 
 For packet capture interface (`-i`/`--interface`:
-- On macOS, the only available interface is `any`.
-- On Linux, `idt` checks available interfaces from `/sys/class/net/` as well as allowing `any`.
+
+-   On macOS, the only available interface is `any`.
+-   On Linux, `idt` checks available interfaces from `/sys/class/net/` as well
+    as allowing `any`.
 
 #### Artifacts
 
@@ -245,8 +247,8 @@ idt discover -t d
 
 #### Artifacts
 
-There is a per device log in `ble` and `dnssd` subdirectory of the root
-artifact dir.
+There is a per device log in `ble` and `dnssd` subdirectory of the root artifact
+dir.
 
 ### Probe
 
@@ -261,10 +263,10 @@ Collect contextually relevant networking info from the local environment and
 provide artifacts.
 
 ## Troubleshooting
-  
-- Wireless `adb` may fail to connect indefinitely depending on network
-    configuration.  
-- Change log level from `INFO` to `DEBUG` in root `config.py` for additional
+
+-   Wireless `adb` may fail to connect indefinitely depending on network
+    configuration.
+-   Change log level from `INFO` to `DEBUG` in root `config.py` for additional
     logging.
 -   Compiling `tcpdump` for android may require additional dependencies.
     -   If the build script fails for you, try
@@ -348,8 +350,8 @@ usage: idt capture [-h] [--platform {Android}] [--ecosystem {DemoExtEcosystem...
 ```
 
 > **IMPORTANT:** Note the following runtime expectations of ecosystems:  
-> `analyze_capture()` must not block the async event loop excessively and must not interact
-> with standard in
+> `analyze_capture()` must not block the async event loop excessively and must
+> not interact with standard in
 
 The platform loader functions the same as `capture/ecosystem`.
 
