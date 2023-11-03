@@ -212,13 +212,6 @@ options:
 Each ecosystem and platform involved in the capture will have their own
 subdirectory in the root artifact dir.
 
-To download your artifacts, run these commands from your admin computer:
-
-`idt_fetch_artifacts`
-
-On windows admin computers, you may use `FileZilla` to pull the archive listed
-at the end of output.
-
 ### Discovery
 
 ```
@@ -246,10 +239,8 @@ idt discover -t d
 
 #### Artifacts
 
-There is a per device log for ble scanning in `ble` subdirectory of the root
+There is a per device log in `ble` and `dnssd` subdirectory of the root
 artifact dir.
-
-The `dnssd` log may be found in the dnssd directory.
 
 ### Probe
 
