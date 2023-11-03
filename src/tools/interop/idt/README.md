@@ -31,22 +31,28 @@ environment and generates additional artifacts.
 
 ## Single host installation (no Raspberry Pi)
 
-All features of `idt` are available on macOS and Linux (tested with Debian based systems).  
-If you would prefer to execute capture and discovery from a Raspberry Pi, read the next section instead.  
+All features of `idt` are available on macOS and Linux (tested with Debian based
+systems).  
+If you would prefer to execute capture and discovery from a Raspberry Pi, read
+the next section instead.
 
-The machine running `idt` should be connected to the same Wi-Fi network used for testing.  
-Follow the steps below to execute capture and discovery without a Raspberry Pi:  
+The machine running `idt` should be connected to the same Wi-Fi network used for
+testing.  
+Follow the steps below to execute capture and discovery without a Raspberry Pi:
 
 -   From the parent directory of `idt`, run `source idt/scripts/alias.sh`.
 -   Optionally, run `source idt/scripts/setup_shell.sh` to install aliases
     permanently.
 -   After `idt` aliases are available in your environment, calling any `idt`
     command will automatically create a new virtual environment and install
-    python dependencies. 
-    - If you're missing non-Python dependencies, you'll be prompted to install them until they're available. 
--   Bluetooth discovery on macOS will require granting the program where `idt` is run, e.g. terminal emulator or IDE 
-    permission to access bluetooth in macOS settings. 
-    - Failure to do so will result in errors / `abort` upon ble discovery execution.
+    python dependencies.
+    -   If you're missing non-Python dependencies, you'll be prompted to install
+        them until they're available.
+-   Bluetooth discovery on macOS will require granting the program where `idt`
+    is run, e.g. terminal emulator or IDE permission to access bluetooth in
+    macOS settings.
+    -   Failure to do so will result in errors / `abort` upon ble discovery
+        execution.
 
 ## Raspberry Pi installation
 
@@ -254,23 +260,23 @@ options:
   -h, --help  show this help message and exit
 ```
 
-Collect contextually relevant networking info from the local environment and provide artifacts.
+Collect contextually relevant networking info from the local environment and
+provide artifacts.
 
 ## Project overview
 
 -   The entry point is in `idt.py` which contains simple CLI parsing with
     `argparse`.
 
-
-
 ### `capture`
 
 -   `base` contains the base classes for ecosystems and platforms.
 -   `controller` contains the ecosystem and platform producer and controller
--   `loader` is a generic class loader that dynamically imports classes
-    matching a given super class from a given directory.
--   `/platform` and `/ecosystem` contain one package for each platform and ecosystem, which should each contain
-    one implementation of the respective base classs.
+-   `loader` is a generic class loader that dynamically imports classes matching
+    a given super class from a given directory.
+-   `/platform` and `/ecosystem` contain one package for each platform and
+    ecosystem, which should each contain one implementation of the respective
+    base classs.
 
 ### `discovery`
 
@@ -281,19 +287,20 @@ Collect contextually relevant networking info from the local environment and pro
 
 ### `probe`
 
--   `probe` contains the base class for (`idt`'s) host platform specific implementation.
-    -    Reuses the dnssd discovery implementation to build probe targets.
-    -    Calls platform + addr type specific probe methods for each target.
-- `linux` and `mac` contain `probe` implementations for each host platform.
-- - The package contains a simple dataclass to represent probe targets.
+-   `probe` contains the base class for (`idt`'s) host platform specific
+    implementation.
+    -   Reuses the dnssd discovery implementation to build probe targets.
+    -   Calls platform + addr type specific probe methods for each target.
+-   `linux` and `mac` contain `probe` implementations for each host platform.
+-   -   The package contains a simple dataclass to represent probe targets.
 
 ### `utils`
 
 -   `log` contains logging utilities used by everything in the project.
 -   `artifact` contains helper functions for managing artifacts.
--   `shell` contains a simple helper class for background and foreground
-    Bash commands.
--   `host_platform` contains helper functions for the interacting with the host 
+-   `shell` contains a simple helper class for background and foreground Bash
+    commands.
+-   `host_platform` contains helper functions for the interacting with the host
     running `idt`.
 
 ### Conventions
@@ -309,8 +316,8 @@ Collect contextually relevant networking info from the local environment and pro
 
 ## Troubleshooting
 
--   Change log level from `INFO` to `DEBUG` in root `config.py` for 
-    additional logging.
+-   Change log level from `INFO` to `DEBUG` in root `config.py` for additional
+    logging.
 -   Compiling `tcpdump` for android may require additional dependencies.
     -   If the build script fails for you, try
         `idt_go && source idt/scripts/compilers.sh`.
@@ -319,8 +326,8 @@ Collect contextually relevant networking info from the local environment and pro
 -   Wireless `adb` may fail to connect indefinitely depending on network
     configuration.
 -   `idt_clean_child` will kill any stray `tcpdump` and `adb` commands.
-    - `idt_check_child` will look for leftover processes.
-    - Not expected to be needed outside of development scenarios.
+    -   `idt_check_child` will look for leftover processes.
+    -   Not expected to be needed outside of development scenarios.
 
 ## Extending functionality
 
@@ -356,4 +363,5 @@ This module must contain a single class which is a subclass of
 
 ### Probe
 
-Simply add host platform specific `run_command()` calls in the functions of the host platform implementations.
+Simply add host platform specific `run_command()` calls in the functions of the
+host platform implementations.
