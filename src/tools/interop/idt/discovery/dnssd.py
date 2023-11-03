@@ -42,7 +42,7 @@ class MatterDnssdListener(ServiceListener):
         self.logger = logger
         self.discovered_matter_devices: [str, ServiceInfo] = {}
 
-    def write_log(self, line: str, log_name:str) -> None:
+    def write_log(self, line: str, log_name: str) -> None:
         with open(self.create_device_log_name(log_name), "a+") as log_file:
             log_file.write(line)
 

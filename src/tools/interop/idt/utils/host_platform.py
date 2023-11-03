@@ -27,6 +27,7 @@ from utils.shell import Bash
 
 logger = log.get_logger(__file__)
 
+
 def is_mac():
     p = host_platform.platform().lower()
     return "darwin" in p or "mac" in p
