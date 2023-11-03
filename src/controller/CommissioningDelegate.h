@@ -699,8 +699,8 @@ class CommissioningDelegate
 public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
-     * kReadCommissioningInfo - ReadCommissioningInfo
-     * kCheckForMatchingFabric = MatchingFabricInfo
+     * kReadCommissioningInfo: ReadCommissioningInfo
+     * kReadCommissioningInfo2: ReadCommissioningInfo2
      * kArmFailsafe: CommissioningErrorInfo if there is an error
      * kConfigRegulatory: CommissioningErrorInfo if there is an error
      * kConfigureUTCTime: None

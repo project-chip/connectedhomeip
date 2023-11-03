@@ -2267,7 +2267,7 @@ void DeviceCommissioner::OnArmFailSafe(void * context,
 void DeviceCommissioner::NonConcurrentNetworkResponse(
     void * context, const NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
 {
-    // In Non Concurrent mode the commissioing network should have been shutdown and not send the
+    // In Non Concurrent mode the commissioing network should have been shutdown and not sent the
     // ConnectNetworkResponse. In case it does send it this handles the message
     ChipLogProgress(Controller, "NonConcurrent Mode : Received Unexpected ConnectNetwork response, ignoring. Status=%u", to_underlying(data.networkingStatus));
 }

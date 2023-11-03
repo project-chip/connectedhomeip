@@ -85,7 +85,7 @@ public:
 
     /**
      * @brief
-     * Called when AdditionalAttributeInfo returned from target
+     * Called when MatchingFabricInfo returned from target
      */
     virtual void OnFabricCheck(NodeId matchingNodeId) {}
 
