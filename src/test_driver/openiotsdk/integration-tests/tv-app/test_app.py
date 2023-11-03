@@ -564,6 +564,6 @@ def test_tv_ctrl(device, controller):
     # WakeOnLan
     err, res = read_zcl_attribute(devCtrl, "WakeOnLan", "MACAddress", nodeId, TV_CTRL_TEST_APP_ENDPOINT_ID)
     assert err == 0
-    assert res.value == "0000000000"
+    assert res.value == "000000000000"
 
     assert disconnect_device(devCtrl, nodeId)
