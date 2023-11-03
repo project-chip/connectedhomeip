@@ -20,6 +20,8 @@ import platform as host_platform
 import sys
 
 import psutil
+
+import config
 from utils import log
 from utils.log import border_print
 from utils.shell import Bash
@@ -69,10 +71,17 @@ def verify_host_dependencies(deps: [str]) -> None:
     if len(missing_deps) > 0:
         for missing_dep in missing_deps:
             border_print(f"Missing dependency, please install {missing_dep}!", important=True)
-        kill_idt_children()
+            logger.critical("Run idt_clean_child to close any dangling processes!")
         sys.exit(1)
 
 
-def kill_idt_children() -> None:
-    for child_proc in psutil.Process(os.getpid()).children(recursive=True):
-        Bash("").stop_single_proc(child_proc)
+def verify_py_version() -> None:
+    py_version_major = sys.version_info[0]
+    py_version_minor = sys.version_info[1]
+    have = f"{py_version_major}.{py_version_minor}"
+    need = f"{config.py_major_version}.{config.py_minor_version}"
+    if not int(py_version_major) == int(config.py_major_version) \
+            and int(py_version_minor) >= int(config.py_minor_version):
+        logger.critical(
+            f"IDT requires python >= {need} but you have {have}")
+        sys.exit(1)
