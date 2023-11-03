@@ -32,6 +32,7 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
+#include "shell_extension/openthread_cli_register.h"
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -156,6 +157,9 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "==================================================");
 
 #if CONFIG_ENABLE_CHIP_SHELL
+#if CONFIG_OPENTHREAD_CLI
+    chip::RegisterOpenThreadCliCommands();
+#endif
     chip::LaunchShell();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

@@ -256,10 +256,19 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
         NL_TEST_ASSERT(inSuite, rm != nullptr);
         NL_TEST_ASSERT(inSuite, rc != nullptr);
 
+        // Adding an if-else to avoid affecting non-ICD tests
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+        // Increase local MRP retry intervals to take into account the increase response delay from an ICD
+        contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig({
+            1000_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+            1000_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        });
+#else  // CHIP_CONFIG_ENABLE_ICD_SERVER != 1
         contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig({
             64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
             64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
         });
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     }
 
     NL_TEST_ASSERT(inSuite,
@@ -279,8 +288,15 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
 
     while (delegate.mMessageDropped)
     {
+        auto waitTimeout = 100_ms + CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+        // If running as an ICD, increase waitTimeout to account for the polling interval
+        waitTimeout += CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+#endif
+
         // Wait some time so the dropped message will be retransmitted when we drain the IO.
-        chip::test_utils::SleepMillis((100_ms + CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST).count());
+        chip::test_utils::SleepMillis(waitTimeout.count());
         delegate.mMessageDropped = false;
         ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), ctx.GetExchangeManager().GetReliableMessageMgr());
         ctx.DrainAndServiceIO();

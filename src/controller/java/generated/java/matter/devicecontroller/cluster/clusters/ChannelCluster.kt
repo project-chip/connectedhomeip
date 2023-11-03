@@ -17,217 +17,144 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class ChannelCluster(private val endpointId: UShort) {
+  class ChangeChannelResponse(val status: UInt, val data: String?)
+
+  class ChannelListAttribute(val value: List<ChannelClusterChannelInfoStruct>?)
+
+  class LineupAttribute(val value: ChannelClusterLineupInfoStruct?)
+
+  class CurrentChannelAttribute(val value: ChannelClusterChannelInfoStruct?)
+
+  class GeneratedCommandListAttribute(val value: List<UInt>)
+
+  class AcceptedCommandListAttribute(val value: List<UInt>)
+
+  class EventListAttribute(val value: List<UInt>)
+
+  class AttributeListAttribute(val value: List<UInt>)
+
+  suspend fun changeChannel(
+    match: String,
+    timedInvokeTimeoutMs: Int? = null
+  ): ChangeChannelResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun changeChannelByNumber(
+    majorNumber: UShort,
+    minorNumber: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun skipChannel(count: Short, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readChannelListAttribute(): ChannelListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeChannelListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ChannelListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLineupAttribute(): LineupAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLineupAttribute(minInterval: Int, maxInterval: Int): LineupAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentChannelAttribute(): CurrentChannelAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentChannelAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CurrentChannelAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 1284u
-  }
-
-  fun changeChannel(callback: ChangeChannelResponseCallback, match: String) {
-    // Implementation needs to be added here
-  }
-
-  fun changeChannel(
-    callback: ChangeChannelResponseCallback,
-    match: String,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun changeChannelByNumber(
-    callback: DefaultClusterCallback,
-    majorNumber: Integer,
-    minorNumber: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun changeChannelByNumber(
-    callback: DefaultClusterCallback,
-    majorNumber: Integer,
-    minorNumber: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun skipChannel(callback: DefaultClusterCallback, count: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun skipChannel(callback: DefaultClusterCallback, count: Integer, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  interface ChangeChannelResponseCallback {
-    fun onSuccess(status: Integer, data: String?)
-
-    fun onError(error: Exception)
-  }
-
-  interface ChannelListAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.ChannelClusterChannelInfoStruct>?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface LineupAttributeCallback {
-    fun onSuccess(value: ChipStructs.ChannelClusterLineupInfoStruct?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface CurrentChannelAttributeCallback {
-    fun onSuccess(value: ChipStructs.ChannelClusterChannelInfoStruct?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readChannelListAttribute(callback: ChannelListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeChannelListAttribute(
-    callback: ChannelListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLineupAttribute(callback: LineupAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLineupAttribute(
-    callback: LineupAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCurrentChannelAttribute(callback: CurrentChannelAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentChannelAttribute(
-    callback: CurrentChannelAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

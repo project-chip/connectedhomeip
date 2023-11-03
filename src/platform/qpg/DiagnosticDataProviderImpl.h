@@ -54,6 +54,7 @@ public:
     CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults) override;
     CHIP_ERROR GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults) override;
     CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults) override;
+    CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
 };
 
 /**

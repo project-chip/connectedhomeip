@@ -376,6 +376,8 @@ void JsonBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
         result["mrp"]["active_retransmit_timeout_ms"] = info.result->mrpRemoteConfig.mActiveRetransTimeout.count();
         result["mrp"]["active_threshold_time_ms"]     = info.result->mrpRemoteConfig.mActiveThresholdTime.count();
 
+        result["isICDOperatingAsLIT"] = info.result->isICDOperatingAsLIT;
+
         value["result"] = result;
     }
 

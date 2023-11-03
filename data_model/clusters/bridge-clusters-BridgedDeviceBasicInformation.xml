@@ -127,7 +127,7 @@ Davis, CA 95616, USA
       <optionalConform/>
     </attribute>
     <attribute id="0x0015" name="SpecificationVersion">
-      <optionalConform/>
+      <disallowConform/>
     </attribute>
     <attribute id="0x0016" name="MaxPathsPerInvoke">
       <disallowConform/>

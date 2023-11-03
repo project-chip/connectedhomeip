@@ -317,7 +317,7 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="TEMPS"/>
         </mandatoryConform>
-        <constraint type="between" from="0x954d" to="0x7fff"/>
+        <constraint type="between" from="0x954D" to="0x7FFF"/>
       </field>
       <field id="3" name="HeatingTempSetpoint" type="temperature" default="null">
         <access read="true" write="true"/>
@@ -325,7 +325,7 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="TEMPS"/>
         </mandatoryConform>
-        <constraint type="between" from="0x954d" to="0x7fff"/>
+        <constraint type="between" from="0x954D" to="0x7FFF"/>
       </field>
     </struct>
   </dataTypes>

@@ -6,12 +6,12 @@
   {%- elif encodable.is_optional -%}
     {{encode_value(source, encodable.without_optional(), depth + 1)}}?
   {%- elif encodable.is_list -%}
-    ArrayList<{{encode_value(source, encodable.without_list(), depth + 1)}}>
+    List<{{encode_value(source, encodable.without_list(), depth + 1)}}>
   {%- elif encodable.is_struct -%}
     {%- set struct = encodable.get_underlying_struct() -%}
-    ChipStructs.{{source.name}}Cluster{{struct.name}}
+    {{source.name}}Cluster{{struct.name}}
   {%- else -%}
-    {{encodable.boxed_java_type}}
+    {{encodable.kotlin_type}}
   {%- endif -%}
 {%- endmacro -%}
 
@@ -22,20 +22,20 @@
     List<{{encode_value_without_optional(source, encodable.without_list(), depth + 1)}}>
   {%- elif encodable.is_struct -%}
     {%- set struct = encodable.get_underlying_struct() -%}
-    ChipStructs.{{source.name}}Cluster{{struct.name}}
+    {{source.name}}Cluster{{struct.name}}
   {%- else -%}
-    {{encodable.boxed_java_type}}
+    {{encodable.kotlin_type}}
   {%- endif -%}
 {%- endmacro -%}
 
 {%- macro encode_value_without_optional_nullable(source, encodable, depth) -%}
   {%- if encodable.is_list -%}
-    ArrayList<{{encode_value_without_optional_nullable(source, encodable.without_list(), depth + 1)}}>
+    List<{{encode_value_without_optional_nullable(source, encodable.without_list(), depth + 1)}}>
   {%- elif encodable.is_struct -%}
     {%- set struct = encodable.get_underlying_struct() -%}
-    ChipStructs.{{source.name}}Cluster{{struct.name}}
+    {{source.name}}Cluster{{struct.name}}
   {%- else -%}
-    {{encodable.boxed_java_type}}
+    {{encodable.kotlin_type}}
   {%- endif -%}
 {%- endmacro -%}
 
@@ -58,80 +58,74 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 {% set typeLookup = idl | createLookupContext(cluster) %}
 class {{cluster.name}}Cluster(private val endpointId: UShort) {
-  companion object {
-    const val CLUSTER_ID: UInt = {{cluster.code}}u
-  }
-{% for command in cluster.commands | sort(attribute='code') -%}
-{%- set callbackName = command | javaCommandCallbackName() -%}
-{%- if not command.is_timed_invoke %}
-  fun {{command.name | lowfirst_except_acronym}}(callback: {{callbackName}}Callback
-{%- if command.input_param -%}
-{%- for field in (cluster.structs | named(command.input_param)).fields -%}
-  , {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}
-{%- endfor -%}
-{%- endif -%}
-  ) {
-    // Implementation needs to be added here
-  }
-{%- endif %}
 
-  fun {{command.name | lowfirst_except_acronym}}(callback: {{callbackName}}Callback
-{%- if command.input_param -%}
-{%- for field in (cluster.structs | named(command.input_param)).fields -%}
-  , {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}
-{%- endfor -%}
-{%- endif -%}
-  , timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-{% endfor %}
 {%- set already_handled_command = [] -%}
 {%- for command in cluster.commands | sort(attribute='code') -%}
 {%- if command | isCommandNotDefaultCallback() -%}
 {%- set callbackName = command | javaCommandCallbackName() -%}
 {%- if callbackName not in already_handled_command %}
-  interface {{callbackName}}Callback {
-    fun onSuccess(
-{%- for field in (cluster.structs | named(command.output_param)).fields -%}
-    {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}{% if not loop.last %}, {% endif %}
-{%- endfor -%}
-    )
-    fun onError(error: Exception)
-  }
+  class {{callbackName}}(
+{%- for field in (cluster.structs | named(command.output_param)).fields %}
+    val {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}
+{%- if not loop.last %}, {% endif %}
+{%- endfor %}
+  )
 {% if already_handled_command.append(callbackName) -%}
 {%- endif -%}
 {%- endif -%}
 {%- endif -%}
 {%- endfor %}
+
 {%- set already_handled_attribute = [] -%}
 {% for attribute in cluster.attributes | rejectattr('definition', 'is_field_global_name', typeLookup) %}
 {%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
 {%- set interfaceName = attribute | javaAttributeCallbackName(typeLookup) -%}
 {%- if interfaceName not in already_handled_attribute %}
-  interface {{interfaceName}} {
-    fun onSuccess(value: {{encode_value(cluster, encodable, 0)}})
-    fun onError(ex: Exception)
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
+  class {{interfaceName}}(
+    val value: {{encode_value(cluster, encodable, 0)}}
+  )
 {% if already_handled_attribute.append(interfaceName) -%}
 {#- This block does nothing, it only exists to append to already_handled_attribute. -#}
 {%- endif -%}
 {%- endif -%}
 {% endfor -%}
+
+{% for command in cluster.commands | sort(attribute='code') -%}
+{%- set callbackName = command | javaCommandCallbackName() %}
+  suspend fun {{command.name | lowfirst_except_acronym}}(
+{%- if command.input_param -%}
+{%- for field in (cluster.structs | named(command.input_param)).fields -%}
+  {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}
+{%- if not loop.last -%}, {% endif %}  
+{%- endfor -%}
+  , timedInvokeTimeoutMs: Int? = null)
+{%- else -%}
+  timedInvokeTimeoutMs: Int? = null)
+{%- endif -%}
+{%- if command | hasResponse -%}
+    : {{callbackName}} {
+{%- else %} {
+{%- endif %}  
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+{% endfor -%}
+
 {% for attribute in cluster.attributes | sort(attribute='code') %}
-  fun read{{ attribute.definition.name | upfirst }}Attribute(
-    callback: {{ attribute | javaAttributeCallbackName(typeLookup) }}
-  ) {
+{%- set interfaceName = attribute | javaAttributeCallbackName(typeLookup) %}
+  suspend fun read{{ attribute.definition.name | upfirst }}Attribute(): {{interfaceName}} {
     // Implementation needs to be added here
   }
 {% if attribute | isFabricScopedList(typeLookup) %}
-  fun read{{ attribute.definition.name | upfirst }}AttributeWithFabricFilter(
-    callback: {{ attribute | javaAttributeCallbackName(typeLookup) }},
+  suspend fun read{{ attribute.definition.name | upfirst }}AttributeWithFabricFilter(
     isFabricFiltered: Boolean
-  ) {
+  ): {{interfaceName}} {
     // Implementation needs to be added here
   }
 
@@ -140,15 +134,13 @@ class {{cluster.name}}Cluster(private val endpointId: UShort) {
 {%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
 {%- set encodable2 = attribute.definition | asEncodable(typeLookup) -%}
 {%- if not attribute.requires_timed_write %}
-  fun write{{ attribute.definition.name | upfirst }}Attribute(
-    callback: DefaultClusterCallback,
+  suspend fun write{{ attribute.definition.name | upfirst }}Attribute(
     value: {{ encode_value_without_optional_nullable(cluster, encodable, 0) }}
   ) {
     // Implementation needs to be added here
   }
 {% endif %}
-  fun write{{ attribute.definition.name | upfirst }}Attribute(
-    callback: DefaultClusterCallback,
+  suspend fun write{{ attribute.definition.name | upfirst }}Attribute(
     value: {{ encode_value_without_optional_nullable(cluster, encodable2, 0) }},
     timedWriteTimeoutMs: Int
   ) {
@@ -156,13 +148,15 @@ class {{cluster.name}}Cluster(private val endpointId: UShort) {
   }
 {% endif %}
 {%- if attribute.is_subscribable %}
-  fun subscribe{{ attribute.definition.name | upfirst }}Attribute(
-    callback: {{ attribute | javaAttributeCallbackName(typeLookup) }},
+  suspend fun subscribe{{ attribute.definition.name | upfirst }}Attribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): {{interfaceName}} {
     // Implementation needs to be added here
   }
 {% endif -%}
-{%- endfor -%}
+{%- endfor %}
+  companion object {
+    const val CLUSTER_ID: UInt = {{cluster.code}}u
+  }
 }
