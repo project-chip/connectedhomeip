@@ -63,7 +63,8 @@ As such one can run compares such as:
 ```
 
 NOTE: due to specification data scraper still being in development, the diff
-should be human-validated (e.g. for tool errors or Zigbee-only markers in the spec).
+should be human-validated (e.g. for tool errors or Zigbee-only markers in the
+spec).
 
 ## Linting `.matter` files for devices
 
