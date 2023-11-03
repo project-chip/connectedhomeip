@@ -1013,9 +1013,23 @@ class TC_DeviceBasicComposition(MatterBaseTest):
 
             return f'Conformance: {str(conformance)}, implemented features: {",".join(codes)}'
 
-        # This is a manually curated list of attributes that are in-progress in the SDK, but have landed in the spec
         ignore_in_progress = self.user_params.get("ignore_in_progress", False)
-        in_progress_attributes = {Clusters.BasicInformation.id: [0x15, 0x016]}
+        is_ci = self.check_pics('PICS_SDK_CI_ONLY')
+
+        ignore_attributes: dict[int, list[int]] = {}
+        if ignore_in_progress:
+            # This is a manually curated list of attributes that are in-progress in the SDK, but have landed in the spec
+            in_progress_attributes = {Clusters.BasicInformation.id: [0x15, 0x016]}
+            ignore_attributes.update(in_progress_attributes)
+
+        if is_ci:
+            # The network commissioning clusters on the CI select the features on the fly and end up non-conformant
+            # on these attributes. Production devices should not.
+            ci_ignore_attributes = {Clusters.NetworkCommissioning.id: [
+                Clusters.NetworkCommissioning.Attributes.ScanMaxTimeSeconds.attribute_id, Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds.attribute_id]}
+            ignore_attributes.update(ci_ignore_attributes)
+
+        print(ignore_attributes)
 
         success = True
         allow_provisional = self.user_params.get("allow_provisional", False)
@@ -1066,6 +1080,8 @@ class TC_DeviceBasicComposition(MatterBaseTest):
 
                 # Attribute conformance checking
                 for attribute_id, attribute in cluster.items():
+                    if cluster_id in ignore_attributes and attribute_id in ignore_attributes[cluster_id]:
+                        continue
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                     if attribute_id not in clusters[cluster_id].attributes.keys():
                         # TODO: Consolidate the range checks with IDM-10.1 once that lands
@@ -1083,7 +1099,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                                           problem=f'Attribute 0x{attribute_id:02x} is included, but is disallowed by conformance. {conformance_str(xml_attribute.conformance, feature_map, clusters[cluster_id].features)}')
                         success = False
                 for attribute_id, xml_attribute in clusters[cluster_id].attributes.items():
-                    if ignore_in_progress and cluster_id in in_progress_attributes and attribute_id in in_progress_attributes[cluster_id]:
+                    if cluster_id in ignore_attributes and attribute_id in ignore_attributes[cluster_id]:
                         continue
                     conformance_decision = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
                     if conformance_decision == ConformanceDecision.MANDATORY and attribute_id not in cluster.keys():
