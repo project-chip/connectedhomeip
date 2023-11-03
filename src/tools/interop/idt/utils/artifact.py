@@ -15,10 +15,25 @@
 #    limitations under the License.
 #
 
-from . import artifact, async_control, shell
+import os
+import time
+from pathlib import Path
 
-__all__ = [
-    'artifact',
-    'async_control',
-    'shell',
-]
+from . import log
+
+logger = log.get_logger(__file__)
+
+
+def create_file_timestamp() -> str:
+    """Conventional file timestamp suffix"""
+    return time.strftime("%Y%m%d_%H%M%S")
+
+
+def create_standard_log_name(name: str, ext: str, parent: str = "") -> str:
+    """Returns the name argument wrapped as a standard log name"""
+    ts = create_file_timestamp()
+    return os.path.join(parent, f'idt_{ts}_{name}.{ext}')
+
+
+def safe_mkdir(dir_name: str) -> None:
+    Path(dir_name).mkdir(parents=True, exist_ok=True)

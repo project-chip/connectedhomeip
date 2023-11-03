@@ -15,18 +15,11 @@
 #    limitations under the License.
 #
 
-from capture import ecosystem, platform
+from dataclasses import dataclass
 
-from .controller import EcosystemCapture, EcosystemController, EcosystemFactory, PlatformFactory, PlatformLogStreamer
-from .pcap import PacketCaptureRunner
 
-__all__ = [
-    'ecosystem',
-    'platform',
-    'EcosystemCapture',
-    'EcosystemController',
-    'EcosystemFactory',
-    'PacketCaptureRunner',
-    'PlatformFactory',
-    'PlatformLogStreamer',
-]
+@dataclass(repr=True)
+class ProbeTarget:
+    name: str
+    ip: str
+    port: str

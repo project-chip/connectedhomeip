@@ -17,19 +17,17 @@
 
 import asyncio
 import os
-import platform as host_platform
 from typing import TYPE_CHECKING
 
-from capture.utils.artifact import create_standard_log_name, safe_mkdir
-from capture.utils.shell import Bash
+from utils.artifact import create_standard_log_name, safe_mkdir, log
+from utils.shell import Bash
+from utils.host_platform import is_mac
 
 from ... import config
 from ..base import AndroidStream
 
 if TYPE_CHECKING:
     from capture.platform.android import Android
-
-import log
 
 logger = log.get_logger(__file__)
 
@@ -39,7 +37,7 @@ class AndroidPcap(AndroidStream):
     def __init__(self, platform: "Android"):
         self.logger = logger
         self.platform = platform
-        self.pcap_artifact = create_standard_log_name("android_tcpdump", "cap", parent=platform.artifact_dir)
+        self.pcap_artifact = create_standard_log_name("android_tcpdump", "pcap", parent=platform.artifact_dir)
         self.pcap_phone_out_path = f"/sdcard/Movies/{os.path.basename(self.pcap_artifact)}"
         self.pcap_phone_bin_location = "tcpdump" if platform.capabilities.c_has_tcpdump else "/sdcard/Movies/tcpdump"
         self.pcap_command = f"shell {self.pcap_phone_bin_location} -w {self.pcap_phone_out_path}"
@@ -69,8 +67,7 @@ class AndroidPcap(AndroidStream):
             return
         if not os.path.exists(os.path.join(self.build_dir, "tcpdump")):
             self.logger.warning("tcpdump bin not found, attempting to build, please wait a few moments!")
-            p = host_platform.platform().lower()
-            if "darwin" in p or "mac" in p:
+            if is_mac():
                 self.logger.critical("Build Android tcpdump on macOS not supported!")
                 return
             safe_mkdir(self.build_dir)

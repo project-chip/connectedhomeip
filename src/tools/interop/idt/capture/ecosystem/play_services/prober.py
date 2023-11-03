@@ -17,8 +17,7 @@
 
 import os
 
-import log
-from capture.utils.shell import Bash
+from utils.shell import Bash, log
 
 logger = log.get_logger(__file__)
 

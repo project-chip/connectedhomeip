@@ -18,9 +18,9 @@
 import os
 import time
 
-import log
-from capture.utils.artifact import create_standard_log_name
-from capture.utils.shell import Bash
+from utils.artifact import create_standard_log_name, log
+from utils.host_platform import verify_host_dependencies
+from utils.shell import Bash
 
 logger = log.get_logger(__file__)
 
@@ -28,6 +28,7 @@ logger = log.get_logger(__file__)
 class PacketCaptureRunner:
 
     def __init__(self, artifact_dir: str, interface: str) -> None:
+        verify_host_dependencies(["tcpdump"])
         self.logger = logger
         self.artifact_dir = artifact_dir
         self.output_path = str(
@@ -35,7 +36,7 @@ class PacketCaptureRunner:
                 self.artifact_dir,
                 create_standard_log_name(
                     "pcap",
-                    "cap")))
+                    "pcap")))
         self.start_delay_seconds = 2
         self.interface = interface
         self.pcap_command = f"tcpdump -i {self.interface} -n -w {self.output_path}"

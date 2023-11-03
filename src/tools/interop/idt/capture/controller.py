@@ -23,17 +23,20 @@ import traceback
 import typing
 
 import capture
-import log
 from capture.base import EcosystemCapture, PlatformLogStreamer, UnsupportedCapturePlatformException
-from capture.utils.artifact import create_standard_log_name, safe_mkdir
-from capture.utils.async_control import get_timeout
-from log import border_print
+from utils.artifact import create_standard_log_name, safe_mkdir, log
+from utils.log import border_print
+from . import config
 
 _PLATFORM_MAP: typing.Dict[str, PlatformLogStreamer] = {}
 _ECOSYSTEM_MAP: typing.Dict[str, PlatformLogStreamer] = {}
 _ERROR_REPORT: typing.Dict[str, list[(str, str, str)]] = {}
 
 logger = log.get_logger(__file__)
+
+
+def get_timeout():
+    return asyncio.get_running_loop().time() + config.async_timeout
 
 
 class PlatformFactory:

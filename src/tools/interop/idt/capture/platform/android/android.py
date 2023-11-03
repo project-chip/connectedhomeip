@@ -20,9 +20,9 @@ import os
 import traceback
 import typing
 
-import log
 from capture.base import PlatformLogStreamer
-from capture.utils.shell import Bash
+from utils.host_platform import verify_host_dependencies
+from utils.shell import Bash, log
 
 from . import config, streams
 from .capabilities import Capabilities
@@ -33,6 +33,7 @@ logger = log.get_logger(__file__)
 class Android(PlatformLogStreamer):
 
     def __init__(self, artifact_dir: str) -> None:
+        verify_host_dependencies(["adb"])
         self.logger = logger
         self.artifact_dir = artifact_dir
         self.device_id: str | None = None

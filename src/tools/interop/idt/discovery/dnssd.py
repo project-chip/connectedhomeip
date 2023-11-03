@@ -15,11 +15,13 @@
 #    limitations under the License.
 #
 
-import log
+import asyncio
+import os
+
 from zeroconf import ServiceBrowser, ServiceInfo, ServiceListener, Zeroconf
+from utils.artifact import create_standard_log_name, log
 
 logger = log.get_logger(__file__)
-
 
 _MDNS_TYPES = {
     "_matterd._udp.local.": "COMMISSIONER",
@@ -29,12 +31,24 @@ _MDNS_TYPES = {
 }
 
 
+# TODO: display discriminator (to hex), device type (decode), Pairing hint (decode)
+
 class MatterDnssdListener(ServiceListener):
 
     def __init__(self, artifact_dir: str) -> None:
         super().__init__()
         self.artifact_dir = artifact_dir
         self.logger = logger
+        self.discovered_matter_devices: [str, ServiceInfo] = {}
+
+    def write_log(self, line: str, log_name:str) -> None:
+        with open(self.create_device_log_name(log_name), "a+") as log_file:
+            log_file.write(line)
+
+    def create_device_log_name(self, device_name) -> str:
+        return os.path.join(
+            self.artifact_dir,
+            create_standard_log_name(f"{device_name}_dnssd", "txt"))
 
     @staticmethod
     def log_addr(info: ServiceInfo) -> str:
@@ -60,6 +74,7 @@ class MatterDnssdListener(ServiceListener):
             name: str,
             delta_type: str) -> None:
         info = zc.get_service_info(type_, name)
+        self.discovered_matter_devices[name] = info
         to_log = f"{name}\n"
         if info.properties is not None:
             for name, value in info.properties.items():
@@ -70,6 +85,7 @@ class MatterDnssdListener(ServiceListener):
         to_log += self.log_vid_pid(info)
         to_log += self.log_addr(info)
         self.logger.info(to_log)
+        self.write_log(to_log, name)
 
     def add_service(self, zc: Zeroconf, type_: str, name: str) -> None:
         self.handle_service_info(zc, type_, name, "ADDED")
@@ -80,12 +96,22 @@ class MatterDnssdListener(ServiceListener):
     def remove_service(self, zc: Zeroconf, type_: str, name: str) -> None:
         to_log = f"Service {name} removed\n"
         to_log += _MDNS_TYPES[type_]
+        if name in self.discovered_matter_devices:
+            del self.discovered_matter_devices[name]
         self.logger.warning(to_log)
+        self.write_log(to_log, name)
 
     def browse_interactive(self) -> None:
         zc = Zeroconf()
         ServiceBrowser(zc, list(_MDNS_TYPES.keys()), self)
         try:
-            input("Browsing Matter DNS-SD, press enter to stop\n")
+            input("Browsing Matter DNS-SD, press enter to stop\nDCL Lookup: https://webui.dcl.csa-iot.org/\n")
         finally:
             zc.close()
+
+    async def browse_once(self, browse_time_seconds: int) -> Zeroconf:
+        zc = Zeroconf()
+        ServiceBrowser(zc, list(_MDNS_TYPES.keys()), self)
+        await asyncio.sleep(browse_time_seconds)
+        zc.close()
+        return zc

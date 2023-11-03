@@ -15,11 +15,13 @@
 #    limitations under the License.
 #
 
+import asyncio
 import datetime
 import os
+import sys
 import time
 
-import log
+from utils import log
 from bleak import AdvertisementData, BleakScanner, BLEDevice
 from bleak.exc import BleakDBusError
 
@@ -60,7 +62,7 @@ class MatterBleScanner:
 
     def handle_device_states(self) -> None:
         for device_id in self.devices_seen_last_time - self.devices_seen_this_time:
-            to_log = f"LOST {device_id}"
+            to_log = f"LOST {device_id}\n"
             self.write_device_log(device_id, to_log)
         self.devices_seen_last_time = self.devices_seen_this_time
         self.devices_seen_this_time = set()
@@ -68,18 +70,21 @@ class MatterBleScanner:
     def log_ble_discovery(
             self,
             name: str,
-            bin_data: bytes,
+            bin_service_data: bytes,
             ble_device: BLEDevice,
             rssi: int) -> None:
-        loggable_data = bin_data.hex()
+        hex_service_data = bin_service_data.hex()
         if self.is_matter_device(name):
             device_id = f"{ble_device.name}_{ble_device.address}"
             self.devices_seen_this_time.add(device_id)
             if device_id not in self.devices_seen_last_time:
-                to_log = f"DISCOVERED\n{ble_device.name} {ble_device.address}"
-                to_log += f"{name}\n{loggable_data}\n"
+                to_log = f"DISCOVERED\n"
+                to_log += f"BLE DEVICE NAME: {ble_device.name}\n"
+                to_log += f"BLE ADDR: {ble_device.address}\n"
+                to_log += f"NAME: {name}\n"
+                to_log += f"HEX SERVICE DATA: {hex_service_data}\n"
                 to_log += f"RSSI {rssi}\n"
-                to_log += self.parse_vid_pid(loggable_data)
+                to_log += self.parse_vid_pid(hex_service_data)
                 self.write_device_log(device_id, to_log)
 
     async def browse(self, scanner: BleakScanner) -> None:
@@ -87,19 +92,25 @@ class MatterBleScanner:
         for device in devices.values():
             ble_device = device[0]
             ad_data = device[1]
-            for name, bin_data in ad_data.service_data.items():
+            for name, bin_service_data in ad_data.service_data.items():
                 self.log_ble_discovery(
-                    name, bin_data, ble_device, ad_data.rssi)
+                    name, bin_service_data, ble_device, ad_data.rssi)
         self.handle_device_states()
 
-    async def browse_interactive(self) -> None:
-        scanner = BleakScanner()
-        self.logger.warning(
-            "Scanning BLE\nDCL Lookup: https://webui.dcl.csa-iot.org/")
+    async def browser_task(self, scanner) -> None:
         while True:
             try:
-                time.sleep(self.throttle_seconds)
+                await asyncio.sleep(self.throttle_seconds)
                 await self.browse(scanner)
             except BleakDBusError as e:
                 self.logger.critical(e)
                 time.sleep(self.error_seconds)
+
+    async def browse_interactive(self) -> None:
+        scanner = BleakScanner()
+        self.logger.warning(
+            "Scanning BLE\nDCL Lookup: https://webui.dcl.csa-iot.org/\nPress enter to stop!\n")
+        task = asyncio.create_task(self.browser_task(scanner))
+        await asyncio.get_event_loop().run_in_executor(
+            None, sys.stdin.readline)
+        task.cancel()

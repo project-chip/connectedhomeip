@@ -20,10 +20,10 @@ import os
 
 from capture.base import EcosystemCapture, UnsupportedCapturePlatformException
 from capture.platform.android.android import Android
-from capture.utils.artifact import create_standard_log_name
-from log import print_and_write
+from utils.artifact import create_standard_log_name
+from utils.log import print_and_write
 
-from log import get_logger
+from utils.log import get_logger
 
 logger = get_logger(__file__)
 

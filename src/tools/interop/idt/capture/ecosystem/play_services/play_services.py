@@ -20,10 +20,9 @@ import json
 import os
 from typing import Dict
 
-import log
 from capture.base import EcosystemCapture, UnsupportedCapturePlatformException
 from capture.platform.android import Android
-from capture.utils.artifact import create_standard_log_name
+from utils.artifact import create_standard_log_name, log
 
 from . import config
 from .play_services_analysis import PlayServicesAnalysis

@@ -20,13 +20,16 @@ import asyncio
 import os
 import shutil
 import sys
+
+import probe.runner as probe_runner
 from pathlib import Path
 
 from capture import EcosystemController, EcosystemFactory, PacketCaptureRunner, PlatformFactory
-from capture.utils.artifact import create_file_timestamp, safe_mkdir
-from capture.utils.shell import Bash
+from utils.artifact import create_file_timestamp, safe_mkdir
+from utils.host_platform import get_available_interfaces
+from utils.shell import Bash
 from discovery import MatterBleScanner, MatterDnssdListener
-from log import border_print
+from utils.log import border_print
 
 import config
 
@@ -80,39 +83,18 @@ class InteropDebuggingTool:
         self.available_ecosystems_default = 'ALL'
         self.available_ecosystems.append(self.available_ecosystems_default)
 
-        net_interface_path = "/sys/class/net/"
-        self.available_net_interfaces = os.listdir(net_interface_path) \
-            if os.path.exists(net_interface_path) \
-            else []
-        self.available_net_interfaces.append("any")
-        self.available_net_interfaces_default = "any"
+        self.available_net_interfaces = get_available_interfaces()
+        self.available_net_interfaces_default = "any" if "any" in self.available_net_interfaces else None
         self.pcap_artifact_dir = os.path.join(self.artifact_dir, "pcap")
         self.net_interface_required = self.available_net_interfaces_default is None
 
         self.ble_artifact_dir = os.path.join(self.artifact_dir, "ble")
         self.dnssd_artifact_dir = os.path.join(self.artifact_dir, "dnssd")
+        self.prober_dir = os.path.join(self.artifact_dir, "probes")
 
         self.process_args()
 
-    @staticmethod
-    def command_is_available(cmd_name) -> bool:
-        cmd = Bash(f"which {cmd_name}", sync=True, capture_output=True)
-        cmd.start_command()
-        return cmd.finished_success()
-
-    def verify_host_dependencies(self) -> None:
-        deps = ["tcpdump", "adb"]
-        missing_deps = []
-        for dep in deps:
-            if not self.command_is_available(dep):
-                missing_deps.append(dep)
-        if len(missing_deps) > 0:
-            for missing_dep in missing_deps:
-                border_print(f"Missing dependency, please install {missing_dep}!")
-            sys.exit(1)
-
     def process_args(self) -> None:
-        self.verify_host_dependencies()  # TODO: host dependency should be checked *per feature*
         parser = argparse.ArgumentParser(
             prog="idt",
             description="Interop Debugging Tool for Matter")
@@ -175,6 +157,10 @@ class InteropDebuggingTool:
 
         capture_parser.set_defaults(func=self.command_capture)
 
+        prober_parser = subparsers.add_parser("probe",
+                                              help="Probe the environment for Matter and general networking info")
+        prober_parser.set_defaults(func=self.command_probe)
+
         args, unknown = parser.parse_known_args()
         if not hasattr(args, 'func'):
             parser.print_help()
@@ -186,9 +172,11 @@ class InteropDebuggingTool:
             safe_mkdir(self.ble_artifact_dir)
             scanner = MatterBleScanner(self.ble_artifact_dir)
             asyncio.run(scanner.browse_interactive())
+            self.zip_artifacts()
         else:
             safe_mkdir(self.dnssd_artifact_dir)
             MatterDnssdListener(self.dnssd_artifact_dir).browse_interactive()
+            self.zip_artifacts()
 
     def zip_artifacts(self) -> None:
         zip_basename = os.path.basename(self.artifact_dir)
@@ -226,4 +214,11 @@ class InteropDebuggingTool:
             EcosystemController.error_report(self.artifact_dir)
 
         border_print("Compressing artifacts...")
+        self.zip_artifacts()
+
+    def command_probe(self, args: argparse.Namespace) -> None:
+        border_print("Starting generic Matter prober for local environment!")
+        safe_mkdir(self.dnssd_artifact_dir)
+        safe_mkdir(self.prober_dir)
+        probe_runner.run_probes(self.prober_dir, self.dnssd_artifact_dir)
         self.zip_artifacts()

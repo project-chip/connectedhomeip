@@ -226,7 +226,7 @@ options:
                         Specify the type of discovery to execute
 ```
 
-#### ble
+#### BLE
 
 ```
 idt discover -t b
@@ -243,9 +243,88 @@ idt discover -t d
 There is a per device log for ble scanning in `ble` subdirectory of the root
 artifact dir.
 
-[TODO] dnssd per device log
+The `dnssd` log may be found in the dnssd directory.
+
+### Probe
+
+```
+usage: idt probe [-h]
+
+options:
+  -h, --help  show this help message and exit
+```
+
+Collect contextually relevant networking info from the local environment and provide artifacts.
+
+## Project overview
+
+-   The entry point is in `idt.py` which contains simple CLI parsing with
+    `argparse`.
+
+
+
+### `capture`
+
+-   `base` contains the base classes for ecosystems and platforms.
+-   `controller` contains the ecosystem and platform producer and controller
+-   `loader` is a generic class loader that dynamically imports classes
+    matching a given super class from a given directory.
+-   `/platform` and `/ecosystem` contain one package for each platform and ecosystem, which should each contain
+    one implementation of the respective base classs.
+
+### `discovery`
+
+-   `matter_ble` provides a simple ble scanner that shows matter devices being
+    discovered and lost, as well as their VID/PID, RSSI, etc.
+-   `matter_dnssd` provides a simple DNS-SD browser that searches for matter
+    devices and thread border routers.
+
+### `probe`
+
+-   `probe` contains the base class for (`idt`'s) host platform specific implementation.
+    -    Reuses the dnssd discovery implementation to build probe targets.
+    -    Calls platform + addr type specific probe methods for each target.
+- `linux` and `mac` contain `probe` implementations for each host platform.
+- - The package contains a simple dataclass to represent probe targets.
+
+### `utils`
+
+-   `log` contains logging utilities used by everything in the project.
+-   `artifact` contains helper functions for managing artifacts.
+-   `shell` contains a simple helper class for background and foreground
+    Bash commands.
+-   `host_platform` contains helper functions for the interacting with the host 
+    running `idt`.
+
+### Conventions
+
+-   `config.py` should be used to hold development configs within the directory
+    where they are needed.
+    -   It may also hold configs for flaky/cumbersome features that might need
+        to be disabled in an emergency.
+    -   `config.py` **should not** be used for everyday operation.
+-   When needed, execute builds in a folder called `BUILD` within the source
+    tree.
+    -   `idt_clean_all` deletes all `BUILD` dirs and `BUILD` is in `.gitignore`.
+
+## Troubleshooting
+
+-   Change log level from `INFO` to `DEBUG` in root `config.py` for 
+    additional logging.
+-   Compiling `tcpdump` for android may require additional dependencies.
+    -   If the build script fails for you, try
+        `idt_go && source idt/scripts/compilers.sh`.
+-   You may disable colors and splash by setting `enable_color` in `config.py`
+    to `False`.
+-   Wireless `adb` may fail to connect indefinitely depending on network
+    configuration.
+-   `idt_clean_child` will kill any stray `tcpdump` and `adb` commands.
+    - `idt_check_child` will look for leftover processes.
+    - Not expected to be needed outside of development scenarios.
 
 ## Extending functionality
+
+### Capture
 
 Ecosystem and Platform implementations are dynamically loaded.
 
@@ -275,48 +354,6 @@ name matching the package name.
 This module must contain a single class which is a subclass of
 `capture.base.PlatformLogStreamer`.
 
-## Project overview
+### Probe
 
--   The entry point is in `idt.py` which contains simple CLI parsing with
-    `argparse`.
--   `log` contains logging utilities used by everything in the project.
-
-For capture:
-
--   `base` contains the base classes for ecosystems and platforms.
--   `factory` contains the ecosystem and platform producer and controller
--   `loader` is a generic class loader that dynamically imports classes
-    matching a given super class from a given directory.
--   `utils/shell` contains a simple helper class for background and foreground
-    Bash commands.
--   `utils/artifact` contains helper functions for managing artifacts.
-
-For discovery:
-
--   `matter_ble` provides a simple ble scanner that shows matter devices being
-    discovered and lost, as well as their VID/PID, RSSI, etc.
--   `matter_dnssd` provides a simple DNS-SD browser that searches for matter
-    devices and thread border routers.
-
-### Conventions
-
--   `config.py` should be used to hold development configs within the directory
-    where they are needed.
-    -   It may also hold configs for flaky/cumbersome features that might need
-        to be disabled in an emergency.
-    -   `config.py` **should not** be used for everyday operation.
--   When needed, execute builds in a folder called `BUILD` within the source
-    tree.
-    -   `idt_clean_all` deletes all `BUILD` dirs and `BUILD` is in `.gitignore`.
-
-## Troubleshooting
-
--   Change log level from `INFO` to `DEBUG` in `config.py` for additional
-    logging.
--   Compiling `tcpdump` for android may require additional dependencies.
-    -   If the build script fails for you, try
-        `idt_go && source idt/scripts/compilers.sh`.
--   You may disable colors and splash by setting `enable_color` in `config.py`
-    to `False`.
--   Wireless `adb` may fail to connect indefinitely depending on network
-    configuration.
+Simply add host platform specific `run_command()` calls in the functions of the host platform implementations.

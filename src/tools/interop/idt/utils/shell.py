@@ -20,7 +20,7 @@ import shlex
 import subprocess
 import psutil
 
-import log
+from . import log
 
 logger = log.get_logger(__file__)
 
@@ -33,7 +33,7 @@ class Bash:
         """
         Run a bash command as a sub process
         :param command: Command to run
-        :param sync: If True, wait for command to terminate
+        :param sync: If True, wait for command to terminate upon start_command()
         :param capture_output: Only applies to sync; if True, store and suppress stdout and stderr
         :param cwd: Set working directory of command
         """
@@ -60,23 +60,19 @@ class Bash:
 
     def start_command(self) -> None:
         if self.sync:
-            # Sync commands share stdin and out
             self.proc = subprocess.run(self.args, capture_output=self.capture_output, cwd=self.cwd)
             return
         if not self.command_is_running():
-            # Background commands cannot access stdin, but share stdout
             self.proc = subprocess.Popen(self.args, cwd=self.cwd, stdin=subprocess.PIPE)
         else:
             self.logger.warning(f'{self.command} start requested while running')
 
     def term_with_sudo(self, proc: multiprocessing.Process) -> None:
         self.logger.debug(f"SIGTERM {proc.pid} with sudo")
-        # These have to be sync in case another prompt for sudo is needed
         Bash(f"sudo kill {proc.pid}", sync=True).start_command()
 
     def kill_with_sudo(self, proc: multiprocessing.Process) -> None:
         self.logger.debug(f"SIGKILL {proc.pid} with sudo")
-        # These have to be sync in case another prompt for sudo is needed
         Bash(f"sudo kill -9 {proc.pid}", sync=True).start_command()
 
     def term(self, proc: multiprocessing.Process) -> None:
@@ -117,7 +113,6 @@ class Bash:
             self.stop_single_proc(psutil_proc)
         else:
             self.logger.warning(f'{self.command} stop requested while not running')
-        self.proc = None
 
     def finished_success(self) -> bool:
         if not self.sync:

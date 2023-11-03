@@ -15,18 +15,13 @@
 #    limitations under the License.
 #
 
-from capture import ecosystem, platform
+from utils.host_platform import is_mac
+from .mac import ProberMacHost
+from .linux import ProberLinuxHost
 
-from .controller import EcosystemCapture, EcosystemController, EcosystemFactory, PlatformFactory, PlatformLogStreamer
-from .pcap import PacketCaptureRunner
 
-__all__ = [
-    'ecosystem',
-    'platform',
-    'EcosystemCapture',
-    'EcosystemController',
-    'EcosystemFactory',
-    'PacketCaptureRunner',
-    'PlatformFactory',
-    'PlatformLogStreamer',
-]
+def run_probes(artifact_dir: str, dnssd_dir: str) -> None:
+    if is_mac():
+        ProberMacHost(artifact_dir, dnssd_dir).probe()
+    else:
+        ProberLinuxHost(artifact_dir, dnssd_dir).probe()

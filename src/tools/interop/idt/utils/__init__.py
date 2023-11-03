@@ -15,10 +15,11 @@
 #    limitations under the License.
 #
 
-import asyncio
+from . import artifact, host_platform, log, shell
 
-from capture import config
-
-
-def get_timeout():
-    return asyncio.get_running_loop().time() + config.async_timeout
+__all__ = [
+    'artifact',
+    'host_platform',
+    'log',
+    'shell',
+]
