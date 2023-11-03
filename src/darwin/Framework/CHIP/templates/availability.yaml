@@ -7739,12 +7739,23 @@
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   - associationFailureCause
+      enums:
+          ContentLauncher:
+              - StatusEnum
+      enum values:
+          ContentLauncher:
+              StatusEnum:
+                  - Success
+                  - URLNotAvailable
+                  - AuthFailed
       bitmaps:
           Scenes:
               - CopyModeBitmap
               - NameSupportBitmap
           AdministratorCommissioning:
               - Feature
+          ContentLauncher:
+              - SupportedProtocolsBitmap
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7760,14 +7771,23 @@
           AdministratorCommissioning:
               Feature:
                   - Basic
+          ContentLauncher:
+              SupportedProtocolsBitmap:
+                  - DASH
+                  - HLS
   deprecated:
       event fields:
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   - associationFailure
+      enums:
+          ContentLauncher:
+              - ContentLaunchStatusEnum
       bitmaps:
           Scenes:
               - ScenesCopyMode
+          ContentLauncher:
+              - SupportedStreamingProtocol
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7805,9 +7825,21 @@
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   associationFailureCause: associationFailure
+      enums:
+          ContentLauncher:
+              StatusEnum: ContentLaunchStatusEnum
+      enum values:
+          ContentLauncher:
+              # The URLNotAvailable value got renamed at the same time
+              # as the enum.  Record the rename here so that the old
+              # value name is generated for the old enum name.
+              ContentLaunchStatusEnum:
+                  URLNotAvailable: UrlNotAvailable
       bitmaps:
           Scenes:
               CopyModeBitmap: ScenesCopyMode
+          ContentLauncher:
+              SupportedProtocolsBitmap: SupportedStreamingProtocol
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7815,3 +7847,10 @@
           SoftwareDiagnostics:
               Feature:
                   Watermarks: WaterMarks
+  removed:
+      enum values:
+          ContentLauncher:
+              # The URLNotAvailable value got renamed at the same time
+              # as the enum.  The old enum name never had the new value name.
+              ContentLaunchStatusEnum:
+                  - URLNotAvailable
