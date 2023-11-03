@@ -276,7 +276,7 @@ provide artifacts.
     a given super class from a given directory.
 -   `/platform` and `/ecosystem` contain one package for each platform and
     ecosystem, which should each contain one implementation of the respective
-    base classs.
+    base class.
 
 ### `discovery`
 
@@ -292,7 +292,6 @@ provide artifacts.
     -   Reuses the dnssd discovery implementation to build probe targets.
     -   Calls platform + addr type specific probe methods for each target.
 -   `linux` and `mac` contain `probe` implementations for each host platform.
--   -   The package contains a simple dataclass to represent probe targets.
 
 ### `utils`
 
@@ -352,7 +351,7 @@ usage: idt capture [-h] [--platform {Android}] [--ecosystem {DemoExtEcosystem...
 ```
 
 > **IMPORTANT:** Note the following runtime expectations of ecosystems:  
-> `analyze_capture` must be async aware and not interact with stdin
+> `analyze_capture` must be async aware and not interact with standard in
 
 The platform loader functions the same as `capture/ecosystem`.
 
