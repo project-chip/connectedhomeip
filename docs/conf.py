@@ -67,6 +67,7 @@ myst_enable_extensions = ["html_image"]
 
 external_content_contents = [
     (MATTER_BASE / "docs", "[!_R]*"),
+    (MATTER_BASE, "data_model/**/*.md"),
     (MATTER_BASE, "README.md"),
     (MATTER_BASE, "examples/**/*.md"),
     (MATTER_BASE, "examples/**/*.png"),
