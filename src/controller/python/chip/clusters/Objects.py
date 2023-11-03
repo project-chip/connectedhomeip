@@ -33080,7 +33080,15 @@ class Channel(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class ChannelStatusEnum(MatterIntEnum):
+        class LineupInfoTypeEnum(MatterIntEnum):
+            kMso = 0x00
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 1,
+
+        class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
             kMultipleMatches = 0x01
             kNoMatches = 0x02
@@ -33089,14 +33097,6 @@ class Channel(Cluster):
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 3,
-
-        class LineupInfoTypeEnum(MatterIntEnum):
-            kMso = 0x00
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 1,
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -33168,11 +33168,11 @@ class Channel(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=Channel.Enums.ChannelStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=Channel.Enums.StatusEnum),
                         ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            status: 'Channel.Enums.ChannelStatusEnum' = 0
+            status: 'Channel.Enums.StatusEnum' = 0
             data: 'typing.Optional[str]' = None
 
         @dataclass

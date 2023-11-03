@@ -47,6 +47,10 @@ namespace ApplicationLauncher {
 using ApplicationLauncherStatusEnum = StatusEnum;
 } // namespace ApplicationLauncher
 
+namespace Channel {
+using ChannelStatusEnum = StatusEnum;
+} // namespace Channel
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

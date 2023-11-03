@@ -164,7 +164,7 @@ tests:
           "Step 9: TH sends ConnectNetwork command to the DUT with NetworkID
           field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field
           set to 2"
-      PICS: CNET.S.C04.Rsp
+      PICS: CNET.S.C04.Rsp && CNET.S.C06.Rsp
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
 

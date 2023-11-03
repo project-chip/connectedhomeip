@@ -157,7 +157,7 @@ tests:
           "Step 9: TH sends ConnectNetwork command to the DUT with NetworkID
           field set to the extended PAN ID of
           PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET and Breadcrumb field set to 2"
-      PICS: CNET.S.C04.Rsp
+      PICS: CNET.S.C04.Rsp && CNET.S.C06.Rsp
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
 
