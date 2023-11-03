@@ -21,61 +21,47 @@ import matter.devicecontroller.cluster.structs.*
 
 class NetworkCommissioningCluster(private val endpointId: UShort) {
   class ScanNetworksResponse(
-    val networkingStatus: UInt, 
-    val debugText: String?, 
-    val wiFiScanResults: List<NetworkCommissioningClusterWiFiInterfaceScanResultStruct>?, 
+    val networkingStatus: UInt,
+    val debugText: String?,
+    val wiFiScanResults: List<NetworkCommissioningClusterWiFiInterfaceScanResultStruct>?,
     val threadScanResults: List<NetworkCommissioningClusterThreadInterfaceScanResultStruct>?
   )
 
   class NetworkConfigResponse(
-    val networkingStatus: UInt, 
-    val debugText: String?, 
+    val networkingStatus: UInt,
+    val debugText: String?,
     val networkIndex: UByte?
   )
 
   class ConnectNetworkResponse(
-    val networkingStatus: UInt, 
-    val debugText: String?, 
+    val networkingStatus: UInt,
+    val debugText: String?,
     val errorValue: Int?
   )
 
-  class NetworksAttribute(
-    val value: List<NetworkCommissioningClusterNetworkInfoStruct>
-  )
+  class NetworksAttribute(val value: List<NetworkCommissioningClusterNetworkInfoStruct>)
 
-  class LastNetworkingStatusAttribute(
-    val value: UInt?
-  )
+  class LastNetworkingStatusAttribute(val value: UInt?)
 
-  class LastNetworkIDAttribute(
-    val value: ByteArray?
-  )
+  class LastNetworkIDAttribute(val value: ByteArray?)
 
-  class LastConnectErrorValueAttribute(
-    val value: Int?
-  )
+  class LastConnectErrorValueAttribute(val value: Int?)
 
-  class SupportedWiFiBandsAttribute(
-    val value: List<UInt>?
-  )
+  class SupportedWiFiBandsAttribute(val value: List<UInt>?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun scanNetworks(ssid: ByteArray?, breadcrumb: ULong?, timedInvokeTimeoutMs: Int? = null): ScanNetworksResponse {  
+  suspend fun scanNetworks(
+    ssid: ByteArray?,
+    breadcrumb: ULong?,
+    timedInvokeTimeoutMs: Int? = null
+  ): ScanNetworksResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -83,7 +69,12 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun addOrUpdateWiFiNetwork(ssid: ByteArray, credentials: ByteArray, breadcrumb: ULong?, timedInvokeTimeoutMs: Int? = null): NetworkConfigResponse {  
+  suspend fun addOrUpdateWiFiNetwork(
+    ssid: ByteArray,
+    credentials: ByteArray,
+    breadcrumb: ULong?,
+    timedInvokeTimeoutMs: Int? = null
+  ): NetworkConfigResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -91,7 +82,11 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun addOrUpdateThreadNetwork(operationalDataset: ByteArray, breadcrumb: ULong?, timedInvokeTimeoutMs: Int? = null): NetworkConfigResponse {  
+  suspend fun addOrUpdateThreadNetwork(
+    operationalDataset: ByteArray,
+    breadcrumb: ULong?,
+    timedInvokeTimeoutMs: Int? = null
+  ): NetworkConfigResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -99,7 +94,11 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun removeNetwork(networkID: ByteArray, breadcrumb: ULong?, timedInvokeTimeoutMs: Int? = null): NetworkConfigResponse {  
+  suspend fun removeNetwork(
+    networkID: ByteArray,
+    breadcrumb: ULong?,
+    timedInvokeTimeoutMs: Int? = null
+  ): NetworkConfigResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -107,7 +106,11 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun connectNetwork(networkID: ByteArray, breadcrumb: ULong?, timedInvokeTimeoutMs: Int? = null): ConnectNetworkResponse {  
+  suspend fun connectNetwork(
+    networkID: ByteArray,
+    breadcrumb: ULong?,
+    timedInvokeTimeoutMs: Int? = null
+  ): ConnectNetworkResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -115,7 +118,12 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun reorderNetwork(networkID: ByteArray, networkIndex: UByte, breadcrumb: ULong?, timedInvokeTimeoutMs: Int? = null): NetworkConfigResponse {  
+  suspend fun reorderNetwork(
+    networkID: ByteArray,
+    networkIndex: UByte,
+    breadcrumb: ULong?,
+    timedInvokeTimeoutMs: Int? = null
+  ): NetworkConfigResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -127,10 +135,7 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxNetworksAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeMaxNetworksAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -138,10 +143,7 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNetworksAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): NetworksAttribute {
+  suspend fun subscribeNetworksAttribute(minInterval: Int, maxInterval: Int): NetworksAttribute {
     // Implementation needs to be added here
   }
 
@@ -149,10 +151,7 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeScanMaxTimeSecondsAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeScanMaxTimeSecondsAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -160,10 +159,7 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeConnectMaxTimeSecondsAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeConnectMaxTimeSecondsAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -171,23 +167,15 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInterfaceEnabledAttribute(
-    value: Boolean
-  ) {
+  suspend fun writeInterfaceEnabledAttribute(value: Boolean) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInterfaceEnabledAttribute(
-    value: Boolean,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeInterfaceEnabledAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInterfaceEnabledAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Boolean {
+  suspend fun subscribeInterfaceEnabledAttribute(minInterval: Int, maxInterval: Int): Boolean {
     // Implementation needs to be added here
   }
 
@@ -250,10 +238,7 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeThreadVersionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeThreadVersionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -283,10 +268,7 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -305,10 +287,7 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -316,10 +295,7 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

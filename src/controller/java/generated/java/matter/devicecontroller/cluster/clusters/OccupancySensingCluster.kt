@@ -20,30 +20,19 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class OccupancySensingCluster(private val endpointId: UShort) {
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readOccupancyAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOccupancyAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeOccupancyAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -51,10 +40,7 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOccupancySensorTypeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeOccupancySensorTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -73,16 +59,11 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePIROccupiedToUnoccupiedDelayAttribute(
-    value: UShort
-  ) {
+  suspend fun writePIROccupiedToUnoccupiedDelayAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePIROccupiedToUnoccupiedDelayAttribute(
-    value: UShort,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writePIROccupiedToUnoccupiedDelayAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -97,16 +78,11 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePIRUnoccupiedToOccupiedDelayAttribute(
-    value: UShort
-  ) {
+  suspend fun writePIRUnoccupiedToOccupiedDelayAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePIRUnoccupiedToOccupiedDelayAttribute(
-    value: UShort,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writePIRUnoccupiedToOccupiedDelayAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -121,9 +97,7 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePIRUnoccupiedToOccupiedThresholdAttribute(
-    value: UByte
-  ) {
+  suspend fun writePIRUnoccupiedToOccupiedThresholdAttribute(value: UByte) {
     // Implementation needs to be added here
   }
 
@@ -145,9 +119,7 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeUltrasonicOccupiedToUnoccupiedDelayAttribute(
-    value: UShort
-  ) {
+  suspend fun writeUltrasonicOccupiedToUnoccupiedDelayAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
@@ -169,9 +141,7 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeUltrasonicUnoccupiedToOccupiedDelayAttribute(
-    value: UShort
-  ) {
+  suspend fun writeUltrasonicUnoccupiedToOccupiedDelayAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
@@ -193,9 +163,7 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeUltrasonicUnoccupiedToOccupiedThresholdAttribute(
-    value: UByte
-  ) {
+  suspend fun writeUltrasonicUnoccupiedToOccupiedThresholdAttribute(value: UByte) {
     // Implementation needs to be added here
   }
 
@@ -217,9 +185,7 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePhysicalContactOccupiedToUnoccupiedDelayAttribute(
-    value: UShort
-  ) {
+  suspend fun writePhysicalContactOccupiedToUnoccupiedDelayAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
@@ -241,9 +207,7 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePhysicalContactUnoccupiedToOccupiedDelayAttribute(
-    value: UShort
-  ) {
+  suspend fun writePhysicalContactUnoccupiedToOccupiedDelayAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
@@ -265,9 +229,7 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePhysicalContactUnoccupiedToOccupiedThresholdAttribute(
-    value: UByte
-  ) {
+  suspend fun writePhysicalContactUnoccupiedToOccupiedThresholdAttribute(value: UByte) {
     // Implementation needs to be added here
   }
 
@@ -311,10 +273,7 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -333,10 +292,7 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -344,10 +300,7 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

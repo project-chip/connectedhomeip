@@ -16,20 +16,15 @@
  */
 package matter.devicecontroller.cluster.eventstructs
 
+import java.util.Optional
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class TimeSynchronizationClusterTimeZoneStatusEvent (
-    val offset: Int,
-    val name: Optional<String>) {
-  override fun toString(): String  = buildString {
+class TimeSynchronizationClusterTimeZoneStatusEvent(val offset: Int, val name: Optional<String>) {
+  override fun toString(): String = buildString {
     append("TimeSynchronizationClusterTimeZoneStatusEvent {\n")
     append("\toffset : $offset\n")
     append("\tname : $name\n")
@@ -41,9 +36,9 @@ class TimeSynchronizationClusterTimeZoneStatusEvent (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_OFFSET), offset)
       if (name.isPresent) {
-      val optname = name.get()
-      put(ContextSpecificTag(TAG_NAME), optname)
-    }
+        val optname = name.get()
+        put(ContextSpecificTag(TAG_NAME), optname)
+      }
       endStructure()
     }
   }
@@ -52,15 +47,16 @@ class TimeSynchronizationClusterTimeZoneStatusEvent (
     private const val TAG_OFFSET = 0
     private const val TAG_NAME = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : TimeSynchronizationClusterTimeZoneStatusEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterTimeZoneStatusEvent {
       tlvReader.enterStructure(tlvTag)
       val offset = tlvReader.getInt(ContextSpecificTag(TAG_OFFSET))
-      val name = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
-    } else {
-      Optional.empty()
-    }
-      
+      val name =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return TimeSynchronizationClusterTimeZoneStatusEvent(offset, name)

@@ -20,41 +20,23 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class NitrogenDioxideConcentrationMeasurementCluster(private val endpointId: UShort) {
-  class MeasuredValueAttribute(
-    val value: Float?
-  )
+  class MeasuredValueAttribute(val value: Float?)
 
-  class MinMeasuredValueAttribute(
-    val value: Float?
-  )
+  class MinMeasuredValueAttribute(val value: Float?)
 
-  class MaxMeasuredValueAttribute(
-    val value: Float?
-  )
+  class MaxMeasuredValueAttribute(val value: Float?)
 
-  class PeakMeasuredValueAttribute(
-    val value: Float?
-  )
+  class PeakMeasuredValueAttribute(val value: Float?)
 
-  class AverageMeasuredValueAttribute(
-    val value: Float?
-  )
+  class AverageMeasuredValueAttribute(val value: Float?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readMeasuredValueAttribute(): MeasuredValueAttribute {
     // Implementation needs to be added here
@@ -104,10 +86,7 @@ class NitrogenDioxideConcentrationMeasurementCluster(private val endpointId: USh
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePeakMeasuredValueWindowAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribePeakMeasuredValueWindowAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -137,10 +116,7 @@ class NitrogenDioxideConcentrationMeasurementCluster(private val endpointId: USh
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeUncertaintyAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Float {
+  suspend fun subscribeUncertaintyAttribute(minInterval: Int, maxInterval: Int): Float {
     // Implementation needs to be added here
   }
 
@@ -148,10 +124,7 @@ class NitrogenDioxideConcentrationMeasurementCluster(private val endpointId: USh
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMeasurementUnitAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeMeasurementUnitAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -159,10 +132,7 @@ class NitrogenDioxideConcentrationMeasurementCluster(private val endpointId: USh
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMeasurementMediumAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeMeasurementMediumAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -170,10 +140,7 @@ class NitrogenDioxideConcentrationMeasurementCluster(private val endpointId: USh
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLevelValueAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeLevelValueAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -203,10 +170,7 @@ class NitrogenDioxideConcentrationMeasurementCluster(private val endpointId: USh
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -225,10 +189,7 @@ class NitrogenDioxideConcentrationMeasurementCluster(private val endpointId: USh
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -236,10 +197,7 @@ class NitrogenDioxideConcentrationMeasurementCluster(private val endpointId: USh
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

@@ -20,93 +20,49 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
-  class MaxPressureAttribute(
-    val value: Short?
-  )
+  class MaxPressureAttribute(val value: Short?)
 
-  class MaxSpeedAttribute(
-    val value: UShort?
-  )
+  class MaxSpeedAttribute(val value: UShort?)
 
-  class MaxFlowAttribute(
-    val value: UShort?
-  )
+  class MaxFlowAttribute(val value: UShort?)
 
-  class MinConstPressureAttribute(
-    val value: Short?
-  )
+  class MinConstPressureAttribute(val value: Short?)
 
-  class MaxConstPressureAttribute(
-    val value: Short?
-  )
+  class MaxConstPressureAttribute(val value: Short?)
 
-  class MinCompPressureAttribute(
-    val value: Short?
-  )
+  class MinCompPressureAttribute(val value: Short?)
 
-  class MaxCompPressureAttribute(
-    val value: Short?
-  )
+  class MaxCompPressureAttribute(val value: Short?)
 
-  class MinConstSpeedAttribute(
-    val value: UShort?
-  )
+  class MinConstSpeedAttribute(val value: UShort?)
 
-  class MaxConstSpeedAttribute(
-    val value: UShort?
-  )
+  class MaxConstSpeedAttribute(val value: UShort?)
 
-  class MinConstFlowAttribute(
-    val value: UShort?
-  )
+  class MinConstFlowAttribute(val value: UShort?)
 
-  class MaxConstFlowAttribute(
-    val value: UShort?
-  )
+  class MaxConstFlowAttribute(val value: UShort?)
 
-  class MinConstTempAttribute(
-    val value: Short?
-  )
+  class MinConstTempAttribute(val value: Short?)
 
-  class MaxConstTempAttribute(
-    val value: Short?
-  )
+  class MaxConstTempAttribute(val value: Short?)
 
-  class CapacityAttribute(
-    val value: Short?
-  )
+  class CapacityAttribute(val value: Short?)
 
-  class SpeedAttribute(
-    val value: UShort?
-  )
+  class SpeedAttribute(val value: UShort?)
 
-  class LifetimeRunningHoursAttribute(
-    val value: UInt?
-  )
+  class LifetimeRunningHoursAttribute(val value: UInt?)
 
-  class PowerAttribute(
-    val value: UInt?
-  )
+  class PowerAttribute(val value: UInt?)
 
-  class LifetimeEnergyConsumedAttribute(
-    val value: UInt?
-  )
+  class LifetimeEnergyConsumedAttribute(val value: UInt?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readMaxPressureAttribute(): MaxPressureAttribute {
     // Implementation needs to be added here
@@ -123,10 +79,7 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxSpeedAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): MaxSpeedAttribute {
+  suspend fun subscribeMaxSpeedAttribute(minInterval: Int, maxInterval: Int): MaxSpeedAttribute {
     // Implementation needs to be added here
   }
 
@@ -134,10 +87,7 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxFlowAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): MaxFlowAttribute {
+  suspend fun subscribeMaxFlowAttribute(minInterval: Int, maxInterval: Int): MaxFlowAttribute {
     // Implementation needs to be added here
   }
 
@@ -255,10 +205,7 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePumpStatusAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribePumpStatusAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -266,10 +213,7 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEffectiveOperationModeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeEffectiveOperationModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -277,10 +221,7 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEffectiveControlModeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeEffectiveControlModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -288,10 +229,7 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCapacityAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): CapacityAttribute {
+  suspend fun subscribeCapacityAttribute(minInterval: Int, maxInterval: Int): CapacityAttribute {
     // Implementation needs to be added here
   }
 
@@ -299,10 +237,7 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSpeedAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): SpeedAttribute {
+  suspend fun subscribeSpeedAttribute(minInterval: Int, maxInterval: Int): SpeedAttribute {
     // Implementation needs to be added here
   }
 
@@ -310,16 +245,11 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLifetimeRunningHoursAttribute(
-    value: UInt
-  ) {
+  suspend fun writeLifetimeRunningHoursAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLifetimeRunningHoursAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeLifetimeRunningHoursAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -334,10 +264,7 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePowerAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): PowerAttribute {
+  suspend fun subscribePowerAttribute(minInterval: Int, maxInterval: Int): PowerAttribute {
     // Implementation needs to be added here
   }
 
@@ -345,16 +272,11 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLifetimeEnergyConsumedAttribute(
-    value: UInt
-  ) {
+  suspend fun writeLifetimeEnergyConsumedAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLifetimeEnergyConsumedAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeLifetimeEnergyConsumedAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -369,23 +291,15 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOperationModeAttribute(
-    value: UInt
-  ) {
+  suspend fun writeOperationModeAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOperationModeAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeOperationModeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOperationModeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeOperationModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -393,23 +307,15 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeControlModeAttribute(
-    value: UInt
-  ) {
+  suspend fun writeControlModeAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeControlModeAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeControlModeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeControlModeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeControlModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -439,10 +345,7 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -461,10 +364,7 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -472,10 +372,7 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

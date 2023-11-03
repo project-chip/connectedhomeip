@@ -17,18 +17,13 @@
 package matter.devicecontroller.cluster.eventstructs
 
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class SwitchClusterLongPressEvent (
-    val newPosition: UByte) {
-  override fun toString(): String  = buildString {
+class SwitchClusterLongPressEvent(val newPosition: UByte) {
+  override fun toString(): String = buildString {
     append("SwitchClusterLongPressEvent {\n")
     append("\tnewPosition : $newPosition\n")
     append("}\n")
@@ -45,10 +40,10 @@ class SwitchClusterLongPressEvent (
   companion object {
     private const val TAG_NEW_POSITION = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : SwitchClusterLongPressEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SwitchClusterLongPressEvent {
       tlvReader.enterStructure(tlvTag)
       val newPosition = tlvReader.getUByte(ContextSpecificTag(TAG_NEW_POSITION))
-      
+
       tlvReader.exitContainer()
 
       return SwitchClusterLongPressEvent(newPosition)

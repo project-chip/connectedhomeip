@@ -20,44 +20,27 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class GroupsCluster(private val endpointId: UShort) {
-  class AddGroupResponse(
-    val status: UInt, 
-    val groupID: UShort
-  )
+  class AddGroupResponse(val status: UInt, val groupID: UShort)
 
-  class ViewGroupResponse(
-    val status: UInt, 
-    val groupID: UShort, 
-    val groupName: String
-  )
+  class ViewGroupResponse(val status: UInt, val groupID: UShort, val groupName: String)
 
-  class GetGroupMembershipResponse(
-    val capacity: UByte?, 
-    val groupList: List<UShort>
-  )
+  class GetGroupMembershipResponse(val capacity: UByte?, val groupList: List<UShort>)
 
-  class RemoveGroupResponse(
-    val status: UInt, 
-    val groupID: UShort
-  )
+  class RemoveGroupResponse(val status: UInt, val groupID: UShort)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun addGroup(groupID: UShort, groupName: String, timedInvokeTimeoutMs: Int? = null): AddGroupResponse {  
+  suspend fun addGroup(
+    groupID: UShort,
+    groupName: String,
+    timedInvokeTimeoutMs: Int? = null
+  ): AddGroupResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -65,7 +48,7 @@ class GroupsCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun viewGroup(groupID: UShort, timedInvokeTimeoutMs: Int? = null): ViewGroupResponse {  
+  suspend fun viewGroup(groupID: UShort, timedInvokeTimeoutMs: Int? = null): ViewGroupResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -73,7 +56,10 @@ class GroupsCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun getGroupMembership(groupList: List<UShort>, timedInvokeTimeoutMs: Int? = null): GetGroupMembershipResponse {  
+  suspend fun getGroupMembership(
+    groupList: List<UShort>,
+    timedInvokeTimeoutMs: Int? = null
+  ): GetGroupMembershipResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -81,7 +67,7 @@ class GroupsCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun removeGroup(groupID: UShort, timedInvokeTimeoutMs: Int? = null): RemoveGroupResponse {  
+  suspend fun removeGroup(groupID: UShort, timedInvokeTimeoutMs: Int? = null): RemoveGroupResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -89,7 +75,7 @@ class GroupsCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun removeAllGroups(timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun removeAllGroups(timedInvokeTimeoutMs: Int? = null) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -97,7 +83,11 @@ class GroupsCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun addGroupIfIdentifying(groupID: UShort, groupName: String, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun addGroupIfIdentifying(
+    groupID: UShort,
+    groupName: String,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -109,10 +99,7 @@ class GroupsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNameSupportAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeNameSupportAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -142,10 +129,7 @@ class GroupsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -164,10 +148,7 @@ class GroupsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -175,10 +156,7 @@ class GroupsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

@@ -20,50 +20,29 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class BallastConfigurationCluster(private val endpointId: UShort) {
-  class IntrinsicBallastFactorAttribute(
-    val value: UByte?
-  )
+  class IntrinsicBallastFactorAttribute(val value: UByte?)
 
-  class BallastFactorAdjustmentAttribute(
-    val value: UByte?
-  )
+  class BallastFactorAdjustmentAttribute(val value: UByte?)
 
-  class LampRatedHoursAttribute(
-    val value: UInt?
-  )
+  class LampRatedHoursAttribute(val value: UInt?)
 
-  class LampBurnHoursAttribute(
-    val value: UInt?
-  )
+  class LampBurnHoursAttribute(val value: UInt?)
 
-  class LampBurnHoursTripPointAttribute(
-    val value: UInt?
-  )
+  class LampBurnHoursTripPointAttribute(val value: UInt?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readPhysicalMinLevelAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePhysicalMinLevelAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribePhysicalMinLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -71,10 +50,7 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePhysicalMaxLevelAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribePhysicalMaxLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -82,10 +58,7 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBallastStatusAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeBallastStatusAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -93,23 +66,15 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeMinLevelAttribute(
-    value: UByte
-  ) {
+  suspend fun writeMinLevelAttribute(value: UByte) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeMinLevelAttribute(
-    value: UByte,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeMinLevelAttribute(value: UByte, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMinLevelAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeMinLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -117,23 +82,15 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeMaxLevelAttribute(
-    value: UByte
-  ) {
+  suspend fun writeMaxLevelAttribute(value: UByte) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeMaxLevelAttribute(
-    value: UByte,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeMaxLevelAttribute(value: UByte, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxLevelAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeMaxLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -141,16 +98,11 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeIntrinsicBallastFactorAttribute(
-    value: UByte
-  ) {
+  suspend fun writeIntrinsicBallastFactorAttribute(value: UByte) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeIntrinsicBallastFactorAttribute(
-    value: UByte,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeIntrinsicBallastFactorAttribute(value: UByte, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -165,16 +117,11 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeBallastFactorAdjustmentAttribute(
-    value: UByte
-  ) {
+  suspend fun writeBallastFactorAdjustmentAttribute(value: UByte) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeBallastFactorAdjustmentAttribute(
-    value: UByte,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeBallastFactorAdjustmentAttribute(value: UByte, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -189,10 +136,7 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLampQuantityAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeLampQuantityAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -200,23 +144,15 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampTypeAttribute(
-    value: String
-  ) {
+  suspend fun writeLampTypeAttribute(value: String) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampTypeAttribute(
-    value: String,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeLampTypeAttribute(value: String, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLampTypeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): CharString {
+  suspend fun subscribeLampTypeAttribute(minInterval: Int, maxInterval: Int): CharString {
     // Implementation needs to be added here
   }
 
@@ -224,23 +160,15 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampManufacturerAttribute(
-    value: String
-  ) {
+  suspend fun writeLampManufacturerAttribute(value: String) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampManufacturerAttribute(
-    value: String,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeLampManufacturerAttribute(value: String, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLampManufacturerAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): CharString {
+  suspend fun subscribeLampManufacturerAttribute(minInterval: Int, maxInterval: Int): CharString {
     // Implementation needs to be added here
   }
 
@@ -248,16 +176,11 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampRatedHoursAttribute(
-    value: UInt
-  ) {
+  suspend fun writeLampRatedHoursAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampRatedHoursAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeLampRatedHoursAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -272,16 +195,11 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampBurnHoursAttribute(
-    value: UInt
-  ) {
+  suspend fun writeLampBurnHoursAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampBurnHoursAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeLampBurnHoursAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -296,23 +214,15 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampAlarmModeAttribute(
-    value: UInt
-  ) {
+  suspend fun writeLampAlarmModeAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampAlarmModeAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeLampAlarmModeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLampAlarmModeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeLampAlarmModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -320,16 +230,11 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampBurnHoursTripPointAttribute(
-    value: UInt
-  ) {
+  suspend fun writeLampBurnHoursTripPointAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampBurnHoursTripPointAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeLampBurnHoursTripPointAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -366,10 +271,7 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -388,10 +290,7 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -399,10 +298,7 @@ class BallastConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

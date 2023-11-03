@@ -20,67 +20,44 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class ColorControlCluster(private val endpointId: UShort) {
-  class NumberOfPrimariesAttribute(
-    val value: UByte?
-  )
+  class NumberOfPrimariesAttribute(val value: UByte?)
 
-  class Primary1IntensityAttribute(
-    val value: UByte?
-  )
+  class Primary1IntensityAttribute(val value: UByte?)
 
-  class Primary2IntensityAttribute(
-    val value: UByte?
-  )
+  class Primary2IntensityAttribute(val value: UByte?)
 
-  class Primary3IntensityAttribute(
-    val value: UByte?
-  )
+  class Primary3IntensityAttribute(val value: UByte?)
 
-  class Primary4IntensityAttribute(
-    val value: UByte?
-  )
+  class Primary4IntensityAttribute(val value: UByte?)
 
-  class Primary5IntensityAttribute(
-    val value: UByte?
-  )
+  class Primary5IntensityAttribute(val value: UByte?)
 
-  class Primary6IntensityAttribute(
-    val value: UByte?
-  )
+  class Primary6IntensityAttribute(val value: UByte?)
 
-  class ColorPointRIntensityAttribute(
-    val value: UByte?
-  )
+  class ColorPointRIntensityAttribute(val value: UByte?)
 
-  class ColorPointGIntensityAttribute(
-    val value: UByte?
-  )
+  class ColorPointGIntensityAttribute(val value: UByte?)
 
-  class ColorPointBIntensityAttribute(
-    val value: UByte?
-  )
+  class ColorPointBIntensityAttribute(val value: UByte?)
 
-  class StartUpColorTemperatureMiredsAttribute(
-    val value: UShort?
-  )
+  class StartUpColorTemperatureMiredsAttribute(val value: UShort?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun moveToHue(hue: UByte, direction: UInt, transitionTime: UShort, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun moveToHue(
+    hue: UByte,
+    direction: UInt,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -88,7 +65,13 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun moveHue(moveMode: UInt, rate: UByte, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun moveHue(
+    moveMode: UInt,
+    rate: UByte,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -96,7 +79,14 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun stepHue(stepMode: UInt, stepSize: UByte, transitionTime: UByte, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun stepHue(
+    stepMode: UInt,
+    stepSize: UByte,
+    transitionTime: UByte,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -104,7 +94,13 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun moveToSaturation(saturation: UByte, transitionTime: UShort, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun moveToSaturation(
+    saturation: UByte,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -112,7 +108,13 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun moveSaturation(moveMode: UInt, rate: UByte, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun moveSaturation(
+    moveMode: UInt,
+    rate: UByte,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -120,7 +122,14 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun stepSaturation(stepMode: UInt, stepSize: UByte, transitionTime: UByte, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun stepSaturation(
+    stepMode: UInt,
+    stepSize: UByte,
+    transitionTime: UByte,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -128,7 +137,14 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun moveToHueAndSaturation(hue: UByte, saturation: UByte, transitionTime: UShort, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun moveToHueAndSaturation(
+    hue: UByte,
+    saturation: UByte,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -136,7 +152,14 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun moveToColor(colorX: UShort, colorY: UShort, transitionTime: UShort, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun moveToColor(
+    colorX: UShort,
+    colorY: UShort,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -144,7 +167,13 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun moveColor(rateX: Short, rateY: Short, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun moveColor(
+    rateX: Short,
+    rateY: Short,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -152,7 +181,14 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun stepColor(stepX: Short, stepY: Short, transitionTime: UShort, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun stepColor(
+    stepX: Short,
+    stepY: Short,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -160,7 +196,13 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun moveToColorTemperature(colorTemperatureMireds: UShort, transitionTime: UShort, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun moveToColorTemperature(
+    colorTemperatureMireds: UShort,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -168,7 +210,14 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun enhancedMoveToHue(enhancedHue: UShort, direction: UInt, transitionTime: UShort, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun enhancedMoveToHue(
+    enhancedHue: UShort,
+    direction: UInt,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -176,7 +225,13 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun enhancedMoveHue(moveMode: UInt, rate: UShort, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun enhancedMoveHue(
+    moveMode: UInt,
+    rate: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -184,7 +239,14 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun enhancedStepHue(stepMode: UInt, stepSize: UShort, transitionTime: UShort, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun enhancedStepHue(
+    stepMode: UInt,
+    stepSize: UShort,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -192,7 +254,14 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun enhancedMoveToHueAndSaturation(enhancedHue: UShort, saturation: UByte, transitionTime: UShort, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun enhancedMoveToHueAndSaturation(
+    enhancedHue: UShort,
+    saturation: UByte,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -200,7 +269,16 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun colorLoopSet(updateFlags: UInt, action: UInt, direction: UInt, time: UShort, startHue: UShort, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun colorLoopSet(
+    updateFlags: UInt,
+    action: UInt,
+    direction: UInt,
+    time: UShort,
+    startHue: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -208,7 +286,11 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun stopMoveStep(optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun stopMoveStep(
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -216,7 +298,15 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun moveColorTemperature(moveMode: UInt, rate: UShort, colorTemperatureMinimumMireds: UShort, colorTemperatureMaximumMireds: UShort, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun moveColorTemperature(
+    moveMode: UInt,
+    rate: UShort,
+    colorTemperatureMinimumMireds: UShort,
+    colorTemperatureMaximumMireds: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -224,7 +314,16 @@ class ColorControlCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun stepColorTemperature(stepMode: UInt, stepSize: UShort, transitionTime: UShort, colorTemperatureMinimumMireds: UShort, colorTemperatureMaximumMireds: UShort, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun stepColorTemperature(
+    stepMode: UInt,
+    stepSize: UShort,
+    transitionTime: UShort,
+    colorTemperatureMinimumMireds: UShort,
+    colorTemperatureMaximumMireds: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -236,10 +335,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentHueAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeCurrentHueAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -247,10 +343,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentSaturationAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeCurrentSaturationAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -258,10 +351,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRemainingTimeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeRemainingTimeAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -269,10 +359,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentXAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeCurrentXAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -280,10 +367,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentYAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeCurrentYAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -291,10 +375,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDriftCompensationAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeDriftCompensationAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -302,10 +383,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCompensationTextAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): CharString {
+  suspend fun subscribeCompensationTextAttribute(minInterval: Int, maxInterval: Int): CharString {
     // Implementation needs to be added here
   }
 
@@ -313,10 +391,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeColorTemperatureMiredsAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeColorTemperatureMiredsAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -324,10 +399,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeColorModeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeColorModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -335,23 +407,15 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOptionsAttribute(
-    value: UInt
-  ) {
+  suspend fun writeOptionsAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOptionsAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeOptionsAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOptionsAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeOptionsAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -370,10 +434,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePrimary1XAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribePrimary1XAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -381,10 +442,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePrimary1YAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribePrimary1YAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -403,10 +461,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePrimary2XAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribePrimary2XAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -414,10 +469,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePrimary2YAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribePrimary2YAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -436,10 +488,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePrimary3XAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribePrimary3XAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -447,10 +496,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePrimary3YAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribePrimary3YAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -469,10 +515,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePrimary4XAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribePrimary4XAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -480,10 +523,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePrimary4YAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribePrimary4YAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -502,10 +542,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePrimary5XAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribePrimary5XAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -513,10 +550,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePrimary5YAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribePrimary5YAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -535,10 +569,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePrimary6XAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribePrimary6XAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -546,10 +577,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePrimary6YAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribePrimary6YAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -568,23 +596,15 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeWhitePointXAttribute(
-    value: UShort
-  ) {
+  suspend fun writeWhitePointXAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeWhitePointXAttribute(
-    value: UShort,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeWhitePointXAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeWhitePointXAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeWhitePointXAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -592,23 +612,15 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeWhitePointYAttribute(
-    value: UShort
-  ) {
+  suspend fun writeWhitePointYAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeWhitePointYAttribute(
-    value: UShort,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeWhitePointYAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeWhitePointYAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeWhitePointYAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -616,23 +628,15 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointRXAttribute(
-    value: UShort
-  ) {
+  suspend fun writeColorPointRXAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointRXAttribute(
-    value: UShort,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeColorPointRXAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeColorPointRXAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeColorPointRXAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -640,23 +644,15 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointRYAttribute(
-    value: UShort
-  ) {
+  suspend fun writeColorPointRYAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointRYAttribute(
-    value: UShort,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeColorPointRYAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeColorPointRYAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeColorPointRYAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -664,16 +660,11 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointRIntensityAttribute(
-    value: UByte
-  ) {
+  suspend fun writeColorPointRIntensityAttribute(value: UByte) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointRIntensityAttribute(
-    value: UByte,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeColorPointRIntensityAttribute(value: UByte, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -688,23 +679,15 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointGXAttribute(
-    value: UShort
-  ) {
+  suspend fun writeColorPointGXAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointGXAttribute(
-    value: UShort,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeColorPointGXAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeColorPointGXAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeColorPointGXAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -712,23 +695,15 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointGYAttribute(
-    value: UShort
-  ) {
+  suspend fun writeColorPointGYAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointGYAttribute(
-    value: UShort,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeColorPointGYAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeColorPointGYAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeColorPointGYAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -736,16 +711,11 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointGIntensityAttribute(
-    value: UByte
-  ) {
+  suspend fun writeColorPointGIntensityAttribute(value: UByte) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointGIntensityAttribute(
-    value: UByte,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeColorPointGIntensityAttribute(value: UByte, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -760,23 +730,15 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointBXAttribute(
-    value: UShort
-  ) {
+  suspend fun writeColorPointBXAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointBXAttribute(
-    value: UShort,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeColorPointBXAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeColorPointBXAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeColorPointBXAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -784,23 +746,15 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointBYAttribute(
-    value: UShort
-  ) {
+  suspend fun writeColorPointBYAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointBYAttribute(
-    value: UShort,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeColorPointBYAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeColorPointBYAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeColorPointBYAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -808,16 +762,11 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointBIntensityAttribute(
-    value: UByte
-  ) {
+  suspend fun writeColorPointBIntensityAttribute(value: UByte) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeColorPointBIntensityAttribute(
-    value: UByte,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeColorPointBIntensityAttribute(value: UByte, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -832,10 +781,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEnhancedCurrentHueAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeEnhancedCurrentHueAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -843,10 +789,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEnhancedColorModeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeEnhancedColorModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -854,10 +797,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeColorLoopActiveAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeColorLoopActiveAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -865,10 +805,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeColorLoopDirectionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeColorLoopDirectionAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -876,10 +813,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeColorLoopTimeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeColorLoopTimeAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -909,10 +843,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeColorCapabilitiesAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeColorCapabilitiesAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -953,16 +884,11 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeStartUpColorTemperatureMiredsAttribute(
-    value: UShort
-  ) {
+  suspend fun writeStartUpColorTemperatureMiredsAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeStartUpColorTemperatureMiredsAttribute(
-    value: UShort,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeStartUpColorTemperatureMiredsAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -999,10 +925,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -1021,10 +944,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -1032,10 +952,7 @@ class ColorControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

@@ -20,39 +20,26 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class GroupKeyManagementCluster(private val endpointId: UShort) {
-  class KeySetReadResponse(
-    val groupKeySet: GroupKeyManagementClusterGroupKeySetStruct
-  )
+  class KeySetReadResponse(val groupKeySet: GroupKeyManagementClusterGroupKeySetStruct)
 
-  class KeySetReadAllIndicesResponse(
-    val groupKeySetIDs: List<UShort>
-  )
+  class KeySetReadAllIndicesResponse(val groupKeySetIDs: List<UShort>)
 
-  class GroupKeyMapAttribute(
-    val value: List<GroupKeyManagementClusterGroupKeyMapStruct>
-  )
+  class GroupKeyMapAttribute(val value: List<GroupKeyManagementClusterGroupKeyMapStruct>)
 
-  class GroupTableAttribute(
-    val value: List<GroupKeyManagementClusterGroupInfoMapStruct>
-  )
+  class GroupTableAttribute(val value: List<GroupKeyManagementClusterGroupInfoMapStruct>)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun keySetWrite(groupKeySet: GroupKeyManagementClusterGroupKeySetStruct, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun keySetWrite(
+    groupKeySet: GroupKeyManagementClusterGroupKeySetStruct,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -60,7 +47,10 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun keySetRead(groupKeySetID: UShort, timedInvokeTimeoutMs: Int? = null): KeySetReadResponse {  
+  suspend fun keySetRead(
+    groupKeySetID: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ): KeySetReadResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -68,7 +58,7 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun keySetRemove(groupKeySetID: UShort, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun keySetRemove(groupKeySetID: UShort, timedInvokeTimeoutMs: Int? = null) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -76,7 +66,9 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun keySetReadAllIndices(timedInvokeTimeoutMs: Int? = null): KeySetReadAllIndicesResponse {  
+  suspend fun keySetReadAllIndices(
+    timedInvokeTimeoutMs: Int? = null
+  ): KeySetReadAllIndicesResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -94,10 +86,7 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-
-  suspend fun writeGroupKeyMapAttribute(
-    value: List<GroupKeyManagementClusterGroupKeyMapStruct>
-  ) {
+  suspend fun writeGroupKeyMapAttribute(value: List<GroupKeyManagementClusterGroupKeyMapStruct>) {
     // Implementation needs to be added here
   }
 
@@ -125,7 +114,6 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-
   suspend fun subscribeGroupTableAttribute(
     minInterval: Int,
     maxInterval: Int
@@ -137,10 +125,7 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxGroupsPerFabricAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeMaxGroupsPerFabricAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -148,10 +133,7 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxGroupKeysPerFabricAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeMaxGroupKeysPerFabricAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -181,10 +163,7 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -203,10 +182,7 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -214,10 +190,7 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

@@ -17,19 +17,16 @@
 package matter.devicecontroller.cluster.structs
 
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class GeneralCommissioningClusterBasicCommissioningInfo (
-    val failSafeExpiryLengthSeconds: UShort,
-    val maxCumulativeFailsafeSeconds: UShort) {
-  override fun toString(): String  = buildString {
+class GeneralCommissioningClusterBasicCommissioningInfo(
+  val failSafeExpiryLengthSeconds: UShort,
+  val maxCumulativeFailsafeSeconds: UShort
+) {
+  override fun toString(): String = buildString {
     append("GeneralCommissioningClusterBasicCommissioningInfo {\n")
     append("\tfailSafeExpiryLengthSeconds : $failSafeExpiryLengthSeconds\n")
     append("\tmaxCumulativeFailsafeSeconds : $maxCumulativeFailsafeSeconds\n")
@@ -49,14 +46,22 @@ class GeneralCommissioningClusterBasicCommissioningInfo (
     private const val TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS = 0
     private const val TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : GeneralCommissioningClusterBasicCommissioningInfo {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): GeneralCommissioningClusterBasicCommissioningInfo {
       tlvReader.enterStructure(tlvTag)
-      val failSafeExpiryLengthSeconds = tlvReader.getUShort(ContextSpecificTag(TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS))
-      val maxCumulativeFailsafeSeconds = tlvReader.getUShort(ContextSpecificTag(TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS))
-      
+      val failSafeExpiryLengthSeconds =
+        tlvReader.getUShort(ContextSpecificTag(TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS))
+      val maxCumulativeFailsafeSeconds =
+        tlvReader.getUShort(ContextSpecificTag(TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS))
+
       tlvReader.exitContainer()
 
-      return GeneralCommissioningClusterBasicCommissioningInfo(failSafeExpiryLengthSeconds, maxCumulativeFailsafeSeconds)
+      return GeneralCommissioningClusterBasicCommissioningInfo(
+        failSafeExpiryLengthSeconds,
+        maxCumulativeFailsafeSeconds
+      )
     }
   }
 }

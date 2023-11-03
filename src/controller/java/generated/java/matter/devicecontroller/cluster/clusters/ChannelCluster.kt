@@ -20,40 +20,26 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class ChannelCluster(private val endpointId: UShort) {
-  class ChangeChannelResponse(
-    val status: UInt, 
-    val data: String?
-  )
+  class ChangeChannelResponse(val status: UInt, val data: String?)
 
-  class ChannelListAttribute(
-    val value: List<ChannelClusterChannelInfoStruct>?
-  )
+  class ChannelListAttribute(val value: List<ChannelClusterChannelInfoStruct>?)
 
-  class LineupAttribute(
-    val value: ChannelClusterLineupInfoStruct?
-  )
+  class LineupAttribute(val value: ChannelClusterLineupInfoStruct?)
 
-  class CurrentChannelAttribute(
-    val value: ChannelClusterChannelInfoStruct?
-  )
+  class CurrentChannelAttribute(val value: ChannelClusterChannelInfoStruct?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun changeChannel(match: String, timedInvokeTimeoutMs: Int? = null): ChangeChannelResponse {  
+  suspend fun changeChannel(
+    match: String,
+    timedInvokeTimeoutMs: Int? = null
+  ): ChangeChannelResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -61,7 +47,11 @@ class ChannelCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun changeChannelByNumber(majorNumber: UShort, minorNumber: UShort, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun changeChannelByNumber(
+    majorNumber: UShort,
+    minorNumber: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -69,7 +59,7 @@ class ChannelCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun skipChannel(count: Short, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun skipChannel(count: Short, timedInvokeTimeoutMs: Int? = null) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -92,10 +82,7 @@ class ChannelCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLineupAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): LineupAttribute {
+  suspend fun subscribeLineupAttribute(minInterval: Int, maxInterval: Int): LineupAttribute {
     // Implementation needs to be added here
   }
 
@@ -136,10 +123,7 @@ class ChannelCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -158,10 +142,7 @@ class ChannelCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -169,10 +150,7 @@ class ChannelCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

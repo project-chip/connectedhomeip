@@ -16,23 +16,21 @@
  */
 package matter.devicecontroller.cluster.structs
 
+import java.util.Optional
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ChannelClusterChannelInfoStruct (
-    val majorNumber: UShort,
-    val minorNumber: UShort,
-    val name: Optional<String>,
-    val callSign: Optional<String>,
-    val affiliateCallSign: Optional<String>) {
-  override fun toString(): String  = buildString {
+class ChannelClusterChannelInfoStruct(
+  val majorNumber: UShort,
+  val minorNumber: UShort,
+  val name: Optional<String>,
+  val callSign: Optional<String>,
+  val affiliateCallSign: Optional<String>
+) {
+  override fun toString(): String = buildString {
     append("ChannelClusterChannelInfoStruct {\n")
     append("\tmajorNumber : $majorNumber\n")
     append("\tminorNumber : $minorNumber\n")
@@ -48,17 +46,17 @@ class ChannelClusterChannelInfoStruct (
       put(ContextSpecificTag(TAG_MAJOR_NUMBER), majorNumber)
       put(ContextSpecificTag(TAG_MINOR_NUMBER), minorNumber)
       if (name.isPresent) {
-      val optname = name.get()
-      put(ContextSpecificTag(TAG_NAME), optname)
-    }
+        val optname = name.get()
+        put(ContextSpecificTag(TAG_NAME), optname)
+      }
       if (callSign.isPresent) {
-      val optcallSign = callSign.get()
-      put(ContextSpecificTag(TAG_CALL_SIGN), optcallSign)
-    }
+        val optcallSign = callSign.get()
+        put(ContextSpecificTag(TAG_CALL_SIGN), optcallSign)
+      }
       if (affiliateCallSign.isPresent) {
-      val optaffiliateCallSign = affiliateCallSign.get()
-      put(ContextSpecificTag(TAG_AFFILIATE_CALL_SIGN), optaffiliateCallSign)
-    }
+        val optaffiliateCallSign = affiliateCallSign.get()
+        put(ContextSpecificTag(TAG_AFFILIATE_CALL_SIGN), optaffiliateCallSign)
+      }
       endStructure()
     }
   }
@@ -70,29 +68,38 @@ class ChannelClusterChannelInfoStruct (
     private const val TAG_CALL_SIGN = 3
     private const val TAG_AFFILIATE_CALL_SIGN = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ChannelClusterChannelInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChannelClusterChannelInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val majorNumber = tlvReader.getUShort(ContextSpecificTag(TAG_MAJOR_NUMBER))
       val minorNumber = tlvReader.getUShort(ContextSpecificTag(TAG_MINOR_NUMBER))
-      val name = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
-    } else {
-      Optional.empty()
-    }
-      val callSign = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CALL_SIGN))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_CALL_SIGN)))
-    } else {
-      Optional.empty()
-    }
-      val affiliateCallSign = if (tlvReader.isNextTag(ContextSpecificTag(TAG_AFFILIATE_CALL_SIGN))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_AFFILIATE_CALL_SIGN)))
-    } else {
-      Optional.empty()
-    }
-      
+      val name =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
+        } else {
+          Optional.empty()
+        }
+      val callSign =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CALL_SIGN))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_CALL_SIGN)))
+        } else {
+          Optional.empty()
+        }
+      val affiliateCallSign =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AFFILIATE_CALL_SIGN))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_AFFILIATE_CALL_SIGN)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return ChannelClusterChannelInfoStruct(majorNumber, minorNumber, name, callSign, affiliateCallSign)
+      return ChannelClusterChannelInfoStruct(
+        majorNumber,
+        minorNumber,
+        name,
+        callSign,
+        affiliateCallSign
+      )
     }
   }
 }

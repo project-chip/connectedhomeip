@@ -24,27 +24,24 @@ class OtaSoftwareUpdateRequestorCluster(private val endpointId: UShort) {
     val value: List<OtaSoftwareUpdateRequestorClusterProviderLocation>
   )
 
-  class UpdateStateProgressAttribute(
-    val value: UByte?
-  )
+  class UpdateStateProgressAttribute(val value: UByte?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun announceOTAProvider(providerNodeID: ULong, vendorID: UShort, announcementReason: UInt, metadataForNode: ByteArray?, endpoint: UShort, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun announceOTAProvider(
+    providerNodeID: ULong,
+    vendorID: UShort,
+    announcementReason: UInt,
+    metadataForNode: ByteArray?,
+    endpoint: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -61,7 +58,6 @@ class OtaSoftwareUpdateRequestorCluster(private val endpointId: UShort) {
   ): DefaultOTAProvidersAttribute {
     // Implementation needs to be added here
   }
-
 
   suspend fun writeDefaultOTAProvidersAttribute(
     value: List<OtaSoftwareUpdateRequestorClusterProviderLocation>
@@ -87,10 +83,7 @@ class OtaSoftwareUpdateRequestorCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeUpdatePossibleAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Boolean {
+  suspend fun subscribeUpdatePossibleAttribute(minInterval: Int, maxInterval: Int): Boolean {
     // Implementation needs to be added here
   }
 
@@ -98,10 +91,7 @@ class OtaSoftwareUpdateRequestorCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeUpdateStateAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeUpdateStateAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -142,10 +132,7 @@ class OtaSoftwareUpdateRequestorCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -164,10 +151,7 @@ class OtaSoftwareUpdateRequestorCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -175,10 +159,7 @@ class OtaSoftwareUpdateRequestorCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

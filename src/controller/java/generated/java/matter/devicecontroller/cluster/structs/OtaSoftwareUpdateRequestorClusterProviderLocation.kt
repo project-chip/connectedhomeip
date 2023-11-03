@@ -17,20 +17,17 @@
 package matter.devicecontroller.cluster.structs
 
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class OtaSoftwareUpdateRequestorClusterProviderLocation (
-    val providerNodeID: ULong,
-    val endpoint: UShort,
-    val fabricIndex: UByte) {
-  override fun toString(): String  = buildString {
+class OtaSoftwareUpdateRequestorClusterProviderLocation(
+  val providerNodeID: ULong,
+  val endpoint: UShort,
+  val fabricIndex: UByte
+) {
+  override fun toString(): String = buildString {
     append("OtaSoftwareUpdateRequestorClusterProviderLocation {\n")
     append("\tproviderNodeID : $providerNodeID\n")
     append("\tendpoint : $endpoint\n")
@@ -53,15 +50,22 @@ class OtaSoftwareUpdateRequestorClusterProviderLocation (
     private const val TAG_ENDPOINT = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : OtaSoftwareUpdateRequestorClusterProviderLocation {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): OtaSoftwareUpdateRequestorClusterProviderLocation {
       tlvReader.enterStructure(tlvTag)
       val providerNodeID = tlvReader.getULong(ContextSpecificTag(TAG_PROVIDER_NODE_I_D))
       val endpoint = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return OtaSoftwareUpdateRequestorClusterProviderLocation(providerNodeID, endpoint, fabricIndex)
+      return OtaSoftwareUpdateRequestorClusterProviderLocation(
+        providerNodeID,
+        endpoint,
+        fabricIndex
+      )
     }
   }
 }

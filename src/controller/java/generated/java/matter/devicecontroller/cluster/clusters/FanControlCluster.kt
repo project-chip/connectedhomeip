@@ -20,31 +20,24 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class FanControlCluster(private val endpointId: UShort) {
-  class PercentSettingAttribute(
-    val value: UByte?
-  )
+  class PercentSettingAttribute(val value: UByte?)
 
-  class SpeedSettingAttribute(
-    val value: UByte?
-  )
+  class SpeedSettingAttribute(val value: UByte?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun step(direction: UInt, wrap: Boolean?, lowestOff: Boolean?, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun step(
+    direction: UInt,
+    wrap: Boolean?,
+    lowestOff: Boolean?,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -56,23 +49,15 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeFanModeAttribute(
-    value: UInt
-  ) {
+  suspend fun writeFanModeAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeFanModeAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeFanModeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFanModeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeFanModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -80,23 +65,15 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeFanModeSequenceAttribute(
-    value: UInt
-  ) {
+  suspend fun writeFanModeSequenceAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeFanModeSequenceAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeFanModeSequenceAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFanModeSequenceAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeFanModeSequenceAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -104,16 +81,11 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePercentSettingAttribute(
-    value: UByte
-  ) {
+  suspend fun writePercentSettingAttribute(value: UByte) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePercentSettingAttribute(
-    value: UByte,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writePercentSettingAttribute(value: UByte, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -128,10 +100,7 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePercentCurrentAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribePercentCurrentAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -139,10 +108,7 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSpeedMaxAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeSpeedMaxAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -150,16 +116,11 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeSpeedSettingAttribute(
-    value: UByte
-  ) {
+  suspend fun writeSpeedSettingAttribute(value: UByte) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeSpeedSettingAttribute(
-    value: UByte,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeSpeedSettingAttribute(value: UByte, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -174,10 +135,7 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSpeedCurrentAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeSpeedCurrentAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -185,10 +143,7 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRockSupportAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeRockSupportAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -196,23 +151,15 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRockSettingAttribute(
-    value: UInt
-  ) {
+  suspend fun writeRockSettingAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRockSettingAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeRockSettingAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRockSettingAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeRockSettingAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -220,10 +167,7 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeWindSupportAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeWindSupportAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -231,23 +175,15 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeWindSettingAttribute(
-    value: UInt
-  ) {
+  suspend fun writeWindSettingAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeWindSettingAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeWindSettingAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeWindSettingAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeWindSettingAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -255,23 +191,15 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeAirflowDirectionAttribute(
-    value: UInt
-  ) {
+  suspend fun writeAirflowDirectionAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeAirflowDirectionAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeAirflowDirectionAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAirflowDirectionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeAirflowDirectionAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -301,10 +229,7 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -323,10 +248,7 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -334,10 +256,7 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

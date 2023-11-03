@@ -20,31 +20,27 @@ package matter.devicecontroller.cluster.clusters
 import matter.devicecontroller.cluster.structs.*
 
 class IcdManagementCluster(private val endpointId: UShort) {
-  class RegisterClientResponse(
-    val ICDCounter: UInt
-  )
+  class RegisterClientResponse(val ICDCounter: UInt)
 
   class RegisteredClientsAttribute(
     val value: List<IcdManagementClusterMonitoringRegistrationStruct>?
   )
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun registerClient(checkInNodeID: ULong, monitoredSubject: ULong, key: ByteArray, verificationKey: ByteArray?, timedInvokeTimeoutMs: Int? = null): RegisterClientResponse {  
+  suspend fun registerClient(
+    checkInNodeID: ULong,
+    monitoredSubject: ULong,
+    key: ByteArray,
+    verificationKey: ByteArray?,
+    timedInvokeTimeoutMs: Int? = null
+  ): RegisterClientResponse {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -52,7 +48,11 @@ class IcdManagementCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun unregisterClient(checkInNodeID: ULong, verificationKey: ByteArray?, timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun unregisterClient(
+    checkInNodeID: ULong,
+    verificationKey: ByteArray?,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -60,7 +60,7 @@ class IcdManagementCluster(private val endpointId: UShort) {
     }
   }
 
-  suspend fun stayActiveRequest(timedInvokeTimeoutMs: Int? = null) {  
+  suspend fun stayActiveRequest(timedInvokeTimeoutMs: Int? = null) {
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -72,10 +72,7 @@ class IcdManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeIdleModeDurationAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeIdleModeDurationAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -83,10 +80,7 @@ class IcdManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActiveModeDurationAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeActiveModeDurationAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -94,10 +88,7 @@ class IcdManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeActiveModeThresholdAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeActiveModeThresholdAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -111,7 +102,6 @@ class IcdManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-
   suspend fun subscribeRegisteredClientsAttribute(
     minInterval: Int,
     maxInterval: Int
@@ -123,10 +113,7 @@ class IcdManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeICDCounterAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeICDCounterAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -189,10 +176,7 @@ class IcdManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -211,10 +195,7 @@ class IcdManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -222,10 +203,7 @@ class IcdManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
