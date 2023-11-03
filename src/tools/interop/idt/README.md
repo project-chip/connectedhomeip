@@ -51,8 +51,10 @@ Follow the steps below to execute capture and discovery without a Raspberry Pi:
 -   Bluetooth discovery on macOS will require granting the program where `idt`
     is run, e.g. terminal emulator or IDE permission to access bluetooth in
     macOS settings.
-    -   Failure to do so will result in errors / `abort` upon ble discovery
-        execution.
+    -   Failure to do so may result in any of the following:
+        - A single `abort` message and no further output in the terminal.
+        - Failure with a relevant stack trace in the terminal.
+        - A prompt to allow the application access to bluetooth.
 
 ## Raspberry Pi installation
 
