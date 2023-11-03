@@ -716,11 +716,16 @@ def main() -> int:
             nrf_build_cmds.append("--")
             if options.do_rpc:
                 nrf_build_cmds.append("-DOVERLAY_CONFIG=rpc.overlay")
-            nrf_build_cmds.append(f"-DCONFIG_CHIP_DEVICE_VENDOR_ID={options.vid}")
-            nrf_build_cmds.append(f"-DCONFIG_CHIP_DEVICE_PRODUCT_ID={options.pid}")
-            nrf_build_cmds.append(f"-DCONFIG_CHIP_DEVICE_PRODUCT_NAME='\"{options.pname}\"'")
-            nrf_build_cmds.append(f"-DSAMPLE_NAME={options.sample_device_type_name}")
-            nrf_build_cmds.append(f"-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING='\"{sw_ver_string}\"'")
+            nrf_build_cmds.append(
+                f"-DCONFIG_CHIP_DEVICE_VENDOR_ID={options.vid}")
+            nrf_build_cmds.append(
+                f"-DCONFIG_CHIP_DEVICE_PRODUCT_ID={options.pid}")
+            nrf_build_cmds.append(
+                f"-DCONFIG_CHIP_DEVICE_PRODUCT_NAME='\"{options.pname}\"'")
+            nrf_build_cmds.append(
+                f"-DSAMPLE_NAME={options.sample_device_type_name}")
+            nrf_build_cmds.append(
+                f"-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING='\"{sw_ver_string}\"'")
 
             shell.run_cmd(" ".join(nrf_build_cmds))
 
