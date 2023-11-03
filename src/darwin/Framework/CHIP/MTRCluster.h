@@ -52,8 +52,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 MTR_NEWLY_AVAILABLE
 @interface MTRGenericBaseCluster : MTRCluster
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
 @end
 
 /**
@@ -61,9 +59,6 @@ MTR_NEWLY_AVAILABLE
  */
 MTR_NEWLY_AVAILABLE
 @interface MTRGenericCluster : MTRCluster
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
 /**
  * The device this cluster object is associated with.
  */
