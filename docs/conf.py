@@ -35,6 +35,7 @@ exclude_patterns = [
     "scripts/tools/memory/memdf/README.md",
     "scripts/tools/memory/platform/README.md",
     "scripts/tools/memory/README-GitHub-CI.md",
+    "data_model/README.md",
 ]
 
 
@@ -83,5 +84,6 @@ external_content_link_prefixes = [
     "README",  # cannot detect README.md
     "scripts/",
     "examples/android/",
+    "data_model/",
 ]
 external_content_link_extensions = [".md", ".png", ".jpg", ".svg"]
