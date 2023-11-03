@@ -1035,7 +1035,7 @@ CHIP_ERROR MakeCertTLV(CertType certType, const ToolChipDN * subjectDN, X509 * c
 
     isCA = (certType == CertType::kICA || certType == CertType::kRoot);
 
-    // If error testing is enabled, let field inclusion be controller that way,
+    // If error testing is enabled, let field inclusion be controlled that way,
     // otherwise use compact identity format for Network (Client) Identities.
     bool useCompactIdentityFormat = (!certConfig.IsErrorTestCaseEnabled() && certType == CertType::kNetworkIdentity);
 

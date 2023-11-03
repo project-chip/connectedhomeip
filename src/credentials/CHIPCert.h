@@ -54,7 +54,7 @@ static constexpr uint32_t kMaxCHIPCertLength = 400;
 static constexpr uint32_t kMaxDERCertLength  = 600;
 
 // As per spec section 11.24 (Wi-Fi Authentication with Per-Device Credentials)
-inline constexpr uint32_t kMaxCHIPCompactNetworkIdentityLength = 140;
+inline constexpr uint32_t kMaxCHIPCompactNetworkIdentityLength = 137;
 
 /** Data Element Tags for the CHIP Certificate
  */

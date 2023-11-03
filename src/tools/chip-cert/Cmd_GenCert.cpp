@@ -1191,6 +1191,8 @@ bool Cmd_GenCert(int argc, char * argv[])
                    gFutureExtensionsCount, newCert.get(), newKey.get(), gCertConfig);
     VerifyTrueOrExit(res);
 
+    // Always use MakeCertTLV() instead of the standard WriteCert() / ConvertX509CertToChipCert() for
+    // Network (Client) Identities in CHIP format so that we can write it in the compact-pdc-identity format.
     if (IsChipCertFormat(gOutCertFormat) && (gCertConfig.IsErrorTestCaseEnabled() || gCertType == CertType::kNetworkIdentity))
     {
         uint32_t chipCertBufLen                = kMaxCHIPCertLength + gCertConfig.GetExtraCertLength();

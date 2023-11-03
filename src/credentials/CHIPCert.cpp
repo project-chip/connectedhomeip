@@ -1095,7 +1095,7 @@ DLL_EXPORT CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1Un
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR ValidateCertificateType(ChipCertificateData const & certData, CertType expectedType)
+static CHIP_ERROR ValidateCertificateType(const ChipCertificateData & certData, CertType expectedType)
 {
     CertType certType;
     ReturnErrorOnFailure(certData.mSubjectDN.GetCertType(certType));
@@ -1436,7 +1436,7 @@ CHIP_ERROR CertificateValidityPolicy::ApplyDefaultPolicy(const ChipCertificateDa
 void InitNetworkIdentitySubject(ChipDN & name)
 {
     name.Clear();
-    ChipError err = name.AddAttribute_CommonName(kNetworkIdentityCN, /* not printable */ false);
+    CHIP_ERROR err = name.AddAttribute_CommonName(kNetworkIdentityCN, /* not printable */ false);
     VerifyOrDie(err == CHIP_NO_ERROR); // AddAttribute can't fail in this case
 }
 
@@ -1513,8 +1513,8 @@ static CHIP_ERROR GenerateNetworkIdentitySignature(const P256Keypair & keypair, 
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR EncodeCompactIdentityCert(TLVWriter & writer, Tag tag, P256PublicKeySpan const & publicKey,
-                                            P256ECDSASignatureSpan const & signature)
+static CHIP_ERROR EncodeCompactIdentityCert(TLVWriter & writer, Tag tag, const P256PublicKeySpan & publicKey,
+                                            const P256ECDSASignatureSpan & signature)
 {
     TLVType containerType;
     ReturnErrorOnFailure(writer.StartContainer(tag, kTLVType_Structure, containerType));
