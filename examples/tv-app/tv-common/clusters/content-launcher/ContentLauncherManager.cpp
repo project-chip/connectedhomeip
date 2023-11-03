@@ -160,7 +160,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
     // Handle test cases
     if (contentUrlString == "https://badurl")
     {
-        response.status = ContentLauncher::StatusEnum::kUrlNotAvailable;
+        response.status = ContentLauncher::StatusEnum::kURLNotAvailable;
     }
     else if (contentUrlString == "https://csa-iot.org/badauth")
     {
