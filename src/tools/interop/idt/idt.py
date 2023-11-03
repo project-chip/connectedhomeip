@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 import probe.runner as probe_runner
-from capture import EcosystemController, EcosystemFactory, PacketCaptureRunner, PlatformFactory
+from capture import Orchestrator, EcosystemFactory, PacketCaptureRunner, PlatformFactory
 from discovery import MatterBleScanner, MatterDnssdListener
 from utils.artifact import create_file_timestamp, safe_mkdir
 from utils.host_platform import get_available_interfaces
@@ -196,20 +196,20 @@ class InteropDebuggingTool:
         asyncio.run(EcosystemFactory.init_ecosystems(args.platform,
                                                      args.ecosystem,
                                                      self.artifact_dir))
-        asyncio.run(EcosystemController.start())
-        asyncio.run(EcosystemController.run_analyzers())
+        asyncio.run(Orchestrator.start())
+        asyncio.run(Orchestrator.run_analyzers())
 
         if pcap:
             border_print("Stopping pcap")
             pcap_runner.stop_pcap()
 
-        asyncio.run(EcosystemController.stop())
+        asyncio.run(Orchestrator.stop())
 
-        asyncio.run(EcosystemController.probe())
+        asyncio.run(Orchestrator.probe())
 
-        if EcosystemController.has_errors():
+        if Orchestrator.has_errors():
             border_print("Errors seen this run:")
-            EcosystemController.error_report(self.artifact_dir)
+            Orchestrator.error_report(self.artifact_dir)
 
         border_print("Compressing artifacts...")
         self.zip_artifacts()

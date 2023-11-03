@@ -56,6 +56,7 @@ class PlatformLogStreamer(ABC):
     async def stop_streaming(self) -> None:
         """
         Stop the capture and pull any artifacts from remote devices
+        Write artifacts to artifact_dir passed on instantiation
         """
         raise NotImplementedError
 
@@ -92,6 +93,7 @@ class EcosystemCapture(ABC):
     async def stop_capture(self) -> None:
         """
         Stop the capture and pull any artifacts from remote devices
+        Write artifacts to artifact_dir passed on instantiation
         Platform is already stopped
         """
         raise NotImplementedError

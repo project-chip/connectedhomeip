@@ -114,7 +114,7 @@ def track_error(ecosystem: str, error_type: str, error_message: str) -> None:
     _ERROR_REPORT[ecosystem].append((error_type, error_message, e))
 
 
-class EcosystemController:
+class Orchestrator:
 
     @staticmethod
     async def handle_capture(attr):
@@ -136,14 +136,14 @@ class EcosystemController:
         for platform_name, platform, in _PLATFORM_MAP.items():
             border_print(f"Starting streaming for platform {platform_name}")
             await platform.start_streaming()
-        await EcosystemController.handle_capture("start")
+        await Orchestrator.handle_capture("start")
 
     @staticmethod
     async def stop():
         for platform_name, platform, in _PLATFORM_MAP.items():
             border_print(f"Stopping streaming for platform {platform_name}")
             await platform.stop_streaming()
-        await EcosystemController.handle_capture("stop")
+        await Orchestrator.handle_capture("stop")
 
     @staticmethod
     async def run_analyzers():
@@ -170,7 +170,7 @@ class EcosystemController:
 
     @staticmethod
     async def probe():
-        await EcosystemController.handle_capture("probe")
+        await Orchestrator.handle_capture("probe")
 
     @staticmethod
     def error_report(artifact_dir: str):
