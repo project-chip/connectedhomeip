@@ -42,7 +42,7 @@ class LogcatStreamer(AndroidStream):
     async def run_observer(self) -> None:
         last_size = 0
         if not os.path.exists(self.logcat_artifact):
-            self.logger.warning(f"Logcat artifact does not exist yes, this might be normal at the start of execution")
+            self.logger.warning("Logcat artifact does not exist yes, this might be normal at the start of execution")
             asyncio.sleep(15)
         while True:
             try:
@@ -53,7 +53,7 @@ class LogcatStreamer(AndroidStream):
             except OSError:
                 self.logger.error(f"Logcat file does not exist for {self.platfrom.device_id}, check connection!")
             if not self.logcat_proc.command_is_running():
-                self.logger.error(f"Logcat proc is not running, trying to restart!")
+                self.logger.error("Logcat proc is not running, trying to restart!")
                 self.logcat_proc = self.platform.get_adb_background_command(self.logcat_command)
                 self.logcat_proc.start_command()
             await asyncio.sleep(4)

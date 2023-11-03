@@ -28,7 +28,6 @@ from discovery import MatterBleScanner, MatterDnssdListener
 from utils.artifact import create_file_timestamp, safe_mkdir
 from utils.host_platform import get_available_interfaces
 from utils.log import border_print
-from utils.shell import Bash
 
 import config
 

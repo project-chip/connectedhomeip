@@ -79,7 +79,7 @@ class MatterBleScanner:
             device_id = f"{ble_device.name}_{ble_device.address}"
             self.devices_seen_this_time.add(device_id)
             if device_id not in self.devices_seen_last_time:
-                to_log = f"DISCOVERED\n"
+                to_log = "DISCOVERED\n"
                 to_log += f"BLE DEVICE NAME: {ble_device.name}\n"
                 to_log += f"BLE ADDR: {ble_device.address}\n"
                 to_log += f"NAME: {name}\n"

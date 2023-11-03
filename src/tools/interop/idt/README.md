@@ -263,6 +263,21 @@ options:
 Collect contextually relevant networking info from the local environment and
 provide artifacts.
 
+## Troubleshooting
+  
+- Wireless `adb` may fail to connect indefinitely depending on network
+    configuration.  
+- Change log level from `INFO` to `DEBUG` in root `config.py` for additional
+    logging.
+-   Compiling `tcpdump` for android may require additional dependencies.
+    -   If the build script fails for you, try
+        `idt_go && source idt/scripts/compilers.sh`.
+-   You may disable colors and splash by setting `enable_color` in `config.py`
+    to `False`.
+-   `idt_clean_child` will kill any stray `tcpdump` and `adb` commands.
+    -   `idt_check_child` will look for leftover processes.
+    -   Not expected to be needed outside of development scenarios.
+
 ## Project overview
 
 -   The entry point is in `idt.py` which contains simple CLI parsing with
@@ -313,21 +328,6 @@ provide artifacts.
     tree.
     -   `idt_clean_all` deletes all `BUILD` dirs and `BUILD` is in `.gitignore`.
 
-## Troubleshooting
-
--   Change log level from `INFO` to `DEBUG` in root `config.py` for additional
-    logging.
--   Compiling `tcpdump` for android may require additional dependencies.
-    -   If the build script fails for you, try
-        `idt_go && source idt/scripts/compilers.sh`.
--   You may disable colors and splash by setting `enable_color` in `config.py`
-    to `False`.
--   Wireless `adb` may fail to connect indefinitely depending on network
-    configuration.
--   `idt_clean_child` will kill any stray `tcpdump` and `adb` commands.
-    -   `idt_check_child` will look for leftover processes.
-    -   Not expected to be needed outside of development scenarios.
-
 ## Extending functionality
 
 ### Capture
@@ -359,8 +359,3 @@ For each package in `capture/platform`, the platform loader expects a module
 name matching the package name.  
 This module must contain a single class which is a subclass of
 `capture.base.PlatformLogStreamer`.
-
-### Probe
-
-Simply add host platform specific `run_command()` calls in the functions of the
-host platform implementations.
