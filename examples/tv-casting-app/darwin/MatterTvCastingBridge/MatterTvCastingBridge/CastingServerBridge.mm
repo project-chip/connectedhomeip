@@ -1076,7 +1076,7 @@
                                              void (^callback)(uint32_t) =
                                                  [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
                                                      objectForKey:@"contentLauncher_subscribeSupportedStreamingProtocols"];
-                                             callback(supportedStreamingProtocols);
+                                             callback(supportedStreamingProtocols.Raw());
                                          },
                                          [](void * context, CHIP_ERROR err) {
                                              void (^callback)(MatterError *) =
