@@ -56,11 +56,17 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     val value: UInt?
   )
 
-  class WeightingAttribute(val value: UShort?)
+  class WeightingAttribute(
+    val value: UShort?
+  )
 
-  class DataVersionAttribute(val value: UShort?)
+  class DataVersionAttribute(
+    val value: UShort?
+  )
 
-  class StableDataVersionAttribute(val value: UShort?)
+  class StableDataVersionAttribute(
+    val value: UShort?
+  )
 
   class LeaderRouterIdAttribute(
     val value: UByte?
