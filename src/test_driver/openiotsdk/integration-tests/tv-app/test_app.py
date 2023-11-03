@@ -357,7 +357,7 @@ def test_tv_ctrl(device, controller):
     ret = device.wait_for_output("ContentLauncherManager::HandleGetAcceptHeaderList")
     assert ret is not None and len(ret) > 0
 
-    err, res = read_zcl_attribute(devCtrl, "ContentLauncher", "SupportedProtocolsBitmaps", nodeId, endpoint)
+    err, res = read_zcl_attribute(devCtrl, "ContentLauncher", "SupportedStreamingProtocols", nodeId, endpoint)
     assert err == 0
     assert res.value == ContentLauncher.Bitmaps.SupportedProtocolsBitmap.kDash | ContentLauncher.Bitmaps.SupportedProtocolsBitmap.kHls
 
