@@ -110,11 +110,11 @@ tests:
           field set to 1"
       PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
-          ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:<your network id in hex> 1 0
+          ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:<your network id in hex> <password> 1 0
 
           Below is an example:
 
-          ./chip-tool networkcommissioning add-or-update-wi-fi-network Sbee_Moto Sunsuraj 1 0 --Breadcrumb 1 ( second network)
+          ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:536265655F4D6F746F Sunsuraj 1 0 --Breadcrumb 1 ( second network)
 
           Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
 
@@ -286,10 +286,10 @@ tests:
           field set to 1"
       PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
-          ./chip-tool networkcommissioning add-or-update-wi-fi-network-network hex:<your network id in hex> 1 0
+          ./chip-tool networkcommissioning add-or-update-wi-fi-network-network hex:<your network id in hex> <password> 1 0
 
           Below is an example:
-          ./chip-tool networkcommissioning add-or-update-wi-fi-network Sbee_Moto Sunsuraj 1 0 --Breadcrumb 1 ( second network)
+          ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:536265655F4D6F746F Sunsuraj 1 0 --Breadcrumb 1 ( second network)
 
           Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
 
