@@ -74,6 +74,7 @@ class PlayServicesUser(EcosystemCapture):
         while True:
             for line in self.logcat_fd.readlines():
                 self.proc_line(line)
+            # Releasing async event loop for other analysis / monitor tasks
             await asyncio.sleep(0)
 
     def show_analysis(self) -> None:

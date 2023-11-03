@@ -103,6 +103,7 @@ class PlayServices(EcosystemCapture):
         self.logcat_fd = open(self.platform.streams["LogcatStreamer"].logcat_artifact, "r")
         while True:
             self.analysis.do_analysis(self.logcat_fd.readlines())
+            # Releasing async event loop for other analysis / monitor topics
             await asyncio.sleep(0)
 
     async def probe_capture(self) -> None:
