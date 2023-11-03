@@ -9,7 +9,7 @@ basis of some tools to make validating zap-based cluster definitions easier.
 More details on the format in
 [matter_idl/README.md](../../scripts/py_matter_idl/matter_idl/README.md).
 
-## Parsing CSA XML Data defintions
+## Parsing CSA XML Data definitions
 
 The SDK contains a copy of CSA XML data definitions in `data_model/clusters`.
 
