@@ -15,7 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-executable("chip-lit-icd-app") {
+executable("lit-icd-app") {
   sources = [ "main.cpp" ]
 
   deps = [
@@ -34,7 +34,7 @@ executable("chip-lit-icd-app") {
 }
 
 group("linux") {
-  deps = [ ":chip-lit-icd-app" ]
+  deps = [ ":lit-icd-app" ]
 }
 
 group("default") {
