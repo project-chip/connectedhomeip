@@ -18,8 +18,8 @@ except ImportError:
         os.path.dirname(__file__)), "..", ".."))
     from matter_idl.lint.type_definitions import AttributeRequirement
 
-from matter_idl.lint.type_definitions import (ClusterAttributeDeny, ClusterCommandRequirement, ClusterRequirement, ClusterValidationRule,
-                                   RequiredAttributesRule, RequiredCommandsRule)
+from matter_idl.lint.type_definitions import (ClusterAttributeDeny, ClusterCommandRequirement, ClusterRequirement,
+                                              ClusterValidationRule, RequiredAttributesRule, RequiredCommandsRule)
 
 
 class ElementNotFoundError(Exception):
