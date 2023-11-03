@@ -19,7 +19,6 @@ import os
 import time
 
 from utils.artifact import create_standard_log_name, log
-from utils.host_platform import verify_host_dependencies
 from utils.shell import Bash
 
 logger = log.get_logger(__file__)
@@ -28,7 +27,6 @@ logger = log.get_logger(__file__)
 class PacketCaptureRunner:
 
     def __init__(self, artifact_dir: str, interface: str) -> None:
-        verify_host_dependencies(["tcpdump"])
         self.logger = logger
         self.artifact_dir = artifact_dir
         self.output_path = str(

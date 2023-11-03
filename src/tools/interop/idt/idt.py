@@ -26,7 +26,7 @@ import probe.runner as probe_runner
 from capture import EcosystemFactory, Orchestrator, PacketCaptureRunner, PlatformFactory
 from discovery import MatterBleScanner, MatterDnssdListener
 from utils.artifact import create_file_timestamp, safe_mkdir
-from utils.host_platform import get_available_interfaces
+from utils.host_platform import get_available_interfaces, verify_host_dependencies
 from utils.log import border_print
 
 import config
@@ -57,6 +57,8 @@ class InteropDebuggingTool:
             create_artifact_dir = False
         elif len(sys.argv) >= 3 and (sys.argv[2] == "-h" or sys.argv[2] == "--help"):
             create_artifact_dir = False
+
+        verify_host_dependencies(["adb", "tcpdump"])
 
         if not os.environ['IDT_OUTPUT_DIR']:
             print('Missing required env vars! Use /scripts!!!')
