@@ -15983,13 +15983,13 @@ typedef NS_ENUM(uint8_t, MTRMediaPlaybackPlaybackState) {
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRMediaPlaybackStatus) {
-    MTRMediaPlaybackStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRMediaPlaybackStatusInvalidStateForCommand MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRMediaPlaybackStatusNotAllowed MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRMediaPlaybackStatusNotActive MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRMediaPlaybackStatusSpeedOutOfRange MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTRMediaPlaybackStatusSeekOutOfRange MTR_PROVISIONALLY_AVAILABLE = 0x05,
-} MTR_PROVISIONALLY_AVAILABLE;
+    MTRMediaPlaybackStatusSuccess MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
+    MTRMediaPlaybackStatusInvalidStateForCommand MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
+    MTRMediaPlaybackStatusNotAllowed MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
+    MTRMediaPlaybackStatusNotActive MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
+    MTRMediaPlaybackStatusSpeedOutOfRange MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
+    MTRMediaPlaybackStatusSeekOutOfRange MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
+} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRMediaPlaybackFeature) {
     MTRMediaPlaybackFeatureAdvancedSeek MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)) = 0x1,

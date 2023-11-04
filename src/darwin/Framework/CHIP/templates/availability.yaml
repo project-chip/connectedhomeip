@@ -3247,7 +3247,10 @@
           TargetNavigator:
               - TargetNavigatorStatusEnum
           MediaPlayback:
-              - MediaPlaybackStatusEnum
+              # StatusEnum was originally named MediaPlaybackStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
               - PlaybackStateEnum
           MediaInput:
               - InputTypeEnum
@@ -3997,7 +4000,10 @@
                   - TargetNotFound
                   - NotAllowed
           MediaPlayback:
-              MediaPlaybackStatusEnum:
+              # StatusEnum was originally named MediaPlaybackStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - InvalidStateForCommand
                   - NotAllowed
