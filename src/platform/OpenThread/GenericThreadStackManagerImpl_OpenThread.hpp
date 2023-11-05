@@ -373,6 +373,14 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadNetwork(
     const Thread::OperationalDataset & dataset, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
 {
+    Thread::OperationalDataset current_dataset;
+    // Validate the dataset change with the current state
+    ThreadStackMgrImpl().GetThreadProvision(current_dataset);
+    if (dataset.AsByteSpan().data_equal(current_dataset.AsByteSpan()) && callback == nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     // Reset the previously set callback since it will never be called in case incorrect dataset was supplied.
     mpConnectCallback = nullptr;
     ReturnErrorOnFailure(Impl()->SetThreadEnabled(false));
