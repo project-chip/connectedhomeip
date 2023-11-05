@@ -90,6 +90,8 @@ static gboolean BluezAdvertisingRelease(BluezLEAdvertisement1 * aAdv, GDBusMetho
     ChipLogDetail(DeviceLayer, "Release adv object in %s", __func__);
 
     g_dbus_object_manager_server_unexport(endpoint->mpRoot, endpoint->mpAdvPath);
+    g_object_unref(endpoint->mpAdv);
+    endpoint->mpAdv          = nullptr;
     endpoint->mIsAdvertising = false;
     isSuccess                = true;
 exit:
@@ -229,14 +231,12 @@ exit:
 
 static CHIP_ERROR BluezAdvSetup(BluezEndpoint * endpoint)
 {
-    BluezLEAdvertisement1 * adv;
-
     VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
     VerifyOrExit(endpoint->mIsAdvertising == FALSE, ChipLogError(DeviceLayer, "FAIL: Advertising already enabled in %s", __func__));
     VerifyOrExit(endpoint->mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL endpoint->mpAdapter in %s", __func__));
 
-    adv = BluezAdvertisingCreate(endpoint);
-    VerifyOrExit(adv != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adv in %s", __func__));
+    endpoint->mpAdv = BluezAdvertisingCreate(endpoint);
+    VerifyOrExit(endpoint->mpAdv != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adv in %s", __func__));
 
 exit:
     return CHIP_NO_ERROR;
@@ -715,56 +715,36 @@ static void EndpointCleanup(BluezEndpoint * apEndpoint)
 {
     if (apEndpoint != nullptr)
     {
-        if (apEndpoint->mpOwningName != nullptr)
-        {
-            g_free(apEndpoint->mpOwningName);
-            apEndpoint->mpOwningName = nullptr;
-        }
-        if (apEndpoint->mpAdapterName != nullptr)
-        {
-            g_free(apEndpoint->mpAdapterName);
-            apEndpoint->mpAdapterName = nullptr;
-        }
-        if (apEndpoint->mpAdapterAddr != nullptr)
-        {
-            g_free(apEndpoint->mpAdapterAddr);
-            apEndpoint->mpAdapterAddr = nullptr;
-        }
-        if (apEndpoint->mpRootPath != nullptr)
-        {
-            g_free(apEndpoint->mpRootPath);
-            apEndpoint->mpRootPath = nullptr;
-        }
-        if (apEndpoint->mpAdvPath != nullptr)
-        {
-            g_free(apEndpoint->mpAdvPath);
-            apEndpoint->mpAdvPath = nullptr;
-        }
-        if (apEndpoint->mpServicePath != nullptr)
-        {
-            g_free(apEndpoint->mpServicePath);
-            apEndpoint->mpServicePath = nullptr;
-        }
+        g_free(apEndpoint->mpOwningName);
+        g_free(apEndpoint->mpAdapterName);
+        g_free(apEndpoint->mpAdapterAddr);
+        g_free(apEndpoint->mpRootPath);
+        g_free(apEndpoint->mpAdvPath);
+        g_free(apEndpoint->mpServicePath);
+        if (apEndpoint->mpObjMgr != nullptr)
+            g_object_unref(apEndpoint->mpObjMgr);
+        if (apEndpoint->mpAdapter != nullptr)
+            g_object_unref(apEndpoint->mpAdapter);
+        if (apEndpoint->mpDevice != nullptr)
+            g_object_unref(apEndpoint->mpDevice);
+        if (apEndpoint->mpRoot != nullptr)
+            g_object_unref(apEndpoint->mpRoot);
+        if (apEndpoint->mpService != nullptr)
+            g_object_unref(apEndpoint->mpService);
+        if (apEndpoint->mpC1 != nullptr)
+            g_object_unref(apEndpoint->mpC1);
+        if (apEndpoint->mpC2 != nullptr)
+            g_object_unref(apEndpoint->mpC2);
+        if (apEndpoint->mpC3 != nullptr)
+            g_object_unref(apEndpoint->mpC3);
+        if (apEndpoint->mpAdv != nullptr)
+            g_object_unref(apEndpoint->mpAdv);
         if (apEndpoint->mpConnMap != nullptr)
-        {
             g_hash_table_destroy(apEndpoint->mpConnMap);
-            apEndpoint->mpConnMap = nullptr;
-        }
-        if (apEndpoint->mpAdvertisingUUID != nullptr)
-        {
-            g_free(apEndpoint->mpAdvertisingUUID);
-            apEndpoint->mpAdvertisingUUID = nullptr;
-        }
-        if (apEndpoint->mpPeerDevicePath != nullptr)
-        {
-            g_free(apEndpoint->mpPeerDevicePath);
-            apEndpoint->mpPeerDevicePath = nullptr;
-        }
+        g_free(apEndpoint->mpAdvertisingUUID);
+        g_free(apEndpoint->mpPeerDevicePath);
         if (apEndpoint->mpConnectCancellable != nullptr)
-        {
             g_object_unref(apEndpoint->mpConnectCancellable);
-            apEndpoint->mpConnectCancellable = nullptr;
-        }
         g_free(apEndpoint);
     }
 }
@@ -1022,9 +1002,16 @@ exit:
 CHIP_ERROR ShutdownBluezBleLayer(BluezEndpoint * apEndpoint)
 {
     VerifyOrReturnError(apEndpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    g_object_unref(apEndpoint->mpAdapter);
-    EndpointCleanup(apEndpoint);
-    return CHIP_NO_ERROR;
+    // Run endpoint cleanup on the CHIPoBluez thread. This is necessary because the
+    // cleanup function releases the D-Bus manager client object, which handles D-Bus
+    // signals. Otherwise, we will face race condition when the D-Bus signal is in
+    // the middle of being processed when the cleanup function is called.
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BluezEndpoint * endpoint) {
+            EndpointCleanup(endpoint);
+            return CHIP_NO_ERROR;
+        },
+        apEndpoint);
 }
 
 // ConnectDevice callbacks

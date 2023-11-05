@@ -85,6 +85,10 @@ public:
     void OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    template <class AdvertisingParams>
+    void AddICDKeyToAdvertisement(AdvertisingParams & advParams);
+#endif
     /// Start operational advertising
     CHIP_ERROR AdvertiseOperational();
 

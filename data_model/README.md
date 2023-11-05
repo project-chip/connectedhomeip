@@ -1,3 +1,7 @@
+---
+orphan: true
+---
+
 ## Contents
 
 This folder contains a machine-readable representation of matter clusters.
