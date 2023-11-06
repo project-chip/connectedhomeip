@@ -56,8 +56,9 @@ source_set("cluster") {
     "ICDMonitoringTable.h",
   ]
 
+  deps = [ ":notifier" ]
+
   public_deps = [
-    ":notifier",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform:platform",
     "${chip_root}/src/protocols:im_status",
