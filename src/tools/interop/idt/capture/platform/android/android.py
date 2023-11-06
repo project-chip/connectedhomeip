@@ -194,9 +194,17 @@ class Android(PlatformLogStreamer):
         await self.handle_stream_action("start")
 
     async def run_observers(self) -> None:
-        observer_tasks = []
-        for stream_name, stream in self.streams.items():
-            observer_tasks.append(asyncio.create_task(stream.run_observer()))
+        try:
+            observer_tasks = []
+            for stream_name, stream in self.streams.items():
+                observer_tasks.append(asyncio.create_task(stream.run_observer()))
+            while True:
+                self.logger.info("Android observers are up")
+                await asyncio.sleep(20)
+        except asyncio.CancelledError:
+            self.logger.info("Cancelling observer tasks")
+            for observer_tasks in observer_tasks:
+                observer_tasks.cancel()
 
     async def stop_streaming(self) -> None:
         await self.handle_stream_action("stop")

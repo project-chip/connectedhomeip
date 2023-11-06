@@ -19,6 +19,7 @@ import asyncio
 import os
 
 from capture.base import EcosystemCapture, UnsupportedCapturePlatformException
+from capture.platform.android.streams.logcat import LogcatStreamer
 from capture.platform.android.android import Android
 from utils.artifact import create_standard_log_name
 from utils.log import get_logger, print_and_write
@@ -45,13 +46,13 @@ class PlayServicesUser(EcosystemCapture):
         self.platform = platform
         self.logcat_fd = None
         self.output = ""
+        self.logcat_stream: LogcatStreamer = self.platform.streams["LogcatStreamer"]
+
 
     async def start_capture(self) -> None:
         pass
 
     async def stop_capture(self) -> None:
-        if self.logcat_fd is not None:
-            self.logcat_fd.close()
         self.show_analysis()
 
     def proc_line(self, line) -> None:
@@ -70,12 +71,17 @@ class PlayServicesUser(EcosystemCapture):
 
     async def analyze_capture(self) -> None:
         """"Show the start and end times of commissioning boundaries"""
-        self.logcat_fd = open(self.platform.streams["LogcatStreamer"].logcat_artifact, "r")
-        while True:
-            for line in self.logcat_fd.readlines():
-                self.proc_line(line)
-            # Releasing async event loop for other analysis / monitor tasks
-            await asyncio.sleep(0)
+        try:
+            self.logcat_fd = open(self.platform.streams["LogcatStreamer"].logcat_artifact, "r")
+            while True:
+                for line in self.logcat_fd.readlines():
+                    self.proc_line(line)
+                # Releasing async event loop for other analysis / monitor tasks
+                await asyncio.sleep(0)
+        except asyncio.CancelledError:
+            self.logger.info("Closing logcat stream")
+            if self.logcat_fd is not None:
+                self.logcat_fd.close()
 
     def show_analysis(self) -> None:
         with open(self.analysis_file, "w") as analysis_file:

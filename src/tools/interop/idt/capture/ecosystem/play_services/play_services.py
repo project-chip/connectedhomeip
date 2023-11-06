@@ -22,6 +22,7 @@ from typing import Dict
 
 from capture.base import EcosystemCapture, UnsupportedCapturePlatformException
 from capture.platform.android import Android
+from capture.platform.android.streams.logcat import LogcatStreamer
 from utils.artifact import create_standard_log_name, log
 
 from . import config
@@ -58,6 +59,7 @@ class PlayServices(EcosystemCapture):
                             '305',  # Thread
                             '168',  # mDNS
                             ]
+        self.logcat_stream: LogcatStreamer = self.platform.streams["LogcatStreamer"]
 
     def _write_standard_info_file(self) -> None:
         for k, v in self.standard_info_data.items():
@@ -94,17 +96,20 @@ class PlayServices(EcosystemCapture):
             self.platform.run_adb_command(verbose_command)
         self._get_standard_info()
 
+    async def analyze_capture(self):
+        try:
+            self.logcat_fd = open(self.logcat_stream.logcat_artifact, "r")
+            while True:
+                self.analysis.do_analysis(self.logcat_fd.readlines())
+                # Releasing async event loop for other analysis / monitor topics
+                await asyncio.sleep(0)
+        except asyncio.CancelledError:
+            self.logger.info("Closing logcat stream")
+            if self.logcat_fd is not None:
+                self.logcat_fd.close()
+
     async def stop_capture(self) -> None:
         self.analysis.show_analysis()
-        if self.logcat_fd is not None:
-            self.logcat_fd.close()
-
-    async def analyze_capture(self):
-        self.logcat_fd = open(self.platform.streams["LogcatStreamer"].logcat_artifact, "r")
-        while True:
-            self.analysis.do_analysis(self.logcat_fd.readlines())
-            # Releasing async event loop for other analysis / monitor topics
-            await asyncio.sleep(0)
 
     async def probe_capture(self) -> None:
         if config.enable_foyer_probers:
