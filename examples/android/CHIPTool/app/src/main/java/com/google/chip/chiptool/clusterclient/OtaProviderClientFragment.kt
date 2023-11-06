@@ -1,22 +1,14 @@
 package com.google.chip.chiptool.clusterclient
 
-import android.Manifest
+import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.database.Cursor
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.DocumentsContract
-import android.provider.MediaStore
-import android.provider.Settings
+import android.provider.OpenableColumns
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipClusters
@@ -28,9 +20,8 @@ import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.OtaProviderClientFragmentBinding
 import java.io.BufferedInputStream
-import java.io.File
-import java.io.FileInputStream
 import java.io.IOException
+import java.io.InputStream
 import java.util.Optional
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -44,6 +35,8 @@ class OtaProviderClientFragment : Fragment() {
   private lateinit var addressUpdateFragment: AddressUpdateFragment
 
   private var _binding: OtaProviderClientFragmentBinding? = null
+
+  private var fileUri: Uri? = null
 
   private val vendorId: Int
     get() = binding.vendorIdEd.text.toString().toInt()
@@ -76,36 +69,41 @@ class OtaProviderClientFragment : Fragment() {
     return binding.root
   }
 
-  override fun onStart() {
-    super.onStart()
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
-      Toast.makeText(
-          requireContext(),
-          "Require to Allow management of all files permission",
-          Toast.LENGTH_LONG
-        )
-        .show()
-      startActivity(
-        Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
-          addCategory("android.intent.category.DEFAULT")
-          data = Uri.parse("package:${requireContext().packageName}")
-        }
-      )
-    } else if (!checkPermissionForReadExternalStorage()) {
-      requestPermissionForReadExternalStorage()
-    }
+  private fun selectFirmwareFileBtnClick() {
+    startActivityForResult(
+      Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+        addCategory(Intent.CATEGORY_OPENABLE)
+        type = "*/*"
+      },
+      REQUEST_CODE_OPEN_SAF
+    )
   }
 
-  private fun selectFirmwareFileBtnClick() {
-    val intent = Intent(Intent.ACTION_GET_CONTENT)
-    val uri = Uri.parse(Environment.getExternalStorageDirectory().path + "/Download/")
-    intent.setDataAndType(uri, "*/*")
-    startActivityForResult(intent, 0)
+  private fun getInputStream(uri: Uri?): InputStream? {
+    if (uri == null) {
+      return null
+    }
+    return requireContext().contentResolver.openInputStream(uri)
+  }
+
+  private fun queryName(uri: Uri?): String? {
+    if (uri == null) {
+      return null
+    }
+    val cursor = requireContext().contentResolver.query(uri, null, null, null, null)
+    return cursor?.let { c ->
+      val nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+      c.moveToFirst()
+
+      val name = cursor.getString(nameIndex)
+      c.close()
+      name
+    }
   }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
     super.onActivityResult(requestCode, resultCode, intent)
-    if (intent == null) {
+    if (resultCode != Activity.RESULT_OK || intent == null) {
       return
     }
     val uri = intent.data
@@ -113,35 +111,9 @@ class OtaProviderClientFragment : Fragment() {
       Log.d(TAG, "onActivityResult : null")
       return
     }
-
-    val filename = getRealPathFromURI(uri)
-
+    val filename = queryName(uri)
+    fileUri = uri
     requireActivity().runOnUiThread { binding.firmwareFileTv.text = filename }
-  }
-
-  private fun getRealPathFromURI(contentUri: Uri): String? {
-    var path = contentUri.path
-    if (path == null || path.startsWith("/storage")) {
-      return path
-    }
-    val id =
-      DocumentsContract.getDocumentId(contentUri)
-        .split(":".toRegex())
-        .dropLastWhile { it.isEmpty() }
-        .toTypedArray()[1]
-    val columns = arrayOf(MediaStore.Files.FileColumns.DATA)
-    val selection = MediaStore.Files.FileColumns._ID + " = " + id
-    val cursor: Cursor? =
-      requireContext()
-        .contentResolver
-        .query(MediaStore.Files.getContentUri("external"), columns, selection, null, null)
-    cursor.use { c ->
-      val columnIndex = c?.getColumnIndex(columns[0]) ?: 0
-      if (c!!.moveToFirst()) {
-        path = c.getString(columnIndex)
-      }
-    }
-    return path
   }
 
   private suspend fun sendAnnounceOTAProviderBtnClick() {
@@ -149,10 +121,9 @@ class OtaProviderClientFragment : Fragment() {
       val version = 2L
       val versionString = "2.0"
 
-      val path = binding.firmwareFileTv.text.toString()
-      val filename = path.substringAfterLast("/")
+      val filename = binding.firmwareFileTv.text.toString()
       Log.d(TAG, "sendAnnounceOTAProviderBtnClick : $filename")
-      otaProviderCallback.setOTAFile(version, versionString, filename, path)
+      otaProviderCallback.setOTAFile(version, versionString, filename, fileUri)
     }
 
     val otaRequestCluster =
@@ -186,33 +157,20 @@ class OtaProviderClientFragment : Fragment() {
     _binding = null
   }
 
-  private fun checkPermissionForReadExternalStorage(): Boolean {
-    val result = requireContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-    return result == PackageManager.PERMISSION_GRANTED
-  }
-
-  private fun requestPermissionForReadExternalStorage() {
-    ActivityCompat.requestPermissions(
-      requireActivity(),
-      arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-      READ_STORAGE_PERMISSION_REQUEST_CODE
-    )
-  }
-
   inner class OtaProviderCallback : OTAProviderDelegate {
     private var fileName: String? = null
     private var version: Long = 0
     private var versionString: String? = null
-    private var path: String? = null
+    private var uri: Uri? = null
 
-    private var fileInputStream: FileInputStream? = null
+    private var inputStream: InputStream? = null
     private var bufferedInputStream: BufferedInputStream? = null
 
-    fun setOTAFile(version: Long, versionString: String, fileName: String, path: String) {
+    fun setOTAFile(version: Long, versionString: String, fileName: String, uri: Uri?) {
       this.version = version
       this.versionString = versionString
       this.fileName = fileName
-      this.path = path
+      this.uri = uri
     }
 
     override fun handleQueryImage(
@@ -259,19 +217,14 @@ class OtaProviderClientFragment : Fragment() {
       offset: Long
     ) {
       Log.d(TAG, "handleBDXTransferSessionBegin, $nodeId, $fileDesignator, $offset")
-      if (path == null) {
-        Log.d(TAG, "path is null")
-        return
-      }
       try {
-        val file = File(path!!)
-        fileInputStream = FileInputStream(file)
-        bufferedInputStream = BufferedInputStream(fileInputStream)
+        inputStream = getInputStream(uri)
+        bufferedInputStream = BufferedInputStream(inputStream)
       } catch (e: IOException) {
         Log.d(TAG, "exception", e)
-        fileInputStream?.close()
+        inputStream?.close()
         bufferedInputStream?.close()
-        fileInputStream = null
+        inputStream = null
         bufferedInputStream = null
         return
       }
@@ -279,9 +232,9 @@ class OtaProviderClientFragment : Fragment() {
 
     override fun handleBDXTransferSessionEnd(errorCode: Long, nodeId: Long) {
       Log.d(TAG, "handleBDXTransferSessionEnd, $errorCode, $nodeId")
-      fileInputStream?.close()
+      inputStream?.close()
       bufferedInputStream?.close()
-      fileInputStream = null
+      inputStream = null
       bufferedInputStream = null
     }
 
@@ -344,7 +297,7 @@ class OtaProviderClientFragment : Fragment() {
 
     fun newInstance(): OtaProviderClientFragment = OtaProviderClientFragment()
 
-    private const val READ_STORAGE_PERMISSION_REQUEST_CODE = 41
+    private const val REQUEST_CODE_OPEN_SAF = 100
 
     private const val APPLY_WAITING_TIME = 10L
     private const val OTA_PROVIDER_ENDPOINT_ID = 0
