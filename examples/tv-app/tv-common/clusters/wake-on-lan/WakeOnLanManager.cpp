@@ -55,7 +55,8 @@ CHIP_ERROR WakeOnLanManager::HandleGetMacAddress(chip::app::AttributeValueEncode
 
     // Spec REQUIRES 48-bit mac addresses. This means at least Thread devices will
     // fail here.
-    if (chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength != 6) {
+    if (chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength != 6)
+    {
         ChipLogError(Zcl, "WakeOnLanManager: primary MAC address is not 48-bit");
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
