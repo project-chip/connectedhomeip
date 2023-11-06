@@ -20,7 +20,7 @@
 #include "pw_sys_io/sys_io.h"
 #include <cassert>
 #include <zephyr/console/console.h>
-#include <zephyr/zephyr.h>
+#include <zephyr/kernel.h>
 
 #ifdef CONFIG_USB
 #include <zephyr/usb/usb_device.h>

@@ -28302,7 +28302,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    ChannelStatusEnum status = static_cast<ChannelStatusEnum>(0);
+    StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -28318,7 +28318,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    ChannelStatusEnum status = static_cast<ChannelStatusEnum>(0);
+    StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

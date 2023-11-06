@@ -98,6 +98,7 @@ jobs:
                         --target darwin-x64-ota-requestor-${BUILD_VARIANT} \
                         --target darwin-x64-tv-app-${BUILD_VARIANT} \
                         --target darwin-x64-bridge-${BUILD_VARIANT} \
+                        --target darwin-x64-lit-icd-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
