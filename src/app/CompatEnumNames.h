@@ -42,6 +42,11 @@ using OTAChangeReasonEnum   = ChangeReasonEnum;
 using OTAUpdateStateEnum    = UpdateStateEnum;
 } // namespace OtaSoftwareUpdateRequestor
 
+namespace ApplicationLauncher {
+// https://github.com/project-chip/connectedhomeip/pull/30134 renamed this
+using ApplicationLauncherStatusEnum = StatusEnum;
+} // namespace ApplicationLauncher
+
 namespace Channel {
 using ChannelStatusEnum = StatusEnum;
 } // namespace Channel
