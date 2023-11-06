@@ -147,6 +147,10 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
         {
             jsonVal["isICDOperatingAsLIT"] = dnsSdInfo->resolutionData.isICDOperatingAsLIT.Value();
         }
+        if (dnsSdInfo->resolutionData.maxPathsPerInvoke.HasValue())
+        {
+            jsonVal["maxPathsPerInvoke"] = dnsSdInfo->resolutionData.maxPathsPerInvoke.Value();
+        }
         if (dnsSdInfo->commissionData.rotatingIdLen > 0)
         {
             jsonVal["rotatingId"] = rotatingId;
@@ -208,6 +212,15 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
         {
             ChipLogProgress(Discovery, "\tICD is operating as a\t%s",
                             dnsSdInfo->resolutionData.isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
+        }
+        if (dnsSdInfo->resolutionData.maxPathsPerInvoke.HasValue())
+        {
+            ChipLogProgress(Discovery, "\tMax path per invoke\t%u",
+                            dnsSdInfo->resolutionData.GetMaxPathsPerInvoke().Value());
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "\tMax path per invoke\tNot present default 1 used");
         }
         for (unsigned j = 0; j < dnsSdInfo->resolutionData.numIPs; ++j)
         {

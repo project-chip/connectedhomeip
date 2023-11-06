@@ -40,6 +40,8 @@ const PeerId kPeerId1 = PeerId().SetCompressedFabricId(0xBEEFBEEFF00DF00D).SetNo
 const PeerId kPeerId2 = PeerId().SetCompressedFabricId(0x5555666677778888).SetNodeId(0x1212343456567878);
 OperationalAdvertisingParameters operationalParams1 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId1).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+// TODO I want to see if this test fails. If it does then I will intentionally drop this to 1 and it should pass.
+operationalParams1.SetMaxPathsPerInvoke(2);
 test::ExpectedCall operationalCall1 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)
                                           .SetServiceName("_matter")
@@ -54,7 +56,8 @@ OperationalAdvertisingParameters operationalParams2 =
         .EnableIpV4(true)
         .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(32_ms32, 30_ms32, 10_ms16)) // SII and SAI to match below
         .SetTcpSupported(Optional<bool>(true))
-        .SetICDOperatingAsLIT(Optional<bool>(false));
+        .SetICDOperatingAsLIT(Optional<bool>(false))
+        .SetMaxPathsPerInvoke(2);
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)
                                           .SetServiceName("_matter")
@@ -65,7 +68,8 @@ test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .AddTxt("SAI", "30")
                                           .AddTxt("SAT", "10")
                                           .AddTxt("T", "1")
-                                          .AddTxt("ICD", "0");
+                                          .AddTxt("ICD", "0")
+                                          .AddTxt("MPI", "2");
 
 CommissionAdvertisingParameters commissionableNodeParamsSmall =
     CommissionAdvertisingParameters()
@@ -99,6 +103,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetRotatingDeviceId(Optional<const char *>("id_that_spins"))
         .SetTcpSupported(Optional<bool>(true))
         .SetICDOperatingAsLIT(Optional<bool>(true))
+        .SetMaxPathsPerInvoke(65535)
         // 3600005 is over the max, so this should be adjusted by the platform
         .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600005_ms32, 65535_ms16));
 
@@ -116,6 +121,7 @@ test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .AddTxt("PH", "3")
                                                   .AddTxt("T", "1")
                                                   .AddTxt("ICD", "1")
+                                                  .AddTxt("MPI", "65535")
                                                   .AddTxt("SII", "3600000")
                                                   .AddTxt("SAI", "3600000")
                                                   .AddTxt("SAT", "65535")

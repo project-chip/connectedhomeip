@@ -229,6 +229,8 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
         return CopyTextRecordValue(buffer, bufferLen, params.GetLocalMRPConfig(), key);
     case TxtFieldKey::kLongIdleTimeICD:
         return CopyTextRecordValue(buffer, bufferLen, params.GetICDOperatingAsLIT());
+    case TxtFieldKey::kMaxPathsPerInvoke:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetMaxPathsPerInvoke());
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -572,6 +574,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     ADD_TXT_RECORD(SessionActiveThreshold);
     ADD_TXT_RECORD(TcpSupported);
     ADD_TXT_RECORD(LongIdleTimeICD); // Optional, will not be added if related 'params' doesn't have a value
+    ADD_TXT_RECORD(MaxPathsPerInvoke); // Optional, will not be added if related 'params' doesn't have a value
 
     ADD_PTR_RECORD(CompressedFabricId);
 
@@ -592,6 +595,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     ADD_TXT_RECORD(SessionActiveThreshold);
     ADD_TXT_RECORD(TcpSupported);
     ADD_TXT_RECORD(LongIdleTimeICD); // Optional, will not be added if related 'params' doesn't have a value
+    ADD_TXT_RECORD(MaxPathsPerInvoke); // Optional, will not be added if related 'params' doesn't have a value
 
     ADD_PTR_RECORD(VendorId);
     ADD_PTR_RECORD(DeviceType);

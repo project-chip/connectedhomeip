@@ -185,7 +185,8 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                                        .SetInterfaceId(GetInterfaceId())
                                        .SetLocalMRPConfig(GetLocalMRPConfig())
                                        .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
-                                       .EnableIpV4(true);
+                                       .EnableIpV4(true)
+                                       .SetMaxPathsPerInvoke(CHIP_CONFIG_MAX_PATHS_PER_INVOKE);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         AddICDKeyToAdvertisement(advertiseParameters);
@@ -259,6 +260,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     }
 
     advertiseParameters.SetLocalMRPConfig(GetLocalMRPConfig()).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
+    advertiseParameters.SetMaxPathsPerInvoke(CHIP_CONFIG_MAX_PATHS_PER_INVOKE);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     AddICDKeyToAdvertisement(advertiseParameters);

@@ -52,6 +52,7 @@ struct CommonResolutionData
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
     Optional<System::Clock::Milliseconds16> mrpRetryActiveThreshold;
+    Optional<uint16_t> maxPathsPerInvoke;
 
     CommonResolutionData() { Reset(); }
 
@@ -67,6 +68,7 @@ struct CommonResolutionData
     Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mrpRetryIntervalIdle; }
     Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mrpRetryIntervalActive; }
     Optional<System::Clock::Milliseconds16> GetMrpRetryActiveThreshold() const { return mrpRetryActiveThreshold; }
+    Optional<uint16_t> GetMaxPathsPerInvoke() const { return maxPathsPerInvoke; }
 
     bool IsDeviceTreatedAsSleepy(const ReliableMessageProtocolConfig * defaultMRPConfig) const
     {
@@ -86,6 +88,7 @@ struct CommonResolutionData
         mrpRetryIntervalActive  = NullOptional;
         mrpRetryActiveThreshold = NullOptional;
         isICDOperatingAsLIT     = NullOptional;
+        maxPathsPerInvoke       = NullOptional;
         numIPs                  = 0;
         port                    = 0;
         supportsTcp             = false;
@@ -147,6 +150,16 @@ struct CommonResolutionData
         {
             ChipLogDetail(Discovery, "\tICD: not present");
         }
+        if (maxPathsPerInvoke.HasValue())
+        {
+            ChipLogProgress(Discovery, "\tMax path per invoke\t%u",
+                            maxPathsPerInvoke.Value());
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "\tMax path per invoke\tNot present default 1 used");
+        }
+
     }
 };
 

@@ -265,6 +265,11 @@ CHIP_ERROR LogDiscoveredNodeData(const chip::Dnssd::DiscoveredNodeData & nodeDat
         value["isICDOperatingAsLIT"] = resolutionData.isICDOperatingAsLIT.Value();
     }
 
+    if (resolutionData.maxPathsPerInvoke.HasValue())
+    {
+        value["maxPathsPerInvoke"] = resolutionData.maxPathsPerInvoke.Value();
+    }
+
     Json::Value rootValue;
     rootValue[kValueKey] = value;
 

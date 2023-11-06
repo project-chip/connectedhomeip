@@ -206,6 +206,18 @@ Optional<System::Clock::Milliseconds16> GetRetryActiveThreshold(const ByteSpan &
     return MakeOptional(System::Clock::Milliseconds16(retryInterval));
 }
 
+Optional<uint16_t> GetMaxPathsPerInvoke(const ByteSpan & value)
+{
+    const auto retryInterval = MakeU16FromAsciiDecimal(value);
+
+    if (retryInterval == 0)
+    {
+        return NullOptional;
+    }
+
+    return MakeOptional(retryInterval);
+}
+
 TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
 {
     for (auto & info : txtFieldInfo)
@@ -274,6 +286,10 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonRes
     case TxtFieldKey::kLongIdleTimeICD:
         nodeData.isICDOperatingAsLIT = Internal::MakeOptionalBoolFromAsciiDecimal(value);
         break;
+    case TxtFieldKey::kMaxPathsPerInvoke:
+        nodeData.maxPathsPerInvoke = Internal::GetMaxPathsPerInvoke(value);
+        break;
+
     default:
         break;
     }

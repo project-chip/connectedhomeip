@@ -83,6 +83,9 @@ void TestGetTxtFieldKey(nlTestSuite * inSuite, void * inContext)
     strcpy(key, "ICD");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kLongIdleTimeICD);
 
+    strcpy(key, "MPI");
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kMaxPathsPerInvoke);
+
     strcpy(key, "XX");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kUnknown);
 }
@@ -292,7 +295,7 @@ bool NodeDataIsEmpty(const DiscoveredNodeData & node)
         node.commissionData.rotatingIdLen != 0 || node.commissionData.pairingHint != 0 ||
         node.resolutionData.mrpRetryIntervalIdle.HasValue() || node.resolutionData.mrpRetryIntervalActive.HasValue() ||
         node.resolutionData.mrpRetryActiveThreshold.HasValue() || node.resolutionData.isICDOperatingAsLIT.HasValue() ||
-        node.resolutionData.supportsTcp)
+        node.resolutionData.supportsTcp || node.resolutionData.maxPathsPerInvoke.HasValue())
     {
         return false;
     }
@@ -392,7 +395,7 @@ bool NodeDataIsEmpty(const ResolvedNodeData & nodeData)
     return nodeData.operationalData.peerId == PeerId{} && nodeData.resolutionData.numIPs == 0 &&
         nodeData.resolutionData.port == 0 && !nodeData.resolutionData.mrpRetryIntervalIdle.HasValue() &&
         !nodeData.resolutionData.mrpRetryIntervalActive.HasValue() && !nodeData.resolutionData.supportsTcp &&
-        !nodeData.resolutionData.isICDOperatingAsLIT.HasValue();
+        !nodeData.resolutionData.isICDOperatingAsLIT.HasValue() && !nodeData.resolutionData.maxPathsPerInvoke.HasValue();
 }
 
 void ResetRetryIntervalIdle(DiscoveredNodeData & nodeData)
@@ -416,11 +419,6 @@ void ResetRetryIntervalActive(ResolvedNodeData & nodeData)
 }
 
 void ResetRetryActiveThreshold(DiscoveredNodeData & nodeData)
-{
-    nodeData.resolutionData.mrpRetryActiveThreshold.ClearValue();
-}
-
-void ResetRetryActiveThreshold(ResolvedNodeData & nodeData)
 {
     nodeData.resolutionData.mrpRetryActiveThreshold.ClearValue();
 }
@@ -680,6 +678,69 @@ void TxtFieldICDoperatesAsLIT(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.HasValue() == false);
 }
 
+// Test MPI (Max paths per invoke)
+template <class NodeData>
+void TxtFieldMaxPathsPerInvoke(nlTestSuite * inSuite, void * inContext)
+{
+    char key[4];
+    char val[16];
+    NodeData nodeData;
+
+    // Minimum
+    strcpy(key, "MPI");
+    strcpy(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMaxPathsPerInvoke().HasValue());
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMaxPathsPerInvoke().Value() == 1);
+
+    // Maximum
+    strcpy(key, "MPI");
+    strcpy(val, "65535");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMaxPathsPerInvoke().HasValue());
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMaxPathsPerInvoke().Value() == 65535);
+
+    // Test no other fields were populated
+    nodeData.resolutionData.maxPathsPerInvoke.ClearValue();
+    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
+
+    // Invalid SAI - negative value
+    strcpy(key, "MPI");
+    strcpy(val, "-1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMaxPathsPerInvoke().HasValue());
+
+    // Invalid SAI - greater than maximum
+    strcpy(key, "MPI");
+    strcpy(val, "65536");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMaxPathsPerInvoke().HasValue());
+
+    // Invalid MPI - much greater than maximum
+    strcpy(key, "MPI");
+    strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMaxPathsPerInvoke().HasValue());
+
+    // Invalid MPI - hexadecimal value
+    strcpy(key, "MPI");
+    strcpy(val, "0x20");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMaxPathsPerInvoke().HasValue());
+
+    // Invalid MPI - leading zeros
+    strcpy(key, "MPI");
+    strcpy(val, "0700");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMaxPathsPerInvoke().HasValue());
+
+    // Invalid MPI - text at the end
+    strcpy(key, "MPI");
+    strcpy(val, "123abc");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMaxPathsPerInvoke().HasValue());
+}
+
 // Test IsDeviceTreatedAsSleepy() with CRI
 template <class NodeData>
 void TestIsDeviceSessionIdle(nlTestSuite * inSuite, void * inContext)
@@ -750,6 +811,7 @@ const nlTest sTests[] = {
     NL_TEST_DEF("TxtDiscoveredFieldMrpRetryActiveThreshold", TxtFieldSessionActiveThreshold<DiscoveredNodeData>),
     NL_TEST_DEF("TxtDiscoveredFieldTcpSupport", (TxtFieldTcpSupport<DiscoveredNodeData>) ),
     NL_TEST_DEF("TxtDiscoveredIsICDoperatingAsLIT", (TxtFieldICDoperatesAsLIT<DiscoveredNodeData>) ),
+    NL_TEST_DEF("TxtDiscoveredIsMaxPathsPerInvoke", (TxtFieldMaxPathsPerInvoke<DiscoveredNodeData>) ),
     NL_TEST_DEF("TxtDiscoveredIsDeviceSessionIdle", TestIsDeviceSessionIdle<DiscoveredNodeData>),
     NL_TEST_DEF("TxtDiscoveredIsDeviceSessionActive", TestIsDeviceSessionActive<DiscoveredNodeData>),
     NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalIdle", TxtFieldSessionIdleInterval<ResolvedNodeData>),
@@ -757,6 +819,7 @@ const nlTest sTests[] = {
     NL_TEST_DEF("TxtResolvedFieldMrpRetryActiveThreshold", TxtFieldSessionActiveThreshold<ResolvedNodeData>),
     NL_TEST_DEF("TxtResolvedFieldTcpSupport", (TxtFieldTcpSupport<ResolvedNodeData>) ),
     NL_TEST_DEF("TxtResolvedFieldICDoperatingAsLIT", (TxtFieldICDoperatesAsLIT<ResolvedNodeData>) ),
+    NL_TEST_DEF("TxtResolvedFieldMaxPathsPerInvoke", (TxtFieldMaxPathsPerInvoke<ResolvedNodeData>) ),
     NL_TEST_DEF("TxtResolvedIsDeviceSessionIdle", TestIsDeviceSessionIdle<ResolvedNodeData>),
     NL_TEST_DEF("TxtResolvedIsDeviceSessionActive", TestIsDeviceSessionActive<ResolvedNodeData>),
     NL_TEST_SENTINEL()

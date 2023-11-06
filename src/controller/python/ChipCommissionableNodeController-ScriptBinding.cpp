@@ -124,6 +124,16 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
                             dnsSdInfo->resolutionData.isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
         }
 
+        if (dnsSdInfo->resolutionData.GetMaxPathsPerInvoke().HasValue())
+        {
+            ChipLogProgress(Discovery, "\tMax path per invoke\t%u",
+                            dnsSdInfo->resolutionData.GetMaxPathsPerInvoke().Value());
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "\tMax path per invoke\tNot present default 1 used");
+        }
+
         for (unsigned j = 0; j < dnsSdInfo->resolutionData.numIPs; ++j)
         {
             char buf[chip::Inet::IPAddress::kMaxStringLength];

@@ -377,6 +377,7 @@ void JsonBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
         result["mrp"]["active_threshold_time_ms"]     = info.result->mrpRemoteConfig.mActiveThresholdTime.count();
 
         result["isICDOperatingAsLIT"] = info.result->isICDOperatingAsLIT;
+        result["maxPathsPerInvoke"] = info.result->maxPathsPerInvoke;
 
         value["result"] = result;
     }

@@ -61,6 +61,7 @@ public:
         ChipLogProgress(Discovery, "   MRP ACTIVE retransmit timeout: %u ms", result.mrpRemoteConfig.mActiveRetransTimeout.count());
         ChipLogProgress(Discovery, "   MRP ACTIVE Threshold time:     %u ms", result.mrpRemoteConfig.mActiveThresholdTime.count());
         ChipLogProgress(Discovery, "   ICD is operating as a:         %s", result.isICDOperatingAsLIT ? "LIT" : "SIT");
+        ChipLogProgress(Discovery, "   Max paths per invoke:          %u", result.maxPathsPerInvoke);
 
         NotifyDone();
     }

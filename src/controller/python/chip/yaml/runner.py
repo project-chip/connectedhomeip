@@ -914,6 +914,7 @@ class ReplTestRunner:
                 'mrpRetryActiveThreshold': response.mrpRetryActiveThreshold,
                 'supportsTcp': response.supportsTcp,
                 'isICDOperatingAsLIT': response.isICDOperatingAsLIT,
+                'maxPathsPerInvoke': response.maxPathsPerInvoke,
                 'addresses': response.addresses,
                 'rotatingId': response.rotatingId,
 

@@ -292,6 +292,11 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
             result.isICDOperatingAsLIT = nodeData.resolutionData.isICDOperatingAsLIT.Value();
         }
 
+        if (nodeData.resolutionData.maxPathsPerInvoke.HasValue())
+        {
+            result.maxPathsPerInvoke = nodeData.resolutionData.maxPathsPerInvoke.Value();
+        }
+
         for (size_t i = 0; i < nodeData.resolutionData.numIPs; i++)
         {
 #if !INET_CONFIG_ENABLE_IPV4

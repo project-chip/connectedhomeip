@@ -1601,5 +1601,19 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_PATHS_PER_INVOKE
+ *
+ * @brief The maximum number of elements in the InvokeRequests list that the Node is able to process.
+ */
+#ifndef CHIP_CONFIG_MAX_PATHS_PER_INVOKE
+#define CHIP_CONFIG_MAX_PATHS_PER_INVOKE 1
+#endif
+
+// TODO also check for the max value. But right now there is no max is spec, other than we are using uint16, should there be?
+#if CHIP_CONFIG_MAX_PATHS_PER_INVOKE < 1
+#error "CHIP_CONFIG_MAX_PATHS_PER_INVOKE is not allowed to be a number less than 1."
+#endif
+
+/**
  * @}
  */

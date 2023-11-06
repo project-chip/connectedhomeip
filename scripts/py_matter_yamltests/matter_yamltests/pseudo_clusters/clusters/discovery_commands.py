@@ -75,6 +75,7 @@ _DEFINITION = '''<?xml version="1.0"?>
         <arg name="mrpRetryIntervalActive" type="int32u" optional="true"/>
         <arg name="mrpRetryActiveThreshold" type="int16u" optional="true"/>
         <arg name="isICDOperatingAsLIT" type="boolean" optional="true"/>
+        <arg name="maxPathsPerInvoke" type="int16u" optional="true"/>
     </command>
 </cluster>
 </configurator>

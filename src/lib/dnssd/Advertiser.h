@@ -108,6 +108,13 @@ public:
     }
     Optional<bool> GetICDOperatingAsLIT() const { return mICDOperatesAsLIT; }
 
+    Derived & SetMaxPathsPerInvoke(uint16_t maxPathsPerInvoke)
+    {
+        mMaxPathsPerInvoke = maxPathsPerInvoke;
+        return *reinterpret_cast<Derived *>(this);
+    }
+    uint16_t GetMaxPathsPerInvoke() const { return mMaxPathsPerInvoke; }
+
 private:
     uint16_t mPort                   = CHIP_PORT;
     Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();
@@ -117,6 +124,7 @@ private:
     Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
     Optional<bool> mTcpSupported;
     Optional<bool> mICDOperatesAsLIT;
+    uint16_t mMaxPathsPerInvoke = 1;
 };
 
 /// Defines parameters required for advertising a CHIP node
