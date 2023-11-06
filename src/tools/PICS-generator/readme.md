@@ -13,27 +13,33 @@ Once the python environment is build it can be activated using this command:
 source out/python_env/bin/activate
 ```
 
-The script uses the json based data model in order to convert cluster identifiers into PICS Codes.
-The file can be downloaded here:
+The script uses the json based data model in order to convert cluster
+identifiers into PICS Codes. The file can be downloaded here:
 [https://groups.csa-iot.org/wg/matter-csg/document/27290](https://groups.csa-iot.org/wg/matter-csg/document/27290)
 
-NOTE: The tool has been verified using the "Specification_version 0.7-spring2024.json" version.
+NOTE: The tool has been verified using the "Specification_version
+0.7-spring2024.json" version.
 
-The script uses the PICS XML templates for generate the PICS output.
-These files can be downloaded here:
+The script uses the PICS XML templates for generate the PICS output. These files
+can be downloaded here:
 [https://groups.csa-iot.org/wg/matter-csg/document/26122](https://groups.csa-iot.org/wg/matter-csg/document/26122)
 
-NOTE: The tool has been verified using V24 PICS (used for Matter 1.2 certification)
+NOTE: The tool has been verified using V24 PICS (used for Matter 1.2
+certification)
 
 # How to run
 
-The tool does, as mentioned above, have external dependencies, these are provided to the tool using these arguments:
+The tool does, as mentioned above, have external dependencies, these are
+provided to the tool using these arguments:
 
-- --cluster-data is the absolute path to the JSON file contaning the cluster data
-- --pics-template is the absolute path to the folder contaning the PICS templates
+- --cluster-data is the absolute path to the JSON file contaning the cluster
+data
+- --pics-template is the absolute path to the folder contaning the PICS
+templates
 - --pics-output is the absolute path to the output folder to be used
 
-If the device has not been commissioned this can be done by passing in the commissioning information:
+If the device has not been commissioned this can be done by passing in the
+commissioning information:
 
 ```
 python3 'src/python_testing/PICSGenerator.py' --cluster-data <pathToClusterJson> --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath> --commissioning-method ble-thread --discriminator <DESCRIMINATOR> --passcode <PASSCODE> --thread-dataset-hex <DATASET_AS_HEX>

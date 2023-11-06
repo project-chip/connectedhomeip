@@ -1,16 +1,17 @@
-import sys
-import os
-import json
-import pathlib
 import argparse
+import json
+import os
+import pathlib
+import sys
 import xml.etree.ElementTree as ET
+
 import chip.clusters as Clusters
 from rich.console import Console
 
 
 # Add the path to python_testing folder, in order to be able to import from matter_testing_support
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
-from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body  # noqa: E402
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
 
 
 console = None
@@ -225,8 +226,9 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
 
         # Read device list (Not required)
         deviceListResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, Clusters.Descriptor.Attributes.DeviceTypeList)])
-        # TODO: Print the list and not just the first element
-        console.print(f"Device Type: {deviceListResponse[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList][0].deviceType}")
+
+        for deviceTypeData in deviceListResponse[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
+            console.print(f"Device Type: {deviceTypeData.deviceType}")
 
         # Read server list
         serverListResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, Clusters.Descriptor.Attributes.ServerList)])
@@ -313,7 +315,8 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
             console.print(generatedCommandListPicsList)
 
             # Write the collected PICS to a PICS XML file
-            GenerateDevicePicsXmlFiles(clusterName, clusterPICS, featurePicsList, attributePicsList, acceptedCommandListPicsList, generatedCommandListPicsList, endpointOutputPathStr)
+            GenerateDevicePicsXmlFiles(clusterName, clusterPICS, featurePicsList, attributePicsList,
+                                       acceptedCommandListPicsList, generatedCommandListPicsList, endpointOutputPathStr)
 
         # Read client list
         clientListResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, Clusters.Descriptor.Attributes.ClientList)])
@@ -396,7 +399,7 @@ with open(clusterInfoInputPathStr, 'rb') as clusterInfoInputFile:
             }
 
         except ValueError:
-            print(f"Ignore ClusterID: {clusterData['Id']} - {clusterData['Cluster Name']}") 
+            print(f"Ignore ClusterID: {clusterData['Id']} - {clusterData['Cluster Name']}")
 
 # Load PICS XML templates
 print("Capture list of PICS XML templates")
