@@ -33,9 +33,9 @@ The tool does, as mentioned above, have external dependencies, these are
 provided to the tool using these arguments:
 
 - --cluster-data is the absolute path to the JSON file contaning the cluster
-data
+  data
 - --pics-template is the absolute path to the folder contaning the PICS
-templates
+  templates
 - --pics-output is the absolute path to the output folder to be used
 
 If the device has not been commissioned this can be done by passing in the
