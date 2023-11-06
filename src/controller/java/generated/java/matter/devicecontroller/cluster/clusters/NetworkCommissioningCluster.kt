@@ -17,16 +17,14 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class NetworkCommissioningCluster(private val endpointId: UShort) {
   class ScanNetworksResponse(
     val networkingStatus: UInt,
     val debugText: String?,
-    val wiFiScanResults:
-      ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResultStruct>?,
-    val threadScanResults:
-      ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResultStruct>?
+    val wiFiScanResults: List<NetworkCommissioningClusterWiFiInterfaceScanResultStruct>?,
+    val threadScanResults: List<NetworkCommissioningClusterThreadInterfaceScanResultStruct>?
   )
 
   class NetworkConfigResponse(
@@ -41,9 +39,7 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     val errorValue: Int?
   )
 
-  class NetworksAttribute(
-    val value: ArrayList<ChipStructs.NetworkCommissioningClusterNetworkInfoStruct>
-  )
+  class NetworksAttribute(val value: List<NetworkCommissioningClusterNetworkInfoStruct>)
 
   class LastNetworkingStatusAttribute(val value: UInt?)
 
@@ -51,15 +47,15 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
 
   class LastConnectErrorValueAttribute(val value: Int?)
 
-  class SupportedWiFiBandsAttribute(val value: ArrayList<UInt>?)
+  class SupportedWiFiBandsAttribute(val value: List<UInt>?)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun scanNetworks(
     ssid: ByteArray?,

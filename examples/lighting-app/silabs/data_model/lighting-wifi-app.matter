@@ -293,6 +293,7 @@ server cluster OnOff = 6 {
   bitmap Feature : bitmap32 {
     kLighting = 0x1;
     kDeadFrontBehavior = 0x2;
+    kOffOnly = 0x4;
   }
 
   bitmap OnOffControlBitmap : bitmap8 {
@@ -313,7 +314,7 @@ server cluster OnOff = 6 {
 
   request struct OffWithEffectRequest {
     EffectIdentifierEnum effectIdentifier = 0;
-    int8u effectVariant = 1;
+    enum8 effectVariant = 1;
   }
 
   request struct OnWithTimedOffRequest {
@@ -1507,7 +1508,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
   }
 
   info event AssociationFailure = 1 {
-    AssociationFailureCauseEnum associationFailure = 0;
+    AssociationFailureCauseEnum associationFailureCause = 0;
     int16u status = 1;
   }
 

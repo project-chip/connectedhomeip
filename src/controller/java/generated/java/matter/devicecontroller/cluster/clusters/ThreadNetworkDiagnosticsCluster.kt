@@ -17,7 +17,7 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
   class ChannelAttribute(val value: UShort?)
@@ -32,21 +32,17 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
 
   class MeshLocalPrefixAttribute(val value: ByteArray?)
 
-  class NeighborTableAttribute(
-    val value: ArrayList<ChipStructs.ThreadNetworkDiagnosticsClusterNeighborTableStruct>
-  )
+  class NeighborTableAttribute(val value: List<ThreadNetworkDiagnosticsClusterNeighborTableStruct>)
 
-  class RouteTableAttribute(
-    val value: ArrayList<ChipStructs.ThreadNetworkDiagnosticsClusterRouteTableStruct>
-  )
+  class RouteTableAttribute(val value: List<ThreadNetworkDiagnosticsClusterRouteTableStruct>)
 
   class PartitionIdAttribute(val value: UInt?)
 
-  class WeightingAttribute(val value: UByte?)
+  class WeightingAttribute(val value: UShort?)
 
-  class DataVersionAttribute(val value: UByte?)
+  class DataVersionAttribute(val value: UShort?)
 
-  class StableDataVersionAttribute(val value: UByte?)
+  class StableDataVersionAttribute(val value: UShort?)
 
   class LeaderRouterIdAttribute(val value: UByte?)
 
@@ -56,25 +52,23 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
 
   class DelayAttribute(val value: UInt?)
 
-  class SecurityPolicyAttribute(
-    val value: ChipStructs.ThreadNetworkDiagnosticsClusterSecurityPolicy?
-  )
+  class SecurityPolicyAttribute(val value: ThreadNetworkDiagnosticsClusterSecurityPolicy?)
 
   class ChannelPage0MaskAttribute(val value: ByteArray?)
 
   class OperationalDatasetComponentsAttribute(
-    val value: ChipStructs.ThreadNetworkDiagnosticsClusterOperationalDatasetComponents?
+    val value: ThreadNetworkDiagnosticsClusterOperationalDatasetComponents?
   )
 
-  class ActiveNetworkFaultsListAttribute(val value: ArrayList<UInt>)
+  class ActiveNetworkFaultsListAttribute(val value: List<UInt>)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun resetCounts(timedInvokeTimeoutMs: Int? = null) {
     if (timedInvokeTimeoutMs != null) {

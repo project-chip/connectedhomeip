@@ -17,29 +17,29 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class UserLabelCluster(private val endpointId: UShort) {
-  class LabelListAttribute(val value: ArrayList<ChipStructs.UserLabelClusterLabelStruct>)
+  class LabelListAttribute(val value: List<UserLabelClusterLabelStruct>)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readLabelListAttribute(): LabelListAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLabelListAttribute(value: ArrayList<ChipStructs.UserLabelClusterLabelStruct>) {
+  suspend fun writeLabelListAttribute(value: List<UserLabelClusterLabelStruct>) {
     // Implementation needs to be added here
   }
 
   suspend fun writeLabelListAttribute(
-    value: ArrayList<ChipStructs.UserLabelClusterLabelStruct>,
+    value: List<UserLabelClusterLabelStruct>,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here

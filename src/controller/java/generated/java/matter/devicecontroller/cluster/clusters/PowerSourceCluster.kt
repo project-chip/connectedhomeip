@@ -17,7 +17,7 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class PowerSourceCluster(private val endpointId: UShort) {
   class WiredAssessedInputVoltageAttribute(val value: UInt?)
@@ -26,7 +26,7 @@ class PowerSourceCluster(private val endpointId: UShort) {
 
   class WiredAssessedCurrentAttribute(val value: UInt?)
 
-  class ActiveWiredFaultsAttribute(val value: ArrayList<UInt>?)
+  class ActiveWiredFaultsAttribute(val value: List<UInt>?)
 
   class BatVoltageAttribute(val value: UInt?)
 
@@ -34,23 +34,23 @@ class PowerSourceCluster(private val endpointId: UShort) {
 
   class BatTimeRemainingAttribute(val value: UInt?)
 
-  class ActiveBatFaultsAttribute(val value: ArrayList<UInt>?)
+  class ActiveBatFaultsAttribute(val value: List<UInt>?)
 
   class BatTimeToFullChargeAttribute(val value: UInt?)
 
   class BatChargingCurrentAttribute(val value: UInt?)
 
-  class ActiveBatChargeFaultsAttribute(val value: ArrayList<UInt>?)
+  class ActiveBatChargeFaultsAttribute(val value: List<UInt>?)
 
-  class EndpointListAttribute(val value: ArrayList<UShort>)
+  class EndpointListAttribute(val value: List<UShort>)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readStatusAttribute(): UByte {
     // Implementation needs to be added here

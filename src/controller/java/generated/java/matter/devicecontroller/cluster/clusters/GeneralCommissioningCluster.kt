@@ -17,7 +17,7 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class GeneralCommissioningCluster(private val endpointId: UShort) {
   class ArmFailSafeResponse(val errorCode: UInt, val debugText: String)
@@ -27,16 +27,16 @@ class GeneralCommissioningCluster(private val endpointId: UShort) {
   class CommissioningCompleteResponse(val errorCode: UInt, val debugText: String)
 
   class BasicCommissioningInfoAttribute(
-    val value: ChipStructs.GeneralCommissioningClusterBasicCommissioningInfo
+    val value: GeneralCommissioningClusterBasicCommissioningInfo
   )
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun armFailSafe(
     expiryLengthSeconds: UShort,

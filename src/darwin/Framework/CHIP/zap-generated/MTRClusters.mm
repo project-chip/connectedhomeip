@@ -16,7 +16,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <Matter/MTRError.h>
 
 #import "MTRClusterConstants.h"
 #import "MTRCluster_Internal.h"
@@ -43,18 +42,6 @@ using chip::System::Clock::Timeout;
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 @implementation MTRClusterIdentify
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)identifyWithParams:(MTRIdentifyClusterIdentifyParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -183,18 +170,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterGroups
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)addGroupWithParams:(MTRGroupsClusterAddGroupParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
@@ -455,18 +430,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterScenes
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)addSceneWithParams:(MTRScenesClusterAddSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
@@ -898,18 +861,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterOnOff
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)offWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     [self offWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
@@ -1235,18 +1186,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterOnOffSwitchConfiguration
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSwitchTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeOnOffSwitchConfigurationID) attributeID:@(MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchTypeID) params:params];
@@ -1310,18 +1249,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterLevelControl
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)moveToLevelWithParams:(MTRLevelControlClusterMoveToLevelParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -1801,18 +1728,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterBinaryInputBasic
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeActiveTextWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBinaryInputBasicID) attributeID:@(MTRAttributeIDTypeClusterBinaryInputBasicAttributeActiveTextID) params:params];
@@ -1967,18 +1882,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterPulseWidthModulation
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypePulseWidthModulationID) attributeID:@(MTRAttributeIDTypeClusterPulseWidthModulationAttributeGeneratedCommandListID) params:params];
@@ -2012,18 +1915,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterDescriptor
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeDeviceTypeListWithParams:(MTRReadParams * _Nullable)params
 {
@@ -2097,18 +1988,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterBinding
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeBindingWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBindingID) attributeID:@(MTRAttributeIDTypeClusterBindingAttributeBindingID) params:params];
@@ -2167,18 +2046,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterAccessControl
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeACLWithParams:(MTRReadParams * _Nullable)params
 {
@@ -2281,18 +2148,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterActions
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)instantActionWithParams:(MTRActionsClusterInstantActionParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -2736,18 +2591,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterBasicInformation
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)mfgSpecificPingWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     [self mfgSpecificPingWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
@@ -2971,18 +2814,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterOTASoftwareUpdateProvider
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)queryImageWithParams:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
@@ -3130,18 +2961,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterOTASoftwareUpdateRequestor
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)announceOTAProviderWithParams:(MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -3262,18 +3081,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterLocalizationConfiguration
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeActiveLocaleWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeLocalizationConfigurationID) attributeID:@(MTRAttributeIDTypeClusterLocalizationConfigurationAttributeActiveLocaleID) params:params];
@@ -3337,18 +3144,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterTimeFormatLocalization
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeHourFormatWithParams:(MTRReadParams * _Nullable)params
 {
@@ -3430,18 +3225,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterUnitLocalization
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeTemperatureUnitWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeUnitLocalizationID) attributeID:@(MTRAttributeIDTypeClusterUnitLocalizationAttributeTemperatureUnitID) params:params];
@@ -3501,18 +3284,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterPowerSourceConfiguration
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSourcesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypePowerSourceConfigurationID) attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID) params:params];
@@ -3560,18 +3331,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterPowerSource
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeStatusWithParams:(MTRReadParams * _Nullable)params
 {
@@ -3776,18 +3535,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterGeneralCommissioning
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)armFailSafeWithParams:(MTRGeneralCommissioningClusterArmFailSafeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
@@ -3979,18 +3726,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterNetworkCommissioning
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)scanNetworksWithParams:(MTRNetworkCommissioningClusterScanNetworksParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
@@ -4311,18 +4046,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterDiagnosticLogs
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)retrieveLogsRequestWithParams:(MTRDiagnosticLogsClusterRetrieveLogsRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
@@ -4400,18 +4123,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterGeneralDiagnostics
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)testEventTriggerWithParams:(MTRGeneralDiagnosticsClusterTestEventTriggerParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -4516,11 +4227,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAverageWearCountWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAverageWearCountID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeGeneratedCommandListID) params:params];
@@ -4572,18 +4278,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterSoftwareDiagnostics
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)resetWatermarksWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -4687,18 +4381,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterThreadNetworkDiagnostics
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -5106,18 +4788,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterWiFiNetworkDiagnostics
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     [self resetCountsWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
@@ -5274,18 +4944,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterEthernetNetworkDiagnostics
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     [self resetCountsWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
@@ -5413,18 +5071,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterTimeSynchronization
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)setUTCTimeWithParams:(MTRTimeSynchronizationClusterSetUTCTimeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -5660,18 +5306,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterBridgedDeviceBasicInformation
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeVendorNameWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBridgedDeviceBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeVendorNameID) params:params];
@@ -5808,18 +5442,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterSwitch
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfPositionsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeSwitchID) attributeID:@(MTRAttributeIDTypeClusterSwitchAttributeNumberOfPositionsID) params:params];
@@ -5877,18 +5499,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterAdministratorCommissioning
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)openCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenCommissioningWindowParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -6060,18 +5670,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterOperationalCredentials
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)attestationRequestWithParams:(MTROperationalCredentialsClusterAttestationRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
@@ -6423,18 +6021,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterGroupKeyManagement
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)keySetWriteWithParams:(MTRGroupKeyManagementClusterKeySetWriteParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -6647,18 +6233,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterFixedLabel
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeLabelListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeFixedLabelID) attributeID:@(MTRAttributeIDTypeClusterFixedLabelAttributeLabelListID) params:params];
@@ -6706,18 +6280,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterUserLabel
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeLabelListWithParams:(MTRReadParams * _Nullable)params
 {
@@ -6778,18 +6340,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterBooleanState
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeStateValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateAttributeStateValueID) params:params];
@@ -6837,18 +6387,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterICDManagement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)registerClientWithParams:(MTRICDManagementClusterRegisterClientParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRICDManagementClusterRegisterClientResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
@@ -7009,18 +6547,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterModeSelect
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)changeToModeWithParams:(MTRModeSelectClusterChangeToModeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -7148,18 +6674,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterLaundryWasherMode
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)changeToModeWithParams:(MTRLaundryWasherModeClusterChangeToModeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRLaundryWasherModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
@@ -7262,18 +6776,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterRefrigeratorAndTemperatureControlledCabinetMode
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)changeToModeWithParams:(MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
@@ -7378,18 +6880,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterLaundryWasherControls
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSpinSpeedsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeLaundryWasherControlsID) attributeID:@(MTRAttributeIDTypeClusterLaundryWasherControlsAttributeSpinSpeedsID) params:params];
@@ -7465,18 +6955,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterRVCRunMode
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)changeToModeWithParams:(MTRRVCRunModeClusterChangeToModeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRRVCRunModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
@@ -7565,18 +7043,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterRVCCleanMode
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)changeToModeWithParams:(MTRRVCCleanModeClusterChangeToModeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRRVCCleanModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
@@ -7663,18 +7129,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterTemperatureControl
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)setTemperatureWithParams:(MTRTemperatureControlClusterSetTemperatureParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -7767,18 +7221,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterRefrigeratorAlarm
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMaskWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID) attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeMaskID) params:params];
@@ -7827,18 +7269,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterDishwasherMode
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)changeToModeWithParams:(MTRDishwasherModeClusterChangeToModeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRDishwasherModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
@@ -7943,18 +7373,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterAirQuality
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAirQualityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeAirQualityID) attributeID:@(MTRAttributeIDTypeClusterAirQualityAttributeAirQualityID) params:params];
@@ -7993,18 +7411,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterSmokeCOAlarm
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)selfTestRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -8147,18 +7553,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterDishwasherAlarm
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)resetWithParams:(MTRDishwasherAlarmClusterResetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -8265,19 +7659,51 @@ using chip::System::Clock::Timeout;
 
 @end
 
-@implementation MTRClusterMicrowaveOvenControl
+@implementation MTRClusterMicrowaveOvenMode
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
 {
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMicrowaveOvenModeID) attributeID:@(MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeSupportedModesID) params:params];
 }
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMicrowaveOvenModeID) attributeID:@(MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeCurrentModeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMicrowaveOvenModeID) attributeID:@(MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMicrowaveOvenModeID) attributeID:@(MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMicrowaveOvenModeID) attributeID:@(MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeEventListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMicrowaveOvenModeID) attributeID:@(MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMicrowaveOvenModeID) attributeID:@(MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMicrowaveOvenModeID) attributeID:@(MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeClusterRevisionID) params:params];
+}
+
+@end
+
+@implementation MTRClusterMicrowaveOvenControl
 
 - (void)setCookingParametersWithParams:(MTRMicrowaveOvenControlClusterSetCookingParametersParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -8391,18 +7817,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterOperationalState
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
@@ -8592,18 +8006,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterRVCOperationalState
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     [self pauseWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
@@ -8792,18 +8194,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterHEPAFilterMonitoring
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)resetConditionWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     [self resetConditionWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
@@ -8910,18 +8300,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterActivatedCarbonFilterMonitoring
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)resetConditionWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     [self resetConditionWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
@@ -9027,18 +8405,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterDoorLock
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)lockDoorWithParams:(MTRDoorLockClusterLockDoorParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -10106,18 +9472,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterWindowCovering
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)upOrOpenWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     [self upOrOpenWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
@@ -10530,18 +9884,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterBarrierControl
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)barrierControlGoToPercentWithParams:(MTRBarrierControlClusterBarrierControlGoToPercentParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -10773,18 +10115,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterPumpConfigurationAndControl
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxPressureWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypePumpConfigurationAndControlID) attributeID:@(MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxPressureID) params:params];
@@ -10986,18 +10316,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterThermostat
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)setpointRaiseLowerWithParams:(MTRThermostatClusterSetpointRaiseLowerParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -11723,18 +11041,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterFanControl
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)stepWithParams:(MTRFanControlClusterStepParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -11942,18 +11248,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterThermostatUserInterfaceConfiguration
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeTemperatureDisplayModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeThermostatUserInterfaceConfigurationID) attributeID:@(MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeTemperatureDisplayModeID) params:params];
@@ -12044,18 +11338,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterColorControl
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)moveToHueWithParams:(MTRColorControlClusterMoveToHueParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -13111,18 +12393,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterBallastConfiguration
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributePhysicalMinLevelWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBallastConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBallastConfigurationAttributePhysicalMinLevelID) params:params];
@@ -13358,18 +12628,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterIlluminanceMeasurement
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeIlluminanceMeasurementID) attributeID:@(MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMeasuredValueID) params:params];
@@ -13438,18 +12696,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterTemperatureMeasurement
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeTemperatureMeasurementID) attributeID:@(MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMeasuredValueID) params:params];
@@ -13512,18 +12758,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterPressureMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
@@ -13613,18 +12847,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterFlowMeasurement
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeFlowMeasurementID) attributeID:@(MTRAttributeIDTypeClusterFlowMeasurementAttributeMeasuredValueID) params:params];
@@ -13688,18 +12910,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterRelativeHumidityMeasurement
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeRelativeHumidityMeasurementID) attributeID:@(MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMeasuredValueID) params:params];
@@ -13762,18 +12972,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterOccupancySensing
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeOccupancyWithParams:(MTRReadParams * _Nullable)params
 {
@@ -14013,18 +13211,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterCarbonMonoxideConcentrationMeasurement
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMeasuredValueID) params:params];
@@ -14113,18 +13299,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterCarbonDioxideConcentrationMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
@@ -14215,18 +13389,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterNitrogenDioxideConcentrationMeasurement
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMeasuredValueID) params:params];
@@ -14315,18 +13477,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterOzoneConcentrationMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
@@ -14417,18 +13567,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterPM25ConcentrationMeasurement
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMeasuredValueID) params:params];
@@ -14517,18 +13655,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterFormaldehydeConcentrationMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
@@ -14619,18 +13745,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterPM1ConcentrationMeasurement
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMeasuredValueID) params:params];
@@ -14719,18 +13833,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterPM10ConcentrationMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
@@ -14821,18 +13923,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterTotalVolatileOrganicCompoundsConcentrationMeasurement
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID) attributeID:@(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMeasuredValueID) params:params];
@@ -14921,18 +14011,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterRadonConcentrationMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
@@ -15023,18 +14101,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterWakeOnLAN
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMACAddressWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeWakeOnLANID) attributeID:@(MTRAttributeIDTypeClusterWakeOnLANAttributeMACAddressID) params:params];
@@ -15084,18 +14150,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterChannel
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)changeChannelWithParams:(MTRChannelClusterChangeChannelParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
@@ -15254,18 +14308,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterTargetNavigator
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)navigateTargetWithParams:(MTRTargetNavigatorClusterNavigateTargetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
@@ -15353,18 +14395,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterMediaPlayback
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)playWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
@@ -15893,18 +14923,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterMediaInput
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)selectInputWithParams:(MTRMediaInputClusterSelectInputParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -16102,18 +15120,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterLowPower
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)sleepWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     [self sleepWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
@@ -16197,18 +15203,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterKeypadInput
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)sendKeyWithParams:(MTRKeypadInputClusterSendKeyParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
@@ -16286,18 +15280,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterContentLauncher
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)launchContentWithParams:(MTRContentLauncherClusterLaunchContentParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRContentLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
@@ -16433,18 +15415,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterAudioOutput
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (void)selectOutputWithParams:(MTRAudioOutputClusterSelectOutputParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -16561,18 +15531,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterApplicationLauncher
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
@@ -16743,18 +15701,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterApplicationBasic
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeVendorNameWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeApplicationBasicID) attributeID:@(MTRAttributeIDTypeClusterApplicationBasicAttributeVendorNameID) params:params];
@@ -16837,18 +15783,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterAccountLogin
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)getSetupPINWithParams:(MTRAccountLoginClusterGetSetupPINParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
@@ -17008,18 +15942,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterElectricalMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)getProfileInfoCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -17863,18 +16785,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterUnitTesting
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)testWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
@@ -20033,18 +18943,6 @@ using chip::System::Clock::Timeout;
 @end
 
 @implementation MTRClusterSampleMEI
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 - (void)pingWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {

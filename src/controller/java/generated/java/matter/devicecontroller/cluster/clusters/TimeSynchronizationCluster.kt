@@ -17,36 +17,30 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class TimeSynchronizationCluster(private val endpointId: UShort) {
   class SetTimeZoneResponse(val DSTOffsetRequired: Boolean)
 
   class UTCTimeAttribute(val value: ULong?)
 
-  class TrustedTimeSourceAttribute(
-    val value: ChipStructs.TimeSynchronizationClusterTrustedTimeSourceStruct?
-  )
+  class TrustedTimeSourceAttribute(val value: TimeSynchronizationClusterTrustedTimeSourceStruct?)
 
   class DefaultNTPAttribute(val value: String?)
 
-  class TimeZoneAttribute(
-    val value: ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct>?
-  )
+  class TimeZoneAttribute(val value: List<TimeSynchronizationClusterTimeZoneStruct>?)
 
-  class DSTOffsetAttribute(
-    val value: ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct>?
-  )
+  class DSTOffsetAttribute(val value: List<TimeSynchronizationClusterDSTOffsetStruct>?)
 
   class LocalTimeAttribute(val value: ULong?)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun setUTCTime(
     UTCTime: ULong,
@@ -62,7 +56,7 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
   }
 
   suspend fun setTrustedTimeSource(
-    trustedTimeSource: ChipStructs.TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct?,
+    trustedTimeSource: TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct?,
     timedInvokeTimeoutMs: Int? = null
   ) {
     if (timedInvokeTimeoutMs != null) {
@@ -73,7 +67,7 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
   }
 
   suspend fun setTimeZone(
-    timeZone: ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct>,
+    timeZone: List<TimeSynchronizationClusterTimeZoneStruct>,
     timedInvokeTimeoutMs: Int? = null
   ): SetTimeZoneResponse {
     if (timedInvokeTimeoutMs != null) {
@@ -84,7 +78,7 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
   }
 
   suspend fun setDSTOffset(
-    DSTOffset: ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct>,
+    DSTOffset: List<TimeSynchronizationClusterDSTOffsetStruct>,
     timedInvokeTimeoutMs: Int? = null
   ) {
     if (timedInvokeTimeoutMs != null) {

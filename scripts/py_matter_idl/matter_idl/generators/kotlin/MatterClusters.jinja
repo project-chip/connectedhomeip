@@ -6,10 +6,10 @@
   {%- elif encodable.is_optional -%}
     {{encode_value(source, encodable.without_optional(), depth + 1)}}?
   {%- elif encodable.is_list -%}
-    ArrayList<{{encode_value(source, encodable.without_list(), depth + 1)}}>
+    List<{{encode_value(source, encodable.without_list(), depth + 1)}}>
   {%- elif encodable.is_struct -%}
     {%- set struct = encodable.get_underlying_struct() -%}
-    ChipStructs.{{source.name}}Cluster{{struct.name}}
+    {{source.name}}Cluster{{struct.name}}
   {%- else -%}
     {{encodable.kotlin_type}}
   {%- endif -%}
@@ -22,7 +22,7 @@
     List<{{encode_value_without_optional(source, encodable.without_list(), depth + 1)}}>
   {%- elif encodable.is_struct -%}
     {%- set struct = encodable.get_underlying_struct() -%}
-    ChipStructs.{{source.name}}Cluster{{struct.name}}
+    {{source.name}}Cluster{{struct.name}}
   {%- else -%}
     {{encodable.kotlin_type}}
   {%- endif -%}
@@ -30,10 +30,10 @@
 
 {%- macro encode_value_without_optional_nullable(source, encodable, depth) -%}
   {%- if encodable.is_list -%}
-    ArrayList<{{encode_value_without_optional_nullable(source, encodable.without_list(), depth + 1)}}>
+    List<{{encode_value_without_optional_nullable(source, encodable.without_list(), depth + 1)}}>
   {%- elif encodable.is_struct -%}
     {%- set struct = encodable.get_underlying_struct() -%}
-    ChipStructs.{{source.name}}Cluster{{struct.name}}
+    {{source.name}}Cluster{{struct.name}}
   {%- else -%}
     {{encodable.kotlin_type}}
   {%- endif -%}
@@ -58,7 +58,7 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 {% set typeLookup = idl | createLookupContext(cluster) %}
 class {{cluster.name}}Cluster(private val endpointId: UShort) {
 

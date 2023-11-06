@@ -1426,22 +1426,22 @@ public static class WiFiNetworkDiagnosticsClusterDisconnectionEvent {
   }
 }
 public static class WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
-  public Integer associationFailure;
+  public Integer associationFailureCause;
   public Integer status;
-  private static final long ASSOCIATION_FAILURE_ID = 0L;
+  private static final long ASSOCIATION_FAILURE_CAUSE_ID = 0L;
   private static final long STATUS_ID = 1L;
 
   public WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
-    Integer associationFailure,
+    Integer associationFailureCause,
     Integer status
   ) {
-    this.associationFailure = associationFailure;
+    this.associationFailureCause = associationFailureCause;
     this.status = status;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(ASSOCIATION_FAILURE_ID, new UIntType(associationFailure)));
+    values.add(new StructElement(ASSOCIATION_FAILURE_CAUSE_ID, new UIntType(associationFailureCause)));
     values.add(new StructElement(STATUS_ID, new UIntType(status)));
 
     return new StructType(values);
@@ -1451,13 +1451,13 @@ public static class WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Integer associationFailure = null;
+    Integer associationFailureCause = null;
     Integer status = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == ASSOCIATION_FAILURE_ID) {
+      if (element.contextTagNum() == ASSOCIATION_FAILURE_CAUSE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          associationFailure = castingValue.value(Integer.class);
+          associationFailureCause = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == STATUS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -1467,7 +1467,7 @@ public static class WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
       }
     }
     return new WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
-      associationFailure,
+      associationFailureCause,
       status
     );
   }
@@ -1476,8 +1476,8 @@ public static class WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("WiFiNetworkDiagnosticsClusterAssociationFailureEvent {\n");
-    output.append("\tassociationFailure: ");
-    output.append(associationFailure);
+    output.append("\tassociationFailureCause: ");
+    output.append(associationFailureCause);
     output.append("\n");
     output.append("\tstatus: ");
     output.append(status);

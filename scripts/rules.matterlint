@@ -25,6 +25,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/dishwasher-alarm-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/dishwasher-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/microwave-oven-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/microwave-oven-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml";
@@ -104,6 +105,16 @@ all endpoints {
 
     require global attribute featureMap = 65532;
     require global attribute clusterRevision = 65533;
+
+    // Deny rules:
+    //   deny cluster Foo;  // denies entire cluster by name
+    //   deny cluster 123;  // denies entire cluster by id
+    //   deny cluster Foo attribute bar;  // denies specific attribute by name
+    //   deny cluster Foo attribute 123;  // denies specific attribute by id
+    //   deny cluster 234 attribute 567;  // Allows deny using ids only
+
+    // (previously AverageWearCount, see #30002/#29285 in GitHub)
+    deny cluster GeneralDiagnostics attribute 9;
 }
 
 endpoint 0 {

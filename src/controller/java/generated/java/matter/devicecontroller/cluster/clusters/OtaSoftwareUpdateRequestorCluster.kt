@@ -17,22 +17,22 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class OtaSoftwareUpdateRequestorCluster(private val endpointId: UShort) {
   class DefaultOTAProvidersAttribute(
-    val value: ArrayList<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation>
+    val value: List<OtaSoftwareUpdateRequestorClusterProviderLocation>
   )
 
   class UpdateStateProgressAttribute(val value: UByte?)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun announceOTAProvider(
     providerNodeID: ULong,
@@ -60,13 +60,13 @@ class OtaSoftwareUpdateRequestorCluster(private val endpointId: UShort) {
   }
 
   suspend fun writeDefaultOTAProvidersAttribute(
-    value: ArrayList<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation>
+    value: List<OtaSoftwareUpdateRequestorClusterProviderLocation>
   ) {
     // Implementation needs to be added here
   }
 
   suspend fun writeDefaultOTAProvidersAttribute(
-    value: ArrayList<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation>,
+    value: List<OtaSoftwareUpdateRequestorClusterProviderLocation>,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here

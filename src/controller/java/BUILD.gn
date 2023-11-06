@@ -337,10 +337,14 @@ kotlin_library("chipcluster_test") {
 }
 
 kotlin_library("kotlin_matter_controller") {
+  import(
+      "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/files.gni")
+
   output_name = "KotlinMatterController.jar"
 
   deps = [
     ":java",
+    ":tlv",
     "${chip_root}/third_party/java_deps:annotation",
   ]
 
@@ -356,6 +360,9 @@ kotlin_library("kotlin_matter_controller") {
     "src/matter/controller/model/Paths.kt",
     "src/matter/controller/model/States.kt",
   ]
+
+  sources += matter_structs_sources
+  sources += matter_eventstructs_sources
 
   if (matter_enable_java_compilation) {
     deps += [

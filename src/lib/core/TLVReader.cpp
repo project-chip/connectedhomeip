@@ -583,23 +583,31 @@ CHIP_ERROR TLVReader::Next()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR TLVReader::Expect(Tag expectedTag)
+{
+    VerifyOrReturnError(GetType() != kTLVType_NotSpecified, CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrReturnError(GetTag() == expectedTag, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR TLVReader::Next(Tag expectedTag)
 {
-    CHIP_ERROR err = Next();
-    if (err != CHIP_NO_ERROR)
-        return err;
-    if (mElemTag != expectedTag)
-        return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
+    ReturnErrorOnFailure(Next());
+    ReturnErrorOnFailure(Expect(expectedTag));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TLVReader::Expect(TLVType expectedType, Tag expectedTag)
+{
+    VerifyOrReturnError(GetType() == expectedType, CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrReturnError(GetTag() == expectedTag, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TLVReader::Next(TLVType expectedType, Tag expectedTag)
 {
-    CHIP_ERROR err = Next(expectedTag);
-    if (err != CHIP_NO_ERROR)
-        return err;
-    if (GetType() != expectedType)
-        return CHIP_ERROR_WRONG_TLV_TYPE;
+    ReturnErrorOnFailure(Next());
+    ReturnErrorOnFailure(Expect(expectedType, expectedTag));
     return CHIP_NO_ERROR;
 }
 

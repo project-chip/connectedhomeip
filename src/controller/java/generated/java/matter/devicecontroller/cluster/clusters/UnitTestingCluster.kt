@@ -17,7 +17,7 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class UnitTestingCluster(private val endpointId: UShort) {
   class TestSpecificResponse(val returnValue: UByte)
@@ -27,17 +27,17 @@ class UnitTestingCluster(private val endpointId: UShort) {
   class TestSimpleArgumentResponse(val returnValue: Boolean)
 
   class TestStructArrayArgumentResponse(
-    val arg1: ArrayList<ChipStructs.UnitTestingClusterNestedStructList>,
-    val arg2: ArrayList<ChipStructs.UnitTestingClusterSimpleStruct>,
-    val arg3: ArrayList<UInt>,
-    val arg4: ArrayList<Boolean>,
+    val arg1: List<UnitTestingClusterNestedStructList>,
+    val arg2: List<UnitTestingClusterSimpleStruct>,
+    val arg3: List<UInt>,
+    val arg4: List<Boolean>,
     val arg5: UInt,
     val arg6: Boolean
   )
 
   class BooleanResponse(val value: Boolean)
 
-  class TestListInt8UReverseResponse(val arg1: ArrayList<UByte>)
+  class TestListInt8UReverseResponse(val arg1: List<UByte>)
 
   class TestEnumsResponse(val arg1: UShort, val arg2: UInt)
 
@@ -64,46 +64,42 @@ class UnitTestingCluster(private val endpointId: UShort) {
     val nullableOptionalStringWasNull: Boolean?,
     val nullableOptionalStringValue: String?,
     val nullableStructWasNull: Boolean,
-    val nullableStructValue: ChipStructs.UnitTestingClusterSimpleStruct?,
+    val nullableStructValue: UnitTestingClusterSimpleStruct?,
     val optionalStructWasPresent: Boolean,
-    val optionalStructValue: ChipStructs.UnitTestingClusterSimpleStruct?,
+    val optionalStructValue: UnitTestingClusterSimpleStruct?,
     val nullableOptionalStructWasPresent: Boolean,
     val nullableOptionalStructWasNull: Boolean?,
-    val nullableOptionalStructValue: ChipStructs.UnitTestingClusterSimpleStruct?,
+    val nullableOptionalStructValue: UnitTestingClusterSimpleStruct?,
     val nullableListWasNull: Boolean,
-    val nullableListValue: ArrayList<UInt>?,
+    val nullableListValue: List<UInt>?,
     val optionalListWasPresent: Boolean,
-    val optionalListValue: ArrayList<UInt>?,
+    val optionalListValue: List<UInt>?,
     val nullableOptionalListWasPresent: Boolean,
     val nullableOptionalListWasNull: Boolean?,
-    val nullableOptionalListValue: ArrayList<UInt>?
+    val nullableOptionalListValue: List<UInt>?
   )
 
-  class SimpleStructResponse(val arg1: ChipStructs.UnitTestingClusterSimpleStruct)
+  class SimpleStructResponse(val arg1: UnitTestingClusterSimpleStruct)
 
   class TestEmitTestEventResponse(val value: ULong)
 
   class TestEmitTestFabricScopedEventResponse(val value: ULong)
 
-  class ListInt8uAttribute(val value: ArrayList<UByte>)
+  class ListInt8uAttribute(val value: List<UByte>)
 
-  class ListOctetStringAttribute(val value: ArrayList<ByteArray>)
+  class ListOctetStringAttribute(val value: List<ByteArray>)
 
-  class ListStructOctetStringAttribute(
-    val value: ArrayList<ChipStructs.UnitTestingClusterTestListStructOctet>
-  )
+  class ListStructOctetStringAttribute(val value: List<UnitTestingClusterTestListStructOctet>)
 
   class ListNullablesAndOptionalsStructAttribute(
-    val value: ArrayList<ChipStructs.UnitTestingClusterNullablesAndOptionalsStruct>
+    val value: List<UnitTestingClusterNullablesAndOptionalsStruct>
   )
 
-  class StructAttrAttribute(val value: ChipStructs.UnitTestingClusterSimpleStruct)
+  class StructAttrAttribute(val value: UnitTestingClusterSimpleStruct)
 
-  class ListLongOctetStringAttribute(val value: ArrayList<ByteArray>)
+  class ListLongOctetStringAttribute(val value: List<ByteArray>)
 
-  class ListFabricScopedAttribute(
-    val value: ArrayList<ChipStructs.UnitTestingClusterTestFabricScoped>
-  )
+  class ListFabricScopedAttribute(val value: List<UnitTestingClusterTestFabricScoped>)
 
   class NullableBooleanAttribute(val value: Boolean?)
 
@@ -161,7 +157,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
 
   class NullableEnumAttrAttribute(val value: UInt?)
 
-  class NullableStructAttribute(val value: ChipStructs.UnitTestingClusterSimpleStruct?)
+  class NullableStructAttribute(val value: UnitTestingClusterSimpleStruct?)
 
   class NullableRangeRestrictedInt8uAttribute(val value: UByte?)
 
@@ -171,13 +167,13 @@ class UnitTestingCluster(private val endpointId: UShort) {
 
   class NullableRangeRestrictedInt16sAttribute(val value: Short?)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun test(timedInvokeTimeoutMs: Int? = null) {
     if (timedInvokeTimeoutMs != null) {
@@ -235,10 +231,10 @@ class UnitTestingCluster(private val endpointId: UShort) {
   }
 
   suspend fun testStructArrayArgumentRequest(
-    arg1: ArrayList<ChipStructs.UnitTestingClusterNestedStructList>,
-    arg2: ArrayList<ChipStructs.UnitTestingClusterSimpleStruct>,
-    arg3: ArrayList<UInt>,
-    arg4: ArrayList<Boolean>,
+    arg1: List<UnitTestingClusterNestedStructList>,
+    arg2: List<UnitTestingClusterSimpleStruct>,
+    arg3: List<UInt>,
+    arg4: List<Boolean>,
     arg5: UInt,
     arg6: Boolean,
     timedInvokeTimeoutMs: Int? = null
@@ -251,7 +247,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
   }
 
   suspend fun testStructArgumentRequest(
-    arg1: ChipStructs.UnitTestingClusterSimpleStruct,
+    arg1: UnitTestingClusterSimpleStruct,
     timedInvokeTimeoutMs: Int? = null
   ): BooleanResponse {
     if (timedInvokeTimeoutMs != null) {
@@ -262,7 +258,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
   }
 
   suspend fun testNestedStructArgumentRequest(
-    arg1: ChipStructs.UnitTestingClusterNestedStruct,
+    arg1: UnitTestingClusterNestedStruct,
     timedInvokeTimeoutMs: Int? = null
   ): BooleanResponse {
     if (timedInvokeTimeoutMs != null) {
@@ -273,7 +269,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
   }
 
   suspend fun testListStructArgumentRequest(
-    arg1: ArrayList<ChipStructs.UnitTestingClusterSimpleStruct>,
+    arg1: List<UnitTestingClusterSimpleStruct>,
     timedInvokeTimeoutMs: Int? = null
   ): BooleanResponse {
     if (timedInvokeTimeoutMs != null) {
@@ -284,7 +280,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
   }
 
   suspend fun testListInt8UArgumentRequest(
-    arg1: ArrayList<UByte>,
+    arg1: List<UByte>,
     timedInvokeTimeoutMs: Int? = null
   ): BooleanResponse {
     if (timedInvokeTimeoutMs != null) {
@@ -295,7 +291,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
   }
 
   suspend fun testNestedStructListArgumentRequest(
-    arg1: ChipStructs.UnitTestingClusterNestedStructList,
+    arg1: UnitTestingClusterNestedStructList,
     timedInvokeTimeoutMs: Int? = null
   ): BooleanResponse {
     if (timedInvokeTimeoutMs != null) {
@@ -306,7 +302,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
   }
 
   suspend fun testListNestedStructListArgumentRequest(
-    arg1: ArrayList<ChipStructs.UnitTestingClusterNestedStructList>,
+    arg1: List<UnitTestingClusterNestedStructList>,
     timedInvokeTimeoutMs: Int? = null
   ): BooleanResponse {
     if (timedInvokeTimeoutMs != null) {
@@ -317,7 +313,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
   }
 
   suspend fun testListInt8UReverseRequest(
-    arg1: ArrayList<UByte>,
+    arg1: List<UByte>,
     timedInvokeTimeoutMs: Int? = null
   ): TestListInt8UReverseResponse {
     if (timedInvokeTimeoutMs != null) {
@@ -357,12 +353,12 @@ class UnitTestingCluster(private val endpointId: UShort) {
     nullableString: String?,
     optionalString: String?,
     nullableOptionalString: String?,
-    nullableStruct: ChipStructs.UnitTestingClusterSimpleStruct?,
-    optionalStruct: ChipStructs.UnitTestingClusterSimpleStruct?,
-    nullableOptionalStruct: ChipStructs.UnitTestingClusterSimpleStruct?,
-    nullableList: ArrayList<UInt>?,
-    optionalList: ArrayList<UInt>?,
-    nullableOptionalList: ArrayList<UInt>?,
+    nullableStruct: UnitTestingClusterSimpleStruct?,
+    optionalStruct: UnitTestingClusterSimpleStruct?,
+    nullableOptionalStruct: UnitTestingClusterSimpleStruct?,
+    nullableList: List<UInt>?,
+    optionalList: List<UInt>?,
+    nullableOptionalList: List<UInt>?,
     timedInvokeTimeoutMs: Int? = null
   ): TestComplexNullableOptionalResponse {
     if (timedInvokeTimeoutMs != null) {
@@ -373,7 +369,7 @@ class UnitTestingCluster(private val endpointId: UShort) {
   }
 
   suspend fun simpleStructEchoRequest(
-    arg1: ChipStructs.UnitTestingClusterSimpleStruct,
+    arg1: UnitTestingClusterSimpleStruct,
     timedInvokeTimeoutMs: Int? = null
   ): SimpleStructResponse {
     if (timedInvokeTimeoutMs != null) {
@@ -843,11 +839,11 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeListInt8uAttribute(value: ArrayList<UByte>) {
+  suspend fun writeListInt8uAttribute(value: List<UByte>) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeListInt8uAttribute(value: ArrayList<UByte>, timedWriteTimeoutMs: Int) {
+  suspend fun writeListInt8uAttribute(value: List<UByte>, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -859,11 +855,11 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeListOctetStringAttribute(value: ArrayList<ByteArray>) {
+  suspend fun writeListOctetStringAttribute(value: List<ByteArray>) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeListOctetStringAttribute(value: ArrayList<ByteArray>, timedWriteTimeoutMs: Int) {
+  suspend fun writeListOctetStringAttribute(value: List<ByteArray>, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -879,13 +875,13 @@ class UnitTestingCluster(private val endpointId: UShort) {
   }
 
   suspend fun writeListStructOctetStringAttribute(
-    value: ArrayList<ChipStructs.UnitTestingClusterTestListStructOctet>
+    value: List<UnitTestingClusterTestListStructOctet>
   ) {
     // Implementation needs to be added here
   }
 
   suspend fun writeListStructOctetStringAttribute(
-    value: ArrayList<ChipStructs.UnitTestingClusterTestListStructOctet>,
+    value: List<UnitTestingClusterTestListStructOctet>,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here
@@ -1000,13 +996,13 @@ class UnitTestingCluster(private val endpointId: UShort) {
   }
 
   suspend fun writeListNullablesAndOptionalsStructAttribute(
-    value: ArrayList<ChipStructs.UnitTestingClusterNullablesAndOptionalsStruct>
+    value: List<UnitTestingClusterNullablesAndOptionalsStruct>
   ) {
     // Implementation needs to be added here
   }
 
   suspend fun writeListNullablesAndOptionalsStructAttribute(
-    value: ArrayList<ChipStructs.UnitTestingClusterNullablesAndOptionalsStruct>,
+    value: List<UnitTestingClusterNullablesAndOptionalsStruct>,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here
@@ -1039,12 +1035,12 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeStructAttrAttribute(value: ChipStructs.UnitTestingClusterSimpleStruct) {
+  suspend fun writeStructAttrAttribute(value: UnitTestingClusterSimpleStruct) {
     // Implementation needs to be added here
   }
 
   suspend fun writeStructAttrAttribute(
-    value: ChipStructs.UnitTestingClusterSimpleStruct,
+    value: UnitTestingClusterSimpleStruct,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here
@@ -1125,14 +1121,11 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeListLongOctetStringAttribute(value: ArrayList<ByteArray>) {
+  suspend fun writeListLongOctetStringAttribute(value: List<ByteArray>) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeListLongOctetStringAttribute(
-    value: ArrayList<ByteArray>,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeListLongOctetStringAttribute(value: List<ByteArray>, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
@@ -1153,14 +1146,12 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeListFabricScopedAttribute(
-    value: ArrayList<ChipStructs.UnitTestingClusterTestFabricScoped>
-  ) {
+  suspend fun writeListFabricScopedAttribute(value: List<UnitTestingClusterTestFabricScoped>) {
     // Implementation needs to be added here
   }
 
   suspend fun writeListFabricScopedAttribute(
-    value: ArrayList<ChipStructs.UnitTestingClusterTestFabricScoped>,
+    value: List<UnitTestingClusterTestFabricScoped>,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here
@@ -1769,12 +1760,12 @@ class UnitTestingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNullableStructAttribute(value: ChipStructs.UnitTestingClusterSimpleStruct) {
+  suspend fun writeNullableStructAttribute(value: UnitTestingClusterSimpleStruct) {
     // Implementation needs to be added here
   }
 
   suspend fun writeNullableStructAttribute(
-    value: ChipStructs.UnitTestingClusterSimpleStruct,
+    value: UnitTestingClusterSimpleStruct,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here

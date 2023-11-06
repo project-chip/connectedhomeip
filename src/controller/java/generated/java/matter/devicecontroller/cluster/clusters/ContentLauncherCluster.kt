@@ -17,23 +17,23 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class ContentLauncherCluster(private val endpointId: UShort) {
   class LauncherResponse(val status: UInt, val data: String?)
 
-  class AcceptHeaderAttribute(val value: ArrayList<String>?)
+  class AcceptHeaderAttribute(val value: List<String>?)
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun launchContent(
-    search: ChipStructs.ContentLauncherClusterContentSearchStruct,
+    search: ContentLauncherClusterContentSearchStruct,
     autoPlay: Boolean,
     data: String?,
     timedInvokeTimeoutMs: Int? = null
@@ -48,7 +48,7 @@ class ContentLauncherCluster(private val endpointId: UShort) {
   suspend fun launchURL(
     contentURL: String,
     displayString: String?,
-    brandingInformation: ChipStructs.ContentLauncherClusterBrandingInformationStruct?,
+    brandingInformation: ContentLauncherClusterBrandingInformationStruct?,
     timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
     if (timedInvokeTimeoutMs != null) {

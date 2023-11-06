@@ -17,22 +17,22 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.devicecontroller.cluster.structs.*
 
 class HepaFilterMonitoringCluster(private val endpointId: UShort) {
   class LastChangedTimeAttribute(val value: UInt?)
 
   class ReplacementProductListAttribute(
-    val value: ArrayList<ChipStructs.HepaFilterMonitoringClusterReplacementProductStruct>?
+    val value: List<HepaFilterMonitoringClusterReplacementProductStruct>?
   )
 
-  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(val value: ArrayList<UInt>)
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(val value: ArrayList<UInt>)
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun resetCondition(timedInvokeTimeoutMs: Int? = null) {
     if (timedInvokeTimeoutMs != null) {
