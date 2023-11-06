@@ -13,26 +13,35 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.5.1. [TC-IDM-5.1] Timed Request Action from DUT to TH. [{DUT_Client}]
+name: 3.5.1. [TC-IDM-5.1] Timed Request Action from DUT to TH. [DUT_Client]
+
+PICS:
+    - MCORE.IDM.C
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
-    - label:
-          "DUT sends the Timed Request to the TH and then sends an Invoke
-          Request Message to the TH after receiving the status response message
-          from the TH. The Timed Request Message should contain a timeout value
-          in milliseconds. (Example - 200 milliseconds)"
+    - label: "Note"
       verification: |
-          In the case of chip tool as a client, here is an example command the client can send invoke request  to the TH
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+          The DUT should have a way of triggering the Timed Request Message for Testing. Test Step #3 might not be testable.
+      disabled: true
+
+    - label:
+          "Step 1: DUT sends the Timed Request to the TH and then sends an
+          Invoke Request Message to the TH after receiving the status response
+          message from the TH. The Timed Request Message should contain a
+          timeout value in milliseconds. (Example - 200 milliseconds)"
+      PICS: MCORE.IDM.C.InvokeRequest
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool onoff on 1 1 --timedInteractionTimeoutMs 200
 
-          Verify that the DUT sent the invoke message to the TH after the specified timeout value for above command
-
-          on the TH (reference all cluster app) you should see
+          On the TH(all-clusters-app) verify the received timed request message has the timeout value as sent by the DUT(chip-tool) and verify that the message is unicast.
           [1655797318.624018][7331:7331] CHIP:EM: Handling via exchange: 28067r, Delegate: 0xaaaad9aed418
           [1655797318.624129][7331:7331] CHIP:DMG: TimedRequestMessage =
           [1655797318.624185][7331:7331] CHIP:DMG: {
@@ -41,6 +50,7 @@ tests:
           [1655797318.624339][7331:7331] CHIP:DMG: }
           [1655797318.624394][7331:7331] CHIP:DMG: Got Timed Request with timeout 200: handler 0xaaaaf9f93440 exchange 28067r
 
+          On the TH(all-clusters-app)  Verify that the DUT(chip-tool) sends the Invoke Request Message to the TH(all-clusters-app) before the specified timeout value and Invoke Request has TimedRequest set to True.
           [1655797318.626273][7331:7331] CHIP:DMG: Handing timed invoke to IM engine: handler 0xaaaaf9f93440 exchange 28067r
           [1655797318.626358][7331:7331] CHIP:DMG: InvokeRequestMessage =
           [1655797318.626411][7331:7331] CHIP:DMG: {
@@ -70,16 +80,18 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends the Timed Request to the TH and then sends a
+          "Step 2: DUT sends the Timed Request to the TH and then sends a
           WriteRequestMessage to the TH after receiving the status response
           message from the TH. The Timed Request Message should contain a
           timeout value in milliseconds. (Example - 200 milliseconds)"
+      PICS: MCORE.IDM.C.WriteRequest
       verification: |
-          Chip-tool as controller , here is the example command you can use
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
            ./chip-tool onoff write  on-time 2 1 1 --timedInteractionTimeoutMs 200
 
-          Verify that the DUT sent the writerequest message to the TH after the specified timeout value for above command
 
+          On the TH(all-clusters-app) verify the received timed request message has the timeout value as sent by the DUT(chip-tool) and verify that the message is unicast.
 
           [1657459639.597900][11525:11525] CHIP:EM: Handling via exchange: 17116r, Delegate: 0xaaaae00c1430
           [1657459639.598014][11525:11525] CHIP:DMG: TimedRequestMessage =
@@ -90,6 +102,7 @@ tests:
           [1657459639.598204][11525:11525] CHIP:DMG: Got Timed Request with timeout 200: handler 0xaaab1651bac0 exchange 17116r
           [1657459639.598282][11525:11525] CHIP:EM: Piggybacking Ack for MessageCounter:161619532 on exchange: 17116r
 
+          On the TH(all-clusters-app) Verify that the DUT(chip-tool) sends the WriteRequestMessage to the TH(all-clusters-app) before the specified timeout value and WriteRequestMessage has the TimedRequest field set to TRUE.
           [1657459639.599816][11525:11525] CHIP:IM: Received Write request
           [1657459639.599844][11525:11525] CHIP:DMG: IM WH moving to [Initialized]
           [1657459639.599908][11525:11525] CHIP:DMG: WriteRequestMessage =
@@ -121,10 +134,11 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends the Timed Request to the TH The Timed Request Message
-          should contain a timeout value in milliseconds. (Example - 200
+          "Step 3: DUT sends the Timed Request to the TH The Timed Request
+          Message should contain a timeout value in milliseconds. (Example - 200
           milliseconds) Force the TH to not send a response back to the DUT for
           the received timed request."
+      PICS: MCORE.IDM.C.WriteRequest || MCORE.IDM.C.InvokeRequest
       verification: |
-          This is not testable in normal scenario, and needs to be tested as part of Unit test.
+          Mark this as not testable /NA. Out of Scope
       disabled: true

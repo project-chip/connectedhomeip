@@ -39,9 +39,6 @@
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
-// Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "CHIPUS"
-
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
  *
@@ -68,21 +65,13 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
- *
- * Enables synchronizing the device's real time clock with a remote CHIP Time service
- * using the CHIP Time Sync protocol.
- */
-// #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
-
-/**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
  *
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
 
-#define MATTER_CC13X2_26X2_PLATFORM_LOG_ENABLED 1
+#define MATTER_CC13XX_26XX_PLATFORM_LOG_ENABLED 1
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT

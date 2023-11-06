@@ -52,7 +52,7 @@ def get_ncs_recommended_revision():
     try:
         with open(os.path.join(chip_root, 'config/nrfconnect/.nrfconnect-recommended-revision'), 'r') as f:
             return f.readline().strip()
-    except:
+    except OSError:
         raise RuntimeError(
             "Encountered problem when trying to read .nrfconnect-recommended-revision file.")
 
@@ -80,8 +80,12 @@ def print_check_revision_warning_message(current_revision, recommended_revision)
     # To keep right frame shape the space characters are added to messages shorter than the longest one.
     fmt = "# {:<%s}#" % (longest_message_len)
 
-    print_messages([(longest_message_len+3)*'#', fmt.format(current_revision_message), fmt.format(recommended_revision_message), fmt.format(''),
-                    fmt.format(allowed_message), fmt.format(update_message), fmt.format(call_command_message), (longest_message_len+3)*'#'], sys.stdout.isatty())
+    print_messages([
+        (longest_message_len+3)*'#', fmt.format(current_revision_message),
+        fmt.format(recommended_revision_message), fmt.format(''),
+        fmt.format(allowed_message), fmt.format(update_message),
+        fmt.format(call_command_message), (longest_message_len+3)*'#'
+    ], sys.stdout.isatty())
 
 
 def main():
@@ -95,13 +99,17 @@ def main():
         parser = argparse.ArgumentParser(
             description='Script helping to update nRF Connect SDK to currently recommended revision.')
         parser.add_argument(
-            "-c", "--check", help="Check if your current nRF Connect SDK revision is the same as recommended one.", action="store_true")
+            "-c", "--check",
+            help="Check if your current nRF Connect SDK revision is the same as recommended one.", action="store_true")
         parser.add_argument(
-            "-u", "--update", help="Update your nRF Connect SDK to currently recommended revision.", action="store_true")
+            "-u", "--update",
+            help="Update your nRF Connect SDK to currently recommended revision.", action="store_true")
         parser.add_argument(
-            "-s", "--shallow", help="Fetch only specific commits (without the history) when updating nRF Connect SDK.", action="store_true")
+            "-s", "--shallow",
+            help="Fetch only specific commits (without the history) when updating nRF Connect SDK.", action="store_true")
         parser.add_argument(
-            "-q", "--quiet", help="Don't print any message if the check succeeds.", action="store_true")
+            "-q", "--quiet",
+            help="Don't print any message if the check succeeds.", action="store_true")
         args = parser.parse_args()
 
         ncs_base = os.path.join(zephyr_base, '../nrf')

@@ -72,7 +72,7 @@ void HandleIncomingBleConnection(BLEEndPoint * bleEP)
     ChipLogProgress(DeviceLayer, "con rcvd");
 }
 
-void BLEManagerImpl::InitConnectionData(void)
+void BLEManagerImpl::InitConnectionData()
 {
     /* Initialize Hashmap */
     if (!mConnectionMap)
@@ -256,17 +256,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         HandleConnectionError(event->CHIPoBLEConnectionError.ConId, event->CHIPoBLEConnectionError.Reason);
         break;
     case DeviceEventType::kServiceProvisioningChange:
-        // If CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED is enabled, and there is a change to the
-        // device's provisioning state, then automatically disable CHIPoBLE advertising if the device
-        // is now fully provisioned.
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-        if (ConfigurationMgr().IsFullyProvisioned())
-        {
-            mFlags.Clear(Flags::kAdvertisingEnabled);
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
-        }
-#endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-
         // Force the advertising configuration to be refreshed to reflect new provisioning state.
         mFlags.Clear(Flags::kAdvertisingConfigured);
 
@@ -511,7 +500,7 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
 {
     bool result = false;
     result      = SubscribeCharacteristicToWebOS(conId, static_cast<const uint8_t *>(svcId->bytes),
-                                            static_cast<const uint8_t *>(charId->bytes));
+                                                 static_cast<const uint8_t *>(charId->bytes));
     return result;
 }
 
@@ -803,16 +792,6 @@ void BLEManagerImpl::DriveBLEState()
     if (!mFlags.Has(Flags::kAsyncInitCompleted))
     {
         mFlags.Set(Flags::kAsyncInitCompleted);
-
-        // If CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED is enabled,
-        // disable CHIPoBLE advertising if the device is fully provisioned.
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-        if (ConfigurationMgr().IsFullyProvisioned())
-        {
-            mFlags.Clear(Flags::kAdvertisingEnabled);
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
-        }
-#endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
         ExitNow();
     }
 
@@ -888,7 +867,7 @@ void BLEManagerImpl::InitiateScan(intptr_t arg)
     sInstance.InitiateScan(static_cast<BleScanState>(arg));
 }
 
-void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator)
+void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator)
 {
     mBLEScanConfig.mDiscriminator = connDiscriminator;
     mBLEScanConfig.mAppState      = appState;
@@ -938,31 +917,26 @@ void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * 
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::OnChipScanComplete(void)
-{
-    if (mBLEScanConfig.mBleScanState != BleScanState::kScanForDiscriminator &&
-        mBLEScanConfig.mBleScanState != BleScanState::kScanForAddress)
-    {
-        ChipLogProgress(DeviceLayer, "Scan complete notification without an active scan.");
-        return;
-    }
-
-    ChipLogError(DeviceLayer, "Scan Completed with Timeout: Notify Upstream.");
-    BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_TIMEOUT);
-    mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
-}
-
 void BLEManagerImpl::OnScanComplete()
 {
-    if (mBLEScanConfig.mBleScanState != BleScanState::kScanForDiscriminator &&
-        mBLEScanConfig.mBleScanState != BleScanState::kScanForAddress)
+    switch (mBLEScanConfig.mBleScanState)
     {
+    case BleScanState::kNotScanning:
         ChipLogProgress(Ble, "Scan complete notification without an active scan.");
-        return;
+        break;
+    case BleScanState::kScanForAddress:
+    case BleScanState::kScanForDiscriminator:
+        mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+        ChipLogProgress(Ble, "Scan complete. No matching device found.");
+        break;
+    case BleScanState::kConnecting:
+        break;
     }
+}
 
-    BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_TIMEOUT);
-    mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+void BLEManagerImpl::OnScanError(CHIP_ERROR err)
+{
+    ChipLogDetail(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 bool BLEManagerImpl::gattGetServiceCb(LSHandle * sh, LSMessage * message, void * userData)

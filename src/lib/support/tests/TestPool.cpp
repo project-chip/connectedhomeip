@@ -180,9 +180,9 @@ void TestCreateReleaseStruct(nlTestSuite * inSuite, void * inContext)
     }
 
     // Verify that ReleaseAll() calls the destructors.
-    for (size_t i = 0; i < kSize; ++i)
+    for (auto & obj : objs2)
     {
-        objs2[i] = pool.CreateObject(objs1);
+        obj = pool.CreateObject(objs1);
     }
     NL_TEST_ASSERT(inSuite, objs1.size() == kSize);
     NL_TEST_ASSERT(inSuite, pool.Allocated() == kSize);
@@ -239,6 +239,11 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
     size_t sum   = 0;
     pool.ForEachActiveObject([&](S * object) {
         NL_TEST_ASSERT(inSuite, object != nullptr);
+        if (object == nullptr)
+        {
+            // NL_TEST_ASSERT doesn't stop running the test and we want to avoid nullptr dereference.
+            return Loop::Continue;
+        }
         NL_TEST_ASSERT(inSuite, objIds.count(object->mId) == 1);
         objIds.erase(object->mId);
         ++count;

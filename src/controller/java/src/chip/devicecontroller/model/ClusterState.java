@@ -17,25 +17,73 @@
  */
 package chip.devicecontroller.model;
 
-import androidx.annotation.Nullable;
+import android.util.Log;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+import javax.annotation.Nullable;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /** Class for tracking CHIP cluster state in a hierarchical manner. */
 public final class ClusterState {
+  private static final String TAG = "ClusterState";
   private Map<Long, AttributeState> attributes;
-  private Map<Long, EventState> events;
+  private Map<Long, ArrayList<EventState>> events;
+  private Optional<Long> dataVersion;
 
-  public ClusterState(Map<Long, AttributeState> attributes, Map<Long, EventState> events) {
+  public ClusterState(
+      Map<Long, AttributeState> attributes, Map<Long, ArrayList<EventState>> events) {
     this.attributes = attributes;
     this.events = events;
+    this.dataVersion = Optional.empty();
   }
 
   public Map<Long, AttributeState> getAttributeStates() {
     return attributes;
   }
 
-  public Map<Long, EventState> getEventStates() {
+  public Map<Long, ArrayList<EventState>> getEventStates() {
     return events;
+  }
+
+  public void setDataVersion(long version) {
+    dataVersion = Optional.of(version);
+  }
+
+  public Optional<Long> getDataVersion() {
+    return dataVersion;
+  }
+
+  /**
+   * Convenience utility for getting all attributes in Json string format.
+   *
+   * @return all attributes in Json string format., or empty string if not found.
+   */
+  public String getAttributesJson() {
+    JSONObject combinedObject = new JSONObject();
+    Stream<JSONObject> attributeJsons =
+        attributes.values().stream().map(it -> it.getJson()).filter(it -> it != null);
+
+    attributeJsons.forEach(
+        attributes -> {
+          for (Iterator<String> iterator = attributes.keys(); iterator.hasNext(); ) {
+            String key = iterator.next();
+            if (combinedObject.has(key)) {
+              Log.e(TAG, "Conflicting attribute tag Id is found: " + key);
+              continue;
+            }
+            try {
+              Object value = attributes.get(key);
+              combinedObject.put(key, value);
+            } catch (JSONException ex) {
+              Log.e(TAG, "receive attribute json exception: " + ex);
+            }
+          }
+        });
+    return combinedObject.toString();
   }
 
   /**
@@ -49,12 +97,12 @@ public final class ClusterState {
   }
 
   /**
-   * Convenience utility for getting an {@code EventState}.
+   * Convenience utility for getting an {@code ArrayList<EventState> }.
    *
-   * @return the {@code EventState} for the specified id, or null if not found.
+   * @return the {@code ArrayList<EventState>} for the specified id, or null if not found.
    */
   @Nullable
-  public EventState getEventState(long eventId) {
+  public ArrayList<EventState> getEventState(long eventId) {
     return events.get(eventId);
   }
 
@@ -67,16 +115,20 @@ public final class ClusterState {
           builder.append(attributeId);
           builder.append(": ");
           builder.append(
-              attributeState.getValue() == null ? "null" : attributeState.getValue().toString());
+              attributeState.getJson() == null ? "null" : attributeState.getJson().toString());
           builder.append("\n");
         });
     events.forEach(
-        (eventId, eventState) -> {
-          builder.append("Event ");
-          builder.append(eventId);
-          builder.append(": ");
-          builder.append(eventState.getValue() == null ? "null" : eventState.getValue().toString());
-          builder.append("\n");
+        (eventId, eventStates) -> {
+          eventStates.forEach(
+              (eventState) -> {
+                builder.append("Event ");
+                builder.append(eventId);
+                builder.append(": ");
+                builder.append(
+                    eventState.getJson() == null ? "null" : eventState.getJson().toString());
+                builder.append("\n");
+              });
         });
     return builder.toString();
   }

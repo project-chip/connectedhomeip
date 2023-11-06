@@ -1,0 +1,84 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.2.2. [TC-BRBINFO-2.2] Events [DUT-Server]
+
+PICS:
+    - BRBINFO.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Precondition"
+      verification: |
+          1. DUT and TH can interact with each other. DUT is commissioned.
+
+          2. TH reads SoftwareVersion attribute from DUT and saves for future use
+
+          3. TH reads Reachable attribute from DUT and saves for future use
+
+          4. TH subscribes to StartUp, ShutDown, ReachableChanged and Leave events on the Bridged Device Basic Information cluster of the DUT
+
+          5. TH saves the FabricIndex during commissioning
+      disabled: true
+
+    - label:
+          "Step 1: Reboot the DUT (i.e. restart by power cycle, not by making it
+          factory new) TH receives the StartUp event from DUT"
+      PICS: BRBINFO.S.E00
+      verification: |
+          StartUp is an optional Event -
+          As its an optional event we cannot generate the event as of now , hence no example logs provided.
+
+
+          ./chip-tool bridgeddevicebasicinformation read-event start-up 1 3
+      disabled: true
+
+    - label:
+          "Step 2: Make the device on the bridged endpoint unreachable across
+          the bridge, such that the Reachable attribute changes, in a
+          manufacturer-specific way, such as powering off or otherwise disabling
+          the bridged device or the connectivity to it."
+      PICS: BRBINFO.S.E03
+      verification: |
+          To verify that  the  ReachableChanged follow the below procedure
+
+          1. ./chip-tool interactive start
+          2. bridgeddevicebasicinformation subscribe reachable 1 60 1 4
+          3. press 'u' on bridge-app to change reachable to false for endpoint 4 and see the reachable value has been changed compared with precondition
+
+          [1659441181.388547][2392:2397] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0039 Attribute 0x0000_0011 DataVersion: 2189020906
+          [1659441181.388600][2392:2397] CHIP:TOO:   Reachable: FALSE
+          [1659441181.388651][2392:2397] CHIP:DMG: MoveToState ReadClient[0xffff7c005ac0]: Moving to [AwaitingSu]
+
+          4. press 'v'  on bridge-app to change reachable to true for endpoint 4
+
+          [1659441193.443232][2392:2397] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_0039 Attribute 0x0000_0011 DataVersion: 2189020907
+          [1659441193.443267][2392:2397] CHIP:TOO:   Reachable: TRUE
+          [1659441193.443331][2392:2397] CHIP:EM: Piggybacking Ack for MessageCounter:194624180 on exchange: 18196r
+      disabled: true
+
+    - label:
+          "Step 3: TH subscribes to the shutdown event on the DUT. Shutdown DUT."
+      PICS: BRBINFO.S.E01
+      verification: |
+          ShutDown is an optional Event -
+          As its an optional event we cannot generate the event as of now , hence no example logs provided.
+
+          ./chip-tool bridgeddevicebasicinformation read-event shut-down  1 3
+      disabled: true

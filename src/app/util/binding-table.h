@@ -22,8 +22,9 @@
 #pragma once
 
 #include <app/util/af-types.h>
+#include <app/util/config.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace chip {
@@ -117,7 +118,6 @@ private:
     uint8_t mSize = 0;
 
     PersistentStorageDelegate * mStorage;
-    DefaultStorageKeyAllocator mKeyAllocator;
 };
 
 } // namespace chip

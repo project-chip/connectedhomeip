@@ -29,6 +29,7 @@
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 
 chip::Shell::Engine sShellBase64Commands;
 
@@ -48,9 +49,13 @@ static CHIP_ERROR Base64DecodeHandler(int argc, char ** argv)
     uint8_t binary[256];
 
     VerifyOrReturnError(argc > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    binarySize = Base64Decode(argv[0], strlen(argv[0]), binary);
+    auto argLen = strlen(argv[0]);
+    VerifyOrReturnError(CanCastTo<uint16_t>(argLen), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(BASE64_MAX_DECODED_LEN(argLen) <= sizeof(binary), CHIP_ERROR_INVALID_ARGUMENT);
+
+    binarySize = Base64Decode(argv[0], static_cast<uint16_t>(argLen), binary);
     VerifyOrReturnError(binarySize != UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
-    streamer_print_hex(sout, binary, binarySize);
+    streamer_print_hex(sout, binary, static_cast<int>(binarySize));
     streamer_printf(sout, "\r\n");
     return CHIP_NO_ERROR;
 }
@@ -63,8 +68,16 @@ static CHIP_ERROR Base64EncodeHandler(int argc, char ** argv)
     uint32_t binarySize, base64Size;
 
     VerifyOrReturnError(argc > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    ArgParser::ParseHexString(argv[0], strlen(argv[0]), binary, sizeof(binary), binarySize);
-    base64Size = Base64Encode(binary, binarySize, base64);
+
+    auto argLen = strlen(argv[0]);
+    VerifyOrReturnError(CanCastTo<uint32_t>(argLen), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ArgParser::ParseHexString(argv[0], static_cast<uint32_t>(argLen), binary, sizeof(binary), binarySize);
+    if (!CanCastTo<uint16_t>(binarySize))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    base64Size = Base64Encode(binary, static_cast<uint16_t>(binarySize), base64);
     streamer_printf(sout, "%.*s\r\n", base64Size, base64);
     return CHIP_NO_ERROR;
 }

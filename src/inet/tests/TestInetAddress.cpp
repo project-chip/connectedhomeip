@@ -23,6 +23,7 @@
  *    a class to store and format IPV4 and IPV6 Internet Protocol addresses.
  *
  */
+#include <lib/core/CHIPConfig.h>
 
 #include <inet/IPAddress.h>
 
@@ -1009,8 +1010,11 @@ void CheckToIPv6(nlTestSuite * inSuite, void * inContext)
         SetupIPAddress(test_addr, lCurrent);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-        ip6_addr_t ip_addr_1, ip_addr_2;
-        ip_addr_1 = *(ip6_addr_t *) addr;
+        ip6_addr_t ip_addr_1 = { 0 }, ip_addr_2 = { 0 };
+        memcpy(ip_addr_1.addr, addr, sizeof(addr));
+#if LWIP_IPV6_SCOPES
+        ip_addr_1.zone = 0;
+#endif
 #else
         struct in6_addr ip_addr_1, ip_addr_2;
         ip_addr_1 = *reinterpret_cast<struct in6_addr *>(addr);
@@ -1047,7 +1051,7 @@ void CheckFromIPv6(nlTestSuite * inSuite, void * inContext)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         ip6_addr_t ip_addr;
-        ip_addr = *(ip6_addr_t *) addr;
+        memcpy(ip_addr.addr, addr, sizeof(addr));
 #else
         struct in6_addr ip_addr;
         ip_addr = *reinterpret_cast<struct in6_addr *>(addr);
@@ -1202,10 +1206,10 @@ void CheckFromSocket(nlTestSuite * inSuite, void * inContext)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     (void) inSuite;
     // This test is only supported for non LWIP stack.
-#else // INET_LWIP
-    const struct TestContext * lContext = static_cast<const struct TestContext *>(inContext);
+#else // CHIP_SYSTEM_CONFIG_USE_LWIP
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
     IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -1257,7 +1261,7 @@ void CheckFromSocket(nlTestSuite * inSuite, void * inContext)
 
         ++lCurrent;
     }
-#endif // INET_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 /**
@@ -1378,25 +1382,25 @@ void CheckEncoding(nlTestSuite * inSuite, void * inContext)
         test_addr.WriteAddress(p);
 
         // buffer has address in network byte order
-        NL_TEST_ASSERT(inSuite, buffer[3] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[0]));
-        NL_TEST_ASSERT(inSuite, buffer[2] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[0] >> 8));
-        NL_TEST_ASSERT(inSuite, buffer[1] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[0] >> 16));
-        NL_TEST_ASSERT(inSuite, buffer[0] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[0] >> 24));
+        NL_TEST_ASSERT(inSuite, buffer[3] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[0]));
+        NL_TEST_ASSERT(inSuite, buffer[2] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[0] >> 8));
+        NL_TEST_ASSERT(inSuite, buffer[1] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[0] >> 16));
+        NL_TEST_ASSERT(inSuite, buffer[0] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[0] >> 24));
 
-        NL_TEST_ASSERT(inSuite, buffer[7] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[1]));
-        NL_TEST_ASSERT(inSuite, buffer[6] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[1] >> 8));
-        NL_TEST_ASSERT(inSuite, buffer[5] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[1] >> 16));
-        NL_TEST_ASSERT(inSuite, buffer[4] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[1] >> 24));
+        NL_TEST_ASSERT(inSuite, buffer[7] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[1]));
+        NL_TEST_ASSERT(inSuite, buffer[6] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[1] >> 8));
+        NL_TEST_ASSERT(inSuite, buffer[5] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[1] >> 16));
+        NL_TEST_ASSERT(inSuite, buffer[4] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[1] >> 24));
 
-        NL_TEST_ASSERT(inSuite, buffer[11] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[2]));
-        NL_TEST_ASSERT(inSuite, buffer[10] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[2] >> 8));
-        NL_TEST_ASSERT(inSuite, buffer[9] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[2] >> 16));
-        NL_TEST_ASSERT(inSuite, buffer[8] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[2] >> 24));
+        NL_TEST_ASSERT(inSuite, buffer[11] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[2]));
+        NL_TEST_ASSERT(inSuite, buffer[10] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[2] >> 8));
+        NL_TEST_ASSERT(inSuite, buffer[9] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[2] >> 16));
+        NL_TEST_ASSERT(inSuite, buffer[8] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[2] >> 24));
 
-        NL_TEST_ASSERT(inSuite, buffer[15] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[3]));
-        NL_TEST_ASSERT(inSuite, buffer[14] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[3] >> 8));
-        NL_TEST_ASSERT(inSuite, buffer[13] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[3] >> 16));
-        NL_TEST_ASSERT(inSuite, buffer[12] == (uint8_t)(lCurrent->mAddr.mAddrQuartets[3] >> 24));
+        NL_TEST_ASSERT(inSuite, buffer[15] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[3]));
+        NL_TEST_ASSERT(inSuite, buffer[14] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[3] >> 8));
+        NL_TEST_ASSERT(inSuite, buffer[13] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[3] >> 16));
+        NL_TEST_ASSERT(inSuite, buffer[12] == (uint8_t) (lCurrent->mAddr.mAddrQuartets[3] >> 24));
 
         ++lCurrent;
     }
@@ -1489,10 +1493,13 @@ void CheckMakeULA(nlTestSuite * inSuite, void * inContext)
         // Call MakeULA function that we test.
         test_addr = IPAddress::MakeULA(lCurrent->global, lCurrent->subnet, lCurrent->interface);
 
-        NL_TEST_ASSERT(inSuite, test_addr.Addr[0] == htonl(ULA_PREFIX | (lCurrent->global & ULA_UP_24_BIT_MASK) >> 16));
-        NL_TEST_ASSERT(inSuite, test_addr.Addr[1] == htonl((lCurrent->global & ULA_LO_16_BIT_MASK) << 16 | lCurrent->subnet));
-        NL_TEST_ASSERT(inSuite, test_addr.Addr[2] == htonl(lCurrent->interface >> 32));
-        NL_TEST_ASSERT(inSuite, test_addr.Addr[3] == htonl(lCurrent->interface));
+        NL_TEST_ASSERT(
+            inSuite, test_addr.Addr[0] == htonl(static_cast<uint32_t>(ULA_PREFIX | (lCurrent->global & ULA_UP_24_BIT_MASK) >> 16)));
+        NL_TEST_ASSERT(inSuite,
+                       test_addr.Addr[1] ==
+                           htonl(static_cast<uint32_t>((lCurrent->global & ULA_LO_16_BIT_MASK) << 16 | lCurrent->subnet)));
+        NL_TEST_ASSERT(inSuite, test_addr.Addr[2] == htonl(static_cast<uint32_t>(lCurrent->interface >> 32)));
+        NL_TEST_ASSERT(inSuite, test_addr.Addr[3] == htonl(static_cast<uint32_t>(lCurrent->interface)));
 
         ++lCurrent;
     }
@@ -1516,8 +1523,8 @@ void CheckMakeLLA(nlTestSuite * inSuite, void * inContext)
 
         NL_TEST_ASSERT(inSuite, test_addr.Addr[0] == htonl(LLA_PREFIX));
         NL_TEST_ASSERT(inSuite, test_addr.Addr[1] == 0);
-        NL_TEST_ASSERT(inSuite, test_addr.Addr[2] == htonl(lCurrent->interface >> 32));
-        NL_TEST_ASSERT(inSuite, test_addr.Addr[3] == htonl(lCurrent->interface));
+        NL_TEST_ASSERT(inSuite, test_addr.Addr[2] == htonl(static_cast<uint32_t>(lCurrent->interface >> 32)));
+        NL_TEST_ASSERT(inSuite, test_addr.Addr[3] == htonl(static_cast<uint32_t>(lCurrent->interface)));
 
         ++lCurrent;
     }
@@ -1695,7 +1702,7 @@ void CheckIPPrefix(nlTestSuite * inSuite, void * inContext)
         SetupIPAddress(test_addr_1, lCurrent);
 
         ipprefix_1.IPAddr = test_addr_1;
-        ipprefix_1.Length = 128 - (i++ % 128);
+        ipprefix_1.Length = static_cast<uint8_t>(128 - (i++ % 128));
         ipprefix_2        = ipprefix_1;
 
         NL_TEST_ASSERT(inSuite, !ipprefix_1.IsZero());
@@ -1769,43 +1776,43 @@ void CheckToLwIPAddr(nlTestSuite * inSuite, void * inContext)
         else
 #endif // INET_CONFIG_ENABLE_IPV4
             if (lCurrent->mAddr.mAddrType == IPAddressType::kIPv6)
-        {
-            ip_addr_copy_from_ip6(lwip_expected_addr, test_addr.ToIPv6());
-            lwip_check_addr = test_addr.ToLwIPAddr();
-            NL_TEST_ASSERT(inSuite, sameLwIPAddress(lwip_expected_addr, lwip_check_addr));
+            {
+                ip_addr_copy_from_ip6(lwip_expected_addr, test_addr.ToIPv6());
+                lwip_check_addr = test_addr.ToLwIPAddr();
+                NL_TEST_ASSERT(inSuite, sameLwIPAddress(lwip_expected_addr, lwip_check_addr));
 
-            err = test_addr.ToLwIPAddr(IPAddressType::kAny, lwip_check_addr);
-            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, sameLwIPAddress(lwip_expected_addr, lwip_check_addr));
+                err = test_addr.ToLwIPAddr(IPAddressType::kAny, lwip_check_addr);
+                NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, sameLwIPAddress(lwip_expected_addr, lwip_check_addr));
 
-            err = test_addr.ToLwIPAddr(IPAddressType::kIPv6, lwip_check_addr);
-            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, sameLwIPAddress(lwip_expected_addr, lwip_check_addr));
-
-#if INET_CONFIG_ENABLE_IPV4
-            err = test_addr.ToLwIPAddr(IPAddressType::kIPv4, lwip_check_addr);
-            NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
-#endif // INET_CONFIG_ENABLE_IPV4
-        }
-        else if (lCurrent->mAddr.mAddrType == IPAddressType::kAny)
-        {
-            lwip_check_addr = test_addr.ToLwIPAddr();
-            NL_TEST_ASSERT(inSuite, sameLwIPAddress(*IP6_ADDR_ANY, lwip_check_addr));
-
-            err = test_addr.ToLwIPAddr(IPAddressType::kAny, lwip_check_addr);
-            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, sameLwIPAddress(*IP6_ADDR_ANY, lwip_check_addr));
-
-            err = test_addr.ToLwIPAddr(IPAddressType::kIPv6, lwip_check_addr);
-            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, sameLwIPAddress(*IP6_ADDR_ANY, lwip_check_addr));
+                err = test_addr.ToLwIPAddr(IPAddressType::kIPv6, lwip_check_addr);
+                NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, sameLwIPAddress(lwip_expected_addr, lwip_check_addr));
 
 #if INET_CONFIG_ENABLE_IPV4
-            err = test_addr.ToLwIPAddr(IPAddressType::kIPv4, lwip_check_addr);
-            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, sameLwIPAddress(*IP4_ADDR_ANY, lwip_check_addr));
+                err = test_addr.ToLwIPAddr(IPAddressType::kIPv4, lwip_check_addr);
+                NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
 #endif // INET_CONFIG_ENABLE_IPV4
-        }
+            }
+            else if (lCurrent->mAddr.mAddrType == IPAddressType::kAny)
+            {
+                lwip_check_addr = test_addr.ToLwIPAddr();
+                NL_TEST_ASSERT(inSuite, sameLwIPAddress(*IP6_ADDR_ANY, lwip_check_addr));
+
+                err = test_addr.ToLwIPAddr(IPAddressType::kAny, lwip_check_addr);
+                NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, sameLwIPAddress(*IP6_ADDR_ANY, lwip_check_addr));
+
+                err = test_addr.ToLwIPAddr(IPAddressType::kIPv6, lwip_check_addr);
+                NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, sameLwIPAddress(*IP6_ADDR_ANY, lwip_check_addr));
+
+#if INET_CONFIG_ENABLE_IPV4
+                err = test_addr.ToLwIPAddr(IPAddressType::kIPv4, lwip_check_addr);
+                NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, sameLwIPAddress(*IP4_ADDR_ANY, lwip_check_addr));
+#endif // INET_CONFIG_ENABLE_IPV4
+            }
 
         ++lCurrent;
     }
@@ -1877,7 +1884,7 @@ int TestTeardown(void * inContext)
 
 } // namespace
 
-int TestInetAddress(void)
+int TestInetAddress()
 {
     // clang-format off
     nlTestSuite theSuite = {

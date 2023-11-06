@@ -27,7 +27,6 @@ template <typename T>
 class otScanResponseIterator : public Iterator<T>
 {
 public:
-    otScanResponseIterator(T * apScanResponse) : mpScanResponse(apScanResponse) {}
     size_t Count() override { return itemCount; }
     bool Next(T & item) override
     {
@@ -62,7 +61,7 @@ private:
     size_t currentIterating           = 0;
     size_t itemCount                  = 0;
     static constexpr size_t kItemSize = sizeof(T);
-    T * mpScanResponse;
+    T * mpScanResponse                = nullptr;
 };
 
 class GenericThreadDriver final : public ThreadDriver
@@ -82,6 +81,12 @@ public:
         bool exhausted = false;
     };
 
+    GenericThreadDriver(uint8_t scanTimeoutSec = 10, uint8_t connectTimeoutSec = 20)
+    {
+        scanNetworkTimeoutSeconds = scanTimeoutSec;
+        connectNetworkTimeout     = connectTimeoutSec;
+    }
+
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new ThreadNetworkIterator(this); }
     CHIP_ERROR Init(Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback) override;
@@ -89,8 +94,11 @@ public:
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }
-    uint8_t GetScanNetworkTimeoutSeconds() override { return 10; }
-    uint8_t GetConnectNetworkTimeoutSeconds() override { return 20; }
+    uint8_t GetScanNetworkTimeoutSeconds() override { return scanNetworkTimeoutSeconds; }
+    uint8_t GetConnectNetworkTimeoutSeconds() override { return connectNetworkTimeout; }
+
+    void SetScanNetworkTimeoutSeconds(uint8_t scanTimeoutSec) { scanNetworkTimeoutSeconds = scanTimeoutSec; }
+    void SetConnectNetworkTimeoutSeconds(uint8_t connectTimeoutSec) { connectNetworkTimeout = connectTimeoutSec; }
 
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;
@@ -104,12 +112,13 @@ public:
     void ScanNetworks(ThreadDriver::ScanCallback * callback) override;
 
 private:
+    uint8_t scanNetworkTimeoutSeconds;
+    uint8_t connectNetworkTimeout;
     Status MatchesNetworkId(const Thread::OperationalDataset & dataset, const ByteSpan & networkId) const;
     CHIP_ERROR BackupConfiguration();
 
     ThreadNetworkIterator mThreadIterator      = ThreadNetworkIterator(this);
     Thread::OperationalDataset mStagingNetwork = {};
-    Optional<Status> mScanStatus;
 };
 
 } // namespace NetworkCommissioning

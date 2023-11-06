@@ -20,18 +20,14 @@ import io
 import json
 import pathlib
 import sys
-
-from typing import (Any, Callable, Dict, List, Mapping, IO, Optional, Protocol,
-                    Sequence, Union)
+from typing import IO, Any, Callable, Dict, List, Mapping, Optional, Protocol, Sequence, Union
 
 import cxxfilt  # type: ignore
-import pandas as pd  # type: ignore
-
 import memdf.df
 import memdf.select
 import memdf.util.pretty
-
-from memdf import Config, ConfigDescription, DF, DFs
+import pandas as pd  # type: ignore
+from memdf import DF, Config, ConfigDescription, DFs
 from memdf.util.config import ParseSizeAction
 
 REPORT_DEMANGLE_CONFIG: ConfigDescription = {

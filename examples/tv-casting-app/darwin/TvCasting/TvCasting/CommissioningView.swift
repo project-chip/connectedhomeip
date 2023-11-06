@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -32,10 +32,10 @@ struct CommissioningView: View {
             if(viewModel.commisisoningWindowOpened == true) {
                 Text("Commissioning window opened.").padding()
                 
-                Text("Onboarding PIN: " + String((CastingServerBridge.getSharedInstance()?.getOnboardingPaylod().setupPasscode)!))
+                Text("Onboarding PIN: " + String((CastingServerBridge.getSharedInstance()?.getOnboardingPayload().setupPasscode)!))
                     .border(Color.blue, width: 1)
                     .padding()
-                Text("Discriminator: " + String((CastingServerBridge.getSharedInstance()?.getOnboardingPaylod().setupDiscriminator)!))
+                Text("Discriminator: " + String((CastingServerBridge.getSharedInstance()?.getOnboardingPayload().setupDiscriminator)!))
                     .border(Color.blue, width: 1)
                     .padding()
 
@@ -65,17 +65,29 @@ struct CommissioningView: View {
             if(viewModel.commisisoningComplete == true)
             {
                 Text("Commissioning finished!").padding()
-                NavigationLink(
-                    destination: ContentLauncherView(),
-                    label: {
-                        Text("Next")
-                            .frame(width: 100, height: 30, alignment: .center)
-                            .border(Color.black, width: 1)
+                
+                if let connectionSuccess = viewModel.connectionSuccess
+                {
+                    if let connectionStatus = viewModel.connectionStatus
+                    {
+                        Text(connectionStatus).padding()
                     }
-                ).background(Color.blue)
-                    .foregroundColor(Color.white)
-                    .frame(maxHeight: .infinity, alignment: .bottom)
-                    .padding()
+                    
+                    if(connectionSuccess)
+                    {
+                        NavigationLink(
+                            destination: ClusterSelectorView(),
+                            label: {
+                                Text("Next")
+                                    .frame(width: 100, height: 30, alignment: .center)
+                                    .border(Color.black, width: 1)
+                            }
+                        ).background(Color.blue)
+                            .foregroundColor(Color.white)
+                            .frame(maxHeight: .infinity, alignment: .bottom)
+                            .padding()
+                    }
+                }
             }
             else if(viewModel.commisisoningComplete == false)
             {

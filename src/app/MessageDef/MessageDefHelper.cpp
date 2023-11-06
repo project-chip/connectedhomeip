@@ -23,7 +23,7 @@
 
 #include "MessageDefHelper.h"
 #include <algorithm>
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/InteractionModelRevision.h>
 #include <app/util/basic-types.h>
 #include <inttypes.h>
@@ -33,7 +33,7 @@
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK && CHIP_DETAIL_LOGGING
+#if CHIP_CONFIG_IM_PRETTY_PRINT && CHIP_DETAIL_LOGGING
 // this is used to run in signle thread for IM message debug purpose
 namespace {
 uint32_t gPrettyPrintingDepthLevel = 0;
@@ -56,7 +56,7 @@ void PrettyPrintIMBlankLine()
         if (sizeof(gLineBuffer) > gCurLineBufferSize)
         {
             size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-            size_t ret      = (size_t)(snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
+            size_t ret      = (size_t) (snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
             if (ret > 0)
             {
                 gCurLineBufferSize += std::min(ret, sizeLeft);
@@ -78,7 +78,7 @@ void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
     if (sizeof(gLineBuffer) > gCurLineBufferSize)
     {
         size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-        size_t ret      = (size_t)(vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
+        size_t ret      = (size_t) (vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
         if (ret > 0)
         {
             gCurLineBufferSize += std::min(ret, sizeLeft);
@@ -98,7 +98,7 @@ void DecreaseDepth()
 }
 #endif
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
 CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLabel)
 {
     if (aDepth == 0)
@@ -217,7 +217,7 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
         {
             for (size_t i = 0; i < len; i++)
             {
-                PRETTY_PRINT_SAMELINE("0x%x, ", value_b[i]);
+                PRETTY_PRINT_SAMELINE("0x%02x, ", value_b[i]);
             }
         }
 
@@ -260,8 +260,7 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
 
     return CHIP_NO_ERROR;
 }
-
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 }; // namespace app
 }; // namespace chip

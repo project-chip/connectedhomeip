@@ -14,12 +14,15 @@
 
 name: 19.8.3. [TC-MEDIAPLAYBACK-6.3] Advanced Seek Media Playback Verification
 
+PICS:
+    - MEDIAPLAYBACK.S
+
 config:
     nodeId: 0x12344321
     cluster: "Media Playback"
     endpoint: 1
     SeekPosition:
-        type: INT64U
+        type: int64u
         defaultValue: 100000000
 
 tests:
@@ -35,29 +38,31 @@ tests:
           "Precondition: Media content in a paused state at the beginning of the
           content"
       command: "Pause"
-      PICS: MEDIAPLAYBACK.S.C0001
+      PICS: MEDIAPLAYBACK.S.C01.Rsp
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
-    - label: "Sends a Seek command"
-      PICS: MEDIAPLAYBACK.S.C0B.Rsp
+    - label:
+          "Step 1: TH sends a Seek command to the DUT with a Position value of
+          10000"
+      PICS: MEDIAPLAYBACK.S.C0b.Rsp
       command: "Seek"
       arguments:
           values:
-              - name: "Position"
+              - name: "position"
                 value: 10000
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label:
           "Verify that the media has moved to 10 seconds from the starting point"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0b.Rsp
       arguments:
           values:
               - name: "message"
@@ -67,82 +72,57 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the SampledPosition attribute"
-      PICS: MEDIAPLAYBACK.S.A0003
+    - label: "Step 2: TH reads the SampledPosition attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0003 && MEDIAPLAYBACK.S.C0b.Rsp
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
-          value: 10000
+          value: { "Position": 10000 }
 
-    #Issue 10988
-    - label: "TH reads the StartTime attribute from the DUT"
-      PICS: MEDIAPLAYBACK.S.A0001 && PICS_USER_PROMPT
-      verification: |
-          ./chip-tool mediaplayback read start-time 1 1
-          [1654001778189] [97015:7707437] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0001 DataVersion: 775839144
-          [1654001778190] [97015:7707437] CHIP: [TOO]   StartTime: 0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Step 3: TH reads the StartTime attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0001
+      command: "readAttribute"
+      attribute: "StartTime"
+      response:
+          constraints:
+              type: epoch_us
 
-    #Issue 10988
-    - label: "TH reads the SeekRangeEnd attribute from the DUT"
-      verification: |
-          ./chip-tool mediaplayback read seek-range-end 1 1
-          [1654002119527] [97409:7712444] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0005 DataVersion: 775839144
-          [1654002119527] [97409:7712444] CHIP: [TOO]   SeekRangeEnd: 80000
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0005
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Step 4: TH reads the SeekRangeEnd attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0005
+      command: "readAttribute"
+      attribute: "SeekRangeEnd"
+      response:
+          constraints:
+              type: int64u
+              minValue: 0
+              maxValue: "18446744073709551615"
 
-    #Issue 10988
-    - label: "TH reads the SeekRangeStart attribute from the DUT"
-      verification: |
-          ./chip-tool mediaplayback read seek-range-start 1 1
-          [1654751320.161753][2491:2496] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0006 DataVersion: 1615951406
-          [1654751320.161846][2491:2496] CHIP:TOO:   SeekRangeStart: 10000
-          [1654751320.161941][2491:2496] CHIP:EM: Sending Standalone Ack for MessageCounter:120565821 on exchange 1929
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0006
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Step 5: TH reads the SeekRangeStart attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0006
+      command: "readAttribute"
+      attribute: "SeekRangeStart"
+      response:
+          constraints:
+              type: int64u
+              minValue: 0
+              maxValue: "18446744073709551615"
 
-    #Issue 10988
-    - label: "TH reads the Duration attribute from the DUT"
-      verification: |
-          ./chip-tool mediaplayback read duration 1 1
-          [1654001869267] [97168:7708957] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0002 DataVersion: 775839144
-          [1654001869267] [97168:7708957] CHIP: [TOO]   Duration: 80000
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0002
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Step 6: TH reads the Duration attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0002
+      command: "readAttribute"
+      attribute: "Duration"
+      response:
+          constraints:
+              type: int64u
+              notValue: 0
+              minValue: 0
+              maxValue: "18446744073709551615"
 
     - label:
-          "Sends a Seek command Position value beyond the furthest valid
-          position"
-      PICS: MEDIAPLAYBACK.S.C0B.Rsp
+          "Step 7: TH sends a Seek command to the DUT with a Position value
+          beyond the furthest valid position (ex: beyond the duration of the
+          media)"
+      PICS: MEDIAPLAYBACK.S.C0b.Rsp
       command: "Seek"
       arguments:
           values:
@@ -150,5 +130,16 @@ tests:
                 value: SeekPosition
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 5
+
+    - label: "verify that the media has not moved."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0b.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' if media has not moved"
+              - name: "expectedValue"
+                value: "y"

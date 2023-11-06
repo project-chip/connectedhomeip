@@ -76,3 +76,5 @@
 #ifndef WDM_PUBLISHER_MAX_NOTIFIES_IN_FLIGHT
 #define WDM_PUBLISHER_MAX_NOTIFIES_IN_FLIGHT 2
 #endif // WDM_PUBLISHER_MAX_NOTIFIES_IN_FLIGHT
+
+#include "platform/nxp/common/CHIPNXPPlatformDefaultConfig.h"

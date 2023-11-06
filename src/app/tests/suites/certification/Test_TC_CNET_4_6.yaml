@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,57 +11,103 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.6. [TC-CNET-4.6] [Thread] FAILSAFE_REQUIRED message Validation
+    12.4.6. [TC-CNET-4.6] [Thread] FAILSAFE_REQUIRED message Validation
     [DUT-Server]
+
+PICS:
+    - CNET.S.F01
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Network Commissioning"
     endpoint: 0
+    PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET:
+        type: octet_string
+        defaultValue: "hex:1111111122222222"
 
 tests:
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/30196
+    - label: "Precondition: Commission TH and DUT on Thread network"
+      verification: |
+          ./chip-tool pairing ble-thread 0x12344321 <operationalDataset> <setup-pin-code> <discriminator>
+
+          [1698660637.937566][6429:6431] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1698660637.937644][6429:6431] CHIP:CTL: Received CommissioningComplete response, errorCode=0
+          [1698660637.937705][6429:6431] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1698660637.937750][6429:6431] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1698660637.937812][6429:6431] CHIP:CTL: Performing next commissioning step 'Cleanup'
+          [1698660637.937863][6429:6431] CHIP:DIS: Closing all BLE connections
+          [1698660637.937911][6429:6431] CHIP:IN: Clearing BLE pending packets.
+          [1698660637.938582][6429:6431] CHIP:BLE: Auto-closing end point's BLE connection.
+          [1698660637.938645][6429:6431] CHIP:DL: Closing BLE GATT connection (con 0xffff9c034bb0)
+          [1698660637.938805][6429:6430] CHIP:DL: BluezDisconnect peer=F7:D4:24:D2:4A:1F
+          [1698660638.365208][6429:6431] CHIP:IN: SecureSession[0xffff9400f900]: MarkForEviction Type:1 LSID:62220
+          [1698660638.365311][6429:6431] CHIP:SC: SecureSession[0xffff9400f900, LSID:62220]: State change 'kActive' --> 'kPendingEviction'
+          [1698660638.365440][6429:6431] CHIP:IN: SecureSession[0xffff9400f900]: Released - Type:1 LSID:62220
+          [1698660638.365529][6429:6431] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1698660638.365598][6429:6431] CHIP:TOO: Device commissioning completed with success
+          [1698660638.365873][6429:6431] CHIP:DMG: ICR moving to [AwaitingDe]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Precondition: TH reads FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 2
+          constraints:
+              type: bitmap32
+
     - label:
-          "TH sends the AddOrUpdateThreadNetwork command to the DUT with the
-          following argument: OperationalDataset argument value as 'Userth_op'
-          Breadcrumb argument value as 1"
+          "Step 1: TH sends the AddOrUpdateThreadNetwork command to the DUT with
+          OperationalDataset field set to
+          PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET and Breadcrumb field set to 1"
       PICS: CNET.S.C03.Rsp
-      verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning add-or-update-thread-network 1232034768527434274  51 0
-
-          Verify on the TH Log:
-
-          [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
-          [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
-          [1657619600.364186][2056:2061] CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
+      command: "AddOrUpdateThreadNetwork"
+      arguments:
+          values:
+              - name: "OperationalDataset"
+                value: PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          error: FAILSAFE_REQUIRED
 
     - label:
-          "TH sends RemoveNetwork command to the DUT with NetworkID argument
-          value as 'Userth_op' and Breadcrumb argument value as 1"
+          "Step 2: TH sends RemoveNetwork command to the DUT with NetworkID
+          field set to PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET and Breadcrumb
+          field set to 1"
       PICS: CNET.S.C04.Rsp
-      verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning remove-network 1232034768527434274 51 0
-
-          Verify on the TH Log:
-
-          [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
-          [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
-          [1657619600.364186][2056:2061] CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
+      command: "RemoveNetwork"
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          error: FAILSAFE_REQUIRED
 
     - label:
-          "TH sends ConnectNetwork command to the DUT with NetworkID argument
-          value as 'Userth_op' and Breadcrumb argument value as 1"
+          "Step 3: TH sends ConnectNetwork command to the DUT with NetworkID
+          field set to PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET and Breadcrumb
+          field set to 1"
       PICS: CNET.S.C06.Rsp
-      verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning connect-network 1232034768527434274 51 0
-
-          Verify on the TH Log:
-
-          [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
-          [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
-          [1657619600.364186][2056:2061] CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
+      command: "ConnectNetwork"
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          error: FAILSAFE_REQUIRED

@@ -17,6 +17,9 @@
 
 #include <lib/address_resolve/AddressResolve_DefaultImpl.h>
 
+#include <lib/address_resolve/TracingStructs.h>
+#include <tracing/macros.h>
+
 namespace chip {
 namespace AddressResolve {
 namespace Impl {
@@ -24,112 +27,35 @@ namespace {
 
 static constexpr System::Clock::Timeout kInvalidTimeout{ System::Clock::Timeout::max() };
 
-// IP addess "suitability"
-//   - Larger value means "more suitable"
-//   - Enum ordered ascending for easier read. Note however that order of
-//     checks MUST match in ScoreIpAddress below.
-enum class IpScore : unsigned
-{
-    kInvalid = 0, // No address available
-
-    // "Other" IPv6 include:
-    //   - invalid addresses (have seen router bugs during interop testing)
-    //   - embedded IPv4 (::/80)
-    kOtherIpv6                     = 1,
-    kIpv4                          = 2, // Not Matter SPEC, so low priority
-    kLinkLocal                     = 3, // Valid only on an interface
-    kUniqueLocal                   = 4, // ULA. Thread devices use this
-    kGlobalUnicast                 = 5, // Maybe routable, not local subnet
-    kUniqueLocalWithSharedPrefix   = 6, // Prefix seems to match a local interface
-    kGlobalUnicastWithSharedPrefix = 7, // Prefix seems to match a local interface
-};
-
-constexpr unsigned ScoreValue(IpScore score)
-{
-    return static_cast<unsigned>(score);
-}
-
-/**
- * Gives a score for an IP address, generally related to "how good" the address
- * is and how likely it is for it to be reachable.
- */
-IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId)
-{
-    if (ip.IsIPv6())
-    {
-        if (interfaceId.MatchLocalIPv6Subnet(ip))
-        {
-            if (ip.IsIPv6GlobalUnicast())
-            {
-                return IpScore::kGlobalUnicastWithSharedPrefix;
-            }
-            if (ip.IsIPv6ULA())
-            {
-                return IpScore::kUniqueLocalWithSharedPrefix;
-            }
-        }
-        if (ip.IsIPv6GlobalUnicast())
-        {
-            return IpScore::kGlobalUnicast;
-        }
-
-        if (ip.IsIPv6ULA())
-        {
-            return IpScore::kUniqueLocal;
-        }
-
-        if (ip.IsIPv6LinkLocal())
-        {
-            return IpScore::kLinkLocal;
-        }
-
-        return IpScore::kOtherIpv6;
-    }
-
-    return IpScore::kIpv4;
-}
-
 } // namespace
 
 void NodeLookupHandle::ResetForLookup(System::Clock::Timestamp now, const NodeLookupRequest & request)
 {
     mRequestStartTime = now;
     mRequest          = request;
-    mBestResult       = ResolveResult();
-    mBestAddressScore = ScoreValue(IpScore::kInvalid);
+    mResults          = NodeLookupResults();
 }
 
 void NodeLookupHandle::LookupResult(const ResolveResult & result)
 {
+    MATTER_LOG_NODE_DISCOVERED(Tracing::DiscoveryInfoType::kIntermediateResult, &GetRequest().GetPeerId(), &result);
+
+    auto score = Dnssd::IPAddressSorter::ScoreIpAddress(result.address.GetIPAddress(), result.address.GetInterface());
+    [[maybe_unused]] bool success = mResults.UpdateResults(result, score);
+
 #if CHIP_PROGRESS_LOGGING
     char addr_string[Transport::PeerAddress::kMaxToStringSize];
     result.address.ToString(addr_string);
-#endif
 
-    unsigned newScore = ScoreValue(ScoreIpAddress(result.address.GetIPAddress(), result.address.GetInterface()));
-    if (newScore > mBestAddressScore)
+    if (success)
     {
-        mBestResult       = result;
-        mBestAddressScore = newScore;
-
-        if (!mBestResult.address.GetIPAddress().IsIPv6LinkLocal())
-        {
-            // Only use the DNS-SD resolution's InterfaceID for addresses that are IPv6 LLA.
-            // For all other addresses, we should rely on the device's routing table to route messages sent.
-            // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
-            // mDNS advertisements are not usually received on the same interface the peer is reachable on.
-            mBestResult.address.SetInterface(Inet::InterfaceId::Null());
-            ChipLogDetail(Discovery, "Lookup clearing interface for non LL address");
-        }
-
-#if CHIP_PROGRESS_LOGGING
-        ChipLogProgress(Discovery, "%s: new best score: %u", addr_string, mBestAddressScore);
+        ChipLogProgress(Discovery, "%s: new best score: %u", addr_string, to_underlying(score));
     }
     else
     {
-        ChipLogProgress(Discovery, "%s: score has not improved: %u", addr_string, newScore);
-#endif
+        ChipLogProgress(Discovery, "%s: score has not improved: %u", addr_string, to_underlying(score));
     }
+#endif
 }
 
 System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timestamp now)
@@ -140,6 +66,24 @@ System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timesta
     {
         return mRequest.GetMinLookupTime() - elapsed;
     }
+
+    if (HasLookupResult())
+    {
+        // We can get here if we got our result before our min lookup time had
+        // elapsed, but time has passed between then and this attempt to re-arm
+        // the timer, such that now we are past our min lookup time.  For
+        // example, this can happen because the timer is a bit delayed in firing
+        // but is now being re-scheduled due to a cancellation of a lookup or
+        // start of a new lookup.  Or it could happen because
+        // OnOperationalNodeResolved got called close to our min lookup time,
+        // and we crossed that line while going through mActiveLookups and
+        // before we got to calling ReArmTimer.
+        //
+        // In this case, we should just fire the timer ASAP, since our min
+        // lookup time has elapsed and we have results.
+        return System::Clock::Timeout::zero();
+    }
+
     if (elapsed < mRequest.GetMaxLookupTime())
     {
         return mRequest.GetMaxLookupTime() - elapsed;
@@ -163,9 +107,10 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
     }
 
     // Minimal time to search reached. If any IP available, ready to return it.
-    if (mBestAddressScore > ScoreValue(IpScore::kInvalid))
+    if (HasLookupResult())
     {
-        return NodeLookupAction::Success(mBestResult);
+        auto result = TakeLookupResult();
+        return NodeLookupAction::Success(result);
     }
 
     // Give up if the maximum search time has been reached
@@ -177,14 +122,88 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
     return NodeLookupAction::KeepSearching();
 }
 
+bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd::IPAddressSorter::IpScore newScore)
+{
+    uint8_t insertAtIndex = 0;
+    for (; insertAtIndex < kNodeLookupResultsLen; insertAtIndex++)
+    {
+        if (insertAtIndex >= count)
+        {
+            // This is a new entry.
+            break;
+        }
+
+        auto & oldAddress = results[insertAtIndex].address;
+        auto oldScore     = Dnssd::IPAddressSorter::ScoreIpAddress(oldAddress.GetIPAddress(), oldAddress.GetInterface());
+        if (newScore > oldScore)
+        {
+            // This is a score update, it will replace a previous entry.
+            break;
+        }
+    }
+
+    if (insertAtIndex == kNodeLookupResultsLen)
+    {
+        return false;
+    }
+
+    // Move the following valid entries one level down.
+    for (auto i = count; i > insertAtIndex; i--)
+    {
+        if (i >= kNodeLookupResultsLen)
+        {
+            continue;
+        }
+
+        results[i] = results[i - 1];
+    }
+
+    // If the number of valid entries is less than the size of the array there is an additional entry.
+    if (count < kNodeLookupResultsLen)
+    {
+        count++;
+    }
+
+    auto & updatedResult = results[insertAtIndex];
+    updatedResult        = result;
+    if (!updatedResult.address.GetIPAddress().IsIPv6LinkLocal())
+    {
+        // Only use the DNS-SD resolution's InterfaceID for addresses that are IPv6 LLA.
+        // For all other addresses, we should rely on the device's routing table to route messages sent.
+        // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
+        // mDNS advertisements are not usually received on the same interface the peer is reachable on.
+        updatedResult.address.SetInterface(Inet::InterfaceId::Null());
+        ChipLogDetail(Discovery, "Lookup clearing interface for non LL address");
+    }
+
+    return true;
+}
+
 CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle)
 {
+    MATTER_LOG_NODE_LOOKUP(&request);
+
     VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     handle.ResetForLookup(mTimeSource.GetMonotonicTimestamp(), request);
-    ReturnErrorOnFailure(Dnssd::Resolver::Instance().ResolveNodeId(request.GetPeerId(), Inet::IPAddressType::kAny));
+    ReturnErrorOnFailure(Dnssd::Resolver::Instance().ResolveNodeId(request.GetPeerId()));
     mActiveLookups.PushBack(&handle);
     ReArmTimer();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Resolver::TryNextResult(Impl::NodeLookupHandle & handle)
+{
+    VerifyOrReturnError(!mActiveLookups.Contains(&handle), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(handle.HasLookupResult(), CHIP_ERROR_WELL_EMPTY);
+
+    auto listener = handle.GetListener();
+    auto peerId   = handle.GetRequest().GetPeerId();
+    auto result   = handle.TakeLookupResult();
+
+    MATTER_LOG_NODE_DISCOVERED(Tracing::DiscoveryInfoType::kRetryDifferent, &peerId, &result);
+
+    listener->OnNodeAddressResolved(peerId, result);
     return CHIP_NO_ERROR;
 }
 
@@ -192,9 +211,12 @@ CHIP_ERROR Resolver::CancelLookup(Impl::NodeLookupHandle & handle, FailureCallba
 {
     VerifyOrReturnError(handle.IsActive(), CHIP_ERROR_INVALID_ARGUMENT);
     mActiveLookups.Remove(&handle);
+    Dnssd::Resolver::Instance().NodeIdResolutionNoLongerNeeded(handle.GetRequest().GetPeerId());
 
     // Adjust any timing updates.
     ReArmTimer();
+
+    MATTER_LOG_NODE_DISCOVERY_FAILED(&handle.GetRequest().GetPeerId(), CHIP_ERROR_CANCELLED);
 
     if (cancel_method == FailureCallback::Call)
     {
@@ -229,6 +251,9 @@ void Resolver::Shutdown()
 
         mActiveLookups.Erase(current);
 
+        MATTER_LOG_NODE_DISCOVERY_FAILED(&peerId, CHIP_ERROR_SHUT_DOWN);
+
+        Dnssd::Resolver::Instance().NodeIdResolutionNoLongerNeeded(peerId);
         // Failure callback only called after iterator was cleared:
         // This allows failure handlers to deallocate structures that may
         // contain the active lookup data as a member (intrusive lists members)
@@ -261,6 +286,11 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
         result.address.SetInterface(nodeData.resolutionData.interfaceId);
         result.mrpRemoteConfig = nodeData.resolutionData.GetRemoteMRPConfig();
         result.supportsTcp     = nodeData.resolutionData.supportsTcp;
+
+        if (nodeData.resolutionData.isICDOperatingAsLIT.HasValue())
+        {
+            result.isICDOperatingAsLIT = nodeData.resolutionData.isICDOperatingAsLIT.Value();
+        }
 
         for (size_t i = 0; i < nodeData.resolutionData.numIPs; i++)
         {
@@ -296,15 +326,19 @@ void Resolver::HandleAction(IntrusiveList<NodeLookupHandle>::Iterator & current)
     NodeListener * listener = current->GetListener();
     mActiveLookups.Erase(current);
 
+    Dnssd::Resolver::Instance().NodeIdResolutionNoLongerNeeded(peerId);
+
     // ensure action is taken AFTER the current current lookup is marked complete
     // This allows failure handlers to deallocate structures that may
     // contain the active lookup data as a member (intrusive lists members)
     switch (action.Type())
     {
     case NodeLookupResult::kLookupError:
+        MATTER_LOG_NODE_DISCOVERY_FAILED(&peerId, action.ErrorResult());
         listener->OnNodeAddressResolutionFailed(peerId, action.ErrorResult());
         break;
     case NodeLookupResult::kLookupSuccess:
+        MATTER_LOG_NODE_DISCOVERED(Tracing::DiscoveryInfoType::kResolutionDone, &peerId, &action.ResolveResult());
         listener->OnNodeAddressResolved(peerId, action.ResolveResult());
         break;
     default:
@@ -342,6 +376,8 @@ void Resolver::OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERR
         NodeListener * listener = current->GetListener();
         mActiveLookups.Erase(current);
 
+        Dnssd::Resolver::Instance().NodeIdResolutionNoLongerNeeded(peerId);
+
         // Failure callback only called after iterator was cleared:
         // This allows failure handlers to deallocate structures that may
         // contain the active lookup data as a member (intrusive lists members)
@@ -357,9 +393,9 @@ void Resolver::ReArmTimer()
     System::Clock::Timestamp now = mTimeSource.GetMonotonicTimestamp();
 
     System::Clock::Timeout nextTimeout = kInvalidTimeout;
-    for (auto it = mActiveLookups.begin(); it != mActiveLookups.end(); it++)
+    for (auto & activeLookup : mActiveLookups)
     {
-        System::Clock::Timeout timeout = it->NextEventTimeout(now);
+        System::Clock::Timeout timeout = activeLookup.NextEventTimeout(now);
 
         if (timeout < nextTimeout)
         {
@@ -369,10 +405,7 @@ void Resolver::ReArmTimer()
 
     if (nextTimeout == kInvalidTimeout)
     {
-#if CHIP_MINMDNS_HIGH_VERBOSITY
         // Generally this is only expected when no active lookups exist
-        ChipLogProgress(Discovery, "Discovery does not require any more timeouts");
-#endif
         return;
     }
 
@@ -391,6 +424,7 @@ void Resolver::ReArmTimer()
             mActiveLookups.Erase(it);
             it = mActiveLookups.begin();
 
+            Dnssd::Resolver::Instance().NodeIdResolutionNoLongerNeeded(peerId);
             // Callback only called after active lookup is cleared
             // This allows failure handlers to deallocate structures that may
             // contain the active lookup data as a member (intrusive lists members)

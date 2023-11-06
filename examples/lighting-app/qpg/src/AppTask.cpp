@@ -16,24 +16,32 @@
  *    limitations under the License.
  */
 
+#if !defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
+#error This application requires powercycle counting.
+#endif
+
+#include "gpSched.h"
+#include "powercycle_counting.h"
 #include "qvIO.h"
 
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
 #include "ota.h"
+#include "powercycle_counting.h"
 
 #include <app/server/OnboardingCodesUtil.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerDelegate.h>
+#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/TypeTraits.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -44,6 +52,8 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+using namespace ::chip;
+using namespace ::chip::app;
 using namespace ::chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
@@ -52,18 +62,27 @@ using namespace ::chip::DeviceLayer;
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
+#define OTA_START_TRIGGER_TIMEOUT 1500
+
 #define APP_TASK_STACK_SIZE (3 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
+#define QPG_LIGHT_ENDPOINT_ID (1)
+
+static uint8_t countdown = 0;
 
 namespace {
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-bool sIsThreadProvisioned = false;
-bool sIsThreadEnabled     = false;
-bool sHaveBLEConnections  = false;
+bool sIsThreadProvisioned     = false;
+bool sIsThreadEnabled         = false;
+bool sHaveBLEConnections      = false;
+bool sIsBLEAdvertisingEnabled = false;
 
+// NOTE! This key is for test/certification only and should not be available in production devices!
+uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 
 StaticQueue_t sAppEventQueueStruct;
@@ -71,7 +90,7 @@ StaticQueue_t sAppEventQueueStruct;
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 
-EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
+Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 /**********************************************************
@@ -81,7 +100,7 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 namespace {
 void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
-    sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
+    sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 }
 } // namespace
 
@@ -89,29 +108,33 @@ void OnTriggerIdentifyEffect(Identify * identify)
 {
     sIdentifyEffect = identify->mCurrentEffectIdentifier;
 
-    if (identify->mCurrentEffectIdentifier == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE)
+    if (identify->mEffectVariant != Clusters::Identify::EffectVariantEnum::kDefault)
     {
-        ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect variant %d",
-                        identify->mEffectVariant);
-        sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
+        ChipLogDetail(AppServer, "Identify Effect Variant unsupported. Using default");
     }
 
     switch (sIdentifyEffect)
     {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
-                                                           identify);
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        SystemLayer().ScheduleLambda([identify] {
+            (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
+                                                               identify);
+        });
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnTriggerIdentifyEffectCompleted,
-                                                           identify);
+    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
+        SystemLayer().ScheduleLambda([identify] {
+            (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
+            (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnTriggerIdentifyEffectCompleted,
+                                                               identify);
+        });
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-        sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
+    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
+        SystemLayer().ScheduleLambda(
+            [identify] { (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify); });
+        sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
         break;
     default:
         ChipLogProgress(Zcl, "No identifier effect");
@@ -122,44 +145,42 @@ Identify gIdentify = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnTriggerIdentifyEffect,
 };
 
 /**********************************************************
  * OffWithEffect Callbacks
  *********************************************************/
+
 void OnTriggerOffWithEffect(OnOffEffect * effect)
 {
-    chip::app::Clusters::OnOff::OnOffEffectIdentifier effectId = effect->mEffectIdentifier;
-    uint8_t effectVariant                                      = effect->mEffectVariant;
+    auto effectId      = effect->mEffectIdentifier;
+    auto effectVariant = effect->mEffectVariant;
 
     // Uses print outs until we can support the effects
-    if (effectId == EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF)
+    if (effectId == Clusters::OnOff::EffectIdentifierEnum::kDelayedAllOff)
     {
-        if (effectVariant == EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS)
+        auto typedEffectVariant = static_cast<Clusters::OnOff::DelayedAllOffEffectVariantEnum>(effectVariant);
+        if (typedEffectVariant == Clusters::OnOff::DelayedAllOffEffectVariantEnum::kDelayedOffFastFade)
         {
-            ChipLogProgress(Zcl, "EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS");
+            ChipLogProgress(Zcl, "DelayedAllOffEffectVariantEnum::kDelayedOffFastFade");
         }
-        else if (effectVariant == EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE)
+        else if (typedEffectVariant == Clusters::OnOff::DelayedAllOffEffectVariantEnum::kNoFade)
         {
-            ChipLogProgress(Zcl, "EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE");
+            ChipLogProgress(Zcl, "DelayedAllOffEffectVariantEnum::kNoFade");
         }
-        else if (effectVariant ==
-                 EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_IN_12_SECONDS)
+        else if (typedEffectVariant == Clusters::OnOff::DelayedAllOffEffectVariantEnum::kDelayedOffSlowFade)
         {
-            ChipLogProgress(Zcl,
-                            "EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_"
-                            "IN_12_SECONDS");
+            ChipLogProgress(Zcl, "DelayedAllOffEffectVariantEnum::kDelayedOffSlowFade");
         }
     }
-    else if (effectId == EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT)
+    else if (effectId == Clusters::OnOff::EffectIdentifierEnum::kDyingLight)
     {
-        if (effectVariant ==
-            EMBER_ZCL_ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND)
+        auto typedEffectVariant = static_cast<Clusters::OnOff::DyingLightEffectVariantEnum>(effectVariant);
+        if (typedEffectVariant == Clusters::OnOff::DyingLightEffectVariantEnum::kDyingLightFadeOff)
         {
-            ChipLogProgress(
-                Zcl, "EMBER_ZCL_ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND");
+            ChipLogProgress(Zcl, "DyingLightEffectVariantEnum::kDyingLightFadeOff");
         }
     }
 }
@@ -167,8 +188,8 @@ void OnTriggerOffWithEffect(OnOffEffect * effect)
 OnOffEffect gEffect = {
     chip::EndpointId{ 1 },
     OnTriggerOffWithEffect,
-    EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF,
-    static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS),
+    Clusters::OnOff::EffectIdentifierEnum::kDelayedAllOff,
+    to_underlying(Clusters::OnOff::DelayedAllOffEffectVariantEnum::kDelayedOffFastFade),
 };
 
 } // namespace
@@ -221,6 +242,12 @@ void AppTask::InitServer(intptr_t arg)
     nativeParams.unlockCb              = UnlockOpenThreadTask;
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+
+    // Use GenericFaultTestEventTriggerDelegate to inject faults
+    static GenericFaultTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+
     chip::Server::GetInstance().Init(initParams);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
@@ -230,28 +257,41 @@ void AppTask::InitServer(intptr_t arg)
     // Open commissioning after boot if no fabric was available
     if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
     {
-        PlatformMgr().ScheduleWork(OpenCommissioning, 0);
+        ChipLogProgress(NotSpecified, "No fabrics, starting commissioning.");
+        AppTask::OpenCommissioning((intptr_t) 0);
     }
 }
 
 void AppTask::OpenCommissioning(intptr_t arg)
 {
     // Enable BLE advertisements
-    chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
-    ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
+
+    SystemLayer().ScheduleLambda([] {
+        CHIP_ERROR err;
+        err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
+        }
+    });
 }
 
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    PlatformMgr().AddEventHandler(MatterEventHandler, 0);
+
     ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
     // Init ZCL Data Model and start server
     PlatformMgr().ScheduleWork(InitServer, 0);
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    ReturnErrorOnFailure(mFactoryDataProvider.Init());
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
 
     // Setup light
     err = LightingMgr().Init();
@@ -269,6 +309,12 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
+    sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
+    sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
+    sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
+    sIsBLEAdvertisingEnabled = ConnectivityMgr().IsBLEAdvertisingEnabled();
+    UpdateLEDs();
+
     return err;
 }
 
@@ -276,61 +322,13 @@ void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
 
-    CHIP_ERROR err = sAppTask.Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "AppTask.Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
-
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
             eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
-        }
-
-        // Collect connectivity and configuration state from the CHIP stack. Because
-        // the CHIP event loop is being run in a separate task, the stack must be
-        // locked while these values are queried.  However we use a non-blocking
-        // lock request (TryLockCHIPStack()) to avoid blocking other UI activities
-        // when the CHIP task is busy (e.g. with a long crypto operation).
-        if (PlatformMgr().TryLockChipStack())
-        {
-            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
-            PlatformMgr().UnlockChipStack();
-        }
-
-        // Update the status LED if factory reset has not been initiated.
-        //
-        // If system has "full connectivity", keep the LED On constantly.
-        //
-        // If thread and service provisioned, but not attached to the thread network
-        // yet OR no connectivity to the service OR subscriptions are not fully
-        // established THEN blink the LED Off for a short period of time.
-        //
-        // If the system has ble connection(s) uptill the stage above, THEN blink
-        // the LEDs at an even rate of 100ms.
-        //
-        // Otherwise, blink the LED ON for a very short time.
-        if (sAppTask.mFunction != kFunction_FactoryReset)
-        {
-            if (sIsThreadProvisioned && sIsThreadEnabled)
-            {
-                qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
-            }
-            else if (sHaveBLEConnections)
-            {
-                qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
-            }
-            else
-            {
-                qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
-            }
         }
     }
 }
@@ -358,7 +356,7 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
     {
         // Toggle Dimming of light between 2 fixed levels
         uint8_t val = 0x0;
-        val         = LightingMgr().GetLevel() == 0x7f ? 0x1 : 0x7f;
+        val         = LightingMgr().GetLevel() == 0x40 ? 0xfe : 0x40;
         action      = LightingManager::LEVEL_ACTION;
 
         sAppTask.mSyncClusterToButtonAction = true;
@@ -420,9 +418,16 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         return;
     }
 
-    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
-    // initiate factory reset
-    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
+    {
+        ChipLogProgress(NotSpecified, "[BTN] Release button now to start Software Updater");
+        ChipLogProgress(NotSpecified, "[BTN] Hold to trigger Factory Reset");
+        sAppTask.mFunction = kFunction_SoftwareUpdate;
+        sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT - OTA_START_TRIGGER_TIMEOUT);
+    }
+    // If we reached here, the button was held past OTA_START_TRIGGER_TIMEOUT,
+    // initiate OTA update
+    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
     {
         ChipLogProgress(NotSpecified, "[BTN] Factory Reset selected. Release within %us to cancel.",
                         FACTORY_RESET_CANCEL_WINDOW_TIMEOUT / 1000);
@@ -443,7 +448,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        chip::Server::GetInstance().ScheduleFactoryReset();
+        SystemLayer().ScheduleLambda([] { chip::Server::GetInstance().ScheduleFactoryReset(); });
     }
 }
 
@@ -466,19 +471,34 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
             ChipLogProgress(NotSpecified, "[BTN] Hold to select function:");
-            ChipLogProgress(NotSpecified, "[BTN] - Trigger OTA (0-3s)");
+            ChipLogProgress(NotSpecified, "[BTN] - Trigger BLE adv (0-1.5s)");
+            ChipLogProgress(NotSpecified, "[BTN] - Trigger OTA (1.5-3s)");
             ChipLogProgress(NotSpecified, "[BTN] - Factory Reset (>6s)");
 
             sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
 
-            sAppTask.mFunction = kFunction_SoftwareUpdate;
+            sAppTask.mFunction = kFunction_StartBleAdv;
         }
     }
     else
     {
-        // If the button was released before factory reset got initiated, trigger a
-        // software update.
-        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
+        {
+            sAppTask.CancelTimer();
+            sAppTask.mFunction = kFunction_NoneSelected;
+
+            if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+            {
+                ChipLogProgress(NotSpecified, "BLE advertising already in progress.");
+            }
+            else
+            {
+                // Enable BLE advertisements and pairing window
+                AppTask::OpenCommissioning((intptr_t) 0);
+                ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
+            }
+        }
+        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
         {
             sAppTask.CancelTimer();
 
@@ -503,24 +523,28 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 
 void AppTask::CancelTimer()
 {
-    chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
-    mFunctionTimerActive = false;
+    SystemLayer().ScheduleLambda([this] {
+        chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
+        this->mFunctionTimerActive = false;
+    });
 }
 
 void AppTask::StartTimer(uint32_t aTimeoutInMs)
 {
-    CHIP_ERROR err;
+    SystemLayer().ScheduleLambda([aTimeoutInMs, this] {
+        CHIP_ERROR err;
+        chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
+        err =
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(aTimeoutInMs), TimerEventHandler, this);
+        SuccessOrExit(err);
 
-    chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
-    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(aTimeoutInMs), TimerEventHandler, this);
-    SuccessOrExit(err);
-
-    mFunctionTimerActive = true;
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
-    }
+        this->mFunctionTimerActive = true;
+    exit:
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
+        }
+    });
 }
 
 void AppTask::ActionInitiated(LightingManager::Action_t aAction)
@@ -557,7 +581,7 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
 
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
-    if (sAppEventQueue != NULL)
+    if (sAppEventQueue != nullptr)
     {
         if (!xQueueSend(sAppEventQueue, aEvent, 1))
         {
@@ -566,7 +590,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
     }
     else
     {
-        ChipLogError(NotSpecified, "Event Queue is NULL should never happen");
+        ChipLogError(NotSpecified, "Event Queue is nullptr should never happen");
     }
 }
 
@@ -587,25 +611,121 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
  */
 void AppTask::UpdateClusterState(void)
 {
-    uint8_t newValue;
+    SystemLayer().ScheduleLambda([] {
+        ChipLogProgress(NotSpecified, "UpdateClusterState");
 
-    ChipLogProgress(NotSpecified, "UpdateClusterState");
+        // Write the new on/off value
+        EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().IsTurnedOn());
 
-    // write the new on/off value
-    newValue = LightingMgr().IsTurnedOn();
-    EmberAfStatus status =
-        emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+        }
+
+        // Write new level value
+        status = Clusters::LevelControl::Attributes::CurrentLevel::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().GetLevel());
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            ChipLogError(NotSpecified, "ERR: updating level %x", status);
+        }
+    });
+}
+
+void AppTask::UpdateLEDs(void)
+{
+    // If system has "full connectivity", keep the LED On constantly.
+    //
+    // If thread and service provisioned, but not attached to the thread network
+    // yet OR no connectivity to the service OR subscriptions are not fully
+    // established THEN blink the LED Off for a short period of time.
+    //
+    // If the system has ble connection(s) uptill the stage above, THEN blink
+    // the LEDs at an even rate of 100ms.
+    //
+    // Otherwise, blink the LED ON for a very short time.
+    if (sIsThreadProvisioned && sIsThreadEnabled)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+        qvIO_LedSet(SYSTEM_STATE_LED, true);
+    }
+    else if (sHaveBLEConnections)
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
+    }
+    else if (sIsBLEAdvertisingEnabled)
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 50);
+    }
+    else
+    {
+        // not commisioned yet
+        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
+    }
+}
+
+void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
+{
+    switch (event->Type)
+    {
+    case DeviceEventType::kServiceProvisioningChange: {
+        sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+        UpdateLEDs();
+        break;
     }
 
-    newValue = LightingMgr().GetLevel();
-    status   = emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t *) &newValue,
-                                   ZCL_INT8U_ATTRIBUTE_TYPE);
-
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        ChipLogError(NotSpecified, "ERR: updating level %x", status);
+    case DeviceEventType::kThreadConnectivityChange: {
+        sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
+        UpdateLEDs();
+        break;
     }
+
+    case DeviceEventType::kCHIPoBLEConnectionEstablished: {
+        sHaveBLEConnections = true;
+        UpdateLEDs();
+        break;
+    }
+
+    case DeviceEventType::kCHIPoBLEConnectionClosed: {
+        sHaveBLEConnections = false;
+        UpdateLEDs();
+        break;
+    }
+
+    case DeviceEventType::kCHIPoBLEAdvertisingChange: {
+        sIsBLEAdvertisingEnabled = (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started);
+        UpdateLEDs();
+        break;
+    }
+
+    default:
+        break;
+    }
+}
+
+static void NextCountdown(void)
+{
+    if (countdown > 0)
+    {
+        LightingMgr().InitiateAction((countdown % 2 == 0) ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, 0, 0);
+        countdown--;
+        gpSched_ScheduleEvent(1000000UL, NextCountdown);
+    }
+    else
+    {
+        SystemLayer().ScheduleLambda([] { ConfigurationMgr().InitiateFactoryReset(); });
+    }
+}
+
+extern "C" {
+void gpAppFramework_Reset_cbTriggerResetCountCompleted(void)
+{
+    uint8_t resetCount = gpAppFramework_Reset_GetResetCount();
+
+    ChipLogProgress(NotSpecified, "%d resets so far", resetCount);
+    if (resetCount == 10)
+    {
+        ChipLogProgress(NotSpecified, "Factory Reset Triggered!");
+        countdown = 5;
+        NextCountdown();
+    }
+}
 }

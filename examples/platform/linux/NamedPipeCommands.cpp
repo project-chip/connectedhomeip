@@ -18,13 +18,15 @@
 
 #include "NamedPipeCommands.h"
 
+#include <errno.h>
 #include <fcntl.h>
 #include <lib/support/CodeUtils.h>
+#include <pthread.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
-static constexpr const size_t kChipEventCmdBufSize = 80;
+static constexpr const size_t kChipEventCmdBufSize = 256;
 
 CHIP_ERROR NamedPipeCommands::Start(std::string & path, NamedPipeCommandDelegate * delegate)
 {

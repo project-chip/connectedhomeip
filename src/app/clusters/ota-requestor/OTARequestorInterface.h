@@ -154,7 +154,7 @@ public:
      */
     virtual void HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) = 0;
+        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) = 0;
 
     // Destructor
     virtual ~OTARequestorInterface() = default;
@@ -202,6 +202,9 @@ public:
 
     // Set the provider location to be used in the next query and OTA update process
     virtual void SetCurrentProviderLocation(ProviderLocationType providerLocation) = 0;
+
+    // Set the metadata value for the provider to be used in the next query and OTA update process
+    virtual void SetMetadataForProvider(chip::ByteSpan metadataForProvider) = 0;
 
     // If there is an OTA update in progress, returns the provider location for the current OTA update, otherwise, returns the
     // provider location that was last used

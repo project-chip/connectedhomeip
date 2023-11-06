@@ -20,7 +20,6 @@
  * @brief Implementation for the Fixed Label Server Cluster
  ***************************************************************************/
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -108,7 +107,7 @@ CHIP_ERROR FixedLabelAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 }
 } // anonymous namespace
 
-void MatterFixedLabelPluginServerInitCallback(void)
+void MatterFixedLabelPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

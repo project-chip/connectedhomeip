@@ -24,6 +24,7 @@
 #pragma once
 
 #include <inet/EndPointStateLwIP.h>
+#include <inet/EndpointQueueFilter.h>
 #include <inet/UDPEndPoint.h>
 
 namespace chip {
@@ -40,6 +41,20 @@ public:
     uint16_t GetBoundPort() const override;
     void Free() override;
 
+    /**
+     * @brief Set the queue filter for all UDP endpoints
+     *
+     * Responsibility is on the caller to avoid changing the filter while packets are being
+     * processed. Setting the queue filter to `nullptr` disables the filtering.
+     *
+     * NOTE: There is only one EndpointQueueFilter instance settable. However it's possible
+     *       to create an instance of EndpointQueueFilter that combines several other
+     *       EndpointQueueFilter by composition to achieve the effect of multiple filters.
+     *
+     * @param queueFilter - queue filter instance to set, owned by caller
+     */
+    static void SetQueueFilter(EndpointQueueFilter * queueFilter) { sQueueFilter = queueFilter; }
+
 private:
     // UDPEndPoint overrides.
 #if INET_CONFIG_ENABLE_IPV4
@@ -55,33 +70,15 @@ private:
     static struct netif * FindNetifFromInterfaceId(InterfaceId aInterfaceId);
     static CHIP_ERROR LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId);
 
-    void HandleDataReceived(chip::System::PacketBufferHandle && aBuffer);
-
-    /**
-     *  Get LwIP IP layer source and destination addressing information.
-     *
-     *  @param[in]   aBuffer    The packet buffer containing the IP message.
-     *
-     *  @returns  a pointer to the address information on success; otherwise,
-     *            nullptr if there is insufficient space in the packet for
-     *            the address information.
-     *
-     *  When using LwIP information about the packet is 'hidden' in the reserved space before the start of the
-     *  data in the packet buffer. This is necessary because the system layer events only have two arguments,
-     *  which in this case are used to convey the pointer to the end point and the pointer to the buffer.
-     *
-     *  In most cases this trick of storing information before the data works because the first buffer in an
-     *  LwIP IP message contains the space that was used for the Ethernet/IP/UDP headers. However, given the
-     *  current size of the IPPacketInfo structure (40 bytes), it is possible for there to not be enough room
-     *  to store the structure along with the payload in a single packet buffer. In practice, this should only
-     *  happen for extremely large IPv4 packets that arrive without an Ethernet header.
-     */
-    static IPPacketInfo * GetPacketInfo(const chip::System::PacketBufferHandle & aBuffer);
+    void HandleDataReceived(System::PacketBufferHandle && msg, IPPacketInfo * pktInfo);
 
     CHIP_ERROR GetPCB(IPAddressType addrType4);
     static void LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr, u16_t port);
 
     udp_pcb * mUDP; // LwIP User datagram protocol (UDP) control block.
+    std::atomic_int mDelayReleaseCount{ 0 };
+
+    static EndpointQueueFilter * sQueueFilter;
 };
 
 using UDPEndPointImpl = UDPEndPointImplLwIP;

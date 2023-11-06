@@ -43,10 +43,10 @@ struct Movable
 {
     Movable(int v1, int v2) : m1(v1), m2(v2) {}
 
-    Movable(Movable &) = delete;
+    Movable(Movable &)             = delete;
     Movable & operator=(Movable &) = delete;
 
-    Movable(Movable &&) = default;
+    Movable(Movable &&)             = default;
     Movable & operator=(Movable &&) = default;
 
     int m1;

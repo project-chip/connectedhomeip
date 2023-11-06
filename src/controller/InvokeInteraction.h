@@ -51,6 +51,9 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
                      const Optional<uint16_t> & timedInvokeTimeoutMs,
                      const Optional<System::Clock::Timeout> & responseTimeout = NullOptional)
 {
+    // InvokeCommandRequest expects responses, so cannot happen over a group session.
+    VerifyOrReturnError(!sessionHandle->IsGroupSession(), CHIP_ERROR_INVALID_ARGUMENT);
+
     app::CommandPathParams commandPath = { endpointId, 0, RequestObjectT::GetClusterId(), RequestObjectT::GetCommandId(),
                                            (app::CommandPathFlags::kEndpointIdValid) };
 
@@ -91,14 +94,13 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
 }
 
 /*
- * A typed group command invocation function that takes as input a cluster-object representation of a command request and
- * callbacks when completed trought the done callback
+ * A typed group command invocation function that takes as input a cluster-object representation of a command request.
  *
  * The RequestObjectT is generally expected to be a ClusterName::Commands::CommandName::Type struct, but any object
  * that can be encoded using the DataModel::Encode machinery and exposes the GetClusterId() and GetCommandId() functions
  * and a ResponseType type is expected to work.
  *
- * Since this sends a group command, no response will be received and all allocated rescources will be cleared before exing this
+ * Since this sends a group command, no response will be received and all allocated resources will be cleared before exiting this
  * function
  */
 template <typename RequestObjectT>

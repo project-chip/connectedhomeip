@@ -22,7 +22,7 @@
 #endif
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace chip;
 using namespace chip::app;
@@ -35,18 +35,13 @@ void BindingHandler::Init()
     DeviceLayer::PlatformMgr().ScheduleWork(InitInternal);
 }
 
-void BindingHandler::OnInvokeCommandFailure(DeviceProxy * aDevice, BindingData & aBindingData, CHIP_ERROR aError)
+void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERROR aError)
 {
     CHIP_ERROR error;
 
     if (aError == CHIP_ERROR_TIMEOUT && !BindingHandler::GetInstance().mCaseSessionRecovered)
     {
         LOG_INF("Response timeout for invoked command, trying to recover CASE session.");
-        if (!aDevice)
-            return;
-
-        // Release current CASE session.
-        aDevice->Disconnect();
 
         // Set flag to not try recover session multiple times.
         BindingHandler::GetInstance().mCaseSessionRecovered = true;
@@ -71,8 +66,8 @@ void BindingHandler::OnInvokeCommandFailure(DeviceProxy * aDevice, BindingData &
     }
 }
 
-void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding, DeviceProxy * aDevice,
-                                         void * aContext)
+void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
+                                         OperationalDeviceProxy * aDevice, void * aContext)
 {
     CHIP_ERROR ret     = CHIP_NO_ERROR;
     BindingData * data = reinterpret_cast<BindingData *>(aContext);
@@ -85,9 +80,13 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
             BindingHandler::GetInstance().mCaseSessionRecovered = false;
     };
 
-    auto onFailure = [aDevice, dataRef = *data](CHIP_ERROR aError) mutable {
-        BindingHandler::OnInvokeCommandFailure(aDevice, dataRef, aError);
-    };
+    auto onFailure = [dataRef = *data](CHIP_ERROR aError) mutable { BindingHandler::OnInvokeCommandFailure(dataRef, aError); };
+
+    if (aDevice)
+    {
+        // We are validating connection is ready once here instead of multiple times in each case statement below.
+        VerifyOrDie(aDevice->ConnectionReady());
+    }
 
     switch (aCommandId)
     {
@@ -144,7 +143,7 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
 }
 
 void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
-                                                DeviceProxy * aDevice, void * aContext)
+                                                OperationalDeviceProxy * aDevice, void * aContext)
 {
     BindingData * data = reinterpret_cast<BindingData *>(aContext);
 
@@ -156,11 +155,15 @@ void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Embe
             BindingHandler::GetInstance().mCaseSessionRecovered = false;
     };
 
-    auto onFailure = [aDevice, dataRef = *data](CHIP_ERROR aError) mutable {
-        BindingHandler::OnInvokeCommandFailure(aDevice, dataRef, aError);
-    };
+    auto onFailure = [dataRef = *data](CHIP_ERROR aError) mutable { BindingHandler::OnInvokeCommandFailure(dataRef, aError); };
 
     CHIP_ERROR ret = CHIP_NO_ERROR;
+
+    if (aDevice)
+    {
+        // We are validating connection is ready once here instead of multiple times in each case statement below.
+        VerifyOrDie(aDevice->ConnectionReady());
+    }
 
     switch (aCommandId)
     {
@@ -189,7 +192,8 @@ void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Embe
     }
 }
 
-void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & binding, DeviceProxy * deviceProxy, void * context)
+void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * deviceProxy,
+                                               void * context)
 {
     VerifyOrReturn(context != nullptr, LOG_ERR("Invalid context for Light switch handler"););
     BindingData * data = static_cast<BindingData *>(context);
@@ -205,7 +209,7 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & bi
             LevelControlProcessCommand(data->CommandId, binding, nullptr, context);
             break;
         default:
-            ChipLogError(NotSpecified, "Invalid binding group command data");
+            LOG_ERR("Invalid binding group command data");
             break;
         }
     }
@@ -220,7 +224,7 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & bi
             LevelControlProcessCommand(data->CommandId, binding, deviceProxy, context);
             break;
         default:
-            ChipLogError(NotSpecified, "Invalid binding unicast command data");
+            LOG_ERR("Invalid binding unicast command data");
             break;
         }
     }
@@ -293,9 +297,6 @@ void BindingHandler::PrintBindingTable()
             break;
         case EMBER_UNUSED_BINDING:
             LOG_INF("[%d] UNUSED", i++);
-            break;
-        case EMBER_MANY_TO_ONE_BINDING:
-            LOG_INF("[%d] MANY TO ONE", i++);
             break;
         default:
             break;

@@ -67,7 +67,6 @@ public:
     static const Key kConfigKey_ServiceId;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
-    static const Key kConfigKey_WiFiStationSecType;
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
@@ -82,6 +81,8 @@ public:
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
+    static const Key kConfigKey_DeviceTypeId;
+    static const Key kConfigKey_DeviceName;
 
     static CHIP_ERROR Init();
 

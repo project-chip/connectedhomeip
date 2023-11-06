@@ -1,0 +1,15 @@
+# Commands will be run in CHIP project root.
+cd "{root}"
+
+# Generating linux-arm64-ota-requestor-nodeps-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true chip_crypto="mbedtls" target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-ota-requestor-nodeps-ipv6only'
+
+# Setting up Java deps
+third_party/java_deps/set_up_java_deps.sh
+
+# Building linux-arm64-ota-requestor-nodeps-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-ota-requestor-nodeps-ipv6only'

@@ -35,9 +35,9 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 
-constexpr const char kIdentityAlpha[] = "";
-constexpr const char kIdentityBeta[]  = "";
-constexpr const char kIdentityGamma[] = "";
+inline constexpr const char kIdentityAlpha[] = "";
+inline constexpr const char kIdentityBeta[]  = "";
+inline constexpr const char kIdentityGamma[] = "";
 
 class TestCommand : public TestRunner,
                     public PICSChecker,
@@ -56,8 +56,10 @@ public:
     void SetCommandExitStatus(CHIP_ERROR status)
     {
         chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-        exit(CHIP_NO_ERROR == status ? EXIT_SUCCESS : EXIT_FAILURE);
+        mExitCode = (CHIP_NO_ERROR == status ? EXIT_SUCCESS : EXIT_FAILURE);
     }
+
+    int GetCommandExitCode() { return mExitCode; }
 
     template <typename T>
     size_t AddArgument(const char * name, chip::Optional<T> * value)
@@ -87,7 +89,21 @@ public:
     void Exit(std::string message, CHIP_ERROR err) override
     {
         LogEnd(message, err);
-        SetCommandExitStatus(err);
+
+        if (CHIP_NO_ERROR == err)
+        {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(AsyncExit, reinterpret_cast<intptr_t>(this));
+        }
+        else
+        {
+            SetCommandExitStatus(err);
+        }
+    }
+
+    static void AsyncExit(intptr_t context)
+    {
+        TestCommand * command = reinterpret_cast<TestCommand *>(context);
+        command->SetCommandExitStatus(CHIP_NO_ERROR);
     }
 
     static void ScheduleNextTest(intptr_t context)
@@ -95,7 +111,6 @@ public:
         TestCommand * command = reinterpret_cast<TestCommand *>(context);
         command->isRunning    = true;
         command->NextTest();
-        chip::DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, context);
     }
 
     static void OnPlatformEvent(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
@@ -105,6 +120,7 @@ public:
         case chip::DeviceLayer::DeviceEventType::kCommissioningComplete:
             ChipLogProgress(chipTool, "Commissioning complete");
             chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleNextTest, arg);
+            chip::DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, arg);
             break;
         }
     }
@@ -113,7 +129,7 @@ public:
     {
         if (commandPath == mCommandPath)
         {
-            NextTest();
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleNextTest, reinterpret_cast<intptr_t>(this));
             return;
         }
 
@@ -125,7 +141,7 @@ public:
     {
         if (attributePath == mAttributePath)
         {
-            NextTest();
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleNextTest, reinterpret_cast<intptr_t>(this));
             return;
         }
 
@@ -160,7 +176,10 @@ public:
 protected:
     chip::app::ConcreteCommandPath mCommandPath;
     chip::app::ConcreteAttributePath mAttributePath;
+    chip::Optional<chip::NodeId> mCommissionerNodeId;
     chip::Optional<chip::EndpointId> mEndpointId;
+    int mExitCode = EXIT_SUCCESS;
+
     void SetIdentity(const char * name){};
 
     /////////// DelayCommands Interface /////////

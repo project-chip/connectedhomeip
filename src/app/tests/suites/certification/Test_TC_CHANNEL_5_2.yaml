@@ -14,15 +14,18 @@
 
 name: 19.7.2. [TC-CHANNEL-5.2] Change Channel by Number Verification
 
+PICS:
+    - CHANNEL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Channel"
     endpoint: 1
     majornumber:
-        type: INT16U
+        type: int16u
         defaultValue: 9
     minornumber:
-        type: INT16U
+        type: int16u
         defaultValue: 1
 
 tests:
@@ -34,7 +37,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads the ChannelList attribute"
+    - label: "Step 1: TH reads the ChannelList attribute from the DUT"
       PICS: CHANNEL.S.A0000
       command: "readAttribute"
       attribute: "ChannelList"
@@ -42,20 +45,22 @@ tests:
           constraints:
               type: list
 
-    - label: "TH sends a ChangeChannelByNumber command"
+    - label:
+          "Step 2: TH sends a ChangeChannelByNumber command to the DUT with
+          channel information (major and minor numbers) from the list in step 1"
       PICS: CHANNEL.S.C02.Rsp
       command: "ChangeChannelByNumber"
       arguments:
           values:
-              - name: "majorNumber"
+              - name: "MajorNumber"
                 value: majornumber
-              - name: "minorNumber"
+              - name: "MinorNumber"
                 value: minornumber
 
-    - label: "Verify that the channel has changed on the device"
+    - label: "Step 2a: Verify that the channel has changed on the device"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && CHANNEL.S.C02.Rsp
       arguments:
           values:
               - name: "message"
@@ -63,9 +68,9 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the CurrentChannel attribute"
-      PICS: CHANNEL.S.A0002
+    - label: "Step 3: TH reads the CurrentChannel attribute from the DUT"
+      PICS: CHANNEL.S.A0002 && CHANNEL.S.C02.Rsp
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
-          value: [majorNumber: majornumber, minorNumber: minornumber]
+          value: { MajorNumber: majornumber, MinorNumber: minornumber }

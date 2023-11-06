@@ -34,12 +34,14 @@
 
 #define LOG_MODULE_ID 1
 
+namespace {
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
+} // namespace
 
 void TestTask(void * pvParameter)
 {
-    while (1)
+    while (true)
     {
         qvCHIP_Printf(LOG_MODULE_ID, "Running Tests:");
         chip::RunKvsTest();

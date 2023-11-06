@@ -18,31 +18,29 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <inet/EndPointStateOpenThread.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
-#include <inet/EndPointStateOpenThread.h>
-
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/attribute-storage.h>
 
 #include "Keyboard.h"
 #include "LED.h"
 #include "LEDWidget.h"
+#include "PWR_Interface.h"
 #include "app_config.h"
 
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif
@@ -52,10 +50,9 @@ constexpr uint8_t kAppEventQueueSize           = 10;
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
-static SemaphoreHandle_t sCHIPEventLock;
 static QueueHandle_t sAppEventQueue;
 
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
 static LEDWidget sStatusLED;
 static LEDWidget sLockLED;
 #endif
@@ -73,6 +70,9 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+static AppTask::FactoryDataProvider sFactoryDataProvider;
+#endif
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -95,18 +95,26 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model and start server
     PlatformMgr().ScheduleWork(InitServer, 0);
 
-    // Initialize device attestation config
+// Initialize device attestation config
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+    // Initialize factory data provider
+    ReturnErrorOnFailure(sFactoryDataProvider.Init());
+    SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+    SetCommissionableDataProvider(&sFactoryDataProvider);
+#else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
+#endif // CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
 
     // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    AppTask::PrintOnboardingInfo();
 
     /* HW init leds */
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
     LED_Init();
 
     /* start with all LEDS turnedd off */
@@ -142,13 +150,6 @@ CHIP_ERROR AppTask::Init()
 
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    sCHIPEventLock = xSemaphoreCreateMutex();
-    if (sCHIPEventLock == NULL)
-    {
-        K32W_LOG("xSemaphoreCreateMutex() failed");
-        assert(err == CHIP_NO_ERROR);
-    }
-
     // Print the current software version
     char currentSoftwareVer[ConfigurationManager::kMaxSoftwareVersionStringLength + 1] = { 0 };
     err = ConfigurationMgr().GetSoftwareVersionString(currentSoftwareVer, sizeof(currentSoftwareVer));
@@ -158,7 +159,7 @@ CHIP_ERROR AppTask::Init()
         assert(err == CHIP_NO_ERROR);
     }
 
-    PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
+    PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 
     K32W_LOG("Current Software Version: %s", currentSoftwareVer);
     return err;
@@ -181,6 +182,10 @@ void AppTask::InitServer(intptr_t arg)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
+    auto & infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
+    infoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&infoProvider);
+
     // Init ZCL Data Model and start server
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = LockOpenThreadTask;
@@ -188,6 +193,18 @@ void AppTask::InitServer(intptr_t arg)
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
+}
+
+void AppTask::PrintOnboardingInfo()
+{
+    chip::PayloadContents payload;
+    CHIP_ERROR err = GetPayloadContents(payload, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "GetPayloadContents() failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    payload.commissioningFlow = chip::CommissioningFlow::kUserActionRequired;
+    PrintOnboardingCodes(payload);
 }
 
 void AppTask::AppTaskMain(void * pvParameter)
@@ -205,7 +222,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     {
         TickType_t xTicksToWait = pdMS_TO_TICKS(10);
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
         xTicksToWait = portMAX_DELAY;
 #endif
 
@@ -243,7 +260,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         //
         // Otherwise, blink the LED ON for a very short time.
 
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
             if (sIsThreadProvisioned)
@@ -306,7 +323,7 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 
 void AppTask::KBD_Callback(uint8_t events)
 {
-    eventMask = eventMask | (uint32_t)(1 << events);
+    eventMask = eventMask | (uint32_t) (1 << events);
 
     HandleKeyboard();
 }
@@ -402,7 +419,7 @@ void AppTask::ResetActionEventHandler(void * aGenericEvent)
         sAppTask.CancelTimer();
         sAppTask.mFunction = kFunction_NoneSelected;
 
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
         /* restore initial state for the LED indicating Lock state */
         if (BoltLockMgr().IsUnlocked())
         {
@@ -430,7 +447,7 @@ void AppTask::ResetActionEventHandler(void * aGenericEvent)
         sAppTask.mFunction = kFunction_FactoryReset;
 
         /* LEDs will start blinking to signal that a Factory Reset was scheduled */
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
         sStatusLED.Set(false);
         sLockLED.Set(false);
 
@@ -542,7 +559,11 @@ void AppTask::BleHandler(void * aGenericEvent)
         K32W_LOG("Another function is scheduled. Could not toggle BLE state!");
         return;
     }
+    PlatformMgr().ScheduleWork(AppTask::BleStartAdvertising, 0);
+}
 
+void AppTask::BleStartAdvertising(intptr_t arg)
+{
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);
@@ -563,7 +584,7 @@ void AppTask::BleHandler(void * aGenericEvent)
     }
 }
 
-void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
+void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceEventType::kServiceProvisioningChange && event->ServiceProvisioningChange.IsServiceProvisioned)
     {
@@ -655,7 +676,7 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
 
     sAppTask.mFunction = kFunctionLockUnlock;
 
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
     sLockLED.Blink(50, 50);
 #endif
 }
@@ -668,14 +689,14 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     if (aAction == BoltLockManager::LOCK_ACTION)
     {
         K32W_LOG("Lock Action has been completed")
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
         sLockLED.Set(true);
 #endif
     }
     else if (aAction == BoltLockManager::UNLOCK_ACTION)
     {
         K32W_LOG("Unlock Action has been completed")
-#if !cPWR_UsePowerDownMode
+#if !defined(chip_with_low_power) || (chip_with_low_power == 0)
         sLockLED.Set(false);
 #endif
     }
@@ -701,21 +722,9 @@ void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aA
 
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
-    portBASE_TYPE taskToWake = pdFALSE;
     if (sAppEventQueue != NULL)
     {
-        if (__get_IPSR())
-        {
-            if (!xQueueSendToFrontFromISR(sAppEventQueue, aEvent, &taskToWake))
-            {
-                K32W_LOG("Failed to post event to app task event queue");
-            }
-            if (taskToWake)
-            {
-                portYIELD_FROM_ISR(taskToWake);
-            }
-        }
-        else if (!xQueueSend(sAppEventQueue, aEvent, 0))
+        if (!xQueueSend(sAppEventQueue, aEvent, 0))
         {
             K32W_LOG("Failed to post event to app task event queue");
         }
@@ -724,7 +733,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
     /* specific processing for events sent from App_PostCallbackMessage (see main.cpp) */
     if (aEvent->Type == AppEvent::kEventType_Lp)
     {
@@ -749,14 +758,24 @@ void AppTask::UpdateClusterState(void)
 }
 void AppTask::UpdateClusterStateInternal(intptr_t arg)
 {
-    uint8_t newValue = !BoltLockMgr().IsUnlocked();
+    using namespace chip::app::Clusters::DoorLock;
 
-    // write the new on/off value
-    EmberAfStatus status =
-        emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    DlLockState newValue;
+    if (BoltLockMgr().IsUnlocked())
+    {
+        newValue = DlLockState::kUnlocked;
+    }
+    else
+    {
+        newValue = DlLockState::kLocked;
+    }
+
+    // write the new door lock state
+    EmberAfStatus status = Attributes::LockState::Set(1, newValue);
+
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+        ChipLogError(NotSpecified, "ERR: updating door lock state %x", status);
     }
 }
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -98,7 +98,7 @@ void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanc
         }
     }
 
-    ChipLogDetail(AppServer, "SetUDCClientProcessingState instance=%s new state=%d", instanceName, (int) state);
+    ChipLogDetail(AppServer, "SetUDCClientProcessingState instance=%s new state=%d", StringOrNullMarker(instanceName), (int) state);
 
     client->SetUDCClientProcessingState(state);
 

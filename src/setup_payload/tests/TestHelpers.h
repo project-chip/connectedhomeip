@@ -30,28 +30,28 @@ namespace chip {
 const uint16_t kSmallBufferSizeInBytes   = 1;
 const uint16_t kDefaultBufferSizeInBytes = 512;
 
-const uint8_t kOptionalDefaultStringTag      = 0x82; // Vendor "test" tag
-constexpr char kOptionalDefaultStringValue[] = "myData";
+const uint8_t kOptionalDefaultStringTag             = 0x82; // Vendor "test" tag
+inline constexpr char kOptionalDefaultStringValue[] = "myData";
 
 const uint8_t kOptionalDefaultIntTag    = 0x83; // Vendor "test" tag
 const uint32_t kOptionalDefaultIntValue = 12;
 
-constexpr char kSerialNumberDefaultStringValue[] = "123456789";
-const uint32_t kSerialNumberDefaultUInt32Value   = 123456789;
+inline constexpr char kSerialNumberDefaultStringValue[] = "123456789";
+const uint32_t kSerialNumberDefaultUInt32Value          = 123456789;
 
-constexpr const char * kDefaultPayloadQRCode = "MT:M5L90MP500K64J00000";
+inline constexpr const char * kDefaultPayloadQRCode = "MT:M5L90MP500K64J00000";
 
 inline SetupPayload GetDefaultPayload()
 {
     SetupPayload payload;
 
-    payload.version               = 0;
-    payload.vendorID              = 12;
-    payload.productID             = 1;
-    payload.commissioningFlow     = CommissioningFlow::kStandard;
-    payload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP);
-    payload.discriminator         = 128;
-    payload.setUpPINCode          = 2048;
+    payload.version           = 0;
+    payload.vendorID          = 12;
+    payload.productID         = 1;
+    payload.commissioningFlow = CommissioningFlow::kStandard;
+    payload.rendezvousInformation.SetValue(RendezvousInformationFlag::kSoftAP);
+    payload.discriminator.SetLongValue(128);
+    payload.setUpPINCode = 2048;
 
     return payload;
 }
@@ -141,7 +141,12 @@ inline bool CheckWriteRead(SetupPayload & inPayload, bool allowInvalidPayload = 
     memset(optionalInfo, 0xFF, sizeof(optionalInfo));
     auto generator = QRCodeSetupPayloadGenerator(inPayload);
     generator.SetAllowInvalidPayload(allowInvalidPayload);
-    generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
+    CHIP_ERROR err = generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
+
+    if (err != CHIP_NO_ERROR)
+    {
+        return false;
+    }
 
     outPayload = {};
     QRCodeSetupPayloadParser(result).populatePayload(outPayload);

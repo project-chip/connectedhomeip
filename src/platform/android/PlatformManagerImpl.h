@@ -46,7 +46,7 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
-    // Post SystemEvent from Java, like WiFIIPChangeListener in Linux Platform
+    // Post SystemEvent from Java, like WiFiIPChangeListener in Linux Platform
     // void PostJavaEvent();
 
 private:

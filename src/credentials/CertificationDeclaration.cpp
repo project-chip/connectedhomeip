@@ -30,7 +30,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/SafeInt.h>
 
 namespace chip {
@@ -143,6 +143,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
     certElements.ProductIdsCount = 0;
     while ((err = reader.Next(AnonymousTag())) == CHIP_NO_ERROR)
     {
+        VerifyOrReturnError(certElements.ProductIdsCount < kMaxProductIdsCount, CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(reader.Get(certElements.ProductIds[certElements.ProductIdsCount++]));
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
@@ -182,6 +183,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
         err = reader.Next();
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT || err == CHIP_NO_ERROR, err);
+    VerifyOrReturnError(reader.GetTag() != TLV::ContextTag(kTag_DACOriginProductId), CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     if (err != CHIP_END_OF_TLV && reader.GetTag() == ContextTag(kTag_AuthorizedPAAList))
     {
@@ -193,6 +195,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
         while ((err = reader.Next(kTLVType_ByteString, AnonymousTag())) == CHIP_NO_ERROR)
         {
             VerifyOrReturnError(reader.GetLength() == kKeyIdentifierLength, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+            VerifyOrReturnError(certElements.AuthorizedPAAListCount < kMaxAuthorizedPAAListCount, CHIP_ERROR_INVALID_ARGUMENT);
 
             ReturnErrorOnFailure(
                 reader.GetBytes(certElements.AuthorizedPAAList[certElements.AuthorizedPAAListCount++], kKeyIdentifierLength));
@@ -277,6 +280,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
         err = reader.Next();
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT || err == CHIP_NO_ERROR, err);
+    VerifyOrReturnError(reader.GetTag() != TLV::ContextTag(kTag_DACOriginProductId), CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     if (err != CHIP_END_OF_TLV && reader.GetTag() == ContextTag(kTag_AuthorizedPAAList))
     {
@@ -332,15 +336,10 @@ CHIP_ERROR CertificationElementsDecoder::FindAndEnterArray(const ByteSpan & enco
     ReturnErrorOnFailure(mReader.EnterContainer(outerContainerType1));
 
     // position to arrayTag Array
-    CHIP_ERROR error = CHIP_NO_ERROR;
     do
     {
-        error = mReader.Next(kTLVType_Array, arrayTag);
-        // Return error code unless one of three things happened:
-        // 1. We found the right thing (CHIP_NO_ERROR returned).
-        // 2. The next tag is not the one we are looking for (CHIP_ERROR_UNEXPECTED_TLV_ELEMENT).
-        VerifyOrReturnError(error == CHIP_NO_ERROR || error == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT, error);
-    } while (error != CHIP_NO_ERROR);
+        ReturnErrorOnFailure(mReader.Next());
+    } while (mReader.Expect(kTLVType_Array, arrayTag) != CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(mReader.EnterContainer(outerContainerType2));
 
@@ -468,12 +467,15 @@ CHIP_ERROR EncodeSignerInfo(const ByteSpan & signerKeyId, const P256ECDSASignatu
             ASN1_END_SEQUENCE;
 
             // signatureAlgorithm OBJECT IDENTIFIER ecdsa-with-SHA256 (1.2.840.10045.4.3.2)
-            ASN1_START_SEQUENCE { ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256); }
+            ASN1_START_SEQUENCE
+            {
+                ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256);
+            }
             ASN1_END_SEQUENCE;
 
             uint8_t asn1SignatureBuf[kMax_ECDSA_Signature_Length_Der];
             MutableByteSpan asn1Signature(asn1SignatureBuf);
-            ReturnErrorOnFailure(EcdsaRawSignatureToAsn1(kP256_FE_Length, ByteSpan(signature, signature.Length()), asn1Signature));
+            ReturnErrorOnFailure(EcdsaRawSignatureToAsn1(kP256_FE_Length, signature.Span(), asn1Signature));
 
             // signature OCTET STRING
             ReturnErrorOnFailure(writer.PutOctetString(asn1Signature.data(), static_cast<uint16_t>(asn1Signature.size())));
@@ -537,7 +539,7 @@ CHIP_ERROR DecodeSignerInfo(ASN1Reader & reader, ByteSpan & signerKeyId, P256ECD
             // signature OCTET STRING
             ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_OctetString);
 
-            MutableByteSpan signatureSpan(signature, signature.Capacity());
+            MutableByteSpan signatureSpan(signature.Bytes(), signature.Capacity());
             ReturnErrorOnFailure(
                 EcdsaAsn1SignatureToRaw(kP256_FE_Length, ByteSpan(reader.GetValue(), reader.GetValueLen()), signatureSpan));
             ReturnErrorOnFailure(signature.SetLength(signatureSpan.size()));

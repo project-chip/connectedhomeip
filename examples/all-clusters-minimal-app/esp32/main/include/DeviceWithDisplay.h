@@ -20,12 +20,14 @@
 
 #include "Button.h"
 #include "DeviceCallbacks.h"
-#include "Display.h"
 #include "Globals.h"
+#if CONFIG_HAVE_DISPLAY
+#include "Display.h"
 #include "ListScreen.h"
 #include "QRCodeScreen.h"
 #include "ScreenManager.h"
 #include "StatusScreen.h"
+#endif
 #include "esp_check.h"
 #include "esp_log.h"
 #include "esp_system.h"
@@ -34,10 +36,7 @@
 #include <string>
 #include <vector>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>

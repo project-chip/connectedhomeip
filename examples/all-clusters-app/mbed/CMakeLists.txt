@@ -57,12 +57,16 @@ target_include_directories(${APP_TARGET} PRIVATE
 target_sources(${APP_TARGET} PRIVATE
                main/main.cpp
                main/AppTask.cpp
-               ${GEN_DIR}/all-clusters-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${MBED_COMMON}/util/DFUManager.cpp
                ${ALL_CLUSTERS_COMMON}/src/bridged-actions-stub.cpp
+               ${ALL_CLUSTERS_COMMON}/src/air-quality-instance.cpp
+               ${ALL_CLUSTERS_COMMON}/src/concentration-measurement-instances.cpp
+               ${ALL_CLUSTERS_COMMON}/src/fan-stub.cpp
+               ${ALL_CLUSTERS_COMMON}/src/resource-monitoring-delegates.cpp
+               ${ALL_CLUSTERS_COMMON}/src/smco-stub.cpp
                ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
+               ${ALL_CLUSTERS_COMMON}/src/static-supported-temperature-levels.cpp
 )
 
 chip_configure_data_model(${APP_TARGET}

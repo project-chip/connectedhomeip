@@ -16,10 +16,14 @@ import("//build_overrides/jlink.gni")
 import("//build_overrides/lwip.gni")
 import("//build_overrides/mw320_sdk.gni")
 
+import("${chip_root}/src/crypto/crypto.gni")
+
 declare_args() {
   # Location of the mw320 SDK.
   mw320_sdk_root = "${chip_root}/third_party/nxp/mw320_sdk/repo"
-  mbedtls_use_tinycrypt = false
+
+  #mbedtls_use_tinycrypt = false
+  chip_with_factory_data = 0
 }
 
 assert(mw320_sdk_root != "", "mw320_sdk_root must be specified")
@@ -81,6 +85,7 @@ template("mw320_sdk") {
       "${mw320_sdk_root}/middleware/lwip/src/include",
       "${mw320_sdk_root}/middleware/lwip/src/include/lwip",
       "${mw320_sdk_root}/middleware/lwip/src/include/lwip/apps",
+      "${mw320_sdk_root}/boards/rdmw320_r0/mbedtls_common",
     ]
 
     defines = [
@@ -106,6 +111,10 @@ template("mw320_sdk") {
 
     if (defined(invoker.defines)) {
       defines += invoker.defines
+    }
+
+    if (chip_with_factory_data == 1) {
+      defines += [ "CONFIG_CHIP_MW320_REAL_FACTORY_DATA=1" ]
     }
 
     cflags = [

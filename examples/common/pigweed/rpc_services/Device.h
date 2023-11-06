@@ -22,6 +22,7 @@
 #include <platform/CommissionableDataProvider.h>
 
 #include "app/clusters/ota-requestor/OTARequestorInterface.h"
+#include "app/server/CommissioningWindowManager.h"
 #include "app/server/OnboardingCodesUtil.h"
 #include "app/server/Server.h"
 #include "credentials/FabricTable.h"
@@ -216,14 +217,14 @@ public:
         return pw::OkStatus();
     }
 
-    virtual pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    virtual pw::Status Reboot(const chip_rpc_RebootRequest & request, pw_protobuf_Empty & response)
     {
         return pw::Status::Unimplemented();
     }
 
     virtual pw::Status TriggerOta(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
-#if CONFIG_CHIP_OTA_REQUESTOR
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) {
                 chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
@@ -238,22 +239,53 @@ public:
             },
             reinterpret_cast<intptr_t>(nullptr));
         return pw::OkStatus();
-#else
+#else  // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         ChipLogError(AppServer, "Trigger OTA requested, but OTA requestor not compiled in.");
         return pw::Status::Unimplemented();
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    }
+
+    virtual pw::Status SetOtaMetadataForProvider(const chip_rpc_MetadataForProvider & request, pw_protobuf_Empty & response)
+    {
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+        chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
+        if (requestor == nullptr)
+        {
+            ChipLogError(SoftwareUpdate, "Can't get the CASESessionManager");
+            return pw::Status::Unavailable();
+        }
+        else if (sizeof(metadataForProviderBuffer) < request.tlv.size)
+        {
+            return pw::Status::ResourceExhausted();
+        }
+        memcpy(metadataForProviderBuffer, request.tlv.bytes, request.tlv.size);
+        DeviceLayer::StackLock lock;
+        requestor->SetMetadataForProvider(chip::ByteSpan(metadataForProviderBuffer, request.tlv.size));
+        return pw::OkStatus();
+#else  // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+        ChipLogError(AppServer, "OTA set metadata for provider requested, but OTA requestor not compiled in.");
+        return pw::Status::Unimplemented();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     }
 
     virtual pw::Status SetPairingState(const chip_rpc_PairingState & request, pw_protobuf_Empty & response)
     {
-        if (request.pairing_enabled)
+        if (request.pairing_enabled && !chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
         {
-            DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-            DeviceLayer::ConnectivityMgr().SetBLEAdvertisingMode(DeviceLayer::ConnectivityMgr().kFastAdvertising);
+            DeviceLayer::StackLock lock;
+            chip::ChipError err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "RPC SetPairingState failed to open commissioning window: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+                return pw::Status::Internal();
+            }
         }
-        else
+        else if (!request.pairing_enabled &&
+                 chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
         {
-            DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+            DeviceLayer::StackLock lock;
+            chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
         }
         return pw::OkStatus();
     }
@@ -294,7 +326,7 @@ public:
         }
         else
         {
-            response.vendor_id = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
+            return pw::Status::Internal();
         }
 
         uint16_t product_id;
@@ -304,7 +336,7 @@ public:
         }
         else
         {
-            response.product_id = CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID;
+            return pw::Status::Internal();
         }
 
         uint32_t software_version;
@@ -314,14 +346,13 @@ public:
         }
         else
         {
-            response.software_version = CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION;
+            return pw::Status::Internal();
         }
 
         if (DeviceLayer::ConfigurationMgr().GetSoftwareVersionString(response.software_version_string,
                                                                      sizeof(response.software_version_string)) != CHIP_NO_ERROR)
         {
-            snprintf(response.software_version_string, sizeof(response.software_version_string),
-                     CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+            return pw::Status::Internal();
         }
 
         uint32_t code;
@@ -341,7 +372,7 @@ public:
         if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetSerialNumber(response.serial_number, sizeof(response.serial_number)) !=
             CHIP_NO_ERROR)
         {
-            snprintf(response.serial_number, sizeof(response.serial_number), CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
+            response.serial_number[0] = '\0'; // optional serial field not set.
         }
 
         // Create buffer for QR code that can fit max size and null terminator.
@@ -396,6 +427,41 @@ public:
         {
             mCommissionableDataProvider.SetSpake2pVerifier(ByteSpan(request.verifier.bytes, request.verifier.size));
         }
+
+        if (Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen() &&
+            Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatusForCluster() !=
+                app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen)
+        {
+            // Cache values before closing to restore them after restart.
+            app::DataModel::Nullable<VendorId> vendorId = Server::GetInstance().GetCommissioningWindowManager().GetOpenerVendorId();
+            app::DataModel::Nullable<FabricIndex> fabricIndex =
+                Server::GetInstance().GetCommissioningWindowManager().GetOpenerFabricIndex();
+
+            // Restart commissioning window to recache the spakeInfo values:
+            {
+                DeviceLayer::StackLock lock;
+                Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+            }
+            // Let other tasks possibly work since Commissioning window close/open are "heavy"
+            if (Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatusForCluster() !=
+                    app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen &&
+                !vendorId.IsNull() && !fabricIndex.IsNull())
+            {
+                DeviceLayer::StackLock lock;
+                System::Clock::Seconds16 commissioningTimeout =
+                    System::Clock::Seconds16(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS); // Use default for timeout for now.
+                Server::GetInstance()
+                    .GetCommissioningWindowManager()
+                    .OpenBasicCommissioningWindowForAdministratorCommissioningCluster(commissioningTimeout, fabricIndex.Value(),
+                                                                                      vendorId.Value());
+            }
+            else
+            {
+                DeviceLayer::StackLock lock;
+                Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+            }
+        }
+
         return pw::OkStatus();
     }
 
@@ -415,6 +481,10 @@ public:
     }
 
 private:
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    static constexpr size_t kMaxMetadataForProviderLength = 512; // length defined in chip spec 11.20.6.7
+    uint8_t metadataForProviderBuffer[kMaxMetadataForProviderLength];
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     Internal::CommissionableDataProviderRpcWrapper mCommissionableDataProvider;
 };
 

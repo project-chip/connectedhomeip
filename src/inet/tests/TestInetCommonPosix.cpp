@@ -37,6 +37,7 @@
 #include "TestInetCommon.h"
 #include "TestInetCommonOptions.h"
 
+#include <assert.h>
 #include <errno.h>
 #include <vector>
 
@@ -46,8 +47,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
@@ -82,7 +83,7 @@ System::LayerImpl gSystemLayer;
 Inet::UDPEndPointManagerImpl gUDP;
 Inet::TCPEndPointManagerImpl gTCP;
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 static sys_mbox_t * sLwIPEventQueue   = NULL;
 static unsigned int sLwIPAcquireCount = 0;
 
@@ -121,7 +122,7 @@ static std::vector<struct netif> sNetIFs; // interface to filter
 
 static bool NetworkIsReady();
 static void OnLwIPInitComplete(void * arg);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
 char gDefaultTapDeviceName[32];
 bool gDone = false;
@@ -161,22 +162,33 @@ void ShutdownTestInetCommon()
 void InitSystemLayer()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+    // LwIP implementation uses the event loop for servicing events.
+    // The CHIP stack initialization is required then.
+    chip::DeviceLayer::PlatformMgr().InitChipStack();
+#ifndef CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
     AcquireLwIP();
-#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     gSystemLayer.Init();
 }
 
 void ShutdownSystemLayer()
 {
+
     gSystemLayer.Shutdown();
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+    // LwIP implementation uses the event loop for servicing events.
+    // The CHIP stack shutdown is required then.
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+#ifndef CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
     ReleaseLwIP();
+#endif // !CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 static void PrintNetworkState()
 {
     char intfName[chip::Inet::InterfaceId::kMaxIfNameLength];
@@ -221,11 +233,11 @@ static void PrintNetworkState()
         }
     }
 }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
 void InitNetwork()
 {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
     // If an tap device name hasn't been specified, derive one from the IPv6 interface id.
 
@@ -286,6 +298,7 @@ void InitNetwork()
         }
     }
 #endif // CHIP_TARGET_STYLE_UNIX
+
     tcpip_init(OnLwIPInitComplete, NULL);
 
     // Lock LwIP stack
@@ -417,7 +430,7 @@ void InitNetwork()
 
     AcquireLwIP();
 
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
     gTCP.Init(gSystemLayer);
     gUDP.Init(gSystemLayer);
@@ -429,7 +442,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 
     if (!printed)
     {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
         if (NetworkIsReady())
 #endif
         {
@@ -447,7 +460,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
     gSystemLayer.PrepareEvents();
     gSystemLayer.WaitForEvents();
     gSystemLayer.HandleEvents();
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (gSystemLayer.IsInitialized())
@@ -456,6 +469,13 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 
         if (sRemainingSystemLayerEventDelay == 0)
         {
+#if CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK
+            // We need to terminate event loop after performance single step.
+            // Event loop processing work items until StopEventLoopTask is called.
+            // Scheduling StopEventLoop task guarantees correct operation of the loop.
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                [](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, (intptr_t) nullptr);
+#endif // CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK
             chip::DeviceLayer::PlatformMgr().RunEventLoop();
             sRemainingSystemLayerEventDelay = gNetworkOptions.EventDelay;
         }
@@ -475,7 +495,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 static bool NetworkIsReady()
 {
     bool ready = true;
@@ -499,7 +519,7 @@ static void OnLwIPInitComplete(void * arg)
     printf("Waiting for addresses assignment...\n");
 }
 
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
 void ShutdownNetwork()
 {
@@ -514,7 +534,7 @@ void ShutdownNetwork()
         return Loop::Continue;
     });
     gUDP.Shutdown();
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
     ReleaseLwIP();
 #endif
 }

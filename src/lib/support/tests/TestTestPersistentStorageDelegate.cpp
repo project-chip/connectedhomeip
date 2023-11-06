@@ -39,7 +39,7 @@ bool SetMatches(const std::set<T> & set, const std::array<T, N> expectedContents
         return false;
     }
 
-    for (auto item : expectedContents)
+    for (const auto & item : expectedContents)
     {
         if (set.find(item) == set.cend())
         {
@@ -347,7 +347,7 @@ const nlTest sTests[] = { NL_TEST_DEF("Test basic API", TestBasicApi),
 
 } // namespace
 
-int TestTestPersistentStorageDelegate(void)
+int TestTestPersistentStorageDelegate()
 {
     nlTestSuite theSuite = { "TestPersistentStorageDelegate tests", &sTests[0], nullptr, nullptr };
 

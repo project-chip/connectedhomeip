@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,45 +17,67 @@
 
 #pragma once
 
-typedef enum
-{
-    RS_ERROR_NONE,
-    RS_ERROR_NOT_FOUND,
-    RS_ERROR_NO_BUFS
-} rsError;
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-/* the structure used for keeping the records has the same structure both in RAM and in NVM:
- * ramBufferLen | ramBufferMaxLen | settingsBlock | .... | settingsBlock
+#include "PDM.h"
+#include "ram_storage.h"
+
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
+
+class RamStorage;
+
+/**
  *
- * ramBufferLen shows how much of the RAM buffer is currently occupied with settingsBlock structures
- * ramBufferMaxLen shows the total malloc'ed size. Dynamic re-allocation is possible
+ * This class describes a RAM storage key wrapper.
  */
-typedef struct
+struct RamStorageKey
 {
-    uint16_t ramBufferLen;
-    uint16_t ramBufferMaxLen;
-    uint8_t pRamBuffer[1];
-} ramBufferDescriptor;
+    RamStorageKey(RamStorage * storage, uint8_t keyId, uint8_t internalId);
 
-struct settingsBlock
+    CHIP_ERROR Read(uint8_t * buf, uint16_t & sizeToRead) const;
+    CHIP_ERROR Write(const uint8_t * buf, uint16_t length);
+    CHIP_ERROR Delete();
+
+    static uint16_t GetInternalId(uint8_t keyId, uint8_t internalId) { return static_cast<uint16_t>(keyId) << 8 | internalId; }
+
+private:
+    RamStorage * mStorage;
+    uint16_t mId;
+};
+
+/**
+ *
+ * This class manages a RAM buffer and its operations.
+ * All operations on the buffer are protected by a mutex.
+ */
+class RamStorage
 {
-    uint16_t key;
-    uint16_t length;
-} __attribute__((packed));
+public:
+    using Buffer = ramBufferDescriptor;
 
-#define member_size(type, member) sizeof(((type *) 0)->member)
+    static constexpr uint16_t kRamBufferInitialSize = 512;
 
-constexpr size_t kRamDescHeaderSize =
-    member_size(ramBufferDescriptor, ramBufferLen) + member_size(ramBufferDescriptor, ramBufferMaxLen);
+    RamStorage(uint16_t aPdmId) : mPdmId(aPdmId), mBuffer(nullptr) {}
 
-/* Return a RAM buffer with initialSize and populated with the contents of NVM ID - if found in flash */
-ramBufferDescriptor * getRamBuffer(uint16_t nvmId, uint16_t initialSize);
+    CHIP_ERROR Init(uint16_t aInitialSize, bool extendedSearch = false);
+    void FreeBuffer();
+    Buffer * GetBuffer() const { return mBuffer; }
+    CHIP_ERROR Read(uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength) const;
+    CHIP_ERROR Write(uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength);
+    CHIP_ERROR Delete(uint16_t aKey, int aIndex);
+    void OnFactoryReset();
 
-/* search pBuffer for aKey and return its value in aValue. aValueLength will contain the length of aValueLength */
-rsError ramStorageGet(const ramBufferDescriptor * pBuffer, uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength);
+private:
+    CHIP_ERROR MapStatusToChipError(rsError rsStatus) const;
+    CHIP_ERROR MapPdmStatusToChipError(PDM_teStatus status) const;
 
-/* search pBuffer for aKey and set its value to aValue (having aValueLength length) */
-rsError ramStorageSet(ramBufferDescriptor ** pBuffer, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength);
+    uint16_t mPdmId;
+    Buffer * mBuffer;
+    bool mExtendedSearch;
+};
 
-/* search pBuffer for aKey and delete it */
-rsError ramStorageDelete(ramBufferDescriptor * pBuffer, uint16_t aKey, int aIndex);
+} // namespace Internal
+} // namespace DeviceLayer
+} // namespace chip

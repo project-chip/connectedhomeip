@@ -16,7 +16,7 @@ name: Basic Information Cluster Tests
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
@@ -30,29 +30,30 @@ tests:
 
     - label: "Read location"
       command: "readAttribute"
-      attribute: "location"
+      attribute: "Location"
       response:
           value: "XX"
 
     - label: "Write location"
       command: "writeAttribute"
-      attribute: "location"
+      attribute: "Location"
       arguments:
           value: "US"
 
     - label: "Read back location"
       command: "readAttribute"
-      attribute: "location"
+      attribute: "Location"
       response:
           value: "US"
 
     - label: "Restore initial location value"
       command: "writeAttribute"
-      attribute: "location"
+      attribute: "Location"
       arguments:
           value: "XX"
 
     - label: "Read AttributeList value"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -74,9 +75,43 @@ tests:
                   14,
                   15,
                   16,
-                  17,
                   18,
                   19,
+                  20,
+                  0xFFF8, # GeneratedCommandList
+                  0xFFF9, # AcceptedCommandList
+                  0xFFFA, # EventList
+                  0xFFFB, # AttributeList
+                  0xFFFC, # FeatureMap
+                  0xFFFD, # ClusterRevision
+              ]
+
+    - label: "Read AttributeList value"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          value: [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  18,
+                  19,
+                  20,
                   0xFFF8, # GeneratedCommandList
                   0xFFF9, # AcceptedCommandList
                   0xFFFB, # AttributeList
@@ -155,3 +190,10 @@ tests:
       attribute: "LocalConfigDisabled"
       arguments:
           value: false
+
+    - label: "Read the ProductApppearance value"
+      command: "readAttribute"
+      attribute: "ProductAppearance"
+      response:
+          # For now all-clusters-app is a satin purple.
+          value: { Finish: 2, PrimaryColor: 5 }

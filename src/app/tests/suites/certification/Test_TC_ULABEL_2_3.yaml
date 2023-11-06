@@ -17,6 +17,9 @@ name:
     92.4. [TC-ULABEL-2.3] User Label cluster constraint_error verification
     [DUT-server]
 
+PICS:
+    - ULABEL.S
+
 config:
     nodeId: 0x12344321
     cluster: "User Label"
@@ -31,31 +34,31 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH writes LabelList attribute of the DUT"
+    - label: "Step 1: TH writes LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "writeAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       arguments:
           value:
               [
                   {
-                      label: "room",
-                      value: "17_bytesIsTooLongforuserlabelnotexpected",
+                      Label: "room",
+                      Value: "17_bytesIsTooLongforuserlabelnotexpected",
                   },
               ]
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "TH reads LabelList attribute of the DUT"
+    - label: "Step 2: TH writes LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "writeAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       arguments:
           value:
               [
                   {
-                      label: "17_bytesIsTooLongforuserlabelnotexpected",
-                      value: "foobar",
+                      Label: "17_bytesIsTooLongforuserlabelnotexpected",
+                      Value: "foobar",
                   },
               ]
       response:

@@ -10,43 +10,17 @@ a reference for creating your own application.
 
 The example is based on
 [Matter](https://github.com/project-chip/connectedhomeip) and Nordic
-Semiconductor's nRF Connect SDK, and supports remote access and control of a
-lighting over a low-power, 802.15.4 Thread network.
+Semiconductor's nRF Connect SDK, and was created to facilitate testing and
+certification of a Matter device communicating over a low-power, 802.15.4 Thread
+network, or Wi-Fi network.
 
 The example behaves as a Matter accessory, that is a device that can be paired
-into an existing Matter network and can be controlled by this network. The
-device works as a Thread Router.
+into an existing Matter network and can be controlled by this network. In the
+case of Thread, this device works as a Thread Sleepy End Device. Support for
+both Thread and Wi-Fi is mutually exclusive and depends on the hardware
+platform, so only one protocol can be supported for a specific light device.
 
 <hr>
-
--   [Overview](#overview)
-    -   [Bluetooth LE advertising](#bluetooth-le-advertising)
-    -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
-    -   [Device Firmware Upgrade](#device-firmware-upgrade)
--   [Requirements](#requirements)
-    -   [Supported devices](#supported_devices)
--   [Device UI](#device-ui)
--   [Setting up the environment](#setting-up-the-environment)
-    -   [Using Docker container for setup](#using-docker-container-for-setup)
-    -   [Using native shell for setup](#using-native-shell-for-setup)
--   [Building](#building)
-    -   [Removing build artifacts](#removing-build-artifacts)
-    -   [Building with release configuration](#building-with-release-configuration)
-    -   [Building with Pigweed RPCs](#building-with-pigweed-rpcs)
-    -   [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
--   [Configuring the example](#configuring-the-example)
-    -   [Example build types](#example-build-types)
--   [Flashing and debugging](#flashing-and-debugging)
-    -   [Flashing on the development kits](#nrfdks_flashing)
-    -   [Flashing on the nRF52840 Dongle](#nrf52840dongle_flashing)
--   [Testing the example](#testing-the-example)
-    -   [Testing using CHIPTool](#testing-using-chiptool)
-    -   [Testing Device Firmware Upgrade](#testing-device-firmware-upgrade)
-    -   [Device Tracing](#device-tracing)
-
-<hr>
-
-<a name="overview"></a>
 
 ## Overview
 
@@ -57,26 +31,37 @@ and [Zephyr RTOS](https://zephyrproject.org/). Visit Matter's
 [nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
 to read more about the platform structure and dependencies.
 
-The Matter device that runs the lighting application is controlled by the Matter
-controller device over the Thread protocol. By default, the Matter device has
-Thread disabled, and it should be paired with Matter controller and get
-configuration from it. Some actions required before establishing full
-communication are described below.
+By default, the Matter accessory device has IPv6 networking disabled. You must
+pair it with the Matter controller over Bluetooth® LE to get the configuration
+from the controller to use the device within a Thread or Wi-Fi network. The
+device starts advertising automatically and you can commission the device within
+15 minutes. If the advertising time elapsed you can re-enable it using buttons.
+See [Bluetooth LE advertising](#bluetooth-le-advertising) to learn how to do
+this. The controller must get the commissioning information from the Matter
+accessory device and provision the device into the network.
 
-The example also comes with a test mode, which allows to start Thread with the
-default settings by pressing button manually. However, this mode does not
-guarantee that the device will be able to communicate with the Matter controller
-and other devices.
+You can test this application remotely over the Thread or the Wi-Fi protocol,
+which in either case requires more devices, including a Matter controller that
+you can configure either on a PC or a mobile device.
 
-The example can be configured to use the secure bootloader and utilize it for
-performing over-the-air Device Firmware Upgrade using Bluetooth LE.
+The sample uses buttons for changing LED states to show the state of these
+changes. You can test it in the following ways:
+
+-   Standalone, using a single DK that runs the lighting application.
+
+-   Remotely over the Thread or the Wi-Fi protocol, which in either case
+    requires more devices, including a Matter controller that you can configure
+    either on a PC or a mobile device.
 
 ### Bluetooth LE advertising
 
-To commission the device onto a Matter network, the device must be discoverable
-over Bluetooth LE that starts automatically upon the device startup, but only
-for a predefined period of time (15 minutes by default). If the Bluetooth LE
-advertising times out, you can re-enable it manually using **Button 4**.
+In this example, to commission the device onto a Matter network, it must be
+discoverable over Bluetooth LE. For security reasons, you must start Bluetooth
+LE advertising manually after powering up the device by pressing:
+
+-   On nRF52840 DK, nRF5340 DK, and nRF21540 DK: **Button 4**.
+
+-   On nRF7002 DK: **Button 2**.
 
 ### Bluetooth LE rendezvous
 
@@ -86,16 +71,16 @@ commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the Matter device. The data payload is encoded within a QR code, printed to
-the UART console, and shared using an NFC tag. NFC tag emulation starts
-automatically when Bluetooth LE advertising is started and stays enabled until
-Bluetooth LE advertising timeout expires.
+the UART console, and shared using an NFC tag. The emulation of the NFC tag
+emulation starts automatically when Bluetooth LE advertising is started and
+stays enabled until Bluetooth LE advertising timeout expires.
 
-#### Thread provisioning
+#### Thread or Wi-Fi provisioning
 
-Last part of the rendezvous procedure, the provisioning operation involves
-sending the Thread network credentials from the Matter controller to the Matter
-device. As a result, device is able to join the Thread network and communicate
-with other Thread devices in the network.
+The provisioning operation, which is the Last part of the rendezvous procedure,
+involves sending the Thread or Wi-Fi network credentials from the Matter
+controller to the Matter device. As a result, the device joins the Thread or
+Wi-Fi network and can communicate with other devices in the network.
 
 ### Device Firmware Upgrade
 
@@ -156,15 +141,11 @@ section to learn how to change MCUboot and flash configuration in this example.
 
 <hr>
 
-<a name="requirements"></a>
-
 ## Requirements
 
 The application requires a specific revision of the nRF Connect SDK to work
 correctly. See [Setting up the environment](#setting-up-the-environment) for
 more information.
-
-<a name="supported_devices"></a>
 
 ### Supported devices
 
@@ -175,10 +156,18 @@ The example supports building and running on the following devices:
 | [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)         | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details>        |
 | [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)           | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>           |
 | [nRF52840 Dongle](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-Dongle) | `nrf52840dongle_nrf52840`  | <details><summary>nRF52840 Dongle</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_Dongle-medium.jpg" alt="nRF52840 Dongle"/></details> |
+| [nRF7002 DK](https://www.nordicsemi.com/Products/Development-hardware/nRF7002-DK)                 | `nrf7002dk_nrf5340_cpuapp` | <details><summary>nRF7002 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF7002-DK_Front-small.png" alt="nRF7002 DK"/></details>           |
 
 <hr>
 
-<a name="device-ui"></a>
+### IPv6 network support
+
+The development kits for this sample offer the following IPv6 network support
+for Matter:
+
+-   Matter over Thread is supported for `nrf52840dk_nrf52840` and
+    `nrf5340dk_nrf5340_cpuapp`.
+-   Matter over Wi-Fi is supported for `nrf7002dk_nrf5340_cpuapp`.
 
 ## Device UI
 
@@ -207,11 +196,10 @@ following states are possible:
     Bluetooth LE.
 
 -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
-    provisioned, but does not yet have full Thread network or service
-    connectivity.
+    provisioned, but does not yet have full connectivity for Thread or Wi-Fi
+    network.
 
--   _Solid On_ &mdash; The device is fully provisioned and has full Thread
-    network and service connectivity.
+-   _Solid On_ &mdash; The device is fully provisioned.
 
 **LED 2** simulates the light bulb and shows the state of the lighting. The
 following states are possible:
@@ -220,33 +208,46 @@ following states are possible:
 
 -   _Off_ &mdash; The light bulb is off.
 
-**LED 3** can be used to identify the device. The LED starts blinking evenly
-(500 ms on/500 ms off) when the Identify command of the Identify cluster is
-received. The command's argument can be used to specify the duration of the
-effect.
+    Additionally, the LED starts blinking evenly (500 ms on/500 ms off) when the
+    Identify command of the Identify cluster is received on the endpoint 1. The
+    command’s argument can be used to specify the duration of the effect.
 
 **Button 1** can be used for the following purposes:
 
--   _Pressed for 6 s_ &mdash; Initiates the factory reset of the device.
-    Releasing the button within the 6-second window cancels the factory reset
-    procedure. **LEDs 1-4** blink in unison when the factory reset procedure is
-    initiated.
-
--   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update over
-    Bluetooth LE process. This feature is disabled by default, but can be
-    enabled by following the
+-   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
+    process. This feature is disabled by default, but can be enabled by
+    following the
     [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
-    instruction.
+    instructions.
+
+-   _Pressed for more than 3 s_ &mdash; initiates the factory reset of the
+    device. Releasing the button within the 3-second window cancels the factory
+    reset procedure.
 
 **Button 2** &mdash; Pressing the button once changes the lighting state to the
 opposite one.
 
-**Button 3** &mdash; Pressing the button once starts the Thread networking in
-the test mode using the default configuration.
+-   On nRF52840 DK, nRF5340 DK, and nRF21540 DK: Changes the LED state to the
+    opposite one.
 
-**Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
-enables Bluetooth LE advertising for the predefined period of time (15 minutes
-by default).
+-   On nRF7002 DK:
+
+    -   If pressed for less than three seconds, it changes the LED state to the
+        opposite one.
+
+    -   If pressed for more than three seconds, it starts the NFC tag emulation,
+        enables Bluetooth LE advertising for the predefined period of time (15
+        minutes by default), and makes the device discoverable over Bluetooth
+        LE.
+
+**Button 4** :
+
+-   On nRF52840 DK, nRF5340 DK, and nRF21540 DK: Starts the NFC tag emulation,
+    enables Bluetooth LE advertising for the predefined period of time (15
+    minutes by default), and makes the device discoverable over Bluetooth LE.
+    This button is used during the commissioning procedure.
+
+-   On nRF7002 DK: Not available.
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the
@@ -275,7 +276,7 @@ image that has the tools pre-installed.
 If you are a macOS user, you won't be able to use the Docker container to flash
 the application onto a Nordic development kit due to
 [certain limitations of Docker for macOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container).
-Use the [native shell](#using-native-shell) for building instead.
+Use the [native shell](#using-native-shell-for-setup) for building instead.
 
 ### Using Docker container for setup
 
@@ -369,8 +370,6 @@ To use the native shell for setup, complete the following steps:
 Now you can proceed with the [Building](#building) instruction.
 
 <hr>
-
-<a name="building"></a>
 
 ## Building
 
@@ -487,8 +486,6 @@ example `nrf52840dk_nrf52840`), edit the `pm_static_dfu.yml` file located in the
 
 <hr>
 
-<a name="configuring"></a>
-
 ## Configuring the example
 
 The Zephyr ecosystem is based on Kconfig files and the settings can be modified
@@ -542,14 +539,10 @@ page.
 
 <hr>
 
-<a name="flashing"></a>
-
 ## Flashing and debugging
 
 The flashing and debugging procedure is different for the development kits and
 the nRF52840 Dongle.
-
-<a name="nrfdks_flashing"></a>
 
 ### Flashing on the development kits
 
@@ -570,8 +563,6 @@ directory:
         $ west debug
         ```
 
-<a name="nrf52840dongle_flashing"></a>
-
 ### Flashing on the nRF52840 Dongle
 
 Visit
@@ -585,11 +576,17 @@ to read more about flashing on the nRF52840 Dongle.
 Check the [CLI tutorial](../../../docs/guides/nrfconnect_examples_cli.md) to
 learn how to use command-line interface of the application.
 
-### Testing using CHIPTool
+### Testing using Linux CHIPTool
+
+Read the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md) to see
+how to use [CHIP Tool for Linux or mac OS](../../chip-tool/README.md) to
+commission and control the application within a Matter-enabled Thread network.
+
+### Testing using Android CHIPTool
 
 Read the
 [Android commissioning guide](../../../docs/guides/nrfconnect_android_commissioning.md)
-to see how to use [CHIPTool](../../../src/android/CHIPTool/README.md) for
+to see how to use [CHIPTool](../../../examples/android/CHIPTool/README.md) for
 Android smartphones to commission and control the application within a
 Matter-enabled Thread network.
 

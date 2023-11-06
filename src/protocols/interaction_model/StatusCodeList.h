@@ -22,6 +22,8 @@
  * include this file, then undefine the macro.
  */
 
+/// WARNING: If you touch this list, please also update src/controller/python/chip/interaction_model/__init__.py
+
 // clang-format off
 CHIP_IM_STATUS_CODE(Success               , SUCCESS                 , 0x0)
 CHIP_IM_STATUS_CODE(Failure               , FAILURE                 , 0x01)
@@ -67,5 +69,6 @@ CHIP_IM_STATUS_CODE(UnsupportedEvent      , UNSUPPORTED_EVENT       , 0xc7)
 CHIP_IM_STATUS_CODE(PathsExhausted        , PATHS_EXHAUSTED         , 0xc8)
 CHIP_IM_STATUS_CODE(TimedRequestMismatch  , TIMED_REQUEST_MISMATCH  , 0xc9)
 CHIP_IM_STATUS_CODE(FailsafeRequired      , FAILSAFE_REQUIRED       , 0xca)
+CHIP_IM_STATUS_CODE(InvalidInState        , INVALID_IN_STATE        , 0xcb)
 CHIP_IM_STATUS_CODE(WriteIgnored          , WRITE_IGNORED           , 0xF0) // non-spec error code and use only internally
 // clang-format on

@@ -49,20 +49,20 @@ OptionDef gCmdOptionDefs[] =
 };
 
 const char * const gCmdOptionHelp =
-    "  -d, --dac <cert-file>\n"
+    "  -d, --dac <file/str>\n"
     "\n"
-    "       A file containing Device Attestation Certificate (DAC) to be\n"
-    "       validated. The DAC is provided in the DER encoded format.\n"
+    "       File or string containing Device Attestation Certificate (DAC) to be validated.\n"
+    "       The DAC format is auto-detected and can be any of: X.509 PEM, DER or HEX formats.\n"
     "\n"
-    "  -i, --pai <cert-file>\n"
+    "  -i, --pai <file/str>\n"
     "\n"
-    "       A file containing Product Attestation Intermediate (PAI) Certificate.\n"
-    "       The PAI is provided in the DER encoded format.\n"
+    "       File or string containing Product Attestation Intermediate (PAI) Certificate.\n"
+    "       The PAI format is auto-detected and can be any of: X.509 PEM, DER or HEX formats.\n"
     "\n"
-    "  -a, --paa <cert-file>\n"
+    "  -a, --paa <file/str>\n"
     "\n"
-    "       A file containing trusted Product Attestation Authority (PAA) Certificate.\n"
-    "       The PAA is provided in the DER encoded format.\n"
+    "       File or string containing trusted Product Attestation Authority (PAA) Certificate.\n"
+    "       The PAA format is auto-detected and can be any of: X.509 PEM, DER or HEX formats.\n"
     "\n"
     ;
 
@@ -89,22 +89,22 @@ OptionSet * gCmdOptionSets[] =
 };
 // clang-format on
 
-const char * gDACFileName = nullptr;
-const char * gPAIFileName = nullptr;
-const char * gPAAFileName = nullptr;
+const char * gDACFileNameOrStr = nullptr;
+const char * gPAIFileNameOrStr = nullptr;
+const char * gPAAFileNameOrStr = nullptr;
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
     switch (id)
     {
     case 'd':
-        gDACFileName = arg;
+        gDACFileNameOrStr = arg;
         break;
     case 'i':
-        gPAIFileName = arg;
+        gPAIFileNameOrStr = arg;
         break;
     case 'a':
-        gPAAFileName = arg;
+        gPAAFileNameOrStr = arg;
         break;
     default:
         PrintArgError("%s: Unhandled option: %s\n", progName, name);
@@ -171,51 +171,51 @@ bool Cmd_ValidateAttCert(int argc, char * argv[])
 
     VerifyOrReturnError(ParseArgs(CMD_NAME, argc, argv, gCmdOptionSets), false);
 
-    if (gDACFileName == nullptr)
+    if (gDACFileNameOrStr == nullptr)
     {
-        fprintf(stderr, "Please specify the DAC certificate file name using the --dac option.\n");
+        fprintf(stderr, "Please specify the DAC certificate using the --dac option.\n");
         return false;
     }
 
-    if (gPAIFileName == nullptr)
+    if (gPAIFileNameOrStr == nullptr)
     {
-        fprintf(stderr, "Please specify the PAI certificate file name using the --pai option.\n");
+        fprintf(stderr, "Please specify the PAI certificate using the --pai option.\n");
         return false;
     }
 
-    if (gPAAFileName == nullptr)
+    if (gPAAFileNameOrStr == nullptr)
     {
-        fprintf(stderr, "Please specify the PAA certificate file name using the --paa option.\n");
+        fprintf(stderr, "Please specify the PAA certificate using the --paa option.\n");
         return false;
     }
 
-    if (!ReadCertDERRaw(gDACFileName, dac))
+    if (!ReadCertDER(gDACFileNameOrStr, dac))
     {
-        fprintf(stderr, "Unable to open DAC Certificate File: %s\n", gDACFileName);
+        fprintf(stderr, "Failed to read DAC Certificate: %s\n", gDACFileNameOrStr);
         return false;
     }
-    if (!ReadCertDERRaw(gPAIFileName, pai))
+    if (!ReadCertDER(gPAIFileNameOrStr, pai))
     {
-        fprintf(stderr, "Unable to open PAI Certificate File: %s\n", gPAIFileName);
+        fprintf(stderr, "Failed to read PAI Certificate: %s\n", gPAIFileNameOrStr);
         return false;
     }
-    if (!ReadCertDERRaw(gPAAFileName, paa))
+    if (!ReadCertDER(gPAAFileNameOrStr, paa))
     {
-        fprintf(stderr, "Unable to open PAA Certificate File: %s\n", gPAAFileName);
+        fprintf(stderr, "Failed to read PAA Certificate: %s\n", gPAAFileNameOrStr);
         return false;
     }
 
-    // Verify certificate validity information
-    {
-        VerifyOrExit(IsCertificateValidAtCurrentTime(dac) == CHIP_NO_ERROR,
-                     attestationError = AttestationVerificationResult::kDacExpired);
+    // Validate Proper Certificate Format
+    VerifyOrExit(VerifyAttestationCertificateFormat(paa, AttestationCertType::kPAA) == CHIP_NO_ERROR,
+                 attestationError = AttestationVerificationResult::kPaaFormatInvalid);
+    VerifyOrExit(VerifyAttestationCertificateFormat(pai, AttestationCertType::kPAI) == CHIP_NO_ERROR,
+                 attestationError = AttestationVerificationResult::kPaiFormatInvalid);
+    VerifyOrExit(VerifyAttestationCertificateFormat(dac, AttestationCertType::kDAC) == CHIP_NO_ERROR,
+                 attestationError = AttestationVerificationResult::kDacFormatInvalid);
 
-        VerifyOrExit(IsCertificateValidAtIssuance(dac, pai) == CHIP_NO_ERROR,
-                     attestationError = AttestationVerificationResult::kPaiExpired);
-
-        VerifyOrExit(IsCertificateValidAtIssuance(dac, paa) == CHIP_NO_ERROR,
-                     attestationError = AttestationVerificationResult::kPaaExpired);
-    }
+    // Verify certificate is valid at the current time
+    VerifyOrExit(IsCertificateValidAtCurrentTime(dac) == CHIP_NO_ERROR,
+                 attestationError = AttestationVerificationResult::kDacExpired);
 
     // Verify that VID and PID in the certificates match.
     {

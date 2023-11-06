@@ -21,6 +21,7 @@ import os
 import subprocess
 import tempfile
 import unittest
+from os.path import exists
 
 TOOLS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -120,6 +121,10 @@ PAI_DER_CERT = bytes([0x30, 0x82, 0x01, 0xb4, 0x30, 0x82, 0x01, 0x5a, 0xa0, 0x03
                       0xde, 0x3d, 0xc0, 0x14, 0x3a, 0x97, 0xe1, 0x35, 0x38, 0xf7, 0xff, 0x76,
                       0x05, 0x5e, 0xbf, 0x27, 0x90, 0x6f, 0x50, 0x0f])
 
+TEST_MANUAL_CODE = "Manualcode : 35442608082"
+
+TEST_QR_CODE = "QRCode : MT:KAYA3EYF15ND8B1OA00"
+
 
 def write_file(path: str, content: bytes) -> None:
     with open(path, 'wb') as f:
@@ -148,7 +153,82 @@ class TestGenerateFactoryData(unittest.TestCase):
             write_file(os.path.join(outdir, 'PAI_cert.der'), PAI_DER_CERT)
 
             subprocess.check_call(['python3', os.path.join(TOOLS_DIR, 'generate_nrfconnect_chip_factory_data.py'),
+                                   '-s', os.path.join(TOOLS_DIR, 'nrfconnect_factory_data.schema'),
                                    '--include_passcode',
+                                   '--sn', 'SN:12345678',
+                                   '--vendor_id', '0x127F',
+                                   '--product_id', '0xABCD',
+                                   '--vendor_name', 'Nordic Semiconductor ASA',
+                                   '--product_name', 'Lock Gen2',
+                                   '--part_number', 'PCA10056',
+                                   '--product_url', 'https://example.com/lock',
+                                   '--product_label', 'Lock',
+                                   '--date', '2022-07-20',
+                                   '--hw_ver', '101',
+                                   '--hw_ver_str', 'v1.1',
+                                   '--dac_key', os.path.join(outdir, 'DAC_key.der'),
+                                   '--dac_cert', os.path.join(outdir, 'DAC_cert.der'),
+                                   '--pai_cert', os.path.join(outdir, 'PAI_cert.der'),
+                                   '--spake2_it', '2000',
+                                   '--spake2_salt', 'U1BBS0UyUCBLZXkgU2FsdA==',
+                                   '--passcode', '13243546',
+                                   '--spake2_verifier', ('WN0SgEXLfUN19BbJqp6qn4pS69EtdNLReIMZwv/CIM0ECMP7ytiAJ7txIYJ0Ovlha/'
+                                                         'rQ3E+88mj3qaqqnviMaZzG+OyXEdSocDIT9ZhmkTCgWwERaHz4Vdh3G37RT6kqbw=='),
+                                   '--discriminator', '0xFED',
+                                   '--rd_uid', '91a9c12a7c80700a31ddcfa7fce63e44',
+                                   '--enable_key', '00112233445566778899aabbccddeeff',
+                                   '--product_color', 'red',
+                                   '--product_finish', 'satin',
+                                   '--user', '{"name": "product_name", "version": 123, "revision": "0x123"}',
+                                   '-o', os.path.join(outdir, 'fd.json')
+                                   ])
+
+            factory_data = read_json(os.path.join(outdir, 'fd.json'))
+
+            self.assertEqual(factory_data.get('version'), 1)
+            self.assertEqual(factory_data.get('sn'), 'SN:12345678')
+            self.assertEqual(factory_data.get('vendor_id'), 0x127F)
+            self.assertEqual(factory_data.get('product_id'), 0xABCD)
+            self.assertEqual(factory_data.get('vendor_name'), 'Nordic Semiconductor ASA')
+            self.assertEqual(factory_data.get('product_name'), 'Lock Gen2')
+            self.assertEqual(factory_data.get('part_number'), 'PCA10056')
+            self.assertEqual(factory_data.get('product_url'), 'https://example.com/lock')
+            self.assertEqual(factory_data.get('product_label'), 'Lock')
+            self.assertEqual(factory_data.get('date'), '2022-07-20')
+            self.assertEqual(factory_data.get('hw_ver'), 101)
+            self.assertEqual(factory_data.get('hw_ver_str'), 'v1.1')
+            self.assertEqual(factory_data.get('dac_key'), bytes_to_json(DAC_RAW_KEY))
+            self.assertEqual(factory_data.get('dac_cert'), bytes_to_json(DAC_DER_CERT))
+            self.assertEqual(factory_data.get('pai_cert'), bytes_to_json(PAI_DER_CERT))
+            self.assertEqual(factory_data.get('spake2_it'), 2000)
+            self.assertEqual(factory_data.get('spake2_salt'), base64_to_json('U1BBS0UyUCBLZXkgU2FsdA=='))
+            self.assertEqual(factory_data.get('spake2_verifier'), base64_to_json(
+                'WN0SgEXLfUN19BbJqp6qn4pS69EtdNLReIMZwv/CIM0ECMP7ytiAJ7txIYJ0Ovlha/'
+                'rQ3E+88mj3qaqqnviMaZzG+OyXEdSocDIT9ZhmkTCgWwERaHz4Vdh3G37RT6kqbw=='))
+            self.assertEqual(factory_data.get('discriminator'), 0xFED)
+            self.assertEqual(factory_data.get('passcode'), 13243546)
+            self.assertEqual(factory_data.get('rd_uid'), 'hex:91a9c12a7c80700a31ddcfa7fce63e44')
+            self.assertEqual(factory_data.get('enable_key'), 'hex:00112233445566778899aabbccddeeff')
+            self.assertEqual(factory_data.get('product_finish'), 2)
+            self.assertEqual(factory_data.get('primary_color'), 11)
+            self.assertEqual(factory_data.get('user'), {'name': 'product_name', 'version': 123, 'revision': '0x123'})
+
+            subprocess.check_call(['python3', os.path.join(TOOLS_DIR, 'nrfconnect_generate_partition.py'),
+                                   '-i', os.path.join(outdir, 'fd.json'),
+                                   '-o', os.path.join(outdir, 'fd'),
+                                   '--offset', "0xfb000",
+                                   '--size', "0x1000",
+                                   '--raw'
+                                   ])
+
+    def test_generate_spake2p_verifier_default(self):
+        with tempfile.TemporaryDirectory() as outdir:
+            write_file(os.path.join(outdir, 'DAC_key.der'), DAC_DER_KEY)
+            write_file(os.path.join(outdir, 'DAC_cert.der'), DAC_DER_CERT)
+            write_file(os.path.join(outdir, 'PAI_cert.der'), PAI_DER_CERT)
+
+            subprocess.check_call(['python3', os.path.join(TOOLS_DIR, 'generate_nrfconnect_chip_factory_data.py'),
+                                   '-s', os.path.join(TOOLS_DIR, 'nrfconnect_factory_data.schema'),
                                    '--sn', 'SN:12345678',
                                    '--vendor_id', '0x127F',
                                    '--product_id', '0xABCD',
@@ -160,38 +240,76 @@ class TestGenerateFactoryData(unittest.TestCase):
                                    '--dac_key', os.path.join(outdir, 'DAC_key.der'),
                                    '--dac_cert', os.path.join(outdir, 'DAC_cert.der'),
                                    '--pai_cert', os.path.join(outdir, 'PAI_cert.der'),
-                                   '--spake2_it', '2000',
+                                   '--spake2_it', '1000',
                                    '--spake2_salt', 'U1BBS0UyUCBLZXkgU2FsdA==',
-                                   '--passcode', '13243546',
-                                   '--spake2_verifier', 'WN0SgEXLfUN19BbJqp6qn4pS69EtdNLReIMZwv/CIM0ECMP7ytiAJ7txIYJ0Ovlha/rQ3E+88mj3qaqqnviMaZzG+OyXEdSocDIT9ZhmkTCgWwERaHz4Vdh3G37RT6kqbw==',
+                                   '--passcode', '20202021',
                                    '--discriminator', '0xFED',
-                                   '--rd_uid', '0123456789ABCDEF',
-                                   '--enable_key', '00112233445566778899aabbccddeeff',
+                                   '--user', '{"name": "product_name", "version": 123, "revision": "0x123"}',
                                    '-o', os.path.join(outdir, 'fd.json')
                                    ])
 
             factory_data = read_json(os.path.join(outdir, 'fd.json'))
 
-            self.assertEqual(factory_data.get('version'), 1)
-            self.assertEqual(factory_data.get('sn'), 'SN:12345678')
-            self.assertEqual(factory_data.get('vendor_id'), 0x127F)
-            self.assertEqual(factory_data.get('product_id'), 0xABCD)
-            self.assertEqual(factory_data.get('vendor_name'), 'Nordic Semiconductor ASA')
-            self.assertEqual(factory_data.get('product_name'), 'Lock')
-            self.assertEqual(factory_data.get('date'), '2022-07-20')
-            self.assertEqual(factory_data.get('hw_ver'), 101)
-            self.assertEqual(factory_data.get('hw_ver_str'), 'v1.1')
-            self.assertEqual(factory_data.get('dac_key'), bytes_to_json(DAC_RAW_KEY))
-            self.assertEqual(factory_data.get('dac_cert'), bytes_to_json(DAC_DER_CERT))
-            self.assertEqual(factory_data.get('pai_cert'), bytes_to_json(PAI_DER_CERT))
-            self.assertEqual(factory_data.get('spake2_it'), 2000)
-            self.assertEqual(factory_data.get('spake2_salt'), base64_to_json('U1BBS0UyUCBLZXkgU2FsdA=='))
+            self.assertEqual(factory_data.get('passcode'), None)
+            self.assertEqual(factory_data.get('spake2_salt'),
+                             base64_to_json('U1BBS0UyUCBLZXkgU2FsdA=='))
+            self.assertEqual(factory_data.get('spake2_it'), 1000)
             self.assertEqual(factory_data.get('spake2_verifier'), base64_to_json(
-                'WN0SgEXLfUN19BbJqp6qn4pS69EtdNLReIMZwv/CIM0ECMP7ytiAJ7txIYJ0Ovlha/rQ3E+88mj3qaqqnviMaZzG+OyXEdSocDIT9ZhmkTCgWwERaHz4Vdh3G37RT6kqbw=='))
-            self.assertEqual(factory_data.get('discriminator'), 0xFED)
-            self.assertEqual(factory_data.get('passcode'), 13243546)
-            self.assertEqual(factory_data.get('rd_uid'), 'hex:0123456789ABCDEF')
-            self.assertEqual(factory_data.get('enable_key'), 'hex:00112233445566778899aabbccddeeff')
+                'uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/'
+                'iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/NH6Rmzw=='))
+            self.assertEqual(factory_data.get('user'), {'name': 'product_name', 'version': 123, 'revision': '0x123'})
+
+            subprocess.check_call(['python3', os.path.join(TOOLS_DIR, 'nrfconnect_generate_partition.py'),
+                                   '-i', os.path.join(outdir, 'fd.json'),
+                                   '-o', os.path.join(outdir, 'fd'),
+                                   '--offset', "0xfb000",
+                                   '--size', "0x1000",
+                                   '--raw'
+                                   ])
+
+    def test_generate_onboarding_codes(self):
+        with tempfile.TemporaryDirectory() as outdir:
+            write_file(os.path.join(outdir, 'DAC_key.der'), DAC_DER_KEY)
+            write_file(os.path.join(outdir, 'DAC_cert.der'), DAC_DER_CERT)
+            write_file(os.path.join(outdir, 'PAI_cert.der'), PAI_DER_CERT)
+
+            subprocess.check_call(['python3', os.path.join(TOOLS_DIR, 'generate_nrfconnect_chip_factory_data.py'),
+                                   '-s', os.path.join(TOOLS_DIR, 'nrfconnect_factory_data.schema'),
+                                   '--include_passcode',
+                                   '--sn', 'SN:12345678',
+                                   '--vendor_id', '0x127F',
+                                   '--product_id', '0xABCD',
+                                   '--vendor_name', 'Nordic Semiconductor ASA',
+                                   '--product_name', 'Lock Gen2',
+                                   '--part_number', 'PCA10056',
+                                   '--product_url', 'https://example.com/lock',
+                                   '--product_label', 'Lock',
+                                   '--date', '2022-07-20',
+                                   '--hw_ver', '101',
+                                   '--hw_ver_str', 'v1.1',
+                                   '--dac_key', os.path.join(outdir, 'DAC_key.der'),
+                                   '--dac_cert', os.path.join(outdir, 'DAC_cert.der'),
+                                   '--pai_cert', os.path.join(outdir, 'PAI_cert.der'),
+                                   '--spake2_it', '2000',
+                                   '--spake2_salt', 'U1BBS0UyUCBLZXkgU2FsdA==',
+                                   '--passcode', '13243546',
+                                   '--spake2_verifier', ('WN0SgEXLfUN19BbJqp6qn4pS69EtdNLReIMZwv/CIM0ECMP7ytiAJ7txIYJ0Ovlha/'
+                                                         'rQ3E+88mj3qaqqnviMaZzG+OyXEdSocDIT9ZhmkTCgWwERaHz4Vdh3G37RT6kqbw=='),
+                                   '--discriminator', '0xFED',
+                                   '--rd_uid', '91a9c12a7c80700a31ddcfa7fce63e44',
+                                   '--enable_key', '00112233445566778899aabbccddeeff',
+                                   '--user', '{"name": "product_name", "version": 123, "revision": "0x123"}',
+                                   '-o', os.path.join(outdir, 'fd.json'),
+                                   '--generate_onboarding'
+                                   ])
+
+            self.assertTrue(exists(os.path.join(outdir, 'fd.txt')))
+            self.assertTrue(exists(os.path.join(outdir, 'fd.png')))
+
+            with open(os.path.join(outdir, 'fd.txt'), 'r') as onboarding_code_file:
+                onboarding = onboarding_code_file.readlines()
+                self.assertEqual(onboarding[0][:-1], TEST_MANUAL_CODE)
+                self.assertEqual(onboarding[1], TEST_QR_CODE)
 
 
 if __name__ == '__main__':

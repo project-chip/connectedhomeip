@@ -22,6 +22,20 @@ import("${chip_root}/build/chip/java/rules.gni")
 
 assert(chip_device_platform == "android")
 
+source_set("tracing") {
+  sources = [
+    "tracing.cpp",
+    "tracing.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/tracing/perfetto:event_storage",
+    "${chip_root}/src/tracing/perfetto:simple_initialization",
+  ]
+}
+
 static_library("android") {
   output_name = "libAndroidPlatform"
 
@@ -34,6 +48,7 @@ static_library("android") {
     "AndroidConfig.h",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
+    "BleConnectCallback-JNI.cpp",
     "BlePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPP256KeypairBridge.cpp",
@@ -46,8 +61,6 @@ static_library("android") {
     "ConnectivityManagerImpl.h",
     "DeviceInstanceInfoProviderImpl.cpp",
     "DeviceInstanceInfoProviderImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "DnssdImpl.cpp",
@@ -59,14 +72,19 @@ static_library("android") {
   ]
 
   deps = [
+    ":tracing",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/setup_payload",
-    "${chip_root}/src/trace",
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   public_configs = []
+}
+
+source_set("inet") {
+  sources = [ "InetInterfaceImpl.cpp" ]
+  deps = [ "${chip_root}/src/lib/support" ]
 }
 
 android_library("java") {
@@ -83,6 +101,7 @@ android_library("java") {
     "java/chip/platform/AndroidChipPlatform.java",
     "java/chip/platform/AndroidChipPlatformException.java",
     "java/chip/platform/BleCallback.java",
+    "java/chip/platform/BleConnectCallback.java",
     "java/chip/platform/BleManager.java",
     "java/chip/platform/ChipMdnsCallback.java",
     "java/chip/platform/ChipMdnsCallbackImpl.java",
@@ -93,15 +112,19 @@ android_library("java") {
     "java/chip/platform/NetworkInterface.java",
     "java/chip/platform/NsdManagerServiceBrowser.java",
     "java/chip/platform/NsdManagerServiceResolver.java",
+    "java/chip/platform/NsdServiceFinderAndResolver.java",
     "java/chip/platform/PreferencesConfigurationManager.java",
     "java/chip/platform/PreferencesKeyValueStoreManager.java",
     "java/chip/platform/ServiceBrowser.java",
     "java/chip/platform/ServiceResolver.java",
   ]
 
-  javac_flags = [ "-Xlint:deprecation" ]
+  javac_flags = [
+    "-Xlint:deprecation",
+    "-parameters",  # Store infomation about method parameters
+  ]
 }
 
 java_prebuilt("android_sdk") {
-  jar_path = "${android_sdk_root}/platforms/android-21/android.jar"
+  jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
 }

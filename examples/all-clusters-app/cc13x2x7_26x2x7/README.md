@@ -19,14 +19,13 @@ Instruments CC13XX_26XX family of Wireless MCUs.
         -   [Provisioning](#provisioning)
             -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
             -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
-        -   [Matter Remote Commands](#matter-remote-commands)
     -   [TI Support](#ti-support)
 
 ---
 
 ## Introduction
 
-![CC1352R1_LAUNCHXL](doc/images/cc1352r1_launchxl.jpg)
+![CC1352R1_LAUNCHXL](../../pump-app/cc13x2x7_26x2x7/doc/images/cc1352r1_launchxl.jpg)
 
 The CC13XX_26XX all clusters example application provides the basis to query and
 run commands for all currently implemented Matter clusters. This uses the
@@ -52,9 +51,9 @@ Short presses (less than 1000ms) of the user buttons are used currently unused
 in the all-clusters application, but stubs are provided.
 
 Long presses (greater than 1000ms) of the user buttons are used for controlling
-BLE advertisements. The left button (`BTN-1`) is used to disable advertisements
-if they are enabled. The Right button (`BTN-2`) is used to enable
-advertisements.
+BLE advertisements and resets. The left button (`BTN-1`) is used to perform a
+factory reset of the device. The Right button (`BTN-2`) is used to disable BLE
+advertisements (if enabled) or enable advertisements (if disabled).
 
 ## Building
 
@@ -64,15 +63,14 @@ Some initial setup is necessary for preparing the build environment. This
 section will need to be done when migrating to new versions of the SDK. This
 guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
--   Download and install [SysConfig][sysconfig] ([recommended
-    version][sysconfig_recommended]). This can be done simply with the following
-    commands.
+-   Download and install [SysConfig][sysconfig]. This can be done simply with
+    the following commands.
 
     ```
     $ cd ~
-    $ wget https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.11.0_2225-setup.run
-    $ chmod +x sysconfig-1.11.0_2225-setup.run
-    $ ./sysconfig-1.11.0_2225-setup.run
+    $ wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.16.2.3028/sysconfig-1.16.2_3028-setup.run
+    $ chmod +x sysconfig-1.16.2_3028-setup.run
+    $ ./sysconfig-1.16.2_3028-setup.run
     ```
 
 -   Run the bootstrap script to setup the build environment.
@@ -99,13 +97,13 @@ Ninja to build the executable.
 -   Run the build to produce a default executable. By default on Linux both the
     TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
     home directory, and you must provide the absolute path to them. For example
-    `/home/username/ti/sysconfig_1.11.0`. On Windows the default directory is
+    `/home/username/ti/sysconfig_1.16.2`. On Windows the default directory is
     `C:\ti`. Take note of this install path, as it will be used in the next
     step.
 
     ```
     $ cd ~/connectedhomeip/examples/all-clusters-app/cc13x2x7_26x2x7
-    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.11.0\""
+    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.16.2\""
     $ ninja -C out/debug
 
     ```
@@ -237,8 +235,6 @@ Additionally, we welcome any feedback.
 [matter-e2e-faq]:
     https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
-[sysconfig_recommended]:
-    https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.11.0_2225-setup.run
 [ti_thread_dnd]:
     https://www.ti.com/wireless-connectivity/thread/design-development.html
 [ot_border_router_setup]: https://openthread.io/guides/border-router/build

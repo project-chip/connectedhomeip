@@ -37,12 +37,36 @@ const char * StageToString(CommissioningStage stage)
         return "ReadCommissioningInfo";
         break;
 
+    case kReadCommissioningInfo2:
+        return "ReadCommissioningInfo2";
+        break;
+
     case kArmFailsafe:
         return "ArmFailSafe";
         break;
 
+    case kScanNetworks:
+        return "ScanNetworks";
+        break;
+
     case kConfigRegulatory:
         return "ConfigRegulatory";
+        break;
+
+    case kConfigureUTCTime:
+        return "ConfigureUTCTime";
+        break;
+
+    case kConfigureTimeZone:
+        return "ConfigureTimeZone";
+        break;
+
+    case kConfigureDSTOffset:
+        return "ConfigureDSTOffset";
+        break;
+
+    case kConfigureDefaultNTP:
+        return "ConfigureDefaultNTP";
         break;
 
     case kSendPAICertificateRequest:
@@ -81,12 +105,24 @@ const char * StageToString(CommissioningStage stage)
         return "SendNOC";
         break;
 
+    case kConfigureTrustedTimeSource:
+        return "ConfigureTrustedTimeSource";
+        break;
+
     case kWiFiNetworkSetup:
         return "WiFiNetworkSetup";
         break;
 
     case kThreadNetworkSetup:
         return "ThreadNetworkSetup";
+        break;
+
+    case kFailsafeBeforeWiFiEnable:
+        return "FailsafeBeforeWiFiEnable";
+        break;
+
+    case kFailsafeBeforeThreadEnable:
+        return "FailsafeBeforeThreadEnable";
         break;
 
     case kWiFiNetworkEnable:
@@ -107,6 +143,10 @@ const char * StageToString(CommissioningStage stage)
 
     case kCleanup:
         return "Cleanup";
+        break;
+
+    case kNeedsNetworkCreds:
+        return "NeedsNetworkCreds";
         break;
 
     default:

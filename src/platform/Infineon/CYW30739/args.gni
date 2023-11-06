@@ -1,0 +1,66 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/cyw30739_sdk.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${chip_root}/examples/platform/infineon/cyw30739/args.gni")
+
+custom_toolchain = "${build_root}/toolchain/arm_gcc"
+
+arm_platform_config = "${cyw30739_sdk_build_root}/cyw30739_arm.gni"
+
+chip_target_style = "embedded"
+chip_crypto = "mbedtls"
+
+chip_device_platform = "cyw30739"
+chip_mdns = "platform"
+
+chip_enable_openthread = true
+
+lwip_platform = "cyw30739"
+
+chip_inet_config_enable_ipv4 = false
+chip_inet_config_enable_tcp_endpoint = false
+chip_system_config_use_open_thread_inet_endpoints = true
+chip_with_lwip = false
+
+chip_system_config_locking = "none"
+chip_system_config_use_sockets = false
+
+optimize_debug_level = "s"
+lwip_debug = false
+default_configs_optimize = [ "$dir_pw_build:optimize_size" ]
+
+chip_build_tests = false
+
+mbedtls_target = "${cyw30739_sdk_build_root}:mbedtls"
+openthread_external_mbedtls = mbedtls_target
+
+openthread_project_core_config_file = "OpenThreadConfig.h"
+openthread_core_config_deps = [ "${chip_root}/examples/platform/infineon/cyw30739:openthread_core_config_ifx_chip_examples" ]
+
+openthread_external_platform =
+    "${chip_root}/third_party/openthread/platforms/ifx:libopenthread-ifx"
+
+openthread_enable_core_config_args = true
+openthread_config_dhcp6_client_enable = true
+openthread_config_dns_client_enable = true
+openthread_config_ecdsa_enable = true
+openthread_config_ip6_slaac_enable = true
+openthread_config_joiner_enable = true
+openthread_config_log_output = "platform_defined"
+openthread_config_srp_client_enable = true

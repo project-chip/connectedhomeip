@@ -43,17 +43,6 @@
 
 #define NOT_APPLICABLE_STRING @"N/A"
 
-@interface MTRDeviceController (ToDoRemove)
-
-/**
- * TODO: Temporary until PairingDelegate is fixed to clearly communicate this
- * information to consumers.
- * This should be migrated over to the proper pairing delegate path
- */
-- (BOOL)_deviceBeingCommissionedOverBLE:(uint64_t)deviceId;
-
-@end
-
 @interface QRCodeViewController ()
 
 @property (nonatomic, strong) AVCaptureSession * captureSession;
@@ -419,7 +408,7 @@
 
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = InitializeMTR();
-    [self.chipController setPairingDelegate:self queue:callbackQueue];
+    [self.chipController setDeviceControllerDelegate:self queue:callbackQueue];
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
@@ -489,16 +478,16 @@
     }
 }
 
-// MARK: MTRDevicePairingDelegate
-- (void)onPairingComplete:(NSError * _Nullable)error
+// MARK: MTRDeviceControllerDelegate
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
 {
     if (error != nil) {
         NSLog(@"Got pairing error back %@", error);
     } else {
         MTRDeviceController * controller = InitializeMTR();
         uint64_t deviceId = MTRGetLastPairedDeviceId();
-        if ([controller respondsToSelector:@selector(_deviceBeingCommissionedOverBLE:)] &&
-            [controller _deviceBeingCommissionedOverBLE:deviceId]) {
+        MTRBaseDevice * device = [controller deviceBeingCommissionedWithNodeID:@(deviceId) error:NULL];
+        if (device.sessionTransportType == MTRTransportTypeBLE) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self->_deviceList refreshDeviceList];
                 [self retrieveAndSendWiFiCredentials];
@@ -683,16 +672,24 @@
     }
 }
 
-- (void)onCommissioningComplete:(NSError * _Nullable)error
+// MARK: MTRDeviceControllerDelegate
+- (void)controller:(MTRDeviceController *)controller
+    commissioningComplete:(NSError * _Nullable)error
+                   nodeID:(NSNumber * _Nullable)nodeID
 {
     if (error != nil) {
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
         return;
     }
     // track this device
-    uint64_t deviceId = MTRGetNextAvailableDeviceID() - 1;
-    MTRSetDevicePaired(deviceId, YES);
+    MTRSetDevicePaired([nodeID unsignedLongLongValue], YES);
     [self setVendorIDOnAccessory];
+}
+
+// MARK: MTRDeviceControllerDelegate
+- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(MTRProductIdentity *)info
+{
+    NSLog(@"readCommissioningInfo, vendorID:%@, productID:%@", info.vendorID, info.productID);
 }
 
 - (void)updateUIFields:(MTRSetupPayload *)payload rawPayload:(nullable NSString *)rawPayload isManualCode:(BOOL)isManualCode
@@ -706,7 +703,11 @@
     } else {
         _manualCodeLabel.hidden = YES;
         _versionLabel.text = [NSString stringWithFormat:@"%@", payload.version];
-        _rendezVousInformation.text = [NSString stringWithFormat:@"%lu", payload.rendezvousInformation];
+        if (payload.rendezvousInformation == nil) {
+            _rendezVousInformation.text = NOT_APPLICABLE_STRING;
+        } else {
+            _rendezVousInformation.text = [NSString stringWithFormat:@"%lu", [payload.rendezvousInformation unsignedLongValue]];
+        }
         if ([payload.serialNumber length] > 0) {
             self->_serialNumber.text = payload.serialNumber;
         } else {
@@ -763,15 +764,22 @@
 
 - (void)handleRendezVous:(MTRSetupPayload *)payload rawPayload:(NSString *)rawPayload
 {
-    switch (payload.rendezvousInformation) {
-    case MTRRendezvousInformationNone:
-    case MTRRendezvousInformationOnNetwork:
-    case MTRRendezvousInformationBLE:
-    case MTRRendezvousInformationAllMask:
+    if (payload.rendezvousInformation == nil) {
+        NSLog(@"Rendezvous Default");
+        [self handleRendezVousDefault:rawPayload];
+        return;
+    }
+
+    // TODO: This is a pretty broken way to handle a bitmask.
+    switch ([payload.rendezvousInformation unsignedLongValue]) {
+    case MTRDiscoveryCapabilitiesNone:
+    case MTRDiscoveryCapabilitiesOnNetwork:
+    case MTRDiscoveryCapabilitiesBLE:
+    case MTRDiscoveryCapabilitiesAllMask:
         NSLog(@"Rendezvous Default");
         [self handleRendezVousDefault:rawPayload];
         break;
-    case MTRRendezvousInformationSoftAP:
+    case MTRDiscoveryCapabilitiesSoftAP:
         NSLog(@"Rendezvous Wi-Fi");
         [self handleRendezVousWiFi:[self getNetworkName:payload.discriminator]];
         break;
@@ -789,7 +797,7 @@
 {
     self.chipController = MTRRestartController(self.chipController);
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
-    [self.chipController setPairingDelegate:self queue:callbackQueue];
+    [self.chipController setDeviceControllerDelegate:self queue:callbackQueue];
 }
 
 - (void)handleRendezVousDefault:(NSString *)payload

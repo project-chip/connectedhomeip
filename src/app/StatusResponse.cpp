@@ -44,14 +44,14 @@ CHIP_ERROR StatusResponse::Send(Protocols::InteractionModel::Status aStatus, Mes
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR StatusResponse::ProcessStatusResponse(System::PacketBufferHandle && aPayload)
+CHIP_ERROR StatusResponse::ProcessStatusResponse(System::PacketBufferHandle && aPayload, CHIP_ERROR & aStatusError)
 {
     StatusResponseMessage::Parser response;
     System::PacketBufferTLVReader reader;
     reader.Init(std::move(aPayload));
     ReturnErrorOnFailure(response.Init(reader));
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnErrorOnFailure(response.CheckSchemaValidity());
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    response.PrettyPrint();
 #endif
     StatusIB status;
     ReturnErrorOnFailure(response.GetStatus(status.mStatus));
@@ -59,12 +59,8 @@ CHIP_ERROR StatusResponse::ProcessStatusResponse(System::PacketBufferHandle && a
                     ChipLogValueIMStatus(status.mStatus));
     ReturnErrorOnFailure(response.ExitContainer());
 
-    if (status.mStatus == Protocols::InteractionModel::Status::Success)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    return status.ToChipError();
+    aStatusError = status.ToChipError();
+    return CHIP_NO_ERROR;
 }
 } // namespace app
 } // namespace chip

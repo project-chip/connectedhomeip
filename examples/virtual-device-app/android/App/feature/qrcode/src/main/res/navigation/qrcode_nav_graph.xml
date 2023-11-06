@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/qrcode_nav_graph"
+    app:startDestination="@id/qrcodeFragment">
+
+    <fragment
+        android:id="@+id/qrcodeFragment"
+        android:name="com.matter.virtual.device.app.feature.qrcode.QrcodeFragment"
+        android:label="QrcodeFragment"
+        tools:layout="@layout/fragment_qrcode">
+        <argument
+            android:name="setting"
+            app:argType="string" />
+        <deepLink app:uri="android-app://com.matter.virtual.device.app.feature.qrcode/qrcodeFragment/{setting}" />
+    </fragment>
+</navigation>

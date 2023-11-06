@@ -36,6 +36,10 @@
 #include "FreeRtosHooks.h"
 #include "app_config.h"
 
+#if PDM_SAVE_IDLE
+#include <openthread/platform/settings.h>
+#endif
+
 const uint16_t shell_task_size    = 3096;
 const uint8_t shell_task_priority = 0;
 
@@ -44,6 +48,7 @@ using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
 using chip::Shell::Engine;
+#include "MacSched.h"
 
 typedef void (*InitFunc)(void);
 extern InitFunc __init_array_start;
@@ -61,6 +66,7 @@ extern "C" unsigned int sleep(unsigned int seconds)
 
 static void shell_task(void * args)
 {
+    Engine::Root().Init();
     Engine::Root().RunMainLoop();
 }
 
@@ -95,6 +101,12 @@ extern "C" void main_task(void const * argument)
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
 
+#if PDM_SAVE_IDLE
+    /* OT Settings needs to be initialized
+     * early as XCVR is making use of it */
+    otPlatSettingsInit(NULL, NULL, 0);
+#endif
+
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
@@ -108,6 +120,11 @@ extern "C" void main_task(void const * argument)
         K32W_LOG("Error during ThreadStackMgr().InitThreadStack()");
         goto exit;
     }
+
+    /* Enable the MAC scheduler after BLEManagerImpl::_Init() and V2MMAC_Enable().
+     * This is needed to register properly the active protocols.
+     */
+    sched_enable();
 
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
     if (ret != CHIP_NO_ERROR)
@@ -129,8 +146,6 @@ extern "C" void main_task(void const * argument)
         K32W_LOG("Error during ThreadStackMgrImpl().StartThreadTask()");
         goto exit;
     }
-
-    // cmd_otcli_init();
 
     shellTaskHandle = xTaskCreate(shell_task, "shell_task", shell_task_size / sizeof(StackType_t), NULL, shell_task_priority, NULL);
     if (!shellTaskHandle)

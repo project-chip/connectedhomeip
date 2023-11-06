@@ -15,46 +15,28 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-/****************************************************************************
- * @file
- * @brief Implementation for the Barrier Control
- *Server plugin.
- *******************************************************************************
- ******************************************************************************/
-
 #include "barrier-control-server.h"
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/config.h>
+#include <lib/support/TypeTraits.h>
 
 #include <assert.h>
 
 // We need this for initializating default reporting configurations.
 #include <app/reporting/reporting.h>
 
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceLayer.h>
+
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BarrierControl;
+using chip::Protocols::InteractionModel::Status;
 
 typedef struct
 {
@@ -73,6 +55,28 @@ static State state;
 #define ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_COMMAND_OPEN_EVENTS_ATTRIBUTE
 #define ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_COMMAND_CLOSE_EVENTS_ATTRIBUTE
 #endif
+
+/**********************************************************
+ * Matter timer scheduling glue logic
+ *********************************************************/
+
+void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint);
+
+static void timerCallback(System::Layer *, void * callbackContext)
+{
+    emberAfBarrierControlClusterServerTickCallback(static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext)));
+}
+
+static void scheduleTimerCallbackMs(EndpointId endpoint, uint32_t delayMs)
+{
+    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
+                                          reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
+}
+
+static void cancelEndpointTimerCallback(EndpointId endpoint)
+{
+    DeviceLayer::SystemLayer().CancelTimer(timerCallback, reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
+}
 
 // -----------------------------------------------------------------------------
 // Accessing attributes
@@ -96,7 +100,7 @@ bool emAfPluginBarrierControlServerIsPartialBarrierSupported(EndpointId endpoint
     uint8_t bitmap;
     EmberAfStatus status = Attributes::BarrierCapabilities::Get(endpoint, &bitmap);
     assert(status == EMBER_ZCL_STATUS_SUCCESS);
-    return READBITS(bitmap, EMBER_AF_BARRIER_CONTROL_CAPABILITIES_PARTIAL_BARRIER);
+    return (bitmap & to_underlying(BarrierControlCapabilities::kPartialBarrier)) != 0;
 }
 
 static uint16_t getOpenOrClosePeriod(EndpointId endpoint, bool open)
@@ -136,7 +140,7 @@ uint16_t emAfPluginBarrierControlServerGetSafetyStatus(EndpointId endpoint)
 static bool isRemoteLockoutOn(EndpointId endpoint)
 {
     uint16_t safetyStatus = emAfPluginBarrierControlServerGetSafetyStatus(endpoint);
-    return READBITS(safetyStatus, EMBER_AF_BARRIER_CONTROL_SAFETY_STATUS_REMOTE_LOCKOUT);
+    return (safetyStatus & to_underlying(BarrierControlSafetyStatus::kRemoteLockout)) != 0;
 }
 
 void emAfPluginBarrierControlServerIncrementEvents(EndpointId endpoint, bool open, bool command)
@@ -246,7 +250,7 @@ void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
     {
         emAfPluginBarrierControlServerSetBarrierPosition(endpoint, state.currentPosition);
         setMovingState(endpoint, EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_STOPPED);
-        emberAfDeactivateServerTick(endpoint, BarrierControl::Id);
+        cancelEndpointTimerCallback(endpoint);
     }
     else
     {
@@ -274,19 +278,16 @@ void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
         setMovingState(
             endpoint,
             (state.increasing ? EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_OPENING : EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_CLOSING));
-        emberAfScheduleServerTick(endpoint, BarrierControl::Id, state.delayMs);
+        scheduleTimerCallbackMs(endpoint, state.delayMs);
     }
 }
 
 // -----------------------------------------------------------------------------
 // Handling commands
 
-static void sendDefaultResponse(EmberAfStatus status)
+static void sendDefaultResponse(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, Status status)
 {
-    if (emberAfSendImmediateDefaultResponse(status) != EMBER_SUCCESS)
-    {
-        emberAfBarrierControlClusterPrintln("Failed to send default response");
-    }
+    commandObj->AddStatus(commandPath, status);
 }
 
 bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
@@ -295,30 +296,30 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
 {
     auto & percentOpen = commandData.percentOpen;
 
-    EndpointId endpoint  = commandPath.mEndpointId;
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EndpointId endpoint = commandPath.mEndpointId;
+    Status status       = Status::Success;
 
-    emberAfBarrierControlClusterPrintln("RX: GoToPercentCallback p=%d", percentOpen);
+    ChipLogProgress(Zcl, "RX: GoToPercentCallback p=%d", percentOpen);
 
     if (isRemoteLockoutOn(endpoint))
     {
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
     }
     else if (percentOpen > 100 // "100" means "100%", so greater than that is invalid
              || (!emAfPluginBarrierControlServerIsPartialBarrierSupported(endpoint) &&
                  percentOpen != EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_CLOSED &&
                  percentOpen != EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_OPEN))
     {
-        status = EMBER_ZCL_STATUS_INVALID_VALUE;
+        status = Status::ConstraintError;
     }
     else
     {
         state.currentPosition = getCurrentPosition(endpoint);
         state.targetPosition  = percentOpen;
         state.delayMs         = calculateDelayMs(endpoint, state.targetPosition, &state.increasing);
-        emberAfBarrierControlClusterPrintln("Scheduling barrier move from %d to %d with %" PRIu32 "ms delay", state.currentPosition,
-                                            state.targetPosition, state.delayMs);
-        emberAfScheduleServerTick(endpoint, BarrierControl::Id, state.delayMs);
+        ChipLogProgress(Zcl, "Scheduling barrier move from %d to %d with %" PRIu32 "ms delay", state.currentPosition,
+                        state.targetPosition, state.delayMs);
+        scheduleTimerCallbackMs(endpoint, state.delayMs);
 
         if (state.currentPosition < state.targetPosition)
         {
@@ -330,7 +331,7 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
         }
     }
 
-    sendDefaultResponse(status);
+    sendDefaultResponse(commandObj, commandPath, status);
 
     return true;
 }
@@ -340,10 +341,16 @@ bool emberAfBarrierControlClusterBarrierControlStopCallback(app::CommandHandler 
                                                             const Commands::BarrierControlStop::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
-    emberAfDeactivateServerTick(endpoint, BarrierControl::Id);
+    cancelEndpointTimerCallback(endpoint);
     setMovingState(endpoint, EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_STOPPED);
-    sendDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    sendDefaultResponse(commandObj, commandPath, Status::Success);
     return true;
 }
 
 void MatterBarrierControlPluginServerInitCallback() {}
+
+void MatterBarrierControlClusterServerShutdownCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "Shuting barrier control server cluster on endpoint %d", endpoint);
+    cancelEndpointTimerCallback(endpoint);
+}

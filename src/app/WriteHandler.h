@@ -21,11 +21,11 @@
 #include <app/AttributePathParams.h>
 #include <app/MessageDef/WriteResponseMessage.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
@@ -41,6 +41,8 @@ namespace app {
 class WriteHandler : public Messaging::ExchangeDelegate
 {
 public:
+    WriteHandler() : mExchangeCtx(*this) {}
+
     /**
      *  Initialize the WriteHandler. Within the lifetime
      *  of this instance, this method is invoked once after object
@@ -68,11 +70,10 @@ public:
     Protocols::InteractionModel::Status OnWriteRequest(Messaging::ExchangeContext * apExchangeContext,
                                                        System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
 
-    /*
-     * This forcibly closes the exchange context if a valid one is pointed to and de-initializes the object. Such a situation does
-     * not arise during normal message processing flows that all normally call Close() below.
+    /**
+     *  Clean up state when we are done sending the write response.
      */
-    void Abort();
+    void Close();
 
     bool IsFree() const { return mState == State::Uninitialized; }
 
@@ -96,7 +97,7 @@ public:
 
     bool MatchesExchangeContext(Messaging::ExchangeContext * apExchangeContext) const
     {
-        return !IsFree() && mpExchangeCtx == apExchangeContext;
+        return !IsFree() && mExchangeCtx.Get() == apExchangeContext;
     }
 
     void CacheACLCheckResult(const AttributeAccessToken & aToken) { mACLCheckCache.SetValue(aToken); }
@@ -112,6 +113,7 @@ public:
     }
 
 private:
+    friend class TestWriteInteraction;
     enum class State
     {
         Uninitialized = 0, // The handler has not been initialized
@@ -119,20 +121,16 @@ private:
         AddStatus,         // The handler has added status code
         Sending,           // The handler has sent out the write response
     };
-    Protocols::InteractionModel::Status ProcessWriteRequest(System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
-    Protocols::InteractionModel::Status HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
-                                                                  System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
+    using Status = Protocols::InteractionModel::Status;
+    Status ProcessWriteRequest(System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
+    Status HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
+                                     bool aIsTimedWrite);
 
     CHIP_ERROR FinalizeMessage(System::PacketBufferTLVWriter && aMessageWriter, System::PacketBufferHandle & packet);
     CHIP_ERROR SendWriteResponse(System::PacketBufferTLVWriter && aMessageWriter);
 
     void MoveToState(const State aTargetState);
-    void ClearState();
     const char * GetStateStr() const;
-    /**
-     *  Clean up state when we are done sending the write response.
-     */
-    void Close();
 
     void DeliverListWriteBegin(const ConcreteAttributePath & aPath);
     void DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool writeWasSuccessful);
@@ -158,7 +156,7 @@ private:
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
-    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
+    Messaging::ExchangeHolder mExchangeCtx;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     State mState           = State::Uninitialized;
     bool mIsTimedRequest   = false;

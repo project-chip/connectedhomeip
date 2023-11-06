@@ -31,15 +31,12 @@
 #include <credentials/OperationalCertificateStore.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/OperationalKeystore.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 #include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
 #include <lib/core/ScopedNodeId.h>
+#include <lib/core/TLV.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
@@ -78,7 +75,7 @@ public:
     ~FabricInfo() { Reset(); }
 
     // Non-copyable
-    FabricInfo(FabricInfo const &) = delete;
+    FabricInfo(FabricInfo const &)     = delete;
     void operator=(FabricInfo const &) = delete;
 
     // Returns a span into our internal storage.
@@ -104,15 +101,19 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    uint16_t GetVendorId() const { return mVendorId; }
+    CHIP_ERROR FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) const;
+
+    VendorId GetVendorId() const { return mVendorId; }
 
     bool IsInitialized() const { return (mFabricIndex != kUndefinedFabricIndex) && IsOperationalNodeId(mNodeId); }
 
     bool HasOperationalKey() const { return mOperationalKey != nullptr; }
 
+    bool ShouldAdvertiseIdentity() const { return mShouldAdvertiseIdentity; }
+
     friend class FabricTable;
 
-protected:
+private:
     struct InitParams
     {
         NodeId nodeId                         = kUndefinedNodeId;
@@ -120,9 +121,10 @@ protected:
         FabricIndex fabricIndex               = kUndefinedFabricIndex;
         CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
         Crypto::P256PublicKey rootPublicKey;
-        uint16_t vendorId                        = VendorId::NotSpecified; /**< Vendor ID for commissioner of fabric */
+        VendorId vendorId                        = VendorId::NotSpecified; /**< Vendor ID for commissioner of fabric */
         Crypto::P256Keypair * operationalKeypair = nullptr;
         bool hasExternallyOwnedKeypair           = false;
+        bool advertiseIdentity                   = false;
 
         CHIP_ERROR AreValid() const
         {
@@ -185,8 +187,6 @@ protected:
      */
     CHIP_ERROR SignWithOpKeypair(ByteSpan message, Crypto::P256ECDSASignature & outSignature) const;
 
-    CHIP_ERROR FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) const;
-
     /**
      *  Reset the state to a completely uninitialized status.
      */
@@ -204,7 +204,9 @@ protected:
         {
             chip::Platform::Delete(mOperationalKey);
         }
-        mOperationalKey = nullptr;
+        mOperationalKey                   = nullptr;
+        mHasExternallyOwnedOperationalKey = false;
+        mShouldAdvertiseIdentity          = true;
 
         mFabricIndex = kUndefinedFabricIndex;
         mNodeId      = kUndefinedNodeId;
@@ -220,23 +222,29 @@ protected:
         return TLV::EstimateStructOverhead(sizeof(uint16_t), Crypto::P256SerializedKeypair::Capacity());
     }
 
-    NodeId mNodeId           = kUndefinedNodeId;
-    FabricId mFabricId       = kUndefinedFabricId;
-    FabricIndex mFabricIndex = kUndefinedFabricIndex;
+    NodeId mNodeId     = kUndefinedNodeId;
+    FabricId mFabricId = kUndefinedFabricId;
     // We cache the compressed fabric id since it's used so often and costly to get.
     CompressedFabricId mCompressedFabricId = kUndefinedCompressedFabricId;
     // We cache the root public key since it's used so often and costly to get.
     Crypto::P256PublicKey mRootPublicKey;
 
-    uint16_t mVendorId                                  = static_cast<uint16_t>(VendorId::NotSpecified);
+    // mFabricLabel is 33 bytes, so ends on a 1 mod 4 byte boundary.
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
 
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-    mutable Crypto::P256KeypairHSM * mOperationalKey = nullptr;
-#else
-    mutable Crypto::P256Keypair * mOperationalKey = nullptr;
-#endif
+    // mFabricIndex, mVendorId, mHasExternallyOwnedOperationalKey,
+    // mShouldAdvertiseIdentity are 5 bytes and do not include any padding if
+    // they come after the 33-byte mFabricLabel, so end on a 2 mod 4 byte
+    // boundary.
+    FabricIndex mFabricIndex               = kUndefinedFabricIndex;
+    VendorId mVendorId                     = VendorId::NotSpecified;
     bool mHasExternallyOwnedOperationalKey = false;
+    bool mShouldAdvertiseIdentity          = true;
+
+    // 2 bytes of padding here, since mOperationalKey needs to be void*-aligned,
+    // so has to be at a 0 mod 4 byte location.
+
+    mutable Crypto::P256Keypair * mOperationalKey = nullptr;
 
     CHIP_ERROR CommitToStorage(PersistentStorageDelegate * storage) const;
     CHIP_ERROR LoadFromStorage(PersistentStorageDelegate * storage, FabricIndex newFabricIndex, const ByteSpan & rcac,
@@ -266,7 +274,7 @@ public:
             Advance();
         }
     }
-    ConstFabricIterator(const ConstFabricIterator &) = default;
+    ConstFabricIterator(const ConstFabricIterator &)             = default;
     ConstFabricIterator & operator=(const ConstFabricIterator &) = default;
 
     ConstFabricIterator & operator++() { return Advance(); }
@@ -361,6 +369,13 @@ public:
         virtual ~Delegate() {}
 
         /**
+         * Gets called when a fabric is about to be deleted, such as on
+         * FabricTable::Delete().  This allows actions to be taken that need the
+         * fabric to still be around before we delete it.
+         **/
+        virtual void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) {}
+
+        /**
          * Gets called when a fabric is deleted, such as on FabricTable::Delete().
          **/
         virtual void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) {}
@@ -386,8 +401,14 @@ public:
     ~FabricTable() = default;
 
     // Non-copyable
-    FabricTable(FabricTable const &) = delete;
+    FabricTable(FabricTable const &)    = delete;
     void operator=(FabricTable const &) = delete;
+
+    enum class AdvertiseIdentity : uint8_t
+    {
+        Yes,
+        No
+    };
 
     // Returns CHIP_ERROR_NOT_FOUND if there is no fabric for that index.
     CHIP_ERROR Delete(FabricIndex fabricIndex);
@@ -399,8 +420,44 @@ public:
     void SendUpdateFabricNotificationForTest(FabricIndex fabricIndex) { NotifyFabricUpdated(fabricIndex); }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
+    /**
+     * Collection of methods to help find a matching FabricInfo instance given a set of query criteria
+     *
+     */
+
+    /**
+     * Finds a matching FabricInfo instance given a root public key and fabric ID that uniquely identifies the fabric in any scope.
+     *
+     * Returns nullptr if no matching instance is found.
+     *
+     */
     const FabricInfo * FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId) const;
+
+    /**
+     * Finds a matching FabricInfo instance given a locally-scoped fabric index.
+     *
+     * Returns nullptr if no matching instance is found.
+     *
+     */
     const FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex) const;
+
+    /**
+     * Finds a matching FabricInfo instance given a root public key, fabric ID AND a matching NodeId. This variant of find
+     * is only to be used when it is possible to have colliding fabrics in the table that are on the same logical fabric
+     * but may be associated with different node identities.
+     *
+     * Returns nullptr if no matching instance is found.
+     *
+     */
+    const FabricInfo * FindIdentity(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId, NodeId nodeId) const;
+
+    /**
+     * Finds a matching FabricInfo instance given a compressed fabric ID. If there are multiple
+     * matching FabricInfo instances given the low but non-zero probability of collision, there is no guarantee
+     * on which instance will be returned.
+     *
+     * Returns nullptr if no matching instance is found.
+     */
     const FabricInfo * FindFabricWithCompressedId(CompressedFabricId compressedFabricId) const;
 
     CHIP_ERROR Init(const FabricTable::InitParams & initParams);
@@ -652,7 +709,7 @@ public:
      * @param fabricIndex - Existing FabricIndex for which a new keypair must be made available. If it
      *                      doesn't have a value, the key will be marked pending for the next available
      *                      fabric index that would apply for `AddNewFabric`.
-     * @param outputCsr - Buffer to contain the CSR. Must be at least `kMAX_CSR_Length` large.
+     * @param outputCsr - Buffer to contain the CSR. Must be at least `kMIN_CSR_Buffer_Size` large.
      *
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_BUFFER_TOO_SMALL if `outputCsr` buffer is too small
@@ -678,6 +735,14 @@ public:
      * @return true if a pending fabric or committed fabric for fabricIndex has an operational key, false otherwise.
      */
     bool HasOperationalKeyForFabric(FabricIndex fabricIndex) const;
+
+    /**
+     * @brief Returns the operational keystore. This is used for
+     *        CASE and the only way the keystore should be used.
+     *
+     * @return The operational keystore, nullptr otherwise.
+     */
+    const Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
 
     /**
      * @brief Add a pending trusted root certificate for the next fabric created with `AddNewPendingFabric*` methods.
@@ -728,9 +793,10 @@ public:
      * @retval other CHIP_ERROR_* on internal errors or certificate validation errors.
      */
     CHIP_ERROR AddNewPendingFabricWithOperationalKeystore(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
-                                                          FabricIndex * outNewFabricIndex)
+                                                          FabricIndex * outNewFabricIndex,
+                                                          AdvertiseIdentity advertiseIdentity = AdvertiseIdentity::Yes)
     {
-        return AddNewPendingFabricCommon(noc, icac, vendorId, nullptr, false, outNewFabricIndex);
+        return AddNewPendingFabricCommon(noc, icac, vendorId, nullptr, false, advertiseIdentity, outNewFabricIndex);
     };
 
     /**
@@ -763,9 +829,11 @@ public:
      */
     CHIP_ERROR AddNewPendingFabricWithProvidedOpKey(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
                                                     Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
-                                                    FabricIndex * outNewFabricIndex)
+                                                    FabricIndex * outNewFabricIndex,
+                                                    AdvertiseIdentity advertiseIdentity = AdvertiseIdentity::Yes)
     {
-        return AddNewPendingFabricCommon(noc, icac, vendorId, existingOpKey, isExistingOpKeyExternallyOwned, outNewFabricIndex);
+        return AddNewPendingFabricCommon(noc, icac, vendorId, existingOpKey, isExistingOpKeyExternallyOwned, advertiseIdentity,
+                                         outNewFabricIndex);
     };
 
     /**
@@ -797,9 +865,10 @@ public:
      * @retval CHIP_ERROR_INVALID_ARGUMENT if any of the arguments are invalid such as too large or out of bounds.
      * @retval other CHIP_ERROR_* on internal errors or certificate validation errors.
      */
-    CHIP_ERROR UpdatePendingFabricWithOperationalKeystore(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac)
+    CHIP_ERROR UpdatePendingFabricWithOperationalKeystore(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
+                                                          AdvertiseIdentity advertiseIdentity = AdvertiseIdentity::Yes)
     {
-        return UpdatePendingFabricCommon(fabricIndex, noc, icac, nullptr, false);
+        return UpdatePendingFabricCommon(fabricIndex, noc, icac, nullptr, false, advertiseIdentity);
     }
 
     /**
@@ -831,9 +900,10 @@ public:
      */
 
     CHIP_ERROR UpdatePendingFabricWithProvidedOpKey(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
-                                                    Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned)
+                                                    Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
+                                                    AdvertiseIdentity advertiseIdentity = AdvertiseIdentity::Yes)
     {
-        return UpdatePendingFabricCommon(fabricIndex, noc, icac, existingOpKey, isExistingOpKeyExternallyOwned);
+        return UpdatePendingFabricCommon(fabricIndex, noc, icac, existingOpKey, isExistingOpKeyExternallyOwned, advertiseIdentity);
     }
 
     /**
@@ -874,12 +944,24 @@ public:
      */
     void RevertPendingOpCertsExceptRoot();
 
-    // Verifies credentials, with the fabric's root under fabricIndex, and extract critical bits.
-    // This call is used for CASE.
+    // Verifies credentials, using the root certificate of the provided fabric index.
     CHIP_ERROR VerifyCredentials(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
                                  Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId,
                                  FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
                                  Crypto::P256PublicKey * outRootPublicKey = nullptr) const;
+
+    // Verifies credentials, using the provided root certificate.
+    static CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+                                        Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId,
+                                        FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
+                                        Crypto::P256PublicKey * outRootPublicKey = nullptr);
+    /**
+     * @brief Enables FabricInfo instances to collide and reference the same logical fabric (i.e Root Public Key + FabricId).
+     *
+     * *WARNING* This is ONLY to be used when creating multiple controllers on the same fabric OR for test.
+     *
+     */
+    void PermitCollidingFabrics() { mStateFlags.Set(StateFlags::kAreCollidingFabricsIgnored); }
 
     // Add a new fabric for testing. The Operational Key is a raw P256Keypair (public key and private key raw bits) that will
     // get copied (directly) into the fabric table.
@@ -891,7 +973,7 @@ public:
     CHIP_ERROR AddNewFabricForTestIgnoringCollisions(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
                                                      const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
     {
-        mStateFlags.Set(StateFlags::kAreCollidingFabricsIgnored);
+        PermitCollidingFabrics();
         CHIP_ERROR err = AddNewFabricForTest(rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
         mStateFlags.Clear(StateFlags::kAreCollidingFabricsIgnored);
         return err;
@@ -912,6 +994,14 @@ public:
         }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
     }
+
+    /**
+     * Get the fabric index that will be used for the next fabric that will be
+     * added.  Returns error if no more fabrics can be added, otherwise writes
+     * the fabric index that will be used for the next addition into the
+     * outparam.
+     */
+    CHIP_ERROR PeekFabricIndexForNextAddition(FabricIndex & outIndex);
 
 private:
     enum class StateFlags : uint16_t
@@ -975,16 +1065,21 @@ private:
 
     // Core validation logic for fabric additions/updates
     CHIP_ERROR AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::P256Keypair * existingOpKey,
-                                bool isExistingOpKeyExternallyOwned, uint16_t vendorId);
+                                bool isExistingOpKeyExternallyOwned, uint16_t vendorId, AdvertiseIdentity advertiseIdentity);
 
     // Common code for fabric addition, for either OperationalKeystore or injected key scenarios.
     CHIP_ERROR AddNewPendingFabricCommon(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
                                          Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
-                                         FabricIndex * outNewFabricIndex);
+                                         AdvertiseIdentity advertiseIdentity, FabricIndex * outNewFabricIndex);
 
     // Common code for fabric updates, for either OperationalKeystore or injected key scenarios.
     CHIP_ERROR UpdatePendingFabricCommon(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
-                                         Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned);
+                                         Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
+                                         AdvertiseIdentity advertiseIdentity);
+
+    // Common code for looking up a fabric given a root public key, a fabric ID and an optional node id scoped to that fabric.
+    const FabricInfo * FindFabricCommon(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId,
+                                        NodeId nodeId = kUndefinedNodeId) const;
 
     /**
      * UpdateNextAvailableFabricIndex should only be called when
@@ -1036,19 +1131,12 @@ private:
      */
     const FabricInfo * GetShadowPendingFabricEntry() const { return HasPendingFabricUpdate() ? &mPendingFabric : nullptr; }
 
-    // Returns true if we have a shadow entry pending for a fabruc update.
+    // Returns true if we have a shadow entry pending for a fabric update.
     bool HasPendingFabricUpdate() const
     {
         return mPendingFabric.IsInitialized() &&
             mStateFlags.HasAll(StateFlags::kIsPendingFabricDataPresent, StateFlags::kIsUpdatePending);
     }
-
-    // Verifies credentials, using the provided root certificate.
-    // This call is done whenever a fabric is "directly" added
-    static CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
-                                        Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId,
-                                        FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
-                                        Crypto::P256PublicKey * outRootPublicKey);
 
     // Validate an NOC chain at time of adding/updating a fabric (uses VerifyCredentials with additional checks).
     // The `existingFabricId` is passed for UpdateNOC, and must match the Fabric, to make sure that we are

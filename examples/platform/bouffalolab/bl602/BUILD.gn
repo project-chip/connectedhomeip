@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/bl602_sdk.gni")
+import("//build_overrides/bouffalolab_iot_sdk.gni")
 import("//build_overrides/chip.gni")
 
-import("${bl602_sdk_build_root}/bl602_sdk.gni")
+import("${bouffalolab_iot_sdk_build_root}/bl602/bl_iot_sdk.gni")
 
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]

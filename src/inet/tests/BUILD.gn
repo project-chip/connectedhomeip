@@ -35,14 +35,19 @@ static_library("helpers") {
     "TestInetCommonOptions.h",
     "TestInetCommonPosix.cpp",
     "TestInetLayerCommon.cpp",
-    "TestSetupFaultInjection.h",
-    "TestSetupFaultInjectionPosix.cpp",
     "TestSetupSignalling.h",
     "TestSetupSignallingPosix.cpp",
   ]
 
   if (current_os != "mbed") {
     sources += [ "TestInetLayer.cpp" ]
+  }
+
+  if (chip_with_nlfaultinjection) {
+    sources += [
+      "TestSetupFaultInjection.h",
+      "TestSetupFaultInjectionPosix.cpp",
+    ]
   }
 
   cflags = [ "-Wconversion" ]
@@ -55,7 +60,7 @@ static_library("helpers") {
   ]
 }
 
-chip_test_suite("tests") {
+chip_test_suite_using_nltest("tests") {
   output_name = "libInetLayerTests"
 
   public_configs = [ ":tests_config" ]
@@ -69,6 +74,7 @@ chip_test_suite("tests") {
   ]
 
   test_sources = [
+    "TestBasicPacketFilters.cpp",
     "TestInetAddress.cpp",
     "TestInetErrorStr.cpp",
   ]
@@ -86,4 +92,6 @@ chip_test_suite("tests") {
     # TODO: This test does not seem executed
     sources += [ "TestLwIPDNS.cpp" ]
   }
+
+  cflags = [ "-Wconversion" ]
 }

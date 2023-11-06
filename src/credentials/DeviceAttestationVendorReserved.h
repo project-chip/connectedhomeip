@@ -17,7 +17,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/Span.h>
 
 #include <cstdint>
@@ -88,7 +88,7 @@ public:
      */
     CHIP_ERROR GetNextVendorReservedElement(struct VendorReservedElement & element)
     {
-        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
         if (mIsDone)
         {
             return CHIP_END_OF_TLV;
@@ -211,7 +211,7 @@ private:
 
             // first lowest tagNum for this vendorId/profileNum
             uint64_t minTagNum = UINT64_MAX;
-            size_t lowestIndex;
+            size_t lowestIndex = SIZE_MAX;
             for (i = starting; i < mNumEntriesUsed; i++)
             {
                 if (mElements[i].vendorId == minVendor && mElements[i].profileNum == minProfile)

@@ -42,7 +42,7 @@ struct ifaddrs;
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-#include <device.h>
+#include <zephyr/device.h>
 
 struct net_if;
 struct net_if_ipv4;
@@ -185,7 +185,9 @@ public:
      *  @retval    #CHIP_ERROR_INVALID_ARGUMENT     If the link local address
      *                                              is nullptr.
      *  @retval    #INET_ERROR_ADDRESS_NOT_FOUND    If the link does not have
-     *                                              any address configured.
+     *                                              any address configured
+     *                                              or if no link local (fe80::)
+     *                                              address is present.
      *  @retval    #CHIP_NO_ERROR                   On success.
      */
     CHIP_ERROR GetLinkLocalAddr(IPAddress * llAddr) const;
@@ -307,6 +309,14 @@ public:
      *          or if the iterator is positioned beyond the end of the list.
      */
     bool IsUp();
+
+    /**
+     * Returns whether the current network interface is a loopback interface
+     *
+     * @return  \c true if current network interface is a loopback interface, \c false
+     *          if not, or if the iterator is positioned beyond the end of the list.
+     */
+    bool IsLoopback();
 
     /**
      * Returns whether the current network interface supports multicast.
@@ -501,6 +511,14 @@ public:
      *          if the iterator is not positioned on an interface address.
      */
     bool IsUp();
+
+    /**
+     * Returns whether the current network interface is a loopback interface
+     *
+     * @return  \c true if current network interface is a loopback interface, \c false
+     *          if not, or if the iterator is positioned beyond the end of the list.
+     */
+    bool IsLoopback();
 
     /**
      * Returns whether the network interface associated with the current interface address supports multicast.

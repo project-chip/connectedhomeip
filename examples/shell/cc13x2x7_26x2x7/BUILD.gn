@@ -76,6 +76,7 @@ ti_simplelink_executable("shell_app") {
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "main/AppTask.cpp",
     "main/main.cpp",
@@ -85,6 +86,7 @@ ti_simplelink_executable("shell_app") {
     ":sdk",
     ":sysconfig",
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
+    "${chip_root}/examples/platform/cc13x2_26x2:cc13x2_26x2-attestation-credentials",
     "${chip_root}/examples/shell/shell_common:shell_common",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/shell:shell",

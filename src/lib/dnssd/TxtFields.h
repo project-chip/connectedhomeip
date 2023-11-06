@@ -31,21 +31,22 @@ namespace Dnssd {
 using namespace System::Clock::Literals;
 
 // Operational node TXT entries
-static constexpr size_t kKeySleepyIdleIntervalMaxLength          = 7; // [SII] 0-3600000
-static constexpr size_t kKeySleepyActiveIntervalMaxLength        = 7; // [SAI] 0-3600000
+static constexpr size_t kKeySessionIdleIntervalMaxLength         = 7; // [SII] 0-3600000
+static constexpr size_t kKeySessionActiveIntervalMaxLength       = 7; // [SAI] 0-3600000
+static constexpr size_t kKeySessionActiveThresholdMaxLength      = 5; // [SAT] 0-65535
 static constexpr System::Clock::Milliseconds32 kMaxRetryInterval = 3600000_ms32;
 static constexpr size_t kKeyTcpSupportedMaxLength                = 1;
+static constexpr size_t kKeyLongIdleTimeICDMaxLength             = 1;
 
 // Commissionable/commissioner node TXT entries
-static constexpr size_t kKeyLongDiscriminatorMaxLength       = 5;
-static constexpr size_t kKeyVendorProductMaxLength           = 11;
-static constexpr size_t kKeyAdditionalCommissioningMaxLength = 1;
-static constexpr size_t kKeyCommissioningModeMaxLength       = 1;
-static constexpr size_t kKeyDeviceTypeMaxLength              = 10;
-static constexpr size_t kKeyDeviceNameMaxLength              = 32;
-static constexpr size_t kKeyRotatingDeviceIdMaxLength        = 100;
-static constexpr size_t kKeyPairingInstructionMaxLength      = 128;
-static constexpr size_t kKeyPairingHintMaxLength             = 10;
+static constexpr size_t kKeyLongDiscriminatorMaxLength  = 5;
+static constexpr size_t kKeyVendorProductMaxLength      = 11;
+static constexpr size_t kKeyCommissioningModeMaxLength  = 1;
+static constexpr size_t kKeyDeviceTypeMaxLength         = 10;
+static constexpr size_t kKeyDeviceNameMaxLength         = 32;
+static constexpr size_t kKeyRotatingDeviceIdMaxLength   = 100;
+static constexpr size_t kKeyPairingInstructionMaxLength = 128;
+static constexpr size_t kKeyPairingHintMaxLength        = 10;
 
 enum class TxtKeyUse : uint8_t
 {
@@ -59,16 +60,17 @@ enum class TxtFieldKey : uint8_t
     kUnknown,
     kLongDiscriminator,
     kVendorProduct,
-    kAdditionalPairing,
     kCommissioningMode,
     kDeviceType,
     kDeviceName,
     kRotatingDeviceId,
     kPairingInstruction,
     kPairingHint,
-    kSleepyIdleInterval,
-    kSleepyActiveInterval,
+    kSessionIdleInterval,
+    kSessionActiveInterval,
+    kSessionActiveThreshold,
     kTcpSupported,
+    kLongIdleTimeICD,
     kCount,
 };
 
@@ -85,16 +87,17 @@ constexpr const TxtFieldInfo txtFieldInfo[static_cast<size_t>(TxtFieldKey::kCoun
     { TxtFieldKey::kUnknown, 0, "", TxtKeyUse::kNone },
     { TxtFieldKey::kLongDiscriminator, kKeyLongDiscriminatorMaxLength, "D", TxtKeyUse::kCommission },
     { TxtFieldKey::kVendorProduct, kKeyVendorProductMaxLength, "VP", TxtKeyUse::kCommission },
-    { TxtFieldKey::kAdditionalPairing, kKeyAdditionalCommissioningMaxLength, "AP", TxtKeyUse::kCommission },
     { TxtFieldKey::kCommissioningMode, kKeyCommissioningModeMaxLength, "CM", TxtKeyUse::kCommission },
     { TxtFieldKey::kDeviceType, kKeyDeviceTypeMaxLength, "DT", TxtKeyUse::kCommission },
     { TxtFieldKey::kDeviceName, kKeyDeviceNameMaxLength, "DN", TxtKeyUse::kCommission },
     { TxtFieldKey::kRotatingDeviceId, kKeyRotatingDeviceIdMaxLength, "RI", TxtKeyUse::kCommission },
     { TxtFieldKey::kPairingInstruction, kKeyPairingInstructionMaxLength, "PI", TxtKeyUse::kCommission },
     { TxtFieldKey::kPairingHint, kKeyPairingHintMaxLength, "PH", TxtKeyUse::kCommission },
-    { TxtFieldKey::kSleepyIdleInterval, kKeySleepyIdleIntervalMaxLength, "SII", TxtKeyUse::kCommon },
-    { TxtFieldKey::kSleepyActiveInterval, kKeySleepyActiveIntervalMaxLength, "SAI", TxtKeyUse::kCommon },
+    { TxtFieldKey::kSessionIdleInterval, kKeySessionIdleIntervalMaxLength, "SII", TxtKeyUse::kCommon },
+    { TxtFieldKey::kSessionActiveInterval, kKeySessionActiveIntervalMaxLength, "SAI", TxtKeyUse::kCommon },
+    { TxtFieldKey::kSessionActiveThreshold, kKeySessionActiveThresholdMaxLength, "SAT", TxtKeyUse::kCommon },
     { TxtFieldKey::kTcpSupported, kKeyTcpSupportedMaxLength, "T", TxtKeyUse::kCommon },
+    { TxtFieldKey::kLongIdleTimeICD, kKeyLongIdleTimeICDMaxLength, "ICD", TxtKeyUse::kCommon },
 };
 #ifdef CHIP_CONFIG_TEST
 

@@ -17,20 +17,22 @@ name:
     3.5.2. [TC-IDM-5.2] Status Response from DUT in response to a Timed Request
     Action from TH.
 
+PICS:
+    - MCORE.IDM.S
+
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
     - label:
-          "TH sends a Timed Request Message with the timeout value set. (Example
-          - 200 milliseconds)."
+          "Step 1: TH sends a Timed Request Message with the timeout value set.
+          (Example - 200 milliseconds). +"
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
           ./chip-tool onoff on 1 1 --timedInteractionTimeoutMs 200
 
-          Verify on TH receives the StatusResponseMessage for the data sent in the above command
+          Verify on TH(chip-tool) receives the StatusResponseMessage for the data sent in the above command
 
           [1655798564.112839][7055:7060] CHIP:DMG: StatusResponseMessage =
           [1655798564.112870][7055:7060] CHIP:DMG: {
@@ -41,16 +43,14 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a Timed Request Message(Timed Write Transaction) with the
-          timeout value set. (Example - 200 milliseconds). Wait for the status
-          response message to be received. Send the Write Request Message to the
-          DUT."
+          "Step 2: TH sends a Timed Request Message(Timed Write Transaction)
+          with the timeout value set. (Example - 200 milliseconds). Wait for the
+          status response message to be received. Send the Write Request Message
+          to the DUT."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
-
           ./chip-tool levelcontrol write on-level 1 1 1 --timedInteractionTimeoutMs 500
 
-          Verify on TH receives the WriteResponseMessage for the data sent in the above command
+          Verify on TH(chip-tool) receives the WriteResponseMessage for the data sent in the above command
 
           [1655798786.131890][7065:7070] CHIP:DMG: WriteResponseMessage =
           [1655798786.131932][7065:7070] CHIP:DMG: {
@@ -87,16 +87,14 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a Timed Request Message(Timed Invoke Transaction) with the
-          timeout value set. (Example - 200 milliseconds). Wait for the status
-          response message to be received. Wait for 5 seconds(Timer has expired)
-          and then send the Invoke Request Message to the DUT."
+          "Step 3: TH sends a Timed Request Message(Timed Invoke Transaction)
+          with the timeout value set. (Example - 200 milliseconds). Wait for the
+          status response message to be received. Wait for 5 seconds(Timer has
+          expired) and then send the Invoke Request Message to the DUT."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+          ./chip-tool onoff on 1 1 --repeat-delay-ms 5000  --timedInteractionTimeoutMs 200
 
-           sudo ./chip-tool onoff on 1 1 --repeat-delay-ms 5000  --timedInteractionTimeoutMs 200
-
-          On TH, Verify we are getting status response and UNSUPPORTED_ACCESS  from DUT to TH for above command
+          On TH(chip-tool), Verify we are getting status response and UNSUPPORTED_ACCESS  from DUT to TH for above command
 
           [1649686333.696111][3252:3257] CHIP:DMG: StatusResponseMessage =
           [1649686333.696178][3252:3257] CHIP:DMG: {
@@ -123,16 +121,14 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a Timed Request Message(Timed Write Transaction) with the
-          timeout value set. (Example - 200 milliseconds). Wait for the status
-          response message to be received. Wait for 5 seconds(Timer has expired)
-          and then send the Write Request Message to the DUT."
+          "Step 4: TH sends a Timed Request Message(Timed Write Transaction)
+          with the timeout value set. (Example - 200 milliseconds). Wait for the
+          status response message to be received. Wait for 5 seconds(Timer has
+          expired) and then send the Write Request Message to the DUT."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
-
           ./chip-tool modeselect write on-mode 0 1 1 --repeat-delay-ms 1000 --timedInteractionTimeoutMs 500
 
-          On TH, Verify we are getting status response and UNSUPPORTED_ACCESS  from DUT to TH for above command
+          On TH(chip-tool), Verify we are getting status response and UNSUPPORTED_ACCESS  from DUT to TH for above command
 
           [1654771611.106067][28715:28720] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1654771611.106112][28715:28720] CHIP:DMG: StatusResponseMessage =

@@ -29,7 +29,6 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/PlatformManager.h>
 #include <platform/android/DeviceInstanceInfoProviderImpl.h>
-#include <platform/android/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
 
 #include <thread>
@@ -46,13 +45,15 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Initialize the configuration system.
     err = Internal::AndroidConfig::Init();
     SuccessOrExit(err);
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
+
+    // Now set up our device instance info provider.  We couldn't do that
+    // earlier, because the generic implementation sets a generic one.
+    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
 exit:
     return err;

@@ -29,8 +29,8 @@
 
 #include <system/SystemConfig.h>
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
@@ -126,6 +126,15 @@ public:
     TestContext() : mGreedyTimer(GreedyTimer, this), mNumTimersHandled(0) {}
 };
 
+static TestContext * gCurrentTestContext = nullptr;
+
+class ScopedGlobalTestContext
+{
+public:
+    ScopedGlobalTestContext(TestContext * ctx) { gCurrentTestContext = ctx; }
+    ~ScopedGlobalTestContext() { gCurrentTestContext = nullptr; }
+};
+
 // Test input data.
 
 static volatile bool sOverflowTestDone;
@@ -204,7 +213,7 @@ static void CheckStarvation(nlTestSuite * inSuite, void * aContext)
     LayerEvents<LayerImpl>::ServiceEvents(lSys);
 }
 
-void CheckOrder(nlTestSuite * inSuite, void * aContext)
+static void CheckOrder(nlTestSuite * inSuite, void * aContext)
 {
     if (!LayerEvents<LayerImpl>::HasServiceEvents())
         return;
@@ -256,6 +265,172 @@ void CheckOrder(nlTestSuite * inSuite, void * aContext)
 
     Clock::Internal::SetSystemClockForTesting(savedClock);
 }
+
+static void CheckCancellation(nlTestSuite * inSuite, void * aContext)
+{
+    if (!LayerEvents<LayerImpl>::HasServiceEvents())
+        return;
+
+    TestContext & testContext = *static_cast<TestContext *>(aContext);
+    Layer & systemLayer       = *testContext.mLayer;
+    nlTestSuite * const suite = testContext.mTestSuite;
+
+    struct TestState
+    {
+        TestState(Layer & aSystemLayer) : mSystemLayer(aSystemLayer) {}
+
+        void Record(char c)
+        {
+            size_t n = strlen(record);
+            if (n + 1 < sizeof(record))
+            {
+                record[n++] = c;
+                record[n]   = 0;
+            }
+        }
+        static void A(Layer * layer, void * state)
+        {
+            auto self = static_cast<TestState *>(state);
+            self->Record('A');
+            self->mSystemLayer.CancelTimer(B, state);
+            self->mSystemLayer.CancelTimer(D, state);
+        }
+        static void B(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('B'); }
+        static void C(Layer * layer, void * state)
+        {
+            auto self = static_cast<TestState *>(state);
+            self->Record('C');
+            self->mSystemLayer.CancelTimer(E, state);
+        }
+        static void D(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('D'); }
+        static void E(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('E'); }
+        char record[6] = { 0 };
+
+        Layer & mSystemLayer;
+    };
+    TestState testState(systemLayer);
+    NL_TEST_ASSERT(suite, testState.record[0] == 0);
+
+    Clock::ClockBase * const savedClock = &SystemClock();
+    Clock::Internal::MockClock mockClock;
+    Clock::Internal::SetSystemClockForTesting(&mockClock);
+
+    using namespace Clock::Literals;
+    systemLayer.StartTimer(0_ms, TestState::A, &testState);
+    systemLayer.StartTimer(0_ms, TestState::B, &testState);
+    systemLayer.StartTimer(20_ms, TestState::C, &testState);
+    systemLayer.StartTimer(30_ms, TestState::D, &testState);
+    systemLayer.StartTimer(50_ms, TestState::E, &testState);
+
+    mockClock.AdvanceMonotonic(100_ms);
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    NL_TEST_ASSERT(suite, strcmp(testState.record, "AC") == 0);
+
+    Clock::Internal::SetSystemClockForTesting(savedClock);
+}
+
+namespace {
+
+namespace CancelTimerTest {
+
+// A bit lower than maximum system timers just in case, for systems that
+// have some form of limit
+constexpr unsigned kCancelTimerCount = CHIP_SYSTEM_CONFIG_NUM_TIMERS - 4;
+int gCallbackProcessed[kCancelTimerCount];
+
+/// Validates that gCallbackProcessed has valid values (0 or 1)
+void ValidateExecutedTimerCounts(nlTestSuite * suite)
+{
+    for (int processed : gCallbackProcessed)
+    {
+        NL_TEST_ASSERT(suite, (processed == 0) || (processed == 1));
+    }
+}
+
+unsigned ExecutedTimerCount()
+{
+    unsigned count = 0;
+    for (int processed : gCallbackProcessed)
+    {
+        if (processed != 0)
+        {
+            count++;
+        }
+    }
+    return count;
+}
+
+void Callback(Layer * layer, void * state)
+{
+    unsigned idx = static_cast<unsigned>(reinterpret_cast<uintptr_t>(state));
+    if (gCallbackProcessed[idx] != 0)
+    {
+        ChipLogError(Test, "UNEXPECTED EXECUTION at index %u", idx);
+    }
+
+    gCallbackProcessed[idx]++;
+
+    if (ExecutedTimerCount() == kCancelTimerCount / 2)
+    {
+        ChipLogProgress(Test, "Cancelling timers");
+        for (unsigned i = 0; i < kCancelTimerCount; i++)
+        {
+            if (gCallbackProcessed[i] != 0)
+            {
+                continue;
+            }
+            ChipLogProgress(Test, "Timer %u is being cancelled", i);
+            gCurrentTestContext->mLayer->CancelTimer(Callback, reinterpret_cast<void *>(static_cast<uintptr_t>(i)));
+            gCallbackProcessed[i]++; // pretend executed.
+        }
+    }
+}
+
+void Test(nlTestSuite * inSuite, void * aContext)
+{
+    // Validates that timers can cancel other timers. Generally the test will
+    // do the following:
+    //   - schedule several timers to start at the same time
+    //   - within each timers, after half of them have run, make one timer
+    //     cancel all the other ones
+    //   - assert that:
+    //       - timers will run if scheduled
+    //       - once cancelled, timers will NOT run (i.e. a timer can cancel
+    //         other timers, even if they are expiring at the same time)
+    memset(gCallbackProcessed, 0, sizeof(gCallbackProcessed));
+
+    TestContext & testContext = *static_cast<TestContext *>(aContext);
+    ScopedGlobalTestContext testScope(&testContext);
+
+    Layer & systemLayer       = *testContext.mLayer;
+    nlTestSuite * const suite = testContext.mTestSuite;
+
+    Clock::ClockBase * const savedClock = &SystemClock();
+    Clock::Internal::MockClock mockClock;
+    Clock::Internal::SetSystemClockForTesting(&mockClock);
+    using namespace Clock::Literals;
+
+    for (unsigned i = 0; i < kCancelTimerCount; i++)
+    {
+        NL_TEST_ASSERT(
+            suite, systemLayer.StartTimer(10_ms, Callback, reinterpret_cast<void *>(static_cast<uintptr_t>(i))) == CHIP_NO_ERROR);
+    }
+
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    ValidateExecutedTimerCounts(suite);
+    NL_TEST_ASSERT(suite, ExecutedTimerCount() == 0);
+
+    mockClock.AdvanceMonotonic(20_ms);
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+
+    ValidateExecutedTimerCounts(suite);
+    NL_TEST_ASSERT(suite, ExecutedTimerCount() == kCancelTimerCount);
+
+    Clock::Internal::SetSystemClockForTesting(savedClock);
+}
+
+} // namespace CancelTimerTest
+} // namespace
 
 // Test the implementation helper classes TimerPool, TimerList, and TimerData.
 namespace chip {
@@ -405,6 +580,136 @@ void chip::System::TestTimer::CheckTimerPool(nlTestSuite * inSuite, void * aCont
     NL_TEST_ASSERT(suite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(Stats::kSystemLayer_NumTimers, 4));
 }
 
+static void ExtendTimerToTest(nlTestSuite * inSuite, void * aContext)
+{
+    if (!LayerEvents<LayerImpl>::HasServiceEvents())
+        return;
+
+    TestContext & testContext = *static_cast<TestContext *>(aContext);
+    Layer & systemLayer       = *testContext.mLayer;
+    nlTestSuite * const suite = testContext.mTestSuite;
+
+    struct TestState
+    {
+        void Record(char c)
+        {
+            size_t n = strlen(record);
+            if (n + 1 < sizeof(record))
+            {
+                record[n++] = c;
+                record[n]   = 0;
+            }
+        }
+        static void A(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('A'); }
+        static void B(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('B'); }
+        static void C(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('C'); }
+        static void D(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('D'); }
+        char record[5] = { 0 };
+    };
+    TestState testState;
+    NL_TEST_ASSERT(suite, testState.record[0] == 0);
+
+    Clock::ClockBase * const savedClock = &SystemClock();
+    Clock::Internal::MockClock mockClock;
+    Clock::Internal::SetSystemClockForTesting(&mockClock);
+
+    using namespace Clock::Literals;
+    systemLayer.StartTimer(150_ms, TestState::B, &testState);
+    systemLayer.StartTimer(200_ms, TestState::C, &testState);
+    systemLayer.StartTimer(150_ms, TestState::D, &testState);
+
+    // Timer wasn't started before. ExtendTimerTo will start it.
+    systemLayer.ExtendTimerTo(100_ms, TestState::A, &testState);
+    mockClock.AdvanceMonotonic(100_ms);
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    NL_TEST_ASSERT(suite, strcmp(testState.record, "A") == 0);
+
+    // Timer B as 50ms remaining. ExtendTimerTo 25 should have no effect
+    // Timer C as 100ms remaining. ExtendTimerTo 75ms should have no effect
+    // Timer D as 50ms remaining. Timer should be extend to a duration of 75ms
+    systemLayer.ExtendTimerTo(25_ms, TestState::B, &testState);
+    systemLayer.ExtendTimerTo(75_ms, TestState::D, &testState);
+    systemLayer.ExtendTimerTo(75_ms, TestState::D, &testState);
+
+    mockClock.AdvanceMonotonic(25_ms);
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    NL_TEST_ASSERT(suite, strcmp(testState.record, "A") == 0);
+
+    mockClock.AdvanceMonotonic(25_ms);
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    NL_TEST_ASSERT(suite, strcmp(testState.record, "AB") == 0);
+
+    // Timer D as 25ms remaining. Timer should be extend to a duration of 75ms
+    systemLayer.ExtendTimerTo(75_ms, TestState::D, &testState);
+    mockClock.AdvanceMonotonic(100_ms);
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    NL_TEST_ASSERT(suite, strcmp(testState.record, "ABCD") == 0);
+
+    Clock::Internal::SetSystemClockForTesting(savedClock);
+
+    // Extending a timer by 0 ms permitted
+    NL_TEST_ASSERT(suite, systemLayer.ExtendTimerTo(0_ms, TestState::A, &testState) == CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+static void IsTimerActiveTest(nlTestSuite * inSuite, void * aContext)
+{
+    if (!LayerEvents<LayerImpl>::HasServiceEvents())
+        return;
+
+    TestContext & testContext = *static_cast<TestContext *>(aContext);
+    Layer & systemLayer       = *testContext.mLayer;
+    nlTestSuite * const suite = testContext.mTestSuite;
+
+    struct TestState
+    {
+        void Record(char c)
+        {
+            size_t n = strlen(record);
+            if (n + 1 < sizeof(record))
+            {
+                record[n++] = c;
+                record[n]   = 0;
+            }
+        }
+        static void A(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('A'); }
+        static void B(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('B'); }
+        static void C(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('C'); }
+        char record[4] = { 0 };
+    };
+    TestState testState;
+    NL_TEST_ASSERT(suite, testState.record[0] == 0);
+
+    Clock::ClockBase * const savedClock = &SystemClock();
+    Clock::Internal::MockClock mockClock;
+    Clock::Internal::SetSystemClockForTesting(&mockClock);
+
+    using namespace Clock::Literals;
+    systemLayer.StartTimer(100_ms, TestState::A, &testState);
+    systemLayer.StartTimer(200_ms, TestState::B, &testState);
+    systemLayer.StartTimer(300_ms, TestState::C, &testState);
+
+    NL_TEST_ASSERT(suite, systemLayer.IsTimerActive(TestState::A, &testState));
+    NL_TEST_ASSERT(suite, systemLayer.IsTimerActive(TestState::B, &testState));
+    NL_TEST_ASSERT(suite, systemLayer.IsTimerActive(TestState::C, &testState));
+
+    mockClock.AdvanceMonotonic(100_ms);
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    NL_TEST_ASSERT(suite, systemLayer.IsTimerActive(TestState::A, &testState) == false);
+    NL_TEST_ASSERT(suite, systemLayer.IsTimerActive(TestState::B, &testState));
+    NL_TEST_ASSERT(suite, systemLayer.IsTimerActive(TestState::C, &testState));
+
+    mockClock.AdvanceMonotonic(100_ms);
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    NL_TEST_ASSERT(suite, systemLayer.IsTimerActive(TestState::B, &testState) == false);
+    NL_TEST_ASSERT(suite, systemLayer.IsTimerActive(TestState::C, &testState));
+
+    mockClock.AdvanceMonotonic(100_ms);
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    NL_TEST_ASSERT(suite, systemLayer.IsTimerActive(TestState::C, &testState) == false);
+
+    Clock::Internal::SetSystemClockForTesting(savedClock);
+}
+
 // Test Suite
 
 /**
@@ -416,7 +721,11 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Timer::TestOverflow",             CheckOverflow),
     NL_TEST_DEF("Timer::TestTimerStarvation",      CheckStarvation),
     NL_TEST_DEF("Timer::TestTimerOrder",           CheckOrder),
+    NL_TEST_DEF("Timer::TestTimerCancellation",    CheckCancellation),
     NL_TEST_DEF("Timer::TestTimerPool",            chip::System::TestTimer::CheckTimerPool),
+    NL_TEST_DEF("Timer::TestCancelTimer",          CancelTimerTest::Test),
+    NL_TEST_DEF("Timer::ExtendTimerTo",            ExtendTimerToTest),
+    NL_TEST_DEF("Timer::TestIsTimerActive",        IsTimerActiveTest),
     NL_TEST_SENTINEL()
 };
 // clang-format on
@@ -448,12 +757,13 @@ static int TestSetup(void * aContext)
         return FAILURE;
     }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 2 && LWIP_VERSION_MINOR == 0
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0) && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
     static sys_mbox_t * sLwIPEventQueue = NULL;
 
     sys_mbox_new(sLwIPEventQueue, 100);
     tcpip_init(NULL, NULL);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 2 && LWIP_VERSION_MINOR == 0
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0) &&
+       // !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
     sLayer.Init();
 
@@ -473,15 +783,16 @@ static int TestTeardown(void * aContext)
 
     lContext.mLayer->Shutdown();
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0) && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
     tcpip_finish(NULL, NULL);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0) &&
+       // !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
     ::chip::Platform::MemoryShutdown();
     return (SUCCESS);
 }
 
-int TestSystemTimer(void)
+int TestSystemTimer()
 {
     return chip::ExecuteTestsWithContext<TestContext>(&kTheSuite);
 }

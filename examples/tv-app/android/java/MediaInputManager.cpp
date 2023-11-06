@@ -72,7 +72,7 @@ CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncode
         jint size = env->GetArrayLength(inputArray);
         for (int i = 0; i < size; i++)
         {
-            app::Clusters::MediaInput::Structs::InputInfo::Type mediaInput;
+            app::Clusters::MediaInput::Structs::InputInfoStruct::Type mediaInput;
 
             jobject inputObj  = env->GetObjectArrayElement(inputArray, i);
             jclass inputClass = env->GetObjectClass(inputObj);

@@ -13,8 +13,3 @@
 # limitations under the License.
 
 # Configuration file
-
-declare_args() {
-  # possible values host_k32w, host_linux
-  host = "host_k32w"
-}

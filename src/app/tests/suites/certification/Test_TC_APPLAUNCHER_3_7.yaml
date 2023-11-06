@@ -14,19 +14,22 @@
 
 name: 19.4.3. [TC-APPLAUNCHER-3.7] Launch Application Verification
 
+PICS:
+    - APPLAUNCHER.S
+
 config:
     nodeId: 0x12344321
     cluster: "Application Launcher"
     endpoint: 1
     catalogVendorId:
-        type: INT16U
+        type: int16u
         defaultValue: 123
     applicationId:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "exampleid"
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -34,40 +37,40 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Launch an app with the provided a application ID"
-      PICS: APPLAUNCHER.S.C0000
+    - label: "Step 1: Launch an app with the provided a application ID"
+      PICS: APPLAUNCHER.S.C00.Rsp
       command: "LaunchApp"
       arguments:
           values:
               - name: "Data"
                 value: "Hello World"
-              - name: "application"
+              - name: "Application"
                 value:
                     {
-                        catalogVendorId: catalogVendorId,
-                        applicationId: applicationId,
+                        CatalogVendorID: catalogVendorId,
+                        ApplicationID: applicationId,
                     }
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label:
-          "TH sends a LaunchApp command to DUT to launch an app which is not
-          available"
-      PICS: APPLAUNCHER.S.C0000
+          "Step 2: TH sends a LaunchApp command to DUT to launch an app which is
+          not available"
+      PICS: APPLAUNCHER.S.C00.Rsp
       command: "LaunchApp"
       arguments:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "Hello World"
-              - name: "application"
+              - name: "Application"
                 value:
                     {
-                        catalogVendorId: catalogVendorId,
-                        applicationId: "NonAvailableApp",
+                        CatalogVendorID: catalogVendorId,
+                        ApplicationID: "NonAvailableApp",
                     }
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 1

@@ -52,6 +52,44 @@ CHIP_ERROR DefaultSessionResumptionStorage::Save(const ScopedNodeId & node, Cons
     SessionIndex index;
     ReturnErrorOnFailure(LoadIndex(index));
 
+    for (size_t i = 0; i < index.mSize; ++i)
+    {
+        if (index.mNodes[i] == node)
+        {
+            // Node already exists in the index.  Save in place.
+            CHIP_ERROR err = CHIP_NO_ERROR;
+            ResumptionIdStorage oldResumptionId;
+            Crypto::P256ECDHDerivedSecret oldSharedSecret;
+            CATValues oldPeerCATs;
+            // This follows the approach in Delete.  Removal of the old
+            // resumption-id-keyed link is best effort.  If we cannot load
+            // state to lookup the resumption ID for the key, the entry in
+            // the link table will be leaked.
+            err = LoadState(node, oldResumptionId, oldSharedSecret, oldPeerCATs);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(SecureChannel,
+                             "LoadState failed; unable to fully delete session resumption record for node " ChipLogFormatX64
+                             ": %" CHIP_ERROR_FORMAT,
+                             ChipLogValueX64(node.GetNodeId()), err.Format());
+            }
+            else
+            {
+                err = DeleteLink(oldResumptionId);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(SecureChannel,
+                                 "DeleteLink failed; unable to fully delete session resumption record for node " ChipLogFormatX64
+                                 ": %" CHIP_ERROR_FORMAT,
+                                 ChipLogValueX64(node.GetNodeId()), err.Format());
+                }
+            }
+            ReturnErrorOnFailure(SaveState(node, resumptionId, sharedSecret, peerCATs));
+            ReturnErrorOnFailure(SaveLink(resumptionId, node));
+            return CHIP_NO_ERROR;
+        }
+    }
+
     if (index.mSize == CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE)
     {
         // TODO: implement LRU for resumption
@@ -209,7 +247,7 @@ CHIP_ERROR DefaultSessionResumptionStorage::DeleteAll(FabricIndex fabricIndex)
             ChipLogError(
                 SecureChannel,
                 "Session resumption cache is in an inconsistent state!  "
-                "Unable to save session resumption index during atetmpted deletion of fabric index %u: %" CHIP_ERROR_FORMAT,
+                "Unable to save session resumption index during attempted deletion of fabric index %u: %" CHIP_ERROR_FORMAT,
                 fabricIndex, err.Format());
         }
     }

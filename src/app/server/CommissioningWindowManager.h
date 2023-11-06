@@ -17,10 +17,14 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/Nullable.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningModeProvider.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/ClusterEnums.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/dnssd/Advertiser.h>
+#include <messaging/ExchangeDelegate.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <system/SystemClock.h>
@@ -35,7 +39,8 @@ enum class CommissioningWindowAdvertisement
 
 class Server;
 
-class CommissioningWindowManager : public SessionEstablishmentDelegate,
+class CommissioningWindowManager : public Messaging::UnsolicitedMessageHandler,
+                                   public SessionEstablishmentDelegate,
                                    public app::CommissioningModeProvider,
                                    public SessionDelegate
 {
@@ -74,15 +79,37 @@ public:
         System::Clock::Seconds16 commissioningTimeout      = System::Clock::Seconds16(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS),
         CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kAllSupported);
 
+    /**
+     * Open the pairing window using default configured parameters, triggered by
+     * the Administrator Commmissioning cluster implementation.
+     */
+    CHIP_ERROR
+    OpenBasicCommissioningWindowForAdministratorCommissioningCluster(System::Clock::Seconds16 commissioningTimeout,
+                                                                     FabricIndex fabricIndex, VendorId vendorId);
+
     CHIP_ERROR OpenEnhancedCommissioningWindow(System::Clock::Seconds16 commissioningTimeout, uint16_t discriminator,
-                                               Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt);
+                                               Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
+                                               FabricIndex fabricIndex, VendorId vendorId);
 
     void CloseCommissioningWindow();
 
-    app::Clusters::AdministratorCommissioning::CommissioningWindowStatus CommissioningWindowStatus() const { return mWindowStatus; }
+    app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum CommissioningWindowStatusForCluster() const;
 
-    // CommissioningModeProvider implemetation.
+    bool IsCommissioningWindowOpen() const;
+
+    const app::DataModel::Nullable<VendorId> & GetOpenerVendorId() const { return mOpenerVendorId; }
+
+    const app::DataModel::Nullable<FabricIndex> & GetOpenerFabricIndex() const { return mOpenerFabricIndex; }
+
+    void OnFabricRemoved(FabricIndex removedIndex);
+
+    // CommissioningModeProvider implementation.
     Dnssd::CommissioningMode GetCommissioningMode() const override;
+
+    //// UnsolicitedMessageHandler Implementation ////
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
+                                            Messaging::ExchangeDelegate *& newDelegate) override;
+    void OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate) override;
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -151,11 +178,19 @@ private:
      */
     void ExpireFailSafeIfArmed();
 
+    /**
+     * Helpers to ensure the right attribute reporting happens when our state is
+     * updated.
+     */
+    void UpdateWindowStatus(app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum aNewStatus);
+    void UpdateOpenerVendorId(app::DataModel::Nullable<VendorId> aNewOpenerVendorId);
+    void UpdateOpenerFabricIndex(app::DataModel::Nullable<FabricIndex> aNewOpenerFabricIndex);
+
     AppDelegate * mAppDelegate = nullptr;
     Server * mServer           = nullptr;
 
-    app::Clusters::AdministratorCommissioning::CommissioningWindowStatus mWindowStatus =
-        app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
+    app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum mWindowStatus =
+        app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
 
     bool mIsBLE = true;
 
@@ -167,7 +202,8 @@ private:
     Spake2pVerifier mECMPASEVerifier;
     uint16_t mECMDiscriminator = 0;
     // mListeningForPASE is true only when we are listening for
-    // PBKDFParamRequest messages.
+    // PBKDFParamRequest messages or when we're in the middle of a PASE
+    // handshake.
     bool mListeningForPASE = false;
     // Boolean that tracks whether we have a live commissioning timeout timer.
     bool mCommissioningTimeoutTimerArmed = false;
@@ -181,6 +217,13 @@ private:
 
     // The PASE session we are using, so we can handle CloseSession properly.
     SessionHolderWithDelegate mPASESession;
+
+    // Information about who opened the commissioning window.  These will only
+    // be non-null if the window was opened via the operational credentials
+    // cluster and the fabric index may be null even then if the fabric has been
+    // removed.
+    app::DataModel::Nullable<VendorId> mOpenerVendorId;
+    app::DataModel::Nullable<FabricIndex> mOpenerFabricIndex;
 };
 
 } // namespace chip

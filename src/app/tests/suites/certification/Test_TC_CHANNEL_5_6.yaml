@@ -15,33 +15,53 @@
 
 name: 3.7.6. [TC-CHANNEL-5.6] Skip Channel Verification (DUT as Client)
 
+PICS:
+    - CHANNEL.C
+
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
-    - label: "DUT sends SkipChannel command to TH"
-      PICS: CHANNEL.C.C0003
+    - label: "Preconditions"
       verification: |
-          product maker needs to provide instructions for how to trigger the command:
-          Refer to device or application documentation for special argument values to each command, and/or additional steps required to put device into in correct state to exhibit test behavior.
+          Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
+      disabled: true
 
-
-          If the DUT knows the Index value, then those can be sent as the argument.
-          Else User needs to execute the following command to know the index InputList
-
-          ./chip-tool channel read channel-list 1 1
+    - label: "Step 1: DUT sends SkipChannel command to TH"
+      PICS: CHANNEL.C.C03.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
           ./chip-tool channel skip-channel 33 1 1
-          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
+          ./chip-tv-casting-app channel skip-channel 33 1 1
 
-          [1653915085.438537][18282:18287] CHIP:DMG:                                 StatusIB =
-          [1653915085.438556][18282:18287] CHIP:DMG:                                 {
-          [1653915085.438575][18282:18287] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1653915085.438594][18282:18287] CHIP:DMG:                                 },
+          On TH (tv-app), Verify the  skip-channel command is received successfully.
 
-
-          Enter the below command to read the current input.
-          ./chip-tool channel read  current-channel   1 1
+          [1658530897782] [21924:317544] CHIP: [DMG] InvokeRequestMessage =
+          [1658530897782] [21924:317544] CHIP: [DMG] {
+          [1658530897782] [21924:317544] CHIP: [DMG]         suppressResponse = false,
+          [1658530897782] [21924:317544] CHIP: [DMG]         timedRequest = false,
+          [1658530897782] [21924:317544] CHIP: [DMG]         InvokeRequests =
+          [1658530897782] [21924:317544] CHIP: [DMG]         [
+          [1658530897782] [21924:317544] CHIP: [DMG]                 CommandDataIB =
+          [1658530897782] [21924:317544] CHIP: [DMG]                 {
+          [1658530897782] [21924:317544] CHIP: [DMG]                         CommandPathIB =
+          [1658530897782] [21924:317544] CHIP: [DMG]                         {
+          [1658530897782] [21924:317544] CHIP: [DMG]                                 EndpointId = 0x1,
+          [1658530897782] [21924:317544] CHIP: [DMG]                                 ClusterId = 0x504,
+          [1658530897782] [21924:317544] CHIP: [DMG]                                 CommandId = 0x3,
+          [1658530897782] [21924:317544] CHIP: [DMG]                         },
+          [1658530897782] [21924:317544] CHIP: [DMG]
+          [1658530897782] [21924:317544] CHIP: [DMG]                         CommandFields =
+          [1658530897782] [21924:317544] CHIP: [DMG]                         {
+          [1658530897782] [21924:317544] CHIP: [DMG]                                 0x0 = 33,
+          [1658530897782] [21924:317544] CHIP: [DMG]                         },
+          [1658530897782] [21924:317544] CHIP: [DMG]                 },
+          [1658530897782] [21924:317544] CHIP: [DMG]
+          [1658530897782] [21924:317544] CHIP: [DMG]         ],
+          [1658530897782] [21924:317544] CHIP: [DMG]
+          [1658530897782] [21924:317544] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658530897782] [21924:317544] CHIP: [DMG] },
       disabled: true

@@ -34,10 +34,6 @@ struct ChipDeviceEvent;
 
 // ==================== Platform Adaptations ====================
 
-#define CHIP_SYSTEM_CONFIG_POSIX_LOCKING 1
-#define CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING 0
-#define CHIP_SYSTEM_CONFIG_NO_LOCKING 0
-
 #ifndef CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 #define CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS 0
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
@@ -51,8 +47,8 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_USE_LWIP 0
 #define CHIP_SYSTEM_CONFIG_USE_SOCKETS 1
 
-// ========== Platform-specific Configuration Overrides =========
+#ifndef CONFIG_ARCH_POSIX
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 8
+#endif
 
-#ifndef CHIP_SYSTEM_CONFIG_NUM_TIMERS
-#define CHIP_SYSTEM_CONFIG_NUM_TIMERS 16
-#endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
+// ========== Platform-specific Configuration Overrides =========

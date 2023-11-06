@@ -18,7 +18,7 @@
 #pragma once
 
 #include <transport/SecureSession.h>
-#include <transport/SessionHandle.h>
+#include <transport/Session.h>
 
 namespace chip {
 namespace Transport {

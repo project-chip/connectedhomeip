@@ -24,6 +24,15 @@
 #include "AppEvent.h"
 #include "BoltLockManager.h"
 
+#include "CHIPProjectConfig.h"
+
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+#include <platform/nxp/k32w/k32w0/FactoryDataProviderImpl.h>
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+#include "CustomFactoryDataProvider.h"
+#endif
+#endif
+
 #include <platform/CHIPDeviceLayer.h>
 
 #include "FreeRTOS.h"
@@ -31,6 +40,15 @@
 
 class AppTask
 {
+public:
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+    using FactoryDataProvider = chip::DeviceLayer::CustomFactoryDataProvider;
+#else
+    using FactoryDataProvider = chip::DeviceLayer::FactoryDataProviderImpl;
+#endif
+#endif
+
 public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
@@ -57,6 +75,7 @@ private:
     static void HandleKeyboard(void);
     static void JoinHandler(void * aGenericEvent);
     static void BleHandler(void * aGenericEvent);
+    static void BleStartAdvertising(intptr_t arg);
     static void LockActionEventHandler(void * aGenericEvent);
     static void ResetActionEventHandler(void * aGenericEvent);
     static void InstallEventHandler(void * aGenericEvent);
@@ -64,10 +83,11 @@ private:
     static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
-    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     static void UpdateClusterStateInternal(intptr_t arg);
     static void ThreadStart();
     static void InitServer(intptr_t arg);
+    static void PrintOnboardingInfo();
     void StartTimer(uint32_t aTimeoutInMs);
 
     enum Function_t

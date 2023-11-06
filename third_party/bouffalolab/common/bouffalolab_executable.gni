@@ -1,0 +1,95 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("//build_overrides/bouffalolab_iot_sdk.gni")
+import("${build_root}/toolchain/flashable_executable.gni")
+
+template("bouffalolab_executable") {
+  output_base_name = get_path_info(invoker.output_name, "name")
+
+  objcopy_image_name = output_base_name + ".bin"
+  objcopy_image_format = "binary"
+
+  objcopy = "riscv64-unknown-elf-objcopy"
+  if ("linux" == host_os) {
+    objcopy = "${bouffalolab_sdk_root}/toolchain/riscv/Linux/bin/riscv64-unknown-elf-objcopy"
+  } else if ("mac" == host_os || "darwin" == host_os) {
+    objcopy = "${bouffalolab_sdk_root}/toolchain/riscv/Darwin/bin/riscv64-unknown-elf-objcopy"
+  }
+
+  # Copy flashing dependencies to the output directory so that the output
+  # is collectively self-contained; this allows flashing to work reliably
+  # even if the build and flashing steps take place on different machines
+  # or in different containers.
+  flashing_runtime_target = target_name + ".flashing_runtime"
+  flashing_script_inputs = [
+    "${chip_root}/scripts/flashing/bouffalolab_firmware_utils.py",
+    "${chip_root}/scripts/flashing/firmware_utils.py",
+  ]
+
+  if (invoker.bl_plat_name == "bl602") {
+    flashing_script_inputs += [ "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_4M.toml" ]
+  } else {
+    flashing_script_inputs += [ "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_2M.toml" ]
+  }
+
+  copy(flashing_runtime_target) {
+    sources = flashing_script_inputs
+    outputs = [ "${root_out_dir}/{{source_file_part}}" ]
+  }
+
+  flashing_script_generator =
+      "${chip_root}/scripts/flashing/gen_flashing_script.py"
+  flashing_script_name = output_base_name + ".flash.py"
+  flashing_options = [ "bouffalolab" ]
+  flashing_options += [ "--chipname" ]
+  flashing_options += [ "${invoker.bl_plat_name}" ]
+  flashing_options += [ "--xtal" ]
+  if (invoker.bl_plat_name == "bl602") {
+    flashing_options += [ "40M" ]
+  } else if (invoker.bl_plat_name == "bl702") {
+    flashing_options += [ "32M" ]
+  } else if (invoker.bl_plat_name == "bl702l") {
+    flashing_options += [ "32M" ]
+  }
+
+  flashing_options += [ "--pt" ]
+  if (invoker.bl_plat_name == "bl602") {
+    flashing_options +=
+        [ rebase_path("partition_cfg_4M.toml", root_out_dir, root_out_dir) ]
+  } else if (defined(invoker.enable_openthread_border_router) &&
+             invoker.enable_openthread_border_router) {
+    flashing_options += [ rebase_path("partition_cfg_2M_noOTA.toml",
+                                      root_out_dir,
+                                      root_out_dir) ]
+  } else {
+    flashing_options +=
+        [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
+  }
+
+  flashing_options += [ "--ota" ]
+  flashing_options += [ "ota_images/" ]
+
+  # set 2000000 baudrate for image download by default
+  flashing_options += [ "--baudrate" ]
+  flashing_options += [ "2000000" ]
+
+  flashable_executable(target_name) {
+    forward_variables_from(invoker, "*")
+    data_deps = [ ":${flashing_runtime_target}" ]
+  }
+}

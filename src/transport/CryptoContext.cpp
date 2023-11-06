@@ -23,6 +23,7 @@
  */
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
@@ -50,76 +51,68 @@ constexpr uint8_t RSEKeysInfo[] = { 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x
 
 using namespace Crypto;
 
-#ifdef ENABLE_HSM_HKDF
-using HKDF_sha_crypto = HKDF_shaHSM;
-#else
-using HKDF_sha_crypto = HKDF_sha;
-#endif
-
 CryptoContext::CryptoContext() : mKeyAvailable(false) {}
 
 CryptoContext::~CryptoContext()
 {
-    for (auto & key : mKeys)
+    if (mKeystore)
     {
-        ClearSecretData(key, sizeof(CryptoKey));
+        mKeystore->DestroyKey(mEncryptionKey);
+        mKeystore->DestroyKey(mDecryptionKey);
     }
+
+    mKeystore   = nullptr;
     mKeyContext = nullptr;
 }
 
-CHIP_ERROR CryptoContext::InitFromSecret(const ByteSpan & secret, const ByteSpan & salt, SessionInfoType infoType, SessionRole role)
+CHIP_ERROR CryptoContext::InitFromSecret(SessionKeystore & keystore, const ByteSpan & secret, const ByteSpan & salt,
+                                         SessionInfoType infoType, SessionRole role)
 {
-    HKDF_sha_crypto mHKDF;
     VerifyOrReturnError(mKeyAvailable == false, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(secret.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(secret.size() > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError((salt.size() == 0) || (salt.data() != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
 
-    const uint8_t * info = SEKeysInfo;
-    size_t infoLen       = sizeof(SEKeysInfo);
+    ByteSpan info = (infoType == SessionInfoType::kSessionResumption) ? ByteSpan(RSEKeysInfo) : ByteSpan(SEKeysInfo);
 
-    if (infoType == SessionInfoType::kSessionResumption)
-    {
-        info    = RSEKeysInfo;
-        infoLen = sizeof(RSEKeysInfo);
-    }
+    // If the secure session is created by session initiator, use the I2R key to encrypt
+    // messages being transmitted. Otherwise, use the R2I key.
+    auto & i2rKey = (role == SessionRole::kInitiator) ? mEncryptionKey : mDecryptionKey;
+    auto & r2iKey = (role == SessionRole::kInitiator) ? mDecryptionKey : mEncryptionKey;
 
 #if CHIP_CONFIG_SECURITY_TEST_MODE
 
     // If enabled, override the generated session key with a known key pair
     // to allow man-in-the-middle session key recovery for testing purposes.
 
-#define TEST_SECRET_SIZE 32
-    constexpr uint8_t kTestSharedSecret[TEST_SECRET_SIZE] = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
-    static_assert(sizeof(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE) == TEST_SECRET_SIZE,
+    constexpr uint8_t kTestSharedSecret[CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH] = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
+    static_assert(sizeof(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE) == CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH,
                   "CHIP_CONFIG_TEST_SHARED_SECRET_VALUE must be 32 bytes");
-    const ByteSpan & testSalt = ByteSpan(nullptr, 0);
+    const ByteSpan & testSalt = ByteSpan();
     (void) info;
-    (void) infoLen;
 
 #warning                                                                                                                           \
-    "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key, and NodeID=0 in NONCE. Node can only communicate with other nodes built with this flag set. Requires build flag 'treat_warnings_as_errors=false'."
-    ChipLogError(SecureChannel,
-                 "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key, "
-                 "and NodeID=0 in NONCE. "
-                 "Node can only communicate with other nodes built with this flag set.");
+    "Warning: CHIP_CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key, and NodeID=0 in NONCE. Node can only communicate with other nodes built with this flag set. Requires build flag 'treat_warnings_as_errors=false'."
+    ChipLogError(
+        SecureChannel,
+        "Warning: CHIP_CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key, "
+        "and NodeID=0 in NONCE. "
+        "Node can only communicate with other nodes built with this flag set.");
 
-    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(kTestSharedSecret, TEST_SECRET_SIZE, testSalt.data(), testSalt.size(), SEKeysInfo,
-                                           sizeof(SEKeysInfo), &mKeys[0][0], sizeof(mKeys)));
+    ReturnErrorOnFailure(keystore.DeriveSessionKeys(ByteSpan(kTestSharedSecret), testSalt, ByteSpan(SEKeysInfo), i2rKey, r2iKey,
+                                                    mAttestationChallenge));
 #else
 
-    ReturnErrorOnFailure(
-        mHKDF.HKDF_SHA256(secret.data(), secret.size(), salt.data(), salt.size(), info, infoLen, &mKeys[0][0], sizeof(mKeys)));
+    ReturnErrorOnFailure(keystore.DeriveSessionKeys(secret, salt, info, i2rKey, r2iKey, mAttestationChallenge));
 
 #endif
 
     mKeyAvailable = true;
     mSessionRole  = role;
+    mKeystore     = &keystore;
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CryptoContext::InitFromKeyPair(const Crypto::P256Keypair & local_keypair,
+CHIP_ERROR CryptoContext::InitFromKeyPair(SessionKeystore & keystore, const Crypto::P256Keypair & local_keypair,
                                           const Crypto::P256PublicKey & remote_public_key, const ByteSpan & salt,
                                           SessionInfoType infoType, SessionRole role)
 {
@@ -129,7 +122,7 @@ CHIP_ERROR CryptoContext::InitFromKeyPair(const Crypto::P256Keypair & local_keyp
     P256ECDHDerivedSecret secret;
     ReturnErrorOnFailure(local_keypair.ECDH_derive_secret(remote_public_key, secret));
 
-    return InitFromSecret(ByteSpan(secret, secret.Length()), salt, infoType, role);
+    return InitFromSecret(keystore, secret.Span(), salt, infoType, role);
 }
 
 CHIP_ERROR CryptoContext::BuildNonce(NonceView nonce, uint8_t securityFlags, uint32_t messageCounter, NodeId nodeId)
@@ -144,6 +137,16 @@ CHIP_ERROR CryptoContext::BuildNonce(NonceView nonce, uint8_t securityFlags, uin
     bbuf.Put64(nodeId);
 #endif
 
+    return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+}
+
+CHIP_ERROR CryptoContext::BuildPrivacyNonce(NonceView nonce, uint16_t sessionId, const MessageAuthenticationCode & mac)
+{
+    const uint8_t * micFragment = &mac.GetTag()[kPrivacyNonceMicFragmentOffset];
+    Encoding::BigEndian::BufferWriter bbuf(nonce.data(), nonce.size());
+
+    bbuf.Put16(sessionId);
+    bbuf.Put(micFragment, kPrivacyNonceMicFragmentLength);
     return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
@@ -187,23 +190,13 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
         MutableByteSpan ciphertext(output, input_length);
         MutableByteSpan mic(tag, taglen);
 
-        ReturnErrorOnFailure(mKeyContext->EncryptMessage(plaintext, ByteSpan(AAD, aadLen), nonce, mic, ciphertext));
+        ReturnErrorOnFailure(mKeyContext->MessageEncrypt(plaintext, ByteSpan(AAD, aadLen), nonce, mic, ciphertext));
     }
     else
     {
         VerifyOrReturnError(mKeyAvailable, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
-        KeyUsage usage = kR2IKey;
-
-        // Message is encrypted before sending. If the secure session was created by session
-        // initiator, we'll use I2R key to encrypt the message that's being transmitted.
-        // Otherwise, we'll use R2I key, as the responder is sending the message.
-        if (mSessionRole == SessionRole::kInitiator)
-        {
-            usage = kI2RKey;
-        }
-
-        ReturnErrorOnFailure(AES_CCM_encrypt(input, input_length, AAD, aadLen, mKeys[usage], Crypto::kAES_CCM128_Key_Length,
-                                             nonce.data(), nonce.size(), output, tag, taglen));
+        ReturnErrorOnFailure(
+            AES_CCM_encrypt(input, input_length, AAD, aadLen, mEncryptionKey, nonce.data(), nonce.size(), output, tag, taglen));
     }
 
     mac.SetTag(&header, tag, taglen);
@@ -231,26 +224,52 @@ CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, ui
         MutableByteSpan plaintext(output, input_length);
         ByteSpan mic(tag, taglen);
 
-        CHIP_ERROR err = mKeyContext->DecryptMessage(ciphertext, ByteSpan(AAD, aadLen), nonce, mic, plaintext);
+        CHIP_ERROR err = mKeyContext->MessageDecrypt(ciphertext, ByteSpan(AAD, aadLen), nonce, mic, plaintext);
         ReturnErrorOnFailure(err);
     }
     else
     {
         VerifyOrReturnError(mKeyAvailable, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
-        KeyUsage usage = kI2RKey;
-
-        // Message is decrypted on receive. If the secure session was created by session
-        // initiator, we'll use R2I key to decrypt the message (as it was sent by responder).
-        // Otherwise, we'll use I2R key, as the responder is sending the message.
-        if (mSessionRole == SessionRole::kInitiator)
-        {
-            usage = kR2IKey;
-        }
-
-        ReturnErrorOnFailure(AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKeys[usage],
-                                             Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output));
+        ReturnErrorOnFailure(
+            AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mDecryptionKey, nonce.data(), nonce.size(), output));
     }
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CryptoContext::PrivacyEncrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+                                         MessageAuthenticationCode & mac) const
+{
+    VerifyOrReturnError(input != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(input_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(output != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Confirm group key is available. Privacy obfuscation is not supported on unicast session keys.
+    VerifyOrReturnError(mKeyContext != nullptr, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
+
+    ByteSpan plaintext(input, input_length);
+    MutableByteSpan privacytext(output, input_length);
+    CryptoContext::NonceStorage privacyNonce;
+    CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac);
+
+    return mKeyContext->PrivacyEncrypt(plaintext, privacyNonce, privacytext);
+}
+
+CHIP_ERROR CryptoContext::PrivacyDecrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
+                                         const MessageAuthenticationCode & mac) const
+{
+    VerifyOrReturnError(input != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(input_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(output != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Confirm group key is available. Privacy obfuscation is not supported on session keys.
+    VerifyOrReturnError(mKeyContext != nullptr, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
+
+    const ByteSpan privacytext(input, input_length);
+    MutableByteSpan plaintext(output, input_length);
+    CryptoContext::NonceStorage privacyNonce;
+    CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac);
+
+    return mKeyContext->PrivacyDecrypt(privacytext, privacyNonce, plaintext);
 }
 
 } // namespace chip

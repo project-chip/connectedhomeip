@@ -24,18 +24,19 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
+
+#include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
 using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR CommandPathIB::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    int tagPresenceMask = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     PRETTY_PRINT("CommandPathIB =");
     PRETTY_PRINT("{");
@@ -53,9 +54,6 @@ CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
         switch (tagNum)
         {
         case to_underlying(Tag::kEndpointId):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEndpointId))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kEndpointId));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
@@ -67,9 +65,6 @@ CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kClusterId):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kClusterId))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kClusterId));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
@@ -80,15 +75,12 @@ CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kCommandId):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kCommandId))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kCommandId));
             VerifyOrReturnError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
                 chip::CommandId commandId;
                 ReturnErrorOnFailure(reader.Get(commandId));
-                PRETTY_PRINT("\tCommandId = 0x%x,", commandId);
+                PRETTY_PRINT("\tCommandId = 0x%" PRIx32 ",", commandId);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -102,15 +94,12 @@ CHIP_ERROR CommandPathIB::Parser::CheckSchemaValidity() const
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // check for required fields:
-        const uint16_t requiredFields = (1 << to_underlying(Tag::kCommandId)) | (1 << to_underlying(Tag::kClusterId));
-
-        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_COMMAND_PATH_IB;
+        err = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 CHIP_ERROR CommandPathIB::Parser::GetEndpointId(chip::EndpointId * const apEndpointID) const
 {
@@ -127,12 +116,30 @@ CHIP_ERROR CommandPathIB::Parser::GetCommandId(chip::CommandId * const apCommand
     return GetUnsignedInteger(to_underlying(Tag::kCommandId), apCommandId);
 }
 
+CHIP_ERROR CommandPathIB::Parser::GetConcreteCommandPath(ConcreteCommandPath & aCommandPath) const
+{
+    ReturnErrorOnFailure(GetGroupCommandPath(&aCommandPath.mClusterId, &aCommandPath.mCommandId));
+
+    return GetEndpointId(&aCommandPath.mEndpointId);
+}
+
+CHIP_ERROR CommandPathIB::Parser::GetGroupCommandPath(ClusterId * apClusterId, CommandId * apCommandId) const
+{
+    ReturnErrorOnFailure(GetClusterId(apClusterId));
+    VerifyOrReturnError(IsValidClusterId(*apClusterId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+    ReturnErrorOnFailure(GetCommandId(apCommandId));
+    VerifyOrReturnError(IsValidCommandId(*apCommandId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+    return CHIP_NO_ERROR;
+}
+
 CommandPathIB::Builder & CommandPathIB::Builder::EndpointId(const chip::EndpointId aEndpointId)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kEndpointId)), aEndpointId);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kEndpointId), aEndpointId);
     }
     return *this;
 }
@@ -142,7 +149,7 @@ CommandPathIB::Builder & CommandPathIB::Builder::ClusterId(const chip::ClusterId
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kClusterId)), aClusterId);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kClusterId), aClusterId);
     }
     return *this;
 }
@@ -152,15 +159,15 @@ CommandPathIB::Builder & CommandPathIB::Builder::CommandId(const chip::CommandId
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kCommandId)), aCommandId);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kCommandId), aCommandId);
     }
     return *this;
 }
 
-CommandPathIB::Builder & CommandPathIB::Builder::EndOfCommandPathIB()
+CHIP_ERROR CommandPathIB::Builder::EndOfCommandPathIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 
 CHIP_ERROR CommandPathIB::Builder::Encode(const CommandPathParams & aCommandPathParams)
@@ -170,17 +177,15 @@ CHIP_ERROR CommandPathIB::Builder::Encode(const CommandPathParams & aCommandPath
         EndpointId(aCommandPathParams.mEndpointId);
     }
 
-    ClusterId(aCommandPathParams.mClusterId).CommandId(aCommandPathParams.mCommandId).EndOfCommandPathIB();
-    return GetError();
+    return ClusterId(aCommandPathParams.mClusterId).CommandId(aCommandPathParams.mCommandId).EndOfCommandPathIB();
 }
 
 CHIP_ERROR CommandPathIB::Builder::Encode(const ConcreteCommandPath & aConcreteCommandPath)
 {
-    EndpointId(aConcreteCommandPath.mEndpointId)
+    return EndpointId(aConcreteCommandPath.mEndpointId)
         .ClusterId(aConcreteCommandPath.mClusterId)
         .CommandId(aConcreteCommandPath.mCommandId)
         .EndOfCommandPathIB();
-    return GetError();
 }
 
 }; // namespace app

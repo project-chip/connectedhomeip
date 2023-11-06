@@ -66,6 +66,7 @@ private:
 
     static void ThreadStart();
     void StartTimer(uint32_t aTimeoutInMs);
+    static void InitServer(intptr_t arg);
 
     enum Function_t
     {

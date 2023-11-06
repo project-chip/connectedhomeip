@@ -26,7 +26,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
@@ -51,6 +51,7 @@ public:
 
     // Implement SessionDelegate
     NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }
+    void OnSessionReleased() override;
 
     Optional<uint16_t> GetLocalSessionId() const
     {
@@ -142,7 +143,10 @@ protected:
 
         Protocols::SecureChannel::StatusReport statusReport(generalCode, Protocols::SecureChannel::Id, protocolCode);
 
-        Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(statusReport.Size()));
+        auto handle = System::PacketBufferHandle::New(statusReport.Size());
+        VerifyOrReturn(!handle.IsNull(), ChipLogError(SecureChannel, "Failed to allocate status report message"));
+        Encoding::LittleEndian::PacketBufferWriter bbuf(std::move(handle));
+
         statusReport.WriteToBuffer(bbuf);
 
         System::PacketBufferHandle msg = bbuf.Finalize();
@@ -158,21 +162,40 @@ protected:
     CHIP_ERROR HandleStatusReport(System::PacketBufferHandle && msg, bool successExpected)
     {
         Protocols::SecureChannel::StatusReport report;
-        CHIP_ERROR err = report.Parse(std::move(msg));
-        ReturnErrorOnFailure(err);
+        ReturnErrorOnFailure(report.Parse(std::move(msg)));
         VerifyOrReturnError(report.GetProtocolId() == Protocols::SecureChannel::Id, CHIP_ERROR_INVALID_ARGUMENT);
 
         if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kSuccess &&
             report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeSuccess && successExpected)
         {
             OnSuccessStatusReport();
-        }
-        else
-        {
-            err = OnFailureStatusReport(report.GetGeneralCode(), report.GetProtocolCode());
+            return CHIP_NO_ERROR;
         }
 
-        return err;
+        if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kBusy &&
+            report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeBusy)
+        {
+            if (!report.GetProtocolData().IsNull())
+            {
+                Encoding::LittleEndian::Reader reader(report.GetProtocolData()->Start(), report.GetProtocolData()->DataLength());
+
+                uint16_t minimumWaitTime = 0;
+                CHIP_ERROR waitTimeErr   = reader.Read16(&minimumWaitTime).StatusCode();
+                if (waitTimeErr != CHIP_NO_ERROR)
+                {
+                    ChipLogError(SecureChannel, "Failed to read the minimum wait time: %" CHIP_ERROR_FORMAT, waitTimeErr.Format());
+                }
+                else
+                {
+                    // TODO: CASE: Notify minimum wait time to clients on receiving busy status report #28290
+                    ChipLogProgress(SecureChannel, "Received busy status report with minimum wait time: %u ms", minimumWaitTime);
+                }
+            }
+        }
+
+        // It's very important that we propagate the return value from
+        // OnFailureStatusReport out to the caller.  Make sure we return it directly.
+        return OnFailureStatusReport(report.GetGeneralCode(), report.GetProtocolCode());
     }
 
     /**
@@ -191,6 +214,12 @@ protected:
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     void Clear();
+
+    /**
+     * Notify our delegate about a session establishment error, if we have not
+     * notified it of an error or success before.
+     */
+    void NotifySessionEstablishmentError(CHIP_ERROR error);
 
 protected:
     CryptoContext::SessionRole mRole;

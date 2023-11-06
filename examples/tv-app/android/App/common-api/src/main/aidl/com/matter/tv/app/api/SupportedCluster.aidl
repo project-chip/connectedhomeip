@@ -5,8 +5,9 @@ parcelable SupportedCluster {
 
     int clusterIdentifier;
 
-    String[] features;
+    int features;
 
     int[] optionalCommandIdentifiers;
 
+    int[] optionalAttributesIdentifiers;
 }

@@ -1,0 +1,208 @@
+From: Chanho Park <chanho61.park@samsung.com>
+Date: Tue, 3 Jun 2014 19:54:53 +0900
+Subject: [PATCH] LOCAL / smack: add permissive mode for debugging purpose
+
+This patch adds smack permissive mode.
+
+Signed-off-by: Chanho Park <chanho61.park@samsung.com>
+Signed-off-by: Seung-Woo Kim <sw0312.kim@samsung.com>
+[k.kozlowski: rebased on 4.1]
+Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+[m.szyprowski: rebased on 5.4]
+Signed-off-by: Marek Szyprowski <m.szyprowski@samsung.com>
+---
+ security/smack/Kconfig        |  8 ++++
+ security/smack/smack.h        |  9 +++++
+ security/smack/smack_access.c | 12 ++++++
+ security/smack/smack_lsm.c    | 11 ++++++
+ security/smack/smackfs.c      | 72 +++++++++++++++++++++++++++++++++++
+ 5 files changed, 112 insertions(+)
+
+diff --git a/security/smack/Kconfig b/security/smack/Kconfig
+index 5a8dfad469c3..39ded0b9bf38 100644
+--- a/security/smack/Kconfig
++++ b/security/smack/Kconfig
+@@ -53,3 +53,11 @@ config SECURITY_SMACK_APPEND_SIGNALS
+ 	  to differentiate between delivering a network packet and
+ 	  delivering a signal in the Smack rules.
+ 	  If you are unsure how to answer this question, answer N.
++
++config SECURITY_SMACK_PERMISSIVE_MODE
++	bool "Enable Permissive mode for debugging purpose"
++	depends on SECURITY_SMACK
++	help
++	  This selects the permissive mode of smack for debug purpose. This
++	  do not block any access of the smack policy and just warn the block
++	  by log message.
+diff --git a/security/smack/smack.h b/security/smack/smack.h
+index 335d2411abe4..9e8000c283cc 100644
+--- a/security/smack/smack.h
++++ b/security/smack/smack.h
+@@ -424,6 +424,15 @@ static inline struct smack_known *smk_of_current(void)
+ 	return smk_of_task(smack_cred(current_cred()));
+ }
+ 
++#ifdef CONFIG_SECURITY_SMACK_PERMISSIVE_MODE
++/*
++ * permissive mode
++ */
++#define SMACK_PERMISSIVE_DENIED 0x0
++#define SMACK_PERMISSIVE_ALLOWED 0x1
++extern int permissive_mode;
++#endif
++
+ /*
+  * logging functions
+  */
+diff --git a/security/smack/smack_access.c b/security/smack/smack_access.c
+index 38ac3da4e791..2b63a2643ef5 100644
+--- a/security/smack/smack_access.c
++++ b/security/smack/smack_access.c
+@@ -45,6 +45,14 @@ LIST_HEAD(smack_known_list);
+  */
+ static u32 smack_next_secid = 10;
+ 
++/*
++ * are we running in permissive mode?
++ * can be overwritten at run-time by /smack/permissive
++ */
++#ifdef CONFIG_SECURITY_SMACK_PERMISSIVE_MODE
++int permissive_mode = SMACK_PERMISSIVE_ALLOWED;
++#endif
++
+ /*
+  * what events do we log
+  * can be overwritten at run-time by /smack/logging
+@@ -200,6 +208,10 @@ int smk_access(struct smack_known *subject, struct smack_known *object,
+ 		smack_log(subject->smk_known, object->smk_known,
+ 			  request, rc, a);
+ #endif
++#ifdef CONFIG_SECURITY_SMACK_PERMISSIVE_MODE
++	if (permissive_mode == SMACK_PERMISSIVE_ALLOWED)
++		return 0;
++#endif
+ 
+ 	return rc;
+ }
+diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
+index 12c0fa85d9f8..a8d2f81690e4 100644
+--- a/security/smack/smack_lsm.c
++++ b/security/smack/smack_lsm.c
+@@ -4796,6 +4796,17 @@ static __init int smack_init(void)
+ 	return 0;
+ }
+ 
++#ifdef CONFIG_SECURITY_SMACK_PERMISSIVE_MODE
++static int __init mode_setup(char *str)
++{
++	unsigned long mode;
++	if (!kstrtoul(str, 10, &mode))
++		permissive_mode = mode ? 1 : 0;
++	return 1;
++}
++__setup("permissive=", mode_setup);
++#endif
++
+ /*
+  * Smack requires early initialization in order to label
+  * all processes and objects when they are created.
+diff --git a/security/smack/smackfs.c b/security/smack/smackfs.c
+index c21b656b3263..fc033626085f 100644
+--- a/security/smack/smackfs.c
++++ b/security/smack/smackfs.c
+@@ -59,6 +59,9 @@ enum smk_inos {
+ 	SMK_NET6ADDR	= 23,	/* single label IPv6 hosts */
+ #endif /* CONFIG_IPV6 */
+ 	SMK_RELABEL_SELF = 24, /* relabel possible without CAP_MAC_ADMIN */
++#ifdef CONFIG_SECURITY_SMACK_PERMISSIVE_MODE
++	SMK_PERMISSIVE	= 25,	/* permissive mode */
++#endif
+ };
+ 
+ /*
+@@ -677,6 +680,71 @@ static const struct file_operations smk_load_ops = {
+ 	.release        = seq_release,
+ };
+ 
++#ifdef CONFIG_SECURITY_SMACK_PERMISSIVE_MODE
++/**
++ * smk_read_permissive - read() for /smack/permissive
++ * @filp: file pointer, not actually used
++ * @buf: where to put the result
++ * @cn: maximum to send along
++ * @ppos: where to start
++ *
++ * Returns number of bytes read or error code, as appropriate
++ */
++static ssize_t smk_read_permissive(struct file *filp, char __user *buf,
++				size_t count, loff_t *ppos)
++{
++	char temp[32];
++	ssize_t rc;
++
++	if (*ppos != 0)
++		return 0;
++
++	sprintf(temp, "%d\n", permissive_mode);
++	rc = simple_read_from_buffer(buf, count, ppos, temp, strlen(temp));
++	return rc;
++}
++
++/**
++ * smk_write_permissive - write() for /smack/permissive
++ * @file: file pointer, not actually used
++ * @buf: where to get the data from
++ * @count: bytes sent
++ * @ppos: where to start
++ *
++ * Returns number of bytes written or error code, as appropriate
++ */
++static ssize_t smk_write_permissive(struct file *file, const char __user *buf,
++				size_t count, loff_t *ppos)
++{
++	char temp[32];
++	int i;
++
++	if (!capable(CAP_MAC_ADMIN))
++		return -EPERM;
++
++	if (count >= sizeof(temp) || count == 0)
++		return -EINVAL;
++
++	if (copy_from_user(temp, buf, count) != 0)
++		return -EFAULT;
++
++	temp[count] = '\0';
++
++	if (sscanf(temp, "%d", &i) != 1)
++		return -EINVAL;
++	if (i < 0 || i > 1)
++		return -EINVAL;
++	permissive_mode = i;
++	return count;
++}
++
++static const struct file_operations smk_permissive_ops = {
++	.read		= smk_read_permissive,
++	.write		= smk_write_permissive,
++	.llseek		= default_llseek,
++};
++#endif	/* End of CONFIG_SECURITY_SMACK_PERMISSIVE_MODE */
++
+ /**
+  * smk_cipso_doi - initialize the CIPSO domain
+  */
+@@ -2881,6 +2949,10 @@ static int smk_fill_super(struct super_block *sb, struct fs_context *fc)
+ 		[SMK_UNCONFINED] = {
+ 			"unconfined", &smk_unconfined_ops, S_IRUGO|S_IWUSR},
+ #endif
++#ifdef CONFIG_SECURITY_SMACK_PERMISSIVE_MODE
++		[SMK_PERMISSIVE] = {
++			"permissive", &smk_permissive_ops, S_IRUGO|S_IWUSR},
++#endif
+ #if IS_ENABLED(CONFIG_IPV6)
+ 		[SMK_NET6ADDR] = {
+ 			"ipv6host", &smk_net6addr_ops, S_IRUGO|S_IWUSR},
+-- 
+2.17.1
+

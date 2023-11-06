@@ -1,0 +1,173 @@
+# # Copyright (c) 2023 Project CHIP Authors
+# #
+# # Licensed under the Apache License, Version 2.0 (the "License");
+# # you may not use this file except in compliance with the License.
+# # You may obtain a copy of the License at
+# #
+# # http://www.apache.org/licenses/LICENSE-2.0
+# #
+# # Unless required by applicable law or agreed to in writing, software
+# # distributed under the License is distributed on an "AS IS" BASIS,
+# # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# # See the License for the specific language governing permissions and
+# # limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/stm32_sdk.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${stm32_sdk_build_root}/stm32_executable.gni")
+import("${stm32_sdk_build_root}/stm32_sdk.gni")
+
+assert(current_os == "freertos")
+
+stm32_project_dir = "${chip_root}/examples/lighting-app/stm32"
+examples_plat_dir = "${chip_root}/examples/platform/stm32"
+stm32_board_src = "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK"
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = false
+
+  # PIN code for PASE session establishment.
+  setupPinCode = 20202021
+  setupDiscriminator = 3840
+
+  # Monitor & log memory usage at runtime.
+  enable_heap_monitoring = false
+
+  # Enable Sleepy end device
+  enable_sleepy_device = false
+
+  # OTA timeout in seconds
+  OTA_periodic_query_timeout = 86400
+}
+
+# Sanity check
+assert(!(chip_enable_wifi && chip_enable_openthread))
+
+# ThunderBoards and Explorer Kit
+if (stm32_board == "STM32WB5MM-DK") {
+  chip_enable_openthread = true
+}
+
+stm32_sdk("sdk") {
+  if (stm32_board == "STM32WB5MM-DK") {
+    sources = [
+      "${examples_plat_dir}/config_files/STM32WB5/FreeRTOSConfig.h",
+      "${examples_plat_dir}/config_files/STM32WB5/matter_config.h",
+      "${stm32_project_dir}/include/STM32WB5/CHIPProjectConfig.h",
+    ]
+  }
+
+  include_dirs = [
+    "${chip_root}/src/platform/stm32",
+    "${examples_plat_dir}",
+    "${chip_root}/src/lib",
+  ]
+
+  if (stm32_board == "STM32WB5MM-DK") {
+    include_dirs += [
+      "${stm32_project_dir}/include/STM32WB5",
+      "${examples_plat_dir}/config_files/STM32WB5",
+      "${chip_root}/src/include",
+    ]
+  }
+
+  defines = [
+    "BOARD_ID=${stm32_board}",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
+    "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
+    "STM32STORE_MAX_KEY_SIZE=75",
+  ]
+}
+
+stm32_executable("lighting_app") {
+  if (stm32_board == "STM32WB5MM-DK") {
+    output_name = "chip-stm32-lighting-example.elf"
+    include_dirs = [
+      "${chip_root}/examples/platform/stm32/config_files/STM32WB5/",
+      "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/Inc",
+      "${chip_root}/src/include/",
+    ]
+    defines = []
+
+    sources = [
+      "${stm32_board_src}/STM32_WPAN/App/app_ble.c",
+      "${stm32_board_src}/STM32_WPAN/App/app_matter.c",
+      "${stm32_board_src}/STM32_WPAN/App/app_thread.c",
+      "${stm32_board_src}/STM32_WPAN/App/custom_stm.c",
+      "${stm32_board_src}/Src/app_entry.cpp",
+      "${stm32_board_src}/Src/main.cpp",
+      "src/STM32WB5/AppTask.cpp",
+      "src/STM32WB5/LightingManager.cpp",
+      "src/STM32WB5/ZclCallbacks.cpp",
+    ]
+  }
+
+  # Add the startup file to the target
+  sources += [ "${examples_plat_dir}/startup_files/startup_${stm32_mcu}.s" ]
+
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  defines += [
+    "DEBUG",
+    "USE_HAL_DRIVER",
+  ]
+
+  # OpenThread Settings
+  if (chip_enable_openthread) {
+    deps += [
+      "${chip_root}/third_party/openthread:openthread",
+      "${chip_root}/third_party/openthread:openthread-platform",
+    ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    defines += [ "STM32_OTA_ENABLED" ]
+    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
+  }
+
+  ldscript = "${examples_plat_dir}/ldscripts/${stm32_mcu}_FLASH.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+
+    # other linker flags ...
+    "-static",
+    "-Wl,--cref",
+    "-Wl,--start-group",
+    "-lc",
+    "-lm",
+    "-lstdc++",
+    "-lsupc++",
+    "-Wl,--no-warn-rwx-segments",
+    "-Wl,--end-group",
+  ]
+  if (chip_print_memory_usage) {
+    ldflags += [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+
+  output_dir = root_out_dir
+}
+group("stm32") {
+  deps = [ ":lighting_app" ]
+}
+
+group("default") {
+  deps = [ ":stm32" ]
+}

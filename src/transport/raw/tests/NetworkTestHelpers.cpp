@@ -19,9 +19,9 @@
 
 #include <inet/tests/TestInetCommon.h>
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
@@ -30,10 +30,9 @@ namespace Test {
 CHIP_ERROR IOContext::Init()
 {
     CHIP_ERROR err = Platform::MemoryInit();
-    chip::DeviceLayer::SetConfigurationMgr(&chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
+    chip::DeviceLayer::SetConfigurationMgr(&chip::DeviceLayer::ConfigurationMgrImpl());
 
-    gSystemLayer.Init();
-
+    InitSystemLayer();
     InitNetwork();
 
     mSystemLayer        = &gSystemLayer;

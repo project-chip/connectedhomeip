@@ -26,7 +26,7 @@
 
 #include "common.h"
 #include <lib/core/CHIPCore.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 
@@ -35,8 +35,9 @@ chip::SessionManager gSessionManager;
 chip::Messaging::ExchangeManager gExchangeManager;
 chip::secure_channel::MessageCounterManager gMessageCounterManager;
 chip::TestPersistentStorageDelegate gStorage;
+chip::Crypto::DefaultSessionKeystore gSessionKeystore;
 
-void InitializeChip(void)
+void InitializeChip()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -62,7 +63,7 @@ exit:
     }
 }
 
-void ShutdownChip(void)
+void ShutdownChip()
 {
     gMessageCounterManager.Shutdown();
     gExchangeManager.Shutdown();

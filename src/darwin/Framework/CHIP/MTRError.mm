@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#import <Matter/MTRDefines.h>
+
 #import "MTRError.h"
 #import "MTRError_Internal.h"
 
@@ -24,12 +26,15 @@
 #import <inet/InetError.h>
 #import <lib/support/TypeTraits.h>
 
+#import <objc/runtime.h>
+
 NSString * const MTRErrorDomain = @"MTRErrorDomain";
 
 NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
 // Class for holding on to a CHIP_ERROR that we can use as the value
 // in a dictionary.
+MTR_HIDDEN
 @interface MTRErrorHolder : NSObject
 @property (nonatomic, readonly) CHIP_ERROR error;
 
@@ -46,6 +51,8 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
     if (errorCode == CHIP_NO_ERROR) {
         return nil;
     }
+
+    ChipLogError(Controller, "Creating NSError from %" CHIP_ERROR_FORMAT, errorCode.Format());
 
     if (errorCode.IsIMStatus()) {
         chip::app::StatusIB status(errorCode);
@@ -77,6 +84,20 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
     } else if (errorCode == CHIP_ERROR_TIMEOUT) {
         code = MTRErrorCodeTimeout;
         [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Transaction timed out.", nil) }];
+    } else if (errorCode == CHIP_ERROR_BUFFER_TOO_SMALL) {
+        code = MTRErrorCodeBufferTooSmall;
+        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A buffer is too small.", nil) }];
+    } else if (errorCode == CHIP_ERROR_FABRIC_EXISTS) {
+        code = MTRErrorCodeFabricExists;
+        [userInfo addEntriesFromDictionary:@{
+            NSLocalizedDescriptionKey : NSLocalizedString(@"The device is already a member of this fabric.", nil)
+        }];
+    } else if (errorCode == CHIP_ERROR_DECODE_FAILED) {
+        code = MTRErrorCodeTLVDecodeFailed;
+        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"TLV decoding failed.", nil) }];
+    } else if (errorCode == CHIP_ERROR_DNS_SD_UNAUTHORIZED) {
+        code = MTRErrorCodeDNSSDUnauthorized;
+        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Access denied to perform DNS-SD lookups.  Check that \"_matter._tcp\" and/or \"_matterc._udp\" are listed under the NSBonjourServices key in Info.plist", nil) }];
     } else {
         code = MTRErrorCodeGeneralError;
         [userInfo addEntriesFromDictionary:@{
@@ -86,10 +107,10 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
         }];
     }
 
-    userInfo[@"underlyingError"] = [[MTRErrorHolder alloc] initWithError:errorCode];
-
-    return [NSError errorWithDomain:MTRErrorDomain code:code userInfo:userInfo];
-    ;
+    auto * error = [NSError errorWithDomain:MTRErrorDomain code:code userInfo:userInfo];
+    void * key = (__bridge void *) [MTRErrorHolder class];
+    objc_setAssociatedObject(error, key, [[MTRErrorHolder alloc] initWithError:errorCode], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    return error;
 }
 
 + (NSError *)errorForIMStatus:(const chip::app::StatusIB &)status
@@ -211,6 +232,11 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
     return [NSError errorWithDomain:MTRInteractionErrorDomain code:chip::to_underlying(status.mStatus) userInfo:userInfo];
 }
 
++ (NSError *)errorForIMStatusCode:(chip::Protocols::InteractionModel::Status)status
+{
+    return [self errorForIMStatus:chip::app::StatusIB(status)];
+}
+
 + (CHIP_ERROR)errorToCHIPErrorCode:(NSError * _Nullable)error
 {
     if (error == nil) {
@@ -226,11 +252,13 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
     }
 
     if (error.domain != MTRErrorDomain) {
+        ChipLogError(Controller, "Trying to convert non-Matter error %@ to a Matter error code", error);
         return CHIP_ERROR_INTERNAL;
     }
 
-    if (error.userInfo != nil) {
-        id underlyingError = error.userInfo[@"underlyingError"];
+    {
+        void * key = (__bridge void *) [MTRErrorHolder class];
+        id underlyingError = objc_getAssociatedObject(error, key);
         if (underlyingError != nil && [underlyingError isKindOfClass:[MTRErrorHolder class]]) {
             return ((MTRErrorHolder *) underlyingError).error;
         }
@@ -258,6 +286,18 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
         break;
     case MTRErrorCodeTimeout:
         code = CHIP_ERROR_TIMEOUT.AsInteger();
+        break;
+    case MTRErrorCodeBufferTooSmall:
+        code = CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger();
+        break;
+    case MTRErrorCodeFabricExists:
+        code = CHIP_ERROR_FABRIC_EXISTS.AsInteger();
+        break;
+    case MTRErrorCodeTLVDecodeFailed:
+        code = CHIP_ERROR_DECODE_FAILED.AsInteger();
+        break;
+    case MTRErrorCodeDNSSDUnauthorized:
+        code = CHIP_ERROR_DNS_SD_UNAUTHORIZED.AsInteger();
         break;
     case MTRErrorCodeGeneralError: {
         if (error.userInfo != nil && error.userInfo[@"errorCode"] != nil) {

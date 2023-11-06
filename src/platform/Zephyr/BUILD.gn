@@ -24,6 +24,8 @@ assert(chip_device_platform == "zephyr")
 static_library("Zephyr") {
   sources = [
     "../SingletonConfigurationManager.cpp",
+    "BLEAdvertisingArbiter.cpp",
+    "BLEAdvertisingArbiter.h",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
@@ -34,8 +36,6 @@ static_library("Zephyr") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
@@ -52,6 +52,7 @@ static_library("Zephyr") {
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
 
   if (chip_enable_openthread) {
     sources += [
@@ -61,8 +62,12 @@ static_library("Zephyr") {
     ]
 
     if (chip_mdns == "platform") {
-      sources += [ "../OpenThread/DnssdImpl.cpp" ]
-      deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
+      sources += [
+        "../OpenThread/DnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.h",
+      ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }
 
@@ -76,4 +81,6 @@ static_library("Zephyr") {
   if (chip_malloc_sys_heap) {
     sources += [ "SysHeapMalloc.cpp" ]
   }
+
+  cflags = [ "-Wconversion" ]
 }

@@ -1,0 +1,214 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 26.1.2. [TC-SC-5.2] Receiving a group message - TH to DUT
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
+config:
+    nodeId: 0x12344321
+    cluster: "Groups"
+    endpoint: 0
+
+    # Users should set endpoint value on the command line to PIXIT.G.ENDPOINT
+    Groups.Endpoint: 1
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read the commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeId
+
+    - label: "Step 1: TH adds ACL Operate privileges for Group 0x0103"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [commissionerNodeId],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 4,
+                      AuthMode: 3,
+                      Subjects: [0x0103],
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Step 2: TH sends KeySetWrite command with TH key"
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a3,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: 18446744073709551613,
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 18446744073709551614,
+                    }
+
+    - label: "Step 3: TH binds GroupId to GroupKeySet"
+      cluster: "Group Key Management"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a3 },
+              ]
+
+    - label:
+          "Step 4: TH sends RemoveAllGroups command to the DUT on
+          PIXIT.G.ENDPOINT"
+      endpoint: Groups.Endpoint
+      command: "RemoveAllGroups"
+
+    - label: "Step 5: TH sends AddGroup command to the DUT on PIXIT.G.ENDPOINT"
+      endpoint: Groups.Endpoint
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0103
+              - name: GroupName
+                value: "Test Group 0103"
+      response:
+          values:
+              - name: Status
+                value: 0
+              - name: GroupID
+                value: 0x0103
+
+    - label:
+          "Step 6: TH sends AddGroup command again but using group messaging
+          (0x0103)"
+      groupId: 0x0103
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0101
+              - name: GroupName
+                value: "Test Group 0101"
+
+    # Give the group AddGroup time to actually happen; unicast delivery can outrace
+    # multicast if the unicast packet is sent immediately after the multicast one.
+    - label: "Wait for AddGroup"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Verify there is no response from DUT"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: "!PICS_SDK_CI_ONLY"
+      arguments:
+          values:
+              - name: "message"
+                value: "Verify that there is no response from DUT"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 7: TH sends ViewGroup command on Endpoint PIXIT.G.ENDPOINT "
+      PICS: G.S.F00
+      endpoint: Groups.Endpoint
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0101
+      response:
+          values:
+              - name: Status
+                value: 0
+              - name: GroupID
+                value: 0x0101
+              - name: GroupName
+                value: "Test Group 0101"
+
+    - label: "Step 8: TH sends ViewGroup command on Endpoint PIXIT.G.ENDPOINT "
+      PICS: "!(G.S.F00)"
+      endpoint: Groups.Endpoint
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0101
+      response:
+          values:
+              - name: Status
+                value: 0
+              - name: GroupID
+                value: 0x0101
+              - name: GroupName
+                value: ""
+
+    - label: "Step 9: TH removes the GroupKeySet"
+      cluster: "Group Key Management"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: GroupKeySetID
+                value: 0x01a3
+
+    - label:
+          "Step 10: TH cleans up groups using RemoveAllGroups command to the DUT
+          on PIXIT.G.ENDPOINT"
+      endpoint: Groups.Endpoint
+      command: "RemoveAllGroups"
+
+    - label: "Step 11: TH removes ACL Operate privileges for Group 0x0103"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [commissionerNodeId],
+                      Targets: null,
+                  },
+              ]

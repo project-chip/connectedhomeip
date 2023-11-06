@@ -34,11 +34,9 @@ static void TestByteSpan(nlTestSuite * inSuite, void * inContext)
     uint8_t arr[] = { 1, 2, 3 };
 
     ByteSpan s0 = ByteSpan();
-    NL_TEST_ASSERT(inSuite, s0.data() == nullptr);
     NL_TEST_ASSERT(inSuite, s0.size() == 0);
     NL_TEST_ASSERT(inSuite, s0.empty());
     NL_TEST_ASSERT(inSuite, s0.data_equal(s0));
-    NL_TEST_ASSERT(inSuite, IsSpanUsable(s0) == false);
 
     ByteSpan s1(arr, 2);
     NL_TEST_ASSERT(inSuite, s1.data() == arr);
@@ -46,7 +44,6 @@ static void TestByteSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !s1.empty());
     NL_TEST_ASSERT(inSuite, s1.data_equal(s1));
     NL_TEST_ASSERT(inSuite, !s1.data_equal(s0));
-    NL_TEST_ASSERT(inSuite, IsSpanUsable(s1) == true);
 
     ByteSpan s2(arr);
     NL_TEST_ASSERT(inSuite, s2.data() == arr);
@@ -55,7 +52,11 @@ static void TestByteSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !s2.empty());
     NL_TEST_ASSERT(inSuite, s2.data_equal(s2));
     NL_TEST_ASSERT(inSuite, !s2.data_equal(s1));
-    NL_TEST_ASSERT(inSuite, IsSpanUsable(s2) == true);
+    NL_TEST_ASSERT(inSuite, s2.front() == 1);
+    NL_TEST_ASSERT(inSuite, s2.back() == 3);
+    NL_TEST_ASSERT(inSuite, s2[0] == 1);
+    NL_TEST_ASSERT(inSuite, s2[1] == 2);
+    NL_TEST_ASSERT(inSuite, s2[2] == 3);
 
     ByteSpan s3 = s2;
     NL_TEST_ASSERT(inSuite, s3.data() == arr);
@@ -63,7 +64,6 @@ static void TestByteSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, s3.data()[2] == 3);
     NL_TEST_ASSERT(inSuite, !s3.empty());
     NL_TEST_ASSERT(inSuite, s3.data_equal(s2));
-    NL_TEST_ASSERT(inSuite, IsSpanUsable(s3) == true);
 
     uint8_t arr2[] = { 3, 2, 1 };
     ByteSpan s4(arr2);
@@ -88,11 +88,9 @@ static void TestMutableByteSpan(nlTestSuite * inSuite, void * inContext)
     uint8_t arr[] = { 1, 2, 3 };
 
     MutableByteSpan s0 = MutableByteSpan();
-    NL_TEST_ASSERT(inSuite, s0.data() == nullptr);
     NL_TEST_ASSERT(inSuite, s0.size() == 0);
     NL_TEST_ASSERT(inSuite, s0.empty());
     NL_TEST_ASSERT(inSuite, s0.data_equal(s0));
-    NL_TEST_ASSERT(inSuite, IsSpanUsable(s0) == false);
 
     MutableByteSpan s1(arr, 2);
     NL_TEST_ASSERT(inSuite, s1.data() == arr);
@@ -100,7 +98,6 @@ static void TestMutableByteSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !s1.empty());
     NL_TEST_ASSERT(inSuite, s1.data_equal(s1));
     NL_TEST_ASSERT(inSuite, !s1.data_equal(s0));
-    NL_TEST_ASSERT(inSuite, IsSpanUsable(s1) == true);
 
     MutableByteSpan s2(arr);
     NL_TEST_ASSERT(inSuite, s2.data() == arr);
@@ -156,31 +153,33 @@ static void TestFixedByteSpan(nlTestSuite * inSuite, void * inContext)
     uint8_t arr[] = { 1, 2, 3 };
 
     FixedByteSpan<3> s0 = FixedByteSpan<3>();
-    NL_TEST_ASSERT(inSuite, s0.data() == nullptr);
+    NL_TEST_ASSERT(inSuite, s0.data() != nullptr);
     NL_TEST_ASSERT(inSuite, s0.size() == 3);
-    NL_TEST_ASSERT(inSuite, s0.empty());
     NL_TEST_ASSERT(inSuite, s0.data_equal(s0));
-    NL_TEST_ASSERT(inSuite, IsSpanUsable(s0) == false);
+    NL_TEST_ASSERT(inSuite, s0[0] == 0);
+    NL_TEST_ASSERT(inSuite, s0[1] == 0);
+    NL_TEST_ASSERT(inSuite, s0[2] == 0);
 
     FixedByteSpan<2> s1(arr);
     NL_TEST_ASSERT(inSuite, s1.data() == arr);
     NL_TEST_ASSERT(inSuite, s1.size() == 2);
-    NL_TEST_ASSERT(inSuite, !s1.empty());
     NL_TEST_ASSERT(inSuite, s1.data_equal(s1));
-    NL_TEST_ASSERT(inSuite, IsSpanUsable(s1) == true);
 
     FixedByteSpan<3> s2(arr);
     NL_TEST_ASSERT(inSuite, s2.data() == arr);
     NL_TEST_ASSERT(inSuite, s2.size() == 3);
     NL_TEST_ASSERT(inSuite, s2.data()[2] == 3);
-    NL_TEST_ASSERT(inSuite, !s2.empty());
     NL_TEST_ASSERT(inSuite, s2.data_equal(s2));
+    NL_TEST_ASSERT(inSuite, s2.front() == 1);
+    NL_TEST_ASSERT(inSuite, s2.back() == 3);
+    NL_TEST_ASSERT(inSuite, s2[0] == 1);
+    NL_TEST_ASSERT(inSuite, s2[1] == 2);
+    NL_TEST_ASSERT(inSuite, s2[2] == 3);
 
     FixedByteSpan<3> s3 = s2;
     NL_TEST_ASSERT(inSuite, s3.data() == arr);
     NL_TEST_ASSERT(inSuite, s3.size() == 3);
     NL_TEST_ASSERT(inSuite, s3.data()[2] == 3);
-    NL_TEST_ASSERT(inSuite, !s3.empty());
     NL_TEST_ASSERT(inSuite, s3.data_equal(s2));
 
     uint8_t arr2[] = { 3, 2, 1 };
@@ -292,16 +291,59 @@ static void TestFromCharString(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, s1.data_equal(CharSpan(str, 3)));
 }
 
+static void TestLiteral(nlTestSuite * inSuite, void * inContext)
+{
+    constexpr CharSpan literal = "HI!"_span;
+    NL_TEST_ASSERT(inSuite, literal.size() == 3);
+    NL_TEST_ASSERT(inSuite, literal.data_equal(CharSpan::fromCharString("HI!")));
+    NL_TEST_ASSERT(inSuite, ""_span.size() == 0);
+}
+
+static void TestConversionConstructors(nlTestSuite * inSuite, void * inContext)
+{
+    struct Foo
+    {
+        int member = 0;
+    };
+    struct Bar : public Foo
+    {
+    };
+
+    Bar objects[2];
+
+    // Check that various things here compile.
+    Span<Foo> span1(objects);
+    Span<Foo> span2(&objects[0], 1);
+    FixedSpan<Foo, 2> span3(objects);
+    FixedSpan<Foo, 1> span4(objects);
+
+    Span<Bar> testSpan1(objects);
+    FixedSpan<Bar, 2> testSpan2(objects);
+
+    Span<Foo> span5(testSpan1);
+    Span<Foo> span6(testSpan2);
+
+    FixedSpan<Foo, 2> span7(testSpan2);
+}
+
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestByteSpan),       NL_TEST_DEF_FN(TestMutableByteSpan),
-                                 NL_TEST_DEF_FN(TestFixedByteSpan),  NL_TEST_DEF_FN(TestSpanOfPointers),
-                                 NL_TEST_DEF_FN(TestSubSpan),        NL_TEST_DEF_FN(TestFromZclString),
-                                 NL_TEST_DEF_FN(TestFromCharString), NL_TEST_SENTINEL() };
+static const nlTest sTests[] = {
+    NL_TEST_DEF_FN(TestByteSpan),
+    NL_TEST_DEF_FN(TestMutableByteSpan),
+    NL_TEST_DEF_FN(TestFixedByteSpan),
+    NL_TEST_DEF_FN(TestSpanOfPointers),
+    NL_TEST_DEF_FN(TestSubSpan),
+    NL_TEST_DEF_FN(TestFromZclString),
+    NL_TEST_DEF_FN(TestFromCharString),
+    NL_TEST_DEF_FN(TestLiteral),
+    NL_TEST_DEF_FN(TestConversionConstructors),
+    NL_TEST_SENTINEL(),
+};
 
-int TestSpan(void)
+int TestSpan()
 {
     nlTestSuite theSuite = { "CHIP Span tests", &sTests[0], nullptr, nullptr };
 

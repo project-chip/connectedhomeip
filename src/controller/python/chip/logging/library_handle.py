@@ -14,8 +14,9 @@
 #    limitations under the License.
 #
 
-import chip.native
 import ctypes
+
+import chip.native
 from chip.logging.types import LogRedirectCallback_t
 
 

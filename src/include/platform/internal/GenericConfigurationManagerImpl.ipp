@@ -26,6 +26,7 @@
 #ifndef GENERIC_CONFIGURATION_MANAGER_IMPL_CPP
 #define GENERIC_CONFIGURATION_MANAGER_IMPL_CPP
 
+#include <FirmwareBuildTime.h>
 #include <ble/CHIPBleServiceData.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/RandUtils.h>
@@ -35,6 +36,7 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/BuildTime.h>
 #include <platform/CommissionableDataProvider.h>
@@ -182,7 +184,10 @@ CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pSal
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
 
     ReturnErrorOnFailure(err);
-    size_t saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
+
+    VerifyOrReturnError(chip::CanCastTo<uint32_t>(saltB64Len), CHIP_ERROR_INTERNAL);
+
+    size_t saltLen = chip::Base64Decode32(saltB64, static_cast<uint32_t>(saltB64Len), reinterpret_cast<uint8_t *>(saltB64));
 
     ReturnErrorCodeIf(saltLen > saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(saltBuf.data(), saltB64, saltLen);
@@ -216,7 +221,11 @@ CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pVer
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
 
     ReturnErrorOnFailure(err);
-    verifierLen = chip::Base64Decode32(verifierB64, verifierB64Len, reinterpret_cast<uint8_t *>(verifierB64));
+
+    VerifyOrReturnError(chip::CanCastTo<uint32_t>(verifierB64Len), CHIP_ERROR_INTERNAL);
+    verifierLen =
+        chip::Base64Decode32(verifierB64, static_cast<uint32_t>(verifierB64Len), reinterpret_cast<uint8_t *>(verifierB64));
+
     ReturnErrorCodeIf(verifierLen > verifierBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(verifierBuf.data(), verifierB64, verifierLen);
     verifierBuf.reduce_size(verifierLen);
@@ -282,6 +291,12 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildChipEpo
         chipEpochTime = sFirmwareBuildChipEpochTime.Value();
         return CHIP_NO_ERROR;
     }
+#ifdef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME_MATTER_EPOCH_S
+    {
+        chipEpochTime = chip::System::Clock::Seconds32(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME_MATTER_EPOCH_S);
+        return CHIP_NO_ERROR;
+    }
+#endif
     // Else, attempt to read the hard-coded values.
     VerifyOrReturnError(!BUILD_DATE_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(!BUILD_TIME_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME), CHIP_ERROR_INTERNAL);
@@ -415,7 +430,22 @@ void GenericConfigurationManagerImpl<ImplClass>::NotifyOfAdvertisementStart()
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRegulatoryLocation(uint8_t & location)
 {
-    return GetLocationCapability(location);
+    uint32_t value;
+    if (CHIP_NO_ERROR != ReadConfigValue(ConfigClass::kConfigKey_RegulatoryLocation, value))
+    {
+        ReturnErrorOnFailure(GetLocationCapability(location));
+
+        if (CHIP_NO_ERROR != StoreRegulatoryLocation(location))
+        {
+            ChipLogError(DeviceLayer, "Failed to store RegulatoryLocation");
+        }
+    }
+    else
+    {
+        location = static_cast<uint8_t>(value);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 template <class ConfigClass>
@@ -474,24 +504,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreBootReason(uint32_t 
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPartNumber(char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductURL(char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductLabel(char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetUniqueId(char * buf, size_t bufSize)
 {
     CHIP_ERROR err;
@@ -536,8 +548,19 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::IncrementLifetimeCounte
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetRotatingDeviceIdUniqueId(const ByteSpan & uniqueIdSpan)
 {
-    ReturnErrorCodeIf(uniqueIdSpan.size() != kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(mRotatingDeviceIdUniqueId, uniqueIdSpan.data(), kRotatingDeviceIDUniqueIDLength);
+    ReturnErrorCodeIf(uniqueIdSpan.size() < kMinRotatingDeviceIDUniqueIDLength, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(uniqueIdSpan.size() > CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(mRotatingDeviceIdUniqueId, uniqueIdSpan.data(), uniqueIdSpan.size());
+    mRotatingDeviceIdUniqueIdLength = uniqueIdSpan.size();
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
+{
+    ReturnErrorCodeIf(mRotatingDeviceIdUniqueIdLength > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(uniqueIdSpan.data(), mRotatingDeviceIdUniqueId, mRotatingDeviceIdUniqueIdLength);
+    uniqueIdSpan.reduce_size(mRotatingDeviceIdUniqueIdLength);
     return CHIP_NO_ERROR;
 }
 
@@ -640,15 +663,14 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingInst
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_CONFIG_TEST
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::RunUnitTests()
+void GenericConfigurationManagerImpl<ConfigClass>::RunUnitTests()
 {
-#if !defined(NDEBUG)
     ChipLogProgress(DeviceLayer, "Running configuration unit test");
     RunConfigUnitTest();
-#endif
-    return CHIP_NO_ERROR;
 }
+#endif
 
 template <class ConfigClass>
 void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
@@ -681,6 +703,19 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
             productId = 0;
         }
         ChipLogProgress(DeviceLayer, "  Product Id: %u (0x%X)", productId, productId);
+    }
+
+    {
+        char productName[ConfigurationManager::kMaxProductNameLength + 1];
+        err = deviceInstanceInfoProvider->GetProductName(productName, sizeof(productName));
+        if (CHIP_NO_ERROR == err)
+        {
+            ChipLogProgress(DeviceLayer, "  Product Name: %s", productName);
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "  Product Name: n/a (%" CHIP_ERROR_FORMAT ")", err.Format());
+        }
     }
 
     {

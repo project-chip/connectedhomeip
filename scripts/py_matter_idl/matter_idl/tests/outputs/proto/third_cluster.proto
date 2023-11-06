@@ -1,0 +1,54 @@
+
+/// AUTO-GENERATED with matter_idl.
+
+syntax = "proto3";
+
+package com.matter.example.proto;
+
+option java_multiple_files = true;
+
+message ThirdCluster {
+  // option (message_type) = MATTER_TRAIT;
+
+  enum ClusterId {
+    CLUSTER_ID_UNSUPPORTED = 0;
+    CLUSTER_ID = 3;
+  }
+
+  // Enums
+  enum MyEnum {
+    ME_UNKNOWN = 0;
+    ME_KNOWN = 100;
+  }
+
+
+  // Bitmaps
+  enum LevelControlOptions {
+    LCO_UNSUPPORTED = 0;
+    LCO_EXECUTE_IF_OFF = 1;
+    LCO_COUPLE_COLOR_TEMP_TO_LEVEL = 2;
+  }
+
+
+  // Attributes
+  /** MyEnum Type: 6 IsList: 0 FieldId: 10 */
+  MyEnum some_enum = 3145738;
+    /*
+    [(attribute) = {
+      is_writable : true,
+      is_subscribable: true,
+    }];
+    */
+
+
+  /** LevelControlOptions Type: 1 IsList: 0 FieldId: 20 */
+  uint32 options = 524308;
+    /*
+    [(attribute) = {
+      is_writable : true,
+      is_subscribable: true,
+    }];
+    */
+
+
+} // ThirdCluster

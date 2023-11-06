@@ -28,12 +28,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR AttributeReportIBs::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR AttributeReportIBs::Parser::PrettyPrint() const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
@@ -51,7 +51,7 @@ CHIP_ERROR AttributeReportIBs::Parser::CheckSchemaValidity() const
             AttributeReportIB::Parser AttributeReport;
             ReturnErrorOnFailure(AttributeReport.Init(reader));
             PRETTY_PRINT_INCDEPTH();
-            ReturnErrorOnFailure(AttributeReport.CheckSchemaValidity());
+            ReturnErrorOnFailure(AttributeReport.PrettyPrint());
             PRETTY_PRINT_DECDEPTH();
         }
     }
@@ -67,7 +67,7 @@ CHIP_ERROR AttributeReportIBs::Parser::CheckSchemaValidity() const
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 AttributeReportIB::Builder & AttributeReportIBs::Builder::CreateAttributeReport()
 {
@@ -78,10 +78,10 @@ AttributeReportIB::Builder & AttributeReportIBs::Builder::CreateAttributeReport(
     return mAttributeReport;
 }
 
-AttributeReportIBs::Builder & AttributeReportIBs::Builder::EndOfAttributeReportIBs()
+CHIP_ERROR AttributeReportIBs::Builder::EndOfAttributeReportIBs()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 
 CHIP_ERROR AttributeReportIBs::Builder::EncodeAttributeStatus(const ConcreteReadAttributePath & aPath, const StatusIB & aStatus)
@@ -103,8 +103,8 @@ CHIP_ERROR AttributeReportIBs::Builder::EncodeAttributeStatus(const ConcreteRead
     statusIBBuilder.EncodeStatusIB(aStatus);
     ReturnErrorOnFailure(statusIBBuilder.GetError());
 
-    ReturnErrorOnFailure(attributeStatusIBBuilder.EndOfAttributeStatusIB().GetError());
-    return attributeReport.EndOfAttributeReportIB().GetError();
+    ReturnErrorOnFailure(attributeStatusIBBuilder.EndOfAttributeStatusIB());
+    return attributeReport.EndOfAttributeReportIB();
 }
 
 } // namespace app

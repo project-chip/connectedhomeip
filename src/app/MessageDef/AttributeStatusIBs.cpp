@@ -25,7 +25,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 namespace chip {
 namespace app {
@@ -38,17 +38,16 @@ AttributeStatusIB::Builder & AttributeStatusIBs::Builder::CreateAttributeStatus(
     return mAttributeStatus;
 }
 
-AttributeStatusIBs::Builder & AttributeStatusIBs::Builder::EndOfAttributeStatuses()
+CHIP_ERROR AttributeStatusIBs::Builder::EndOfAttributeStatuses()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR AttributeStatusIBs::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR AttributeStatusIBs::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err            = CHIP_NO_ERROR;
-    size_t NumAttributeStatus = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("AttributeStatusIBs =");
@@ -65,11 +64,9 @@ CHIP_ERROR AttributeStatusIBs::Parser::CheckSchemaValidity() const
             ReturnErrorOnFailure(status.Init(reader));
 
             PRETTY_PRINT_INCDEPTH();
-            ReturnErrorOnFailure(status.CheckSchemaValidity());
+            ReturnErrorOnFailure(status.PrettyPrint());
             PRETTY_PRINT_DECDEPTH();
         }
-
-        ++NumAttributeStatus;
     }
 
     PRETTY_PRINT("],");
@@ -82,6 +79,6 @@ CHIP_ERROR AttributeStatusIBs::Parser::CheckSchemaValidity() const
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
-#endif
-}; // namespace app
-}; // namespace chip
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
+};     // namespace app
+};     // namespace chip

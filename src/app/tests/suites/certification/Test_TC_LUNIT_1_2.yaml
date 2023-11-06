@@ -11,69 +11,105 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 105.1.2. [TC-LUNIT-1.2] Global Attributes [DUT as Server]
+name: 108.1.2. [TC-LUNIT-1.2] Global Attributes [DUT as Server]
+
+PICS:
+    - LUNIT.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Unit Localization"
     endpoint: 0
 
 tests:
-    - label: "TH reads from the DUT the (0xFFFD) ClusterRevision attribute"
-      verification: |
-          Verify in TH log
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-          ./chip-tool unitlocalization read  cluster-revision 1 0
-          [1651186310867] [11123:114108] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFFD DataVersion: 486381485
-          [1651186310867] [11123:114108] CHIP: [TOO]   ClusterRevision: 1
-      disabled: true
+    - label: "Step 2: TH reads the ClusterRevision from DUT"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
 
-    - label: "TH reads from the DUT the (0xFFFC) FeatureMap attribute"
-      verification: |
-          Verify in TH log
+    - label: "Step 3: TH reads the FeatureMap from DUT"
+      PICS: " !LUNIT.S.F00 "
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
 
-          ./chip-tool unitlocalization read  feature-map 1 0
-          [1651186357789] [11140:114768] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFFC DataVersion: 486381485
-          [1651186357789] [11140:114768] CHIP: [TOO]   FeatureMap: 1
-      disabled: true
+    - label:
+          "Step 3: Given LUNIT.S.F00(TEMP) ensure featuremap has the correct bit
+          set"
+      PICS: LUNIT.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
 
-    - label: "TH reads from the DUT the (0xFFFB) AttributeList attribute"
-      verification: |
-          Verify in TH log
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65530, 65531, 65532, 65533]
 
-          ./chip-tool unitlocalization read attribute-list 1 0
-          [1652335691.917681][3124:3129] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFFB DataVersion: 3157629909
-          [1652335691.917762][3124:3129] CHIP:TOO:   AttributeList: 6 entries
-          [1652335691.917802][3124:3129] CHIP:TOO:     [1]: 0
-          [1652335691.917834][3124:3129] CHIP:TOO:     [2]: 65528
-          [1652335691.917865][3124:3129] CHIP:TOO:     [3]: 65529
-          [1652335691.917895][3124:3129] CHIP:TOO:     [4]: 65531
-          [1652335691.917924][3124:3129] CHIP:TOO:     [5]: 65532
-          [1652335691.917957][3124:3129] CHIP:TOO:     [6]: 65533
-      disabled: true
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65531, 65532, 65533]
 
-    - label: "TH reads from the DUT the (0xFFFA) EventList attribute"
-      verification: |
-          out of scope for V1.0
-      disabled: true
+    - label:
+          "Step 4b: TH reads Feature dependent(LUNIT.S.F00) attribute in
+          AttributeList"
+      PICS: LUNIT.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
 
-    - label: "TH reads from the DUT the (0xFFF9) AcceptedCommandList attribute"
-      verification: |
-          Verify in TH log
+    - label: "Step 5: TH reads EventList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
 
-          ./chip-tool unitlocalization read accepted-command-list 1 0
+    - label: "Step 6: TH reads AcceptedCommandList from DUT"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
-          [1651186469211] [11184:116328] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFF9 DataVersion: 486381485
-          [1651186469211] [11184:116328] CHIP: [TOO]   AcceptedCommandList: 0 entries
-      disabled: true
+    - label: "Step 7: TH reads GeneratedCommandList from DUT"
 
-    - label: "TH reads from the DUT the (0xFFF8) GeneratedCommandList attribute"
-      verification: |
-          Verify in TH log:
-
-          ./chip-tool unitlocalization read generated-command-list 1 0
-          [1651191485645] [13481:177154] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFF8 DataVersion: 486381492
-          [1651191485646] [13481:177154] CHIP: [TOO]   GeneratedCommandList: 0 entries
-      disabled: true
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

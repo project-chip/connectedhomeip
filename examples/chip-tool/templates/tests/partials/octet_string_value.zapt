@@ -1,0 +1,5 @@
+{{#if (isHexString value)}}
+  chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringFromHexString value}}{{extraGarbage}}"), {{octetStringLengthFromHexString value}})
+{{else}}
+  chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringEscapedForCLiteral value}}{{extraGarbage}}"), {{value.length}})
+{{/if}}

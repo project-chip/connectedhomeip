@@ -59,6 +59,7 @@ static_library("webos") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
+    "../GLibTypeDeleter.h",
     "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
@@ -78,12 +79,8 @@ static_library("webos") {
     "ConnectivityManagerImpl.h",
     "ConnectivityUtils.cpp",
     "ConnectivityUtils.h",
-    "DeviceInfoProviderImpl.cpp",
-    "DeviceInfoProviderImpl.h",
     "DeviceInstanceInfoProviderImpl.cpp",
     "DeviceInstanceInfoProviderImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
@@ -103,7 +100,10 @@ static_library("webos") {
     "SystemTimeSupport.cpp",
   ]
 
-  deps = [ "${chip_root}/src/setup_payload" ]
+  deps = [
+    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/setup_payload",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
@@ -130,7 +130,6 @@ static_library("webos") {
 
   if (chip_enable_openthread) {
     sources += [
-      "GlibTypeDeleter.h",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]

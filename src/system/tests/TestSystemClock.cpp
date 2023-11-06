@@ -21,8 +21,8 @@
 
 #include <system/SystemConfig.h>
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
@@ -115,10 +115,10 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestSystemClock(void)
+int TestSystemClock()
 {
     nlTestSuite theSuite = {
-        "chip-timesource", &sTests[0], nullptr /* setup */, nullptr /* teardown */
+        "chip-systemclock", &sTests[0], nullptr /* setup */, nullptr /* teardown */
     };
 
     // Run test suit againt one context.

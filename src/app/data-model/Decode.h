@@ -23,8 +23,8 @@
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
+#include <lib/core/TLV.h>
 #include <protocols/interaction_model/Constants.h>
 
 namespace chip {
@@ -170,7 +170,7 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x)
 
     // We have a value; decode it.
     ReturnErrorOnFailure(Decode(reader, x.SetNonNull()));
-    if (!x.HasValidValue())
+    if (!x.ExistingValueInEncodableRange())
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }

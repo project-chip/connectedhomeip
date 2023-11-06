@@ -135,8 +135,8 @@ CHIP_ERROR ESP32FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
 
-    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(messageToSign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!outSignBuffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!messageToSign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     uint8_t privKeyBuf[kDACPrivateKeySize];
@@ -189,6 +189,26 @@ CHIP_ERROR ESP32FactoryDataProvider::GetProductId(uint16_t & productId)
     return err;
 }
 
+CHIP_ERROR ESP32FactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
+{
+    CHIP_ERROR err = ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_ProductURL, buf, bufSize, bufSize);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
+{
+    CHIP_ERROR err = ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_ProductLabel, buf, bufSize, bufSize);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
+}
+
 CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
 {
     size_t hardwareVersionStringLen = 0; // without counting null-terminator
@@ -198,16 +218,37 @@ CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersionString(char * buf, size_t
 CHIP_ERROR ESP32FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
     ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
-#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
     static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
                   "Length of unique ID for rotating device ID is smaller than minimum.");
 
     size_t uniqueIdLen = 0;
-    err = ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_UniqueId, uniqueIdSpan.data(), uniqueIdSpan.size(), uniqueIdLen);
+    err = ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_RotatingDevIdUniqueId, uniqueIdSpan.data(), uniqueIdSpan.size(),
+                                          uniqueIdLen);
     ReturnErrorOnFailure(err);
     uniqueIdSpan.reduce_size(uniqueIdLen);
 #endif
     return err;
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
+{
+    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetSerialNumber(buf, bufSize);
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
+{
+    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetManufacturingDate(year, month, day);
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
+{
+    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetHardwareVersion(hardwareVersion);
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
+{
+    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetPartNumber(buf, bufSize);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 

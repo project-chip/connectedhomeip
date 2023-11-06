@@ -58,51 +58,60 @@ for define in "${defines[@]}"; do
     esac
     target_defines+=,\"${define//\"/\\\"}\"
 done
+[[ $CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES == YES ]] && {
+    target_defines+=,\"CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES=1\"
+}
 target_defines=[${target_defines:1}]
 
+declare target_arch=
 declare target_cpu=
-case $PLATFORM_PREFERRED_ARCH in
-    i386)
-        target_cpu=x86
-        ;;
-    x86_64)
-        target_cpu=x64
-        ;;
-    armv7)
-        target_cpu=arm
-        ;;
-    arm64)
-        target_cpu=arm64
-        ;;
-    *)
-        echo >&2
-        ;;
-esac
-
-declare target_cflags='"-target","'"$PLATFORM_PREFERRED_ARCH"'-'"$LLVM_TARGET_TRIPLE_VENDOR"'-'"$LLVM_TARGET_TRIPLE_OS_VERSION"'"'
+declare target_cflags=
+declare current_arch="$(uname -m)"
 
 read -r -a archs <<<"$ARCHS"
-
 for arch in "${archs[@]}"; do
-    target_cflags+=',"-arch","'"$arch"'"'
+    if [ -z "$target_arch" ] || [ "$arch" = "$current_arch" ]; then
+        target_arch="$arch"
+        case "$arch" in
+            x86_64) target_cpu="x64" ;;
+            *) target_cpu="$arch" ;;
+        esac
+    fi
+    if [ -n "$target_cflags" ]; then
+        target_cflags+=','
+    fi
+    target_cflags+='"-arch","'"$arch"'"'
 done
 
 [[ $ENABLE_BITCODE == YES ]] && {
-    target_cflags+=',"-flto"'
+    if [ -n "$target_cflags" ]; then
+        target_cflags+=','
+    fi
+    target_cflags+='"-flto"'
 }
 
 declare -a args=(
     'default_configs_cosmetic=[]' # suppress colorization
-    'chip_crypto="mbedtls"'
+    'chip_crypto="boringssl"'
+    'chip_build_controller_dynamic_server=true'
     'chip_build_tools=false'
     'chip_build_tests=false'
+    'chip_enable_wifi=false'
+    'chip_enable_python_modules=false'
+    'chip_log_message_max_size=4096' # might as well allow nice long log messages
     'chip_disable_platform_kvs=true'
-    'target_cpu="'"$target_cpu"'"'
-    'target_defines='"$target_defines"
-    'target_cflags=['"$target_cflags"']'
+    'enable_fuzz_test_targets=false'
+    "target_cpu=\"$target_cpu\""
+    "target_defines=$target_defines"
+    "target_cflags=[$target_cflags]"
+    "mac_target_arch=\"$target_arch\""
+    "mac_deployment_target=\"$LLVM_TARGET_TRIPLE_OS_VERSION$LLVM_TARGET_TRIPLE_SUFFIX\""
 )
 
-[[ $CONFIGURATION != Debug* ]] && args+='is_debug=true'
+case "$CONFIGURATION" in
+    Debug) args+=('is_debug=true') ;;
+    Release) args+=('is_debug=false') ;;
+esac
 
 [[ $PLATFORM_FAMILY_NAME != macOS ]] && {
     args+=(
@@ -114,6 +123,51 @@ declare -a args=(
 [[ $PLATFORM_FAMILY_NAME == macOS ]] && {
     args+=(
         'target_os="mac"'
+    )
+}
+
+[[ $CHIP_INET_CONFIG_ENABLE_IPV4 == NO ]] && {
+    args+=(
+        'chip_inet_config_enable_ipv4=false'
+    )
+}
+
+[[ $CHIP_IS_ASAN == YES ]] && {
+    args+=(
+        'is_asan=true'
+    )
+}
+
+[[ $CHIP_IS_UBSAN == YES ]] && {
+    args+=(
+        'is_ubsan=true'
+    )
+}
+
+[[ $CHIP_IS_TSAN == YES ]] && {
+    args+=(
+        'is_tsan=true'
+        # The system stats stuff races on the stats in various ways,
+        # so just disable it when using TSan.
+        'chip_system_config_provide_statistics=false'
+    )
+}
+
+[[ $CHIP_IS_CLANG == YES ]] && {
+    args+=(
+        'is_clang=true'
+    )
+}
+
+[[ $CHIP_IS_BLE == NO ]] && {
+    args+=(
+        'chip_config_network_layer_ble=false'
+    )
+}
+
+[[ $CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES == YES ]] && {
+    args+=(
+        'enable_encoding_sentinel_enum_values=true'
     )
 }
 
@@ -135,7 +189,7 @@ find_in_ancestors() {
 }
 
 # actual build stuff
-(
+{
     cd "$CHIP_ROOT" # pushd and popd because we need the env vars from activate
 
     if ENV=$(find_in_ancestors chip_xcode_build_connector_env.sh 2>/dev/null); then
@@ -156,7 +210,7 @@ find_in_ancestors() {
     # put build intermediates in TEMP_DIR
     cd "$TEMP_DIR"
 
-    # gnerate and build
+    # generate and build
     gn --root="$CHIP_ROOT" gen --check out --args="${args[*]}"
-    ninja -v -C out
-)
+    exec ninja -v -C out
+}

@@ -1,0 +1,13 @@
+# Minimal requirements for building stand-alone CHIP applications.
+#
+# The list of Python packages required to perform a minimal CHIP
+# application build should be kept as small as possible. Ideally,
+# core build scripts should depend only on the standard library.
+
+# scripts/build
+click
+
+# scripts/py_matter_idl/matter_idl
+jinja2
+lark
+stringcase

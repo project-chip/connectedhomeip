@@ -6,10 +6,8 @@ state and device states and LEDs to show the state of these changes. This
 example is inherited from the "lock-app" example but modified to simulate a pump
 device and can be used as a reference for creating your own pump application.
 
-<p align="center">
-  <img src="../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
-  <img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
-</p>
+<img src="../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
+<img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK"/>
 
 The example is based on
 [Matter](https://github.com/project-chip/connectedhomeip) and Nordic
@@ -22,27 +20,6 @@ device works as a Thread Minimal End Device.
 
 <hr>
 
--   [Overview](#overview)
-    -   [Bluetooth LE advertising](#bluetooth-le-advertising)
-    -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
-    -   [Device Firmware Upgrade](#device-firmware-upgrade)
--   [Requirements](#requirements)
-    -   [Supported devices](#supported_devices)
--   [Device UI](#device-ui)
--   [Setting up the environment](#setting-up-the-environment)
-    -   [Using Docker container for setup](#using-docker-container-for-setup)
-    -   [Using native shell for setup](#using-native-shell-for-setup)
--   [Building](#building)
--   [Configuring the example](#configuring-the-example)
-    -   [Example build types](#example-build-types)
--   [Flashing and debugging](#flashing-and-debugging)
--   [Testing the example](#testing-the-example)
-    -   [Testing using CHIPTool](#testing-using-chiptool)
-
-<hr>
-
-<a name="overview"></a>
-
 ## Overview
 
 This example is running on the nRF Connect platform, which is based on Nordic
@@ -53,18 +30,18 @@ and [Zephyr RTOS](https://zephyrproject.org/). Visit Matter's
 to read more about the platform structure and dependencies.
 
 The Matter device that runs the pump application is controlled by the Matter
-controller device over the Thread protocol. By default, the Matter device has
-Thread disabled, and it should be paired with Matter controller and get
-configuration from it. Some actions required before establishing full
-communication are described below.
+controller device over the Thread protocol. By default, the Matter accessory
+device has IPv6 networking disabled. You must pair it with the Matter controller
+over Bluetooth® LE to get the configuration from the controller to use the
+device within a Thread or Wi-Fi network. You have to make the device
+discoverable manually (for security reasons). See
+[Bluetooth LE advertising](#bluetooth-le-advertising) to learn how to do this.
+The controller must get the commissioning information from the Matter accessory
+device and provision the device into the network.
 
-The example also comes with a test mode, which allows to start Thread with the
-default settings by pressing button manually. However, this mode does not
-guarantee that the device will be able to communicate with the Matter controller
-and other devices.
-
-The example can be configured to use the secure bootloader and utilize it for
-performing over-the-air Device Firmware Upgrade using Bluetooth LE.
+You can test this application remotely over the Thread or the Wi-Fi protocol,
+which in either case requires more devices, including a Matter controller that
+you can configure either on a PC or a mobile device.
 
 ### Bluetooth LE advertising
 
@@ -150,28 +127,22 @@ section to learn how to change MCUboot and flash configuration in this example.
 
 <hr>
 
-<a name="requirements"></a>
-
 ## Requirements
 
 The application requires a specific revision of the nRF Connect SDK to work
 correctly. See [Setting up the environment](#setting-up-the-environment) for
 more information.
 
-<a name="supported_devices"></a>
-
 ### Supported devices
 
 The example supports building and running on the following devices:
 
-| Hardware platform                                                                         | Build target               | Platform image                                                                                                                                      |
-| ----------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840-DK_top-view-small.jpg" alt="nRF52840 DK"/></details> |
-| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340-DK_top-view-small.jpg" alt="nRF5340 DK"/></details>    |
+| Hardware platform                                                                         | Build target               | Platform image                                                                                                                                   |
+| ----------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
+| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
 
 <hr>
-
-<a name="device-ui"></a>
 
 ## Device UI
 
@@ -191,8 +162,8 @@ following states are possible:
     Bluetooth LE.
 
 -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
-    provisioned, but does not yet have full Thread network or service
-    connectivity.
+    provisioned, but does not yet have full connectivity for Thread or Wi-Fi
+    network.
 
 -   _Solid On_ &mdash; The device is fully provisioned and has full Thread
     network and service connectivity.
@@ -219,9 +190,6 @@ following states are possible:
 
 **Button 2** &mdash; Pressing the button once changes the pump state to the
 opposite one.
-
-**Button 3** &mdash; Pressing the button once starts the Thread networking in
-the test mode using the default configuration.
 
 **Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
 enables Bluetooth LE advertising for the predefined period of time (15 minutes
@@ -252,7 +220,7 @@ image that has the tools pre-installed.
 If you are a macOS user, you won't be able to use the Docker container to flash
 the application onto a Nordic development kit due to
 [certain limitations of Docker for macOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container).
-Use the [native shell](#using-native-shell) for building instead.
+Use the [native shell](#using-native-shell-for-setup) for building instead.
 
 ### Using Docker container for setup
 
@@ -334,8 +302,6 @@ To use the native shell for setup, complete the following steps:
 Now you can proceed with the [Building](#building) instruction.
 
 <hr>
-
-<a name="building"></a>
 
 ## Building
 
@@ -428,8 +394,6 @@ example `nrf52840dk_nrf52840`), edit the `pm_static_dfu.yml` file located in the
 
 <hr>
 
-<a name="configuring"></a>
-
 ## Configuring the example
 
 The Zephyr ecosystem is based on Kconfig files and the settings can be modified
@@ -478,8 +442,6 @@ page.
 
 <hr>
 
-<a name="flashing"></a>
-
 ## Flashing and debugging
 
 To flash the application to the device, use the west tool and run the following
@@ -502,10 +464,16 @@ directory:
 Check the [CLI tutorial](../../../docs/guides/nrfconnect_examples_cli.md) to
 learn how to use command-line interface of the application.
 
-### Testing using CHIPTool
+### Testing using Linux CHIPTool
+
+Read the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md) to see
+how to use [CHIP Tool for Linux or mac OS](../../chip-tool/README.md) to
+commission and control the application within a Matter-enabled Thread network.
+
+### Testing using Android CHIPTool
 
 Read the
 [Android commissioning guide](../../../docs/guides/nrfconnect_android_commissioning.md)
-to see how to use [CHIPTool](../../../src/android/CHIPTool/README.md) for
+to see how to use [CHIPTool](../../../examples/android/CHIPTool/README.md) for
 Android smartphones to commission and control the application within a
 Matter-enabled Thread network.

@@ -30,7 +30,7 @@
 #include "common.h"
 
 #include <lib/core/CHIPCore.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/PASESession.h>
@@ -84,16 +84,11 @@ int main(int argc, char * argv[])
     if (useTCP)
     {
         err = gTCPManager.Init(chip::Transport::TcpListenParameters(chip::DeviceLayer::TCPEndPointManager())
-#if INET_CONFIG_ENABLE_IPV4
-                                   .SetAddressType(chip::Inet::IPAddressType::kIPv4)
-#else
-                                   .SetAddressType(chip::Inet::IPAddressType::kIPv6)
-#endif
-        );
+                                   .SetAddressType(chip::Inet::IPAddressType::kIPv6));
         SuccessOrExit(err);
 
         err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager, &gStorage,
-                                   &gFabricTable);
+                                   &gFabricTable, gSessionKeystore);
         SuccessOrExit(err);
     }
     else
@@ -103,7 +98,7 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
 
         err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager, &gStorage,
-                                   &gFabricTable);
+                                   &gFabricTable, gSessionKeystore);
         SuccessOrExit(err);
     }
 

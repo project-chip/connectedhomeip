@@ -36,20 +36,6 @@ menu "Demo"
           bool "Ethernet"
     endchoice
 
-    config USE_ECHO_CLIENT
-        bool "Enable the built-in Echo Client"
-        default "n"
-        help
-            This enables a local FreeRTOS Echo Client so that the end-to-end echo server can be
-            tested easily
-
-    config ECHO_HOST_IP
-        string "IPV4 address"
-        default "127.0.0.1"
-        depends on USE_ECHO_CLIENT
-        help
-            The IPV4 Address of the ECHO Server.
-
     config RENDEZVOUS_MODE
        int
        range 0 8

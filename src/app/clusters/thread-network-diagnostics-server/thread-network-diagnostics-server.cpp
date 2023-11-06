@@ -25,8 +25,8 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPEncoding.h>
-#include <lib/core/CHIPTLVTypes.h>
 #include <lib/core/Optional.h>
+#include <lib/core/TLVTypes.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
@@ -37,6 +37,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ThreadNetworkDiagnostics;
 using namespace chip::app::Clusters::ThreadNetworkDiagnostics::Attributes;
 using namespace chip::DeviceLayer;
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -61,8 +62,8 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aP
 
     switch (aPath.mAttributeId)
     {
-    case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id:
-    case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id:
+    case ThreadNetworkDiagnostics::Attributes::NeighborTable::Id:
+    case ThreadNetworkDiagnostics::Attributes::RouteTable::Id:
     case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
     case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id:
     case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id:
@@ -123,7 +124,7 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aP
     case ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id:
     case ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id:
     case ThreadNetworkDiagnostics::Attributes::Delay::Id:
-    case ThreadNetworkDiagnostics::Attributes::ChannelMask::Id:
+    case ThreadNetworkDiagnostics::Attributes::ChannelPage0Mask::Id:
         return ConnectivityMgr().WriteThreadNetworkDiagnosticAttributeToTlv(aPath.mAttributeId, aEncoder);
     default:
         break;
@@ -139,7 +140,7 @@ bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandl
                                                                const Commands::ResetCounts::DecodableType & commandData)
 {
     ConnectivityMgr().ResetThreadNetworkDiagnosticsCounts();
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }
 

@@ -26,7 +26,8 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      enableASanStackUseAfterReturn = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
@@ -38,15 +39,6 @@
                ReferencedContainer = "container:Matter.xcodeproj">
             </BuildableReference>
             <SkippedTests>
-               <Test
-                  Identifier = "MTRDeviceTests">
-               </Test>
-               <Test
-                  Identifier = "MTRRemoteDeviceSampleTests">
-               </Test>
-               <Test
-                  Identifier = "MTRXPCListenerSampleTests">
-               </Test>
             </SkippedTests>
          </TestableReference>
       </Testables>

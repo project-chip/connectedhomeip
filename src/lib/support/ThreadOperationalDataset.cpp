@@ -52,13 +52,13 @@ public:
         kActiveTimestamp = 14,
     };
 
-    uint8_t GetSize(void) const { return static_cast<uint8_t>(sizeof(*this) + GetLength()); }
+    uint8_t GetSize() const { return static_cast<uint8_t>(sizeof(*this) + GetLength()); }
 
-    uint8_t GetType(void) const { return mType; }
+    uint8_t GetType() const { return mType; }
 
     void SetType(uint8_t aType) { mType = aType; }
 
-    uint8_t GetLength(void) const
+    uint8_t GetLength() const
     {
         assert(mLength != kLengthEscape);
         return mLength;
@@ -70,7 +70,7 @@ public:
         mLength = aLength;
     }
 
-    const void * GetValue(void) const
+    const void * GetValue() const
     {
         assert(mLength != kLengthEscape);
 
@@ -79,7 +79,7 @@ public:
         return reinterpret_cast<const uint8_t *>(this) + sizeof(*this);
     }
 
-    void * GetValue(void) { return const_cast<void *>(const_cast<const ThreadTLV *>(this)->GetValue()); }
+    void * GetValue() { return const_cast<void *>(const_cast<const ThreadTLV *>(this)->GetValue()); }
 
     void Get64(uint64_t & aValue) const
     {
@@ -156,13 +156,13 @@ public:
         memcpy(GetValue(), aValue, aLength);
     }
 
-    const ThreadTLV * GetNext(void) const
+    const ThreadTLV * GetNext() const
     {
         static_assert(alignof(ThreadTLV) == 1, "Wrong alignment for ThreadTLV header");
         return reinterpret_cast<const ThreadTLV *>(static_cast<const uint8_t *>(GetValue()) + GetLength());
     }
 
-    ThreadTLV * GetNext(void) { return reinterpret_cast<ThreadTLV *>(static_cast<uint8_t *>(GetValue()) + GetLength()); }
+    ThreadTLV * GetNext() { return reinterpret_cast<ThreadTLV *>(static_cast<uint8_t *>(GetValue()) + GetLength()); }
 
     static bool IsValid(ByteSpan aData)
     {
@@ -318,7 +318,7 @@ CHIP_ERROR OperationalDataset::SetExtendedPanId(const uint8_t (&aExtendedPanId)[
 
     tlv->SetValue(aExtendedPanId, sizeof(aExtendedPanId));
 
-    assert(mLength + tlv->GetSize() < sizeof(mData));
+    assert(mLength + tlv->GetSize() <= sizeof(mData));
 
     mLength = static_cast<uint8_t>(mLength + tlv->GetSize());
 
@@ -349,7 +349,7 @@ CHIP_ERROR OperationalDataset::SetMasterKey(const uint8_t (&aMasterKey)[kSizeMas
 
     tlv->SetValue(aMasterKey, sizeof(aMasterKey));
 
-    assert(mLength + tlv->GetSize() < sizeof(mData));
+    assert(mLength + tlv->GetSize() <= sizeof(mData));
 
     mLength = static_cast<uint8_t>(mLength + tlv->GetSize());
 
@@ -480,17 +480,17 @@ CHIP_ERROR OperationalDataset::SetPSKc(const uint8_t (&aPSKc)[kSizePSKc])
     return CHIP_NO_ERROR;
 }
 
-void OperationalDataset::UnsetMasterKey(void)
+void OperationalDataset::UnsetMasterKey()
 {
     Remove(ThreadTLV::kMasterKey);
 }
 
-void OperationalDataset::UnsetPSKc(void)
+void OperationalDataset::UnsetPSKc()
 {
     Remove(ThreadTLV::kPSKc);
 }
 
-bool OperationalDataset::IsCommissioned(void) const
+bool OperationalDataset::IsCommissioned() const
 {
     return Has(ThreadTLV::kPanId) && Has(ThreadTLV::kMasterKey) && Has(ThreadTLV::kExtendedPanId) && Has(ThreadTLV::kChannel);
 }

@@ -1,0 +1,89 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/platform/device.gni")
+
+assert(chip_device_platform == "openiotsdk")
+
+declare_args() {
+  # Default value of software version
+  chip_openiotsdk_software_version = "0"
+
+  # Default value of software version in string
+  chip_openiotsdk_software_version_string = "0.0.0"
+}
+
+buildconfig_header("openiotsdk_buildconfig") {
+  header = "OpenIoTSDKConfig.h"
+  header_dir = "ois"
+
+  _chip_openiotsdk_persisted_storage_key_type = "uint64_t"
+
+  defines = [
+    "CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE=${_chip_openiotsdk_persisted_storage_key_type}",
+    "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${chip_openiotsdk_software_version_string}\"",
+    "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_openiotsdk_software_version}",
+  ]
+}
+
+static_library("openiotsdk") {
+  sources = [
+    "../SingletonConfigurationManager.cpp",
+    "BlePlatformConfig.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "CHIPPlatformConfig.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
+    "InetPlatformConfig.h",
+    "KVPsaPsStore.cpp",
+    "KVPsaPsStore.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "Logging.cpp",
+    "Logging.h",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningEthernetDriver.cpp",
+    "OpenIoTSDKArchUtils.c",
+    "OpenIoTSDKArchUtils.h",
+    "OpenIoTSDKPort.h",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "SystemPlatformConfig.h",
+    "SystemTimeSupport.cpp",
+  ]
+
+  public_deps = [
+    ":openiotsdk_buildconfig",
+    "${chip_root}/src/platform:platform_base",
+  ]
+
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+  }
+
+  cflags = [ "-Wconversion" ]
+}

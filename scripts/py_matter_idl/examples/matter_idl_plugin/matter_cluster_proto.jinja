@@ -1,0 +1,94 @@
+
+/// AUTO-GENERATED with matter_idl.
+
+syntax = "proto3";
+
+package {{package}};
+
+option java_multiple_files = true;
+
+message {{cluster.name}}Cluster {
+  // option (message_type) = MATTER_TRAIT;
+
+  enum ClusterId {
+    CLUSTER_ID_UNSUPPORTED = 0;
+    CLUSTER_ID = {{cluster.code}};
+  }
+{%- if cluster.enums %}
+
+  // Enums
+{%-   for entry in cluster.enums %}
+  enum {{entry.name}} {
+    {%- if (entry.entries[0].code != 0) %}
+    {{"unsupported" | toEnumEntryName(entry.name)}} = 0;{% endif -%}
+    {%-  for field in entry.entries %}
+    {{field.name | toEnumEntryName(entry.name)}} = {{field.code}};{%   endfor %}
+  }
+{%   endfor %}{% endif -%}
+{%- if cluster.bitmaps %}
+
+  // Bitmaps
+{%-   for entry in cluster.bitmaps %}
+  enum {{entry.name}} {
+    {{"unsupported" | toEnumEntryName(entry.name)}} = 0;
+    {%-  for field in entry.entries %}
+    {{field.name | toEnumEntryName(entry.name)}} = {{field.code}};{%   endfor %}
+  }
+{%   endfor %}{% endif -%}
+{%- if cluster.structs %}
+
+  // Structs
+{%-   for entry in cluster.structs %}{% if not entry.tag %}
+  message {{entry.name}} {
+    {%-  for field in entry.fields %}
+    {{field | toFieldComment}}
+    {{field | toProtobufFullType}} {{field.name | toLowerSnakeCase}} = {{field | toFieldTag}};{%   endfor %}
+  }
+{% endif %}{%   endfor %}{% endif -%}
+{%- if cluster.attributes %}
+
+  // Attributes
+{%-   for attr in cluster.attributes %}
+  {{attr.definition | toFieldComment}}
+  {{attr.definition.data_type.name | toProtobufType}} {{attr.definition.name | toLowerSnakeCase}} = {{attr.definition | toFieldTag()}};
+    /*
+    [(attribute) = {
+{%- if attr.is_writable %}
+      is_writable : true,{% endif %}
+{%- if attr.is_subscribable %}
+      is_subscribable: true,{% endif %}
+    }];
+    */
+
+{%   endfor %}{% endif -%}
+{%- if cluster.commands %}
+
+  // Commands
+{%-   for cmd in cluster.commands %}
+  message {{cmd.name}}Command {
+    // option (message_type) = MATTER_COMMAND;
+    {% if cmd.input_param %}{%-  for field in cmd | commandArgs(cluster) %}
+    {{field | toFieldComment}}
+    {{field | toProtobufFullType}} {{field.name | toLowerSnakeCase}} = {{field | toFieldTag}};{%   endfor %}{% endif %}
+  }{% if cmd.output_param != "DefaultSuccess" %}
+  
+  message {{cmd.name}}CommandResponse {
+    // option (message_type) = MATTER_COMMAND_RESPONSE;
+    {% if cmd.output_param %}{%-  for field in cmd | commandResponseArgs(cluster) %}
+    {{field | toFieldComment}}
+    {{field | toProtobufFullType}} {{field.name | toLowerSnakeCase}} = {{field | toFieldTag}};{%   endfor %}{% endif %}
+  }{% endif %}
+{%   endfor %}{% endif %}
+
+{%- if cluster.events %}
+  // Events
+{%-   for entry in cluster.events %}
+  message {{entry.name}} {
+    // option (message_type) = MATTER_EVENT;
+    {%  for field in entry.fields %}
+    {{field | toFieldComment}}
+    {{field | toProtobufFullType}} {{field.name | toLowerSnakeCase}} = {{field | toFieldTag}};{%   endfor %}
+  }
+
+{%   endfor %}{% endif %}
+} // {{cluster.name}}Cluster

@@ -13,11 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-from pathlib import Path
-import importlib
-
-from pw_hdlc.rpc import HdlcRpcClient, default_channels
+from pw_hdlc import rpc
 
 
 class PigweedClient:
@@ -32,8 +28,11 @@ class PigweedClient:
         self.device.stop()
         self.last_timeout = self.device.serial.get_timeout()
         self.device.serial.set_timeout(0.01)
-        self._pw_rpc_client = HdlcRpcClient(lambda: self.device.serial.read(4096),
-                                            protos, default_channels(self.device.serial.write))
+        reader = rpc.Serialreader(self.device.serial, 4096)
+        self._pw_rpc_client = rpc.HdlcRpcClient(
+            reader,
+            protos,
+            rpc.default_channels(self.device.serial.write))
         self._rpcs = self._pw_rpc_client.rpcs()
 
     def __del__(self):
@@ -43,3 +42,12 @@ class PigweedClient:
     @property
     def rpcs(self):
         return self._rpcs
+
+    def __enter__(self) -> 'PigweedClient':
+        return self
+
+    def __exit__(self, *exc_info) -> None:
+        self.stop()
+
+    def stop(self) -> None:
+        self._pw_rpc_client.stop()

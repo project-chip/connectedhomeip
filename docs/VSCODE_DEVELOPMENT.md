@@ -21,7 +21,7 @@ Tested on:
 1. _Windows Only_ Install Ubuntu from the Windows App Store here:
    <https://www.microsoft.com/en-us/p/ubuntu-1804-lts/9n9tngvndl3q>
 1. Install [Docker](https://www.docker.com/) for your operating system of choice
-   from here: <https://docs.docker.com/install>
+   from here: <https://docs.docker.com/engine/install>
 1. Install [Visual Studio Code](https://code.visualstudio.com/) for your
    operating system of choice here: <https://code.visualstudio.com/Download>
 1. Install [Git](https://git-scm.com/) if you haven't already
@@ -29,9 +29,9 @@ Tested on:
    `git config --global core.autocrlf false`
 1. Git clone the main Matter repository here:
    <https://github.com/project-chip/connectedhomeip>
-1. Launch Visual Studio Code, and open the cloned folder from
+1. Launch Visual Studio Code, and open the cloned folder from above
 1. Install the
-   [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+   [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
    extension for Visual Studio Code, this extension allows you to use docker
    containers as a development backend.
 1. Once this is installed, you'll be prompted to reload Visual Studio Code, do

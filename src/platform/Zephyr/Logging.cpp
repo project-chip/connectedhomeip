@@ -6,9 +6,9 @@
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 
-#include <kernel.h>
-#include <logging/log.h>
-#include <sys/cbprintf.h>
+#include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/sys/cbprintf.h>
 
 // If CONFIG_LOG_MODE_MINIMAL the timestamp is NOT added automatically by the Zephyr logger
 #ifdef CONFIG_LOG_MODE_MINIMAL
@@ -19,7 +19,8 @@
 #define LOG_MESSAGE(msg) (msg)
 #endif
 
-LOG_MODULE_REGISTER(chip, CONFIG_MATTER_LOG_LEVEL);
+/* Assume using always debug level and rely on Matter logger layer filtering */
+LOG_MODULE_REGISTER(chip, LOG_LEVEL_DBG);
 
 namespace chip {
 namespace DeviceLayer {
@@ -49,7 +50,7 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
     const size_t prefixLen = strlen(formattedMsg);
     vsnprintfcb(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, msg, v);
 
-    const char * allocatedMsg = log_strdup(formattedMsg);
+    const char * allocatedMsg = formattedMsg;
 
     // Invoke the Zephyr logging library to log the message.
     //

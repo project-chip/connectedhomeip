@@ -22,6 +22,7 @@
  */
 
 #include <lib/support/CodeUtils.h>
+#include <platform/LockTracker.h>
 #include <system/PlatformEventSupport.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
@@ -51,6 +52,8 @@ void LayerImplFreeRTOS::Shutdown()
 
 CHIP_ERROR LayerImplFreeRTOS::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delay = Clock::kZero);
@@ -73,8 +76,30 @@ CHIP_ERROR LayerImplFreeRTOS::StartTimer(Clock::Timeout delay, TimerCompleteCall
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR LayerImplFreeRTOS::ExtendTimerTo(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+{
+    VerifyOrReturnError(delay.count() > 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    assertChipStackLockedByCurrentThread();
+
+    Clock::Timeout remainingTime = mTimerList.GetRemainingTime(onComplete, appState);
+    if (remainingTime.count() < delay.count())
+    {
+        return StartTimer(delay, onComplete, appState);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+bool LayerImplFreeRTOS::IsTimerActive(TimerCompleteCallback onComplete, void * appState)
+{
+    return (mTimerList.GetRemainingTime(onComplete, appState) > Clock::kZero);
+}
+
 void LayerImplFreeRTOS::CancelTimer(TimerCompleteCallback onComplete, void * appState)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturn(mLayerState.IsInitialized());
 
     TimerList::Node * timer = mTimerList.Remove(onComplete, appState);
@@ -86,12 +111,36 @@ void LayerImplFreeRTOS::CancelTimer(TimerCompleteCallback onComplete, void * app
 
 CHIP_ERROR LayerImplFreeRTOS::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
+    // Ideally we would not use a timer here at all, but if we try to just
+    // ScheduleLambda the lambda needs to capture the following:
+    // 1) onComplete
+    // 2) appState
+    // 3) The `this` pointer, because onComplete needs to be passed a pointer to
+    //    the System::Layer.
+    //
+    // On a 64-bit system that's 24 bytes, but lambdas passed to ScheduleLambda
+    // are capped at CHIP_CONFIG_LAMBDA_EVENT_SIZE which is 16 bytes.
+    //
+    // So for now use a timer as a poor-man's closure that captures `this` and
+    // onComplete and appState in a single pointer, so we fit inside the size
+    // limit.
+    //
+    // TODO: We could do something here where we compile-time condition on the
+    // sizes of things and use a direct ScheduleLambda if it would fit and this
+    // setup otherwise.
     TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp(), onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    return ScheduleLambda([this, timer] { this->mTimerPool.Invoke(timer); });
+    CHIP_ERROR err = ScheduleLambda([this, timer] { this->mTimerPool.Invoke(timer); });
+    if (err != CHIP_NO_ERROR)
+    {
+        mTimerPool.Release(timer);
+    }
+    return err;
 }
 
 /**

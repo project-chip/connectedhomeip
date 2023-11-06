@@ -24,11 +24,11 @@
  * needs to use HDLC/UART for another purpose like the RPC server.
  */
 
+#include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_backend.h>
 #include <zephyr/logging/log_backend_std.h>
 #include <zephyr/logging/log_output.h>
-#include <zephyr/zephyr.h>
 
 #include <pw_hdlc/encoder.h>
 #include <pw_stream/sys_io_stream.h>
@@ -98,7 +98,7 @@ void init(const log_backend *)
     pw_sys_io_Init();
 }
 
-void processMessage(const struct log_backend * const backend, union log_msg2_generic * msg)
+void processMessage(const struct log_backend * const backend, union log_msg_generic * msg)
 {
     int ret = k_sem_take(&sLoggerLock, K_FOREVER);
     assert(ret == 0);

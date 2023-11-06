@@ -17,7 +17,6 @@
 
 import logging
 import pprint
-
 from typing import Any
 
 

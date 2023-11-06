@@ -16,6 +16,7 @@ name: Lint Code Base
 on:
     push:
     pull_request:
+    merge_group:
     workflow_dispatch:
 
 concurrency:
@@ -27,15 +28,46 @@ jobs:
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
+        container:
+            image: ghcr.io/project-chip/chip-build:24
+
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            # Bootstrap and checkout for internal scripts (like idl_lint)
+            # to run
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+                platform: linux
+
+            - name: Check for matter lint errors
+              if: always()
+              run: |
+                  for idl_file in $(find . -name '*.matter'); do
+                      # TODO: all these conformance failures should be fixed
+                      #       Issues exist for most of them:
+                      #       https://github.com/project-chip/connectedhomeip/issues/19176
+                      #       https://github.com/project-chip/connectedhomeip/issues/19175
+                      #       https://github.com/project-chip/connectedhomeip/issues/19173
+                      if [ "$idl_file" = './examples/log-source-app/log-source-common/log-source-app.matter' ]; then continue; fi
+                      if [ "$idl_file" = './examples/placeholder/linux/apps/app1/config.matter' ]; then continue; fi
+                      if [ "$idl_file" = './examples/placeholder/linux/apps/app2/config.matter' ]; then continue; fi
+                      if [ "$idl_file" = './examples/thermostat/thermostat-common/thermostat.matter' ]; then continue; fi
+                      if [ "$idl_file" = './examples/window-app/common/window-app.matter' ]; then continue; fi
+
+                      # Test files are intentionally small and not spec-compilant, just parse-compliant
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/cluster_struct_attribute.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/global_struct_attribute.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/optional_argument.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/several_clusters.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/simple_attribute.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/large_lighting_app.matter" ]; then continue; fi
+                      if [ "$idl_file" = "./scripts/py_matter_idl/matter_idl/tests/inputs/large_all_clusters_app.matter" ]; then continue; fi
+
+                      ./scripts/run_in_build_env.sh "./scripts/idl_lint.py --log-level warn $idl_file" >/dev/null || exit 1
+                  done
 
             - name: Check broken links
               # On-push disabled until the job can run fully green
@@ -44,7 +76,7 @@ jobs:
               uses: gaurav-nelson/github-action-markdown-link-check@v1
 
             # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
             - name: Check for incorrect error use in VerifyOrExit
               if: always()
@@ -52,23 +84,23 @@ jobs:
                   git grep -n "VerifyOrExit(.*, [A-Za-z]*_ERROR" -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
             - name: Check for use of PRI*8, which are not supported on some libcs.
               if: always()
               run: |
                   git grep -n "PRI.8" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)third_party/lwip/repo/lwip/src/include/lwip/arch.h' && exit 1 || exit 0
-                  
+
             # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
             - name: Check for use of PRI*16, which are not supported on some libcs.
               if: always()
               run: |
                   git grep -n "PRI.16" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)third_party/lwip/repo/lwip/src/include/lwip/arch.h' && exit 1 || exit 0
-                  
+
             # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
             - name: Check for use of %zu, which are not supported on some libcs.
               if: always()
@@ -95,7 +127,7 @@ jobs:
                   scripts/tools/check_test_pics.py src/app/tests/suites/certification/ci-pics-values src/app/tests/suites/certification/PICS.yaml
 
             # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
             - name: Check for use of 0x%u and the like, which lead to misleading output.
               if: always()
@@ -103,9 +135,58 @@ jobs:
                   git grep -n '0x%[0-9l.-]*[^0-9lxX".-]' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
             - name: Check for use of '"0x" PRIu*' and the like, which lead to misleading output.
               if: always()
               run: |
                   git grep -n '0x%[0-9-]*" *PRI[^xX]' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.
+            - name: Check for use of NSLog instead of Matter logging in Matter framework
+              if: always()
+              run: |
+                  git grep -n 'NSLog(' -- src/darwin/Framework/CHIP && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself, as well as excluding the files
+            # that implement the type-safe accessors
+            - name: Check for use of 'emberAfReadAttribute' instead of the type-safe getters
+              if: always()
+              run: |
+                  git grep -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/af.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' ':(exclude)src/app/util/attribute-table.cpp'  && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself, as well as excluding the files
+            # that implement the type-safe accessors, attribute writing from the wire, and some
+            # Pigweed RPC code that seems hard to update.
+            - name: Check for use of 'emberAfWriteAttribute' instead of the type-safe setters
+              if: always()
+              run: |
+                  git grep -n 'emberAfWriteAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/af.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' ':(exclude)src/app/util/attribute-table.cpp' ':(exclude)examples/common/pigweed/rpc_services/Attributes.h' ':(exclude)src/app/util/attribute-table.h' ':(exclude)src/app/util/ember-compatibility-functions.cpp' && exit 1 || exit 0
+
+            # Run python Linter (flake8) and verify python files
+            # ignore some style errors, restyler should do that
+            - name: Check for errors using flake8 Python linter
+              if: always()
+              run: |
+                  flake8 --extend-ignore=E501,W391
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name: Check for use of "SuccessOrExit(CHIP_ERROR_*)", which should probably be "SuccessOrExit(err = CHIP_ERROR_*)"
+              if: always()
+              run: |
+                  git grep -n 'SuccessOrExit(CHIP_ERROR' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name: Check for use of "SuccessOrExit(something-without-assignment(", which should probably be "SuccessOrExit(err = something("
+              if: always()
+              run: |
+                  git grep -n 'SuccessOrExit([^=)]*(' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0

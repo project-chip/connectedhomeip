@@ -22,7 +22,7 @@
 
 namespace chip {
 
-const size_t kTestSuitesMax = 128;
+const size_t kTestSuitesMax = 256;
 
 typedef struct
 {
@@ -32,7 +32,7 @@ typedef struct
 
 static test_suites_t gs_test_suites;
 
-#if __ZEPHYR__
+#ifdef __ZEPHYR__
 inline static bool AlreadyExists(UnitTestTriggerFunction tests)
 {
     for (uint32_t i = 0; i < gs_test_suites.num_test_suites; ++i)
@@ -50,7 +50,7 @@ CHIP_ERROR RegisterUnitTests(UnitTestTriggerFunction tests)
         return CHIP_ERROR_NO_MEMORY;
     }
 
-#if __ZEPHYR__
+#ifdef __ZEPHYR__
     // Not sure yet if it's a Zephyr bug or misconfiguration, but global constructors are called
     // twice on native_posix platform - by libc and by Zephyr's main thread initialization code.
     // This makes sure tests are not run twice for that reason.

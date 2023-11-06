@@ -34,7 +34,7 @@ declare_args() {
   chip_automation_logging = chip_logging
 
   # Configure the maximum size for logged messages
-  if (current_os == "linux" || current_os == "mac") {
+  if (current_os == "linux" || current_os == "mac" || current_os == "ios") {
     # Allow base64 encoding of 1 MTU (4 * (1280 / 3) + padding
     chip_log_message_max_size = 1708
   } else {
@@ -46,6 +46,11 @@ declare_args() {
 
   # Configure chip logging to output through pigweed logging.
   chip_use_pw_logging = false
+
+  # Configure chip logging to output through external logging implementation.
+  # External code will need to provide implementation for CHIP log output
+  # function (LogV), which is defined in "src/platform/logging/LogV.h".
+  chip_use_external_logging = false
 
   # Enable short error strings.
   chip_config_short_error_str = false
@@ -74,15 +79,23 @@ declare_args() {
   # When not set, CHIP_CONFIG_MAX_FABRICS is used for static allocation
   # of tracking information for operational advertisement.
   chip_config_minmdns_dynamic_operational_responder_list =
-      current_os == "linux" || current_os == "android" || current_os == "darwin"
+      current_os == "linux" || current_os == "android" || current_os == "mac" ||
+      current_os == "ios"
 
   # When using minmdns, set the number of parallel resolves
   chip_config_minmdns_max_parallel_resolves = 2
+
+  # If set to true, adds a string "info" field to Cancelable.
+  # Only here for backwards compat.  Generally, THIS SHOULD NOT BE SET TO TRUE.
+  chip_config_cancelable_has_info_string_field = false
+
+  # Whether the target architecture is big-endian (true) or little-endian (false).
+  chip_target_is_big_endian = false
 }
 
 if (chip_target_style == "") {
   if (current_os != "freertos" && current_os != "zephyr" &&
-      current_os != "mbed") {
+      current_os != "mbed" && current_os != "cmsis-rtos") {
     chip_target_style = "unix"
   } else {
     chip_target_style = "embedded"

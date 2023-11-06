@@ -36,7 +36,7 @@ class Delegate
 public:
     virtual void HandleSendKey(CommandResponseHelper<Commands::SendKeyResponse::Type> & helper, const CecKeyCode & keyCode) = 0;
 
-    bool HasFeature(chip::EndpointId endpoint, KeypadInputFeature feature);
+    bool HasFeature(chip::EndpointId endpoint, Feature feature);
 
     virtual uint32_t GetFeatureMap(chip::EndpointId endpoint) = 0;
 

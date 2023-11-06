@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import importlib
 import os
 from pathlib import Path
-import serial  # type: ignore
-import importlib
 
+import serial  # type: ignore
 from pw_hdlc.rpc import HdlcRpcClient
 
 # Point the script to the .proto file with our RPC services.

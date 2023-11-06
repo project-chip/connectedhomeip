@@ -1,0 +1,1000 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//args.gni")
+import("//build_overrides/bouffalolab_iot_sdk.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/mbedtls.gni")
+import("${chip_root}/src/lib/lib.gni")
+
+declare_args() {
+  bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
+
+  enable_debug_frame_ptr = false
+  debug_output_file = ""
+}
+
+assert(bl_iot_sdk_root != "", "bl_iot_sdk_root must be specified")
+
+# Defines an Bouffa Lab IOT SDK build target.
+#
+# Parameters:
+#   bl_iot_sdk_root - The location of Bouffalo Lab IOT SDK.
+#   sources - The sources files to build.
+template("bl_iot_sdk") {
+  sdk_target_name = target_name
+
+  config("${sdk_target_name}_config") {
+    defines = [
+      "__FILENAME__=strrchr(__FILE__,'/')?strrchr(__FILE__,'/')+1:__FILE__",
+      "ARCH_RISCV",
+      "BL602=BL602",
+      "BL602_USE_HAL_DRIVER=1",
+
+      "CFG_CHIP_BL602",
+      "CFG_COMPONENT_BLOG_ENABLE=0",
+    ]
+
+    include_dirs = []
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
+
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
+
+    cflags = [ "-Wundef" ]
+    cflags_c = [
+      "-include",
+      rebase_path("${invoker.freertos_config}", root_build_dir),
+    ]
+    cflags_cc = [
+      "-include",
+      rebase_path("${invoker.freertos_config}", root_build_dir),
+    ]
+
+    if (defined(invoker.enable_debug_frame_ptr) &&
+        invoker.enable_debug_frame_ptr) {
+      cflags += [ "-fno-omit-frame-pointer" ]
+    }
+  }
+
+  source_set("${sdk_target_name}_soc") {
+    defines = [ "BL602_MATTER_SUPPORT" ]
+
+    sources = [
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602/evb/src/boot/gcc/start.S",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602/evb/src/debug.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602/evb/src/strntoumax.c",
+    ]
+    cflags_c = [ "-Wno-format-truncation" ]
+
+    configs += [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_freertos",
+    ]
+  }
+
+  config("${sdk_target_name}_config_BSP_Driver") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/RISCV/Device/Bouffalo/BL602/Startup",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/RISCV/Core/Include",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/Device/Bouffalo/BL602/Peripherals",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Inc",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/Common/platform_print",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/Common/soft_crc",
+    ]
+  }
+
+  source_set("${sdk_target_name}_BSP_Driver") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/Common/ring_buffer",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/Common/partition",
+    ]
+
+    sources = [
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/Common/platform_print/platform_device.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_acomp.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_adc.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_aon.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_common.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_common_ext.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_dac.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_dma.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_ef_ctrl.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_glb.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_hbn.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_i2c.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_ir.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_l1c.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_mfg_efuse.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_mfg_flash.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_mfg_media.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_pds.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_pwm.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_romapi.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_sdu.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_sec_dbg.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_sec_eng.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_sf_cfg.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_sf_cfg_ext.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_sf_ctrl.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_sflash.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_sflash_ext.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_spi.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_timer.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_tzc_sec.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_uart.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_xip_sflash.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_xip_sflash_ext.c",
+    ]
+
+    configs += [ ":${sdk_target_name}_config_freertos" ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_BSP_Driver",
+    ]
+    cflags_c = [
+      "-Wno-sign-compare",
+      "-Wno-unused-variable",
+    ]
+  }
+
+  config("${sdk_target_name}_config_freertos") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/config",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/portable/GCC/RISC-V",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/panic",
+    ]
+  }
+
+  source_set("${sdk_target_name}_bl602_freertos") {
+    defines = [ "portasmHANDLE_INTERRUPT=interrupt_entry" ]
+
+    if (defined(invoker.enable_debug_frame_ptr) &&
+        invoker.enable_debug_frame_ptr) {
+      defines += [
+        "CONF_ENABLE_FRAME_PTR=1",
+        "CONF_ENABLE_FUNC_BACKTRACE_ELF=${invoker.debug_output_file}",
+      ]
+    }
+
+    include_dirs = [ "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/portable/GCC/RISC-V/chip_specific_extensions/RV32F_float_abi_single" ]
+
+    sources = [
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/event_groups.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/list.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/misaligned/fp_asm.S",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/misaligned/misaligned_ldst.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/panic/panic_c.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/portable/GCC/RISC-V/port.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/portable/GCC/RISC-V/portASM.S",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/portable/MemMang/heap_5.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/queue.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/stream_buffer.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/tasks.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl602/freertos_riscv_ram/timers.c",
+    ]
+
+    cflags_c = [
+      "-Wno-sign-compare",
+      "-Wno-old-style-declaration",
+    ]
+
+    public_configs = [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_freertos",
+    ]
+  }
+
+  config("${sdk_target_name}_config_hosal") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/platform/hosal/include",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/include",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal",
+      "${bl_iot_sdk_root}/components/platform/hosal/sec_common",
+    ]
+
+    cflags_cc = [ "-Wno-literal-suffix" ]
+  }
+
+  source_set("${sdk_target_name}_hosal") {
+    defines = [
+      "CFG_BLE_ENABLE",
+      "CONF_BL602_USE_1M_FLASH=0",
+    ]
+    sources = [
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_adc.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_boot2.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_chip.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_cks.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_clocktree.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_dac_audio.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_dma.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_efuse.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_flash.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_gpio.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_gpio_cli.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_hbn.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_i2c.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_ir.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_irq.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_pds.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_pm.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_pwm.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_rtc.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_sec.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_sys.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_sys_cli.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_timer.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_uart.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_wdt.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_wdt_cli.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_wifi.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hal_board.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hal_boot2.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hal_button.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hal_gpio.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hal_hbn.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hal_hbnram.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hal_hwtimer.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hal_ir.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hal_pds.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hal_sys.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hal_wifi.c",
+
+      #     hosal_adc.c is included by the code in wifi module
+      #      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_adc.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_dac.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_dma.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_efuse.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_flash.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_gpio.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_i2c.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_ota.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_pwm.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_rng.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_rtc.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_spi.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_timer.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_uart.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_wdg.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_aes.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_common.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_ghash.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_pka.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_sha.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_trng.c",
+    ]
+
+    cflags_c = [
+      "-Wno-sign-compare",
+      "-Wno-shadow",
+      "-Wno-unused-but-set-variable",
+      "-Wno-old-style-declaration",
+      "-Wno-stringop-overflow",
+      "-Wno-format-truncation",
+      "-Wno-unused-variable",
+      "-Wno-array-bounds",
+    ]
+    configs += [
+      ":${sdk_target_name}_config_wifi",
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_stage",
+      ":${sdk_target_name}_config_sys",
+      ":${sdk_target_name}_config_fs",
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_freertos",
+      ":${sdk_target_name}_config_ble",
+    ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_hosal",
+    ]
+  }
+
+  config("${sdk_target_name}_config_fs") {
+    include_dirs = [ "${bl_iot_sdk_root}/components/fs/vfs/include" ]
+  }
+
+  source_set("${sdk_target_name}_fs") {
+    sources = [
+      "${bl_iot_sdk_root}/components/fs/vfs/device/vfs_adc.c",
+      "${bl_iot_sdk_root}/components/fs/vfs/device/vfs_gpio.c",
+      "${bl_iot_sdk_root}/components/fs/vfs/device/vfs_pwm.c",
+      "${bl_iot_sdk_root}/components/fs/vfs/device/vfs_spi.c",
+      "${bl_iot_sdk_root}/components/fs/vfs/device/vfs_uart.c",
+      "${bl_iot_sdk_root}/components/fs/vfs/src/vfs.c",
+      "${bl_iot_sdk_root}/components/fs/vfs/src/vfs_file.c",
+      "${bl_iot_sdk_root}/components/fs/vfs/src/vfs_inode.c",
+      "${bl_iot_sdk_root}/components/fs/vfs/src/vfs_register.c",
+    ]
+    cflags_c = [
+      "-Wno-sign-compare",
+      "-Wno-builtin-declaration-mismatch",
+    ]
+    configs += [
+      ":${sdk_target_name}_config_hosal",
+      ":${sdk_target_name}_config_stage",
+      ":${sdk_target_name}_config_fs",
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_freertos",
+    ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_fs",
+    ]
+  }
+
+  source_set("${sdk_target_name}_libc") {
+    sources = [
+      "${bl_iot_sdk_root}/components/libc/newlibc/assert.c",
+      "${bl_iot_sdk_root}/components/libc/newlibc/stdatomic.c",
+      "${bl_iot_sdk_root}/components/libc/newlibc/syscalls.c",
+    ]
+    cflags_c = [ "-Wno-builtin-declaration-mismatch" ]
+    configs += [ ":${sdk_target_name}_config_freertos" ]
+    public_configs = [ ":${sdk_target_name}_config" ]
+  }
+
+  config("${sdk_target_name}_config_stage") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/stage/easyflash4/inc",
+      "${bl_iot_sdk_root}/components/stage/yloop/include",
+      "${bl_iot_sdk_root}/components/stage/blog",
+      "${bl_iot_sdk_root}/components/stage/yloop/include/aos",
+      "${bl_iot_sdk_root}/components/stage/blfdt/inc",
+      "${bl_iot_sdk_root}/components/stage/cli/cli/include",
+    ]
+  }
+
+  source_set("${sdk_target_name}_stage") {
+    defines = [
+      "EF_ENV_CACHE_TABLE_SIZE=64",
+      "RHINO_CONFIG_WORKQUEUE=0",
+    ]
+    sources = [
+      "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt.c",
+      "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt_addresses.c",
+      "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt_empty_tree.c",
+      "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt_overlay.c",
+      "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt_ro.c",
+      "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt_rw.c",
+      "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt_strerror.c",
+      "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt_sw.c",
+      "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt_wip.c",
+      "${bl_iot_sdk_root}/components/stage/blog/blog.c",
+      "${bl_iot_sdk_root}/components/stage/easyflash4/src/easyflash.c",
+      "${bl_iot_sdk_root}/components/stage/easyflash4/src/ef_env.c",
+      "${bl_iot_sdk_root}/components/stage/easyflash4/src/ef_port.c",
+      "${bl_iot_sdk_root}/components/stage/easyflash4/src/ef_utils.c",
+      "${bl_iot_sdk_root}/components/stage/yloop/src/aos_freertos.c",
+      "${bl_iot_sdk_root}/components/stage/yloop/src/device.c",
+      "${bl_iot_sdk_root}/components/stage/yloop/src/local_event.c",
+      "${bl_iot_sdk_root}/components/stage/yloop/src/select.c",
+      "${bl_iot_sdk_root}/components/stage/yloop/src/yloop.c",
+    ]
+
+    cflags_c = [ "-Wno-sign-compare" ]
+    configs += [
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_freertos",
+      ":${sdk_target_name}_config_fs",
+      ":${sdk_target_name}_config_sys",
+      ":${sdk_target_name}_config_utils",
+    ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_stage",
+    ]
+  }
+
+  config("${sdk_target_name}_config_sys") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/sys/bloop/bloop/include",
+      "${bl_iot_sdk_root}/components/sys/bloop/looprt/include",
+      "${bl_iot_sdk_root}/components/sys/bloop/loopset/include",
+      "${bl_iot_sdk_root}/components/sys/blmtd/include",
+    ]
+  }
+
+  source_set("${sdk_target_name}_sys") {
+    include_dirs = [ "${bl_iot_sdk_root}/components/sys/bltime/include" ]
+    sources = [
+      "${bl_iot_sdk_root}/components/sys/blmtd/bl_mtd.c",
+      "${bl_iot_sdk_root}/components/sys/bltime/bl_sys_time.c",
+    ]
+    configs += [
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_hosal",
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_freertos",
+    ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_sys",
+    ]
+  }
+
+  config("${sdk_target_name}_config_utils") {
+    include_dirs = [ "${bl_iot_sdk_root}/components/utils/include/" ]
+  }
+
+  source_set("${sdk_target_name}_utils") {
+    sources = [
+      "${bl_iot_sdk_root}/components/utils/src/utils_base64.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_crc.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_dns.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_fec.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_getopt.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_hex.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_hexdump.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_hmac_sha1_fast.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_list.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_log.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_memp.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_notifier.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_psk_fast.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_rbtree.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_sha256.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_string.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_time.c",
+      "${bl_iot_sdk_root}/components/utils/src/utils_tlv_bl.c",
+    ]
+
+    cflags_c = [
+      "-Wno-shadow",
+      "-Wno-sign-compare",
+      "-Wno-incompatible-pointer-types",
+    ]
+    configs += [
+      ":${sdk_target_name}_config_hosal",
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_freertos",
+    ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_utils",
+    ]
+  }
+
+  config("${sdk_target_name}_config_mbedtls") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/include",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port",
+    ]
+
+    defines = [ "MBEDTLS_CONFIG_FILE=\"bl602-chip-mbedtls-config.h\"" ]
+  }
+
+  source_set("${sdk_target_name}_mbedtls") {
+    defines = [ "MBEDTLS_ECP_ALT_KEEP_ORIGINAL=0" ]
+    include_dirs =
+        [ "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library" ]
+
+    sources = [
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/aes_alt.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/bignum_hw.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/ecp_alt.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/ecp_curves_alt.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/hw_common.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/hw_common.h",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/sha1_alt.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/sha256_alt.c",
+    ]
+
+    sources += [
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/bignum_ext.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_entropy_poll.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/mbedtls_port_mem.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/net_sockets.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/pkparse.c",
+    ]
+
+    sources += [
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/aes.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/asn1parse.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/asn1write.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/base64.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/bignum.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ccm.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/cipher.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/cipher_wrap.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/cmac.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/constant_time.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ctr_drbg.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ecdh.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ecdsa.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ecp.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ecp_curves.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/entropy.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/hkdf.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/hmac_drbg.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/md.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/oid.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pem.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pk.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pk_wrap.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pkcs5.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pkwrite.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/platform.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/platform_util.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/sha256.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/sha512.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509_create.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509_crt.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509write_csr.c",
+    ]
+
+    cflags_c = [
+      "-Wno-sign-compare",
+      "-Wno-implicit-function-declaration",
+    ]
+    configs += [
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_hosal",
+      ":${sdk_target_name}_config_freertos",
+    ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_mbedtls",
+    ]
+  }
+
+  config("${sdk_target_name}_config_ble") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/network/ble/blecontroller/ble_inc",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/include",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/include/bluetooth",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/include/drivers/bluetooth",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include/zephyr",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/port/include",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/host",
+    ]
+
+    defines = [
+      "BFLB_BLE",
+      "CONFIG_SET_TX_PWR",
+      "CFG_CON=1",
+      "CFG_BLE",
+      "CFG_SLEEP",
+      "CONFIG_BT_PERIPHERAL=1",
+      "CFG_BLE_TX_BUFF_DATA=2",
+      "CONFIG_BT_GATT_DYNAMIC_DB",
+      "CONFIG_BT_GATT_SERVICE_CHANGED",
+      "CONFIG_BT_SETTINGS_CCC_LAZY_LOADING",
+      "CONFIG_BT_KEYS_OVERWRITE_OLDEST",
+      "CONFIG_BT_GAP_PERIPHERAL_PREF_PARAMS",
+      "CONFIG_BT_BONDABLE",
+      "CONFIG_BT_ASSERT",
+      "CFG_BLE_STACK_DBG_PRINT",
+    ]
+
+    cflags_cc = [ "-Wno-conversion" ]
+  }
+
+  source_set("${sdk_target_name}_ble") {
+    defines = [
+      "CONFIG_BT_L2CAP_DYNAMIC_CHANNEL",
+      "CONFIG_BT_GATT_CLIENT",
+      "CONFIG_BT_CONN=1",
+      "CONFIG_BT_GATT_DIS_PNP",
+      "CONFIG_BT_GATT_DIS_SERIAL_NUMBER",
+      "CONFIG_BT_GATT_DIS_FW_REV",
+      "CONFIG_BT_GATT_DIS_HW_REV",
+      "CONFIG_BT_GATT_DIS_SW_REV",
+      "CONFIG_BT_ECC",
+      "CONFIG_BT_KEYS_SAVE_AGING_COUNTER_ON_PAIRING",
+      "CONFIG_BT_HCI_VS_EVT_USER",
+      "CONFIG_BT_SETTINGS_USE_PRINTK",
+    ]
+
+    libs = [ "${bl_iot_sdk_root}/components/network/ble/blecontroller_602_m0s1/lib/libblecontroller_602_m0s1.a" ]
+
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include/misc",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/bl_hci_wrapper",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/include/tinycrypt",
+    ]
+
+    sources = [
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/bl_hci_wrapper/bl_hci_wrapper.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/atomic_c.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/buf.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/dec.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/log.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/poll.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/work_q.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/hci_onchip/hci_driver.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/host/att.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/host/conn.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/host/crypto.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/host/gatt.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/host/hci_core.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/host/l2cap.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/host/settings.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/host/uuid.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/port/bl_port.c",
+    ]
+
+    configs += [
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_freertos",
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_hosal",
+    ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_hosal",
+      ":${sdk_target_name}_config_ble",
+    ]
+
+    cflags_c = [
+      "-Wno-sign-compare",
+      "-Wno-unused-but-set-variable",
+      "-Wno-misleading-indentation",
+      "-Wno-format",
+      "-Wno-format-nonliteral",
+      "-Wno-format-security",
+      "-Wno-unused-function",
+      "-Wno-incompatible-pointer-types",
+      "-Wno-discarded-qualifiers",
+      "-Wno-unused-variable",
+    ]
+  }
+
+  config("${sdk_target_name}_config_blcrypto_suite") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/security/blcrypto_suite/inc",
+      "${bl_iot_sdk_root}/components/security/blcrypto_suite/inc/blcrypto_suite",
+    ]
+  }
+
+  source_set("${sdk_target_name}_blcrypto_suite") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/security/blcrypto_suite/priv_inc",
+      "${bl_iot_sdk_root}/components/security/blcrypto_suite/priv_inc",
+    ]
+    sources = [
+      "${bl_iot_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_aes.c",
+      "${bl_iot_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_bignum.c",
+      "${bl_iot_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_ecp.c",
+      "${bl_iot_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_ecp_curves.c",
+      "${bl_iot_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_export_fw.c",
+      "${bl_iot_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_hacc.c",
+      "${bl_iot_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_hacc_glue.c",
+      "${bl_iot_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_hacc_secp256r1_mul.c",
+      "${bl_iot_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_platform_util.c",
+      "${bl_iot_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_porting.c",
+      "${bl_iot_sdk_root}/components/security/blcrypto_suite/src/blcrypto_suite_supplicant_api.c",
+    ]
+
+    configs += [
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_hosal",
+      ":${sdk_target_name}_config_freertos",
+    ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_blcrypto_suite",
+    ]
+  }
+
+  config("${sdk_target_name}_config_wifi") {
+    defines = [
+      "CFG_TXDESC=2",
+      "CFG_STA_MAX=1",
+      "BL_CHIP_NAME=\"BL602\"",
+      "TD_DIAGNOSIS_STA",
+      "OS_USING_FREERTOS",
+      "CFG_VIRT_DEV_MAX=1",
+      "TDLS_ENABLE=0",
+      "CONFIG_NEWLIB_NANO_FORMAT=0",
+    ]
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/os/bl_os_adapter/bl_os_adapter/include",
+      "${bl_iot_sdk_root}/components/os/bl_os_adapter/bl_os_adapter/include/bl_os_adapter",
+      "${bl_iot_sdk_root}/components/network/wifi/include",
+      "${bl_iot_sdk_root}/components/network/wifi_hosal/include",
+      "${bl_iot_sdk_root}/components/network/wifi_manager",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/include",
+      "${bl_iot_sdk_root}/components/security",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/include",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/port/include",
+    ]
+
+    cflags_c = [ "-Wno-sign-compare" ]
+    cflags_cc = [ "-Wno-sign-compare" ]
+  }
+
+  source_set("${sdk_target_name}_wifi") {
+    defines = [
+      "BL602_MATTER_SUPPORT",
+      "LWIP_IPV6",
+      "CONFIG_WPA_WAPI_PSK=0",
+    ]
+
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/os/bl_os_adapter/bl_os_adapter",
+      "${bl_iot_sdk_root}/components/network/dns_server/include",
+      "${bl_iot_sdk_root}/components/network/dns_server/include",
+      "${bl_iot_sdk_root}/components/network/rfparam_adapter_tmp/rftlv",
+      "${bl_iot_sdk_root}/components/network/wifi/modules/supplicant/src/sae",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/include",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/include/bl_supplicant",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/port",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/ap",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/bl_supplicant",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/common",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/eap_peer",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/rsn_supp",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/wps",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/test",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/port/include",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/utils",
+    ]
+
+    sources = [ "${bl_iot_sdk_root}/components/os/bl_os_adapter/bl_os_adapter/bl_os_hal.c" ]
+
+    sources += [
+      "${bl_iot_sdk_root}/components/network/rfparam_adapter_tmp/rftlv/phy_rftlv.c",
+      "${bl_iot_sdk_root}/components/network/wifi_hosal/port/wifi_hosal_bl602.c",
+      "${bl_iot_sdk_root}/components/network/wifi_hosal/wifi_hosal.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_cmds.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_irqs.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_main.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_mod_params.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_msg_rx.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_msg_tx.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_platform.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_rx.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_tx.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/bl_utils.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/ipc_host.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/stateMachine.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi_mgmr.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi_mgmr_api.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi_mgmr_cli.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi_mgmr_event.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi_mgmr_ext.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi_mgmr_profile.c",
+      "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/wifi_netif.c",
+
+      #wap_supplicant
+      "${bl_iot_sdk_root}/components/network/dns_server/src/dns_server.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/port/os_bl.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/ap/ap_config.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/ap/wpa_auth_ie.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/ap/wpa_auth_rsn_ccmp_only.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/bl_supplicant/bl_hostap.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/bl_supplicant/bl_wpa3.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/bl_supplicant/bl_wpa_main.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/bl_supplicant/bl_wpas_glue.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/bl_supplicant/bl_wps.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/common/sae.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/common/wpa_common.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/aes-cbc.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/aes-internal-bl.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/aes-omac1.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/aes-unwrap.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/aes-wrap.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/crypto_internal-modexp.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/dh_group5.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/dh_groups.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/md5-internal.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/md5.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/rc4.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/sha1-internal.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/sha1-pbkdf2.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/sha1.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/sha256-internal.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/sha256-prf.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/crypto/sha256.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/eap_peer/eap_common.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/rsn_supp/pmksa_cache.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/rsn_supp/wpa.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/rsn_supp/wpa_ie.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/utils/common.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/utils/wpa_debug.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/utils/wpabuf.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/wps/wps.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/wps/wps_attr_build.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/wps/wps_attr_parse.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/wps/wps_attr_process.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/wps/wps_common.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/wps/wps_dev_attr.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/wps/wps_enrollee.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/wps/wps_registrar.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src/wps/wps_validate.c",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/test/test_crypto-bl.c",
+    ]
+
+    libs = [ "${bl_iot_sdk_root}/components/network/wifi/lib/libwifi.a" ]
+
+    configs += [
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_stage",
+      ":${sdk_target_name}_config_lwip",
+      ":${sdk_target_name}_config_blcrypto_suite",
+      ":${sdk_target_name}_config_freertos",
+      ":${sdk_target_name}_config_utils",
+    ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_wifi",
+    ]
+
+    deps = [ ":${sdk_target_name}_hosal" ]
+
+    cflags_c = [
+      "-Wno-unused-function",
+      "-Wno-shadow",
+      "-Wno-old-style-declaration",
+      "-Wno-incompatible-pointer-types",
+      "-Wno-format-security",
+      "-Wno-format-nonliteral",
+      "-Wno-unused-but-set-variable",
+      "-Wno-unused-variable",
+      "-fcommon",
+    ]
+  }
+
+  config("${sdk_target_name}_config_lwip") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/network/lwip/src/include",
+      "${bl_iot_sdk_root}/components/network/lwip/src/include/lwip/apps",
+      "${bl_iot_sdk_root}/components/network/lwip/lwip-port",
+      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/FreeRTOS",
+      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/hook",
+      "${bl_iot_sdk_root}/components/network/lwip_dhcpd",
+    ]
+
+    defines = [ "LWIP_IPV6=1" ]
+  }
+
+  source_set("${sdk_target_name}_lwip") {
+    sources = [
+      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/FreeRTOS/ethernetif.c",
+      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/FreeRTOS/sys_arch.c",
+    ]
+    sources += [
+      "${bl_iot_sdk_root}/components/network/lwip/src/netif/bridgeif.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/netif/bridgeif_fdb.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/netif/ethernet.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/netif/slipif.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/netif/zepif.c",
+    ]
+    sources += [
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/def.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/dns.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/inet_chksum.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/init.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ip.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/mem.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/memp.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/netif.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/pbuf.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/raw.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/stats.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/sys.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/tcp.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/tcp_in.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/tcp_out.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/timeouts.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/udp.c",
+    ]
+
+    sources += [
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv4/autoip.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv4/dhcp.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv4/etharp.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv4/icmp.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv4/igmp.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv4/ip4.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv4/ip4_addr.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv4/ip4_frag.c",
+    ]
+
+    sources += [
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv6/dhcp6.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv6/ethip6.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv6/icmp6.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv6/inet6.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv6/ip6.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv6/ip6_addr.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv6/ip6_frag.c",
+
+      #"${bl_iot_sdk_root}/components/network/lwip/src/core/ipv6/ip6_route_table.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv6/mld6.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv6/nd6.c",
+    ]
+
+    sources += [
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/api_lib.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/api_msg.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/err.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/if_api.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/netbuf.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/netifapi.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/sockets.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/tcpip.c",
+    ]
+    sources +=
+        [ "${bl_iot_sdk_root}/components/network/lwip/src/apps/mdns/mdns.c" ]
+    sources +=
+        [ "${bl_iot_sdk_root}/components/network/lwip_dhcpd/dhcp_server_raw.c" ]
+
+    cflags_c = [
+      "-Wno-incompatible-pointer-types",
+      "-Wno-sign-compare",
+    ]
+    configs += [ ":${sdk_target_name}_config_freertos" ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_lwip",
+    ]
+  }
+
+  config("${sdk_target_name}_config_factory_data") {
+    include_dirs = [ "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/include" ]
+  }
+
+  source_set("${sdk_target_name}_factory_data") {
+    sources = [
+      "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/efuse_slot.c",
+      "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/matter_factory_data.c",
+    ]
+    configs += [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_freertos",
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_hosal",
+    ]
+    public_configs = [ ":${sdk_target_name}_config_factory_data" ]
+  }
+
+  group(sdk_target_name) {
+    public_deps = [
+      ":${sdk_target_name}_BSP_Driver",
+      ":${sdk_target_name}_bl602_freertos",
+      ":${sdk_target_name}_blcrypto_suite",
+      ":${sdk_target_name}_ble",
+      ":${sdk_target_name}_fs",
+      ":${sdk_target_name}_hosal",
+      ":${sdk_target_name}_libc",
+      ":${sdk_target_name}_lwip",
+      ":${sdk_target_name}_mbedtls",
+      ":${sdk_target_name}_soc",
+      ":${sdk_target_name}_stage",
+      ":${sdk_target_name}_sys",
+      ":${sdk_target_name}_utils",
+      ":${sdk_target_name}_wifi",
+    ]
+
+    if (defined(invoker.chip_enable_factory_data) &&
+        invoker.chip_enable_factory_data) {
+      public_deps += [ ":${sdk_target_name}_factory_data" ]
+    }
+  }
+}

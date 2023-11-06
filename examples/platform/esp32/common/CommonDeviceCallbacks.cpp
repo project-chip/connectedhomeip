@@ -16,22 +16,13 @@
  *    limitations under the License.
  */
 #include "CommonDeviceCallbacks.h"
-
-#if CONFIG_BT_ENABLED
-#include "esp_bt.h"
-#if CONFIG_BT_NIMBLE_ENABLED
-#include "esp_nimble_hci.h"
-#include "nimble/nimble_port.h"
-#endif // CONFIG_BT_NIMBLE_ENABLED
-#endif // CONFIG_BT_ENABLED
+#include "Esp32AppServer.h"
 
 #include "esp_err.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
-#include "route_hook/esp_route_hook.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/server/Dnssd.h>
+#include <app/server/Server.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
 #if CONFIG_ENABLE_OTA_REQUESTOR
@@ -60,35 +51,22 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
 
     case DeviceEventType::kCHIPoBLEConnectionClosed:
         ESP_LOGI(TAG, "CHIPoBLE disconnected");
+        Esp32AppServer::DeInitBLEIfCommissioned();
+        break;
+
+    case DeviceEventType::kDnssdInitialized:
+#if CONFIG_ENABLE_OTA_REQUESTOR
+        OTAHelpers::Instance().InitOTARequestor();
+#endif
+        appDelegate = DeviceCallbacksDelegate::Instance().GetAppDelegate();
+        if (appDelegate != nullptr)
+        {
+            appDelegate->OnDnssdInitialized();
+        }
         break;
 
     case DeviceEventType::kCommissioningComplete: {
         ESP_LOGI(TAG, "Commissioning complete");
-#if CONFIG_BT_NIMBLE_ENABLED && CONFIG_DEINIT_BLE_ON_COMMISSIONING_COMPLETE
-
-        if (ble_hs_is_enabled())
-        {
-            int ret = nimble_port_stop();
-            if (ret == 0)
-            {
-                nimble_port_deinit();
-                esp_err_t err = esp_nimble_hci_and_controller_deinit();
-                err += esp_bt_mem_release(ESP_BT_MODE_BLE);
-                if (err == ESP_OK)
-                {
-                    ESP_LOGI(TAG, "BLE deinit successful and memory reclaimed");
-                }
-            }
-            else
-            {
-                ESP_LOGW(TAG, "nimble_port_stop() failed");
-            }
-        }
-        else
-        {
-            ESP_LOGI(TAG, "BLE already deinited");
-        }
-#endif
     }
     break;
 
@@ -102,10 +80,6 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
             // newly selected address.
             chip::app::DnssdServer::Instance().StartServer();
         }
-        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
-        {
-            ESP_ERROR_CHECK(esp_route_hook_init(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF")));
-        }
         break;
     }
 
@@ -114,9 +88,6 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
 
 void CommonDeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
 {
-#if CONFIG_ENABLE_OTA_REQUESTOR
-    static bool isOTAInitialized = false;
-#endif
     appDelegate = DeviceCallbacksDelegate::Instance().GetAppDelegate();
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
@@ -126,13 +97,6 @@ void CommonDeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent *
             appDelegate->OnIPv4ConnectivityEstablished();
         }
         chip::app::DnssdServer::Instance().StartServer();
-#if CONFIG_ENABLE_OTA_REQUESTOR
-        if (!isOTAInitialized)
-        {
-            OTAHelpers::Instance().InitOTARequestor();
-            isOTAInitialized = true;
-        }
-#endif
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -146,14 +110,6 @@ void CommonDeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent *
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
         chip::app::DnssdServer::Instance().StartServer();
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-        if (!isOTAInitialized)
-        {
-            OTAHelpers::Instance().InitOTARequestor();
-            isOTAInitialized = true;
-        }
-#endif
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {

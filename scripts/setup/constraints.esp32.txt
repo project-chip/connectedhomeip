@@ -1,0 +1,3 @@
+cryptography>=2.1.4
+pyelftools>=0.22
+pyserial>=3.3

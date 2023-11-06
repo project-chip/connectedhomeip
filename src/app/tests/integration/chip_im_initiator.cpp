@@ -27,11 +27,13 @@
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/integration/common.h>
 #include <chrono>
 #include <lib/core/CHIPCore.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/TypeTraits.h>
 #include <memory>
 #include <mutex>
@@ -146,7 +148,6 @@ public:
         }
     }
 
-    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override {}
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * aData,
                          const chip::app::StatusIB & status) override
     {}
@@ -348,7 +349,7 @@ CHIP_ERROR SendReadRequest()
         chip::Platform::MakeUnique<chip::app::ReadClient>(chip::app::InteractionModelEngine::GetInstance(), &gExchangeManager,
                                                           gMockDelegate, chip::app::ReadClient::InteractionType::Read);
 
-    SuccessOrExit(readClient->SendRequest(readPrepareParams));
+    SuccessOrExit(err = readClient->SendRequest(readPrepareParams));
 
     gMockDelegate.AdoptReadClient(std::move(readClient));
 
@@ -645,7 +646,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     ReturnErrorOnFailure(errorStatus.GetError());
     attributeStatus.EndOfAttributeStatusIB();
     ReturnErrorOnFailure(attributeStatus.GetError());
-    return attributeReport.EndOfAttributeReportIB().GetError();
+    return attributeReport.EndOfAttributeReportIB();
 }
 
 const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
@@ -653,6 +654,16 @@ const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePat
     // Note: This test does not make use of the real attribute metadata.
     static EmberAfAttributeMetadata stub = { .defaultValue = EmberAfDefaultOrMinMaxAttributeValue(uint32_t(0)) };
     return &stub;
+}
+
+bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
+{
+    return true;
+}
+
+Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
+{
+    return Protocols::InteractionModel::Status::Success;
 }
 
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
@@ -712,7 +723,7 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &gMessageCounterManager, &gStorage,
-                               &gFabricTable);
+                               &gFabricTable, gSessionKeystore);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
@@ -721,7 +732,8 @@ int main(int argc, char * argv[])
     err = gMessageCounterManager.Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &gFabricTable);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &gFabricTable,
+                                                                 chip::app::reporting::GetDefaultReportScheduler());
     SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP im responder.

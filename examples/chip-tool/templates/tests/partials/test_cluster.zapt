@@ -1,4 +1,4 @@
-{{#chip_tests tests}}
+{{#chip_tests tests includeAllClusters=true}}
 class {{filename}}Suite: public TestCommand
 {
 public:
@@ -12,7 +12,7 @@ public:
           {{#if (isString type)}}
           AddArgument("{{name}}", &m{{asUpperCamelCase name}});
           {{else}}
-          AddArgument("{{name}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asUpperCamelCase name}});
+          AddArgument("{{name}}",{{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &m{{asUpperCamelCase name}});
           {{/if}}
         {{/chip_tests_config}}
     }

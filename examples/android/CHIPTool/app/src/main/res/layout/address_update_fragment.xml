@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/fabricIdEd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:hint="@string/enter_fabric_id_hint_text"
+        android:inputType="number"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/deviceIdEd"/>
+
+    <EditText
+        android:id="@+id/deviceIdEd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:textSize="20sp"
+        android:hint="@string/enter_device_id_hint_text"
+        app:layout_constraintStart_toEndOf="@+id/fabricIdEd"
+        app:layout_constraintTop_toTopOf="parent"  />
+
+  <EditText
+      android:id="@+id/epIdEd"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hint="@string/enter_endpoint_id_hint_text"
+      android:inputType="number"
+      android:textSize="20sp"
+      android:text ="1"
+      app:layout_constraintStart_toEndOf="@+id/deviceIdEd"
+      app:layout_constraintTop_toTopOf="parent" />
+
+  <androidx.constraintlayout.widget.Barrier
+      android:id="@+id/barrier"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:barrierDirection="bottom"
+      app:constraint_referenced_ids="fabricIdEd,deviceIdEd,epIdEd" />
+
+    <TextView
+        android:id="@+id/deviceIdTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text = "@string/commissioned_device_id_text"
+        app:layout_constraintTop_toBottomOf="@id/fabricIdEd"
+        />
+
+    <Spinner
+        android:id="@+id/deviceIdSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/deviceIdTv" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

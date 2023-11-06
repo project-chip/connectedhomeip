@@ -226,7 +226,7 @@ int TestCATValues_Teardown(void * inContext)
     return SUCCESS;
 }
 
-int TestCATValues(void)
+int TestCATValues()
 {
     // clang-format off
     nlTestSuite theSuite =

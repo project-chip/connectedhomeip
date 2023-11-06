@@ -84,7 +84,7 @@ namespace {{asUpperCamelCase name}} {
 namespace Commands {
 {{/first}}
 namespace {{asUpperCamelCase name}} {
-enum class Fields {
+enum class Fields : uint8_t {
     {{#zcl_command_arguments}}
     k{{asUpperCamelCase label}} = {{fieldIdentifier}},
     {{/zcl_command_arguments}}
@@ -101,11 +101,11 @@ public:
     {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
     {{/zcl_command_arguments}}
 
-    CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType =
     {{~#if responseName}}
-      Clusters::{{asUpperCamelCase parent.name}}::Commands::{{responseName}}::DecodableType;
+      Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase responseName}}::DecodableType;
     {{else}}
       DataModel::NullObjectType;
     {{/if}}
@@ -165,7 +165,7 @@ namespace Events {
 namespace {{asUpperCamelCase name}} {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::{{asUpperCamelCase priority}};
 
-enum class Fields {
+enum class Fields : uint8_t {
     {{#zcl_event_fields}}
     k{{asUpperCamelCase name}} = {{fieldIdentifier}},
     {{/zcl_event_fields}}
@@ -177,19 +177,19 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::{{asUpperCamelCase name}}::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
-    static constexpr bool kIsFabricScoped = {{event_is_fabric_scoped}};
+    static constexpr bool kIsFabricScoped = {{isFabricSensitive}};
 
     {{#zcl_event_fields}}
     {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase name}}{{> cluster_objects_field_init}};
     {{/zcl_event_fields}}
 
-    {{#if event_is_fabric_scoped}}
+    {{#if isFabricSensitive}}
     auto GetFabricIndex() const {
-        return {{ asLowerCamelCase event_fabric_idx_field }};
+        return fabricIndex;
     }
     {{/if}}
 
-    CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType {

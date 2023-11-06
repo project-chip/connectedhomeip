@@ -32,45 +32,75 @@
 
 #include "FreeRTOS.h"
 
+extern "C" {
+#include <network_flash_storage.h>
+}
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+#define kMaxKeyValueBytes 2048
+#define keyNameBytes 128
+
 CHIP_ERROR MW320Config::Init()
 {
-
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MW320Config::ReadConfigValue(Key key, bool & val)
 {
-    CHIP_ERROR err;
+    uint32_t ret;
+    uint32_t read_size = sizeof(bool);
+    char keyname[keyNameBytes];
+    snprintf(keyname, keyNameBytes, "%08lx", key);
 
-    err = CHIP_NO_ERROR;
-    err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    ret = ::get_saved_wifi_network(keyname, (uint8_t *) (&val), &read_size);
+    VerifyOrReturnError(ret == 0, CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MW320Config::ReadConfigValue(Key key, uint32_t & val)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    uint32_t ret;
+    uint32_t read_size = sizeof(uint32_t);
+    char keyname[keyNameBytes];
+    snprintf(keyname, keyNameBytes, "%08lx", key);
 
-    return err;
+    ret = ::get_saved_wifi_network(keyname, (uint8_t *) (&val), &read_size);
+    VerifyOrReturnError(ret == 0, CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MW320Config::ReadConfigValue(Key key, uint64_t & val)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint32_t ret;
+    uint32_t read_size = sizeof(uint64_t);
+    char keyname[keyNameBytes];
+    snprintf(keyname, keyNameBytes, "%08lx", key);
 
-    return err;
+    ret = ::get_saved_wifi_network(keyname, (uint8_t *) (&val), &read_size);
+    VerifyOrReturnError(ret == 0, CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MW320Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    uint32_t ret;
+    uint32_t read_size = bufSize;
+    char keyname[keyNameBytes];
+    snprintf(keyname, keyNameBytes, "%08lx", key);
+
+    ret = ::get_saved_wifi_network(keyname, (uint8_t *) (buf), &read_size);
+    VerifyOrReturnError(ret == 0, CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+    if (read_size <= bufSize)
+    {
+        outLen = read_size;
+    }
 
     return err;
 }
@@ -78,10 +108,16 @@ CHIP_ERROR MW320Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
 CHIP_ERROR MW320Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    uint32_t ret;
+    uint32_t read_size = bufSize;
+    char keyname[keyNameBytes];
+    snprintf(keyname, keyNameBytes, "%08lx", key);
 
-    if (buf == NULL)
+    ret = ::get_saved_wifi_network(keyname, (uint8_t *) (buf), &read_size);
+    VerifyOrReturnError(ret == 0, CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+    if (read_size <= bufSize)
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        outLen = read_size;
     }
 
     return err;
@@ -96,19 +132,28 @@ CHIP_ERROR MW320Config::ReadConfigValueCounter(const char * index, uint32_t & va
 
 CHIP_ERROR MW320Config::WriteConfigValue(Key key, bool val)
 {
+    char keyname[keyNameBytes];
 
+    snprintf(keyname, keyNameBytes, "%08lx", key);
+    ::save_wifi_network(keyname, (uint8_t *) &val, sizeof(bool));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MW320Config::WriteConfigValue(Key key, uint32_t val)
 {
+    char keyname[keyNameBytes];
 
+    snprintf(keyname, keyNameBytes, "%08lx", key);
+    ::save_wifi_network(keyname, (uint8_t *) &val, sizeof(uint32_t));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MW320Config::WriteConfigValue(Key key, uint64_t val)
 {
+    char keyname[keyNameBytes];
 
+    snprintf(keyname, keyNameBytes, "%08lx", key);
+    ::save_wifi_network(keyname, (uint8_t *) &val, sizeof(uint64_t));
     return CHIP_NO_ERROR;
 }
 
@@ -119,28 +164,48 @@ CHIP_ERROR MW320Config::WriteConfigValueStr(Key key, const char * str)
 
 CHIP_ERROR MW320Config::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
+    char keyname[keyNameBytes];
 
+    snprintf(keyname, keyNameBytes, "%08lx", key);
+    ::save_wifi_network(keyname, (uint8_t *) str, strLen);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MW320Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
+    char keyname[keyNameBytes];
 
+    snprintf(keyname, keyNameBytes, "%08lx", key);
+    ::save_wifi_network(keyname, (uint8_t *) data, dataLen);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MW320Config::ClearConfigValue(Key key)
 {
+    char keyname[keyNameBytes];
 
+    snprintf(keyname, keyNameBytes, "%08lx", key);
+    ::reset_saved_wifi_network(keyname);
     return CHIP_NO_ERROR;
 }
 
 bool MW320Config::ConfigValueExists(Key key)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint32_t ret;
+    uint32_t read_size = kMaxKeyValueBytes;
+    uint8_t buf[kMaxKeyValueBytes];
+    char keyname[keyNameBytes];
 
-    // Return true if the record was found.
-    return (err == CHIP_NO_ERROR);
+    snprintf(keyname, keyNameBytes, "%08lx", key);
+    ret = ::get_saved_wifi_network(keyname, buf, &read_size);
+    if (ret == 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 CHIP_ERROR MW320Config::FactoryResetConfig(void)

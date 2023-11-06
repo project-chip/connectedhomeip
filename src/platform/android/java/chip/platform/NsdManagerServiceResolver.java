@@ -25,8 +25,13 @@ import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class NsdManagerServiceResolver implements ServiceResolver {
   private static final String TAG = NsdManagerServiceResolver.class.getSimpleName();
@@ -35,8 +40,16 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   private MulticastLock multicastLock;
   private Handler mainThreadHandler;
   private List<NsdManager.RegistrationListener> registrationListeners = new ArrayList<>();
+  private final CopyOnWriteArrayList<String> mMFServiceName = new CopyOnWriteArrayList<>();
+  @Nullable private final NsdManagerResolverAvailState nsdManagerResolverAvailState;
 
-  public NsdManagerServiceResolver(Context context) {
+  /**
+   * @param context application context
+   * @param nsdManagerResolverAvailState Passing NsdManagerResolverAvailState allows
+   *     NsdManagerServiceResolver to synchronize on the usage of NsdManager's resolveService() API
+   */
+  public NsdManagerServiceResolver(
+      Context context, @Nullable NsdManagerResolverAvailState nsdManagerResolverAvailState) {
     this.nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
     this.mainThreadHandler = new Handler(Looper.getMainLooper());
 
@@ -44,6 +57,11 @@ public class NsdManagerServiceResolver implements ServiceResolver {
         ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
             .createMulticastLock("chipMulticastLock");
     this.multicastLock.setReferenceCounted(true);
+    this.nsdManagerResolverAvailState = nsdManagerResolverAvailState;
+  }
+
+  public NsdManagerServiceResolver(Context context) {
+    this(context, null);
   }
 
   @Override
@@ -53,8 +71,6 @@ public class NsdManagerServiceResolver implements ServiceResolver {
       final long callbackHandle,
       final long contextHandle,
       final ChipMdnsCallback chipMdnsCallback) {
-    multicastLock.acquire();
-
     NsdServiceInfo serviceInfo = new NsdServiceInfo();
     serviceInfo.setServiceName(instanceName);
     serviceInfo.setServiceType(serviceType);
@@ -76,52 +92,27 @@ public class NsdManagerServiceResolver implements ServiceResolver {
             Log.d(TAG, "resolve: Timing out");
             if (multicastLock.isHeld()) {
               multicastLock.release();
+
+              if (nsdManagerResolverAvailState != null) {
+                nsdManagerResolverAvailState.signalFree();
+              }
             }
           }
         };
 
-    this.nsdManager.resolveService(
-        serviceInfo,
-        new NsdManager.ResolveListener() {
-          @Override
-          public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-            Log.w(
-                TAG,
-                "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
-            chipMdnsCallback.handleServiceResolve(
-                instanceName, serviceType, null, null, 0, null, callbackHandle, contextHandle);
+    NsdServiceFinderAndResolver serviceFinderResolver =
+        new NsdServiceFinderAndResolver(
+            this.nsdManager,
+            serviceInfo,
+            callbackHandle,
+            contextHandle,
+            chipMdnsCallback,
+            timeoutRunnable,
+            multicastLock,
+            mainThreadHandler,
+            nsdManagerResolverAvailState);
+    serviceFinderResolver.start();
 
-            if (multicastLock.isHeld()) {
-              multicastLock.release();
-            }
-            mainThreadHandler.removeCallbacks(timeoutRunnable);
-          }
-
-          @Override
-          public void onServiceResolved(NsdServiceInfo serviceInfo) {
-            Log.i(
-                TAG,
-                "Resolved service '"
-                    + serviceInfo.getServiceName()
-                    + "' to "
-                    + serviceInfo.getHost());
-            // TODO: Find out if DNS-SD results for Android should contain interface ID
-            chipMdnsCallback.handleServiceResolve(
-                instanceName,
-                serviceType,
-                serviceInfo.getHost().getHostName(),
-                serviceInfo.getHost().getHostAddress(),
-                serviceInfo.getPort(),
-                serviceInfo.getAttributes(),
-                callbackHandle,
-                contextHandle);
-
-            if (multicastLock.isHeld()) {
-              multicastLock.release();
-            }
-            mainThreadHandler.removeCallbacks(timeoutRunnable);
-          }
-        });
     mainThreadHandler.postDelayed(timeoutRunnable, RESOLVE_SERVICE_TIMEOUT);
   }
 
@@ -134,6 +125,15 @@ public class NsdManagerServiceResolver implements ServiceResolver {
       String[] textEntriesKeys,
       byte[][] textEntriesDatas,
       String[] subTypes) {
+    /**
+     * Note, MF's NSDService will be repeatedly registered until it exceeds the OS's
+     * maximum(http://androidxref.com/9.0.0_r3/xref/frameworks/base/services/core/java/com/android/server/NsdService.java#MAX_LIMIT)
+     * limit at which time the registration will fail.
+     */
+    if (serviceName.contains("-") && mMFServiceName.contains(serviceName)) {
+      Log.w(TAG, "publish: duplicate MF nsdService");
+      return;
+    }
     NsdServiceInfo serviceInfo = new NsdServiceInfo();
     serviceInfo.setServiceName(serviceName);
 
@@ -189,7 +189,11 @@ public class NsdManagerServiceResolver implements ServiceResolver {
                 "service " + serviceInfo.getServiceName() + "(" + this + ") onServiceUnregistered");
           }
         };
+    if (registrationListeners.size() == 0) {
+      multicastLock.acquire();
+    }
     registrationListeners.add(registrationListener);
+    mMFServiceName.add(serviceName);
 
     nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);
     Log.d(TAG, "publish " + registrationListener + " count = " + registrationListeners.size());
@@ -198,10 +202,61 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   @Override
   public void removeServices() {
     Log.d(TAG, "removeServices: ");
+    if (registrationListeners.size() > 0) {
+      multicastLock.release();
+    }
     for (NsdManager.RegistrationListener l : registrationListeners) {
       Log.i(TAG, "Remove " + l);
       nsdManager.unregisterService(l);
     }
     registrationListeners.clear();
+    mMFServiceName.clear();
+  }
+
+  /**
+   * The Android NsdManager calls back on the NsdManager.ResolveListener with a
+   * FAILURE_ALREADY_ACTIVE(3) if any application code calls resolveService() on it while the
+   * resolve operation is already active (from another call made previously). An object of
+   * NsdManagerResolverAvailState allows NsdManagerServiceResolver to synchronize on the usage of
+   * NsdManager's resolveService() API
+   */
+  public static class NsdManagerResolverAvailState {
+    private static final String TAG = NsdManagerResolverAvailState.class.getSimpleName();
+
+    private Lock lock = new ReentrantLock();
+    private Condition condition = lock.newCondition();
+    private boolean busy = false;
+
+    /**
+     * Waits if the NsdManager is already busy with resolving a service. Otherwise, it marks it as
+     * busy and returns
+     */
+    public void acquireResolver() {
+      lock.lock();
+      try {
+        while (busy) {
+          Log.d(TAG, "Found NsdManager Resolver busy, waiting");
+          condition.await();
+        }
+        Log.d(TAG, "Found NsdManager Resolver free, using it and marking it as busy");
+        busy = true;
+      } catch (InterruptedException e) {
+        Log.e(TAG, "Failure while waiting for condition: " + e);
+      } finally {
+        lock.unlock();
+      }
+    }
+
+    /** Signals the NsdManager resolver as free */
+    public void signalFree() {
+      lock.lock();
+      try {
+        Log.d(TAG, "Signaling NsdManager Resolver as free");
+        busy = false;
+        condition.signal();
+      } finally {
+        lock.unlock();
+      }
+    }
   }
 }

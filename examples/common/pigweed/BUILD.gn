@@ -24,84 +24,82 @@ config("default_config") {
   ]
 }
 
-if (chip_enable_pw_rpc) {
-  import("//build_overrides/pigweed.gni")
-  import("$dir_pw_protobuf_compiler/proto.gni")
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_protobuf_compiler/proto.gni")
 
-  pw_proto_library("echo_service") {
-    sources = [ "$dir_pw_rpc/echo.proto" ]
-    inputs = [ "$dir_pw_rpc/echo.options" ]
-    deps = [ "$dir_pw_protobuf:common_protos" ]
-    strip_prefix = "$dir_pw_rpc"
-    prefix = "echo_service"
-  }
+pw_proto_library("echo_service") {
+  sources = [ "$dir_pw_rpc/echo.proto" ]
+  inputs = [ "$dir_pw_rpc/echo.options" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "$dir_pw_rpc"
+  prefix = "echo_service"
+}
 
-  pw_proto_library("attributes_service") {
-    sources = [ "protos/attributes_service.proto" ]
-    inputs = [ "protos/attributes_service.options" ]
-    deps = [ "$dir_pw_protobuf:common_protos" ]
-    strip_prefix = "protos"
-    prefix = "attributes_service"
-  }
+pw_proto_library("attributes_service") {
+  sources = [ "protos/attributes_service.proto" ]
+  inputs = [ "protos/attributes_service.options" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "attributes_service"
+}
 
-  pw_proto_library("device_service") {
-    sources = [ "protos/device_service.proto" ]
-    inputs = [ "protos/device_service.options" ]
-    deps = [ "$dir_pw_protobuf:common_protos" ]
-    strip_prefix = "protos"
-    prefix = "device_service"
-  }
+pw_proto_library("device_service") {
+  sources = [ "protos/device_service.proto" ]
+  inputs = [ "protos/device_service.options" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "device_service"
+}
 
-  pw_proto_library("descriptor_service") {
-    sources = [ "protos/descriptor_service.proto" ]
-    deps = [ "$dir_pw_protobuf:common_protos" ]
-    strip_prefix = "protos"
-    prefix = "descriptor_service"
-  }
+pw_proto_library("descriptor_service") {
+  sources = [ "protos/descriptor_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "descriptor_service"
+}
 
-  pw_proto_library("button_service") {
-    sources = [ "protos/button_service.proto" ]
-    deps = [ "$dir_pw_protobuf:common_protos" ]
-    strip_prefix = "protos"
-    prefix = "button_service"
-  }
+pw_proto_library("button_service") {
+  sources = [ "protos/button_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "button_service"
+}
 
-  pw_proto_library("lighting_service") {
-    sources = [ "protos/lighting_service.proto" ]
-    deps = [ "$dir_pw_protobuf:common_protos" ]
-    strip_prefix = "protos"
-    prefix = "lighting_service"
-  }
+pw_proto_library("lighting_service") {
+  sources = [ "protos/lighting_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "lighting_service"
+}
 
-  pw_proto_library("locking_service") {
-    sources = [ "protos/locking_service.proto" ]
-    deps = [ "$dir_pw_protobuf:common_protos" ]
-    strip_prefix = "protos"
-    prefix = "locking_service"
-  }
+pw_proto_library("locking_service") {
+  sources = [ "protos/locking_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "locking_service"
+}
 
-  pw_proto_library("ot_cli_service") {
-    sources = [ "protos/ot_cli_service.proto" ]
-    inputs = [ "protos/ot_cli_service.options" ]
-    deps = [ "$dir_pw_protobuf:common_protos" ]
-    strip_prefix = "protos"
-    prefix = "ot_cli_service"
-  }
+pw_proto_library("ot_cli_service") {
+  sources = [ "protos/ot_cli_service.proto" ]
+  inputs = [ "protos/ot_cli_service.options" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "ot_cli_service"
+}
 
-  pw_proto_library("thread_service") {
-    sources = [ "protos/thread_service.proto" ]
-    inputs = [ "protos/thread_service.options" ]
-    deps = [ "$dir_pw_protobuf:common_protos" ]
-    strip_prefix = "protos"
-    prefix = "thread_service"
-  }
+pw_proto_library("thread_service") {
+  sources = [ "protos/thread_service.proto" ]
+  inputs = [ "protos/thread_service.options" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "thread_service"
+}
 
-  pw_proto_library("wifi_service") {
-    sources = [ "protos/wifi_service.proto" ]
-    deps = [ "$dir_pw_protobuf:common_protos" ]
-    strip_prefix = "protos"
-    prefix = "wifi_service"
-  }
+pw_proto_library("wifi_service") {
+  sources = [ "protos/wifi_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "wifi_service"
 }
 
 pw_source_set("rpc_services") {

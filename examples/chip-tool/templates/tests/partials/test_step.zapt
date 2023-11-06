@@ -106,11 +106,11 @@
 {{#if (isTestOnlyCluster cluster)}}{{>testOnlyClusterArguments}}, value
 {{else if isWait}}                 {{>waitArguments}}
 {{else if isReadAttribute}}        {{>attributeArguments}}{{>maybeFabricFiltered}}{{>maybeDataVersion~}}
-{{else if isSubscribeAttribute}}   {{>attributeArguments}}, {{minInterval}}, {{maxInterval}}{{>maybeFabricFiltered}}{{>maybeDataVersion}}{{>maybeKeepSubscriptions~}}
+{{else if isSubscribeAttribute}}   {{>attributeArguments}}, {{minInterval}}, {{maxInterval}}{{>maybeFabricFiltered}}{{>maybeDataVersion}}{{>maybeKeepSubscriptions~}}, /* autoResubscribe = */ chip::NullOptional
 {{else if isWriteGroupAttribute}}  {{>groupAttributeArguments}}, value{{>maybeDataVersion~}}
 {{else if isWriteAttribute}}       {{>attributeArguments}}, value{{>maybeTimedInteractionTimeoutMs}}{{>maybeSuppressResponse}}{{>maybeDataVersion~}}
 {{else if isReadEvent}}            {{>eventArguments}}{{>maybeFabricFiltered}}{{>maybeEventNumber~}}
-{{else if isSubscribeEvent}}       {{>eventArguments}}, {{minInterval}}, {{maxInterval}}{{>maybeFabricFiltered}}{{>maybeEventNumber}}{{>maybeKeepSubscriptions~}}
+{{else if isSubscribeEvent}}       {{>eventArguments}}, {{minInterval}}, {{maxInterval}}{{>maybeFabricFiltered}}{{>maybeEventNumber}}{{>maybeKeepSubscriptions~}}, /* autoResubscribe = */ chip::NullOptional
 {{else if isGroupCommand}}         {{>groupCommandArguments}}, value
 {{else if isCommand}}              {{>commandArguments}}, value{{>maybeTimedInteractionTimeoutMs}}{{>maybeSuppressResponse}}
 {{/if}}

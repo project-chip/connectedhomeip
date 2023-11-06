@@ -22,7 +22,7 @@
 
 #include <app/tests/suites/pics/PICSBooleanExpressionParser.h>
 #include <app/tests/suites/pics/PICSBooleanReader.h>
-
+#include <lib/core/Optional.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 class PICSChecker
@@ -40,7 +40,7 @@ public:
         bool shouldSkip = !PICSBooleanExpressionParser::Eval(expression, pics);
         if (shouldSkip)
         {
-            ChipLogProgress(chipTool, " **** Skipping: %s == false\n", expression);
+            ChipLogProgress(chipTool, " **** Skipping: %s == false\n", StringOrNullMarker(expression));
         }
         return shouldSkip;
     }

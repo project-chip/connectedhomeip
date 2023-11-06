@@ -4,11 +4,11 @@ This document describes how to build below Linux examples with the NXP embedded
 Linux Yocto SDK and then run the output executable files on the **NXP i.MX 8M**
 **Mini EVK** development board.
 
--   [CHIP Linux All-clusters Example](../../examples/all-clusters-app/linux)
--   [CHIP Linux Lighting Example](../../examples/lighting-app/linux)
--   [CHIP Linux Thermostat Example](../../examples/thermostat/linux)
--   [CHIP Linux CHIP-tool Example](../../examples/chip-tool)
--   [CHIP Linux OTA-provider Example](../../examples/ota-provider-app/linux)
+-   [CHIP Linux All-clusters Example](../../examples/all-clusters-app/linux/README.md)
+-   [CHIP Linux Lighting Example](../../examples/lighting-app/linux/README.md)
+-   [CHIP Linux Thermostat Example](https://github.com/project-chip/connectedhomeip/tree/master/examples/thermostat/linux)
+-   [CHIP Linux CHIP-tool Example](../../examples/chip-tool/README.md)
+-   [CHIP Linux OTA-provider Example](../../examples/ota-provider-app/linux/README.md)
 
 This document has been tested on:
 
@@ -29,8 +29,6 @@ Linux OS development. For more information about this project, see the
     -   [Running the Examples on i.MX 8M Mini EVK](#running-the-examples-on-imx-8m-mini-evk)
 
 <hr>
-
-<a name="building"></a>
 
 ## Building
 
@@ -73,7 +71,7 @@ to be generated.
 
     More information about the downloaded Yocto release can be found in the
     corresponding i.MX Yocto Project User’s Guide which can be found at
-    [NXP official website](www.nxp.com/imxlinux).
+    [NXP official website](https://www.nxp.com/imxlinux).
 
     Change the current directory to the top directory of the Yocto source code
     and execute the commands below to generate the Yocto SDK:
@@ -181,8 +179,6 @@ to be generated.
     running the Yocto image previously generated as described in the sections
     above.
 
-<a name="command-line-args"></a>
-
 ## Commandline arguments
 
 The generated executable files supports to work with below commandline argument:
@@ -204,8 +200,6 @@ The generated executable files supports to work with below commandline argument:
 
     The BLE device on **i.MX 8M Mini EVK** is a module based on the NXP 88W8987
     Wi-Fi/Bluetooth SoC.
-
-<a name="running-complete-examples-on-imx8mmevk"></a>
 
 ## Running the Examples on i.MX 8M Mini EVK
 

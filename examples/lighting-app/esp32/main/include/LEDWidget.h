@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -43,6 +43,11 @@ public:
     uint8_t GetLevel(void);
     bool IsTurnedOn(void);
 
+#if CONFIG_DEVICE_TYPE_M5STACK
+    // binds this LED to a virtual LED on a screen
+    void SetVLED(int id1);
+#endif
+
 private:
     bool mState;
     uint8_t mBrightness;
@@ -53,6 +58,10 @@ private:
     led_strip_t * mStrip;
 #else
     gpio_num_t mGPIONum;
+#endif
+
+#if CONFIG_DEVICE_TYPE_M5STACK
+    int mVirtualLEDIndex = -1;
 #endif
 
     void DoSet(void);

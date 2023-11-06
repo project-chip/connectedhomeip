@@ -17,20 +17,35 @@ name:
     3.3.10. [TC-DD-3.10] Commissioning Flow - Custom Flow = 2 [DUT -
     Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.CUSTOM_COMM_FLOW
+
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
-    - label:
-          "DUT receives Onboarding Payload from the TH with Custom Flow field
-          set to value 2"
+    - label: "Note"
       verification: |
-          1. Parse the TH Onboarding Payload using the DUT commissioner
+          Chip-tool command used below are an example to verify the DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
 
-          Example using chip-tool as a DUT:
-          $ ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
+    - label: "Preconditions"
+      verification: |
+          1 -DUT is on an operational network and has accurate date, time, timezone, regulatory, and fabric information available.
+      disabled: true
+
+    - label:
+          "Step 1: DUT receives Onboarding Payload from the TH with Custom Flow
+          field set to value 2"
+      verification: |
+          1. Run TH. Example all-clusters app
+          ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3840 --passcode 20202021
+
+          2. Parse the QR Code using the DUT: chip-tool
+           ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
           [1657230447725] [31078:16782733] CHIP: [SPL] Parsing base38Representation: MT:-24J029Q00KA0648G00
           [1657230447725] [31078:16782733] CHIP: [SPL] Version:       0
           [1657230447725] [31078:16782733] CHIP: [SPL] VendorID:      65521
@@ -40,28 +55,30 @@ tests:
           [1657230447725] [31078:16782733] CHIP: [SPL] Discriminator: 3840
           [1657230447725] [31078:16782733] CHIP: [SPL] Passcode:      20202021
 
-          2. Verify that the Commissioning Flow is set to 2 (Custom Flow)
+          3. Verify that the CommissioningFlow is set to 2 (Custom Flow)
       disabled: true
 
     - label:
-          "DUT fetches commissioning data from DCL using VID and PID from
-          Onboarding Payload"
+          "Step 2: User follows any TH-specific steps to place the TH
+          Commissionee into commissioning mode."
       verification: |
-          1. Observe the TH's DCL on the DUT
+          1. Launch the TH commissionee all-clusters-app:
+          ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3840 --passcode 20202021
+
+          Verifiy on TH(ALL-CLUSTER-APP):
+          [1660152729.426029][648909:648909] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
+          [1660152729.426076][648909:648909] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]
+          [1660152729.426103][648909:648909] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1660152729.426123][648909:648909] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J029Q00KA0648G00
       disabled: true
 
-    - label:
-          "Using the instructions located at the CommissioningCustomFlowURL from
-          the DCL, DUT guides the user in next steps to prepare the commissionee
-          (TH) for commissioning"
+    - label: "Step 3: DUT commissions TH"
       verification: |
-          1. Follow instructions for commissioning using the URL contained in the DCL
-      disabled: true
+          ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
 
-    - label: "DUT commissions TH"
-      verification: |
-          $  ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
+          Verify in DUT(CHIP-TOOL)
+          CHIP:CTL: Received CommissioningComplete response
 
-          [1657578523795] [9610:351965] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
-          [1657578523795] [9610:351965] CHIP: [TOO] Device commissioning completed with success
+          Verifiy on TH(ALL-CLUSTER-APP):
+          [1660154248.898113][7143:7143] CHIP:SVR: Commissioning completed successfully
       disabled: true

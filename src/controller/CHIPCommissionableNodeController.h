@@ -39,7 +39,10 @@ public:
     CommissionableNodeController(chip::Dnssd::Resolver * resolver = nullptr) : mResolver(resolver) {}
     ~CommissionableNodeController() override;
 
+    void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDeviceDiscoveryDelegate = delegate; }
     CHIP_ERROR DiscoverCommissioners(Dnssd::DiscoveryFilter discoveryFilter = Dnssd::DiscoveryFilter());
+
+    CHIP_ERROR StopDiscovery();
 
     /**
      * @return

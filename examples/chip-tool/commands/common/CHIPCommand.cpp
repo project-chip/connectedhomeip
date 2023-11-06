@@ -25,35 +25,61 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
+#include <platform/LockTracker.h>
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceDecoder.h"
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
-std::map<std::string, std::unique_ptr<chip::Controller::DeviceCommissioner>> CHIPCommand::mCommissioners;
+std::map<CHIPCommand::CommissionerIdentity, std::unique_ptr<chip::Controller::DeviceCommissioner>> CHIPCommand::mCommissioners;
 std::set<CHIPCommand *> CHIPCommand::sDeferredCleanups;
 
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
-constexpr chip::FabricId kIdentityNullFabricId  = chip::kUndefinedFabricId;
-constexpr chip::FabricId kIdentityAlphaFabricId = 1;
-constexpr chip::FabricId kIdentityBetaFabricId  = 2;
-constexpr chip::FabricId kIdentityGammaFabricId = 3;
-constexpr chip::FabricId kIdentityOtherFabricId = 4;
+constexpr chip::FabricId kIdentityNullFabricId    = chip::kUndefinedFabricId;
+constexpr chip::FabricId kIdentityAlphaFabricId   = 1;
+constexpr chip::FabricId kIdentityBetaFabricId    = 2;
+constexpr chip::FabricId kIdentityGammaFabricId   = 3;
+constexpr chip::FabricId kIdentityOtherFabricId   = 4;
+constexpr const char * kPAATrustStorePathVariable = "CHIPTOOL_PAA_TRUST_STORE_PATH";
+constexpr const char * kCDTrustStorePathVariable  = "CHIPTOOL_CD_TRUST_STORE_PATH";
+
+const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = nullptr;
+chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
 
 namespace {
-const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStore(const char * paaTrustStorePath)
-{
-    static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath };
 
-    if (attestationTrustStore.IsInitialized())
+CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::Credentials::AttestationTrustStore ** trustStore)
+{
+    if (paaTrustStorePath == nullptr)
     {
-        return &attestationTrustStore;
+        paaTrustStorePath = getenv(kPAATrustStorePathVariable);
     }
 
-    return nullptr;
+    if (paaTrustStorePath == nullptr)
+    {
+        *trustStore = chip::Credentials::GetTestAttestationTrustStore();
+        return CHIP_NO_ERROR;
+    }
+
+    static chip::Credentials::FileAttestationTrustStore attestationTrustStore{ paaTrustStorePath };
+
+    if (paaTrustStorePath != nullptr && attestationTrustStore.paaCount() == 0)
+    {
+        ChipLogError(chipTool, "No PAAs found in path: %s", paaTrustStorePath);
+        ChipLogError(chipTool,
+                     "Please specify a valid path containing trusted PAA certificates using "
+                     "the argument [--paa-trust-store-path paa/file/path] "
+                     "or environment variable [%s=paa/file/path]",
+                     kPAATrustStorePathVariable);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    *trustStore = &attestationTrustStore;
+    return CHIP_NO_ERROR;
 }
+
 } // namespace
 
 CHIP_ERROR CHIPCommand::MaybeSetUpStack()
@@ -65,12 +91,12 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
 
     StartTracing();
 
-#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if (CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_TIZEN) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
     ReturnLogErrorOnFailure(chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(mBleAdapterId.ValueOr(0), true));
 #endif
 
-    ReturnLogErrorOnFailure(mDefaultStorage.Init());
+    ReturnLogErrorOnFailure(mDefaultStorage.Init(nullptr, GetStorageDirectory().ValueOr(nullptr)));
     ReturnLogErrorOnFailure(mOperationalKeystore.Init(&mDefaultStorage));
     ReturnLogErrorOnFailure(mOpCertStore.Init(&mDefaultStorage));
 
@@ -79,16 +105,19 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.fabricIndependentStorage = &mDefaultStorage;
     factoryInitParams.operationalKeystore      = &mOperationalKeystore;
     factoryInitParams.opCertStore              = &mOpCertStore;
+    factoryInitParams.enableServerInteractions = NeedsOperationalAdvertising();
+    factoryInitParams.sessionKeystore          = &mSessionKeystore;
 
     // Init group data provider that will be used for all group keys and IPKs for the
     // chip-tool-configured fabrics. This is OK to do once since the fabric tables
     // and the DeviceControllerFactory all "share" in the same underlying data.
     // Different commissioner implementations may want to use alternate implementations
     // of GroupDataProvider for injection through factoryInitParams.
-    mGroupDataProvider.SetStorageDelegate(&mDefaultStorage);
-    ReturnLogErrorOnFailure(mGroupDataProvider.Init());
-    chip::Credentials::SetGroupDataProvider(&mGroupDataProvider);
-    factoryInitParams.groupDataProvider = &mGroupDataProvider;
+    sGroupDataProvider.SetStorageDelegate(&mDefaultStorage);
+    sGroupDataProvider.SetSessionKeystore(factoryInitParams.sessionKeystore);
+    ReturnLogErrorOnFailure(sGroupDataProvider.Init());
+    chip::Credentials::SetGroupDataProvider(&sGroupDataProvider);
+    factoryInitParams.groupDataProvider = &sGroupDataProvider;
 
     uint16_t port = mDefaultStorage.GetListenPort();
     if (port != 0)
@@ -99,56 +128,34 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.listenPort = port;
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
-    const chip::Credentials::AttestationTrustStore * trustStore = mPaaTrustStorePath.HasValue()
-        ? GetTestFileAttestationTrustStore(mPaaTrustStorePath.Value())
-        : chip::Credentials::GetTestAttestationTrustStore();
-    ;
-    if (mPaaTrustStorePath.HasValue() && trustStore == nullptr)
+    ReturnErrorOnFailure(GetAttestationTrustStore(mPaaTrustStorePath.ValueOr(nullptr), &sTrustStore));
+
+    CommissionerIdentity nullIdentity{ kIdentityNull, chip::kUndefinedNodeId };
+    ReturnLogErrorOnFailure(InitializeCommissioner(nullIdentity, kIdentityNullFabricId));
+
+    // After initializing first commissioner, add the additional CD certs once
     {
-        ChipLogError(chipTool, "No PAAs found in path: %s", mPaaTrustStorePath.Value());
-        ChipLogError(chipTool,
-                     "Please specify a valid path containing trusted PAA certificates using [--paa-trust-store-path paa/file/path] "
-                     "argument");
-
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityNull, kIdentityNullFabricId, trustStore));
-    ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityAlpha, kIdentityAlphaFabricId, trustStore));
-    ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityBeta, kIdentityBetaFabricId, trustStore));
-    ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityGamma, kIdentityGammaFabricId, trustStore));
-
-    std::string name        = GetIdentity();
-    chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
-    if (fabricId >= kIdentityOtherFabricId)
-    {
-        ReturnLogErrorOnFailure(InitializeCommissioner(name, fabricId, trustStore));
-    }
-
-    // Initialize Group Data, including IPK
-    for (auto it = mCommissioners.begin(); it != mCommissioners.end(); it++)
-    {
-        if (0 == it->first.compare(kIdentityNull))
+        const char * cdTrustStorePath = mCDTrustStorePath.ValueOr(nullptr);
+        if (cdTrustStorePath == nullptr)
         {
-            continue;
+            cdTrustStorePath = getenv(kCDTrustStorePathVariable);
         }
-        const chip::Controller::DeviceCommissioner * controller = it->second.get();
 
-        chip::FabricIndex fabricIndex = controller->GetFabricIndex();
-        uint8_t compressed_fabric_id[sizeof(uint64_t)];
-        chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
-        ReturnLogErrorOnFailure(controller->GetCompressedFabricIdBytes(compressed_fabric_id_span));
-
-        ReturnLogErrorOnFailure(chip::GroupTesting::InitData(&mGroupDataProvider, fabricIndex, compressed_fabric_id_span));
-
-        // Configure the default IPK for all fabrics used by CHIP-tool. The epoch
-        // key is the same, but the derived keys will be different for each fabric.
-        // This has to be done here after we know the Compressed Fabric ID of all
-        // chip-tool-managed fabrics
-        chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-        ReturnLogErrorOnFailure(
-            chip::Credentials::SetSingleIpkEpochKey(&mGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
+        auto additionalCdCerts = chip::Credentials::LoadAllX509DerCerts(cdTrustStorePath);
+        if (cdTrustStorePath != nullptr && additionalCdCerts.size() == 0)
+        {
+            ChipLogError(chipTool, "Warning: no CD signing certs found in path: %s, only defaults will be used", cdTrustStorePath);
+            ChipLogError(chipTool,
+                         "Please specify a path containing trusted CD verifying key certificates using "
+                         "the argument [--cd-trust-store-path cd/file/path] "
+                         "or environment variable [%s=cd/file/path]",
+                         kCDTrustStorePathVariable);
+        }
+        ReturnErrorOnFailure(mCredIssuerCmds->AddAdditionalCDVerifyingCerts(additionalCdCerts));
     }
+    bool allowTestCdSigningKey = !mOnlyAllowTrustedCdKeys.ValueOr(false);
+    mCredIssuerCmds->SetCredentialIssuerOption(CredentialIssuerCommands::CredentialIssuerOptions::kAllowTestCdSigningKey,
+                                               allowTestCdSigningKey);
 
     return CHIP_NO_ERROR;
 }
@@ -165,12 +172,49 @@ void CHIPCommand::MaybeTearDownStack()
     // since the CHIP thread and event queue have been stopped, preventing any thread
     // races.
     //
-    for (auto it = mCommissioners.begin(); it != mCommissioners.end(); it++)
+    for (auto & commissioner : mCommissioners)
     {
-        ShutdownCommissioner(it->first);
+        ShutdownCommissioner(commissioner.first);
     }
 
     StopTracing();
+}
+
+CHIP_ERROR CHIPCommand::EnsureCommissionerForIdentity(std::string identity)
+{
+    chip::NodeId nodeId;
+    ReturnErrorOnFailure(GetIdentityNodeId(identity, &nodeId));
+    CommissionerIdentity lookupKey{ identity, nodeId };
+    if (mCommissioners.find(lookupKey) != mCommissioners.end())
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    // Need to initialize the commissioner.
+    chip::FabricId fabricId;
+    if (identity == kIdentityAlpha)
+    {
+        fabricId = kIdentityAlphaFabricId;
+    }
+    else if (identity == kIdentityBeta)
+    {
+        fabricId = kIdentityBetaFabricId;
+    }
+    else if (identity == kIdentityGamma)
+    {
+        fabricId = kIdentityGammaFabricId;
+    }
+    else
+    {
+        fabricId = strtoull(identity.c_str(), nullptr, 0);
+        if (fabricId < kIdentityOtherFabricId)
+        {
+            ChipLogError(chipTool, "Invalid identity: %s", identity.c_str());
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    }
+
+    return InitializeCommissioner(lookupKey, fabricId);
 }
 
 CHIP_ERROR CHIPCommand::Run()
@@ -179,17 +223,17 @@ CHIP_ERROR CHIPCommand::Run()
 
     CHIP_ERROR err = StartWaiting(GetWaitDuration());
 
-    bool deferCleanup = (IsInteractive() && DeferInteractiveCleanup());
-
-    Shutdown();
-
-    if (deferCleanup)
+    if (IsInteractive())
     {
-        sDeferredCleanups.insert(this);
+        bool timedOut;
+        // Give it 2 hours to run our cleanup; that should never get hit in practice.
+        CHIP_ERROR cleanupErr = RunOnMatterQueue(RunCommandCleanup, chip::System::Clock::Seconds16(7200), &timedOut);
+        VerifyOrDie(cleanupErr == CHIP_NO_ERROR);
+        VerifyOrDie(!timedOut);
     }
     else
     {
-        Cleanup();
+        CleanupAfterRun();
     }
 
     MaybeTearDownStack();
@@ -199,6 +243,14 @@ CHIP_ERROR CHIPCommand::Run()
 
 void CHIPCommand::StartTracing()
 {
+    if (mTraceTo.HasValue())
+    {
+        for (const auto & destination : mTraceTo.Value())
+        {
+            mTracingSetup.EnableTracingFor(destination.c_str());
+        }
+    }
+
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::trace::InitTrace();
 
@@ -225,6 +277,8 @@ void CHIPCommand::StartTracing()
 
 void CHIPCommand::StopTracing()
 {
+    mTracingSetup.StopTracing();
+
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::trace::DeInitTrace();
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
@@ -271,6 +325,43 @@ std::string CHIPCommand::GetIdentity()
     return name;
 }
 
+CHIP_ERROR CHIPCommand::GetIdentityNodeId(std::string identity, chip::NodeId * nodeId)
+{
+    if (mCommissionerNodeId.HasValue())
+    {
+        *nodeId = mCommissionerNodeId.Value();
+        return CHIP_NO_ERROR;
+    }
+
+    if (identity == kIdentityNull)
+    {
+        *nodeId = chip::kUndefinedNodeId;
+        return CHIP_NO_ERROR;
+    }
+
+    ReturnLogErrorOnFailure(mCommissionerStorage.Init(identity.c_str(), GetStorageDirectory().ValueOr(nullptr)));
+
+    *nodeId = mCommissionerStorage.GetLocalNodeId();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CHIPCommand::GetIdentityRootCertificate(std::string identity, chip::ByteSpan & span)
+{
+    if (identity == kIdentityNull)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    chip::NodeId nodeId;
+    VerifyOrDie(GetIdentityNodeId(identity, &nodeId) == CHIP_NO_ERROR);
+    CommissionerIdentity lookupKey{ identity, nodeId };
+    auto item = mCommissioners.find(lookupKey);
+
+    span = chip::ByteSpan(item->first.mRCAC, item->first.mRCACLen);
+    return CHIP_NO_ERROR;
+}
+
 chip::FabricId CHIPCommand::CurrentCommissionerId()
 {
     chip::FabricId id;
@@ -303,36 +394,35 @@ chip::FabricId CHIPCommand::CurrentCommissionerId()
 
 chip::Controller::DeviceCommissioner & CHIPCommand::CurrentCommissioner()
 {
-    auto item = mCommissioners.find(GetIdentity());
-    return *item->second;
+    return GetCommissioner(GetIdentity());
 }
 
-chip::Controller::DeviceCommissioner & CHIPCommand::GetCommissioner(const char * identity)
+chip::Controller::DeviceCommissioner & CHIPCommand::GetCommissioner(std::string identity)
 {
-    auto item = mCommissioners.find(identity);
+    // We don't have a great way to handle commissioner setup failures here.
+    // This only matters for commands (like TestCommand) that involve multiple
+    // identities.
+    VerifyOrDie(EnsureCommissionerForIdentity(identity) == CHIP_NO_ERROR);
+
+    chip::NodeId nodeId;
+    VerifyOrDie(GetIdentityNodeId(identity, &nodeId) == CHIP_NO_ERROR);
+    CommissionerIdentity lookupKey{ identity, nodeId };
+    auto item = mCommissioners.find(lookupKey);
+    VerifyOrDie(item != mCommissioners.end());
     return *item->second;
 }
 
-void CHIPCommand::ShutdownCommissioner(std::string key)
+void CHIPCommand::ShutdownCommissioner(const CommissionerIdentity & key)
 {
     mCommissioners[key].get()->Shutdown();
 }
 
-CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId fabricId,
-                                               const chip::Credentials::AttestationTrustStore * trustStore)
+CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, chip::FabricId fabricId)
 {
-    chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
-    chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
-    chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
-
     std::unique_ptr<ChipDeviceCommissioner> commissioner = std::make_unique<ChipDeviceCommissioner>();
     chip::Controller::SetupParams commissionerParams;
 
-    ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams, trustStore));
-
-    VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
-    VerifyOrReturnError(icac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
-    VerifyOrReturnError(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
+    ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams, sTrustStore));
 
     chip::Crypto::P256Keypair ephemeralKey;
 
@@ -342,30 +432,60 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
         // TODO - OpCreds should only be generated for pairing command
         //        store the credentials in persistent storage, and
         //        generate when not available in the storage.
-        ReturnLogErrorOnFailure(mCommissionerStorage.Init(key.c_str()));
+        ReturnLogErrorOnFailure(mCommissionerStorage.Init(identity.mName.c_str(), GetStorageDirectory().ValueOr(nullptr)));
+        if (mUseMaxSizedCerts.HasValue())
+        {
+            auto option = CredentialIssuerCommands::CredentialIssuerOptions::kMaximizeCertificateSizes;
+            mCredIssuerCmds->SetCredentialIssuerOption(option, mUseMaxSizedCerts.Value());
+        }
+
         ReturnLogErrorOnFailure(mCredIssuerCmds->InitializeCredentialsIssuer(mCommissionerStorage));
 
-        chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
-        chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
-        chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
+        chip::MutableByteSpan nocSpan(identity.mNOC);
+        chip::MutableByteSpan icacSpan(identity.mICAC);
+        chip::MutableByteSpan rcacSpan(identity.mRCAC);
 
-        ReturnLogErrorOnFailure(ephemeralKey.Initialize());
-        chip::NodeId nodeId = mCommissionerNodeId.ValueOr(mCommissionerStorage.GetLocalNodeId());
+        ReturnLogErrorOnFailure(ephemeralKey.Initialize(chip::Crypto::ECPKeyTarget::ECDSA));
 
-        ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(
-            nodeId, fabricId, mCommissionerStorage.GetCommissionerCATs(), ephemeralKey, rcacSpan, icacSpan, nocSpan));
-        commissionerParams.operationalKeypair = &ephemeralKey;
-        commissionerParams.controllerRCAC     = rcacSpan;
-        commissionerParams.controllerICAC     = icacSpan;
-        commissionerParams.controllerNOC      = nocSpan;
+        ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(identity.mLocalNodeId, fabricId,
+                                                                            mCommissionerStorage.GetCommissionerCATs(),
+                                                                            ephemeralKey, rcacSpan, icacSpan, nocSpan));
+
+        identity.mRCACLen = rcacSpan.size();
+        identity.mICACLen = icacSpan.size();
+        identity.mNOCLen  = nocSpan.size();
+
+        commissionerParams.operationalKeypair           = &ephemeralKey;
+        commissionerParams.controllerRCAC               = rcacSpan;
+        commissionerParams.controllerICAC               = icacSpan;
+        commissionerParams.controllerNOC                = nocSpan;
+        commissionerParams.permitMultiControllerFabrics = true;
     }
 
     // TODO: Initialize IPK epoch key in ExampleOperationalCredentials issuer rather than relying on DefaultIpkValue
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
-    commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
+    commissionerParams.controllerVendorId             = mCommissionerVendorId.ValueOr(chip::VendorId::TestVendor1);
 
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *(commissioner.get())));
-    mCommissioners[key] = std::move(commissioner);
+
+    if (identity.mName != kIdentityNull)
+    {
+        // Initialize Group Data, including IPK
+        chip::FabricIndex fabricIndex = commissioner->GetFabricIndex();
+        uint8_t compressed_fabric_id[sizeof(uint64_t)];
+        chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
+        ReturnLogErrorOnFailure(commissioner->GetCompressedFabricIdBytes(compressed_fabric_id_span));
+
+        ReturnLogErrorOnFailure(chip::GroupTesting::InitData(&sGroupDataProvider, fabricIndex, compressed_fabric_id_span));
+
+        // Configure the default IPK for all fabrics used by CHIP-tool. The epoch
+        // key is the same, but the derived keys will be different for each fabric.
+        chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+        ReturnLogErrorOnFailure(
+            chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
+    }
+
+    mCommissioners[identity] = std::move(commissioner);
 
     return CHIP_NO_ERROR;
 }
@@ -373,11 +493,66 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
 void CHIPCommand::RunQueuedCommand(intptr_t commandArg)
 {
     auto * command = reinterpret_cast<CHIPCommand *>(commandArg);
-    CHIP_ERROR err = command->RunCommand();
+    CHIP_ERROR err = command->EnsureCommissionerForIdentity(command->GetIdentity());
+    if (err == CHIP_NO_ERROR)
+    {
+        err = command->RunCommand();
+    }
+
     if (err != CHIP_NO_ERROR)
     {
         command->SetCommandExitStatus(err);
     }
+}
+
+void CHIPCommand::RunCommandCleanup(intptr_t commandArg)
+{
+    auto * command = reinterpret_cast<CHIPCommand *>(commandArg);
+    command->CleanupAfterRun();
+    command->StopWaiting();
+}
+
+void CHIPCommand::CleanupAfterRun()
+{
+    assertChipStackLockedByCurrentThread();
+    bool deferCleanup = (IsInteractive() && DeferInteractiveCleanup());
+
+    Shutdown();
+
+    if (deferCleanup)
+    {
+        sDeferredCleanups.insert(this);
+    }
+    else
+    {
+        Cleanup();
+    }
+}
+
+CHIP_ERROR CHIPCommand::RunOnMatterQueue(MatterWorkCallback callback, chip::System::Clock::Timeout timeout, bool * timedOut)
+{
+    {
+        std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
+        mWaitingForResponse = true;
+    }
+
+    auto err = chip::DeviceLayer::PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(this));
+    if (CHIP_NO_ERROR != err)
+    {
+        {
+            std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
+            mWaitingForResponse = false;
+        }
+        return err;
+    }
+
+    auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(timeout);
+    {
+        std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
+        *timedOut = !cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; });
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 #if !CONFIG_USE_SEPARATE_EVENTLOOP
@@ -402,19 +577,15 @@ CHIP_ERROR CHIPCommand::StartWaiting(chip::System::Clock::Timeout duration)
     }
     else
     {
+        bool timedOut;
+        CHIP_ERROR err = RunOnMatterQueue(RunQueuedCommand, duration, &timedOut);
+        if (CHIP_NO_ERROR != err)
         {
-            std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
-            mWaitingForResponse = true;
+            return err;
         }
-
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
-        auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(duration);
+        if (timedOut)
         {
-            std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
-            if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
-            {
-                mCommandExitStatus = CHIP_ERROR_TIMEOUT;
-            }
+            mCommandExitStatus = CHIP_ERROR_TIMEOUT;
         }
     }
     if (!IsInteractive())
@@ -443,7 +614,7 @@ void CHIPCommand::StopWaiting()
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP
 }
 
-void CHIPCommand::ExecuteDeferredCleanups()
+void CHIPCommand::ExecuteDeferredCleanups(intptr_t ignored)
 {
     for (auto * cmd : sDeferredCleanups)
     {

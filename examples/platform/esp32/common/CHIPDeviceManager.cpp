@@ -27,9 +27,9 @@
 #include "CHIPDeviceManager.h"
 #include <app/ConcreteAttributePath.h>
 #include <app/util/basic-types.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <setup_payload/SetupPayload.h>
 
 #include "esp_log.h"
@@ -78,6 +78,9 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.
     PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
+
+    // Start a task to run the CHIP Device background event loop.
+    ReturnErrorOnFailure(PlatformMgr().StartBackgroundEventLoopTask());
 
     // Start a task to run the CHIP Device event loop.
     return PlatformMgr().StartEventLoopTask();

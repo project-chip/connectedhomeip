@@ -19,12 +19,12 @@
 #include "CHIPDevicePlatformConfig.h"
 #include <crypto/CHIPCryptoPAL.h>
 
-#if CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
+#ifdef CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
 #include <credentials/CertificationDeclaration.h>
 #include <platform/Zephyr/ZephyrConfig.h>
 #endif
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 
 namespace chip {
 namespace {
@@ -37,6 +37,18 @@ CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P
     memcpy(serializedKeypair.Bytes() + publicKey.size(), privateKey.data(), privateKey.size());
     return keypair.Deserialize(serializedKeypair);
 }
+
+CHIP_ERROR GetFactoryDataString(const FactoryDataString & str, char * buf, size_t bufSize)
+{
+    ReturnErrorCodeIf(bufSize < str.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(!str.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
+    memcpy(buf, str.data, str.len);
+    buf[str.len] = 0;
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace
 
 namespace DeviceLayer {
@@ -69,7 +81,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
         return error;
     }
 
-    if (!ParseFactoryData(factoryData, factoryDataSize, &mFactoryData))
+    if (!ParseFactoryData(factoryData, static_cast<uint16_t>(factoryDataSize), &mFactoryData))
     {
         ChipLogError(DeviceLayer, "Failed to parse factory data");
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -89,7 +101,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
 template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
-#if CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
+#ifdef CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
     size_t cdLen = 0;
 
     if (Internal::ZephyrConfig::ReadConfigValueBin(Internal::ZephyrConfig::kConfigKey_CertificationDeclaration,
@@ -230,13 +242,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SetSetupPasscode(uint32_t setu
 template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetVendorName(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < mFactoryData.vendor_name.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(!mFactoryData.vendor_name.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-
-    memcpy(buf, mFactoryData.vendor_name.data, mFactoryData.vendor_name.len);
-    buf[mFactoryData.vendor_name.len] = 0;
-
-    return CHIP_NO_ERROR;
+    return GetFactoryDataString(mFactoryData.vendor_name, buf, bufSize);
 }
 
 template <class FlashFactoryData>
@@ -250,13 +256,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetVendorId(uint16_t & vendorI
 template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetProductName(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < mFactoryData.product_name.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(!mFactoryData.product_name.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-
-    memcpy(buf, mFactoryData.product_name.data, mFactoryData.product_name.len);
-    buf[mFactoryData.product_name.len] = 0;
-
-    return CHIP_NO_ERROR;
+    return GetFactoryDataString(mFactoryData.product_name, buf, bufSize);
 }
 
 template <class FlashFactoryData>
@@ -268,15 +268,27 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetProductId(uint16_t & produc
 }
 
 template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetPartNumber(char * buf, size_t bufSize)
+{
+    return GetFactoryDataString(mFactoryData.part_number, buf, bufSize);
+}
+
+template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetProductURL(char * buf, size_t bufSize)
+{
+    return GetFactoryDataString(mFactoryData.product_url, buf, bufSize);
+}
+
+template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetProductLabel(char * buf, size_t bufSize)
+{
+    return GetFactoryDataString(mFactoryData.product_label, buf, bufSize);
+}
+
+template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetSerialNumber(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < mFactoryData.sn.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(!mFactoryData.sn.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-
-    memcpy(buf, mFactoryData.sn.data, mFactoryData.sn.len);
-    buf[mFactoryData.sn.len] = 0;
-
-    return CHIP_NO_ERROR;
+    return GetFactoryDataString(mFactoryData.sn, buf, bufSize);
 }
 
 template <class FlashFactoryData>
@@ -300,13 +312,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetHardwareVersion(uint16_t & 
 template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetHardwareVersionString(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < mFactoryData.hw_ver_str.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(!mFactoryData.hw_ver_str.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-
-    memcpy(buf, mFactoryData.hw_ver_str.data, mFactoryData.hw_ver_str.len);
-    buf[mFactoryData.hw_ver_str.len] = 0;
-
-    return CHIP_NO_ERROR;
+    return GetFactoryDataString(mFactoryData.hw_ver_str, buf, bufSize);
 }
 
 template <class FlashFactoryData>
@@ -316,6 +322,8 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetRotatingDeviceIdUniqueId(Mu
     ReturnErrorCodeIf(!mFactoryData.rd_uid.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     memcpy(uniqueIdSpan.data(), mFactoryData.rd_uid.data, mFactoryData.rd_uid.len);
+
+    uniqueIdSpan.reduce_size(mFactoryData.rd_uid.len);
 
     return CHIP_NO_ERROR;
 }
@@ -329,6 +337,53 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetEnableKey(MutableByteSpan &
     memcpy(enableKey.data(), mFactoryData.enable_key.data, mFactoryData.enable_key.len);
 
     enableKey.reduce_size(mFactoryData.enable_key.len);
+
+    return CHIP_NO_ERROR;
+}
+
+template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish)
+{
+    ReturnErrorCodeIf(!finish, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!mFactoryData.productFinishPresent, CHIP_ERROR_NOT_IMPLEMENTED);
+    *finish = static_cast<app::Clusters::BasicInformation::ProductFinishEnum>(mFactoryData.product_finish);
+
+    return CHIP_NO_ERROR;
+}
+
+template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor)
+{
+    ReturnErrorCodeIf(!primaryColor, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!mFactoryData.primaryColorPresent, CHIP_ERROR_NOT_IMPLEMENTED);
+
+    *primaryColor = static_cast<app::Clusters::BasicInformation::ColorEnum>(mFactoryData.primary_color);
+
+    return CHIP_NO_ERROR;
+}
+
+template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetUserData(MutableByteSpan & userData)
+{
+    ReturnErrorCodeIf(!mFactoryData.user.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    ReturnErrorCodeIf(userData.size() < mFactoryData.user.len, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(userData.data(), mFactoryData.user.data, mFactoryData.user.len);
+
+    userData.reduce_size(mFactoryData.user.len);
+
+    return CHIP_NO_ERROR;
+}
+
+template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetUserKey(const char * userKey, void * buf, size_t & len)
+{
+    ReturnErrorCodeIf(!mFactoryData.user.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    ReturnErrorCodeIf(!buf, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    bool success = FindUserDataEntry(&mFactoryData, userKey, buf, len, &len);
+
+    ReturnErrorCodeIf(!success, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     return CHIP_NO_ERROR;
 }

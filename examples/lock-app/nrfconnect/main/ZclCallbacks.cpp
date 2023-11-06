@@ -23,13 +23,16 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
+#include <app/data-model/Nullable.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::DoorLock;
+using ::chip::app::DataModel::Nullable;
 
-LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
@@ -55,34 +58,54 @@ bool emberAfPluginDoorLockGetUser(EndpointId endpointId, uint16_t userIndex, Emb
 }
 
 bool emberAfPluginDoorLockSetUser(EndpointId endpointId, uint16_t userIndex, FabricIndex creator, FabricIndex modifier,
-                                  const CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType userType,
-                                  DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials)
+                                  const CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum userType,
+                                  CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
 {
     return BoltLockMgr().SetUser(userIndex, creator, modifier, userName, uniqueId, userStatus, userType, credentialRule,
                                  credentials, totalCredentials);
 }
 
-bool emberAfPluginDoorLockGetCredential(EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+bool emberAfPluginDoorLockGetCredential(EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                         EmberAfPluginDoorLockCredentialInfo & credential)
 {
     return BoltLockMgr().GetCredential(credentialIndex, credentialType, credential);
 }
 
 bool emberAfPluginDoorLockSetCredential(EndpointId endpointId, uint16_t credentialIndex, FabricIndex creator, FabricIndex modifier,
-                                        DlCredentialStatus credentialStatus, DlCredentialType credentialType,
+                                        DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
                                         const ByteSpan & secret)
 {
     return BoltLockMgr().SetCredential(credentialIndex, creator, modifier, credentialStatus, credentialType, secret);
 }
 
-bool emberAfPluginDoorLockOnDoorLockCommand(EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
+bool emberAfPluginDoorLockOnDoorLockCommand(EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                            const Nullable<chip::NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
+                                            OperationErrorEnum & err)
 {
-    return BoltLockMgr().ValidatePIN(pinCode, err);
+    bool result = BoltLockMgr().ValidatePIN(pinCode, err);
+
+    /* Handle changing attribute state on command reception */
+    if (result)
+    {
+        BoltLockMgr().Lock(BoltLockManager::OperationSource::kRemote);
+    }
+
+    return result;
 }
 
-bool emberAfPluginDoorLockOnDoorUnlockCommand(EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
+bool emberAfPluginDoorLockOnDoorUnlockCommand(EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
+                                              OperationErrorEnum & err)
 {
-    return BoltLockMgr().ValidatePIN(pinCode, err);
+    bool result = BoltLockMgr().ValidatePIN(pinCode, err);
+
+    /* Handle changing attribute state on command reception */
+    if (result)
+    {
+        BoltLockMgr().Unlock(BoltLockManager::OperationSource::kRemote);
+    }
+
+    return result;
 }
 
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
@@ -103,9 +126,9 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     logOnFailure(DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::Set(endpoint, CONFIG_LOCK_NUM_CREDENTIALS_PER_USER),
                  "number of credentials per user");
 
-    // Set FeatureMap to (kUsersManagement|kPINCredentials), default is:
-    // (kUsersManagement|kAccessSchedules|kRFIDCredentials|kPINCredentials) 0x113
-    logOnFailure(DoorLock::Attributes::FeatureMap::Set(endpoint, 0x101), "feature map");
+    // Set FeatureMap to (kUser|kPinCredential), default is:
+    // (kUser|kAccessSchedules|kRfidCredential|kPinCredential) 0x113
+    logOnFailure(DoorLock::Attributes::FeatureMap::Set(endpoint, 0x181), "feature map");
 
-    GetAppTask().UpdateClusterState(BoltLockMgr().GetState(), BoltLockManager::OperationSource::kUnspecified);
+    AppTask::Instance().UpdateClusterState(BoltLockMgr().GetState(), BoltLockManager::OperationSource::kUnspecified);
 }

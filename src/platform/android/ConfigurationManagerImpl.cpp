@@ -141,18 +141,6 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
     AndroidConfig::RunConfigUnitTest();
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-CHIP_ERROR ConfigurationManagerImpl::GetWiFiStationSecurityType(WiFiAuthSecurityType & secType)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ConfigurationManagerImpl::UpdateWiFiStationSecurityType(WiFiAuthSecurityType secType)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     return;
@@ -191,28 +179,48 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetPartNumber(char * buf, size_t bufSize)
-{
-    size_t dateLen;
-    return ReadConfigValueStr(AndroidConfig::kConfigKey_PartNumber, buf, bufSize, dateLen);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetProductURL(char * buf, size_t bufSize)
-{
-    size_t dateLen;
-    return ReadConfigValueStr(AndroidConfig::kConfigKey_ProductURL, buf, bufSize, dateLen);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetProductLabel(char * buf, size_t bufSize)
-{
-    size_t dateLen;
-    return ReadConfigValueStr(AndroidConfig::kConfigKey_ProductLabel, buf, bufSize, dateLen);
-}
-
 CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
 {
     size_t dateLen;
     return ReadConfigValueStr(AndroidConfig::kConfigKey_UniqueId, buf, bufSize, dateLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetDeviceTypeId(uint32_t & deviceType)
+{
+    CHIP_ERROR err;
+    uint32_t u32DeviceTypeId = 0;
+    err                      = ReadConfigValue(AndroidConfig::kConfigKey_DeviceTypeId, u32DeviceTypeId);
+
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        deviceType = CHIP_DEVICE_CONFIG_DEVICE_TYPE;
+    }
+    else
+    {
+        deviceType = u32DeviceTypeId;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetCommissionableDeviceName(char * buf, size_t bufSize)
+{
+    CHIP_ERROR err;
+    size_t u32DeviceNameSize = 0;
+    err                      = ReadConfigValueStr(AndroidConfig::kConfigKey_DeviceName, buf, bufSize, u32DeviceNameSize);
+
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

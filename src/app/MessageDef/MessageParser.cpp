@@ -36,7 +36,7 @@ CHIP_ERROR MessageParser::ExitContainer()
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
 CHIP_ERROR MessageParser::CheckInteractionModelRevision(TLV::TLVReader & aReader) const
 {
 #if CHIP_DETAIL_LOGGING
@@ -48,7 +48,7 @@ CHIP_ERROR MessageParser::CheckInteractionModelRevision(TLV::TLVReader & aReader
 #endif // CHIP_DETAIL_LOGGING
     return CHIP_NO_ERROR;
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 CHIP_ERROR MessageParser::GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const
 {

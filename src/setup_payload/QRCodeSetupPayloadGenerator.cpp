@@ -26,10 +26,10 @@
 #include "Base38Encode.h"
 
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVData.hpp>
-#include <lib/core/CHIPTLVDebug.hpp>
-#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVData.h>
+#include <lib/core/TLVDebug.h>
+#include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
@@ -53,7 +53,8 @@ static CHIP_ERROR populateBits(uint8_t * bits, size_t & offset, uint64_t input, 
     {
         if (input & 1)
         {
-            bits[index / 8] |= static_cast<uint8_t>(1 << index % 8);
+            const uint8_t mask = static_cast<uint8_t>(1 << index % 8);
+            bits[index / 8]    = static_cast<uint8_t>(bits[index / 8] | mask);
         }
         index++;
         input >>= 1;
@@ -168,10 +169,11 @@ static CHIP_ERROR generateBitSet(PayloadContents & payload, MutableByteSpan & bi
         populateBits(bits.data(), offset, payload.productID, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, static_cast<uint64_t>(payload.commissioningFlow),
                                       kCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits));
-    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.rendezvousInformation.Raw(), kRendezvousInfoFieldLengthInBits,
-                                      kTotalPayloadDataSizeInBits));
-    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.discriminator, kPayloadDiscriminatorFieldLengthInBits,
-                                      kTotalPayloadDataSizeInBits));
+    VerifyOrReturnError(payload.rendezvousInformation.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.rendezvousInformation.Value().Raw(),
+                                      kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.discriminator.GetLongValue(),
+                                      kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(
         populateBits(bits.data(), offset, payload.setUpPINCode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, 0, kPaddingFieldLengthInBits, kTotalPayloadDataSizeInBits));

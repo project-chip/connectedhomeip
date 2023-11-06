@@ -23,9 +23,9 @@
  *
  */
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <protocols/Protocols.h>
 #include <transport/raw/MessageHeader.h>
@@ -173,7 +173,7 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationGroupId(2);
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, &decodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(42ull));
-    NL_TEST_ASSERT(inSuite, !header.GetDestinationGroupId().HasValue());
+    NL_TEST_ASSERT(inSuite, !header.HasDestinationGroupId());
     NL_TEST_ASSERT(inSuite, header.HasPrivacyFlag());
     NL_TEST_ASSERT(inSuite, header.IsValidMCSPMsg());
 }
@@ -375,52 +375,45 @@ struct SpecComplianceTestVector theSpecComplianceTestVector[] = {
     },
 };
 
-const unsigned theSpecComplianceTestVectorLength = sizeof(theSpecComplianceTestVector) / sizeof(struct SpecComplianceTestVector);
-
 void TestSpecComplianceEncode(nlTestSuite * inSuite, void * inContext)
 {
-    struct SpecComplianceTestVector * testEntry;
     uint8_t buffer[MAX_FIXED_HEADER_SIZE];
     uint16_t encodeSize;
 
-    for (unsigned i = 0; i < theSpecComplianceTestVectorLength; i++)
+    for (const auto & testEntry : theSpecComplianceTestVector)
     {
         PacketHeader packetHeader;
-        testEntry = &theSpecComplianceTestVector[i];
 
-        packetHeader.SetMessageFlags(testEntry->messageFlags);
-        packetHeader.SetSecurityFlags(testEntry->securityFlags);
-        packetHeader.SetSessionId(testEntry->sessionId);
-        packetHeader.SetMessageCounter(testEntry->messageCounter);
+        packetHeader.SetMessageFlags(testEntry.messageFlags);
+        packetHeader.SetSecurityFlags(testEntry.securityFlags);
+        packetHeader.SetSessionId(testEntry.sessionId);
+        packetHeader.SetMessageCounter(testEntry.messageCounter);
 
-        if (testEntry->groupId >= 0)
+        if (testEntry.groupId >= 0)
         {
-            packetHeader.SetDestinationGroupId(static_cast<GroupId>(testEntry->groupId));
+            packetHeader.SetDestinationGroupId(static_cast<GroupId>(testEntry.groupId));
         }
 
         NL_TEST_ASSERT(inSuite, packetHeader.Encode(buffer, sizeof(buffer), &encodeSize) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, encodeSize == testEntry->size);
-        NL_TEST_ASSERT(inSuite, memcmp(buffer, testEntry->encoded, encodeSize) == 0);
+        NL_TEST_ASSERT(inSuite, encodeSize == testEntry.size);
+        NL_TEST_ASSERT(inSuite, memcmp(buffer, testEntry.encoded, encodeSize) == 0);
     }
 }
 
 void TestSpecComplianceDecode(nlTestSuite * inSuite, void * inContext)
 {
-    struct SpecComplianceTestVector * testEntry;
     PacketHeader packetHeader;
     uint16_t decodeSize;
 
-    for (unsigned i = 0; i < theSpecComplianceTestVectorLength; i++)
+    for (const auto & testEntry : theSpecComplianceTestVector)
     {
-        testEntry = &theSpecComplianceTestVector[i];
-
-        NL_TEST_ASSERT(inSuite, packetHeader.Decode(testEntry->encoded, testEntry->size, &decodeSize) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, decodeSize == testEntry->size);
-        NL_TEST_ASSERT(inSuite, packetHeader.GetMessageFlags() == testEntry->messageFlags);
-        NL_TEST_ASSERT(inSuite, packetHeader.GetSecurityFlags() == testEntry->securityFlags);
-        NL_TEST_ASSERT(inSuite, packetHeader.GetSessionId() == testEntry->sessionId);
-        NL_TEST_ASSERT(inSuite, packetHeader.GetMessageCounter() == testEntry->messageCounter);
-        NL_TEST_ASSERT(inSuite, packetHeader.IsEncrypted() == testEntry->isSecure);
+        NL_TEST_ASSERT(inSuite, packetHeader.Decode(testEntry.encoded, testEntry.size, &decodeSize) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, decodeSize == testEntry.size);
+        NL_TEST_ASSERT(inSuite, packetHeader.GetMessageFlags() == testEntry.messageFlags);
+        NL_TEST_ASSERT(inSuite, packetHeader.GetSecurityFlags() == testEntry.securityFlags);
+        NL_TEST_ASSERT(inSuite, packetHeader.GetSessionId() == testEntry.sessionId);
+        NL_TEST_ASSERT(inSuite, packetHeader.GetMessageCounter() == testEntry.messageCounter);
+        NL_TEST_ASSERT(inSuite, packetHeader.IsEncrypted() == testEntry.isSecure);
     }
 }
 
@@ -439,7 +432,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN,
         .msgLength        = HDR_LEN + PRO_LEN + APP_LEN,
         .msg              = "\x00\x00\x00\x00\xCC\xCC\xCC\xCC"
-               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+                            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     // ================== Test MX ==================
     {
@@ -448,7 +441,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN,
         .msgLength        = HDR_LEN + MX_LEN + PRO_LEN + APP_LEN,
         .msg              = "\x00\x00\x00\x20\xCC\xCC\xCC\xCC\x04\x00\xE4\xE3\xE2\xE1"
-               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+                            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     {
         // SRC=1, DST=none, MX=1, SX=0
@@ -456,7 +449,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN,
         .msgLength        = HDR_LEN + MX_LEN + SRC_LEN + PRO_LEN + APP_LEN,
         .msg              = "\x04\x00\x00\x20\xCC\xCC\xCC\xCC\x11\x11\x11\x11\x11\x11\x11\x11\x04\x00\xE4\xE3\xE2\xE1"
-               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+                            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     {
         // SRC=none, DST=1, MX=1, SX=0
@@ -464,7 +457,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN,
         .msgLength        = HDR_LEN + MX_LEN + DST_LEN + PRO_LEN + APP_LEN,
         .msg              = "\x01\x00\x00\x20\xCC\xCC\xCC\xCC\xDD\xDD\xDD\xDD\xDD\xDD\xDD\xDD\x04\x00\xE4\xE3\xE2\xE1"
-               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+                            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     {
         // SRC=1, DST=1, MX=1, SX=0
@@ -481,7 +474,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN,
         .msgLength        = HDR_LEN + MX_LEN + GID_LEN + PRO_LEN + APP_LEN,
         .msg              = "\x02\x00\x00\x21\xCC\xCC\xCC\xCC\xDD\xDD\x04\x00\xE4\xE3\xE2\xE1"
-               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+                            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     {
         // SRC=1, DST=group, MX=1, SX=0
@@ -489,7 +482,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN,
         .msgLength        = HDR_LEN + MX_LEN + SRC_LEN + GID_LEN + PRO_LEN + APP_LEN,
         .msg              = "\x06\x00\x00\x21\xCC\xCC\xCC\xCC\x11\x11\x11\x11\x11\x11\x11\x11\xDD\xDD\x04\x00\xE4\xE3\xE2\xE1"
-               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+                            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     // ================== Test SX ==================
     {
@@ -498,7 +491,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN + SX_LEN,
         .msgLength        = HDR_LEN + PRO_LEN + SX_LEN + APP_LEN,
         .msg              = "\x00\x00\x00\x00\xCC\xCC\xCC\xCC"
-               "\x08\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
+                            "\x08\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
     },
     {
         // SRC=none, DST=none, MX=1, SX=1
@@ -506,7 +499,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN + SX_LEN,
         .msgLength        = HDR_LEN + MX_LEN + PRO_LEN + SX_LEN + APP_LEN,
         .msg              = "\x00\x00\x00\x20\xCC\xCC\xCC\xCC\x04\x00\xE4\xE3\xE2\xE1"
-               "\x08\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
+                            "\x08\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
     },
     {
         // SRC=1, DST=1, MX=1, SX=1
@@ -519,28 +512,23 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
     },
 };
 
-const unsigned theTestVectorMsgExtensionsLength = sizeof(theTestVectorMsgExtensions) / sizeof(struct TestVectorMsgExtensions);
-
 void TestMsgExtensionsDecode(nlTestSuite * inSuite, void * inContext)
 {
-    struct TestVectorMsgExtensions * testEntry;
     PacketHeader packetHeader;
     PayloadHeader payloadHeader;
     uint16_t decodeSize;
 
     NL_TEST_ASSERT(inSuite, chip::Platform::MemoryInit() == CHIP_NO_ERROR);
 
-    for (unsigned i = 0; i < theTestVectorMsgExtensionsLength; i++)
+    for (const auto & testEntry : theTestVectorMsgExtensions)
     {
-        testEntry = &theTestVectorMsgExtensions[i];
-
-        System::PacketBufferHandle msg = System::PacketBufferHandle::NewWithData(testEntry->msg, testEntry->msgLength);
+        System::PacketBufferHandle msg = System::PacketBufferHandle::NewWithData(testEntry.msg, testEntry.msgLength);
 
         NL_TEST_ASSERT(inSuite, packetHeader.Decode(msg->Start(), msg->DataLength(), &decodeSize) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, decodeSize == testEntry->payloadOffset);
+        NL_TEST_ASSERT(inSuite, decodeSize == testEntry.payloadOffset);
 
         NL_TEST_ASSERT(inSuite, payloadHeader.Decode(msg->Start() + decodeSize, msg->DataLength(), &decodeSize) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, decodeSize == testEntry->appPayloadOffset);
+        NL_TEST_ASSERT(inSuite, decodeSize == testEntry.appPayloadOffset);
     }
 }
 
@@ -562,7 +550,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestMessageHeader(void)
+int TestMessageHeader()
 {
     nlTestSuite theSuite = { "Transport-MessageHeader", &sTests[0], nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

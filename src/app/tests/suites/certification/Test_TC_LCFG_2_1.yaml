@@ -11,149 +11,130 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    99.2.1. [TC-LCFG-2.1] Localization Configuration Cluster
+    102.2.1. [TC-LCFG-2.1] Localization Configuration Cluster
     Attributes[DUT-Server]
+
+PICS:
+    - LCFG.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Localization Configuration"
     endpoint: 0
+    #default value is assigned by the Vendor
+    Default.Vendor.ActiveLocaleValue:
+        type: char_string
+        defaultValue: "en-US"
+    #string not present in SupportedLocales
+    Value.NotPresentInSupportedLocales:
+        type: char_string
+        defaultValue: "fw-GB"
+    #string present in SupportedLocales
+    Value.PresentInSupportedLocales:
+        type: char_string
+        defaultValue: "es-ES"
 
 tests:
-    - label: "TH reads SupportedLocales attribute from DUT"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1a: TH reads SupportedLocales attribute from DUT"
       PICS: LCFG.S.A0001
+      command: "readAttribute"
+      attribute: "SupportedLocales"
+      response:
+          saveAs: SupportedLocalesValues
+          constraints:
+              type: list
+              maxLength: 35
+
+    - label:
+          "Step 1b: Verify that the values in the SupportedLocales attribute are
+          not repeated"
       verification: |
-          Verify in TH Log
+          Verify that the values in the SupportedLocales attribute are not repeated
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && LCFG.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
-          ./chip-tool localizationconfiguration read supported-locales 1 0
+    - label: "Step 2: TH writes 'xx-XX' to SupportedLocales attribute"
+      command: "writeAttribute"
+      attribute: "SupportedLocales"
+      arguments:
+          value: [xx-XX]
+      response:
+          error: UNSUPPORTED_WRITE
 
-          [1651129546.170573][174082:174087] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_0002 DataVersion: 3111654481
-          [1651129546.170622][174082:174087] CHIP:TOO:   SupportedLocales: 8 entries
-          [1651129546.170636][174082:174087] CHIP:TOO:     [1]: en-US
-          [1651129546.170647][174082:174087] CHIP:TOO:     [2]: de-DE
-          [1651129546.170656][174082:174087] CHIP:TOO:     [3]: fr-FR
-          [1651129546.170664][174082:174087] CHIP:TOO:     [4]: en-GB
-          [1651129546.170672][174082:174087] CHIP:TOO:     [5]: es-ES
-          [1651129546.170681][174082:174087] CHIP:TOO:     [6]: zh-CN
-          [1651129546.170689][174082:174087] CHIP:TOO:     [7]: it-IT
-          [1651129546.170697][174082:174087] CHIP:TOO:     [8]: ja-JP
-      disabled: true
+    - label: "Step 3: TH reads SupportedLocales attribute from DUT"
+      PICS: LCFG.S.A0001
+      command: "readAttribute"
+      attribute: "SupportedLocales"
+      response:
+          value: SupportedLocalesValues
 
-    - label: 'TH writes "xx-XX" to SupportedLocales attribute'
-      verification: |
-          Verify in TH Log
-
-           ./chip-tool any write-by-id 0x002B 1 xx-XX 1 0
-           [1653996674.832226][7281:7286] CHIP:DMG: WriteClient moving to [AwaitingDe]
-           [1653996674.832300][7281:7286] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-           [1653996674.832411][7281:7286] CHIP:EM: Sending Standalone Ack for MessageCounter:12567655 on exchange 10797i
-      disabled: true
-
-    - label: "TH reads SupportedLocales attribute"
-      verification: |
-          Verify in TH Log
-
-          ./chip-tool localizationconfiguration read supported-locales 1 0
-          [1645772065.848431][3762:3767] CHIP:TOO:   SupportedLocales: 8 entries
-          [1645772065.850249][3762:3767] CHIP:TOO:     [1]: en-US
-          [1645772065.850298][3762:3767] CHIP:TOO:     [2]: de-DE
-          [1645772065.850333][3762:3767] CHIP:TOO:     [3]: fr-FR
-          [1645772065.850368][3762:3767] CHIP:TOO:     [4]: en-GB
-          [1645772065.850402][3762:3767] CHIP:TOO:     [5]: es-ES
-          [1645772065.850435][3762:3767] CHIP:TOO:     [6]: zh-CN
-          [1645772065.850469][3762:3767] CHIP:TOO:     [7]: it-IT
-          [1645772065.850502][3762:3767] CHIP:TOO:     [8]: ja-JP
-          [1645772065.851668][3762:3767] CHIP:EM: Sending Standalone Ack for MessageCounter:4927804 on exchange 64827i
-      disabled: true
-
-    - label: "TH reads ActiveLocale Attribute from the DUT"
+    - label: "Step 4a: TH reads ActiveLocale Attribute from the DUT"
       PICS: LCFG.S.A0000
-      verification: |
-          Verify in TH Log
-
-          ./chip-tool localizationconfiguration read active-locale 1 0
-
-
-          [1651035208.064278][2761:2766] CHIP:DMG:        SuppressResponse = true,
-          [1651035208.064316][2761:2766] CHIP:DMG:        InteractionModelRevision = 1
-          [1651035208.064350][2761:2766] CHIP:DMG: }
-          [1651035208.064552][2761:2766] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_0001 DataVersion: 1509240084
-          [1651035208.064613][2761:2766] CHIP:TOO:   ActiveLocale: en-US
-      disabled: true
+      command: "readAttribute"
+      attribute: "ActiveLocale"
+      response:
+          value: Default.Vendor.ActiveLocaleValue
+          constraints:
+              type: char_string
+              maxLength: 35
 
     - label:
-          "TH writes new string not present in SupportedLocale attribute to
-          ActiveLocale Attribute."
+          "Step 4b: Verify that the ActiveLocale attribute is Language Tag as
+          defined by BCP47. Verify that the ActiveLocale Attribute value is
+          present in the SupportedLocales attribute list"
       verification: |
-          Verify in TH Log
-
-          ./chip-tool localizationconfiguration write active-locale fw-GB 1 0
-
-
-          [[1651130076.882814][174458:174463] CHIP:DMG: WriteResponseMessage =
-          [1651130076.882819][174458:174463] CHIP:DMG: {
-          [1651130076.882824][174458:174463] CHIP:DMG:         AttributeStatusIBs =
-          [1651130076.882832][174458:174463] CHIP:DMG:         [
-          [1651130076.882835][174458:174463] CHIP:DMG:                 AttributeStatusIB =
-          [1651130076.882842][174458:174463] CHIP:DMG:                 {
-          [1651130076.882846][174458:174463] CHIP:DMG:                         AttributePathIB =
-          [1651130076.882850][174458:174463] CHIP:DMG:                         {
-          [1651130076.882855][174458:174463] CHIP:DMG:                                 Endpoint = 0x0,
-          [1651130076.882861][174458:174463] CHIP:DMG:                                 Cluster = 0x2b,
-          [1651130076.882867][174458:174463] CHIP:DMG:                                 Attribute = 0x0000_0001,
-          [1651130076.882871][174458:174463] CHIP:DMG:                         }
-          [1651130076.882877][174458:174463] CHIP:DMG:
-          [1651130076.882881][174458:174463] CHIP:DMG:                         StatusIB =
-          [1651130076.882885][174458:174463] CHIP:DMG:                         {
-          [1651130076.882889][174458:174463] CHIP:DMG:                                 status = 0x87 (CONSTRAINT_ERROR),
-          [1651130076.882893][174458:174463] CHIP:DMG:                         },
-          [1651130076.882899][174458:174463] CHIP:DMG:
-          [1651130076.882903][174458:174463] CHIP:DMG:                 },
-          [1651130076.882908][174458:174463] CHIP:DMG:
-          [1651130076.882911][174458:174463] CHIP:DMG:         ],
-          [1651130076.882916][174458:174463] CHIP:DMG:
-          [1651130076.882920][174458:174463] CHIP:DMG:         InteractionModelRevision = 1
-          [1651130076.882923][174458:174463] CHIP:DMG: }
-          [1651130076.882938][174458:174463] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
-          [1651130076.882946][174458:174463] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1651130076.882957][174458:174463] CHIP:EM: Sending Standalone Ack for MessageCounter
-      disabled: true
+          1. Verify that the ActiveLocale attribute is Language Tag as defined by BCP47
+          2. Verify that the ActiveLocale Attribute value is present in the SupportedLocales attribute list
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && LCFG.S.A0000
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "TH writes new string present in SupportedLocale attribute to
+          "Step 5: TH writes new string not present in SupportedLocales
+          attribute to ActiveLocale Attribute."
+      PICS: LCFG.S.A0000
+      command: "writeAttribute"
+      attribute: "ActiveLocale"
+      arguments:
+          value: Value.NotPresentInSupportedLocales
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 6: TH writes new string present in SupportedLocales attribute to
           ActiveLocale Attribute"
-      verification: |
-          Verify in TH Log
+      PICS: LCFG.S.A0000
+      command: "writeAttribute"
+      attribute: "ActiveLocale"
+      arguments:
+          value: Value.PresentInSupportedLocales
 
-          ./chip-tool localizationconfiguration write active-locale fr-FR 1 0
-
-          [1651035259.959116][2776:2781] CHIP:DMG:                        StatusIB =
-          [1651035259.959158][2776:2781] CHIP:DMG:                        {
-          [1651035259.959195][2776:2781] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1651035259.959234][2776:2781] CHIP:DMG:                        },
-          [1651035259.959271][2776:2781] CHIP:DMG:
-          [1651035259.959304][2776:2781] CHIP:DMG:                },
-          [1651035259.959343][2776:2781] CHIP:DMG:
-          [1651035259.959372][2776:2781] CHIP:DMG:        ],
-          [1651035259.959409][2776:2781] CHIP:DMG:
-          [1651035259.959438][2776:2781] CHIP:DMG:        InteractionModelRevision = 1
-          [1651035259.959466][2776:2781] CHIP:DMG: }
-          [1651035259.959552][2776:2781] CHIP:DMG: WriteClient moving to [AwaitingDe]
-      disabled: true
-
-    - label: "TH Reads ActiveLocale"
-      verification: |
-          Verify in TH Log
-
-          ./chip-tool localizationconfiguration read active-locale 1 0
-
-          [1645772597.252904][3816:3821] CHIP:DMG:
-          [1645772597.252948][3816:3821] CHIP:DMG:        SuppressResponse = true,
-          [1645772597.252981][3816:3821] CHIP:DMG:        InteractionModelRevision = 1
-          [1645772597.253024][3816:3821] CHIP:DMG: }
-          [1645772597.253230][3816:3821] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_0001DataVersion: 3479138639
-          [1645772597.253293][3816:3821] CHIP:TOO:   ActiveLocale: fr-FR
-      disabled: true
+    - label: "Step 7: TH Reads ActiveLocale"
+      PICS: LCFG.S.A0000
+      command: "readAttribute"
+      attribute: "ActiveLocale"
+      response:
+          value: Value.PresentInSupportedLocales

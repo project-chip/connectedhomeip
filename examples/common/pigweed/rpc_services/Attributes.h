@@ -21,14 +21,12 @@
 #include "app/util/attribute-storage.h"
 #include "attributes_service/attributes_service.rpc.pb.h"
 #include "pigweed/rpc_services/internal/StatusUtils.h"
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVTags.h>
-#include <lib/core/CHIPTLVTypes.h>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {
@@ -113,15 +111,15 @@ public:
             response.which_data = chip_rpc_AttributeData_data_uint32_tag;
             break;
         case chip_rpc_AttributeType_ZCL_INT8S_ATTRIBUTE_TYPE:
-            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_UnsignedInteger, response.data.data_int8));
+            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_SignedInteger, response.data.data_int8));
             response.which_data = chip_rpc_AttributeData_data_int8_tag;
             break;
         case chip_rpc_AttributeType_ZCL_INT16S_ATTRIBUTE_TYPE:
-            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_UnsignedInteger, response.data.data_int16));
+            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_SignedInteger, response.data.data_int16));
             response.which_data = chip_rpc_AttributeData_data_int16_tag;
             break;
         case chip_rpc_AttributeType_ZCL_INT32S_ATTRIBUTE_TYPE:
-            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_UnsignedInteger, response.data.data_int32));
+            PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_SignedInteger, response.data.data_int32));
             response.which_data = chip_rpc_AttributeData_data_int32_tag;
             break;
         case chip_rpc_AttributeType_ZCL_BITMAP8_ATTRIBUTE_TYPE:

@@ -26,12 +26,14 @@
 #include <app/clusters/application-basic-server/application-basic-server.h>
 
 #include <app/AttributeAccessInterface.h>
+#include <app/data-model/Encode.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/config.h>
+#include <platform/CHIPDeviceConfig.h>
+
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-#include <app/data-model/Encode.h>
-#include <app/util/attribute-storage.h>
-#include <platform/CHIPDeviceConfig.h>
 
 #include <list>
 
@@ -44,6 +46,7 @@ using namespace chip::AppPlatform;
 
 static constexpr size_t kApplicationBasicDelegateTableSize =
     EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kApplicationBasicDelegateTableSize <= kEmberInvalidEndpointIndex, "ApplicationBasic Delegate table size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -66,8 +69,9 @@ Delegate * GetDelegate(EndpointId endpoint)
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(Zcl, "ApplicationBasic NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationBasic::Id);
-    return ((ep == 0xFFFF || ep >= EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationBasic::Id,
+                                                       EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kApplicationBasicDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -88,9 +92,10 @@ namespace ApplicationBasic {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ApplicationBasic::Id);
-    // if endpoint is found and is not a dynamic endpoint
-    if (ep != 0xFFFF && ep < EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT)
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ApplicationBasic::Id,
+                                                       EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT);
+    // if endpoint is found
+    if (ep < kApplicationBasicDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }
@@ -107,15 +112,15 @@ Delegate * GetDefaultDelegate(EndpointId endpoint)
 CHIP_ERROR Delegate::HandleGetApplication(app::AttributeValueEncoder & aEncoder)
 {
     ApplicationBasicApplicationType application;
-    application.catalogVendorId = mCatalogVendorApp.catalogVendorId;
-    application.applicationId   = CharSpan(mCatalogVendorApp.applicationId, strlen(mCatalogVendorApp.applicationId));
+    application.catalogVendorID = mCatalogVendorApp.catalogVendorId;
+    application.applicationID   = CharSpan(mCatalogVendorApp.applicationId, strlen(mCatalogVendorApp.applicationId));
     return aEncoder.Encode(application);
 }
 
-bool Delegate::Matches(ApplicationBasicApplication match)
+bool Delegate::Matches(const ApplicationBasicApplicationType & match)
 {
-    std::string appId(match.applicationId.data(), match.applicationId.size());
-    CatalogVendorApp matchApp(match.catalogVendorId, appId.c_str());
+    std::string appId(match.applicationID.data(), match.applicationID.size());
+    CatalogVendorApp matchApp(match.catalogVendorID, appId.c_str());
     return mCatalogVendorApp.Matches(&matchApp);
 }
 

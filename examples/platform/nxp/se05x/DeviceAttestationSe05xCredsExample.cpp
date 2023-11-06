@@ -16,22 +16,16 @@
  */
 #include "DeviceAttestationSe05xCredsExample.h"
 
+#include <CHIPCryptoPAL_se05x.h>
 #include <credentials/examples/ExampleDACs.h>
 #include <credentials/examples/ExamplePAI.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
-
-#ifdef ENABLE_HSM_DEVICE_ATTESTATION
-
-#include <crypto/hsm/nxp/CHIPCryptoPALHsm_SE05X_utils.h>
-
-#define DEV_ATTESTATION_KEY_ID 0xDADADADA
-#define DEV_ATTESTATION_CERT_ID 0xDADADADB
+/* Device attestation key ids */
+#define DEV_ATTESTATION_KEY_SE05X_ID 0x7D300000
+#define DEV_ATTESTATION_CERT_SE05X_ID 0x7D300001
 
 extern CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t * buf, size_t * buflen);
 
@@ -57,8 +51,8 @@ CHIP_ERROR ExampleSe05xDACProvider::GetDeviceAttestationCert(MutableByteSpan & o
     return CopySpanToMutableSpan(DevelopmentCerts::kDacCert, out_dac_buffer);
 #else
     size_t buflen = out_dac_buffer.size();
-    ChipLogDetail(Crypto, "Get certificate from se05x");
-    ReturnErrorOnFailure(se05xGetCertificate(DEV_ATTESTATION_CERT_ID, out_dac_buffer.data(), &buflen));
+    ChipLogDetail(Crypto, "Get DA certificate from se05x");
+    ReturnErrorOnFailure(se05xGetCertificate(DEV_ATTESTATION_CERT_SE05X_ID, out_dac_buffer.data(), &buflen));
     out_dac_buffer.reduce_size(buflen);
     return CHIP_NO_ERROR;
 #endif
@@ -88,7 +82,7 @@ CHIP_ERROR ExampleSe05xDACProvider::GetCertificationDeclaration(MutableByteSpan 
     //-> certification_type = 0
     //-> dac_origin_vendor_id is not present
     //-> dac_origin_product_id is not present
-    const uint8_t kCdForAllExamples[541] = {
+    const uint8_t kCdForAllExamples[] = {
         0x30, 0x82, 0x02, 0x19, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x02, 0xa0, 0x82, 0x02, 0x0a, 0x30,
         0x82, 0x02, 0x06, 0x02, 0x01, 0x03, 0x31, 0x0d, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02,
         0x01, 0x30, 0x82, 0x01, 0x71, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x01, 0xa0, 0x82, 0x01, 0x62,
@@ -134,17 +128,32 @@ CHIP_ERROR ExampleSe05xDACProvider::SignWithDeviceAttestationKey(const ByteSpan 
                                                                  MutableByteSpan & out_signature_buffer)
 {
     Crypto::P256ECDSASignature signature;
-    Crypto::P256KeypairHSM keypair;
+    Crypto::P256Keypair keypair;
+    Crypto::P256SerializedKeypair serialized_keypair;
+    uint8_t magic_bytes[] = NXP_CRYPTO_KEY_MAGIC;
 
     ChipLogDetail(Crypto, "Sign using DA key from se05x");
 
-    VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(message_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!out_signature_buffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!message_to_sign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_signature_buffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    keypair.SetKeyId(DEV_ATTESTATION_KEY_ID);
-    keypair.provisioned_key = true;
-    keypair.Initialize();
+    // Add public key + reference private key (ref to key inside SE)
+
+    serialized_keypair.SetLength(Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length);
+
+    memset(serialized_keypair.Bytes(), 0, Crypto::kP256_PublicKey_Length);
+    memcpy(serialized_keypair.Bytes() + Crypto::kP256_PublicKey_Length, magic_bytes, sizeof(magic_bytes));
+    *(serialized_keypair.Bytes() + Crypto::kP256_PublicKey_Length + sizeof(magic_bytes) + 0) =
+        (DEV_ATTESTATION_KEY_SE05X_ID & 0xFF000000) >> (8 * 3);
+    *(serialized_keypair.Bytes() + Crypto::kP256_PublicKey_Length + sizeof(magic_bytes) + 1) =
+        (DEV_ATTESTATION_KEY_SE05X_ID & 0x00FF0000) >> (8 * 2);
+    *(serialized_keypair.Bytes() + Crypto::kP256_PublicKey_Length + sizeof(magic_bytes) + 2) =
+        (DEV_ATTESTATION_KEY_SE05X_ID & 0x0000FF00) >> (8 * 1);
+    *(serialized_keypair.Bytes() + Crypto::kP256_PublicKey_Length + sizeof(magic_bytes) + 3) =
+        (DEV_ATTESTATION_KEY_SE05X_ID & 0x000000FF) >> (8 * 0);
+
+    ReturnErrorOnFailure(keypair.Deserialize(serialized_keypair));
 
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(message_to_sign.data(), message_to_sign.size(), signature));
 
@@ -163,5 +172,3 @@ DeviceAttestationCredentialsProvider * GetExampleSe05xDACProvider()
 } // namespace Examples
 } // namespace Credentials
 } // namespace chip
-
-#endif //#ifdef ENABLE_HSM_DEVICE_ATTESTATION

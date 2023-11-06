@@ -31,6 +31,61 @@
  *   GCC linker script for K32W061/K32W041.
  */
 
+/******************* Map of K32W0 internal flash ***********************************
+
+             0x000A_0000
+    - - - +---------------+ - - - - - - - -
+          |               |
+    8.5K  | Flash config  |
+          |   RESERVED    | 0x0009_DE00
+    - - - +---------------+ - - - - - - - -
+          |               |
+     2K   | Factory data  |
+          |               | 0x0009_D600
+    - - - +---------------+ - - - - - - - -
+          |               |
+     1K   | App metadata  |
+          |               | 0x0009_D200
+    - - - +---------------+ - - - - - - - -
+          |               |
+   612.5K |  Application  |
+          |               | 0x0000_4000
+    - - - +---------------+ - - - - - - - -
+          |               |
+     8K   |  SSBL update  |
+          |               | 0x0000_2000
+    - - - +---------------+ - - - - - - - -
+          |               |
+     8K   |     SSBL      |
+          |               | 0x0000_0000
+    - - - +---------------+ - - - - - - - -
+             0x0000_0000
+
+* - If OTA is disabled, SSBL and SSBL updated region are not present.
+  - The only address range that changes is the application, which will span from
+    0x0000_0000 to 0x0009_D200, having 628.5K max size.
+ *****************************************************************************/
+
+/******************* Map of DK6 external flash ***********************************
+
+             0x0010_0000
+    - - - +---------------+ - - - - - - - -
+          |               |
+    252K  |   PDM area    |
+          |               | 0x000C_1000
+    - - - +---------------+ - - - - - - - -
+          |               |
+     4K   |   OTA entry   |
+          |               | 0x000C_0000
+    - - - +---------------+ - - - - - - - -
+          |               |
+    768K  |   OTA area    |
+          |               |
+    - - - +---------------+ - - - - - - - -
+             0x0000_0000
+
+ *****************************************************************************/
+
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 
 /*
@@ -54,11 +109,22 @@ m_int_sector_size      = 512;
 /* first 8K: SSBL, next 8K: SSBL update region */
 m_app_start            = DEFINED(__app_load_address__) ? __app_load_address__ : 0x0;
 
+/* flash_config: 8.5K */
+m_flash_config_size           = 0x2200;
+
 /* sizeof(BOOT_BLOCK_T) + sizeof(IMAGE_CERT_T) + SIGNATURE_LEN + alignment = 1024 bytes */
 m_app_meta_data        = 0x400;
 
-/* 640K (Total Flash size) - 16K (SSBL + SSBL update region) - 8.5K (PSECT) - m_app_meta_data */
-m_app_size     = DEFINED(__app_stated_size__) ? __app_stated_size__ : 0x9DE00;
+/* manufacturing data: 2K */
+m_factory_data_size    = 0x800;
+
+/* 16K: SSBL + SSBL update region */
+m_ssbl_size            = 0x4000;
+
+/* default app size, without OTA */
+m_app_default_size     = m_int_flash_size - m_flash_config_size - m_app_meta_data - m_factory_data_size;
+
+m_app_size     = DEFINED(__app_stated_size__) ? __app_stated_size__ : m_app_default_size;
 
 MEMORY
 {
@@ -70,10 +136,11 @@ MEMORY
 }
 
 /* Define a symbol for the top of each memory region */
-__top_RAM1      = MEM_RAM1_BASE + MEM_RAM1_SIZE; /* 64K bytes */
+__top_RAM1 = MEM_RAM1_BASE + MEM_RAM1_SIZE; /* 64K bytes */
 
-/* To be improved. At this moment the second RAM bank is dedicated entirely to heap + stack. */
-HEAP_SIZE = DEFINED(HEAP_SIZE) ? HEAP_SIZE : 0x10000;
+/* The second RAM bank is dedicated entirely to heap + stack. */
+HEAP_SIZE = MEM_RAM1_SIZE - STACK_SIZE;
+ASSERT(((HEAP_SIZE + STACK_SIZE) == MEM_RAM1_SIZE), "Heap size + stack size should total RAM1 size.");
 
 /* set external flash properties - external flash is present on the DK6 board */
 m_ext_flash_size          = 0x00100000;
@@ -88,9 +155,13 @@ NV_STORAGE_SECTOR_SIZE    = m_ext_flash_sector_size;
 NV_STORAGE_START_ADDRESS  = m_ext_flash_size - 1;
 NV_STORAGE_END_ADDRESS    = NV_STORAGE_START_ADDRESS - NV_STORAGE_SIZE + 1;
 
-INT_STORAGE_START         = m_int_flash_size - 17 * m_int_sector_size - 1;
-INT_STORAGE_END           = INT_STORAGE_START;
-INT_STORAGE_SIZE          = INT_STORAGE_START - INT_STORAGE_END;
+INT_STORAGE_START         = m_int_flash_size - 1;
+INT_STORAGE_SIZE          = m_int_flash_size;
+INT_STORAGE_END           = 0x00000000;
+INT_STORAGE_SECTOR_SIZE   = m_int_sector_size;
+
+FACTORY_DATA_START_ADDRESS = m_int_flash_size - m_flash_config_size - m_factory_data_size;
+FACTORY_DATA_END_ADDRESS   = FACTORY_DATA_START_ADDRESS + m_factory_data_size - 1;
 
 __ram_vector_table__      = 1;
 vector_table_size         = 0x120;
@@ -213,9 +284,8 @@ SECTIONS
 
     _etext = .;
 
-    .heap_packet_buffer (COPY):
+    .heap (COPY):
     {
-        *(.bss._ZN4chip6System12PacketBuffer11sBufferPoolE)
         __HeapBase = .;
          _heap = .;
         KEEP(*(.heap*))
@@ -314,6 +384,14 @@ SECTIONS
         . = ALIGN (. != 0 ? 4 : 1) ; /* avoid empty segment */
     } > RAM0
 
+    /* BSS section for unretained contents */
+    .bss_discard (NOLOAD) : ALIGN(4)
+    {
+       *(.discard.bss.pdm)
+
+        . = ALIGN (. != 0 ? 4 : 1) ; /* avoid empty segment */
+    } > RAM0
+
     /* DEFAULT NOINIT SECTION */
     .noinit (NOLOAD): ALIGN(4)
     {
@@ -353,4 +431,11 @@ SECTIONS
     PROVIDE(_scratch_buf_end = __scratch_area_top__);
 
     __StackLimit = _vStackTop - STACK_SIZE;
+
+    __FACTORY_DATA_START = FACTORY_DATA_START_ADDRESS;
+    __FACTORY_DATA_SIZE = m_factory_data_size;
+     
+    ASSERT(((m_app_start + m_app_size + m_app_meta_data + m_factory_data_size + m_flash_config_size) <= m_int_flash_size),
+            "Internal flash capacity exceeded")
+
 }

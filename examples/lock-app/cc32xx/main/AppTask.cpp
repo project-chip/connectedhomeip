@@ -20,8 +20,9 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
@@ -29,7 +30,10 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <examples/platform/cc32xx/CC32XXDeviceAttestationCreds.h>
 
+#include <CHIPDeviceManager.h>
+#include <DeviceCallbacks.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -48,8 +52,6 @@ extern int WiFi_init();
 extern void DisplayBanner();
 }
 
-/* Application Version and Naming*/
-
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
@@ -61,6 +63,7 @@ using namespace ::chip::System;
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceManager;
 
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
@@ -70,6 +73,8 @@ static Button_Handle gButtonRightHandle;
 
 AppTask AppTask::sAppTask;
 
+static DeviceCallbacks EchoCallbacks;
+
 int AppTask::StartAppTask()
 {
     int ret = 0;
@@ -78,7 +83,7 @@ int AppTask::StartAppTask()
     if (sAppEventQueue == NULL)
     {
         PLAT_LOG("Failed to allocate app event queue");
-        while (1)
+        while (true)
             ;
     }
 
@@ -87,7 +92,7 @@ int AppTask::StartAppTask()
         pdPASS)
     {
         PLAT_LOG("Failed to create app task");
-        while (1)
+        while (true)
             ;
     }
     return ret;
@@ -138,15 +143,7 @@ int AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("PlatformMgr().InitChipStack() failed");
-        while (1)
-            ;
-    }
-    PLAT_LOG("Start Event Loop Task");
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        PLAT_LOG("PlatformMgr().StartEventLoopTask() failed");
-        while (1)
+        while (true)
             ;
     }
 
@@ -158,7 +155,12 @@ int AppTask::Init()
 
     // Initialize device attestation config
     PLAT_LOG("Initialize device attestation config");
+#ifdef CC32XX_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(CC32XX::GetCC32XXDacProvider());
+#else
+
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
 
     // Initialize BoltLock module
     PLAT_LOG("Initialize BoltLock");
@@ -172,8 +174,15 @@ int AppTask::Init()
     PLAT_LOG("Print Onboarding Codes");
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kOnNetwork));
 
-    PLAT_LOG("Start DNS Server");
-    chip::app::DnssdServer::Instance().StartServer();
+    PLAT_LOG("Start CHIPDeviceManager and Start Event Loop Task");
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    ret                           = deviceMgr.Init(&EchoCallbacks);
+    if (ret != CHIP_NO_ERROR)
+    {
+        PLAT_LOG("CHIPDeviceManager::Init() failed: %s", ErrorStr(ret));
+        while (1)
+            ;
+    }
 
     return 0;
 }
@@ -184,7 +193,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     sAppTask.Init();
 
-    while (1)
+    while (true)
     {
         /* Task pend until we have stuff to do */
         if (xQueueReceive(sAppEventQueue, &event, portMAX_DELAY) == pdTRUE)
@@ -268,7 +277,7 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
         LED_setOff(gLedRedHandle);
         state = 0;
     }
-    emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &state, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    app::Clusters::OnOff::Attributes::OnOff::Set(1, state);
 }
 
 void AppTask::DispatchEvent(AppEvent * aEvent)

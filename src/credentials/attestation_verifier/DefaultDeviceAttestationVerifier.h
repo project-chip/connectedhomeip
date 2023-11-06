@@ -16,10 +16,43 @@
  */
 #pragma once
 
+#include <array>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/Span.h>
+#include <stdlib.h>
 
 namespace chip {
 namespace Credentials {
+
+class CsaCdKeysTrustStore : public WellKnownKeysTrustStore
+{
+public:
+    CsaCdKeysTrustStore()          = default;
+    virtual ~CsaCdKeysTrustStore() = default;
+
+    CHIP_ERROR AddTrustedKey(const ByteSpan & kid, const Crypto::P256PublicKey & pubKey) override;
+    CHIP_ERROR AddTrustedKey(const ByteSpan & derCertBytes) override;
+    CHIP_ERROR LookupVerifyingKey(const ByteSpan & kid, Crypto::P256PublicKey & outPubKey) const override;
+    bool IsCdTestKey(const ByteSpan & kid) const override;
+
+protected:
+    struct SingleKeyEntry
+    {
+        static constexpr size_t kMaxKidSize = 32u;
+        uint8_t kidBuffer[kMaxKidSize];
+        size_t kidSize;
+        Crypto::P256PublicKey publicKey;
+
+        ByteSpan GetKid() const { return ByteSpan{ &kidBuffer[0], kidSize }; }
+    };
+
+    static constexpr size_t kMaxNumTrustedKeys = CHIP_CONFIG_NUM_CD_KEY_SLOTS;
+    std::array<SingleKeyEntry, kMaxNumTrustedKeys> mTrustedKeys;
+    size_t mNumTrustedKeys = 0;
+};
 
 class DefaultDACVerifier : public DeviceAttestationVerifier
 {
@@ -41,9 +74,12 @@ public:
                                                    const ByteSpan & attestationSignatureBuffer,
                                                    const Crypto::P256PublicKey & dacPublicKey, const ByteSpan & csrNonce) override;
 
+    CsaCdKeysTrustStore * GetCertificationDeclarationTrustStore() override { return &mCdKeysTrustStore; }
+
 protected:
     DefaultDACVerifier() {}
 
+    CsaCdKeysTrustStore mCdKeysTrustStore;
     const AttestationTrustStore * mAttestationTrustStore;
 };
 

@@ -107,7 +107,7 @@ void ExchangeManager::Shutdown()
     mState = State::kState_NotInitialized;
 }
 
-ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, ExchangeDelegate * delegate)
+ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, ExchangeDelegate * delegate, bool isInitiator)
 {
     if (!session->IsActiveSession())
     {
@@ -115,7 +115,7 @@ ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, Exc
         ChipLogError(ExchangeManager, "NewContext failed: session inactive");
         return nullptr;
     }
-    return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
+    return mContextPool.CreateObject(this, mNextExchangeId++, session, isInitiator, delegate);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId,
@@ -191,11 +191,41 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 {
     UnsolicitedMessageHandlerSlot * matchingUMH = nullptr;
 
+#if CHIP_PROGRESS_LOGGING
+    auto * protocolName = Protocols::GetProtocolName(payloadHeader.GetProtocolID());
+    auto * msgTypeName  = Protocols::GetMessageTypeName(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType());
+
+    //
+    // 32-bit value maximum = 10 chars + text preamble (6) + trailer (1) + null (1) + 2 buffer = 20
+    //
+    char ackBuf[20];
+    ackBuf[0] = '\0';
+    if (payloadHeader.GetAckMessageCounter().HasValue())
+    {
+        snprintf(ackBuf, sizeof(ackBuf), " (Ack:" ChipLogFormatMessageCounter ")", payloadHeader.GetAckMessageCounter().Value());
+    }
+
+    CompressedFabricId compressedFabricId = 0;
+    if (session->IsSecureSession() && mSessionManager->GetFabricTable() != nullptr)
+    {
+        auto fabricInfo = mSessionManager->GetFabricTable()->FindFabricWithIndex(session->AsSecureSession()->GetFabricIndex());
+        if (fabricInfo)
+        {
+            compressedFabricId = fabricInfo->GetCompressedFabricId();
+        }
+    }
+
+    //
+    // Legend that can be used to decode this log line can be found in README.md
+    //
     ChipLogProgress(ExchangeManager,
-                    "Received message of type " ChipLogFormatMessageType " with protocolId " ChipLogFormatProtocolId
-                    " and MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchangeId,
-                    payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()),
-                    packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
+                    ">>> [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter
+                    "%s] (%s) Msg RX from %u:" ChipLogFormatX64 " [%04X] --- Type %04x:%02x (%s:%s)",
+                    ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), session->SessionIdForLogging(),
+                    packetHeader.GetMessageCounter(), ackBuf, Transport::GetSessionTypeString(session), session->GetFabricIndex(),
+                    ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId),
+                    payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType(), protocolName, msgTypeName);
+#endif
 
     MessageFlags msgFlags;
     if (isDuplicate == DuplicateMessage::Yes)
@@ -230,8 +260,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     }
     else
     {
-        ChipLogProgress(ExchangeManager, "Received Groupcast Message with GroupId of %d",
-                        packetHeader.GetDestinationGroupId().Value());
+        ChipLogProgress(ExchangeManager, "Received Groupcast Message with GroupId 0x%04X (%d)",
+                        packetHeader.GetDestinationGroupId().Value(), packetHeader.GetDestinationGroupId().Value());
     }
 
     // Do not handle messages that don't match an existing exchange on an
@@ -270,9 +300,17 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // an ack to the peer.
     else if (!payloadHeader.NeedsAck())
     {
-        // Using same error message for all errors to reduce code size.
-        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT,
-                     CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR.Format());
+        // We can easily get standalone acks here: any time we fail to get a
+        // timely ack for the last message in an exchange and retransmit it,
+        // then get acks for both the message and the retransmit, the second ack
+        // will end up in this block.  That's not really an error condition, so
+        // there is no need to log an error in that case.
+        if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
+        {
+            // Using same error message for all errors to reduce code size.
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT,
+                         CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR.Format());
+        }
         return;
     }
 
@@ -328,7 +366,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     }
 
     SendStandaloneAckIfNeeded(packetHeader, payloadHeader, session, msgFlags, std::move(msgBuf));
-    return;
 }
 
 void ExchangeManager::SendStandaloneAckIfNeeded(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
@@ -364,7 +401,6 @@ void ExchangeManager::SendStandaloneAckIfNeeded(const PacketHeader & packetHeade
     }
 
     // The exchange should be closed inside HandleMessage function. So don't bother close it here.
-    return;
 }
 
 void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * delegate)

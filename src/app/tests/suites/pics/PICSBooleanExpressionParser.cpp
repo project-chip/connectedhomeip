@@ -17,6 +17,7 @@
  */
 
 #include "PICSBooleanExpressionParser.h"
+#include "PICSNormalizer.h"
 
 #include <lib/support/CodeUtils.h>
 
@@ -38,9 +39,8 @@ void PICSBooleanExpressionParser::Tokenize(std::string & expression, std::vector
 
     std::string s;
 
-    for (size_t i = 0; i < expression.size(); i++)
+    for (char c : expression)
     {
-        char c = expression[i];
         switch (c)
         {
         case ' ':
@@ -149,6 +149,8 @@ bool PICSBooleanExpressionParser::EvaluateSubExpression(std::vector<std::string>
         bool expr = EvaluateSubExpression(tokens, PICS, index);
         return !expr;
     }
+
+    token = PICSNormalizer::Normalize(token);
 
     index++;
 

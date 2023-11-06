@@ -21,7 +21,7 @@
 #include "app/ConcreteAttributePath.h"
 #include "protocols/interaction_model/Constants.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
@@ -31,7 +31,7 @@
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -83,7 +83,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, ATTRIBUTE_MASK_WRITABLE)
     DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute2, ARRAY, 1, ATTRIBUTE_MASK_WRITABLE), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrsOnEndpoint, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
@@ -126,7 +126,7 @@ class TestAttrAccess : public app::AttributeAccessInterface
 {
 public:
     // Register for the Test Cluster cluster on all endpoints.
-    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TestCluster::Id) {}
+    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id) {}
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder) override;
@@ -193,7 +193,7 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
@@ -201,23 +201,24 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
 
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
     //
-    // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2
+    // We've empirically determined that by reserving all but 75 bytes in the packet buffer, we can fit 2
     // AttributeDataIBs into the packet. ~30-40 bytes covers a single write chunk, but let's 2-3x that
     // to ensure we'll sweep from fitting 2 chunks to 3-4 chunks.
     //
-    for (int i = 100; i > 0; i--)
+    constexpr size_t minReservationSize = kMaxSecureSduLengthBytes - 75 - 100;
+    for (uint32_t i = 100; i > 0; i--)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         TestWriteCallback writeCallback;
 
         ChipLogDetail(DataManagement, "Running iteration %d\n", i);
 
-        gIterationCount = (uint32_t) i;
+        gIterationCount = i;
 
         app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-                                     static_cast<uint16_t>(850 + i) /* reserved buffer size */);
+                                     static_cast<uint16_t>(minReservationSize + i) /* reserved buffer size */);
 
         ByteSpan list[kTestListLength];
 
@@ -267,7 +268,7 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
     bool atLeastOneRequestFailed = false;
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
@@ -275,7 +276,7 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
 
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
 
     for (int i = 850; i < static_cast<int>(chip::app::kMaxSecureSduLengthBytes); i++)
     {
@@ -289,9 +290,9 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
         app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing());
 
         ByteSpan list[kTestListLength];
-        for (uint8_t j = 0; j < kTestListLength; j++)
+        for (auto & item : list)
         {
-            list[j] = ByteSpan(sByteSpanData, static_cast<uint32_t>(i));
+            item = ByteSpan(sByteSpanData, static_cast<uint32_t>(i));
         }
 
         err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
@@ -348,7 +349,7 @@ void TestWriteChunking::TestConflictWrite(nlTestSuite * apSuite, void * apContex
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
@@ -356,17 +357,18 @@ void TestWriteChunking::TestConflictWrite(nlTestSuite * apSuite, void * apContex
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
 
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
+
+    /* use a smaller chunk (128 bytes) so we only need a few attributes in the write request. */
+    constexpr size_t kReserveSize = kMaxSecureSduLengthBytes - 128;
 
     TestWriteCallback writeCallback1;
-    app::WriteClient writeClient1(
-        &ctx.GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
-        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+    app::WriteClient writeClient1(&ctx.GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
+                                  static_cast<uint16_t>(kReserveSize));
 
     TestWriteCallback writeCallback2;
-    app::WriteClient writeClient2(
-        &ctx.GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
-        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+    app::WriteClient writeClient2(&ctx.GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
+                                  static_cast<uint16_t>(kReserveSize));
 
     ByteSpan list[kTestListLength];
 
@@ -424,7 +426,7 @@ void TestWriteChunking::TestNonConflictWrite(nlTestSuite * apSuite, void * apCon
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
@@ -432,18 +434,19 @@ void TestWriteChunking::TestNonConflictWrite(nlTestSuite * apSuite, void * apCon
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
 
-    app::AttributePathParams attributePath1(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListAttribute);
-    app::AttributePathParams attributePath2(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListAttribute2);
+    app::AttributePathParams attributePath1(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
+    app::AttributePathParams attributePath2(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute2);
+
+    /* use a smaller chunk (128 bytes) so we only need a few attributes in the write request. */
+    constexpr size_t kReserveSize = kMaxSecureSduLengthBytes - 128;
 
     TestWriteCallback writeCallback1;
-    app::WriteClient writeClient1(
-        &ctx.GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
-        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+    app::WriteClient writeClient1(&ctx.GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
+                                  static_cast<uint16_t>(kReserveSize));
 
     TestWriteCallback writeCallback2;
-    app::WriteClient writeClient2(
-        &ctx.GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
-        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+    app::WriteClient writeClient2(&ctx.GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
+                                  static_cast<uint16_t>(kReserveSize));
 
     ByteSpan list[kTestListLength];
 
@@ -514,7 +517,8 @@ void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions
     TestWriteCallback writeCallback;
     std::unique_ptr<WriteClient> writeClient = std::make_unique<WriteClient>(
         &ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+        static_cast<uint16_t>(kMaxSecureSduLengthBytes -
+                              128) /* use a smaller chunk so we only need a few attributes in the write request. */);
 
     ConcreteAttributePath onGoingPath = ConcreteAttributePath();
     std::vector<PathStatus> status;
@@ -605,7 +609,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     TestContext & ctx = *static_cast<TestContext *>(apContext);
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
@@ -617,7 +621,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     ChipLogProgress(Zcl, "Test 1: we should receive transaction notifications");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .expectedStatus = { true },
             });
 
@@ -625,7 +629,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     RunTest(
         apSuite, ctx,
         Instructions{
-            .paths                   = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+            .paths                   = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
             .onListWriteBeginActions = [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
             .expectedStatus          = { false },
         });
@@ -633,16 +637,16 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications for every list in the transaction");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute2) },
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
                 .expectedStatus = { true, true },
             });
 
     ChipLogProgress(Zcl, "Test 4: we should receive transaction notifications with the status of each list");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute2) },
+                .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
                 .onListWriteBeginActions =
                     [&](const app::ConcreteAttributePath & aPath) {
                         if (aPath.mAttributeId == kTestListAttribute2)
@@ -659,8 +663,8 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
                     "null value before non null values");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kNull, ListData::kList },
                 .expectedStatus = { true },
             });
@@ -670,8 +674,8 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
                     "null value after non null values");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kList, ListData::kNull },
                 .expectedStatus = { true },
             });
@@ -681,9 +685,9 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
                     "null value between non null values");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kList, ListData::kNull, ListData::kList },
                 .expectedStatus = { true },
             });
@@ -691,7 +695,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     ChipLogProgress(Zcl, "Test 8: transactional list callbacks will be called for nullable lists");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kNull },
                 .expectedStatus = { true },
             });
@@ -701,7 +705,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
                     "during processing the requests");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kBadValue },
                 .expectedStatus = { false },
             });

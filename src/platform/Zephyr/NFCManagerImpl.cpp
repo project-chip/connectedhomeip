@@ -26,7 +26,7 @@
 #include <nfc/ndef/uri_msg.h>
 #include <nfc/ndef/uri_rec.h>
 #include <nfc_t2t_lib.h>
-#include <zephyr.h>
+#include <zephyr/kernel.h>
 
 namespace chip {
 namespace DeviceLayer {

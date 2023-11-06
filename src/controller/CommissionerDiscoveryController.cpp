@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -51,7 +51,7 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
         return;
     }
     mReady = false;
-    strncpy(mCurrentInstance, state.GetInstanceName(), sizeof(mCurrentInstance));
+    Platform::CopyString(mCurrentInstance, state.GetInstanceName());
     mPendingConsent = true;
     char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
     Encoding::BytesToUppercaseHexString(state.GetRotatingId(), state.GetRotatingIdLength(), rotatingDeviceIdHexBuffer,
@@ -118,7 +118,6 @@ void CommissionerDiscoveryController::Ok()
         mUserPrompter->PromptForCommissionPincode(client->GetVendorId(), client->GetProductId(), client->GetDeviceName());
     }
     ChipLogDetail(Controller, "------Via Shell Enter: controller ux ok [pincode]");
-    return;
 }
 
 void CommissionerDiscoveryController::CommissionWithPincode(uint32_t pincode)
@@ -174,11 +173,11 @@ void CommissionerDiscoveryController::Cancel()
     }
     client->SetUDCClientProcessingState(UDCClientProcessingState::kUserDeclined);
     mPendingConsent = false;
-    return;
 }
 
 void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, uint16_t productId, NodeId nodeId,
-                                                             OperationalDeviceProxy * device)
+                                                             Messaging::ExchangeManager & exchangeMgr,
+                                                             const SessionHandle & sessionHandle)
 {
     mVendorId  = vendorId;
     mProductId = productId;
@@ -186,7 +185,7 @@ void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, 
     if (mPostCommissioningListener != nullptr)
     {
         ChipLogDetail(Controller, "CommissionerDiscoveryController calling listener");
-        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, device);
+        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
     }
     else
     {

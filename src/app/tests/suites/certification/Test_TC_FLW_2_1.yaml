@@ -14,13 +14,16 @@
 
 name: 33.2.1. [TC-FLW-2.1] Attributes with server as DUT
 
+PICS:
+    - FLW.S
+
 config:
     nodeId: 0x12344321
     cluster: "Flow Measurement"
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,42 +31,44 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read the mandatory attribute: MeasuredValue"
+    - label: "Step 2: Read the mandatory attribute: MinMeasuredValue"
+      PICS: FLW.S.A0001
+      command: "readAttribute"
+      attribute: "MinMeasuredValue"
+      response:
+          saveAs: MinMeasuredVariable
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65533
+
+    - label: "Step 3: Read the mandatory attribute: MaxMeasuredValue"
+      PICS: FLW.S.A0002
+      command: "readAttribute"
+      attribute: "MaxMeasuredValue"
+      response:
+          saveAs: MaxMeasuredVariable
+          constraints:
+              type: int16u
+              minValue: MinMeasuredVariable + 1
+              maxValue: 65534
+
+    - label: "Step 4: Read the mandatory attribute: MeasuredValue"
       PICS: FLW.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
           constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
+              type: int16u
+              minValue: MinMeasuredVariable
+              maxValue: MaxMeasuredVariable
 
-    - label: "Read the mandatory attribute: MinMeasuredValue"
-      PICS: FLW.S.A0001
-      command: "readAttribute"
-      attribute: "MinMeasuredValue"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
-    - label: "Read the mandatory attribute: MaxMeasuredValue"
-      PICS: FLW.S.A0002
-      command: "readAttribute"
-      attribute: "MaxMeasuredValue"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
-    - label: "read the optional attribute: Tolerance"
+    - label: "Step 5: TH reads from the DUT the Tolerance attribute"
       PICS: FLW.S.A0003
       command: "readAttribute"
       attribute: "Tolerance"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 2048

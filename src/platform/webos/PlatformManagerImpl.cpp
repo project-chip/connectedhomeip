@@ -24,20 +24,6 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <app-common/zap-generated/enums.h>
-#include <app-common/zap-generated/ids/Events.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <platform/DeviceControlServer.h>
-#include <platform/DeviceInstanceInfoProvider.h>
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
-#include <platform/webos/DeviceInfoProviderImpl.h>
-#include <platform/webos/DeviceInstanceInfoProviderImpl.h>
-#include <platform/webos/DiagnosticDataProviderImpl.h>
-
-#include <thread>
-
 #include <arpa/inet.h>
 #include <dirent.h>
 #include <errno.h>
@@ -47,10 +33,18 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
-#if __GLIBC__ == 2 && __GLIBC_MINOR__ < 30
-#include <sys/syscall.h>
-#define gettid() syscall(SYS_gettid)
-#endif
+#include <thread>
+
+#include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/ids/Events.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/DeviceControlServer.h>
+#include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/PlatformManager.h>
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
+#include <platform/webos/DeviceInstanceInfoProviderImpl.h>
+#include <platform/webos/DiagnosticDataProviderImpl.h>
 
 using namespace ::chip::app::Clusters;
 
@@ -61,19 +55,18 @@ PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 namespace {
 
-#if CHIP_WITH_GIO
-void GDBus_Thread()
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+void * GLibMainLoopThread(void * loop)
 {
-    GMainLoop * loop = g_main_loop_new(nullptr, false);
-
-    g_main_loop_run(loop);
-    g_main_loop_unref(loop);
+    g_main_loop_run(static_cast<GMainLoop *>(loop));
+    return nullptr;
 }
 #endif
+
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-void PlatformManagerImpl::WiFIIPChangeListener()
+void PlatformManagerImpl::WiFiIPChangeListener()
 {
     int sock;
     if ((sock = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1)
@@ -149,29 +142,26 @@ void PlatformManagerImpl::WiFIIPChangeListener()
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
-#if CHIP_WITH_GIO
-    GError * error = nullptr;
-
-    this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error));
-
-    std::thread gdbusThread(GDBus_Thread);
-    gdbusThread.detach();
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+    mGLibMainLoop       = g_main_loop_new(nullptr, FALSE);
+    mGLibMainLoopThread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop);
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    std::thread wifiIPThread(WiFIIPChangeListener);
+    std::thread wifiIPThread(WiFiIPChangeListener);
     wifiIPThread.detach();
 #endif
 
     // Initialize the configuration system.
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
-    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack());
+
+    // Now set up our device instance info provider.  We couldn't do that
+    // earlier, because the generic implementation sets a generic one.
+    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
@@ -201,14 +191,13 @@ void PlatformManagerImpl::_Shutdown()
     }
 
     Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
-}
 
-#if CHIP_WITH_GIO
-GDBusConnection * PlatformManagerImpl::GetGDBusConnection()
-{
-    return this->mpGDBusConnection.get();
-}
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+    g_main_loop_quit(mGLibMainLoop);
+    g_main_loop_unref(mGLibMainLoop);
+    g_thread_join(mGLibMainLoopThread);
 #endif
+}
 
 } // namespace DeviceLayer
 } // namespace chip

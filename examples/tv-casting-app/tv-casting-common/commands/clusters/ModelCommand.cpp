@@ -47,31 +47,25 @@ CHIP_ERROR ModelCommand::RunCommand()
         return SendGroupCommand(GroupIdFromNodeId(mDestinationId), fabricIndex);
     }
 
-    Server * server           = &(chip::Server::GetInstance());
-    const FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(fabricIndex);
-    if (fabric == nullptr)
-    {
-        ChipLogError(AppServer, "Did not find fabric for index %d", fabricIndex);
-        return CHIP_ERROR_INVALID_FABRIC_INDEX;
-    }
-
-    PeerId peerID = fabric->GetPeerIdForNode(mDestinationId);
-    server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnDeviceConnectedCallback,
+    Server * server = &(chip::Server::GetInstance());
+    server->GetCASESessionManager()->FindOrEstablishSession(ScopedNodeId(mDestinationId, fabricIndex), &mOnDeviceConnectedCallback,
                                                             &mOnDeviceConnectionFailureCallback);
     return CHIP_NO_ERROR;
 }
 
-void ModelCommand::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
+void ModelCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                       const SessionHandle & sessionHandle)
 {
     ChipLogProgress(chipTool, "ModelCommand::OnDeviceConnectedFn");
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
 
-    CHIP_ERROR err = command->SendCommand(device, command->mEndPointId);
+    OperationalDeviceProxy device(&exchangeMgr, sessionHandle);
+    CHIP_ERROR err = command->SendCommand(&device, command->mEndPointId);
     VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
 }
 
-void ModelCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR err)
+void ModelCommand::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
 {
     ChipLogProgress(chipTool, "ModelCommand::OnDeviceConnectionFailureFn");
     LogErrorOnFailure(err);

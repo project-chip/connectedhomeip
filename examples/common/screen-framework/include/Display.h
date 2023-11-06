@@ -28,24 +28,13 @@
 
 #include "esp_system.h"
 
-#if CONFIG_DEVICE_TYPE_M5STACK
-
-#define CONFIG_HAVE_DISPLAY 1
-// for some reason this is backwards (turns out this is because of a 2019 update to the m5stack hw)
-#define INVERT_DISPLAY INVERT_ON
-
-#elif CONFIG_DEVICE_TYPE_ESP32_WROVER_KIT
-
-#define CONFIG_HAVE_DISPLAY 1
-#define INVERT_DISPLAY INVERT_OFF
-
-#else
-
-#define CONFIG_HAVE_DISPLAY 0
-
-#endif
-
 #if CONFIG_HAVE_DISPLAY
+
+#if CONFIG_DEVICE_TYPE_M5STACK
+#define INVERT_DISPLAY INVERT_ON
+#elif CONFIG_DEVICE_TYPE_ESP32_WROVER_KIT
+#define INVERT_DISPLAY INVERT_OFF
+#endif
 
 extern "C" {
 #include "tft.h"

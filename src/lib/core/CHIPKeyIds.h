@@ -269,7 +269,10 @@ public:
      *  @return      root key number.
      *
      */
-    static uint8_t GetRootKeyNumber(uint32_t keyId) { return (keyId & kMask_RootKeyNumber) >> kShift_RootKeyNumber; }
+    static uint8_t GetRootKeyNumber(uint32_t keyId)
+    {
+        return static_cast<uint8_t>((keyId & kMask_RootKeyNumber) >> kShift_RootKeyNumber);
+    }
 
     /**
      *  Get application group epoch key number that was used to derive specified application key.
@@ -278,7 +281,10 @@ public:
      *  @return      epoch key number.
      *
      */
-    static uint8_t GetEpochKeyNumber(uint32_t keyId) { return (keyId & kMask_EpochKeyNumber) >> kShift_EpochKeyNumber; }
+    static uint8_t GetEpochKeyNumber(uint32_t keyId)
+    {
+        return static_cast<uint8_t>((keyId & kMask_EpochKeyNumber) >> kShift_EpochKeyNumber);
+    }
 
     /**
      *  Get application group local number that was used to derive specified application key.
@@ -287,7 +293,10 @@ public:
      *  @return      application group local number.
      *
      */
-    static uint8_t GetAppGroupLocalNumber(uint32_t keyId) { return (keyId & kMask_GroupLocalNumber) >> kShift_GroupLocalNumber; }
+    static uint8_t GetAppGroupLocalNumber(uint32_t keyId)
+    {
+        return static_cast<uint8_t>((keyId & kMask_GroupLocalNumber) >> kShift_GroupLocalNumber);
+    }
 
     /**
      *  Construct application group root key ID given root key number.

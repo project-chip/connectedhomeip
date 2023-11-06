@@ -1,0 +1,113 @@
+# Silicon Labs Project Configuration Tools: slcp, v0, Component selection file.
+project_name: matter-platform
+label: matter-platform
+description: |
+  This project contains the minimal requirements to generate the dependencies needed by all Matter examples
+category: Matter Examples
+filter:
+- name: Capability
+  value: [Multiprotocol]
+- name: Device Type
+  value: [SoC]
+- name: Project Difficulty
+  value: [Advanced]
+- name: Wireless Technology
+  value: [Bluetooth, Thread]
+package: OpenThread
+quality: production
+readme:
+- {path: README.md}
+source:
+- {path: main.c}
+- {path: app.c}
+- {path: bluetooth_event_callback.c}
+tag: [prebuilt_demo]
+include:
+- path: ''
+  file_list:
+  - {path: app.h}
+  - {path: reset_util.h}
+sdk: {id: gecko_sdk, version: 4.3.1}
+toolchain_settings: []
+
+component:
+- {id: bluetooth_feature_nvm}
+- {id: bluetooth_feature_gatt_server}
+- {id: nvm3_lib}
+- {id: bluetooth_feature_sm}
+- {id: bluetooth_feature_gap}
+- {id: bluetooth_feature_legacy_advertiser}
+- {id: gatt_configuration}
+- {id: freertos}
+- {id: bluetooth_stack}
+- {id: brd4002a}
+- {id: rail_util_pti}
+- {id: bluetooth_feature_gatt}
+- {id: bluetooth_feature_connection}
+- {id: rail_lib_multiprotocol}
+- {id: bluetooth_feature_system}
+- {id: bluetooth_feature_scanner}
+- {id: rail_util_power_manager_init}
+- {id: psa_crypto}
+- {id: psa_crypto_aes}
+- {id: psa_crypto_ccm}
+- {id: psa_crypto_cmac}
+- {id: psa_crypto_ecc}
+- {id: psa_crypto_ecdh}
+- {id: psa_crypto_ecdsa}
+- {id: psa_crypto_hash}
+- {id: psa_crypto_hkdf}
+- {id: mbedtls_x509}
+- {id: mbedtls_cmac}
+- {id: mbedtls_platform_dynamic_memory_allocation_config_init_runtime }
+- {id: mbedtls_base64}
+- {id: ot_psa_crypto}
+- {id: bluetooth_crypto}
+- {id: iostream_rtt}
+# Necessary componenets for ot coap cert lib
+# - {id: mbedtls_dtls} # Requried by COAP lib
+# - {id: mbedtls_tls_server} # Requried by COAP lib
+# - {id: mbedtls_tls} # Requried by COAP lib
+# - {id: mbedtls_jpake} # Required by COAP lib
+
+config_file:
+  - override:
+      component: gatt_configuration
+      file_id: gatt_configuration_file_id
+    path: gatt_configuration.btconf
+    directory: btconf
+
+configuration:
+- {name: SL_MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED, value: '0'}
+- {name: SL_MBEDTLS_KEY_EXCHANGE_PSK_ENABLED, value: '1'}
+- condition: [uartdrv_usart]
+  name: UARTDRV_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION
+  value: '1'
+- condition: [iostream_usart]
+  name: SL_IOSTREAM_USART_VCOM_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION
+  value: '1'
+- condition: [iostream_usart]
+  name: SL_IOSTREAM_USART_VCOM_RX_BUFFER_SIZE
+  value: '128'
+- {name: SL_HEAP_SIZE, value: '0'}
+- {name: SL_STACK_SIZE, value: '0'}
+- {name: SL_BOARD_ENABLE_VCOM, value: '0'}
+- {name: EMDRV_UARTDRV_FLOW_CONTROL_ENABLE, value: '0'}
+
+template_contribution:
+  - name: mbedtls_ssl_content_len_in_requirement
+    value: 900
+  - name: mbedtls_ssl_content_len_out_requirement
+    value: 900
+
+requires:
+- condition: [device_series_1]
+  name: uartdrv_usart
+- condition: [device_series_2]
+  name: uartdrv_eusart
+- condition: [device_series_2]
+  name: device_init_dpll
+
+ui_hints:
+  highlight:
+  - {path: ./README.md, focus: true}

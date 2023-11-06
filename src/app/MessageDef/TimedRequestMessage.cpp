@@ -19,11 +19,10 @@
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR TimedRequestMessage::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR TimedRequestMessage::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    int tagPresenceMask = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     PRETTY_PRINT("TimedRequestMessage =");
     PRETTY_PRINT("{");
@@ -41,8 +40,6 @@ CHIP_ERROR TimedRequestMessage::Parser::CheckSchemaValidity() const
         switch (tagNum)
         {
         case to_underlying(Tag::kTimeoutMs):
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kTimeoutMs))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kTimeoutMs));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
@@ -64,13 +61,12 @@ CHIP_ERROR TimedRequestMessage::Parser::CheckSchemaValidity() const
     PRETTY_PRINT_BLANK_LINE();
     if (CHIP_END_OF_TLV == err)
     {
-        const int requiredFields = (1 << to_underlying(Tag::kTimeoutMs));
-        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE;
+        err = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 CHIP_ERROR TimedRequestMessage::Parser::GetTimeoutMs(uint16_t * const apTimeoutMs) const
 {
@@ -82,7 +78,7 @@ TimedRequestMessage::Builder & TimedRequestMessage::Builder::TimeoutMs(const uin
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kTimeoutMs)), aTimeoutMs);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kTimeoutMs), aTimeoutMs);
     }
     if (mError == CHIP_NO_ERROR)
     {

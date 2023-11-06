@@ -1,0 +1,41 @@
+# Commands will be run in CHIP project root.
+cd "{root}"
+
+# Setting up Android deps through Gradle
+python3 third_party/android_deps/set_up_android_deps.py
+
+# Setting up Java deps
+third_party/java_deps/set_up_java_deps.sh
+
+# Generating android-arm64-chip-tool
+gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_build_controller_dynamic_server=true '
+
+# Accepting NDK licenses @ tools
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Building JNI android-arm64-chip-tool
+ninja -C {out}/android-arm64-chip-tool
+
+# Prepare Native libs android-arm64-chip-tool
+mkdir -p {root}/examples/android/CHIPTool/app/libs/jniLibs/arm64-v8a
+
+cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libCHIPController.so {root}/examples/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libCHIPController.so
+
+cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libc++_shared.so {root}/examples/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libc++_shared.so
+
+cp {out}/android-arm64-chip-tool/lib/src/controller/java/CHIPController.jar {root}/examples/android/CHIPTool/app/libs/CHIPController.jar
+
+cp {out}/android-arm64-chip-tool/lib/src/controller/java/OnboardingPayload.jar {root}/examples/android/CHIPTool/app/libs/OnboardingPayload.jar
+
+cp {out}/android-arm64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/examples/android/CHIPTool/app/libs/AndroidPlatform.jar
+
+cp {out}/android-arm64-chip-tool/lib/src/controller/java/libMatterJson.jar {root}/examples/android/CHIPTool/app/libs/libMatterJson.jar
+
+cp {out}/android-arm64-chip-tool/lib/src/controller/java/libMatterTlv.jar {root}/examples/android/CHIPTool/app/libs/libMatterTlv.jar
+
+cp {out}/android-arm64-chip-tool/lib/src/controller/java/CHIPClusters.jar {root}/examples/android/CHIPTool/app/libs/CHIPClusters.jar
+
+cp {out}/android-arm64-chip-tool/lib/src/controller/java/CHIPClusterID.jar {root}/examples/android/CHIPTool/app/libs/CHIPClusterID.jar
+
+# Building APP android-arm64-chip-tool
+{root}/examples/android/CHIPTool/gradlew -p {root}/examples/android/CHIPTool -PmatterBuildSrcDir={out}/android-arm64-chip-tool -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tool assembleDebug

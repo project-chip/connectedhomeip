@@ -23,10 +23,13 @@
 
 #pragma once
 
+#include <condition_variable>
+#include <mutex>
+
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 
-#if CHIP_WITH_GIO
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 #include <gio/gio.h>
 #endif
 
@@ -50,8 +53,31 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
-#if CHIP_WITH_GIO
-    GDBusConnection * GetGDBusConnection();
+
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+
+    /**
+     * @brief Invoke a function on the Matter GLib context.
+     *
+     * If execution of the function will have to be scheduled on other thread,
+     * this call will block the current thread until the function is executed.
+     *
+     * @param[in] function The function to call.
+     * @param[in] userData User data to pass to the function.
+     * @returns The result of the function.
+     */
+    template <typename T>
+    CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
+    {
+        return _GLibMatterContextInvokeSync((CHIP_ERROR(*)(void *)) func, (void *) userData);
+    }
+
+    unsigned int GLibMatterContextAttachSource(GSource * source)
+    {
+        VerifyOrDie(mGLibMainLoop != nullptr);
+        return g_source_attach(source, g_main_loop_get_context(mGLibMainLoop));
+    }
+
 #endif
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
@@ -72,18 +98,39 @@ private:
 
     static PlatformManagerImpl sInstance;
 
-    // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
-    // This should be removed or find a better place once we depercate the rendezvous session.
-    static void WiFIIPChangeListener();
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 
-#if CHIP_WITH_GIO
-    struct GDBusConnectionDeleter
+    struct GLibMatterContextInvokeData
     {
-        void operator()(GDBusConnection * conn) { g_object_unref(conn); }
+        CHIP_ERROR (*mFunc)(void *);
+        void * mFuncUserData;
+        CHIP_ERROR mFuncResult;
+        // Sync primitives to wait for the function to be executed
+        std::condition_variable mDoneCond;
+        bool mDone = false;
     };
-    using UniqueGDBusConnection = std::unique_ptr<GDBusConnection, GDBusConnectionDeleter>;
-    UniqueGDBusConnection mpGDBusConnection;
-#endif
+
+    /**
+     * @brief Invoke a function on the Matter GLib context.
+     *
+     * @note This function does not provide type safety for the user data. Please,
+     *       use the GLibMatterContextInvokeSync() template function instead.
+     */
+    CHIP_ERROR _GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData);
+
+    // XXX: Mutex for guarding access to glib main event loop callback indirection
+    //      synchronization primitives. This is a workaround to suppress TSAN warnings.
+    //      TSAN does not know that from the thread synchronization perspective the
+    //      g_source_attach() function should be treated as pthread_create(). Memory
+    //      access to shared data before the call to g_source_attach() without mutex
+    //      is not a race condition - the callback will not be executed on glib main
+    //      event loop thread before the call to g_source_attach().
+    std::mutex mGLibMainLoopCallbackIndirectionMutex;
+
+    GMainLoop * mGLibMainLoop     = nullptr;
+    GThread * mGLibMainLoopThread = nullptr;
+
+#endif // CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 };
 
 /**

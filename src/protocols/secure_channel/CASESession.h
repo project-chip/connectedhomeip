@@ -30,16 +30,19 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/ScopedNodeId.h>
+#include <lib/core/TLV.h>
 #include <lib/support/Base64.h>
+#include <lib/support/CHIPMem.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/CASEDestinationId.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/PairingSession.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
+#include <system/SystemClock.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/CryptoContext.h>
 #include <transport/raw/MessageHeader.h>
@@ -64,7 +67,7 @@ public:
 
     /**
      * @brief
-     *   Initialize using configured fabrics and wait for session establishment requests.
+     *   Initialize using configured fabrics and wait for session establishment requests (as a responder).
      *
      * @param sessionManager                session manager from which to allocate a secure session object
      * @param fabricTable                   Table of fabrics that are currently configured on the device
@@ -86,7 +89,7 @@ public:
 
     /**
      * @brief
-     *   Create and send session establishment request using device's operational credentials.
+     *   Create and send session establishment request (as an initiator) using device's operational credentials.
      *
      * @param sessionManager                session manager from which to allocate a secure session object
      * @param fabricTable                   The fabric table that contains a fabric in common with the peer
@@ -175,24 +178,41 @@ public:
 
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
+    // Compute our Sigma1 response timeout.  This can give consumers an idea of
+    // how long it will take to detect that our Sigma1 did not get through.
+    static System::Clock::Timeout ComputeSigma1ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig);
+
+    // Compute our Sigma2 response timeout.  This can give consumers an idea of
+    // how long it will take to detect that our Sigma1 did not get through.
+    static System::Clock::Timeout ComputeSigma2ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig);
+
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
      **/
     void Clear();
 
-private:
-    friend class TestCASESession;
     enum class State : uint8_t
     {
-        kInitialized       = 0,
-        kSentSigma1        = 1,
-        kSentSigma2        = 2,
-        kSentSigma3        = 3,
-        kSentSigma1Resume  = 4,
-        kSentSigma2Resume  = 5,
-        kFinished          = 6,
-        kFinishedViaResume = 7,
+        kInitialized         = 0,
+        kSentSigma1          = 1,
+        kSentSigma2          = 2,
+        kSentSigma3          = 3,
+        kSentSigma1Resume    = 4,
+        kSentSigma2Resume    = 5,
+        kFinished            = 6,
+        kFinishedViaResume   = 7,
+        kSendSigma3Pending   = 8,
+        kHandleSigma3Pending = 9,
     };
+
+    State GetState() { return mState; }
+
+    // Returns true if the CASE session handshake was stuck due to failing to schedule work on the Matter thread.
+    // If this function returns true, the CASE session has been reset and is ready for a new session establishment.
+    bool InvokeBackgroundWorkWatchdog();
+
+private:
+    friend class TestCASESession;
 
     /*
      * Initialize the object given a reference to the SessionManager, certificate validity policy and a delegate which will be
@@ -221,21 +241,28 @@ private:
     CHIP_ERROR HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg);
     CHIP_ERROR HandleSigma2(System::PacketBufferHandle && msg);
     CHIP_ERROR HandleSigma2Resume(System::PacketBufferHandle && msg);
-    CHIP_ERROR SendSigma3();
-    CHIP_ERROR HandleSigma3(System::PacketBufferHandle && msg);
+
+    struct SendSigma3Data;
+    CHIP_ERROR SendSigma3a();
+    static CHIP_ERROR SendSigma3b(SendSigma3Data & data, bool & cancel);
+    CHIP_ERROR SendSigma3c(SendSigma3Data & data, CHIP_ERROR status);
+
+    struct HandleSigma3Data;
+    CHIP_ERROR HandleSigma3a(System::PacketBufferHandle && msg);
+    static CHIP_ERROR HandleSigma3b(HandleSigma3Data & data, bool & cancel);
+    CHIP_ERROR HandleSigma3c(HandleSigma3Data & data, CHIP_ERROR status);
 
     CHIP_ERROR SendSigma2Resume();
 
+    CHIP_ERROR DeriveSigmaKey(const ByteSpan & salt, const ByteSpan & info, Crypto::AutoReleaseSessionKey & key) const;
     CHIP_ERROR ConstructSaltSigma2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                    MutableByteSpan & salt);
-    CHIP_ERROR ValidatePeerIdentity(const ByteSpan & peerNOC, const ByteSpan & peerICAC, NodeId & peerNodeId,
-                                    Crypto::P256PublicKey & peerPublicKey);
     CHIP_ERROR ConstructTBSData(const ByteSpan & senderNOC, const ByteSpan & senderICAC, const ByteSpan & senderPubKey,
                                 const ByteSpan & receiverPubKey, uint8_t * tbsData, size_t & tbsDataLen);
     CHIP_ERROR ConstructSaltSigma3(const ByteSpan & ipk, MutableByteSpan & salt);
 
     CHIP_ERROR ConstructSigmaResumeKey(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID, const ByteSpan & skInfo,
-                                       const ByteSpan & nonce, MutableByteSpan & resumeKey);
+                                       const ByteSpan & nonce, Crypto::AutoReleaseSessionKey & resumeKey);
 
     CHIP_ERROR GenerateSigmaResumeMIC(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID, const ByteSpan & skInfo,
                                       const ByteSpan & nonce, MutableByteSpan & resumeMIC);
@@ -282,6 +309,11 @@ private:
     SessionResumptionStorage::ResumptionIdStorage mNewResumptionId;    // ResumptionId which is stored to resume future session
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
+
+    template <class DATA>
+    class WorkHelper;
+    Platform::SharedPtr<WorkHelper<SendSigma3Data>> mSendSigma3Helper;
+    Platform::SharedPtr<WorkHelper<HandleSigma3Data>> mHandleSigma3Helper;
 
     State mState;
 

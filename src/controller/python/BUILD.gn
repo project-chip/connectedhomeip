@@ -20,6 +20,7 @@ import("$dir_pw_build/python.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/platform/python.gni")
+import("${chip_root}/src/system/system.gni")
 import("${dir_pw_unit_test}/test.gni")
 
 if (current_os == "mac") {
@@ -30,7 +31,11 @@ config("controller_wno_deprecate") {
   cflags = [ "-Wno-deprecated-declarations" ]
 }
 
-chip_python_version = "0.0"
+declare_args() {
+  chip_python_version = "0.0"
+  chip_python_package_prefix = "chip"
+  chip_python_supports_stack_locking = chip_system_config_locking != "none"
+}
 
 shared_library("ChipDeviceCtrl") {
   if (chip_controller) {
@@ -48,18 +53,25 @@ shared_library("ChipDeviceCtrl") {
 
   sources += [ "chip/native/CommonStackInit.cpp" ]
 
+  defines = []
+
   if (chip_controller) {
     sources += [
       "ChipCommissionableNodeController-ScriptBinding.cpp",
+      "ChipDeviceController-Discovery.cpp",
       "ChipDeviceController-IssueNocChain.cpp",
       "ChipDeviceController-ScriptBinding.cpp",
       "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
       "ChipDeviceController-ScriptDevicePairingDelegate.h",
+      "ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.cpp",
+      "ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.h",
       "ChipDeviceController-StorageDelegate.cpp",
       "ChipDeviceController-StorageDelegate.h",
       "OpCredsBinding.cpp",
       "chip/clusters/attribute.cpp",
       "chip/clusters/command.cpp",
+      "chip/credentials/cert.cpp",
+      "chip/crypto/p256keypair.cpp",
       "chip/discovery/NodeResolution.cpp",
       "chip/interaction_model/Delegate.cpp",
       "chip/interaction_model/Delegate.h",
@@ -67,8 +79,19 @@ shared_library("ChipDeviceCtrl") {
       "chip/internal/ChipThreadWork.h",
       "chip/internal/CommissionerImpl.cpp",
       "chip/logging/LoggingRedirect.cpp",
+      "chip/native/ChipMainLoopWork.h",
+      "chip/native/PyChipError.cpp",
+      "chip/tracing/TracingSetup.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
     ]
+    defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
+    defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
+
+    if (chip_python_supports_stack_locking) {
+      sources += [ "chip/native/ChipMainLoopWork_StackLock.cpp" ]
+    } else {
+      sources += [ "chip/native/ChipMainLoopWork_WorkSchedule.cpp" ]
+    }
   } else {
     sources += [
       "chip/server/Options.cpp",
@@ -107,6 +130,15 @@ shared_library("ChipDeviceCtrl") {
     public_deps += [
       "${chip_root}/src/controller/data_model",
       "${chip_root}/src/credentials:file_attestation_trust_store",
+      "${chip_root}/src/tracing/json",
+      "${chip_root}/src/tracing/perfetto",
+      "${chip_root}/src/tracing/perfetto:file_output",
+      "${chip_root}/third_party/jsoncpp",
+    ]
+
+    deps = [
+      "${chip_root}/src/tracing/perfetto:event_storage",
+      "${chip_root}/src/tracing/perfetto:simple_initialization",
     ]
   } else {
     public_deps += [ "$chip_data_model" ]
@@ -183,11 +215,11 @@ chip_python_wheel_action("chip-core") {
     {
       src_dir = "."
       sources = [
+        "chip/CertificateAuthority.py",
         "chip/ChipBleBase.py",
         "chip/ChipBleUtility.py",
         "chip/ChipBluezMgr.py",
         "chip/ChipCommissionableNodeCtrl.py",
-        "chip/ChipCoreBluetoothMgr.py",
         "chip/ChipStack.py",
         "chip/FabricAdmin.py",
         "chip/__init__.py",
@@ -200,7 +232,13 @@ chip_python_wheel_action("chip-core") {
         "chip/clusters/Attribute.py",
         "chip/clusters/Command.py",
         "chip/clusters/__init__.py",
+        "chip/commissioning/__init__.py",
+        "chip/commissioning/commissioning_flow_blocks.py",
+        "chip/commissioning/pase.py",
         "chip/configuration/__init__.py",
+        "chip/credentials/cert.py",
+        "chip/crypto/fabric.py",
+        "chip/crypto/p256keypair.py",
         "chip/discovery/__init__.py",
         "chip/discovery/library_handle.py",
         "chip/discovery/types.py",
@@ -218,16 +256,18 @@ chip_python_wheel_action("chip-core") {
         "chip/setup_payload/__init__.py",
         "chip/setup_payload/setup_payload.py",
         "chip/storage/__init__.py",
+        "chip/tracing/__init__.py",
         "chip/utils/CommissioningBuildingBlocks.py",
         "chip/utils/__init__.py",
+        "chip/yaml/__init__.py",
+        "chip/yaml/data_model_lookup.py",
+        "chip/yaml/errors.py",
+        "chip/yaml/format_converter.py",
+        "chip/yaml/runner.py",
       ]
 
       if (chip_controller) {
-        sources += [
-          "chip-device-ctrl.py",
-          "chip-repl.py",
-          "chip/ChipDeviceCtrl.py",
-        ]
+        sources += [ "chip/ChipDeviceCtrl.py" ]
       } else {
         sources += [
           "chip/server/__init__.py",
@@ -256,17 +296,22 @@ chip_python_wheel_action("chip-core") {
     "chip.ble",
     "chip.ble.commissioning",
     "chip.configuration",
+    "chip.commissioning",
     "chip.clusters",
+    "chip.credentials",
+    "chip.crypto",
     "chip.utils",
     "chip.discovery",
     "chip.exceptions",
     "chip.internal",
     "chip.interaction_model",
     "chip.logging",
+    "chip.yaml",
     "chip.native",
     "chip.clusters",
     "chip.setup_payload",
     "chip.storage",
+    "chip.tracing",
   ]
 
   if (!chip_controller) {
@@ -281,16 +326,9 @@ chip_python_wheel_action("chip-core") {
     "pyyaml",
     "ipdb",
     "deprecation",
+    "cryptography",
+    "ecdsa",
   ]
-
-  if (current_os == "mac") {
-    py_package_reqs += [ "pyobjc-framework-corebluetooth" ]
-  } else if (current_os == "linux") {
-    py_package_reqs += [
-      "dbus-python",
-      "pygobject",
-    ]
-  }
 
   if (current_cpu == "x64") {
     cpu_tag = "x86_64"
@@ -303,8 +341,10 @@ chip_python_wheel_action("chip-core") {
   }
 
   if (current_os == "mac") {
-    py_platform_tag =
-        "macosx_" + string_replace(mac_deployment_target, ".", "_")
+    py_platform_tag = string_replace(
+            string_replace(mac_deployment_target, "macos", "macosx."),
+            ".",
+            "_")
   } else {
     py_platform_tag = current_os
   }
@@ -319,11 +359,12 @@ chip_python_wheel_action("chip-core") {
     lib_name = "_ChipServer.so"
   }
 
-  py_package_name = "chip-core"
+  py_package_name = "${chip_python_package_prefix}-core"
+  py_package_output = string_replace(py_package_name, "-", "_")
 
   public_deps = [ ":ChipDeviceCtrl" ]
 
-  output_name = "chip_core-${chip_python_version}-${tags}.whl"
+  output_name = "${py_package_output}-${chip_python_version}-${tags}.whl"
 }
 
 chip_python_wheel_action("chip-clusters") {
@@ -337,7 +378,9 @@ chip_python_wheel_action("chip-clusters") {
         "chip/clusters/Objects.py",
         "chip/clusters/TestObjects.py",
         "chip/clusters/Types.py",
+        "chip/clusters/enum.py",
         "chip/tlv/__init__.py",
+        "chip/tlv/tlvlist.py",
       ]
     },
     {
@@ -354,12 +397,16 @@ chip_python_wheel_action("chip-clusters") {
     "chip.tlv",
   ]
 
-  py_package_reqs = [ "dacite" ]
+  py_package_reqs = [
+    "dacite",
+    "aenum",
+  ]
 
-  py_package_name = "chip-clusters"
+  py_package_name = "${chip_python_package_prefix}-clusters"
+  py_package_output = string_replace(py_package_name, "-", "_")
   py_platform_tag = "any"
 
-  output_name = "chip_clusters-${chip_python_version}-py3-none-any.whl"
+  output_name = "${py_package_output}-${chip_python_version}-py3-none-any.whl"
 }
 
 chip_python_wheel_action("chip-repl") {
@@ -371,7 +418,11 @@ chip_python_wheel_action("chip-repl") {
   py_manifest_files = [
     {
       src_dir = "."
-      sources = [ "chip/ChipReplStartup.py" ]
+      sources = [
+        "chip/ChipBluezMgr.py",
+        "chip/ChipCoreBluetoothMgr.py",
+        "chip/ChipReplStartup.py",
+      ]
       sources += py_scripts
     },
     {
@@ -399,7 +450,17 @@ chip_python_wheel_action("chip-repl") {
     "ipykernel",
   ]
 
-  py_package_name = "chip-repl"
+  if (current_os == "mac") {
+    py_package_reqs += [ "pyobjc-framework-corebluetooth" ]
+  } else if (current_os == "linux") {
+    py_package_reqs += [
+      "dbus-python==1.2.18",
+      "pygobject",
+    ]
+  }
+
+  py_package_name = "${chip_python_package_prefix}-repl"
+  py_package_output = string_replace(py_package_name, "-", "_")
   py_platform_tag = "any"
 
   data_deps = [
@@ -407,5 +468,5 @@ chip_python_wheel_action("chip-repl") {
     ":chip-core",
   ]
 
-  output_name = "chip_repl-${chip_python_version}-py3-none-any.whl"
+  output_name = "${py_package_output}-${chip_python_version}-py3-none-any.whl"
 }

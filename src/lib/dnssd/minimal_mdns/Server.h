@@ -23,6 +23,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/PoolWrapper.h>
 
+#include <lib/dnssd/minimal_mdns/ListenIterator.h>
 #include <lib/dnssd/minimal_mdns/core/BytesRange.h>
 
 namespace mdns {
@@ -31,30 +32,9 @@ namespace Minimal {
 namespace BroadcastIpAddresses {
 
 // Get standard mDNS Broadcast addresses
-
-void GetIpv6Into(chip::Inet::IPAddress & dest);
-void GetIpv4Into(chip::Inet::IPAddress & dest);
+chip::Inet::IPAddress Get(chip::Inet::IPAddressType addressType);
 
 } // namespace BroadcastIpAddresses
-
-/// Provides a list of intefaces to listen on.
-///
-/// When listening on IP, both IP address type (IPv4 or IPv6) and interface id
-/// are important. In particular, when using link-local IP addresses, the actual
-/// interface matters (e.g. FF02::FB will care over which IPv6 interface it is sent)
-///
-/// For MDNS in particular, you may want:
-///  - IPv4 listen on InterfaceId::Null()
-///  - IPv6 listen on every specific interface id available (except local loopback and other
-///    not usable interfaces like docker)
-class ListenIterator
-{
-public:
-    virtual ~ListenIterator() {}
-
-    // Get the next interface/address type to listen on
-    virtual bool Next(chip::Inet::InterfaceId * id, chip::Inet::IPAddressType * type) = 0;
-};
 
 /// Handles mDNS Server Callbacks
 class ServerDelegate
@@ -148,17 +128,17 @@ public:
 
     ServerBase(EndpointInfoPoolType & pool) : mEndpoints(pool)
     {
-        BroadcastIpAddresses::GetIpv6Into(mIpv6BroadcastAddress);
-
+        mIpv6BroadcastAddress = BroadcastIpAddresses::Get(chip::Inet::IPAddressType::kIPv6);
 #if INET_CONFIG_ENABLE_IPV4
-        BroadcastIpAddresses::GetIpv4Into(mIpv4BroadcastAddress);
+        mIpv4BroadcastAddress = BroadcastIpAddresses::Get(chip::Inet::IPAddressType::kIPv4);
 #endif
     }
     virtual ~ServerBase();
 
-    /// Closes all currently open endpoints
+    /// Closes all currently open endpoints and resets the 'initialized' flag
     void Shutdown();
 
+    void ShutdownEndpoints();
     void ShutdownEndpoint(EndpointInfo & aEndpoint);
 
     /// Listen on the given interfaces/address types.
@@ -195,13 +175,6 @@ public:
         return *this;
     }
 
-    /// Iterator through all Endpoints
-    template <typename Function>
-    chip::Loop ForEachEndPoints(Function && function)
-    {
-        return mEndpoints.ForEachActiveObject(std::forward<Function>(function));
-    }
-
     /// A server is considered listening if any UDP endpoint is active.
     ///
     /// This is expected to return false after any Shutdown() and will
@@ -224,6 +197,7 @@ private:
 #if INET_CONFIG_ENABLE_IPV4
     chip::Inet::IPAddress mIpv4BroadcastAddress;
 #endif
+    bool mIsInitialized = false;
 };
 
 // The PoolImpl impl is used as a base class because its destructor must be called after ServerBase's destructor.

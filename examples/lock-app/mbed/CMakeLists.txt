@@ -57,8 +57,6 @@ target_sources(${APP_TARGET} PRIVATE
                main/BoltLockManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${GEN_DIR}/lock-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/lock-app/zap-generated/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${MBED_COMMON}/util/DFUManager.cpp
 )

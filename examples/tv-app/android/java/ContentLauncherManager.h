@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
-
 #include <app/AttributeAccessInterface.h>
 #include <app/clusters/content-launch-server/content-launch-server.h>
 #include <jni.h>
@@ -29,9 +27,9 @@ using chip::CharSpan;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using ContentLauncherDelegate = chip::app::Clusters::ContentLauncher::Delegate;
-using LaunchResponseType      = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
-using ParameterType           = chip::app::Clusters::ContentLauncher::Structs::Parameter::DecodableType;
-using BrandingInformationType = chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type;
+using LaunchResponseType      = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
+using ParameterType           = chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType;
+using BrandingInformationType = chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type;
 
 class ContentLauncherManager : public ContentLauncherDelegate
 {

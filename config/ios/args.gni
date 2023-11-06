@@ -19,4 +19,4 @@ chip_device_platform = "darwin"
 
 chip_project_config_include_dirs = [ "${chip_root}/config/ios" ]
 
-pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/constraints.txt" ]
+pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/setup/constraints.txt" ]

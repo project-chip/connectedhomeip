@@ -18,10 +18,11 @@
 
 #pragma once
 
-#include "../common/CHIPCommand.h"
-#include "../common/Command.h"
-
 #include <lib/support/Span.h>
+
+#include "commands/common/CHIPCommand.h"
+#include "commands/common/Command.h"
+#include "commands/common/Commands.h"
 
 class ShowControllerGroups : public CHIPCommand
 {
@@ -331,10 +332,7 @@ public:
         }
         iter->Release();
 
-        if (err == CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(err);
         ReturnErrorOnFailure(groupDataProvider->RemoveKeySet(fabricIndex, keysetId));
 
         SetCommandExitStatus(CHIP_NO_ERROR);
@@ -360,5 +358,6 @@ void registerCommandsGroup(Commands & commands, CredentialIssuerCommands * creds
         make_unique<RemoveKeySet>(credsIssuerConfig),
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands,
+                                "Commands for manipulating group keys and memberships for chip-tool itself.");
 }

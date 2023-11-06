@@ -18,14 +18,18 @@
 
 #pragma once
 
+#include <app/AppBuildConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadPrepareParams.h>
 #include <controller/TypedReadCallback.h>
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
 namespace chip {
 namespace Controller {
 namespace detail {
+
+using SubscriptionOnDoneCallback = std::function<void(void)>;
 
 template <typename DecodableAttributeType>
 struct ReportAttributeParams : public app::ReadPrepareParams
@@ -40,6 +44,7 @@ struct ReportAttributeParams : public app::ReadPrepareParams
         mOnSubscriptionEstablishedCb = nullptr;
     typename TypedReadAttributeCallback<DecodableAttributeType>::OnResubscriptionAttemptCallbackType mOnResubscriptionAttemptCb =
         nullptr;
+    SubscriptionOnDoneCallback mOnDoneCb         = nullptr;
     app::ReadClient::InteractionType mReportType = app::ReadClient::InteractionType::Read;
 };
 
@@ -63,7 +68,14 @@ CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId 
         readParams.mpDataVersionFilterList    = dataVersionFilters.get();
         readParams.mDataVersionFilterListSize = 1;
     }
-    auto onDone = [](TypedReadAttributeCallback<DecodableAttributeType> * callback) { chip::Platform::Delete(callback); };
+    auto onDoneCb = readParams.mOnDoneCb;
+    auto onDone   = [onDoneCb](TypedReadAttributeCallback<DecodableAttributeType> * callback) {
+        if (onDoneCb)
+        {
+            onDoneCb();
+        }
+        chip::Platform::Delete(callback);
+    };
 
     auto callback = chip::Platform::MakeUnique<TypedReadAttributeCallback<DecodableAttributeType>>(
         clusterId, attributeId, readParams.mOnReportCb, readParams.mOnErrorCb, onDone, readParams.mOnSubscriptionEstablishedCb,
@@ -151,13 +163,15 @@ CHIP_ERROR SubscribeAttribute(
         nullptr,
     typename TypedReadAttributeCallback<DecodableAttributeType>::OnResubscriptionAttemptCallbackType onResubscriptionAttemptCb =
         nullptr,
-    bool fabricFiltered = true, bool keepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional)
+    bool fabricFiltered = true, bool keepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional,
+    typename detail::SubscriptionOnDoneCallback onDoneCb = nullptr)
 {
     detail::ReportAttributeParams<DecodableAttributeType> params(sessionHandle);
     params.mOnReportCb                  = onReportCb;
     params.mOnErrorCb                   = onErrorCb;
     params.mOnSubscriptionEstablishedCb = onSubscriptionEstablishedCb;
     params.mOnResubscriptionAttemptCb   = onResubscriptionAttemptCb;
+    params.mOnDoneCb                    = onDoneCb;
     params.mMinIntervalFloorSeconds     = minIntervalFloorSeconds;
     params.mMaxIntervalCeilingSeconds   = maxIntervalCeilingSeconds;
     params.mKeepSubscriptions           = keepPreviousSubscriptions;
@@ -185,12 +199,13 @@ CHIP_ERROR SubscribeAttribute(
         onSubscriptionEstablishedCb = nullptr,
     typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnResubscriptionAttemptCallbackType
         onResubscriptionAttemptCb = nullptr,
-    bool fabricFiltered = true, bool keepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional)
+    bool fabricFiltered = true, bool keepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional,
+    typename detail::SubscriptionOnDoneCallback onDoneCb = nullptr)
 {
     return SubscribeAttribute<typename AttributeTypeInfo::DecodableType>(
         exchangeMgr, sessionHandle, endpointId, AttributeTypeInfo::GetClusterId(), AttributeTypeInfo::GetAttributeId(), onReportCb,
         onErrorCb, aMinIntervalFloorSeconds, aMaxIntervalCeilingSeconds, onSubscriptionEstablishedCb, onResubscriptionAttemptCb,
-        fabricFiltered, keepPreviousSubscriptions, aDataVersion);
+        fabricFiltered, keepPreviousSubscriptions, aDataVersion, onDoneCb);
 }
 
 namespace detail {
@@ -315,3 +330,4 @@ CHIP_ERROR SubscribeEvent(
 
 } // namespace Controller
 } // namespace chip
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT

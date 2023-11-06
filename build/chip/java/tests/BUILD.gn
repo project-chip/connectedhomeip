@@ -17,7 +17,7 @@ import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/python.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 
-pw_python_script("java_build_test") {
+pw_python_action("java_build_test") {
   inputs = [
     "expected_output/child_library_2_expected.json",
     "expected_output/grandchild_library_expected.json",
@@ -26,8 +26,9 @@ pw_python_script("java_build_test") {
     "expected_output/child_prebuilt_expected.json",
     "expected_output/java_prebuilt_expected.json",
   ]
-  other_deps = [ ":java_library" ]
-  tests = [ "test.py" ]
+  deps = [ ":java_library" ]
+  script = "test.py"
+  stamp = true
 }
 
 java_library("java_library") {

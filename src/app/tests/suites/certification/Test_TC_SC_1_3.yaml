@@ -15,9 +15,12 @@
 
 name: 14.1.3. [TC-SC-1.3] MRP Retransmissions
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:

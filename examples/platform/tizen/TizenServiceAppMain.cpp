@@ -79,6 +79,11 @@ void TizenServiceAppMain::AppTerminated()
     ChipLogProgress(NotSpecified, "Tizen app terminated");
 }
 
+static void TizenMainLoopWrapper()
+{
+    ChipLinuxAppMainLoop();
+}
+
 void TizenServiceAppMain::AppControl(app_control_h app_control)
 {
     ChipLogProgress(NotSpecified, "Tizen app control");
@@ -91,7 +96,7 @@ void TizenServiceAppMain::AppControl(app_control_h app_control)
             return;
         }
 
-        mLinuxThread = std::thread(ChipLinuxAppMainLoop);
+        mLinuxThread = std::thread(TizenMainLoopWrapper);
         initialized  = true;
     }
 }

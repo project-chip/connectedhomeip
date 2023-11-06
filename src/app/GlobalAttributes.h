@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace app {
@@ -30,6 +31,9 @@ namespace app {
 constexpr AttributeId GlobalAttributesNotInMetadata[] = {
     Clusters::Globals::Attributes::GeneratedCommandList::Id,
     Clusters::Globals::Attributes::AcceptedCommandList::Id,
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+    Clusters::Globals::Attributes::EventList::Id,
+#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     Clusters::Globals::Attributes::AttributeList::Id,
 };
 

@@ -2,7 +2,6 @@
 package com.matter.tv.app.api;
 
 import com.matter.tv.app.api.SetSupportedClustersRequest;
-import com.matter.tv.app.api.ReportAttributeChangeRequest;
 
 /*
  * To use this interface, partners should query for and bind to a service that handles the "com.matter.tv.app.api.action.MatterAppAgent" Action.
@@ -29,5 +28,5 @@ interface IMatterAppAgent {
      * @return - ReportAttributeChangeResult, returns success or error code
      */
      // TODO : replace the boolean with some kind of enumerated status field
-    boolean reportAttributeChange(in ReportAttributeChangeRequest request);
+    boolean reportAttributeChange(in int clusterId, in int attributeId);
 }

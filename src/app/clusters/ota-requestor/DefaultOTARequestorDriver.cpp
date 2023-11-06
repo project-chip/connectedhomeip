@@ -48,7 +48,12 @@ using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
 constexpr uint8_t kMaxInvalidSessionRetries        = 1;  // Max # of query image retries to perform on invalid session error
 constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
 constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
+
+#ifdef NON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR
+constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(NON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR);
+#else
 constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
+#endif // NON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR
 
 DefaultOTARequestorDriver * ToDriver(void * context)
 {
@@ -76,7 +81,10 @@ void DefaultOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
                 return;
             }
 
-            mRequestor->NotifyUpdateApplied();
+            if (mSendNotifyUpdateApplied)
+            {
+                mRequestor->NotifyUpdateApplied();
+            }
         });
     }
     else if ((mRequestor->GetCurrentUpdateState() != OTAUpdateStateEnum::kIdle))
@@ -184,7 +192,11 @@ void DefaultOTARequestorDriver::ApplyTimerHandler(System::Layer * systemLayer, v
     DefaultOTARequestorDriver * driver = ToDriver(appState);
 
     VerifyOrDie(driver->mImageProcessor != nullptr);
-    driver->mImageProcessor->Apply();
+
+    if (driver->mImageProcessor->Apply() != CHIP_NO_ERROR)
+    {
+        driver->mRequestor->CancelImageUpdate();
+    }
 }
 
 void DefaultOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)
@@ -388,6 +400,13 @@ void DefaultOTARequestorDriver::StopPeriodicQueryTimer()
     CancelDelayedAction(PeriodicQueryTimerHandler, this);
 }
 
+void DefaultOTARequestorDriver::RekickPeriodicQueryTimer()
+{
+    ChipLogProgress(SoftwareUpdate, "Rekicking the Periodic Query timer");
+    StopPeriodicQueryTimer();
+    StartPeriodicQueryTimer();
+}
+
 void DefaultOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer, void * appState)
 {
     DefaultOTARequestorDriver * driver = ToDriver(appState);
@@ -501,7 +520,7 @@ CHIP_ERROR DefaultOTARequestorDriver::ScheduleQueryRetry(bool trySameProvider, S
 
     if (status == CHIP_NO_ERROR)
     {
-        ChipLogProgress(SoftwareUpdate, "Scheduling a retry");
+        ChipLogProgress(SoftwareUpdate, "Scheduling a retry; delay: %" PRIu32, delay.count());
         ScheduleDelayedAction(delay, StartDelayTimerHandler, this);
     }
 

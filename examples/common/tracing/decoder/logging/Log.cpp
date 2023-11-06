@@ -36,12 +36,12 @@ void ENFORCE_FORMAT(1, 2) LogFormatted(const char * format, ...)
 {
     char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE] = {};
 
-    uint8_t indentation = gIndentLevel * kSpacePerIndent;
+    int indentation = gIndentLevel * kSpacePerIndent;
     snprintf(buffer, sizeof(buffer), "%*s", indentation, "");
 
     va_list args;
     va_start(args, format);
-    vsnprintf(&buffer[indentation], sizeof(buffer) - indentation, format, args);
+    vsnprintf(&buffer[indentation], sizeof(buffer) - static_cast<size_t>(indentation), format, args);
     va_end(args);
 
     ChipLogDetail(DataManagement, "%s", buffer);

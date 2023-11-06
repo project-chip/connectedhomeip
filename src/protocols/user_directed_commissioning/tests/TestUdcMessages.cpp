@@ -6,7 +6,9 @@
 #include <lib/dnssd/TxtFields.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -60,7 +62,7 @@ void TestUDCServerClients(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, nullptr == udcServer.GetUDCClients().FindUDCClientState(instanceName1));
     udcServer.SetUDCClientProcessingState((char *) instanceName1, UDCClientProcessingState::kUserDeclined);
     UDCClientState * state = udcServer.GetUDCClients().FindUDCClientState(instanceName1);
-    NL_TEST_ASSERT(inSuite, nullptr != state);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, nullptr != state);
     NL_TEST_ASSERT(inSuite, UDCClientProcessingState::kUserDeclined == state->GetUDCClientProcessingState());
 }
 
@@ -84,21 +86,21 @@ void TestUDCServerUserConfirmationProvider(nlTestSuite * inSuite, void * inConte
     nodeData1.resolutionData.port         = 5540;
     nodeData1.resolutionData.ipAddress[0] = address;
     nodeData1.resolutionData.numIPs       = 1;
-    strncpy((char *) nodeData1.commissionData.instanceName, instanceName1, sizeof(nodeData1.commissionData.instanceName));
+    Platform::CopyString(nodeData1.commissionData.instanceName, instanceName1);
 
     Dnssd::DiscoveredNodeData nodeData2;
     nodeData2.resolutionData.port              = 5540;
     nodeData2.resolutionData.ipAddress[0]      = address;
     nodeData2.resolutionData.numIPs            = 1;
     nodeData2.commissionData.longDiscriminator = disc2;
-    strncpy((char *) nodeData2.commissionData.instanceName, instanceName2, sizeof(nodeData2.commissionData.instanceName));
-    strncpy((char *) nodeData2.commissionData.deviceName, deviceName2, sizeof(nodeData2.commissionData.deviceName));
+    Platform::CopyString(nodeData2.commissionData.instanceName, instanceName2);
+    Platform::CopyString(nodeData2.commissionData.deviceName, deviceName2);
 
     // test empty UserConfirmationProvider
     udcServer.OnCommissionableNodeFound(nodeData2);
     udcServer.OnCommissionableNodeFound(nodeData1);
     state = udcServer.GetUDCClients().FindUDCClientState(instanceName1);
-    NL_TEST_ASSERT(inSuite, nullptr != state);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, nullptr != state);
     NL_TEST_ASSERT(inSuite, UDCClientProcessingState::kUserDeclined == state->GetUDCClientProcessingState());
     // test other fields on UDCClientState
     NL_TEST_ASSERT(inSuite, 0 == strcmp(state->GetInstanceName(), instanceName1));
@@ -112,10 +114,10 @@ void TestUDCServerUserConfirmationProvider(nlTestSuite * inSuite, void * inConte
     udcServer.OnCommissionableNodeFound(nodeData2);
     udcServer.OnCommissionableNodeFound(nodeData1);
     state = udcServer.GetUDCClients().FindUDCClientState(instanceName1);
-    NL_TEST_ASSERT(inSuite, nullptr != state);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, nullptr != state);
     NL_TEST_ASSERT(inSuite, UDCClientProcessingState::kUserDeclined == state->GetUDCClientProcessingState());
     state = udcServer.GetUDCClients().FindUDCClientState(instanceName2);
-    NL_TEST_ASSERT(inSuite, nullptr != state);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, nullptr != state);
     NL_TEST_ASSERT(inSuite, UDCClientProcessingState::kPromptingUser == state->GetUDCClientProcessingState());
     // test other fields on UDCClientState
     NL_TEST_ASSERT(inSuite, 0 == strcmp(state->GetInstanceName(), instanceName2));
@@ -165,7 +167,7 @@ void TestUDCServerInstanceNameResolver(nlTestSuite * inSuite, void * inContext)
 
     // check if the state is set for the instance name sent
     state = udcServer.GetUDCClients().FindUDCClientState(nameBuffer);
-    NL_TEST_ASSERT(inSuite, nullptr != state);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, nullptr != state);
     NL_TEST_ASSERT(inSuite, UDCClientProcessingState::kDiscoveringNode == state->GetUDCClientProcessingState());
 
     // check if a callback happened
@@ -306,7 +308,7 @@ void TestUDCClientState(nlTestSuite * inSuite, void * inContext)
 
     const ByteSpan & value = GetSpan(rotatingIdLongString);
     rotatingIdLongLen      = Encoding::HexToBytes(reinterpret_cast<const char *>(value.data()), value.size(), rotatingIdLong,
-                                             chip::Dnssd::kMaxRotatingIdLen * 2);
+                                                  chip::Dnssd::kMaxRotatingIdLen * 2);
 
     NL_TEST_ASSERT(inSuite, rotatingIdLongLen > chip::Dnssd::kMaxRotatingIdLen);
 
@@ -319,7 +321,7 @@ void TestUDCClientState(nlTestSuite * inSuite, void * inContext)
 
     // get the state
     state = mUdcClients.FindUDCClientState(instanceName1);
-    NL_TEST_ASSERT(inSuite, nullptr != state);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, nullptr != state);
     NL_TEST_ASSERT(inSuite, strcmp(state->GetInstanceName(), instanceName1) == 0);
 
     state->SetPeerAddress(chip::Transport::PeerAddress::UDP(address, port));

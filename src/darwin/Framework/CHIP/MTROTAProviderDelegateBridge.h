@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTROTAProviderDelegate.h"
+#import <Matter/MTROTAProviderDelegate.h>
 
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 
@@ -27,7 +27,15 @@ public:
     MTROTAProviderDelegateBridge();
     ~MTROTAProviderDelegateBridge();
 
-    void setDelegate(id<MTROTAProviderDelegate> delegate, dispatch_queue_t queue);
+    CHIP_ERROR Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeManager);
+
+    // Shutdown must be called after the event loop has been stopped, since it
+    // touches Matter objects.
+    void Shutdown();
+
+    // ControllerShuttingDown must be called on the Matter work queue, since it
+    // touches Matter objects.
+    void ControllerShuttingDown(MTRDeviceController * controller);
 
     void HandleQueryImage(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -44,22 +52,19 @@ public:
 private:
     static CHIP_ERROR ConvertToQueryImageParams(
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
-        MTROtaSoftwareUpdateProviderClusterQueryImageParams * commandParams);
-    static void ConvertFromQueryImageResponseParms(
-        const MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * responseParams,
+        MTROTASoftwareUpdateProviderClusterQueryImageParams * commandParams);
+    static void ConvertFromQueryImageResponseParams(
+        const MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * responseParams,
         chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Type & response);
     static void ConvertToApplyUpdateRequestParams(
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData,
-        MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * commandParams);
+        MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams * commandParams);
     static void ConvertFromApplyUpdateRequestResponseParms(
-        const MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * responseParams,
+        const MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * responseParams,
         chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Type & response);
     static void ConvertToNotifyUpdateAppliedParams(
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData,
-        MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * commandParams);
-
-    _Nullable id<MTROTAProviderDelegate> mDelegate;
-    _Nullable dispatch_queue_t mQueue;
+        MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * commandParams);
 };
 
 NS_ASSUME_NONNULL_END

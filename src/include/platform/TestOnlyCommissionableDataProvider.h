@@ -16,9 +16,9 @@
  */
 #pragma once
 
-#include <platform/CommissionableDataProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
+#include <platform/CommissionableDataProvider.h>
 
 namespace chip {
 namespace DeviceLayer {

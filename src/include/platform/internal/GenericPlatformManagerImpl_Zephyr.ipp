@@ -34,8 +34,13 @@
 
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
+#include <system/SystemStats.h>
 
-#include <sys/reboot.h>
+#include <zephyr/sys/reboot.h>
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
 
 #define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
 
@@ -68,6 +73,10 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_InitChipStack(void)
                 CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE);
 
     mShouldRunEventLoop = false;
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    VerifyOrReturnError(psa_crypto_init() == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+#endif
 
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
@@ -114,7 +123,7 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StopEventLoopTask(void
 template <class ImplClass>
 void GenericPlatformManagerImpl_Zephyr<ImplClass>::_Shutdown(void)
 {
-#if CONFIG_REBOOT
+#ifdef CONFIG_REBOOT
     sys_reboot(SYS_REBOOT_WARM);
 #else
     // NB: When this is implemented, |mInitialized| can be removed.
@@ -130,6 +139,8 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDe
         ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
         return System::MapErrorZephyr(status);
     }
+
+    SYSTEM_STATS_INCREMENT(System::Stats::kPlatformMgr_NumEvents);
 
     // Wake CHIP thread to process the event. If the function is called from ISR, such as a Zephyr
     // timer handler, do not signal the thread directly because that involves taking a mutex, which
@@ -151,7 +162,10 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::ProcessDeviceEvents()
     ChipDeviceEvent event;
 
     while (k_msgq_get(&mChipEventQueue, &event, K_NO_WAIT) == 0)
+    {
+        SYSTEM_STATS_DECREMENT(System::Stats::kPlatformMgr_NumEvents);
         Impl()->DispatchEvent(&event);
+    }
 }
 
 template <class ImplClass>

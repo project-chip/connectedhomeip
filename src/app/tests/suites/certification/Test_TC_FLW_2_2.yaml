@@ -14,13 +14,16 @@
 
 name: 33.2.2. [TC-FLW-2.2] Primary functionality with server as DUT
 
+PICS:
+    - FLW.S
+
 config:
     nodeId: 0x12344321
     cluster: "Flow Measurement"
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,18 +31,18 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the mandatory attribute: MeasuredValue"
+    - label: "Step 2: Read the mandatory attribute: MeasuredValue"
       PICS: FLW.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
           saveAs: ValueBeforeChange
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
-    - label: "operate on DUT to change the flow significantly"
+    - label: "Step 3: Operate on device to change the flow significantly"
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && FLW.M.FlowChange
@@ -50,13 +53,13 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "read the mandatory attribute: MeasuredValue"
-      PICS: FLW.S.A0000
+    - label: "Step 4: Read the mandatory attribute: MeasuredValue"
+      PICS: FLW.S.A0000 && FLW.M.FlowChange
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
               notValue: ValueBeforeChange

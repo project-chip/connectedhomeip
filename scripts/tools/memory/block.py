@@ -19,19 +19,15 @@
 
 import logging
 import sys
-
 from typing import Optional, Pattern
-
-import pandas as pd  # type: ignore
 
 import memdf.collect
 import memdf.name
 import memdf.report
 import memdf.select
 import memdf.util.config
-
+import pandas as pd  # type: ignore
 from memdf import Config, ConfigDescription
-
 
 BLOCKLIST_CONFIG: ConfigDescription = {
     'symbol.block': {

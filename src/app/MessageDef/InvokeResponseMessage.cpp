@@ -21,15 +21,14 @@
 #include "InvokeResponseMessage.h"
 #include "MessageDefHelper.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR InvokeResponseMessage::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR InvokeResponseMessage::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    int tagPresenceMask = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("InvokeResponseMessage =");
@@ -48,30 +47,23 @@ CHIP_ERROR InvokeResponseMessage::Parser::CheckSchemaValidity() const
         switch (tagNum)
         {
         case to_underlying(Tag::kSuppressResponse):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kSuppressResponse))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kSuppressResponse));
 #if CHIP_DETAIL_LOGGING
-            {
-                bool suppressResponse;
-                ReturnErrorOnFailure(reader.Get(suppressResponse));
-                PRETTY_PRINT("\tsuppressResponse = %s, ", suppressResponse ? "true" : "false");
-            }
+        {
+            bool suppressResponse;
+            ReturnErrorOnFailure(reader.Get(suppressResponse));
+            PRETTY_PRINT("\tsuppressResponse = %s, ", suppressResponse ? "true" : "false");
+        }
 #endif // CHIP_DETAIL_LOGGING
-            break;
-        case to_underlying(Tag::kInvokeResponses):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kInvokeResponses))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kInvokeResponses));
-            {
-                InvokeResponseIBs::Parser invokeResponses;
-                ReturnErrorOnFailure(invokeResponses.Init(reader));
+        break;
+        case to_underlying(Tag::kInvokeResponses): {
+            InvokeResponseIBs::Parser invokeResponses;
+            ReturnErrorOnFailure(invokeResponses.Init(reader));
 
-                PRETTY_PRINT_INCDEPTH();
-                ReturnErrorOnFailure(invokeResponses.CheckSchemaValidity());
-                PRETTY_PRINT_DECDEPTH();
-            }
-            break;
+            PRETTY_PRINT_INCDEPTH();
+            ReturnErrorOnFailure(invokeResponses.PrettyPrint());
+            PRETTY_PRINT_DECDEPTH();
+        }
+        break;
         case kInteractionModelRevisionTag:
             ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
             break;
@@ -86,15 +78,13 @@ CHIP_ERROR InvokeResponseMessage::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int requiredFields = (1 << to_underlying(Tag::kSuppressResponse)) | (1 << to_underlying(Tag::kInvokeResponses));
-        err =
-            (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE;
+        err = CHIP_NO_ERROR;
     }
 
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 CHIP_ERROR InvokeResponseMessage::Parser::GetSuppressResponse(bool * const apSuppressResponse) const
 {
@@ -104,7 +94,7 @@ CHIP_ERROR InvokeResponseMessage::Parser::GetSuppressResponse(bool * const apSup
 CHIP_ERROR InvokeResponseMessage::Parser::GetInvokeResponses(InvokeResponseIBs::Parser * const apStatus) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kInvokeResponses)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kInvokeResponses), reader));
     return apStatus->Init(reader);
 }
 
@@ -112,7 +102,7 @@ InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::SuppressRespons
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kSuppressResponse)), aSuppressResponse);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kSuppressResponse), aSuppressResponse);
     }
     return *this;
 }
@@ -126,7 +116,7 @@ InvokeResponseIBs::Builder & InvokeResponseMessage::Builder::CreateInvokeRespons
     return mInvokeResponses;
 }
 
-InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::EndOfInvokeResponseMessage()
+CHIP_ERROR InvokeResponseMessage::Builder::EndOfInvokeResponseMessage()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -136,7 +126,7 @@ InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::EndOfInvokeResp
     {
         EndOfContainer();
     }
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

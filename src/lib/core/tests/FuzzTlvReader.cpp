@@ -1,8 +1,8 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "lib/core/CHIPTLV.h"
-#include "lib/core/CHIPTLVUtilities.hpp"
+#include "lib/core/TLV.h"
+#include "lib/core/TLVUtilities.h"
 
 using chip::TLV::TLVReader;
 

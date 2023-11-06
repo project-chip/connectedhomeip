@@ -35,7 +35,7 @@ public:
     EventLogger(const T & aEventData) : mEventData(aEventData){};
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
     {
-        return DataModel::Encode(aWriter, TLV::ContextTag(to_underlying(EventDataIB::Tag::kData)), mEventData);
+        return DataModel::Encode(aWriter, TLV::ContextTag(EventDataIB::Tag::kData), mEventData);
     }
 
 private:
@@ -72,6 +72,8 @@ CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aE
     eventOptions.mPath        = path;
     eventOptions.mPriority    = aEventData.GetPriorityLevel();
     eventOptions.mFabricIndex = aEventData.GetFabricIndex();
+    // this skips logging the event if it's fabric-scoped but no fabric association exists yet.
+    VerifyOrReturnError(eventOptions.mFabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     //
     // Unlike attributes which have a different 'EncodeForRead' for fabric-scoped structs,

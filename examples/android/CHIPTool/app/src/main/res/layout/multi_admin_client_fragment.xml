@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/addressUpdateFragment"
+        android:name="com.google.chip.chiptool.clusterclient.AddressUpdateFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <EditText
+        android:id="@+id/timeoutEd"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/addressUpdateFragment"
+        android:inputType="number"
+        android:textSize="20sp"
+        android:hint="@string/enter_commissioning_timeout_hint_text"/>
+
+    <Button
+        android:id="@+id/basicCommissioningMethodBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/basic_commissioning_method_btn_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/timeoutEd"/>
+
+    <EditText
+        android:id="@+id/discriminatorEd"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:layout_constraintEnd_toStartOf="@id/setupPinCodeEd"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/basicCommissioningMethodBtn"
+        android:inputType="text"
+        android:textSize="20sp"
+        android:hint="@string/enter_discriminator_hint_text"/>
+
+    <EditText
+        android:id="@+id/setupPinCodeEd"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/discriminatorEd"
+        app:layout_constraintTop_toBottomOf="@id/basicCommissioningMethodBtn"
+        android:inputType="text"
+        android:textSize="20sp"
+        android:hint="@string/enter_setup_pin_code_hint_text"/>
+
+    <Button
+        android:id="@+id/enhancedCommissioningMethodBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:layout_constraintTop_toBottomOf="@id/discriminatorEd"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/enhanced_commissioning_method_btn_text" />
+
+    <Button
+        android:id="@+id/revokeBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:layout_constraintTop_toBottomOf="@id/enhancedCommissioningMethodBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/revoke_btn_text" />
+
+    <Button
+        android:id="@+id/readWindowStatusBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:textSize="10dp"
+        app:layout_constraintTop_toBottomOf="@id/revokeBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/readAdminFabricIndexBtn"
+        android:text="@string/read_window_status_btn_text" />
+
+    <Button
+        android:id="@+id/readAdminFabricIndexBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:textSize="10dp"
+        app:layout_constraintTop_toBottomOf="@id/revokeBtn"
+        app:layout_constraintEnd_toStartOf="@id/readAdminVendorIdBtn"
+        app:layout_constraintStart_toEndOf="@id/readWindowStatusBtn"
+        android:text="@string/read_admin_fabric_index_btn_text" />
+
+    <Button
+        android:id="@+id/readAdminVendorIdBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:textSize="10dp"
+        app:layout_constraintTop_toBottomOf="@id/revokeBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/readAdminFabricIndexBtn"
+        android:text="@string/read_admin_vendor_id_btn_text" />
+
+    <TextView
+        android:id="@+id/multiAdminClusterCommandStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/readWindowStatusBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:singleLine="false"
+        android:minLines="4"
+        android:textSize="20sp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

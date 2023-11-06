@@ -44,6 +44,10 @@ integrations:
     - integrations/*
     - integrations/**/*
 
+docker:
+    - integrations/docker/*
+    - integrations/docker/**/*
+
 vscode:
     - .vscode/*
     - .vscode/**/*
@@ -80,6 +84,8 @@ tools:
 #  Tests
 ############################################################
 tests:
+    - src/python_testing/*
+    - src/python_testing/**/*
     - src/app/tests/*
     - src/app/tests/**/*
 
@@ -119,6 +125,12 @@ core:
 protocols:
     - src/lib/protocols/*
     - src/lib/protocols/**/*
+    - src/protocols/*
+    - src/protocols/**/*
+
+messaging:
+    - src/messaging/*
+    - src/messaging/**/*
 
 shell:
     - src/lib/shell/*
@@ -140,13 +152,13 @@ ble:
     - src/ble/*
     - src/ble/**/*
 
-android:
-    - src/android/*
-    - src/android/**/*
-
 app:
     - src/app/*
     - src/app/**/*
+
+icd:
+    - src/app/icd/*
+    - src/app/icd/**/*
 
 transport:
     - src/transport/*
@@ -185,9 +197,9 @@ darwin:
     - examples/darwin-framework-tool/*
     - examples/darwin-framework-tool/**/*
 
-efr32:
-    - src/platform/EFR32/*
-    - src/platform/EFR32/**/*
+silabs:
+    - src/platform/silabs/*
+    - src/platform/silabs/**/*
 
 esp32:
     - src/platform/ESP32/*
@@ -220,3 +232,7 @@ zephyr:
 telink:
     - src/platform/telink/*
     - src/platform/telink/**/*
+
+tizen:
+    - src/platform/Tizen/*
+    - src/platform/Tizen/**/*

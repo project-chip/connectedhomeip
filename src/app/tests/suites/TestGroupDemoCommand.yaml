@@ -28,7 +28,7 @@ name: Group Messaging Demo Commands
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:

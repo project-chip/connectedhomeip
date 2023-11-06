@@ -1,0 +1,54 @@
+
+/// AUTO-GENERATED with matter_idl.
+
+syntax = "proto3";
+
+package com.matter.example.proto;
+
+option java_multiple_files = true;
+
+message SecondCluster {
+  // option (message_type) = MATTER_TRAIT;
+
+  enum ClusterId {
+    CLUSTER_ID_UNSUPPORTED = 0;
+    CLUSTER_ID = 2;
+  }
+
+  // Structs
+  message FabricDescriptorStruct {
+    /** octet_string Type: 5 IsList: 0 FieldId: 1 */
+    bytes root_public_key = 2621441;
+    /** vendor_id Type: 1 IsList: 0 FieldId: 2 */
+    uint32 vendor_id = 524290;
+    /** fabric_id Type: 1 IsList: 0 FieldId: 3 */
+    uint64 fabric_id = 524291;
+    /** node_id Type: 1 IsList: 0 FieldId: 4 */
+    uint64 node_id = 524292;
+    /** char_string Type: 4 IsList: 0 FieldId: 5 */
+    string label = 2097157;
+    /** fabric_idx Type: 1 IsList: 0 FieldId: 254 */
+    uint32 fabric_index = 524542;
+  }
+
+
+  // Attributes
+  /** FabricDescriptorStruct Type: 6 IsList: 1 FieldId: 0 */
+  FabricDescriptorStruct fabrics = 3145728;
+    /*
+    [(attribute) = {
+      is_subscribable: true,
+    }];
+    */
+
+
+  /** octet_string Type: 5 IsList: 0 FieldId: 123 */
+  bytes some_bytes = 2621563;
+    /*
+    [(attribute) = {
+      is_subscribable: true,
+    }];
+    */
+
+
+} // SecondCluster

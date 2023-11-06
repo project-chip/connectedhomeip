@@ -25,11 +25,17 @@ Building tizen-arm-light
 ninja -C $PW_PROJECT_ROOT/out/tizen-arm-light
 ```
 
-## Preparing Tizen SDK certificate
+## Preparing Tizen SDK certificate (optional)
 
-For packaging the Tizen APP, there is a need to generate an author certificate
-and security profile using the commands described below. Change password and
-author data as needed.
+When building Matter example application, this step is optional. In case when
+author certificate and security profile are not found, they will be created
+automatically. Automatically generated dummy certificate will have the following
+options: name="Matter Example" email="matter@tizen.org" password="0123456789"
+
+In order to create and use custom author certificate, one can use the commands
+described below. Change the certificate password and author data as needed. The
+security profile alias should not be changed, as the "CHIP" name is used in the
+Matter example build system.
 
 ```sh
 $TIZEN_SDK_ROOT/tools/ide/bin/tizen certificate \
@@ -59,11 +65,9 @@ rm -r \
 After that, normally call scripts to generate the author certificate and
 security profile mentioned previously.
 
-### Important
-
-Regenerating the author certificate and security profile makes it necessary to
-remove the previously installed Tizen app. You can't reinstall an application on
-the Tizen device with a different certificate.
+Please note, that regenerating the author certificate and security profile makes
+it necessary to remove the previously installed Tizen app. You can't reinstall
+an application on the Tizen device with a different certificate.
 
 ```sh
 pkgcmd -u -n org.tizen.matter.example.lighting
@@ -108,37 +112,37 @@ installed.
 
 1. Build app:
 
-```
-open the Command Palette (Ctrl+Shift+P) ->
-    Tasks: Run Task ->
-    Build LightingApp (Tizen)
-```
+    ```text
+    open the Command Palette (Ctrl+Shift+P) ->
+        Tasks: Run Task ->
+        Build LightingApp (Tizen)
+    ```
 
 2. SDB connect to device: required to run Tizen commands below if device is
    debugged over network
 
-```
-open the Command Palette (Ctrl+Shift+P) ->
-    Tasks: Run Task -> Connect to device (Tizen) ->
-    insert IP address and port
-```
+    ```text
+    open the Command Palette (Ctrl+Shift+P) ->
+        Tasks: Run Task -> Connect to device (Tizen) ->
+        insert IP address and port
+    ```
 
 3. Install app: it is separated from build app step.
 
-```
-open the Command Palette (Ctrl+Shift+P) ->
-    Tasks: Run Task ->
-    Install LightingApp (Tizen)
-```
+    ```text
+    open the Command Palette (Ctrl+Shift+P) ->
+        Tasks: Run Task ->
+        Install LightingApp (Tizen)
+    ```
 
 4. Launch LightingApp with gdbserver attached: require to install app
    previously.
 
-```
-open the Command Palette (Ctrl+Shift+P) ->
-    Tasks: Run Task ->
-    Launch LightingApp with gdbserver attached (Tizen)
-```
+    ```text
+    open the Command Palette (Ctrl+Shift+P) ->
+        Tasks: Run Task ->
+        Launch LightingApp with gdbserver attached (Tizen)
+    ```
 
 ### Debug
 

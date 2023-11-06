@@ -19,6 +19,10 @@
 
 #pragma once
 
+#include <access/SubjectDescriptor.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
+
 void MatterPreAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath);
 void MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath);
 void MatterPreAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath);

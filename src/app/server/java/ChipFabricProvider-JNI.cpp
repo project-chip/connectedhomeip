@@ -32,7 +32,6 @@
 #include <lib/support/JniTypeWrappers.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <thread>
-#include <trace/trace.h>
 
 using namespace chip;
 
@@ -58,8 +57,6 @@ CHIP_ERROR AndroidChipFabricProviderJNI_OnLoad(JavaVM * jvm, void * reserved)
     // check if the JNI environment is correct
     env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
-
-    chip::InitializeTracing();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -99,7 +96,7 @@ CHIP_ERROR ReadFabricList(JNIEnv * env, jobject & self)
         VerifyOrExit(jlabel != nullptr, err = CHIP_JNI_ERROR_FIELD_NOT_FOUND);
 
         env->SetIntField(jFabric, jvendorId, fabricInfo.GetVendorId());
-        env->SetLongField(jFabric, jnodeId, fabricInfo.GetNodeId());
+        env->SetLongField(jFabric, jnodeId, static_cast<jlong>(fabricInfo.GetNodeId()));
         env->SetShortField(jFabric, jfabricIndex, fabricInfo.GetFabricIndex());
         UtfString jLabelStr(env, fabricInfo.GetFabricLabel());
         env->SetObjectField(jFabric, jlabel, jLabelStr.jniValue());

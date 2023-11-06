@@ -32,17 +32,19 @@ public class MediaInputManagerStub implements MediaInputManager {
 
     info[0] = new MediaInputInfo();
     info[0].name = "HDMI 1";
-    info[0].description = "Living room Playstation";
+    info[0].description = "High-Definition Multimedia Interface";
     info[0].index = 0;
     info[0].type = MediaInputInfo.INPUT_TYPE_HDMI;
 
     info[1] = new MediaInputInfo();
     info[1].name = "HDMI 2";
-    info[1].description = "Living room XBox";
+    info[1].description = "High-Definition Multimedia Interface";
     info[1].index = 1;
     info[1].type = MediaInputInfo.INPUT_TYPE_HDMI;
 
     info[2] = new MediaInputInfo();
+    info[2].name = "HDMI 3";
+    info[2].description = "High-Definition Multimedia Interface";
     info[2].index = 2;
     info[2].type = MediaInputInfo.INPUT_TYPE_HDMI;
   }

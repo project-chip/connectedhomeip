@@ -16,15 +16,21 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
+import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
 
 declare_args() {
   # Build monolithic test library.
   chip_monolithic_tests = false
 }
+
+# chip_root relative to root_build_dir for macro-prefix-map.
+# "/." avoids trailing "/" in result when chip_root is "//"
+build_relative_chip_root = rebase_path("${chip_root}/.", root_build_dir)
 
 config("includes") {
   include_dirs = [
@@ -37,6 +43,9 @@ config("includes") {
   include_dirs += [ "${chip_root}/zzz_generated/app-common" ]
 
   defines = [ "CHIP_HAVE_CONFIG_H=1" ]
+
+  # Make __FILE__ and related macros relative to chip_root
+  cflags = [ "-fmacro-prefix-map=${build_relative_chip_root}/=" ]
 }
 
 if (chip_build_tests) {
@@ -47,6 +56,7 @@ if (chip_build_tests) {
       "${chip_root}/src/access/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
+      "${chip_root}/src/lib/address_resolve/tests",
       "${chip_root}/src/lib/asn1/tests",
       "${chip_root}/src/lib/core/tests",
       "${chip_root}/src/messaging/tests",
@@ -82,11 +92,17 @@ if (chip_build_tests) {
         # TODO(#10447): App test has HF on EFR32.
         "${chip_root}/src/app/tests",
         "${chip_root}/src/credentials/tests",
+        "${chip_root}/src/lib/format/tests",
         "${chip_root}/src/lib/support/tests",
         "${chip_root}/src/protocols/secure_channel/tests",
         "${chip_root}/src/system/tests",
         "${chip_root}/src/transport/tests",
       ]
+
+      if (matter_enable_tracing_support &&
+          matter_trace_config == "multiplexed") {
+        deps += [ "${chip_root}/src/tracing/tests" ]
+      }
     }
 
     if (chip_device_platform != "none") {
@@ -107,10 +123,13 @@ if (chip_build_tests) {
     if (chip_device_platform != "nrfconnect" &&
         chip_device_platform != "efr32") {
       # TODO(#10447): Controller test has HF on EFR32.
-      deps += [
-        "${chip_root}/src/controller/tests",
-        "${chip_root}/src/controller/tests/data_model",
-      ]
+      deps += [ "${chip_root}/src/controller/tests/data_model" ]
+
+      # Skip controller test for Open IoT SDK
+      # https://github.com/project-chip/connectedhomeip/issues/23747
+      if (chip_device_platform != "openiotsdk") {
+        deps += [ "${chip_root}/src/controller/tests" ]
+      }
     }
 
     if (current_os != "zephyr" && current_os != "mbed" &&
@@ -135,5 +154,11 @@ if (chip_build_tests) {
       "${chip_root}/src/credentials/tests",
       "${chip_root}/src/crypto/tests",
     ]
+  }
+
+  if (matter_enable_java_compilation) {
+    group("java_controller_tests") {
+      deps = [ "${chip_root}/src/controller/java:unit_tests" ]
+    }
   }
 }

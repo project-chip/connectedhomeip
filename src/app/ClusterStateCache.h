@@ -21,6 +21,7 @@
 #include "lib/core/CHIPError.h"
 #include "system/SystemPacketBuffer.h"
 #include "system/TLVPacketBufferBackingStore.h"
+#include <app/AppBuildConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/BufferedReadCallback.h>
 #include <app/ReadClient.h>
@@ -33,6 +34,7 @@
 #include <set>
 #include <vector>
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
 namespace chip {
 namespace app {
 /*
@@ -70,6 +72,14 @@ public:
     class Callback : public ReadClient::Callback
     {
     public:
+        Callback() = default;
+
+        // Callbacks are not expected to be copyable or movable.
+        Callback(const Callback &)             = delete;
+        Callback(Callback &&)                  = delete;
+        Callback & operator=(const Callback &) = delete;
+        Callback & operator=(Callback &&)      = delete;
+
         /*
          * Called anytime an attribute value has changed in the cache
          */
@@ -86,11 +96,26 @@ public:
         virtual void OnEndpointAdded(ClusterStateCache * cache, EndpointId endpointId){};
     };
 
-    ClusterStateCache(Callback & callback, Optional<EventNumber> highestReceivedEventNumber = Optional<EventNumber>::Missing()) :
-        mCallback(callback), mBufferedReader(*this)
+    /**
+     *
+     * @param [in] callback the derived callback which inherit from ReadClient::Callback
+     * @param [in] highestReceivedEventNumber optional highest received event number, if cache receive the events with the number
+     *             less than or equal to this value, skip those events
+     * @param [in] cacheData boolean to decide whether this cache would store attribute/event data/status,
+     *             the default is true.
+     */
+    ClusterStateCache(Callback & callback, Optional<EventNumber> highestReceivedEventNumber = Optional<EventNumber>::Missing(),
+                      bool cacheData = true) :
+        mCallback(callback),
+        mBufferedReader(*this), mCacheData(cacheData)
     {
         mHighestReceivedEventNumber = highestReceivedEventNumber;
     }
+
+    ClusterStateCache(const ClusterStateCache &)             = delete;
+    ClusterStateCache(ClusterStateCache &&)                  = delete;
+    ClusterStateCache & operator=(const ClusterStateCache &) = delete;
+    ClusterStateCache & operator=(ClusterStateCache &&)      = delete;
 
     void SetHighestReceivedEventNumber(EventNumber highestReceivedEventNumber)
     {
@@ -140,6 +165,17 @@ public:
 
         ReturnErrorOnFailure(Get(path, reader));
         return DataModel::Decode(reader, value);
+    }
+
+    /**
+     * Get the value of a particular attribute for the given endpoint.  See the
+     * documentation for Get() with a ConcreteAttributePath above.
+     */
+    template <typename AttributeObjectTypeT>
+    CHIP_ERROR Get(EndpointId endpoint, typename AttributeObjectTypeT::DecodableType & value) const
+    {
+        ConcreteAttributePath path(endpoint, AttributeObjectTypeT::GetClusterId(), AttributeObjectTypeT::GetAttributeId());
+        return Get<AttributeObjectTypeT>(path, value);
     }
 
     /*
@@ -483,8 +519,23 @@ public:
         mEventStatusCache.clear();
     }
 
+    /*
+     *  Get the last concrete report data path, if path is not concrete cluster path, return CHIP_ERROR_NOT_FOUND
+     *
+     */
+    CHIP_ERROR GetLastReportDataPath(ConcreteClusterPath & aPath);
+
 private:
-    using AttributeState = Variant<Platform::ScopedMemoryBufferWithSize<uint8_t>, StatusIB>;
+    // An attribute state can be one of three things:
+    // * If we got a path-specific error for the attribute, the corresponding
+    //   status.
+    // * If we got data for the attribute and we are storing data ourselves, the
+    //   data.
+    // * If we got data for the attribute and we are not storing data
+    //   oureselves, the size of the data, so we can still prioritize sending
+    //   DataVersions correctly.
+    using AttributeData  = Platform::ScopedMemoryBufferWithSize<uint8_t>;
+    using AttributeState = Variant<StatusIB, AttributeData, size_t>;
     // mPendingDataVersion represents a tentative data version for a cluster that we have gotten some reports for.
     //
     // mCurrentDataVersion represents a known data version for a cluster.  In order for this to have a
@@ -576,9 +627,9 @@ private:
         mCallback.OnSubscriptionEstablished(aSubscriptionId);
     }
 
-    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override
+    CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
     {
-        mCallback.OnResubscriptionAttempt(aTerminationCause, aNextResubscribeIntervalMsec);
+        return mCallback.OnResubscriptionNeeded(apReadClient, aTerminationCause);
     }
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
@@ -589,6 +640,16 @@ private:
     virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                                      const Span<AttributePathParams> & aAttributePaths,
                                                      bool & aEncodedDataVersionList) override;
+
+    void OnUnsolicitedMessageFromPublisher(ReadClient * apReadClient) override
+    {
+        return mCallback.OnUnsolicitedMessageFromPublisher(apReadClient);
+    }
+
+    void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) override
+    {
+        return mCallback.OnCASESessionEstablished(aSession, aSubscriptionParams);
+    }
 
     // Commit the pending cluster data version, if there is one.
     void CommitPendingDataVersion();
@@ -611,7 +672,9 @@ private:
     std::map<ConcreteEventPath, StatusIB> mEventStatusCache;
     BufferedReadCallback mBufferedReader;
     ConcreteClusterPath mLastReportDataPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
+    const bool mCacheData                   = true;
 };
 
-}; // namespace app
-}; // namespace chip
+};     // namespace app
+};     // namespace chip
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT

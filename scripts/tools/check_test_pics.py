@@ -20,9 +20,10 @@ Takes two filenames as arguments: the CI PICS values file and the PICS
 definition YAML file.
 """
 
-import yaml
-import sys
 import re
+import sys
+
+import yaml
 
 value_regexp = re.compile("=.*")
 

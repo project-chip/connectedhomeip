@@ -44,7 +44,7 @@ public:
 
     void HandleAnnounceOTAProvider(
         app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-        const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
+        const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) override;
 
     // Application API to send the QueryImage command and start the image update process with the next available Provider
     CHIP_ERROR TriggerImmediateQuery(FabricIndex fabricIndex) override;
@@ -91,6 +91,10 @@ public:
     }
 
     void GetProviderLocation(Optional<ProviderLocationType> & providerLocation) override { providerLocation = mProviderLocation; }
+
+    // Set the metadata value for the provider to be used in the next query and OTA update process
+    // NOTE: Does not persist across reboot.
+    void SetMetadataForProvider(ByteSpan metadataForProvider) override { mMetadataForProvider.SetValue(metadataForProvider); }
 
     // Add a default OTA provider to the cached list
     CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation) override;
@@ -169,6 +173,12 @@ private:
         void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override
         {
             ChipLogError(BDX, "exchange timed out");
+            // Null out mExchangeCtx before calling OnDownloadTimeout, in case
+            // the downloader decides to call Reset() on us.  If we don't, we
+            // will end up closing the exchange from Reset and then the caller
+            // will close it _again_ (see API documentation for
+            // OnResponseTimeout), which will lead to refcount underflow.
+            mExchangeCtx = nullptr;
             if (mDownloader != nullptr)
             {
                 mDownloader->OnDownloadTimeout();
@@ -205,6 +215,11 @@ private:
      */
     IdleStateReason MapErrorToIdleStateReason(CHIP_ERROR error);
 
+    ScopedNodeId GetProviderScopedId() const
+    {
+        return ScopedNodeId(mProviderLocation.Value().providerNodeID, mProviderLocation.Value().fabricIndex);
+    }
+
     /**
      * Record the new update state by updating the corresponding server attribute and logging a StateTransition event
      */
@@ -223,7 +238,7 @@ private:
     /**
      * Send QueryImage request using values matching Basic cluster
      */
-    CHIP_ERROR SendQueryImageRequest(OperationalDeviceProxy & deviceProxy);
+    CHIP_ERROR SendQueryImageRequest(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 
     /**
      * Validate and extract mandatory information from QueryImageResponse
@@ -254,17 +269,17 @@ private:
     /**
      * Start download of the software image returned in QueryImageResponse
      */
-    CHIP_ERROR StartDownload(OperationalDeviceProxy & deviceProxy);
+    CHIP_ERROR StartDownload(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 
     /**
      * Send ApplyUpdate request using values obtained from QueryImageResponse
      */
-    CHIP_ERROR SendApplyUpdateRequest(OperationalDeviceProxy & deviceProxy);
+    CHIP_ERROR SendApplyUpdateRequest(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 
     /**
      * Send NotifyUpdateApplied request
      */
-    CHIP_ERROR SendNotifyUpdateAppliedRequest(OperationalDeviceProxy & deviceProxy);
+    CHIP_ERROR SendNotifyUpdateAppliedRequest(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 
     /**
      * Store current update information to KVS
@@ -279,8 +294,8 @@ private:
     /**
      * Session connection callbacks
      */
-    static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);
-    static void OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+    static void OnConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
@@ -314,6 +329,7 @@ private:
     BDXDownloader * mBdxDownloader           = nullptr; // TODO: this should be OTADownloader
     BDXMessenger mBdxMessenger;                         // TODO: ideally this is held by the application
     uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
+    Optional<ByteSpan> mMetadataForProvider;
     ByteSpan mUpdateToken;
     uint32_t mCurrentVersion = 0;
     uint32_t mTargetVersion  = 0;
@@ -326,6 +342,7 @@ private:
     // persistent storage (if available), used for sending the NotifyApplied message, and then cleared. This will ensure determinism
     // in the OTARequestorDriver on reboot.
     Optional<ProviderLocationType> mProviderLocation;
+    SessionHolder mSessionHolder;
 };
 
 } // namespace chip

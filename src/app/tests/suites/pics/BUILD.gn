@@ -23,6 +23,8 @@ static_library("pics") {
     "PICSBooleanExpressionParser.h",
     "PICSBooleanReader.cpp",
     "PICSBooleanReader.h",
+    "PICSNormalizer.cpp",
+    "PICSNormalizer.h",
   ]
 
   cflags = [ "-Wconversion" ]

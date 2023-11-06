@@ -31,8 +31,10 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPJNIError.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <lib/support/SafeInt.h>
 #include <platform/android/AndroidConfig.h>
 
 namespace chip {
@@ -78,6 +80,8 @@ const AndroidConfig::Key AndroidConfig::kConfigKey_UniqueId              = { kCo
 const AndroidConfig::Key AndroidConfig::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_DeviceTypeId          = { kConfigNamespace_ChipFactory, "device-type-id" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_DeviceName            = { kConfigNamespace_ChipFactory, "device-name" };
 
 // Keys stored in the Chip-config namespace
 const AndroidConfig::Key AndroidConfig::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
@@ -85,7 +89,6 @@ const AndroidConfig::Key AndroidConfig::kConfigKey_PairedAccountId    = { kConfi
 const AndroidConfig::Key AndroidConfig::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 
@@ -239,7 +242,7 @@ CHIP_ERROR AndroidConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize
     chip::JniUtfString utfValue(env, (jstring) javaValue);
     outLen = strlen(utfValue.c_str());
 
-    strncpy(buf, utfValue.c_str(), bufSize);
+    Platform::CopyString(buf, bufSize, utfValue.c_str());
 
     return CHIP_NO_ERROR;
 }
@@ -371,13 +374,14 @@ CHIP_ERROR AndroidConfig::WriteConfigValueBin(Key key, const uint8_t * data, siz
     chip::DeviceLayer::StackUnlock unlock;
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gWriteConfigValueBinMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(chip::CanCastTo<uint32_t>(dataLen), CHIP_ERROR_INVALID_ARGUMENT);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
 
     UtfString space(env, key.Namespace);
     UtfString name(env, key.Name);
-    ByteArray jval(env, reinterpret_cast<const jbyte *>(data), dataLen);
+    ByteArray jval(env, reinterpret_cast<const jbyte *>(data), static_cast<uint32_t>(dataLen));
 
     env->CallVoidMethod(gAndroidConfigObject, gWriteConfigValueBinMethod, space.jniValue(), name.jniValue(), jval.jniValue());
     if (env->ExceptionCheck())

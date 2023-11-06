@@ -23,19 +23,29 @@
 
 #pragma once
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include <bluetooth.h>
 #include <glib.h>
-#include <sys/param.h>
+
+#include <ble/Ble.h>
+#include <ble/CHIPBleServiceData.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/SetupDiscriminator.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <system/SystemLayer.h>
+#include <system/SystemPacketBuffer.h>
 
 #include "ChipDeviceScanner.h"
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-using namespace chip::Ble;
 
 /**
  * enum Class for BLE Scanning state. CHIP supports Scanning by Discriminator or Address
@@ -57,7 +67,7 @@ struct BLEScanConfig
     BleScanState mBleScanState = BleScanState::kNotScanning;
 
     // If scanning by discriminator, what are we scanning for
-    uint16_t mDiscriminator = 0;
+    SetupDiscriminator mDiscriminator;
 
     // If scanning by address, what address are we searching for
     std::string mAddress;
@@ -86,18 +96,19 @@ public:
 private:
     // ===== Members that implement the BLEManager internal interface.
 
-    CHIP_ERROR _Init(void);
-    void _Shutdown() {}
-    bool _IsAdvertisingEnabled(void);
+    CHIP_ERROR _Init();
+    void _Shutdown();
+    bool _IsAdvertisingEnabled();
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
-    bool _IsAdvertising(void);
+    bool _IsAdvertising();
     CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetDeviceName(const char * deviceName);
-    uint16_t _NumConnections(void);
+    uint16_t _NumConnections();
+
     void _OnPlatformEvent(const ChipDeviceEvent * event);
     void HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * event);
-    BleLayer * _GetBleLayer(void);
+    BleLayer * _GetBleLayer();
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
@@ -122,17 +133,19 @@ private:
 
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
-    void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
     CHIP_ERROR CancelConnection() override;
 
     //  ===== Members that implement virtual methods on ChipDeviceScannerDelegate
-    void OnChipDeviceScanned(void * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
-    void OnChipScanComplete() override;
+    void OnChipDeviceScanned(void * device, const Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    void OnScanComplete() override;
+    void OnScanError(CHIP_ERROR err) override;
 
     // ===== Members for internal use by the following friends.
 
-    friend BLEManager & BLEMgr(void);
-    friend BLEManagerImpl & BLEMgrImpl(void);
+    friend BLEManager & BLEMgr();
+    friend BLEManagerImpl & BLEMgrImpl();
 
     static BLEManagerImpl sInstance;
 
@@ -151,7 +164,7 @@ private:
         kAdvertisingRefreshNeeded = 0x0200, /**< The advertising configuration/state in BLE layer needs to be updated. */
     };
 
-    static gboolean _BleInitialize(void * userData);
+    static CHIP_ERROR _BleInitialize(void * userData);
     void DriveBLEState();
     static void DriveBLEState(intptr_t arg);
 
@@ -161,6 +174,8 @@ private:
     static void AdvertisingStateChangedCb(int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState,
                                           void * userData);
     static void NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h gattHandle, void * userData);
+    static void ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
+                                     int offset, void * userData);
     static void WriteValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
                                       bool responseNeeded, int offset, const char * value, int len, void * userData);
     static void IndicationConfirmationCb(int result, const char * remoteAddress, bt_gatt_server_h server, bt_gatt_h characteristic,
@@ -172,14 +187,13 @@ private:
     static void CharacteristicNotificationCb(bt_gatt_h characteristic, char * value, int len, void * userData);
 
     // ==== Connection.
-    void InitConnectionData(void);
     void AddConnectionData(const char * remoteAddr);
     void RemoveConnectionData(const char * remoteAddr);
 
     void HandleC1CharWriteEvent(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     void HandleRXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     void HandleConnectionEvent(bool connected, const char * remoteAddress);
-    static void HandleConnectionTimeout(chip::System::Layer * layer, void * data);
+    static void HandleConnectionTimeout(System::Layer * layer, void * data);
     static bool IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId);
 
     // ==== BLE Adv & GATT Server.
@@ -192,8 +206,7 @@ private:
     void NotifyBLEWriteReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
 
     // ==== Connection.
-    void ConnectHandler(const char * address);
-    static gboolean ConnectChipThing(gpointer userData);
+    static CHIP_ERROR ConnectChipThing(const char * userData);
     void NotifyBLEConnectionEstablished(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
     void NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
     void NotifyHandleNewConnection(BLE_CONNECTION_OBJECT conId);
@@ -202,10 +215,10 @@ private:
     void NotifySubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool isSubscribed);
     void NotifyBLENotificationReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
 
-    int RegisterGATTServer(void);
-    int StartAdvertising(void);
-    int StopAdvertising(void);
-    void CleanScanConfig(void);
+    int RegisterGATTServer();
+    int StartBLEAdvertising();
+    int StopBLEAdvertising();
+    void CleanScanConfig();
 
     CHIPoBLEServiceMode mServiceMode;
     BitFlags<Flags> mFlags;
@@ -220,7 +233,6 @@ private:
 
     BLEScanConfig mBLEScanConfig;
     std::unique_ptr<ChipDeviceScanner> mDeviceScanner;
-    GMainContext * mMainContext  = nullptr;
     bt_gatt_client_h mGattClient = nullptr;
 };
 
@@ -230,7 +242,7 @@ private:
  * Internal components should use this to access features of the BLEManager object
  * that are common to all platforms.
  */
-inline BLEManager & BLEMgr(void)
+inline BLEManager & BLEMgr()
 {
     return BLEManagerImpl::sInstance;
 }
@@ -241,7 +253,7 @@ inline BLEManager & BLEMgr(void)
  * Internal components can use this to gain access to features of the BLEManager
  * that are specific to the Tizen platforms.
  */
-inline BLEManagerImpl & BLEMgrImpl(void)
+inline BLEManagerImpl & BLEMgrImpl()
 {
     return BLEManagerImpl::sInstance;
 }
@@ -264,5 +276,3 @@ inline bool BLEManagerImpl::_IsAdvertising()
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

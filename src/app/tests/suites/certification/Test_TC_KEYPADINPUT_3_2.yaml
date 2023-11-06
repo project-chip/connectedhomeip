@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 19.3.1. [TC-KEYPADINPUT-3.1] Send Key Command Verification (DUT as Client)
+name: 19.3.2. [TC-KEYPADINPUT-3.2] Location Keys Verification
+
+PICS:
+    - KEYPADINPUT.S.F01
 
 config:
     nodeId: 0x12344321
@@ -28,26 +31,26 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH sends CEC Settings Keys(0x0A) to DUT"
-      PICS: KEYPADINPUT.S.LK
+    - label: "Step 1: TH sends CEC Settings Keys(0x0A) to DUT"
+      PICS: KEYPADINPUT.S.F01 && KEYPADINPUT.S.C00.Rsp
       command: "SendKey"
       arguments:
           values:
-              - name: "keyCode"
+              - name: "KeyCode"
                 value: 0x0A
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
-    - label: "TH sends CEC Home Keys(0x09) to DUT"
-      PICS: KEYPADINPUT.S.LK
+    - label: "Step 2: TH sends CEC Home Keys(0x09) to DUT"
+      PICS: KEYPADINPUT.S.F01 && KEYPADINPUT.S.C00.Rsp
       command: "SendKey"
       arguments:
           values:
-              - name: "keyCode"
+              - name: "KeyCode"
                 value: 0x09
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0

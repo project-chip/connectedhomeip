@@ -1,0 +1,38 @@
+# Copyright (c) 2020-2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#TODO: Decouple Android Bluetooth stuff from ChipDeviceController.Java, remove dummy implemenation here.
+#TODO: Decouple Android Logging from from ChipDeviceController.Java, remove dummy implemenation here.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${build_root}/config/android_abi.gni")
+import("${chip_root}/build/chip/java/rules.gni")
+
+android_library("stub_src") {
+  output_name = "Android.jar"
+
+  sources = [
+    "android/bluetooth/BluetoothGatt.java",
+    "android/bluetooth/BluetoothGattCallback.java",
+    "android/bluetooth/BluetoothGattCharacteristic.java",
+    "android/bluetooth/BluetoothGattDescriptor.java",
+    "android/bluetooth/BluetoothGattService.java",
+    "android/bluetooth/BluetoothProfile.java",
+    "android/os/Build.java",
+    "android/util/Log.java",
+  ]
+
+  javac_flags = [ "-Xlint:deprecation" ]
+}

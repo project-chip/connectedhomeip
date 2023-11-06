@@ -20,7 +20,6 @@
  * @brief Implementation for the Descriptor Server Cluster
  ***************************************************************************/
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -98,7 +97,7 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
 
 } // anonymous namespace
 
-void MatterPowerSourceConfigurationPluginServerInitCallback(void)
+void MatterPowerSourceConfigurationPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

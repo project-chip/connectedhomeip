@@ -14,6 +14,9 @@
 
 name: 24.4.1. [TC-LVL-4.1] Move Verification (DUT as Server)
 
+PICS:
+    - LVL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Level Control"
@@ -41,112 +44,69 @@ tests:
       response:
           value: 1
 
-    - label: "Reads Minlevel attribute from DUT"
-      PICS: LVL.S.A0002
-      command: "readAttribute"
-      attribute: "min level"
-      response:
-          saveAs: MinlevelValue
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 255
-
-    - label: "sends a MoveToLevelWithOnOff command"
-      PICS: LVL.S.C00.Rsp
-      command: "MoveToLevelWithOnOff"
+    #Adding below step resolve the issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/499
+    - label:
+          "Precondition: write default value of OnOffTransitionTime attribute"
+      PICS: LVL.S.A0010
+      command: "writeAttribute"
+      attribute: "OnOffTransitionTime"
       arguments:
-          values:
-              - name: "level"
-                value: 1
-              - name: "transitionTime"
-                value: 0
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
+          value: 0
 
-    - label: "reads max level attribute from DUT"
+    - label: "Step 1a: TH writes 0 to the Options attribute"
+      PICS: LVL.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
+    - label: "Step 1b: TH reads the MaxLevel attribute from the DUT"
       PICS: LVL.S.A0003
       command: "readAttribute"
-      attribute: "max level"
+      attribute: "MaxLevel"
       response:
-          saveAs: MaxlevelValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
-    - label: "sends a Move up command"
-      PICS: LVL.S.C01.Rsp
-      command: "Move"
-      arguments:
-          values:
-              - name: "moveMode"
-                value: 0
-              - name: "rate"
-                value: 32
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
+    - label: "Step 2a: TH sends Off command to DUT"
+      cluster: "On/Off"
+      PICS: OO.S.C00.Rsp && LVL.S.C05.Rsp
+      command: "Off"
 
     - label:
-          "Physically verify that the DUT moves at a rate of 32 units per second
-          or as close as possible to this rate and completes moving to its
-          maximum level"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Wait 9000ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 10000
-
-    - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && LVL.S.A0003
-      command: "readAttribute"
-      attribute: "current level"
-      response:
-          value: MaxlevelValue
-
-    - label: "sends a MoveWithOnOff command"
+          "Step 2b: TH sends a MoveWithOnOff command to DUT, with MoveMode =0x00
+          (up) and Rate =10 (units/s)"
       PICS: LVL.S.C05.Rsp
       command: "MoveWithOnOff"
       arguments:
           values:
-              - name: "moveMode"
-                value: 1
-              - name: "rate"
-                value: 64
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
+              - name: "MoveMode"
+                value: 0
+              - name: "Rate"
+                value: 10
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
-    - label:
-          "Physically verify that the DUT moves at a rate of 64 units per second
-          or as close as possible to this rate and complete moving to its
-          minimum level"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Step 2c: TH reads OnOff attribute (On/Off cluster) from DUT"
+      cluster: "On/Off"
+      PICS: OO.S.A0000 && LVL.S.C05.Rsp
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "Step 2d: TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C05.Rsp && LVL.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          saveAs: CurrentLevelValue
+          constraints:
+              type: int8u
 
     - label: "Wait 5000ms"
       cluster: "DelayCommands"
@@ -156,61 +116,124 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "reads CurrentLevel attribute from DUT"
+    - label: "Step 2e: TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C05.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
-          value: MinlevelValue
           constraints:
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
-    - label: "reads default move rate attribute from DUT"
-      PICS: LVL.S.A0014
+    - label: "Step 3a: TH sends On command to DUT"
+      cluster: "On/Off"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label:
+          "Step 3b: TH sends a MoveToLevel command to DUT, with Level =50 and
+          TransitionTime =0 (immediate)"
+      PICS: LVL.S.C00.Rsp
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "Level"
+                value: 50
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Step 3c: TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "default move rate"
+      attribute: "CurrentLevel"
       response:
-          saveAs: DefaultMoveRateValue
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 255
+          value: 50
 
-    - label: "sends a Move up command at default move rate"
-      PICS: LVL.S.C05.Rsp && LVL.S.A0014
+    - label:
+          "Step 4a: TH sends a Move command to the DUT with MoveMode =0x00 (up)
+          and Rate =5 (units/s)"
+      PICS: LVL.S.C01.Rsp
       command: "Move"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 0
-              - name: "rate"
-                value: 255
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
+              - name: "Rate"
+                value: 5
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
-    - label: "Wait 100ms"
+    - label: "Wait 10s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 100
+                value: 10000
 
-    - label:
-          "Physically verify that the device moves at the rate recorded in step
-          3a and completes moving to its maximum level"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+    - label: "Step 4b: TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          constraints:
+              minValue: 85
+              maxValue: 115
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
       arguments:
           values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+              - name: "ms"
+                value: 10000
+
+    - label: "Step 4c: TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          constraints:
+              minValue: 127
+              maxValue: 173
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Step 4d: TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          constraints:
+              minValue: 170
+              maxValue: 230
+
+    - label: "Wait 19s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 19000
+
+    - label: "Step 4e: TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          value: 254
 
     - label: "Precondition send Off Command"
       cluster: "On/Off"

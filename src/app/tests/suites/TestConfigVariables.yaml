@@ -16,13 +16,13 @@ name: Test Cluster Config Variables Tests
 
 config:
     nodeId: 0x12344321
-    cluster: "Test Cluster"
+    cluster: "Unit Testing"
     endpoint: 1
     arg1:
-        type: INT8U
+        type: int8u
         defaultValue: 5
     returnValueWithArg1:
-        type: INT8U
+        type: int8u
         defaultValue: 25
 
 tests:
@@ -35,7 +35,7 @@ tests:
                 value: nodeId
 
     - label: "Send Test Add Arguments Command"
-      command: "testAddArguments"
+      command: "TestAddArguments"
       arguments:
           values:
               - name: "arg1"
@@ -49,7 +49,7 @@ tests:
                 value: 20
 
     - label: "Send Test Add Arguments Command"
-      command: "testAddArguments"
+      command: "TestAddArguments"
       arguments:
           values:
               - name: "arg1"

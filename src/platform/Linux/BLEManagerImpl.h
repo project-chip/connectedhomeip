@@ -23,11 +23,12 @@
 
 #pragma once
 
+#include <string>
+
 #include <ble/BleLayer.h>
 #include <platform/internal/BLEManager.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
+#include "bluez/BluezEndpoint.h"
 #include "bluez/ChipDeviceScanner.h"
 #include "bluez/Types.h"
 
@@ -66,7 +67,7 @@ struct BLEScanConfig
     BleScanState mBleScanState = BleScanState::kNotScanning;
 
     // If scanning by discriminator, what are we scanning for
-    uint16_t mDiscriminator = 0;
+    SetupDiscriminator mDiscriminator;
 
     // If scanning by address, what address are we searching for
     std::string mAddress;
@@ -91,6 +92,7 @@ class BLEManagerImpl final : public BLEManager,
 
 public:
     CHIP_ERROR ConfigureBle(uint32_t aAdapterId, bool aIsCentral);
+    void OnScanError(CHIP_ERROR error) override;
 
     // Driven by BlueZ IO
     static void HandleNewConnection(BLE_CONNECTION_OBJECT conId);
@@ -148,11 +150,12 @@ private:
 
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
-    void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
-    void OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
     void OnScanComplete() override;
 
     // ===== Members for internal use by the following friends.
@@ -179,9 +182,9 @@ private:
 
     enum
     {
-        kMaxConnections             = 1,  // TODO: right max connection
-        kMaxDeviceNameLength        = 20, // TODO: right-size this
-        kMaxAdvertismentDataSetSize = 31  // TODO: verify this
+        kMaxConnections              = 1,  // TODO: right max connection
+        kMaxDeviceNameLength         = 20, // TODO: right-size this
+        kMaxAdvertisementDataSetSize = 31  // TODO: verify this
     };
 
     CHIP_ERROR StartBLEAdvertising();
@@ -201,7 +204,7 @@ private:
     char mDeviceName[kMaxDeviceNameLength + 1];
     bool mIsCentral            = false;
     BluezEndpoint * mpEndpoint = nullptr;
-    std::unique_ptr<ChipDeviceScanner> mDeviceScanner;
+    ChipDeviceScanner mDeviceScanner;
 };
 
 /**
@@ -244,5 +247,3 @@ inline bool BLEManagerImpl::_IsAdvertising()
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

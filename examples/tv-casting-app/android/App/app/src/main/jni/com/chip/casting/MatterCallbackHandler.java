@@ -17,58 +17,18 @@
  */
 package com.chip.casting;
 
-import java.util.Objects;
+import android.util.Log;
 
 public abstract class MatterCallbackHandler {
-  public abstract void handle(Status status);
+  private static final String TAG = MatterCallbackHandler.class.getSimpleName();
 
-  public final void handle(int errorCode, String errorMessage) {
-    handle(new Status(errorCode, errorMessage));
-  }
+  public abstract void handle(MatterError err);
 
-  public static class Status {
-    private int errorCode;
-    private String errorMessage;
-
-    public static final Status SUCCESS = new Status(0, null);
-
-    public Status(int errorCode, String errorMessage) {
-      this.errorCode = errorCode;
-      this.errorMessage = errorMessage;
-    }
-
-    public boolean isSuccess() {
-      return this.equals(SUCCESS);
-    }
-
-    public int getErrorCode() {
-      return errorCode;
-    }
-
-    public String getErrorMessage() {
-      return errorMessage;
-    }
-
-    @Override
-    public String toString() {
-      return "Status{"
-          + (isSuccess()
-              ? "Success"
-              : "errorCode=" + errorCode + ", errorMessage='" + errorMessage + '\'')
-          + '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-      Status status = (Status) o;
-      return errorCode == status.errorCode;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(errorCode);
+  protected final void handleInternal(int errorCode, String errorMessage) {
+    try {
+      handle(new MatterError(errorCode, errorMessage));
+    } catch (Throwable t) {
+      Log.e(TAG, "MatterCallbackHandler::Caught an unhandled Throwable from the client: " + t);
     }
   }
 }

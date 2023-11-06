@@ -16,9 +16,8 @@
 #
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 
-get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../../.. REALPATH)
+get_filename_component(CHIP_ROOT ../third_party/connectedhomeip REALPATH)
 get_filename_component(CHEF ${CMAKE_CURRENT_SOURCE_DIR}/../../ REALPATH)
-get_filename_component(GEN_DIR ${CHEF}/out/${SAMPLE_NAME}/zap-generated REALPATH)
 
 # include(${CMAKE_CURRENT_LIST_DIR}/../../project_include.cmake)
 
@@ -33,7 +32,7 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/nlio/repo/include"
                       "${CMAKE_SOURCE_DIR}/../"
-                      "${GEN_DIR}/../"
+                      "${CMAKE_SOURCE_DIR}/../common"
                       "${CMAKE_SOURCE_DIR}/main/include/"
 )
 
@@ -62,12 +61,11 @@ message(STATUS "** End of Cluster List **")
 set(SRC_DIRS_LIST
                       ${SRC_DIRS_LIST}
                       "${CMAKE_CURRENT_LIST_DIR}"
-                      "${GEN_DIR}"
+                      "${CMAKE_SOURCE_DIR}/../common"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
-                      "${CMAKE_SOURCE_DIR}/../common"
 )
 
 if (CONFIG_ENABLE_CHIP_SHELL)
@@ -87,8 +85,14 @@ set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed/esp32"
                      "${CMAKE_SOURCE_DIR}/../../common/screen-framework/include/"
                      "${CMAKE_SOURCE_DIR}/../../../src/lib/support"
-                     "${IDF_PATH}/components/freertos/include/freertos"
 )
+
+if (${IDF_VERSION_MAJOR} LESS 5)
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${IDF_PATH}/components/freertos/include/freertos")
+else()
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include/freertos")
+endif()
+
 set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
                      "${CMAKE_SOURCE_DIR}/../../platform/esp32"
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed"
@@ -104,18 +108,20 @@ endif (CONFIG_ENABLE_PW_RPC)
 idf_component_register(PRIV_INCLUDE_DIRS
                       "${CHIP_SHELL_DIR}/shell_common/include"
                       "${PRIV_INCLUDE_DIRS_LIST}"
-                      PRIV_REQUIRES chip nvs_flash bt console esp32_mbedtls QRCode tft screen-framework spidriver
+                      PRIV_REQUIRES chip nvs_flash bt console mbedtls QRCode tft screen-framework spidriver
                       SRC_DIRS ${SRC_DIRS_LIST})
 
+include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
+chip_app_component_codegen("${CHEF}/devices/${SAMPLE_NAME}.matter")
+chip_app_component_zapgen("${CHEF}/devices/${SAMPLE_NAME}.zap")
+
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
-target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H")
+target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )
 
 if (CONFIG_ENABLE_PW_RPC)
-
-get_filename_component(CHIP_ROOT ../third_party/connectedhomeip REALPATH)
 
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
@@ -192,6 +198,8 @@ target_link_libraries(${COMPONENT_LIB} PUBLIC
   pw_hdlc
   pw_log
   pw_rpc.server
+  pw_sys_io
+  pw_trace
   pw_trace_tokenized
   pw_trace_tokenized.trace_buffer
   pw_trace_tokenized.rpc_service
@@ -202,6 +210,7 @@ target_link_libraries(${COMPONENT_LIB} PUBLIC
 target_link_options(${COMPONENT_LIB}
   PUBLIC
     "-T${PIGWEED_ROOT}/pw_tokenizer/pw_tokenizer_linker_sections.ld"
+    "-L${PIGWEED_ROOT}/pw_tokenizer"
 )
 
 target_compile_options(${COMPONENT_LIB} PRIVATE

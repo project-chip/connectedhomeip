@@ -25,12 +25,13 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
+#include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVDebug.hpp>
-#include <lib/core/CHIPTLVUtilities.hpp>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVDebug.h>
+#include <lib/core/TLVUtilities.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
@@ -130,7 +131,8 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     ReadRequestMessage::Builder readRequestBuilder;
     DummyDelegate dummy;
 
-    err = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
+                                                      app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     TestExchangeDelegate delegate;
     Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(&delegate);
@@ -156,7 +158,8 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
+    app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
+                                 app::reporting::GetDefaultReportScheduler());
     readHandler.OnInitialRequest(std::move(readRequestbuf));
     err = InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler);
 
@@ -169,7 +172,8 @@ void TestReportingEngine::TestMergeOverlappedAttributePath(nlTestSuite * apSuite
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
+                                                                    app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     AttributePathParams * clusterInfo = InteractionModelEngine::GetInstance()->GetReportingEngine().mGlobalDirtySet.CreateObject();
@@ -240,7 +244,8 @@ void TestReportingEngine::TestMergeAttributePathWhenDirtySetPoolExhausted(nlTest
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
+                                                                    app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().mGlobalDirtySet.ReleaseAll();

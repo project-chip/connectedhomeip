@@ -26,6 +26,11 @@
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
+#include <platform/internal/GenericConnectivityManagerImpl_UDP.h>
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <platform/internal/GenericConnectivityManagerImpl_TCP.h>
+#endif
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
@@ -33,6 +38,10 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
 #endif
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
+
+extern "C" {
+#include "lwip_if.h"
+}
 
 namespace chip {
 namespace Inet {
@@ -50,6 +59,10 @@ namespace DeviceLayer {
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_UDP<ConnectivityManagerImpl>,
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                      public Internal::GenericConnectivityManagerImpl_TCP<ConnectivityManagerImpl>,
+#endif
                                       public Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
                                       public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
@@ -113,16 +126,14 @@ private:
     uint32_t mWiFiAPIdleTimeoutMS;
     uint16_t mFlags;
 
-    void DriveStationState(void);
     void OnStationConnected(void);
     void OnStationDisconnected(void);
     void ChangeWiFiStationState(WiFiStationState newState);
-    // static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
 
-    void DriveAPState(void);
+    static void _OnLwipEvent(struct netif * pNetIf, NetIfStatus_e status, void * pParams);
+    static void _OnIpAcquired(intptr_t arg);
     CHIP_ERROR ConfigureWiFiAP(void);
     void ChangeWiFiAPState(WiFiAPState newState);
-    // static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
 
     void UpdateInternetConnectivityState(void);
     void OnStationIPv4AddressAvailable();

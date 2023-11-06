@@ -16,4 +16,4 @@
 #
 
 git grep -n -E '^[[:space:]]*#[[:space:]]*include[[:space:]]*[<"]' src |
-    python "${0%.*}.py"
+    python3 "${0%.*}.py"

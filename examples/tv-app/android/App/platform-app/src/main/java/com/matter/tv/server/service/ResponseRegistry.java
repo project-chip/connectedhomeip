@@ -9,6 +9,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ResponseRegistry {
 
+  public enum WaitState {
+    TIMED_OUT,
+    INTERRUPTED,
+    SUCCESS,
+    INVALID_COUNTER
+  }
+
   private static final String TAG = "ResponseRegistry";
 
   private AtomicInteger messageCounter = new AtomicInteger();
@@ -27,18 +34,21 @@ public class ResponseRegistry {
     return counter;
   }
 
-  public void waitForMessage(int counter, long timeout, TimeUnit unit) {
+  public WaitState waitForMessage(int counter, long timeout, TimeUnit unit) {
     CountDownLatch latch = latches.get(counter);
     if (latch == null) {
-      return;
+      return WaitState.INVALID_COUNTER;
     }
     try {
       if (!latch.await(timeout, unit)) {
         Log.i(TAG, "Timed out while waiting for response for message " + counter);
+        return WaitState.TIMED_OUT;
       }
     } catch (InterruptedException e) {
       Log.i(TAG, "Interrupted while waiting for response for message " + counter);
+      return WaitState.INTERRUPTED;
     }
+    return WaitState.SUCCESS;
   }
 
   public void receivedMessageResponse(int counter, String response) {

@@ -1,0 +1,459 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x0300" />
+    <field name="HueAndSaturation" mask="0x01" />
+    <field name="EnhancedHue" mask="0x02" />
+    <field name="ColorLoop" mask="0x04" />
+    <field name="XY" mask="0x08" />
+    <field name="ColorTemperature" mask="0x10" />
+  </bitmap>
+
+  <enum name="HueDirection" type="enum8">
+    <cluster code="0x0300"/>
+    <item name="ShortestDistance" value="0x0"/>
+    <item name="LongestDistance" value="0x1"/>
+    <item name="Up" value="0x2"/>
+    <item name="Down" value="0x3"/>
+  </enum>
+
+  <enum name="HueMoveMode" type="enum8">
+    <cluster code="0x0300"/>
+    <item name="Stop" value="0x0"/>
+    <item name="Up" value="0x1"/>
+    <item name="Down" value="0x3"/>
+  </enum>
+
+  <enum name="HueStepMode" type="enum8">
+    <cluster code="0x0300"/>
+    <item name="Up" value="0x1"/>
+    <item name="Down" value="0x3"/>
+  </enum>
+
+  <enum name="SaturationMoveMode" type="enum8">
+    <cluster code="0x0300"/>
+    <item name="Stop" value="0x0"/>
+    <item name="Up" value="0x1"/>
+    <item name="Down" value="0x3"/>
+  </enum>
+
+  <enum name="SaturationStepMode" type="enum8">
+    <cluster code="0x0300"/>
+    <item name="Up" value="0x1"/>
+    <item name="Down" value="0x3"/>
+  </enum>
+
+  <enum name="ColorMode" type="enum8">
+    <cluster code="0x0300"/>
+    <item name="CurrentHueAndCurrentSaturation" value="0x00"/>
+    <item name="CurrentXAndCurrentY" value="0x01"/>
+    <item name="ColorTemperature" value="0x02"/>
+  </enum>
+
+  <bitmap name="ColorCapabilities" type="bitmap16">
+    <cluster code="0x0300"/>
+    <field name="HueSaturationSupported" mask="0x0001"/>
+    <field name="EnhancedHueSupported" mask="0x0002"/>
+    <field name="ColorLoopSupported" mask="0x0004"/>
+    <field name="XYAttributesSupported" mask="0x0008"/>
+    <field name="ColorTemperatureSupported" mask="0x0010"/>
+  </bitmap>
+
+  <bitmap name="ColorLoopUpdateFlags" type="bitmap8">
+    <cluster code="0x0300"/>
+    <field name="UpdateAction" mask="0x01"/>
+    <field name="UpdateDirection" mask="0x02"/>
+    <field name="UpdateTime" mask="0x04"/>
+    <field name="UpdateStartHue" mask="0x08"/>
+  </bitmap>
+
+  <enum name="ColorLoopAction" type="enum8">
+    <cluster code="0x0300"/>
+    <item name="Deactivate" value="0x00"/>
+    <item name="ActivateFromColorLoopStartEnhancedHue" value="0x01"/>
+    <item name="ActivateFromEnhancedCurrentHue" value="0x02"/>
+  </enum>
+
+  <enum name="ColorLoopDirection" type="enum8">
+    <cluster code="0x0300"/>
+    <item name="DecrementHue" value="0x00"/>
+    <item name="IncrementHue" value="0x01"/>
+  </enum>
+
+  <cluster>
+    <name>Color Control</name>
+    <domain>Lighting</domain>
+    <description>Attributes and commands for controlling the color properties of a color-capable light.</description>
+    <code>0x0300</code>
+    <define>COLOR_CONTROL_CLUSTER</define>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="6"/>
+
+    <attribute side="server" code="0x0000" define="COLOR_CONTROL_CURRENT_HUE" type="int8u" min="0x00" max="0xFE" writable="false" reportable="true" default="0x00" optional="true">CurrentHue</attribute>
+    <!-- CURRENT_HUE -->
+    <attribute side="server" code="0x0001" define="COLOR_CONTROL_CURRENT_SATURATION" type="int8u" min="0x00" max="0xFE" writable="false" reportable="true" default="0x00" optional="true">CurrentSaturation</attribute>
+    <!-- CURRENT_SATURATION -->
+    <attribute side="server" code="0x0002" define="COLOR_CONTROL_REMAINING_TIME" type="int16u" min="0x0000" max="0xFFFE" writable="false" default="0x0000" optional="true">RemainingTime</attribute>
+    <!-- REMAINING_TIME -->
+    <attribute side="server" code="0x0003" define="COLOR_CONTROL_CURRENT_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x616B" optional="true">CurrentX</attribute>
+    <!-- CURRENT_X -->
+    <attribute side="server" code="0x0004" define="COLOR_CONTROL_CURRENT_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x607D" optional="true">CurrentY</attribute>
+    <!-- CURRENT_Y -->
+    <attribute side="server" code="0x0005" define="COLOR_CONTROL_DRIFT_COMPENSATION" type="enum8" min="0x00" max="0x04" writable="false" optional="true">DriftCompensation</attribute>
+    <!-- DRIFT_COMPENSATION -->
+    <attribute side="server" code="0x0006" define="COLOR_CONTROL_COMPENSATION_TEXT" type="char_string" length="254" writable="false" optional="true">CompensationText</attribute>
+    <!-- COMPENSATION_TEXT -->
+    <attribute side="server" code="0x0007" define="COLOR_CONTROL_COLOR_TEMPERATURE" type="int16u" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x00FA" optional="true">ColorTemperatureMireds</attribute>
+    <!-- COLOR_TEMPERATURE -->
+    <attribute side="server" code="0x0008" define="COLOR_CONTROL_COLOR_MODE" type="enum8" min="0x00" max="0x02" writable="false" default="0x01">ColorMode</attribute>
+    <!-- COLOR_MODE -->
+    <attribute side="server" code="0x000F" define="COLOR_CONTROL_OPTIONS" type="bitmap8" writable="true" default="0x00">Options</attribute>
+    <!-- COLOR_CONTROL_OPTIONS -->
+    <attribute side="server" code="0x0010" define="COLOR_CONTROL_NUMBER_OF_PRIMARIES" type="int8u" min="0x00" max="0x06" isNullable="true" writable="false">NumberOfPrimaries</attribute>
+    <!-- NUMBER_OF_PRIMARIES -->
+    <attribute side="server" code="0x0011" define="COLOR_CONTROL_PRIMARY_1_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary1X</attribute>
+    <!-- PRIMARY_1_X -->
+    <attribute side="server" code="0x0012" define="COLOR_CONTROL_PRIMARY_1_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary1Y</attribute>
+    <!-- PRIMARY_1_Y -->
+    <attribute side="server" code="0x0013" define="COLOR_CONTROL_PRIMARY_1_INTENSITY" type="int8u" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary1Intensity</attribute>
+    <!-- PRIMARY_1_INTENSITY -->
+    <attribute side="server" code="0x0015" define="COLOR_CONTROL_PRIMARY_2_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary2X</attribute>
+    <!-- PRIMARY_2_X -->
+    <attribute side="server" code="0x0016" define="COLOR_CONTROL_PRIMARY_2_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary2Y</attribute>
+    <!-- PRIMARY_2_Y -->
+    <attribute side="server" code="0x0017" define="COLOR_CONTROL_PRIMARY_2_INTENSITY" type="int8u" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary2Intensity</attribute>
+    <!-- PRIMARY_2_INTENSITY -->
+    <attribute side="server" code="0x0019" define="COLOR_CONTROL_PRIMARY_3_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary3X</attribute>
+    <!-- PRIMARY_3_X -->
+    <attribute side="server" code="0x001A" define="COLOR_CONTROL_PRIMARY_3_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary3Y</attribute>
+    <!-- PRIMARY_3_Y -->
+    <attribute side="server" code="0x001B" define="COLOR_CONTROL_PRIMARY_3_INTENSITY" type="int8u" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary3Intensity</attribute>
+    <!-- PRIMARY_3_INTENSITY -->
+    <attribute side="server" code="0x0020" define="COLOR_CONTROL_PRIMARY_4_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary4X</attribute>
+    <!-- PRIMARY_4_X -->
+    <attribute side="server" code="0x0021" define="COLOR_CONTROL_PRIMARY_4_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary4Y</attribute>
+    <!-- PRIMARY_4_Y -->
+    <attribute side="server" code="0x0022" define="COLOR_CONTROL_PRIMARY_4_INTENSITY" type="int8u" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary4Intensity</attribute>
+    <!-- PRIMARY_4_INTENSITY -->
+    <attribute side="server" code="0x0024" define="COLOR_CONTROL_PRIMARY_5_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary5X</attribute>
+    <!-- PRIMARY_5_X -->
+    <attribute side="server" code="0x0025" define="COLOR_CONTROL_PRIMARY_5_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary5Y</attribute>
+    <!-- PRIMARY_5_Y -->
+    <attribute side="server" code="0x0026" define="COLOR_CONTROL_PRIMARY_5_INTENSITY" type="int8u" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary5Intensity</attribute>
+    <!-- PRIMARY_5_INTENSITY -->
+    <attribute side="server" code="0x0028" define="COLOR_CONTROL_PRIMARY_6_X" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary6X</attribute>
+    <!-- PRIMARY_6_X -->
+    <attribute side="server" code="0x0029" define="COLOR_CONTROL_PRIMARY_6_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" optional="true">Primary6Y</attribute>
+    <!-- PRIMARY_6_Y -->
+    <attribute side="server" code="0x002A" define="COLOR_CONTROL_PRIMARY_6_INTENSITY" type="int8u" min="0x00" max="0xFF" isNullable="true" writable="false" optional="true">Primary6Intensity</attribute>
+    <!-- PRIMARY_6_INTENSITY -->
+    <attribute side="server" code="0x0030" define="COLOR_CONTROL_WHITE_POINT_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>WhitePointX</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <!-- WHITE_POINT_X -->
+    <attribute side="server" code="0x0031" define="COLOR_CONTROL_WHITE_POINT_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>WhitePointY</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <!-- WHITE_POINT_Y -->
+    <attribute side="server" code="0x0032" define="COLOR_CONTROL_COLOR_POINT_R_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>ColorPointRX</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <!-- COLOR_POINT_R_X -->
+    <attribute side="server" code="0x0033" define="COLOR_CONTROL_COLOR_POINT_R_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>ColorPointRY</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <!-- COLOR_POINT_R_Y -->
+    <attribute side="server" code="0x0034" define="COLOR_CONTROL_COLOR_POINT_R_INTENSITY" type="int8u" isNullable="true" writable="true" optional="true">
+      <description>ColorPointRIntensity</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <!-- COLOR_POINT_R_INTENSITY -->
+    <attribute side="server" code="0x0036" define="COLOR_CONTROL_COLOR_POINT_G_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>ColorPointGX</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <!-- COLOR_POINT_G_X -->
+    <attribute side="server" code="0x0037" define="COLOR_CONTROL_COLOR_POINT_G_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>ColorPointGY</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <!-- COLOR_POINT_G_Y -->
+    <attribute side="server" code="0x0038" define="COLOR_CONTROL_COLOR_POINT_G_INTENSITY" type="int8u" isNullable="true" writable="true" optional="true">
+      <description>ColorPointGIntensity</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <!-- COLOR_POINT_G_INTENSITY -->
+    <attribute side="server" code="0x003A" define="COLOR_CONTROL_COLOR_POINT_B_X" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>ColorPointBX</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <!-- COLOR_POINT_B_X -->
+    <attribute side="server" code="0x003B" define="COLOR_CONTROL_COLOR_POINT_B_Y" type="int16u" min="0x0000" max="0xFEFF" writable="true" optional="true">
+      <description>ColorPointBY</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <!-- COLOR_POINT_B_Y -->
+    <attribute side="server" code="0x003C" define="COLOR_CONTROL_COLOR_POINT_B_INTENSITY" type="int8u" isNullable="true" writable="true" optional="true">
+      <description>ColorPointBIntensity</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+    <!-- COLOR_POINT_B_INTENSITY -->
+    <attribute side="server" code="0x400D" define="COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS" type="int16u" min="0x0000" max="0xFFFF" writable="false" optional="true">CoupleColorTempToLevelMinMireds</attribute>
+    <attribute side="server" code="0x4010" define="START_UP_COLOR_TEMPERATURE_MIREDS" type="int16u" min="0x0000" max="0xFEFF" writable="true" isNullable="true" optional="true">
+      <description>StartUpColorTemperatureMireds</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+
+    <command source="client" code="0x00" name="MoveToHue" optional="true" cli="zcl color-control movetohue">
+      <description>
+        Move to specified hue.
+      </description>
+      <arg name="Hue" type="int8u"/>
+      <arg name="Direction" type="HueDirection"/>
+      <arg name="TransitionTime" type="int16u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x01" name="MoveHue" optional="true" cli="zcl color-control movehue">
+      <description>
+        Move hue up or down at specified rate.
+      </description>
+      <arg name="MoveMode" type="HueMoveMode"/>
+      <arg name="Rate" type="int8u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x02" name="StepHue" optional="true" cli="zcl color-control stephue">
+      <description>
+        Step hue up or down by specified size at specified rate.
+      </description>
+      <arg name="StepMode" type="HueStepMode"/>
+      <arg name="StepSize" type="int8u"/>
+      <arg name="TransitionTime" type="int8u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x03" name="MoveToSaturation" optional="true" cli="zcl color-control movetosat">
+      <description>
+        Move to specified saturation.
+      </description>
+      <arg name="Saturation" type="int8u"/>
+      <arg name="TransitionTime" type="int16u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x04" name="MoveSaturation" optional="true" cli="zcl color-control movesat">
+      <description>
+        Move saturation up or down at specified rate.
+      </description>
+      <arg name="MoveMode" type="SaturationMoveMode"/>
+      <arg name="Rate" type="int8u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x05" name="StepSaturation" optional="true" cli="zcl color-control stepsat">
+      <description>
+        Step saturation up or down by specified size at specified rate.
+      </description>
+      <arg name="StepMode" type="SaturationStepMode"/>
+      <arg name="StepSize" type="int8u"/>
+      <arg name="TransitionTime" type="int8u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x06" name="MoveToHueAndSaturation" optional="true" cli="zcl color-control movetohueandsat">
+      <description>
+        Move to hue and saturation.
+      </description>
+      <arg name="Hue" type="int8u"/>
+      <arg name="Saturation" type="int8u"/>
+      <arg name="TransitionTime" type="int16u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x07" name="MoveToColor" optional="true" cli="zcl color-control movetocolor">
+      <description>
+        Move to specified color.
+      </description>
+      <arg name="ColorX" type="int16u"/>
+      <arg name="ColorY" type="int16u"/>
+      <arg name="TransitionTime" type="int16u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x08" name="MoveColor" optional="true" cli="zcl color-control movecolor">
+      <description>
+        Moves the color.
+      </description>
+      <arg name="RateX" type="int16s"/>
+      <arg name="RateY" type="int16s"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x09" name="StepColor" optional="true" cli="zcl color-control stepcolor">
+      <description>
+        Steps the lighting to a specific color.
+      </description>
+      <arg name="StepX" type="int16s"/>
+      <arg name="StepY" type="int16s"/>
+      <arg name="TransitionTime" type="int16u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x0A" name="MoveToColorTemperature" optional="true" cli="zcl color-control movetocolortemp">
+      <description>
+        Move to a specific color temperature.
+      </description>
+      <arg name="ColorTemperatureMireds" type="int16u"/>
+      <arg name="TransitionTime" type="int16u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+  </cluster>
+
+  <clusterExtension code="0x0300">
+    <attribute side="server" code="0x4000" define="COLOR_CONTROL_ENHANCED_CURRENT_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">EnhancedCurrentHue</attribute>
+    <attribute side="server" code="0x4001" define="COLOR_CONTROL_ENHANCED_COLOR_MODE" type="enum8" min="0x00" max="0xFF" writable="false" default="0x01">EnhancedColorMode</attribute>
+    <attribute side="server" code="0x4002" define="COLOR_CONTROL_COLOR_LOOP_ACTIVE" type="int8u" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">ColorLoopActive</attribute>
+    <attribute side="server" code="0x4003" define="COLOR_CONTROL_COLOR_LOOP_DIRECTION" type="int8u" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">ColorLoopDirection</attribute>
+    <attribute side="server" code="0x4004" define="COLOR_CONTROL_COLOR_LOOP_TIME" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0019" optional="true">ColorLoopTime</attribute>
+    <attribute side="server" code="0x4005" define="COLOR_CONTROL_COLOR_LOOP_START_ENHANCED_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x2300" optional="true">ColorLoopStartEnhancedHue</attribute>
+    <attribute side="server" code="0x4006" define="COLOR_CONTROL_COLOR_LOOP_STORED_ENHANCED_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">ColorLoopStoredEnhancedHue</attribute>
+    <attribute side="server" code="0x400A" define="COLOR_CONTROL_COLOR_CAPABILITIES" type="bitmap16" min="0x0000" max="0x001F" writable="false" default="0x0000">ColorCapabilities</attribute>
+    <attribute side="server" code="0x400B" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN" type="int16u" min="0x0000" max="0xFEFF" writable="false" default="0x0000" optional="true">ColorTempPhysicalMinMireds</attribute>
+    <attribute side="server" code="0x400C" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX" type="int16u" min="0x0000" max="0xFEFF" writable="false" default="0xFEFF" optional="true">ColorTempPhysicalMaxMireds</attribute>
+
+    <command source="client" code="0x40" name="EnhancedMoveToHue" optional="true" noDefaultImplementation="true" cli="zcl color-control emovetohue">
+      <description>
+        Command description for EnhancedMoveToHue
+      </description>
+      <arg name="EnhancedHue" type="int16u"/>
+      <arg name="Direction" type="HueDirection"/>
+      <arg name="TransitionTime" type="int16u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x41" name="EnhancedMoveHue" optional="true" noDefaultImplementation="true" cli="zcl color-control emovehue">
+      <description>
+        Command description for EnhancedMoveHue
+      </description>
+      <arg name="MoveMode" type="HueMoveMode"/>
+      <arg name="Rate" type="int16u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x42" name="EnhancedStepHue" optional="true" noDefaultImplementation="true" cli="zcl color-control estephue">
+      <description>
+        Command description for EnhancedStepHue
+      </description>
+      <arg name="StepMode" type="HueStepMode"/>
+      <arg name="StepSize" type="int16u"/>
+      <arg name="TransitionTime" type="int16u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x43" name="EnhancedMoveToHueAndSaturation" optional="true" noDefaultImplementation="true" cli="zcl color-control emovetohueandsat">
+      <description>
+        Command description for EnhancedMoveToHueAndSaturation
+      </description>
+      <arg name="EnhancedHue" type="int16u"/>
+      <arg name="Saturation" type="int8u"/>
+      <arg name="TransitionTime" type="int16u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x44" name="ColorLoopSet" optional="true" noDefaultImplementation="true" cli="zcl color-control loop">
+      <description>
+        Command description for ColorLoopSet
+      </description>
+      <arg name="UpdateFlags" type="ColorLoopUpdateFlags"/>
+      <arg name="Action" type="ColorLoopAction"/>
+      <arg name="Direction" type="ColorLoopDirection"/>
+      <arg name="Time" type="int16u"/>
+      <arg name="StartHue" type="int16u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x47" name="StopMoveStep" optional="true" noDefaultImplementation="true" cli="zcl color-control stopmovestep">
+      <description>
+        Command description for StopMoveStep
+      </description>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x4B" name="MoveColorTemperature" optional="true" noDefaultImplementation="true" cli="zcl color-control movecolortemp">
+      <description>
+        Command description for MoveColorTemperature
+      </description>
+      <arg name="MoveMode" type="HueMoveMode"/>
+      <arg name="Rate" type="int16u"/>
+      <arg name="ColorTemperatureMinimumMireds" type="int16u"/>
+      <arg name="ColorTemperatureMaximumMireds" type="int16u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+
+    <command source="client" code="0x4C" name="StepColorTemperature" optional="true" noDefaultImplementation="true" cli="zcl color-control stepcolortemp">
+      <description>
+        Command description for StepColorTemperature
+      </description>
+      <arg name="StepMode" type="HueStepMode"/>
+      <arg name="StepSize" type="int16u"/>
+      <arg name="TransitionTime" type="int16u"/>
+      <arg name="ColorTemperatureMinimumMireds" type="int16u"/>
+      <arg name="ColorTemperatureMaximumMireds" type="int16u"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
+    </command>
+  </clusterExtension>
+</configurator>

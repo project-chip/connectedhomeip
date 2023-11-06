@@ -21,7 +21,7 @@
 
 #include <lib/core/CHIPCore.h>
 
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
@@ -178,7 +178,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestErrorStr(void)
+int TestErrorStr()
 {
     // clang-format off
     nlTestSuite theSuite =

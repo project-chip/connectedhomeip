@@ -61,9 +61,9 @@ public:
 
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
     // defined on this class.
-    //#ifndef DOXYGEN_SHOULD_SKIP_THIS
+    // #ifndef DOXYGEN_SHOULD_SKIP_THIS
     //    friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
-    //#endif
+    // #endif
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
@@ -74,6 +74,10 @@ private:
     void InitiateFactoryReset(void) override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
+    CHIP_ERROR GetBootReason(uint32_t & bootReasons) override;
+    CHIP_ERROR StoreBootReason(uint32_t bootReasons) override;
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
@@ -94,8 +98,6 @@ private:
     // ===== Members for internal use by the following friends.
 
     friend class Internal::NetworkProvisioningServerImpl;
-    friend ConfigurationManager & ConfigurationMgr(void);
-    friend ConfigurationManagerImpl & ConfigurationMgrImpl(void);
 
     //    static ConfigurationManagerImpl sInstance;
 
@@ -103,30 +105,6 @@ private:
 
     static void DoFactoryReset(intptr_t arg);
 };
-
-#if 0
-/**
- * Returns the public interface of the ConfigurationManager singleton object.
- *
- * Chip applications should use this to access features of the ConfigurationManager object
- * that are common to all platforms.
- */
-inline ConfigurationManager & ConfigurationMgr(void)
-{
-    return ConfigurationManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the ConfigurationManager singleton object.
- *
- * Chio applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the MW320 platform.
- */
-inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
-{
-    return ConfigurationManagerImpl::sInstance;
-}
-#endif // 0
 
 inline CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
@@ -138,6 +116,14 @@ inline CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * b
     // return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     return CHIP_NO_ERROR;
 }
+
+/**
+ * Returns the platform-specific implementation of the ConfigurationManager object.
+ *
+ * Applications can use this to gain access to features of the ConfigurationManager
+ * that are specific to the selected platform.
+ */
+ConfigurationManager & ConfigurationMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -180,7 +180,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         break;
     case TransferSession::OutputEventType::kAckEOFReceived:
         ChipLogDetail(BDX, "Transfer completed, got AckEOF");
-        mStopPolling = true;
+        mStopPolling = true; // Stop polling the TransferSession only after receiving BlockAckEOF
         Reset();
         break;
     case TransferSession::OutputEventType::kStatusReceived:
@@ -212,7 +212,7 @@ void BdxOtaSender::Reset()
 {
     mFabricIndex.ClearValue();
     mNodeId.ClearValue();
-    mTransfer.Reset();
+    Responder::ResetTransfer();
     if (mExchangeCtx != nullptr)
     {
         mExchangeCtx->Close();

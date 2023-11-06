@@ -20,7 +20,6 @@
  * @brief Implementation for the Time Format Localization Server Cluster
  ***************************************************************************/
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -68,7 +67,7 @@ CHIP_ERROR TimeFormatLocalizationAttrAccess::ReadSupportedCalendarTypes(Attribut
         if (it)
         {
             err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
-                CalendarType type;
+                CalendarTypeEnum type;
 
                 while (it->Next(type))
                 {
@@ -109,10 +108,10 @@ CHIP_ERROR TimeFormatLocalizationAttrAccess::Read(const ConcreteReadAttributePat
 
 // Returns whether newType is a valid calendar type.  If it's not, validType is set to a valid calendar type,
 // if there are any, and to kBuddhist if there are not.
-bool IsSupportedCalendarType(CalendarType newType, CalendarType & validType)
+bool IsSupportedCalendarType(CalendarTypeEnum newType, CalendarTypeEnum & validType)
 {
     // Reset valid type if no supported calendar types found.
-    validType = CalendarType::kBuddhist;
+    validType = CalendarTypeEnum::kBuddhist;
 
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
 
@@ -122,7 +121,7 @@ bool IsSupportedCalendarType(CalendarType newType, CalendarType & validType)
 
         if (it)
         {
-            CalendarType type;
+            CalendarTypeEnum type;
 
             while (it->Next(type))
             {
@@ -149,10 +148,10 @@ bool IsSupportedCalendarType(CalendarType newType, CalendarType & validType)
 // =============================================================================
 
 static Protocols::InteractionModel::Status emberAfPluginTimeFormatLocalizationOnCalendarTypeChange(EndpointId EndpointId,
-                                                                                                   CalendarType newType)
+                                                                                                   CalendarTypeEnum newType)
 {
     Protocols::InteractionModel::Status res;
-    CalendarType validType = CalendarType::kBuddhist;
+    CalendarTypeEnum validType = CalendarTypeEnum::kBuddhist;
 
     if (IsSupportedCalendarType(newType, validType))
     {
@@ -185,7 +184,7 @@ Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPre
         if (sizeof(uint8_t) == size)
         {
             res = emberAfPluginTimeFormatLocalizationOnCalendarTypeChange(attributePath.mEndpointId,
-                                                                          static_cast<CalendarType>(*value));
+                                                                          static_cast<CalendarTypeEnum>(*value));
         }
         else
         {
@@ -203,8 +202,8 @@ Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPre
 
 void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
 {
-    CalendarType calendarType;
-    CalendarType validType;
+    CalendarTypeEnum calendarType;
+    CalendarTypeEnum validType;
     EmberAfStatus status = ActiveCalendarType::Get(endpoint, &calendarType);
 
     VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
@@ -220,7 +219,7 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
     }
 }
 
-void MatterTimeFormatLocalizationPluginServerInitCallback(void)
+void MatterTimeFormatLocalizationPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

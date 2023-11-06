@@ -42,7 +42,7 @@ public:
     bool IsGroupBound();
 
     static void SwitchWorkerHandler(intptr_t);
-    static void OnInvokeCommandFailure(chip::DeviceProxy * aDevice, BindingData & aBindingData, CHIP_ERROR aError);
+    static void OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERROR aError);
 
     static BindingHandler & GetInstance()
     {
@@ -51,9 +51,9 @@ public:
     }
 
 private:
-    static void OnOffProcessCommand(chip::CommandId, const EmberBindingTableEntry &, chip::DeviceProxy *, void *);
-    static void LevelControlProcessCommand(chip::CommandId, const EmberBindingTableEntry &, chip::DeviceProxy *, void *);
-    static void LightSwitchChangedHandler(const EmberBindingTableEntry &, chip::DeviceProxy *, void *);
+    static void OnOffProcessCommand(chip::CommandId, const EmberBindingTableEntry &, chip::OperationalDeviceProxy *, void *);
+    static void LevelControlProcessCommand(chip::CommandId, const EmberBindingTableEntry &, chip::OperationalDeviceProxy *, void *);
+    static void LightSwitchChangedHandler(const EmberBindingTableEntry &, chip::OperationalDeviceProxy *, void *);
     static void LightSwitchContextReleaseHandler(void * context);
     static void InitInternal(intptr_t);
 

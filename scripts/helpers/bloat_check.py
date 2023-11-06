@@ -17,11 +17,8 @@
 #
 
 import argparse
-import coloredlogs
 import csv
 import datetime
-import github
-import github_fetch_artifacts
 import io
 import logging
 import os
@@ -30,6 +27,10 @@ import stat
 import subprocess
 import traceback
 import zipfile
+
+import coloredlogs
+import github
+import github_fetch_artifacts
 
 LOG_KEEP_DAYS = 3
 BINARY_KEEP_DAYS = 30
@@ -356,7 +357,7 @@ def main():
             # Output processed.
             a.delete()
 
-        except Exception as e:
+        except Exception:
             tb = traceback.format_exc()
             logging.warning('Failed to process bloat report: %s', tb)
 

@@ -7,7 +7,7 @@
 
 namespace chip {
 
-{{#chip_tests_only_clusters}}
+{{#chip_tests_only_clusters includeAllClusters=true}}
 {{#chip_tests_only_cluster_commands}}
 
 struct {{name}}Command

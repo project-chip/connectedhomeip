@@ -15,41 +15,20 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2021 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-/****************************************************************************
- * @file
- * @brief Routines for the Channel plugin, the
- *server implementation of the Channel cluster.
- *******************************************************************************
- ******************************************************************************/
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-#include <app/app-platform/ContentAppPlatform.h>
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/clusters/channel-server/channel-delegate.h>
 #include <app/clusters/channel-server/channel-server.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
+
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/app-platform/ContentAppPlatform.h>
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -57,9 +36,11 @@ using namespace chip::app::Clusters::Channel;
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kChannelDelegateTableSize =
     EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kChannelDelegateTableSize <= kEmberInvalidEndpointIndex, "Channel Delegate table size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -82,8 +63,8 @@ Delegate * GetDelegate(EndpointId endpoint)
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(Zcl, "Channel NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, Channel::Id);
-    return ((ep == 0xFFFF || ep >= EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Channel::Id, EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kChannelDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -104,9 +85,9 @@ namespace Channel {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, Channel::Id);
-    // if endpoint is found and is not a dynamic endpoint
-    if (ep != 0xFFFF && ep < EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT)
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Channel::Id, EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    // if endpoint is found
+    if (ep < kChannelDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }
@@ -115,7 +96,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
 }
 
-bool Delegate::HasFeature(chip::EndpointId endpoint, ChannelFeature feature)
+bool Delegate::HasFeature(chip::EndpointId endpoint, Feature feature)
 {
     uint32_t featureMap = GetFeatureMap(endpoint);
     return (featureMap & chip::to_underlying(feature));
@@ -155,7 +136,7 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
     switch (aPath.mAttributeId)
     {
     case app::Clusters::Channel::Attributes::ChannelList::Id: {
-        if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, ChannelFeature::kChannelList))
+        if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, Feature::kChannelList))
         {
             return aEncoder.EncodeEmptyList();
         }
@@ -163,7 +144,7 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
         return ReadChannelListAttribute(aEncoder, delegate);
     }
     case app::Clusters::Channel::Attributes::Lineup::Id: {
-        if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, ChannelFeature::kLineupInfo))
+        if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, Feature::kLineupInfo))
         {
             return CHIP_NO_ERROR;
         }
@@ -246,7 +227,7 @@ exit:
     // If isDelegateNull, no one will call responder, so HasSentResponse will be false
     if (!responder.HasSentResponse())
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        command->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -255,55 +236,55 @@ exit:
 bool emberAfChannelClusterChangeChannelByNumberCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                         const Commands::ChangeChannelByNumber::DecodableType & commandData)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
-    EndpointId endpoint  = commandPath.mEndpointId;
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    auto & majorNumber   = commandData.majorNumber;
-    auto & minorNumber   = commandData.minorNumber;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    Status status       = Status::Success;
+    auto & majorNumber  = commandData.majorNumber;
+    auto & minorNumber  = commandData.minorNumber;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     if (!delegate->HandleChangeChannelByNumber(majorNumber, minorNumber))
     {
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfChannelClusterChangeChannelByNumberCallback error: %s", err.AsString());
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
     }
 
-    emberAfSendImmediateDefaultResponse(status);
+    command->AddStatus(commandPath, status);
     return true;
 }
 
 bool emberAfChannelClusterSkipChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                               const Commands::SkipChannel::DecodableType & commandData)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
-    EndpointId endpoint  = commandPath.mEndpointId;
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    auto & count         = commandData.count;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    Status status       = Status::Success;
+    auto & count        = commandData.count;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     if (!delegate->HandleSkipChannel(count))
     {
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfChannelClusterSkipChannelCallback error: %s", err.AsString());
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
     }
 
-    emberAfSendImmediateDefaultResponse(status);
+    command->AddStatus(commandPath, status);
     return true;
 }
 

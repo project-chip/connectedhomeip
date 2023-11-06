@@ -17,6 +17,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "VideoPlayer.h"
+
 #ifndef DiscoveredNodeData_h
 #define DiscoveredNodeData_h
 
@@ -53,6 +55,12 @@
 @property size_t numIPs;
 
 - (DiscoveredNodeData *)initWithDeviceName:(NSString *)deviceName vendorId:(uint16_t)vendorId productId:(uint16_t)productId;
+
+- (bool)isPreCommissioned;
+
+- (VideoPlayer *)getConnectableVideoPlayer;
+
+- (void)setConnectableVideoPlayer:(VideoPlayer *)videoPlayer;
 
 @end
 

@@ -17,18 +17,23 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Matter/MTRDefines.h>
+
 NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSErrorDomain const MTRErrorDomain;
 
 FOUNDATION_EXPORT NSErrorDomain const MTRInteractionErrorDomain;
 
 /**
- * ChipErrorDomain contains errors caused by data processing the framework
+ * MTRErrorDomain contains errors caused by data processing the framework
  * itself is performing.  These can be caused by invalid values provided to a
  * framework API, failure to decode an incoming message, and so forth.
  *
- * Errors reported by the other side of a Matter interaction use
- * MTRInteractionErrorDomain instead.
+ * This error domain also contains errors that are communicated via success
+ * responses from a server but mapped to an error on the client.
+ *
+ * Errors reported by the server side of a Matter interaction via the normal
+ * Matter error-reporting mechanisms use MTRInteractionErrorDomain instead.
  */
 // clang-format off
 typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
@@ -50,6 +55,38 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
     MTRErrorCodeWrongAddressType     = 7,
     MTRErrorCodeIntegrityCheckFailed = 8,
     MTRErrorCodeTimeout              = 9,
+    MTRErrorCodeBufferTooSmall       = 10,
+    /**
+     * MTRErrorCodeFabricExists is returned when trying to commission a device
+     * into a fabric when it's already part of that fabric.
+     */
+    MTRErrorCodeFabricExists         = 11,
+    /**
+     * MTRErrorCodeUnknownSchema means the schema for the given cluster/attribute,
+     * cluster/event, or cluster/command combination is not known.
+     */
+    MTRErrorCodeUnknownSchema MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 12,
+    /**
+     * MTRErrorCodeSchemaMismatch means that provided data did not match the
+     * expected schema.
+     */
+    MTRErrorCodeSchemaMismatch MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 13,
+    /**
+     * MTRErrorCodeTLVDecodeFailed means that the TLV being decoded was malformed in
+     * some way.  This can include things like lengths running past the end of
+     * the buffer, strings that are not actually UTF-8, and various other
+     * TLV-level failures.
+     */
+    MTRErrorCodeTLVDecodeFailed MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 14,
+
+    /**
+     * MTRErrorCodeDNSSDUnauthorized means that the application is not
+     * authorized to perform DNS_SD lookups.  This typically means missing
+     * entries for "_matter._tcp" (for operational lookup) and "_matterc._udp"
+     * (for commissionable lookup) under the NSBonjourServices key in the
+     * application's Info.plist.
+     */
+    MTRErrorCodeDNSSDUnauthorized MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 15,
 };
 // clang-format on
 
@@ -66,35 +103,26 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
 // clang-format off
 typedef NS_ERROR_ENUM(MTRInteractionErrorDomain, MTRInteractionErrorCode){
     // These values come from the general status code table in the Matter
-    // Interaction Model specification.  Do not change these values unless the
-    // specification changes.
+    // Interaction Model specification.
     MTRInteractionErrorCodeFailure                = 0x01,
     MTRInteractionErrorCodeInvalidSubscription    = 0x7d,
     MTRInteractionErrorCodeUnsupportedAccess      = 0x7e,
     MTRInteractionErrorCodeUnsupportedEndpoint    = 0x7f,
     MTRInteractionErrorCodeInvalidAction          = 0x80,
     MTRInteractionErrorCodeUnsupportedCommand     = 0x81,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeInvalidCommand         = 0x85,
     MTRInteractionErrorCodeUnsupportedAttribute   = 0x86,
     MTRInteractionErrorCodeConstraintError        = 0x87,
     MTRInteractionErrorCodeUnsupportedWrite       = 0x88,
     MTRInteractionErrorCodeResourceExhausted      = 0x89,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeNotFound               = 0x8b,
     MTRInteractionErrorCodeUnreportableAttribute  = 0x8c,
     MTRInteractionErrorCodeInvalidDataType        = 0x8d,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeUnsupportedRead        = 0x8f,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeDataVersionMismatch    = 0x92,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeTimeout                = 0x94,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeBusy                   = 0x9c,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeUnsupportedCluster     = 0xc3,
-    // Gap in values is intentional.
     MTRInteractionErrorCodeNoUpstreamSubscription = 0xc5,
     MTRInteractionErrorCodeNeedsTimedInteraction  = 0xc6,
     MTRInteractionErrorCodeUnsupportedEvent       = 0xc7,

@@ -28,12 +28,13 @@
 #pragma once
 
 #include <system/SystemLayer.h>
-#include <system/SystemMutex.h>
 
 #include <ble/BleRole.h>
 #include <ble/BtpEngine.h>
+
 #if CHIP_ENABLE_CHIPOBLE_TEST
 #include <ble/BtpEngineTest.h>
+#include <system/SystemMutex.h>
 #endif
 
 namespace chip {

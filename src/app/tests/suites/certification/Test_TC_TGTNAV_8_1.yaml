@@ -14,16 +14,16 @@
 
 name: 19.10.1. [TC-TGTNAV-8.1] Navigate Target Verification
 
+PICS:
+    - TGTNAV.S
+
 config:
     nodeId: 0x12344321
     cluster: "Target Navigator"
     endpoint: 1
-    targetvalue1:
-        type: INT8U
+    targetvalue:
+        type: int8u
         defaultValue: 1
-    targetvalue2:
-        type: INT8U
-        defaultValue: 2
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -34,17 +34,17 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads the CurrentTarget attribute"
+    - label: "Step 1a: Reads the CurrentTarget attribute"
       PICS: TGTNAV.S.A0001
       command: "readAttribute"
       attribute: "CurrentTarget"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
-    - label: "Reads the TargetList attribute"
+    - label: "Step 1b: Reads the TargetList attribute"
       PICS: TGTNAV.S.A0000
       command: "readAttribute"
       attribute: "TargetList"
@@ -53,17 +53,17 @@ tests:
           constraints:
               type: list
 
-    - label: "Sends a NavigateTarget command"
-      PICS: TGTNAV.S.C0000
+    - label: "Step 2a: Sends a NavigateTarget command"
+      PICS: TGTNAV.S.C00.Rsp
       command: "NavigateTarget"
       arguments:
           values:
               - name: "Target"
-                value: targetvalue1
+                value: targetvalue
 
-    - label: "Reads the CurrentTarget attribute"
-      PICS: TGTNAV.S.A0001
+    - label: "Step 2b: Reads the CurrentTarget attribute"
+      PICS: TGTNAV.S.A0001 && TGTNAV.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentTarget"
       response:
-          value: targetvalue1
+          value: targetvalue

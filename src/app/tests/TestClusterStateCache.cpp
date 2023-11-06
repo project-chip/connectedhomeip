@@ -18,15 +18,18 @@
 
 #include "app-common/zap-generated/ids/Attributes.h"
 #include "app-common/zap-generated/ids/Clusters.h"
-#include "lib/core/CHIPTLVTags.h"
+#include "lib/core/TLVTags.h"
+#include "lib/core/TLVWriter.h"
 #include "protocols/interaction_model/Constants.h"
 #include "system/SystemPacketBuffer.h"
 #include "system/TLVPacketBufferBackingStore.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ClusterStateCache.h>
+#include <app/MessageDef/DataVersionFilterIBs.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
@@ -82,19 +85,19 @@ struct AttributeInstruction
         switch (mAttributeType)
         {
         case kAttributeA:
-            return Clusters::TestCluster::Attributes::Int16u::Id;
+            return Clusters::UnitTesting::Attributes::Int16u::Id;
             break;
 
         case kAttributeB:
-            return Clusters::TestCluster::Attributes::OctetString::Id;
+            return Clusters::UnitTesting::Attributes::OctetString::Id;
             break;
 
         case kAttributeC:
-            return Clusters::TestCluster::Attributes::StructAttr::Id;
+            return Clusters::UnitTesting::Attributes::StructAttr::Id;
             break;
 
         default:
-            return Clusters::TestCluster::Attributes::ListStructOctetString::Id;
+            return Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
             break;
         }
     }
@@ -181,10 +184,9 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
     StatusIB status;
     callback->OnReportBegin();
 
-    uint8_t index = 0;
     for (auto & instruction : mInstructionList)
     {
-        ConcreteDataAttributePath path(instruction.mEndpointId, Clusters::TestCluster::Id, 0);
+        ConcreteDataAttributePath path(instruction.mEndpointId, Clusters::UnitTesting::Id, 0);
         Platform::ScopedMemoryBufferWithSize<uint8_t> handle;
         handle.Calloc(3000);
         TLV::ScopedBufferTLVWriter writer(std::move(handle), 3000);
@@ -202,7 +204,7 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
             case AttributeInstruction::kAttributeA: {
                 ChipLogProgress(DataManagement, "\t -- Generating A");
 
-                Clusters::TestCluster::Attributes::Int16u::TypeInfo::Type value = instruction.mInstructionId;
+                Clusters::UnitTesting::Attributes::Int16u::TypeInfo::Type value = instruction.mInstructionId;
                 NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
                 break;
             }
@@ -210,7 +212,7 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
             case AttributeInstruction::kAttributeB: {
                 ChipLogProgress(DataManagement, "\t -- Generating B");
 
-                Clusters::TestCluster::Attributes::OctetString::TypeInfo::Type value;
+                Clusters::UnitTesting::Attributes::OctetString::TypeInfo::Type value;
                 uint8_t buf[] = { 'h', 'e', 'l', 'l', 'o' };
                 value         = buf;
 
@@ -221,7 +223,7 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
             case AttributeInstruction::kAttributeC: {
                 ChipLogProgress(DataManagement, "\t -- Generating C");
 
-                Clusters::TestCluster::Attributes::StructAttr::TypeInfo::Type value;
+                Clusters::UnitTesting::Attributes::StructAttr::TypeInfo::Type value;
                 value.a = instruction.mInstructionId;
                 value.b = true;
                 NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
@@ -232,14 +234,14 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
                 ChipLogProgress(DataManagement, "\t -- Generating D");
 
                 // buf[200] is 1.6k
-                Clusters::TestCluster::Structs::TestListStructOctet::Type buf[200];
+                Clusters::UnitTesting::Structs::TestListStructOctet::Type buf[200];
 
                 for (auto & i : buf)
                 {
                     i.member1 = instruction.mInstructionId;
                 }
 
-                Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
+                Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value;
                 path.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
 
                 value = buf;
@@ -266,8 +268,6 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
             dataCallbackValidator.SetExpectation();
             callback->OnAttributeData(path, nullptr, status);
         }
-
-        index++;
     }
 
     callback->OnReportEnd();
@@ -278,7 +278,7 @@ class CacheValidator : public ClusterStateCache::Callback
 public:
     CacheValidator(AttributeInstructionListType & instructionList, ForwardedDataCallbackValidator & dataCallbackValidator);
 
-    Clusters::TestCluster::Attributes::TypeInfo::DecodableType clusterValue;
+    Clusters::UnitTesting::Attributes::TypeInfo::DecodableType clusterValue;
 
 private:
     void OnDone(ReadClient *) override {}
@@ -316,8 +316,8 @@ private:
         case AttributeInstruction::kAttributeA: {
             ChipLogProgress(DataManagement, "\t\t -- Validating A");
 
-            Clusters::TestCluster::Attributes::Int16u::TypeInfo::DecodableType v = 0;
-            err = cache->Get<Clusters::TestCluster::Attributes::Int16u::TypeInfo>(path, v);
+            Clusters::UnitTesting::Attributes::Int16u::TypeInfo::DecodableType v = 0;
+            err = cache->Get<Clusters::UnitTesting::Attributes::Int16u::TypeInfo>(path, v);
             if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
             {
                 gotStatus = true;
@@ -335,8 +335,8 @@ private:
         case AttributeInstruction::kAttributeB: {
             ChipLogProgress(DataManagement, "\t\t -- Validating B");
 
-            Clusters::TestCluster::Attributes::OctetString::TypeInfo::DecodableType v;
-            err = cache->Get<Clusters::TestCluster::Attributes::OctetString::TypeInfo>(path, v);
+            Clusters::UnitTesting::Attributes::OctetString::TypeInfo::DecodableType v;
+            err = cache->Get<Clusters::UnitTesting::Attributes::OctetString::TypeInfo>(path, v);
             if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
             {
                 gotStatus = true;
@@ -354,8 +354,8 @@ private:
         case AttributeInstruction::kAttributeC: {
             ChipLogProgress(DataManagement, "\t\t -- Validating C");
 
-            Clusters::TestCluster::Attributes::StructAttr::TypeInfo::DecodableType v;
-            err = cache->Get<Clusters::TestCluster::Attributes::StructAttr::TypeInfo>(path, v);
+            Clusters::UnitTesting::Attributes::StructAttr::TypeInfo::DecodableType v;
+            err = cache->Get<Clusters::UnitTesting::Attributes::StructAttr::TypeInfo>(path, v);
             if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
             {
                 gotStatus = true;
@@ -373,8 +373,8 @@ private:
         case AttributeInstruction::kAttributeD: {
             ChipLogProgress(DataManagement, "\t\t -- Validating D");
 
-            Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo::DecodableType v;
-            err = cache->Get<Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo>(path, v);
+            Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::DecodableType v;
+            err = cache->Get<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(path, v);
             if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
             {
                 gotStatus = true;
@@ -452,7 +452,7 @@ private:
 
             auto status = statusList.front();
             NL_TEST_ASSERT(gSuite, status.mPath.mEndpointId == instruction.mEndpointId);
-            NL_TEST_ASSERT(gSuite, status.mPath.mClusterId == Clusters::TestCluster::Id);
+            NL_TEST_ASSERT(gSuite, status.mPath.mClusterId == Clusters::UnitTesting::Id);
             NL_TEST_ASSERT(gSuite, status.mPath.mAttributeId == instruction.GetAttributeId());
             NL_TEST_ASSERT(gSuite, status.mStatus.mStatus == Protocols::InteractionModel::Status::Failure);
         }
@@ -473,7 +473,7 @@ private:
         for (auto & instruction : mInstructionSet)
         {
             if (instruction.mEndpointId == path.mEndpointId && instruction.GetAttributeId() == path.mAttributeId &&
-                path.mClusterId == Clusters::TestCluster::Id)
+                path.mClusterId == Clusters::UnitTesting::Id)
             {
 
                 //
@@ -532,8 +532,8 @@ CacheValidator::CacheValidator(AttributeInstructionListType & instructionList,
         mInstructionSet.erase(instruction);
         mInstructionSet.insert(instruction);
         mExpectedAttributes.insert(
-            ConcreteAttributePath(instruction.mEndpointId, Clusters::TestCluster::Id, instruction.GetAttributeId()));
-        mExpectedClusters.insert(std::make_tuple(instruction.mEndpointId, Clusters::TestCluster::Id));
+            ConcreteAttributePath(instruction.mEndpointId, Clusters::UnitTesting::Id, instruction.GetAttributeId()));
+        mExpectedClusters.insert(std::make_tuple(instruction.mEndpointId, Clusters::UnitTesting::Id));
         mExpectedEndpoints.insert(instruction.mEndpointId);
     }
 }
@@ -543,8 +543,75 @@ void RunAndValidateSequence(AttributeInstructionListType list)
     ForwardedDataCallbackValidator dataCallbackValidator;
     CacheValidator client(list, dataCallbackValidator);
     ClusterStateCache cache(client);
+
+    // In order for the cache to track our data versions, we need to claim to it
+    // that we are dealing with a wildcard path.  And we need to do that before
+    // it has seen any reports.
+    AttributePathParams wildcardPath;
+    const Span<AttributePathParams> pathSpan(&wildcardPath, 1);
+    {
+        // Just need a buffer big enough that we can start the list.  We don't
+        // care about the actual data versions here.
+        uint8_t buf[20];
+        TLV::TLVWriter writer;
+        writer.Init(buf);
+        DataVersionFilterIBs::Builder builder;
+        CHIP_ERROR err = builder.Init(&writer);
+        NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+        bool encodedDataVersionList = false;
+        err = cache.GetBufferedCallback().OnUpdateDataVersionFilterList(builder, pathSpan, encodedDataVersionList);
+
+        // We had nothing to encode so far.
+        NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, !encodedDataVersionList);
+    }
+
     DataSeriesGenerator generator(&cache.GetBufferedCallback(), list);
     generator.Generate(dataCallbackValidator);
+
+    // Now verify that we would do the right thing when encoding our data
+    // versions.
+
+    size_t bufferSize = 1;
+    do
+    {
+        Platform::ScopedMemoryBuffer<uint8_t> buf;
+        if (!buf.Calloc(bufferSize))
+        {
+            NL_TEST_ASSERT(gSuite, false);
+            break;
+        }
+
+        TLV::TLVWriter writer;
+        writer.Init(buf.Get(), bufferSize);
+
+        DataVersionFilterIBs::Builder builder;
+        CHIP_ERROR err = builder.Init(&writer);
+        NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL);
+        if (err == CHIP_NO_ERROR)
+        {
+            // We had enough space to start the list.  Now try encoding the data
+            // version filters.
+            bool encodedDataVersionList = false;
+            err = cache.GetBufferedCallback().OnUpdateDataVersionFilterList(builder, pathSpan, encodedDataVersionList);
+
+            // We should be rolling back properly if we run out of space.
+            NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(gSuite, builder.GetError() == CHIP_NO_ERROR);
+
+            if (writer.GetRemainingFreeLength() > 40)
+            {
+                // We have lots of empty space left, so we did not end up
+                // needing to roll back; no point testing larger buffer sizes.
+                //
+                // Note: we may still have encodedDataVersionList false here, if
+                // there were no non-status attribute values cached.
+                break;
+            }
+        }
+
+        ++bufferSize;
+    } while (true);
 }
 
 /*

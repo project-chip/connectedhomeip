@@ -65,7 +65,11 @@ public:
         mNodeIdRequested     = true;
     }
 
+    void SetMaximallyLargeCertsUsed(bool areMaximallyLargeCertsUsed) { mUseMaximallySizedCerts = areMaximallyLargeCertsUsed; }
+
     void SetFabricIdForNextNOCRequest(FabricId fabricId) override { mNextFabricId = fabricId; }
+
+    void SetCATValuesForNextNOCRequest(CATValues cats) { mNextCATs = cats; }
 
     /**
      * @brief Initialize the issuer with the keypair in the storage.
@@ -108,8 +112,8 @@ private:
     Crypto::P256Keypair mIssuer;
     Crypto::P256Keypair mIntermediateIssuer;
     bool mInitialized              = false;
-    uint32_t mIssuerId             = 0;
-    uint32_t mIntermediateIssuerId = 1;
+    uint32_t mIssuerId             = 1;
+    uint32_t mIntermediateIssuerId = 2;
     uint32_t mNow                  = 0;
 
     // By default, let's set validity to 10 years
@@ -117,9 +121,11 @@ private:
 
     NodeId mNextAvailableNodeId          = 1;
     PersistentStorageDelegate * mStorage = nullptr;
+    bool mUseMaximallySizedCerts         = false;
 
     NodeId mNextRequestedNodeId = 1;
     FabricId mNextFabricId      = 1;
+    CATValues mNextCATs         = kUndefinedCATs;
     bool mNodeIdRequested       = false;
     uint64_t mIndex             = 0;
 };

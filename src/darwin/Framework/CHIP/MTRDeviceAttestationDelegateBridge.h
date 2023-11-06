@@ -28,13 +28,15 @@ NS_ASSUME_NONNULL_BEGIN
 class MTRDeviceAttestationDelegateBridge : public chip::Credentials::DeviceAttestationDelegate {
 public:
     MTRDeviceAttestationDelegateBridge(MTRDeviceController * deviceController,
-        id<MTRDeviceAttestationDelegate> deviceAttestationDelegate, dispatch_queue_t queue,
-        chip::Optional<uint16_t> expiryTimeoutSecs)
+        id<MTRDeviceAttestationDelegate> deviceAttestationDelegate, chip::Optional<uint16_t> expiryTimeoutSecs,
+        bool shouldWaitAfterDeviceAttestation = false)
         : mResult(chip::Credentials::AttestationVerificationResult::kSuccess)
         , mDeviceController(deviceController)
         , mDeviceAttestationDelegate(deviceAttestationDelegate)
-        , mQueue(queue)
+        , mQueue(dispatch_queue_create(
+              "org.csa-iot.matter.framework.device_attestation.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL))
         , mExpiryTimeoutSecs(expiryTimeoutSecs)
+        , mShouldWaitAfterDeviceAttestation(shouldWaitAfterDeviceAttestation)
     {
     }
 
@@ -42,8 +44,11 @@ public:
 
     chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override { return mExpiryTimeoutSecs; }
 
-    void OnDeviceAttestationFailed(chip::Controller::DeviceCommissioner * deviceCommissioner, chip::DeviceProxy * device,
+    void OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner, chip::DeviceProxy * device,
+        const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
         chip::Credentials::AttestationVerificationResult attestationResult) override;
+
+    bool ShouldWaitAfterDeviceAttestation() override { return mShouldWaitAfterDeviceAttestation; }
 
     chip::Credentials::AttestationVerificationResult attestationVerificationResult() const { return mResult; }
 
@@ -53,6 +58,7 @@ private:
     id<MTRDeviceAttestationDelegate> mDeviceAttestationDelegate;
     dispatch_queue_t mQueue;
     chip::Optional<uint16_t> mExpiryTimeoutSecs;
+    const bool mShouldWaitAfterDeviceAttestation;
 };
 
 NS_ASSUME_NONNULL_END

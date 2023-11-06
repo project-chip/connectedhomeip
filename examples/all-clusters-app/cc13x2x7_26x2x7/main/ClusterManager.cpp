@@ -18,10 +18,8 @@
  */
 #include "ClusterManager.h"
 #include "Globals.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/util/basic-types.h>
@@ -31,6 +29,7 @@
 #endif
 
 using namespace ::chip;
+using namespace ::chip::app;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
@@ -47,17 +46,17 @@ void OnIdentifyTriggerEffect(Identify * identify)
 {
     switch (identify->mCurrentEffectIdentifier)
     {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-        PLAT_LOG("EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+        PLAT_LOG("Clusters::Identify::EffectIdentifierEnum::kBlink");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-        PLAT_LOG("EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+        PLAT_LOG("Clusters::Identify::EffectIdentifierEnum::kBreathe");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-        PLAT_LOG("EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        PLAT_LOG("Clusters::Identify::EffectIdentifierEnum::kOkay");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-        PLAT_LOG("EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        PLAT_LOG("Clusters::Identify::EffectIdentifierEnum::kChannelChange");
         break;
     default:
         PLAT_LOG("No identifier effect");
@@ -70,7 +69,7 @@ Identify gIdentify0 = {
     chip::EndpointId{ 0 },
     [](Identify *) { PLAT_LOG("onIdentifyStart"); },
     [](Identify *) { PLAT_LOG("onIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnIdentifyTriggerEffect,
 };
 
@@ -78,13 +77,15 @@ Identify gIdentify1 = {
     chip::EndpointId{ 1 },
     [](Identify *) { PLAT_LOG("onIdentifyStart"); },
     [](Identify *) { PLAT_LOG("onIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnIdentifyTriggerEffect,
 };
 
 void ClusterManager::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, PLAT_LOG("Unhandled Attribute ID: '0x%04x", attributeId));
+    using namespace app::Clusters::OnOff::Attributes;
+
+    VerifyOrExit(attributeId == OnOff::Id, PLAT_LOG("Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == ENDPOINT_ID_1 || endpointId == ENDPOINT_ID_2,
                  PLAT_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
 
@@ -98,11 +99,13 @@ exit:
 
 void ClusterManager::OnLevelControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
+    using namespace app::Clusters::LevelControl::Attributes;
+
     bool onOffState    = mEndpointOnOffState[endpointId - 1];
     uint8_t brightness = onOffState ? *value : 0;
 
     VerifyOrExit(brightness > 0, PLAT_LOG("Brightness set to 0, ignoring"));
-    VerifyOrExit(attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, PLAT_LOG("Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(attributeId == CurrentLevel::Id, PLAT_LOG("Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == ENDPOINT_ID_1 || endpointId == ENDPOINT_ID_2,
                  PLAT_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
 
@@ -119,8 +122,9 @@ exit:
 
 void ClusterManager::OnColorControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID ||
-                     attributeId == ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+    using namespace app::Clusters::ColorControl::Attributes;
+
+    VerifyOrExit(attributeId == CurrentHue::Id || attributeId == CurrentSaturation::Id,
                  PLAT_LOG("Unhandled AttributeId ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == ENDPOINT_ID_1 || endpointId == ENDPOINT_ID_2,
                  PLAT_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
@@ -128,17 +132,17 @@ void ClusterManager::OnColorControlAttributeChangeCallback(EndpointId endpointId
     if (endpointId == ENDPOINT_ID_1)
     {
         uint8_t hue, saturation;
-        if (attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID)
+        if (attributeId == CurrentHue::Id)
         {
             hue = *value;
             /* Read Current Saturation value when Attribute change callback for HUE Attribute */
-            app::Clusters::ColorControl::Attributes::CurrentSaturation::Get(endpointId, &saturation);
+            CurrentSaturation::Get(endpointId, &saturation);
         }
         else
         {
             saturation = *value;
             /* Read Current Hue value when Attribute change callback for SATURATION Attribute */
-            app::Clusters::ColorControl::Attributes::CurrentHue::Get(endpointId, &hue);
+            CurrentHue::Get(endpointId, &hue);
         }
         PLAT_LOG("Color Control triggered: Hue: %d Saturation: %d", hue, saturation);
     }

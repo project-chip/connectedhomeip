@@ -17,17 +17,31 @@ name:
     3.3.7. [TC-DD-3.7] Commissioning Flow - Concurrent - Negative Scenario [DUT
     - Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
-    - label:
-          "Commissioner has regulatory and fabric information available and has
-          accurate date, time and timezone"
+    - label: "Note"
       verification: |
-          On TH:
+          Chip-tool command used below are an example to verify the DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Preconditions"
+      verification: |
+          1 - 5.5 - Commissioner is on a network. - The network can either be WiFi or Thread.
+          2 - 5.5 - Commissionee can either be a Matter device which is already on a network or the test harness connected to the network.
+      disabled: true
+
+    - label:
+          "Step 1: Commissioner has regulatory and fabric information available
+          and has accurate date, time and timezone"
+      verification: |
+          Verify in TH as server side
           sudo ./chip-all-clusters-app --wifi --discriminator 3841
 
           [1653471956.966855][10713:10713] CHIP:SPT: PASE PBKDF iterations set to 1000
@@ -52,7 +66,7 @@ tests:
           [1653471956.972769][10713:10713] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
           [1653471956.972803][10713:10713] CHIP:SVR: Manual pairing code: [749701123365521327694]
 
-          On DUT:
+          Verify in DUT as client side
           ./chip-tool pairing code 1 MT:-24J0CEK01KA0648G00
           ...
           [1657226543861] [30621:16744161] CHIP: [IN] SecureSession[0x6000007cc000]: Activated - Type:1 LSID:47293
@@ -65,10 +79,10 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner and Commissionee discover each other and connect via the
-          discovery mode applicable for the DUT."
+          "Step 2: Commissioner and Commissionee discover each other and connect
+          via the discovery mode applicable for the DUT."
       verification: |
-          On DUT:
+          Verify in DUT as client side
           ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
           ...
           [1657226543861] [30621:16744161] CHIP: [IN] SecureSession[0x6000007cc000]: Activated - Type:1 LSID:47293
@@ -80,8 +94,8 @@ tests:
           [1657226543861] [30621:16744161] CHIP: [CTL] Commissioning stage next step: 'SecurePairing' -> 'ReadCommissioningInfo'
 
 
-          On TH:
-          $ ./out/all-clusters-app/chip-all-clusters-app
+          Verify in TH as server side
+          ./chip-all-clusters-app
           ...
           [1657226543.948995][369114:369114] CHIP:IN: SecureSession[0xaaaab60788e0]: Activated - Type:1 LSID:201
           [1657226543.949023][369114:369114] CHIP:IN: New secure session created for device <FFFFFFFB00000000, 0>, LSID:201 PSID:47293!
@@ -89,10 +103,10 @@ tests:
       disabled: true
 
     - label:
-          "Establish encryption keys with Password Authenticated Session
+          "Step 3: Establish encryption keys with Password Authenticated Session
           Establishment on the commissioning channel"
       verification: |
-          Verify on DUT:
+          Verify in DUT as client side
 
           CHIP:SC: Sent PBKDF param request
           CHIP:CTL: Setting attestation nonce to random value
@@ -106,24 +120,25 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner SHALL re-arm Fail-safe timer on Commissionee within 60s
-          (the autonomously Fail-safe timer length set by Commissionee)"
+          "Step 4: Commissioner SHALL re-arm Fail-safe timer on Commissionee
+          within 60s (the autonomously Fail-safe timer length set by
+          Commissionee)"
       verification: |
-          Verify on DUT:
+          Verify in DUT as client side
 
           CHIP:CTL: Commissioning stage next step: 'ReadCommissioningInfo' -> 'ArmFailSafe'
           CHIP:CTL: Performing next commissioning step 'ArmFailSafe'
           CHIP:CTL: Arming failsafe (60 seconds)
       disabled: true
 
-    - label: "Reboot TH and prepare for commissioning"
+    - label: "Step 5: Reboot TH and prepare for commissioning"
       verification: |
           1. Using TH=all-clusters-app, exit the app, re-launch app
       disabled: true
 
-    - label: "Commissioner should return to step 2"
+    - label: "Step 6: Commissioner should return to step 2"
       verification: |
-          Verify on DUT:
+          Verify in DUT as client side
 
           ./chip-tool discover commissionables
           Waiting for device responses...
@@ -270,10 +285,10 @@ tests:
       disabled: true
 
     - label:
-          "Establish encryption keys with Password Authenticated Session
+          "Step 7: Establish encryption keys with Password Authenticated Session
           Establishment on the commissioning channel"
       verification: |
-          Verify on DUT:
+          Verify in DUT as client side
 
           CHIP:SC: Sent PBKDF param request
           CHIP:CTL: Setting attestation nonce to random value
@@ -287,10 +302,11 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner SHALL re-arm Fail-safe timer on Commissionee within 60s
-          (the autonomously Fail-safe timer length set by Commissionee)"
+          "Step 8: Commissioner SHALL re-arm Fail-safe timer on Commissionee
+          within 60s (the autonomously Fail-safe timer length set by
+          Commissionee)"
       verification: |
-          Verify on DUT:
+          Verify in DUT as client side
 
           CHIP:CTL: Commissioning stage next step: 'ReadCommissioningInfo' -> 'ArmFailSafe'
           CHIP:CTL: Performing next commissioning step 'ArmFailSafe'
@@ -298,35 +314,35 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner SHALL configure regulatory information in the
+          "Step 9: Commissioner SHALL configure regulatory information in the
           Commissionee."
-      PICS: MCORE.DD.WIRELESS
+      PICS: MCORE.COM.WIRELESS
       verification: |
-          Verify on DUT Log:
+          Verify in DUT as client side
 
           Performing next commissioning step 'ConfigRegulatory'
           [1653471968.202645][30157:30162] CHIP:CTL: Setting Regulatory Config
           [1653471968.202666][30157:30162] CHIP:CTL: No regulatory config supplied by controller, leaving as device default (0)
 
-          Verify on TH:
+          Verify in TH as server side
            NVS set: chip-config/regulatory-location = 0 (0x0)
       disabled: true
 
     - label:
-          "Commissioner requests operational CSR from Commissionee with
+          "Step 10: Commissioner requests operational CSR from Commissionee with
           OperationalCSRRequest command"
       verification: |
-          Verify on TH:
+          Verify in DUT as client side
 
           CHIP:ZCL: OpCreds: commissioner has requested a CSR
           CHIP:ZCL: OpCreds: NewCertificateSigningRequest returned ../../third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1114: Success
       disabled: true
 
     - label:
-          "Commissioner configures operational credentials on DUT if not
-          previously installed"
+          "Step 11: Commissioner configures operational credentials on DUT if
+          not previously installed"
       verification: |
-          Verify on DUT:
+          Verify in DUT as client side
 
           CHIP:CTL: Performing next commissioning step 'SendTrustedRootCert'
           CHIP:CTL: Sending root certificate to the device
@@ -339,10 +355,10 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner configures itself as administrator in ACL on TH if
-          needed"
+          "Step 12: Commissioner configures itself as administrator in ACL on TH
+          if needed"
       verification: |
-          Verify the following on DUT after commissioning
+          Verify in DUT as client side after commissioning
 
 
 
@@ -405,56 +421,58 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner configures operational network on TH if TH both supports
-          and requires"
+          "Step 13: Commissioner configures operational network on TH if TH both
+          supports and requires"
       verification: |
-          Verifiy on DUT:
+          Verify in DUT as client side
 
           CHIP:CTL: Operational credentials provisioned on device 0xffff8c000b60
           CHIP:TOO: Secure Pairing Success
       disabled: true
 
     - label:
-          "Commissioner instructs Commissionee to connect to operational network
-          if not already connected"
+          "Step 14: Commissioner instructs Commissionee to connect to
+          operational network if not already connected"
       verification: |
-          Verify on DUT:
+          Verify in DUT as client side
 
           CHIP:CTL: Performing next commissioning step 'FindOperational'
           CHIP:CSM: FindOrEstablishSession: PeerId = BFCBED670D527591:000000000001B669
           CHIP:CSM: FindOrEstablishSession: No existing OperationalDeviceProxy instance found
       disabled: true
 
-    - label: "Reboot TH"
+    - label: "Step 15: Reboot TH"
       verification: |
           1. Using TH=all-clusters-app, exit the app, re-launch app
       disabled: true
 
     - label:
-          "Commissioner should return to the same state as step 13 to continue
-          commissioning (i.e. Commissioner configure operational network on TH
-          if TH both supports and requires)"
+          "Step 16: Commissioner should return to the same state as step 13 to
+          continue commissioning (i.e. Commissioner configure operational
+          network on TH if TH both supports and requires)"
       verification: |
-          Verifiy on DUT:
+          Verify in DUT as client side
 
           CHIP:CTL: Operational credentials provisioned on device 0xffff8c000b60
           CHIP:TOO: Secure Pairing Success
       disabled: true
 
     - label:
-          "Commissioner instructs Commissionee to connect to operational network
-          if not already connected"
+          "Step 17: Commissioner instructs Commissionee to connect to
+          operational network if not already connected"
       verification: |
-          Verify on DUT:
+          Verify in DUT as client side
 
           CHIP:CTL: Performing next commissioning step 'FindOperational'
           CHIP:CSM: FindOrEstablishSession: PeerId = BFCBED670D527591:000000000001B669
           CHIP:CSM: FindOrEstablishSession: No existing OperationalDeviceProxy instance found
       disabled: true
 
-    - label: "Commissioner starts discovery of TH using Operational Discovery"
+    - label:
+          "Step 18: Commissioner starts discovery of TH using Operational
+          Discovery"
       verification: |
-          Verify on DUT:
+          Verify in DUT as client side
 
           CHIP:DIS: Resolving BFCBED670D527591:000000000001B669 ...
           CHIP:DIS: Operational node lookup already in progress. Will NOT start a new one.
@@ -469,26 +487,27 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner opens a CASE session with TH over operational network"
+          "Step 19: Commissioner opens a CASE session with TH over operational
+          network"
       verification: |
-          Verifiy on DUT:
+          Verify in DUT as client side
 
           CHIP:SC: Establishing CASE session
       disabled: true
 
-    - label: "Commissioner sends CommissioningComplete command"
+    - label: "Step 20: Commissioner sends CommissioningComplete command"
       verification: |
-          Verifiy on DUT:
+          Verify in DUT as client side
 
           CHIP:CTL: Received CommissioningComplete response
           CHIP:CTL: Successfully finished commissioning step 'SendComplete'
       disabled: true
 
     - label:
-          "Commissioning channel between the Commissioner and Commissionee is
-          terminated."
+          "Step 21: Commissioning channel between the Commissioner and
+          Commissionee is terminated."
       verification: |
-          Verify the following on DUT:
+          Verify in DUT as client side
 
           CHIP:CTL: Successfully finished commissioning step 'SendComplete'
           CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'

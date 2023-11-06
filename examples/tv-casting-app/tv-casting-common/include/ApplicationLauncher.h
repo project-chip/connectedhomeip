@@ -17,10 +17,14 @@
  */
 
 #include "MediaCommandBase.h"
+#include "MediaSubscriptionBase.h"
 
+#include <controller/CHIPCluster.h>
 #include <functional>
-#include <zap-generated/CHIPClusters.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
+
+// COMMAND CLASSES
 class LaunchAppCommand
     : public MediaCommandBase<chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type,
                               chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType>
@@ -28,7 +32,7 @@ class LaunchAppCommand
 public:
     LaunchAppCommand() : MediaCommandBase(chip::app::Clusters::ApplicationLauncher::Id) {}
 
-    CHIP_ERROR Invoke(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+    CHIP_ERROR Invoke(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                       chip::Optional<chip::ByteSpan> data, std::function<void(CHIP_ERROR)> responseCallback);
 };
 
@@ -38,7 +42,7 @@ class StopAppCommand : public MediaCommandBase<chip::app::Clusters::ApplicationL
 public:
     StopAppCommand() : MediaCommandBase(chip::app::Clusters::ApplicationLauncher::Id) {}
 
-    CHIP_ERROR Invoke(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+    CHIP_ERROR Invoke(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                       std::function<void(CHIP_ERROR)> responseCallback);
 };
 
@@ -48,6 +52,14 @@ class HideAppCommand : public MediaCommandBase<chip::app::Clusters::ApplicationL
 public:
     HideAppCommand() : MediaCommandBase(chip::app::Clusters::ApplicationLauncher::Id) {}
 
-    CHIP_ERROR Invoke(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+    CHIP_ERROR Invoke(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application,
                       std::function<void(CHIP_ERROR)> responseCallback);
+};
+
+// SUBSCRIBER CLASSES
+class CurrentAppSubscriber
+    : public MediaSubscriptionBase<chip::app::Clusters::ApplicationLauncher::Attributes::CurrentApp::TypeInfo>
+{
+public:
+    CurrentAppSubscriber() : MediaSubscriptionBase(chip::app::Clusters::ApplicationLauncher::Id) {}
 };

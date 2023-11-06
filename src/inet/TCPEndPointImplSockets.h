@@ -25,10 +25,6 @@
 #include <inet/EndPointStateSockets.h>
 #include <inet/TCPEndPoint.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-#include <dispatch/dispatch.h>
-#endif
-
 namespace chip {
 namespace Inet {
 
@@ -73,11 +69,6 @@ private:
     void HandleIncomingConnection();
     CHIP_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId);
     static void HandlePendingIO(System::SocketEvents events, intptr_t data);
-
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_source_t mReadableSource  = nullptr;
-    dispatch_source_t mWriteableSource = nullptr;
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
     /// This counts the number of bytes written on the TCP socket since thelast probe into the TCP outqueue was made.

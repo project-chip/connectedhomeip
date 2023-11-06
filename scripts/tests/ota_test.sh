@@ -26,7 +26,7 @@ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux "$OTA_PROVI
 
 echo "Test" >"$FIRMWARE_BIN"
 
-rm /tmp/chip_*
+rm -f /tmp/chip_*
 
 ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 10 -vs "10.0" -da sha256 "$FIRMWARE_BIN" "$FIRMWARE_OTA"
 
@@ -75,7 +75,7 @@ else
     RETURN_VALUE=1
 fi
 
-killall -e "$OTA_PROVIDER_APP" "$OTA_REQUESTOR_APP"
+killall -s SIGKILL -e "$OTA_PROVIDER_APP" "$OTA_REQUESTOR_APP"
 rm -f "$FIRMWARE_OTA" "$FIRMWARE_BIN" "$OTA_DOWNLOAD_PATH"
 
 echo "$TEST_RESULT"

@@ -14,6 +14,9 @@
 
 name: 19.8.1. [TC-MEDIAPLAYBACK-6.1] Mandatory Media Playback Verification
 
+PICS:
+    - MEDIAPLAYBACK.S
+
 config:
     nodeId: 0x12344321
     cluster: "Media Playback"
@@ -32,31 +35,31 @@ tests:
           "Precondition: Media content in a paused state at the beginning of the
           content"
       command: "Pause"
-      PICS: MEDIAPLAYBACK.S.C0001
+      PICS: MEDIAPLAYBACK.S.C01.Rsp
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
-    - label: "Reads the CurrentState attribute"
-      PICS: MEDIAPLAYBACK.S.A0000
+    - label: "Step 1: Reads the CurrentState attribute"
+      PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
-    - label: "Sends a Play command"
-      PICS: MEDIAPLAYBACK.S.C0000
+    - label: "Step 2: Sends a Play command"
+      PICS: MEDIAPLAYBACK.S.C00.Rsp
       command: "Play"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the media state is playing"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C00.Rsp
       arguments:
           values:
               - name: "message"
@@ -64,25 +67,25 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the CurrentState attribute"
-      PICS: MEDIAPLAYBACK.S.A0000
+    - label: "Step 3: Reads the CurrentState attribute"
+      PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 0
 
-    - label: "sends a Pause command"
-      PICS: MEDIAPLAYBACK.S.C0001
+    - label: "Step 4: sends a Pause command"
+      PICS: MEDIAPLAYBACK.S.C01.Rsp
       command: "Pause"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the media is paused"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C01.Rsp
       arguments:
           values:
               - name: "message"
@@ -90,24 +93,25 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the CurrentState attribute"
+    - label: "Step 5: Reads the CurrentState attribute"
+      PICS: MEDIAPLAYBACK.S.C01.Rsp && MEDIAPLAYBACK.S.A0000
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
-    - label: "Sends a Stop command"
-      PICS: MEDIAPLAYBACK.S.C0002
-      command: "StopPlayback"
+    - label: "Step 6: Sends a Stop command"
+      PICS: MEDIAPLAYBACK.S.C02.Rsp
+      command: "Stop"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the media is stoped"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C02.Rsp
       arguments:
           values:
               - name: "message"
@@ -115,8 +119,8 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the CurrentState attribute"
-      PICS: MEDIAPLAYBACK.S.A0000
+    - label: "Step 7: Reads the CurrentState attribute"
+      PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C02.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:

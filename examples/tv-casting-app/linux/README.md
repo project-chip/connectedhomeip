@@ -14,8 +14,6 @@ commissioned. Then it allows the user to send CHIP commands to the TV.
 
 <hr>
 
-<a name="building"></a>
-
 ## Building
 
 -   Install tool chain
@@ -34,8 +32,6 @@ commissioned. Then it allows the user to send CHIP commands to the TV.
 
           $ cd ~/connectedhomeip/examples/tv-casting-app/linux
           $ rm -rf out/
-
-<a name="running-the-complete-example-on-linux"></a>
 
 ## Running the Complete Example on Linux
 

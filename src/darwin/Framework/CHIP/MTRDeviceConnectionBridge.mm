@@ -19,21 +19,17 @@
 #import "MTRBaseDevice_Internal.h"
 #import "MTRError_Internal.h"
 
-void MTRDeviceConnectionBridge::OnConnected(void * context, chip::OperationalDeviceProxy * device)
+void MTRDeviceConnectionBridge::OnConnected(
+    void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle)
 {
     auto * object = static_cast<MTRDeviceConnectionBridge *>(context);
-    MTRBaseDevice * chipDevice = [[MTRBaseDevice alloc] initWithDevice:device];
-    dispatch_async(object->mQueue, ^{
-        object->mCompletionHandler(chipDevice, nil);
-        object->Release();
-    });
+    object->mCompletionHandler(&exchangeMgr, chip::MakeOptional<chip::SessionHandle>(*sessionHandle->AsSecureSession()), nil);
+    object->Release();
 }
 
-void MTRDeviceConnectionBridge::OnConnectionFailure(void * context, chip::PeerId peerId, CHIP_ERROR error)
+void MTRDeviceConnectionBridge::OnConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error)
 {
     auto * object = static_cast<MTRDeviceConnectionBridge *>(context);
-    dispatch_async(object->mQueue, ^{
-        object->mCompletionHandler(nil, [MTRError errorForCHIPErrorCode:error]);
-        object->Release();
-    });
+    object->mCompletionHandler(nil, chip::NullOptional, [MTRError errorForCHIPErrorCode:error]);
+    object->Release();
 }

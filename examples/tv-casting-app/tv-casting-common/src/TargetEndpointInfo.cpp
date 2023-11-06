@@ -41,6 +41,11 @@ bool TargetEndpointInfo::HasCluster(ClusterId clusterId)
     return false;
 }
 
+chip::ClusterId * TargetEndpointInfo::GetClusters()
+{
+    return mClusters;
+}
+
 bool TargetEndpointInfo::AddCluster(ClusterId clusterId)
 {
     for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint; i++)

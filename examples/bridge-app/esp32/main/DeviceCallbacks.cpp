@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -32,25 +31,25 @@ static const char * TAG = "bridge-devicecallbacks";
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::app::Clusters;
-using namespace ::chip::app::Clusters::BridgedActions::Attributes;
+using namespace ::chip::app::Clusters::Actions::Attributes;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 
 void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
                                                      uint8_t type, uint16_t size, uint8_t * value)
 {
-    ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
-             endpointId, attributeId);
+    ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%" PRIx32 "', EndPoint ID: '0x%x', Attribute ID: '0x%" PRIx32 "'",
+             clusterId, endpointId, attributeId);
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
 
 namespace {
 
-class BridgedActionsAttrAccess : public AttributeAccessInterface
+class ActionsAttrAccess : public AttributeAccessInterface
 {
 public:
-    // Register for the Bridged Actions cluster on all endpoints.
-    BridgedActionsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), BridgedActions::Id) {}
+    // Register for the Actions cluster on all endpoints.
+    ActionsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Actions::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
@@ -63,44 +62,44 @@ private:
     CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
 
-constexpr uint16_t BridgedActionsAttrAccess::ClusterRevision;
+constexpr uint16_t ActionsAttrAccess::ClusterRevision;
 
-CHIP_ERROR BridgedActionsAttrAccess::ReadActionListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ActionsAttrAccess::ReadActionListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     // Just return an empty list
     return aEncoder.EncodeEmptyList();
 }
 
-CHIP_ERROR BridgedActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     // Just return an empty list
     return aEncoder.EncodeEmptyList();
 }
 
-CHIP_ERROR BridgedActionsAttrAccess::ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ActionsAttrAccess::ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     const char SetupUrl[] = "https://example.com";
     return aEncoder.Encode(chip::CharSpan::fromCharString(SetupUrl));
 }
 
-CHIP_ERROR BridgedActionsAttrAccess::ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ActionsAttrAccess::ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     return aEncoder.Encode(ClusterRevision);
 }
 
-BridgedActionsAttrAccess gAttrAccess;
+ActionsAttrAccess gAttrAccess;
 
-CHIP_ERROR BridgedActionsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ActionsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    VerifyOrDie(aPath.mClusterId == BridgedActions::Id);
+    VerifyOrDie(aPath.mClusterId == Actions::Id);
 
     switch (aPath.mAttributeId)
     {
     case ActionList::Id:
         return ReadActionListAttribute(aPath.mEndpointId, aEncoder);
-    case EndpointList::Id:
+    case EndpointLists::Id:
         return ReadEndpointListAttribute(aPath.mEndpointId, aEncoder);
-    case SetupUrl::Id:
+    case SetupURL::Id:
         return ReadSetupUrlAttribute(aPath.mEndpointId, aEncoder);
     case ClusterRevision::Id:
         return ReadClusterRevision(aPath.mEndpointId, aEncoder);
@@ -111,7 +110,7 @@ CHIP_ERROR BridgedActionsAttrAccess::Read(const ConcreteReadAttributePath & aPat
 }
 } // anonymous namespace
 
-void MatterBridgedActionsPluginServerInitCallback(void)
+void MatterActionsPluginServerInitCallback(void)
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

@@ -24,10 +24,10 @@
 #include "SetupPayload.h"
 
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVData.hpp>
-#include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVData.h>
+#include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 #include <utility>
 
@@ -74,15 +74,12 @@ bool PayloadContents::isValidQRCodePayload() const
 
     chip::RendezvousInformationFlags allvalid(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork,
                                               RendezvousInformationFlag::kSoftAP);
-    if (!rendezvousInformation.HasOnly(allvalid))
+    if (!rendezvousInformation.HasValue() || !rendezvousInformation.Value().HasOnly(allvalid))
     {
         return false;
     }
 
-    if (discriminator >= 1 << kPayloadDiscriminatorFieldLengthInBits)
-    {
-        return false;
-    }
+    // Discriminator validity is enforced by the SetupDiscriminator class.
 
     if (setUpPINCode >= 1 << kSetupPINCodeFieldLengthInBits)
     {
@@ -94,15 +91,8 @@ bool PayloadContents::isValidQRCodePayload() const
 
 bool PayloadContents::isValidManualCode() const
 {
-    // The discriminator for manual setup code is 4 most significant bits
-    // in a regular 12 bit discriminator. Let's make sure that the provided
-    // discriminator fits within 12 bits (kPayloadDiscriminatorFieldLengthInBits).
-    // The manual setup code generator will only use 4 most significant bits from
-    // it.
-    if (discriminator >= 1 << kPayloadDiscriminatorFieldLengthInBits)
-    {
-        return false;
-    }
+    // Discriminator validity is enforced by the SetupDiscriminator class.
+
     if (setUpPINCode >= 1 << kSetupPINCodeFieldLengthInBits)
     {
         return false;

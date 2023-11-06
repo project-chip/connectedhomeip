@@ -37,8 +37,10 @@ namespace chip {
  *
  * E.g. The application will send on/off commands to peer for the OnOff cluster.
  *
+ * The handler is not allowed to hold onto the pointer to the SessionHandler that is passed in.
  */
-using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, DeviceProxy * peer_device, void * context);
+using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device,
+                                           void * context);
 
 /**
  * Application callback function when a context used in NotifyBoundClusterChanged will not be needed and should be
@@ -51,6 +53,7 @@ struct BindingManagerInitParams
     FabricTable * mFabricTable               = nullptr;
     CASESessionManager * mCASESessionManager = nullptr;
     PersistentStorageDelegate * mStorage     = nullptr;
+    bool mEstablishConnectionOnInit          = true;
 };
 
 /**
@@ -59,6 +62,7 @@ struct BindingManagerInitParams
  * when a binding is ready to be communicated with.
  *
  * A CASE connection will be triggered when:
+ *  - During init of the BindingManager, unless the application actively disables this using mEstablishConnectionOnInit
  *  - The binding cluster adds a unicast entry to the binding table.
  *  - A watched cluster changes with a unicast binding but we cannot find an active connection to the peer.
  *
@@ -70,9 +74,7 @@ struct BindingManagerInitParams
 class BindingManager
 {
 public:
-    BindingManager() :
-        mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
-    {}
+    BindingManager() {}
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
 
@@ -121,22 +123,57 @@ public:
     static BindingManager & GetInstance() { return sBindingManager; }
 
 private:
+    /*
+     * Used when providing OnConnection/Failure callbacks to CASESessionManager when establishing session.
+     *
+     * Since the BindingManager calls EstablishConnection inside of a loop, and it is possible that the
+     * callback is called some time after the loop is completed, we need a separate callbacks for each
+     * connection we are trying to establish. Failure to provide different instances of the callback
+     * to CASESessionManager may result in the callback only be called for that last EstablishConnection
+     * that was called when it establishes the connections asynchronously.
+     *
+     */
+    class ConnectionCallback
+    {
+    public:
+        ConnectionCallback(BindingManager & bindingManager) :
+            mBindingManager(bindingManager), mOnConnectedCallback(HandleDeviceConnected, this),
+            mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
+        {}
+
+        Callback::Callback<OnDeviceConnected> * GetOnDeviceConnected() { return &mOnConnectedCallback; }
+        Callback::Callback<OnDeviceConnectionFailure> * GetOnDeviceConnectionFailure() { return &mOnConnectionFailureCallback; }
+
+    private:
+        static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                          const SessionHandle & sessionHandle)
+        {
+            ConnectionCallback * _this = static_cast<ConnectionCallback *>(context);
+            _this->mBindingManager.HandleDeviceConnected(exchangeMgr, sessionHandle);
+            Platform::Delete(_this);
+        }
+        static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
+        {
+            ConnectionCallback * _this = static_cast<ConnectionCallback *>(context);
+            _this->mBindingManager.HandleDeviceConnectionFailure(peerId, error);
+            Platform::Delete(_this);
+        }
+
+        BindingManager & mBindingManager;
+        Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
+        Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+    };
+
     static BindingManager sBindingManager;
 
-    static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device);
-    void HandleDeviceConnected(OperationalDeviceProxy * device);
-
-    static void HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error);
-    void HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR error);
-
-    CHIP_ERROR EstablishConnection(FabricIndex fabric, NodeId node);
+    CHIP_ERROR EstablishConnection(const ScopedNodeId & nodeId);
 
     PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
     BindingManagerInitParams mInitParams;
 
-    Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
-    Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+    void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+    void HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error);
 
     // Used to keep track of synchronous failures from FindOrEstablishSession.
     CHIP_ERROR mLastSessionEstablishmentError;

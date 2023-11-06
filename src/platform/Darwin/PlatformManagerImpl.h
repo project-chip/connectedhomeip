@@ -23,13 +23,17 @@
 
 #pragma once
 
-#include <dispatch/dispatch.h>
+#include <lib/core/Global.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
-static constexpr const char * const CHIP_CONTROLLER_QUEUE = "com.csa.matter.framework.controller.workqueue";
+#include <dispatch/dispatch.h>
+
+static constexpr const char * const CHIP_CONTROLLER_QUEUE = "org.csa-iot.matter.framework.controller.workqueue";
 
 namespace chip {
 namespace DeviceLayer {
+
+class BleScannerDelegate;
 
 /**
  * Concrete implementation of the PlatformManager singleton object for Darwin platforms.
@@ -43,16 +47,12 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
-    dispatch_queue_t GetWorkQueue()
-    {
-        if (mWorkQueue == nullptr)
-        {
-            mWorkQueue = dispatch_queue_create(CHIP_CONTROLLER_QUEUE, DISPATCH_QUEUE_SERIAL);
-            dispatch_suspend(mWorkQueue);
-            mIsWorkQueueSuspended = true;
-        }
-        return mWorkQueue;
-    }
+    dispatch_queue_t GetWorkQueue();
+    bool IsWorkQueueCurrentQueue() const;
+
+    CHIP_ERROR StartBleScan(BleScannerDelegate * delegate = nullptr);
+    CHIP_ERROR StopBleScan();
+    CHIP_ERROR PrepareCommissioning();
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
@@ -79,9 +79,8 @@ private:
 
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
-    friend class Internal::BLEManagerImpl;
 
-    static PlatformManagerImpl sInstance;
+    static Global<PlatformManagerImpl> sInstance;
 
     System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
@@ -106,7 +105,7 @@ private:
  */
 inline PlatformManager & PlatformMgr(void)
 {
-    return PlatformManagerImpl::sInstance;
+    return PlatformManagerImpl::sInstance.get();
 }
 
 /**
@@ -117,7 +116,7 @@ inline PlatformManager & PlatformMgr(void)
  */
 inline PlatformManagerImpl & PlatformMgrImpl(void)
 {
-    return PlatformManagerImpl::sInstance;
+    return PlatformManagerImpl::sInstance.get();
 }
 
 } // namespace DeviceLayer

@@ -1,0 +1,10 @@
+{{> header excludeZapComment=true}}
+
+#import <Foundation/Foundation.h>
+
+#import "MTRClusters.h"
+#import "MTRDevice.h"
+#import "MTRDevice_Internal.h"
+
+// Nothing here for now, but leaving this file in place in case we need to add
+// something.

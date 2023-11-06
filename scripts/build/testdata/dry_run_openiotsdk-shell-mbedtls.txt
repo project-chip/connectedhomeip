@@ -1,0 +1,8 @@
+# Commands will be run in CHIP project root.
+cd "{root}"
+
+# Generating openiotsdk-shell-mbedtls
+cmake -GNinja -S {root}/examples/shell/openiotsdk -B {out}/openiotsdk-shell-mbedtls --toolchain=toolchains/toolchain-arm-none-eabi-gcc.cmake -DCMAKE_SYSTEM_PROCESSOR=cortex-m55 -DCMAKE_BUILD_TYPE=Release -DCONFIG_CHIP_CRYPTO=mbedtls
+
+# Building openiotsdk-shell-mbedtls
+cmake --build {out}/openiotsdk-shell-mbedtls

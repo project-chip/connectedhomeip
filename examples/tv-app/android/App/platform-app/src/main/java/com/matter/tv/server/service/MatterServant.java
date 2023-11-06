@@ -31,8 +31,6 @@ import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
 import com.matter.tv.server.MatterCommissioningPrompter;
-import com.matter.tv.server.handlers.ContentAppEndpointManagerImpl;
-import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.tvapp.ChannelManagerStub;
 import com.matter.tv.server.tvapp.Clusters;
 import com.matter.tv.server.tvapp.ContentLaunchManagerStub;
@@ -84,40 +82,29 @@ public class MatterServant {
     mTvApp =
         new TvApp(
             (app, clusterId, endpoint) -> {
-              switch (clusterId) {
-                case Clusters.ClusterId_KeypadInput:
-                  app.setKeypadInputManager(endpoint, new KeypadInputManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_WakeOnLan:
-                  app.setWakeOnLanManager(endpoint, new WakeOnLanManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_MediaInput:
-                  app.setMediaInputManager(endpoint, new MediaInputManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_ContentLauncher:
-                  app.setContentLaunchManager(endpoint, new ContentLaunchManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_LowPower:
-                  app.setLowPowerManager(endpoint, new LowPowerManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_MediaPlayback:
-                  app.setMediaPlaybackManager(endpoint, new MediaPlaybackManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_Channel:
-                  app.setChannelManager(endpoint, new ChannelManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_OnOff:
-                  mOnOffEndpoint = endpoint;
-                  app.setOnOffManager(endpoint, new OnOffManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_LevelControl:
-                  mLevelEndpoint = endpoint;
-                  app.setLevelManager(endpoint, new LevelManagerStub(endpoint));
-                  break;
+              if (clusterId == Clusters.ClusterId_KeypadInput) {
+                app.setKeypadInputManager(endpoint, new KeypadInputManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_WakeOnLan) {
+                app.setWakeOnLanManager(endpoint, new WakeOnLanManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_MediaInput) {
+                app.setMediaInputManager(endpoint, new MediaInputManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_ContentLauncher) {
+                app.setContentLaunchManager(endpoint, new ContentLaunchManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_LowPower) {
+                app.setLowPowerManager(endpoint, new LowPowerManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_MediaPlayback) {
+                app.setMediaPlaybackManager(endpoint, new MediaPlaybackManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_Channel) {
+                app.setChannelManager(endpoint, new ChannelManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_OnOff) {
+                mOnOffEndpoint = endpoint;
+                app.setOnOffManager(endpoint, new OnOffManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_LevelControl) {
+                mLevelEndpoint = endpoint;
+                app.setLevelManager(endpoint, new LevelManagerStub(endpoint));
               }
             });
     mTvApp.setDACProvider(new DACProviderStub());
-    mTvApp.setUserPrompter(new MatterCommissioningPrompter(activity));
 
     mTvApp.setChipDeviceEventProvider(
         new DeviceEventProvider() {
@@ -144,8 +131,10 @@ public class MatterServant {
 
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();
+  }
 
-    mTvApp.postServerInit(new ContentAppEndpointManagerImpl(context));
+  public void initCommissioner() {
+    mTvApp.initializeCommissioner(new MatterCommissioningPrompter(context));
   }
 
   public void restart() {
@@ -162,6 +151,10 @@ public class MatterServant {
     this.activity = activity;
   }
 
+  public Activity getActivity() {
+    return activity;
+  }
+
   public void sendCustomCommand(String customCommand) {
     Log.i(MatterServant.class.getName(), customCommand);
     // TODO: insert logic ot send custom command here
@@ -169,19 +162,5 @@ public class MatterServant {
 
   public void updateLevel(int value) {
     mTvApp.setCurrentLevel(mLevelEndpoint, value);
-  }
-
-  public int addContentApp(ContentApp app) {
-    return mTvApp.addContentApp(
-        app.getVendorName(),
-        app.getVendorId(),
-        app.getAppName(),
-        app.getProductId(),
-        "1.0",
-        new ContentAppEndpointManagerImpl(context));
-  }
-
-  public void sendTestMessage(int endpoint, String message) {
-    mTvApp.sendTestMessage(endpoint, message);
   }
 }

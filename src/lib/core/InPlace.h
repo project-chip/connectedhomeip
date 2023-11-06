@@ -31,7 +31,7 @@ struct InPlaceType
 {
     explicit InPlaceType() = default;
 };
-constexpr InPlaceType InPlace{};
+inline constexpr InPlaceType InPlace{};
 
 template <class T>
 struct InPlaceTemplateType
@@ -39,6 +39,6 @@ struct InPlaceTemplateType
     explicit InPlaceTemplateType() = default;
 };
 template <class T>
-constexpr InPlaceTemplateType<T> InPlaceTemplate{};
+inline constexpr InPlaceTemplateType<T> InPlaceTemplate{};
 
 } // namespace chip

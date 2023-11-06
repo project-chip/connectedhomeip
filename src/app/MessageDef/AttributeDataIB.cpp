@@ -24,15 +24,14 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR AttributeDataIB::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR AttributeDataIB::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    int tagPresenceMask = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("AttributeDataIB =");
@@ -51,11 +50,7 @@ CHIP_ERROR AttributeDataIB::Parser::CheckSchemaValidity() const
         switch (tagNum)
         {
         case to_underlying(Tag::kDataVersion):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kDataVersion))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kDataVersion));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-
 #if CHIP_DETAIL_LOGGING
             {
                 chip::DataVersion version;
@@ -64,24 +59,16 @@ CHIP_ERROR AttributeDataIB::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case to_underlying(Tag::kPath):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kPath))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kPath));
-            {
-                AttributePathIB::Parser path;
-                ReturnErrorOnFailure(path.Init(reader));
+        case to_underlying(Tag::kPath): {
+            AttributePathIB::Parser path;
+            ReturnErrorOnFailure(path.Init(reader));
 
-                PRETTY_PRINT_INCDEPTH();
-                ReturnErrorOnFailure(path.CheckSchemaValidity());
-                PRETTY_PRINT_DECDEPTH();
-            }
-            break;
+            PRETTY_PRINT_INCDEPTH();
+            ReturnErrorOnFailure(path.PrettyPrint());
+            PRETTY_PRINT_DECDEPTH();
+        }
+        break;
         case to_underlying(Tag::kData):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kData))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kData));
-
             PRETTY_PRINT_INCDEPTH();
             ReturnErrorOnFailure(CheckIMPayload(reader, 0, "Data"));
             PRETTY_PRINT_DECDEPTH();
@@ -97,20 +84,17 @@ CHIP_ERROR AttributeDataIB::Parser::CheckSchemaValidity() const
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // check for required fields:
-        const int requiredFields = (1 << to_underlying(Tag::kPath)) | (1 << to_underlying(Tag::kData));
-
-        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_IB;
+        err = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 CHIP_ERROR AttributeDataIB::Parser::GetPath(AttributePathIB::Parser * const apPath) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kPath)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kPath), reader));
     return apPath->Init(reader);
 }
 
@@ -121,7 +105,7 @@ CHIP_ERROR AttributeDataIB::Parser::GetDataVersion(chip::DataVersion * const apV
 
 CHIP_ERROR AttributeDataIB::Parser::GetData(TLV::TLVReader * const apReader) const
 {
-    return mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kData)), *apReader);
+    return mReader.FindElementWithTag(TLV::ContextTag(Tag::kData), *apReader);
 }
 
 AttributePathIB::Builder & AttributeDataIB::Builder::CreatePath()
@@ -138,15 +122,15 @@ AttributeDataIB::Builder & AttributeDataIB::Builder::DataVersion(const chip::Dat
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kDataVersion)), aDataVersion);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kDataVersion), aDataVersion);
     }
     return *this;
 }
 
-AttributeDataIB::Builder & AttributeDataIB::Builder::EndOfAttributeDataIB()
+CHIP_ERROR AttributeDataIB::Builder::EndOfAttributeDataIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

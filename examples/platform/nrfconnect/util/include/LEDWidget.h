@@ -20,7 +20,7 @@
 
 #include <cstdint>
 
-#include <zephyr/zephyr.h>
+#include <zephyr/kernel.h>
 
 class LEDWidget
 {

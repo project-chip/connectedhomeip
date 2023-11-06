@@ -1,0 +1,147 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/psoc6.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${psoc6_sdk_build_root}/psoc6_executable.gni")
+import("${psoc6_sdk_build_root}/psoc6_sdk.gni")
+
+assert(current_os == "freertos")
+
+psoc6_project_dir = "${chip_root}/examples/lock-app/infineon/psoc6"
+examples_plat_dir = "${chip_root}/examples/platform/infineon/psoc6"
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = false
+
+  # PIN code for PASE session establishment.
+  setup_pin_code = 20202021
+
+  # Build update app
+  build_update_image = false
+}
+
+config("psoc6_ota_config") {
+  linker_script = "${psoc6_sdk_root}/ota/cy8c6xxa_cm4_dual_ota_int.ld"
+
+  ldflags = [ "-T" + rebase_path(linker_script, root_build_dir) ]
+
+  ldflags += [ "-Wl,--defsym,MCUBOOT_HEADER_SIZE=0x400,--defsym,MCUBOOT_BOOTLOADER_SIZE=0x18000,--defsym,CY_BOOT_PRIMARY_1_SIZE=0x1C0000" ]
+
+  defines = [
+    "P6_OTA",
+    "OTA_SUPPORT ",
+    "OTA_USE_EXTERNAL_FLASH",
+    "CY_BOOT_USE_EXTERNAL_FLASH",
+    "MCUBOOT_HEADER_SIZE=0x400",
+    "MCUBOOT_MAX_IMG_SECTORS=3584",
+    "CY_BOOT_SCRATCH_SIZE=0x00004000",
+    "MCUBOOT_BOOTLOADER_SIZE=0x00018000",
+    "CY_BOOT_BOOTLOADER_SIZE=0x00018000",
+    "CY_BOOT_PRIMARY_1_START=0x00018000",
+    "CY_BOOT_PRIMARY_1_SIZE=0x1C0000",
+    "CY_BOOT_SECONDARY_1_START=0x00000000",
+    "CY_BOOT_SECONDARY_1_SIZE=0x001C0000",
+    "CY_FLASH_ERASE_VALUE=0xFF",
+    "MCUBOOT_IMAGE_NUMBER=1",
+    "MCUBOOT_SLOT_SIZE=0x1C0000",
+    "MCUBOOT_SCRATCH_SIZE=0x4000",
+    "MCUBOOT_SECTOR_SIZE = 512",
+    "APP_VERSION_MAJOR=1",
+    "APP_VERSION_MINOR=0",
+    "APP_VERSION_BUILD=0",
+    "MCUBOOT_OVERWRITE_ONLY",
+    "CY_ENABLE_XIP_PROGRAM",
+  ]
+
+  if (build_update_image) {
+    defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=2" ]
+  }
+}
+psoc6_sdk_sources("lock_app_sdk_sources") {
+  include_dirs = [
+    "${chip_root}/src/platform/Infineon/PSOC6",
+    "${psoc6_project_dir}/include",
+    "${examples_plat_dir}",
+  ]
+
+  defines = [
+    "BOARD_ID=${psoc6_board}",
+    "P6_LOG_ENABLED=1",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setup_pin_code}",
+  ]
+
+  sources = [ "${psoc6_project_dir}/include/CHIPProjectConfig.h" ]
+
+  public_configs =
+      [ "${chip_root}/third_party/infineon/psoc6:psoc6_sdk_config" ]
+
+  if (chip_enable_ota_requestor) {
+    public_configs += [ ":psoc6_ota_config" ]
+  }
+}
+
+psoc6_executable("lock_app") {
+  include_dirs = []
+  defines = []
+  output_name = "chip-psoc6-lock-example.out"
+
+  public_deps = [
+    ":lock_app_sdk_sources",
+    "${chip_root}/examples/common/QRCode",
+    "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  include_dirs += [
+    "include",
+    "${examples_plat_dir}",
+    "${psoc6_project_dir}/include",
+  ]
+
+  sources = [
+    "${examples_plat_dir}/LEDWidget.cpp",
+    "${examples_plat_dir}/init_psoc6Platform.cpp",
+    "${psoc6_project_dir}/include/CHIPProjectConfig.h",
+    "src/AppTask.cpp",
+    "src/ButtonHandler.cpp",
+    "src/LockManager.cpp",
+    "src/ZclCallbacks.cpp",
+    "src/main.cpp",
+  ]
+
+  output_dir = root_out_dir
+
+  if (chip_print_memory_usage) {
+    ldflags = [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+}
+
+group("psoc6") {
+  deps = [ ":lock_app" ]
+}
+
+group("default") {
+  deps = [ ":psoc6" ]
+}

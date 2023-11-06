@@ -45,6 +45,7 @@ public:
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
     CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
     CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
+    CHIP_ERROR GetLocationCapability(uint8_t & locationCapability) override;
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
@@ -75,6 +76,14 @@ private:
 
     static void DoFactoryReset(intptr_t arg);
 };
+
+/**
+ * Returns the platform-specific implementation of the ConfigurationManager object.
+ *
+ * Applications can use this to gain access to features of the ConfigurationManager
+ * that are specific to the selected platform.
+ */
+ConfigurationManager & ConfigurationMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

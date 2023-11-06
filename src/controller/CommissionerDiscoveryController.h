@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <app/OperationalDeviceProxy.h>
+#include <app/OperationalSessionSetup.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
@@ -39,7 +39,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
 using chip::NodeId;
-using chip::OperationalDeviceProxy;
+using chip::OperationalSessionSetup;
 using chip::Protocols::UserDirectedCommissioning::UDCClientState;
 using chip::Protocols::UserDirectedCommissioning::UserConfirmationProvider;
 using chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer;
@@ -133,10 +133,13 @@ public:
      *  @param[in]    vendorId           The vendorid from the DAC of the new node.
      *  @param[in]    productId          The productid from the DAC of the new node.
      *  @param[in]    nodeId             The node id for the newly commissioned node.
-     *  @param[in]    device             The device proxy for use in cluster communication.
+     *  @param[in]    exchangeMgr        The exchange manager to be used to get an exchange context.
+     *  @param[in]    sessionHandle      A reference to an established session.
      *
      */
-    virtual void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, OperationalDeviceProxy * device) = 0;
+    virtual void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId,
+                                        chip::Messaging::ExchangeManager & exchangeMgr,
+                                        const chip::SessionHandle & sessionHandle) = 0;
 
     virtual ~PostCommissioningListener() = default;
 };
@@ -210,10 +213,12 @@ public:
      *  @param[in]    vendorId           The vendorid from the DAC of the new node.
      *  @param[in]    productId          The productid from the DAC of the new node.
      *  @param[in]    nodeId             The node id for the newly commissioned node.
-     *  @param[in]    device             The device proxy for use in cluster communication.
+     *  @param[in]    exchangeMgr        The exchange manager to be used to get an exchange context.
+     *  @param[in]    sessionHandle      A reference to an established session.
      *
      */
-    void CommissioningSucceeded(uint16_t vendorId, uint16_t productId, NodeId nodeId, OperationalDeviceProxy * device);
+    void CommissioningSucceeded(uint16_t vendorId, uint16_t productId, NodeId nodeId,
+                                chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
 
     /**
      * This method should be called by the commissioner to indicate that commissioning failed.

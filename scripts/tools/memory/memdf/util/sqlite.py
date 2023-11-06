@@ -17,11 +17,9 @@
 """Wrapper and utility functions around sqlite3"""
 
 import sqlite3
-
 from typing import List, Optional
 
 import pandas as pd  # type: ignore
-
 from memdf import Config, ConfigDescription
 
 CONFIG: ConfigDescription = {

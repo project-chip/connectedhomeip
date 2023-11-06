@@ -31,6 +31,7 @@ using namespace chip;
 JNI_METHOD(void, OnPinCodeEntered)(JNIEnv *, jobject, jint jPinCode)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    chip::DeviceLayer::StackLock lock;
     uint32_t pinCode = (uint32_t) jPinCode;
     ChipLogProgress(Zcl, "OnPinCodeEntered %d", pinCode);
     GetCommissionerDiscoveryController()->CommissionWithPincode(pinCode);
@@ -40,6 +41,7 @@ JNI_METHOD(void, OnPinCodeEntered)(JNIEnv *, jobject, jint jPinCode)
 JNI_METHOD(void, OnPinCodeDeclined)(JNIEnv *, jobject)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    chip::DeviceLayer::StackLock lock;
     ChipLogProgress(Zcl, "OnPinCodeDeclined");
     GetCommissionerDiscoveryController()->Cancel();
 #endif
@@ -48,6 +50,7 @@ JNI_METHOD(void, OnPinCodeDeclined)(JNIEnv *, jobject)
 JNI_METHOD(void, OnPromptAccepted)(JNIEnv *, jobject)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    chip::DeviceLayer::StackLock lock;
     ChipLogProgress(Zcl, "OnPromptAccepted");
     GetCommissionerDiscoveryController()->Ok();
 #endif
@@ -56,6 +59,7 @@ JNI_METHOD(void, OnPromptAccepted)(JNIEnv *, jobject)
 JNI_METHOD(void, OnPromptDeclined)(JNIEnv *, jobject)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    chip::DeviceLayer::StackLock lock;
     ChipLogProgress(Zcl, "OnPromptDeclined");
     GetCommissionerDiscoveryController()->Cancel();
 #endif

@@ -1,0 +1,276 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 132.2.5. [TC-S-2.5] RemainingCapacity functionality with DUT as Server
+
+PICS:
+    - S.S
+    - S.S.F03
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Precondition"
+      verification: |
+          - Commission DUT to TH
+          - A given fabric SHALL NOT consume more than half (rounded down towards 0) of the Scene Table entries (as indicated in the SceneTableSize attribute).
+          - MaxRemainingCapacity is SceneTableSize/2.
+      disabled: true
+
+    - label:
+          "Step 0a: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT using a key that is pre-installed on the TH.
+          GroupKeySet fields are as follows: GroupKeySetID: 0x01a1
+          GroupKeySecurityPolicy: TrustFirst (0) EpochKey0:
+          d0d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime0: 2220000 EpochKey1:
+          d1d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime1: 2220001 EpochKey2:
+          d2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2: 2220002"
+      verification: |
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,
+          "groupKeySecurityPolicy": 0, "epochKey0":
+          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
+          "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
+          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
+
+          Verify the "status is success" on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
+
+          [1658316948.574526][4039:4044] CHIP:DMG:                                StatusIB =
+          [1658316948.574561][4039:4044] CHIP:DMG:                                {
+          [1658316948.574597][4039:4044] CHIP:DMG:                                   status = 0x00 (SUCCESS),
+          [1658316948.574632][4039:4044] CHIP:DMG:                                },
+      disabled: true
+
+    - label:
+          "Step 0b: TH binds GroupId 0x0001 with GroupKeySetID 0x01a1 in the
+          GroupKeyMap attribute list on GroupKeyManagement cluster by writing
+          the GroupKeyMap attribute with one entry as follows: List item 1:
+          FabricIndex: 1 GroupId: 0x0001 GroupKeySetId: 0x01a1"
+      verification: |
+          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 1, "groupKeySetID": 1, "fabricIndex": 1}]' 1 0
+
+          [1688019387.509419][1710:1712] CHIP:DMG:                         }
+          [1688019387.509461][1710:1712] CHIP:DMG:
+          [1688019387.509497][1710:1712] CHIP:DMG:                         StatusIB =
+          [1688019387.509534][1710:1712] CHIP:DMG:                         {
+          [1688019387.509572][1710:1712] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1688019387.509610][1710:1712] CHIP:DMG:                         },
+      disabled: true
+
+    - label: "Step 1: TH sends a RemoveAllGroups command to DUT."
+      PICS: G.S.C04.Rsp
+      verification: |
+          ./chip-tool groups remove-all-groups 1 1
+
+          [1688019423.251477][1716:1718] CHIP:DMG: 				},
+          [1688019423.251524][1716:1718] CHIP:DMG:
+          [1688019423.251561][1716:1718] CHIP:DMG: 				StatusIB =
+          [1688019423.251602][1716:1718] CHIP:DMG: 				{
+          [1688019423.251643][1716:1718] CHIP:DMG: 					status = 0x00 (SUCCESS),
+          [1688019423.251686][1716:1718] CHIP:DMG: 				},
+          [1688019423.251727][1716:1718] CHIP:DMG:
+      disabled: true
+
+    - label:
+          "Step 2: TH sends a AddGroup command to DUT with the GroupID field set
+          to G1."
+      PICS: G.S.C00.Rsp
+      verification: |
+          ./chip-tool groups add-group 0x0001 grp1 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0004 Command 0x0000_0000
+          CHIP:TOO:   AddGroupResponse: {
+          CHIP:TOO:     status: 0
+          CHIP:TOO:     groupID: 1
+          CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 3: TH sends a RemoveAllScenes command to DUT with the GroupID
+          field set to G1."
+      PICS: S.S.C03.Rsp
+      verification: |
+          ./chip-tool scenes remove-all-scenes 0x0001 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0003
+          CHIP:TOO:   RemoveAllScenesResponse: {
+          CHIP:TOO:     status: 1
+          CHIP:TOO:     groupID: 1
+          CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 4a: TH reads from the DUT the SceneTableSize attribute"
+      PICS: S.S.A0006
+      verification: |
+          ./chip-tool scenes read scene-table-size 1 1
+
+          [1688019474.695136][1726:1728] CHIP:DMG: }
+          [1688019474.695335][1726:1728] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0006 DataVersion: 1550229741
+          [1688019474.695397][1726:1728] CHIP:TOO:   SceneTableSize: 0
+      disabled: true
+
+    - label:
+          "Step 4b: TH sends a subscription request action for FabricSceneInfo
+          to the DUT."
+      PICS: S.S.A0007
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 4c: Keep subscription session active for the remainder of the
+          test"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 5a: TH sends a AddScene command to DUT with the GroupID field
+          set to G1, the SceneID field set to 0x01, the TransitionTime field set
+          to 0x0014 (20s) and no extension field sets."
+      PICS: S.S.C00.Rsp
+      verification: |
+          ./chip-tool scenes add-scene 0x0001 0x1 0x0014 scene1 [] 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
+          CHIP:TOO:   AddSceneResponse: {
+          CHIP:TOO:     status: 0
+          CHIP:TOO:     groupID: 1
+          CHIP:TOO:     sceneID: 1
+          CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 5b: Verify that the DUT sends a report data for
+          RemainingCapacity after the MinIntervalFloor time; store this value
+          into RemainingCapacity; verify RemainingCapacity equals
+          (MaxRemainingCapacity-1)."
+      PICS: S.S.A0007
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 6a: If RemainingCapacity is greater than 0, TH sends a
+          StoreScene command to DUT with the GroupID field set to 0x0001 and the
+          SceneID field set to 0x02. If RemainingCapacity is 0, continue to Step
+          8a."
+      PICS: S.S.C04.Rsp
+      verification: |
+          ./chip-tool scenes add-scene 0x0001 0x2 0x0014 scene2 [] 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
+          CHIP:TOO:   AddSceneResponse: {
+          CHIP:TOO:     status: 0
+          CHIP:TOO:     groupID: 1
+          CHIP:TOO:     sceneID: 2
+          CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 6b: Verify that the DUT sends a report data for
+          RemainingCapacity after the MinIntervalFloor time; store this value
+          into RemainingCapacity; verify RemainingCapacity equals
+          (MaxRemainingCapacity-2)."
+      PICS: S.S.A0007
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 7a: If RemainingCapacity is greater than 0, TH sends a AddScene
+          command to DUT with the GroupID field set to G1, the SceneID field set
+          to 0x03, the TransitionTime field set to 0x0014 (20s) and no extension
+          field sets. If RemainingCapacity is 0, continue to Step 8a."
+      PICS: S.S.C00.Rsp
+      verification: |
+          ./chip-tool scenes add-scene 0x0001 0x3 0x0014 scene3 [] 1 1
+      disabled: true
+
+    - label:
+          "Step 7b: Verify that the DUT sends a report data for
+          RemainingCapacity after the MinIntervalFloor time; store this value
+          into RemainingCapacity; verify RemainingCapacity equals
+          (MaxRemainingCapacity-3)."
+      PICS: S.S.A0007
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 8a: TH sends a RemoveScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0x01."
+      PICS: S.S.C02.Rsp
+      verification: |
+          ./chip-tool scenes remove-scene 0x0001 0x1 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0002
+          CHIP:TOO:   RemoveSceneResponse: {
+          CHIP:TOO:     status: 0
+          CHIP:TOO:     groupID: 1
+          CHIP:TOO:     sceneID: 1
+          CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 8b: Verify that the DUT sends a report data for
+          RemainingCapacity after the MinIntervalFloor time; store this value
+          into RemainingCapacity; verify RemainingCapacity equals
+          (MaxRemainingCapacity-2)."
+      PICS: S.S.A0007
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 9a: TH sends a RemoveAllScenes command to DUT with the GroupID
+          field set to G1."
+      PICS: S.S.C03.Rsp
+      verification: |
+          ./chip-tool scenes remove-all-scenes 0x0001 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0003
+          CHIP:TOO:   RemoveAllScenesResponse: {
+          CHIP:TOO:     status: 0
+          CHIP:TOO:     groupID: 1
+          CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 9b: Verify that the DUT sends a report data for
+          RemainingCapacity after the MinIntervalFloor time; store this value
+          into RemainingCapacity; verify RemainingCapacity equals
+          (MaxRemainingCapacity)."
+      PICS: S.S.A0007
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 10: TH removes the Group key set that was added by sending a
+          KeySetRemove command to the GroupKeyManagement cluster with the
+          GroupKeySetID field set to 0x01a1"
+      verification: |
+          ./chip-tool groupkeymanagement key-set-remove 1 1 0
+
+          [1688019719.867880][1746:1748] CHIP:DMG: 				},
+          [1688019719.867923][1746:1748] CHIP:DMG:
+          [1688019719.867956][1746:1748] CHIP:DMG: 				StatusIB =
+          [1688019719.867995][1746:1748] CHIP:DMG: 				{
+          [1688019719.868033][1746:1748] CHIP:DMG: 					status = 0x00 (SUCCESS),
+          [1688019719.868071][1746:1748] CHIP:DMG: 				},
+      disabled: true

@@ -48,14 +48,26 @@ public:
     /**
      * @brief
      *   This method is invoked when device attestation fails for a device that is being commissioned. The client
-     *   handling the failure has the option to continue commissionning or fail the operation.
+     *   handling the failure has the option to continue commissioning or fail the operation.
+     *
+     *   Optionally, when ShouldWaitAfterDeviceAttestation is overridden to return true, this method is also
+     *   invoked when device attestation succeeds.
      *
      *   @param deviceCommissioner The commissioner object that is commissioning the device
      *   @param device The proxy represent the device being commissioned
+     *   @param info The structure holding device info for additional verification by the application
      *   @param attestationResult The failure code for the device attestation validation operation
      */
-    virtual void OnDeviceAttestationFailed(Controller::DeviceCommissioner * deviceCommissioner, DeviceProxy * device,
-                                           AttestationVerificationResult attestationResult) = 0;
+    virtual void OnDeviceAttestationCompleted(Controller::DeviceCommissioner * deviceCommissioner, DeviceProxy * device,
+                                              const DeviceAttestationVerifier::AttestationDeviceInfo & info,
+                                              AttestationVerificationResult attestationResult) = 0;
+
+    /**
+     * @brief
+     *   Override this method to return whether the attestation delegate wants the commissioner to wait for a
+     *   ContinueCommissioningAfterDeviceAttestation call in the case attestationResult is successful.
+     */
+    virtual bool ShouldWaitAfterDeviceAttestation() { return false; }
 };
 
 } // namespace Credentials

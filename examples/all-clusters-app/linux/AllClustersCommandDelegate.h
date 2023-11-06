@@ -20,17 +20,20 @@
 
 #include "NamedPipeCommands.h"
 
+#include <json/json.h>
 #include <platform/DiagnosticDataProvider.h>
 
-class AllClustersCommandDelegate : public NamedPipeCommandDelegate
+class AllClustersAppCommandHandler
 {
 public:
-    void OnEventCommandReceived(const char * command) override;
+    static AllClustersAppCommandHandler * FromJSON(const char * json);
+
+    static void HandleCommand(intptr_t context);
+
+    AllClustersAppCommandHandler(Json::Value && jasonValue) : mJsonValue(std::move(jasonValue)) {}
 
 private:
-    std::string mCurrentCommand;
-
-    static void HandleEventCommand(intptr_t context);
+    Json::Value mJsonValue;
 
     bool IsClusterPresentOnAnyEndpoint(chip::ClusterId clusterId);
 
@@ -50,7 +53,55 @@ private:
     void OnSoftwareFaultEventHandler(uint32_t eventId);
 
     /**
-     * Should be called when a switch operation takes place on the Node.
+     * Should be called when the latching switch is moved to a new position.
      */
-    void OnSwitchEventHandler(uint32_t eventId);
+    void OnSwitchLatchedHandler(uint8_t newPosition);
+
+    /**
+     * Should be called when the momentary switch starts to be pressed.
+     */
+    void OnSwitchInitialPressedHandler(uint8_t newPosition);
+
+    /**
+     * Should be called when the momentary switch has been pressed for a "long" time.
+     */
+    void OnSwitchLongPressedHandler(uint8_t newPosition);
+
+    /**
+     * Should be called when the momentary switch has been released.
+     */
+    void OnSwitchShortReleasedHandler(uint8_t previousPosition);
+
+    /**
+     * Should be called when the momentary switch has been released after having been pressed for a long time.
+     */
+    void OnSwitchLongReleasedHandler(uint8_t previousPosition);
+
+    /**
+     * Should be called to indicate how many times the momentary switch has been pressed in a multi-press
+     * sequence, during that sequence.
+     */
+    void OnSwitchMultiPressOngoingHandler(uint8_t newPosition, uint8_t count);
+
+    /**
+     * Should be called to indicate how many times the momentary switch has been pressed in a multi-press
+     * sequence, after it has been detected that the sequence has ended.
+     */
+    void OnSwitchMultiPressCompleteHandler(uint8_t previousPosition, uint8_t count);
+
+    /**
+     * Should be called when it is necessary to change the mode to manual operation.
+     */
+    void OnModeChangeHandler(std::string device, std::string type, chip::app::DataModel::Nullable<uint8_t> mode);
+
+    /**
+     * Should be called when it is necessary to change the air quality attribute.
+     */
+    void OnAirQualityChange(uint32_t aEnum);
+};
+
+class AllClustersCommandDelegate : public NamedPipeCommandDelegate
+{
+public:
+    void OnEventCommandReceived(const char * json) override;
 };

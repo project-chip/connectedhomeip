@@ -14,27 +14,30 @@
 
 name: 24.2.2. [TC-LVL-2.2] Write cluster attributes (DUT as Server)
 
+PICS:
+    - LVL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Level Control"
     endpoint: 1
     OnOffTransitionTimeConfigValue:
-        type: INT16U
+        type: int16u
         defaultValue: 10
     OnLevelConfigValue:
-        type: INT8U
+        type: int8u
         defaultValue: 5
     OnTransitionTimeConfigValue:
-        type: INT16U
+        type: int16u
         defaultValue: 5
     OffTransitionTimeConfigValue:
-        type: INT16U
+        type: int16u
         defaultValue: 10
     DefaultMoveRateConfigValue:
-        type: INT8U
+        type: int8u
         defaultValue: 111
     StartUpCurrentLevelConfigValue:
-        type: INT8U
+        type: int8u
         defaultValue: 5
 
 tests:
@@ -46,177 +49,178 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads the OnOffTransitionTime attribute from the DUT"
+    - label: "Step 1a: Reads the OnOffTransitionTime attribute from the DUT"
       PICS: LVL.S.A0010
       command: "readAttribute"
-      attribute: "on off transition time"
+      attribute: "OnOffTransitionTime"
       response:
           saveAs: OnOffTransitionTimeValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
-    - label: "writes the OnOffTransitionTime attribute on the DUT"
+    - label: "Step 1b: writes the OnOffTransitionTime attribute on the DUT"
       PICS: LVL.S.A0010
       command: "writeAttribute"
-      attribute: "on off transition time"
+      attribute: "OnOffTransitionTime"
       arguments:
           value: OnOffTransitionTimeConfigValue
 
-    - label: "Reads the OnOffTransitionTime attribute from the DUT"
+    - label: "Step 1c: Reads the OnOffTransitionTime attribute from the DUT"
       PICS: LVL.S.A0010
       command: "readAttribute"
-      attribute: "on off transition time"
+      attribute: "OnOffTransitionTime"
       response:
           value: OnOffTransitionTimeConfigValue
           constraints:
-              type: uint16
+              type: int16u
               notValue: OnOffTransitionTimeValue
 
-    - label: "Reads the OnLevel attribute from the DUT"
+    - label: "Step 2a: Reads the OnLevel attribute from the DUT"
       PICS: LVL.S.A0011
       command: "readAttribute"
-      attribute: "on level"
+      attribute: "OnLevel"
       response:
           saveAs: OnLevelValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
-              maxValue: 255
+              maxValue: 254
 
-    - label: "writes the OnLevel attribute on the DUT"
+    - label: "Step 2b: writes the OnLevel attribute on the DUT"
       PICS: LVL.S.A0011
       command: "writeAttribute"
-      attribute: "on level"
+      attribute: "OnLevel"
       arguments:
           value: OnLevelConfigValue
 
-    - label: "Reads the OnLevel attribute from the DUT"
+    - label: "Step 2c: Reads the OnLevel attribute from the DUT"
       PICS: LVL.S.A0011
       command: "readAttribute"
-      attribute: "on level"
+      attribute: "OnLevel"
       response:
           value: OnLevelConfigValue
           constraints:
-              type: uint8
+              type: int8u
               notValue: OnLevelValue
 
-    - label: "Reads the OnTransitionTime attribute from the DUT"
+    - label: "Step 3a: Reads the OnTransitionTime attribute from the DUT"
       PICS: LVL.S.A0012
       command: "readAttribute"
-      attribute: "on transition time"
+      attribute: "OnTransitionTime"
       response:
           saveAs: OnTransitionTimeValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
-    - label: "Writes the OnTransitionTime attribute on the DUT"
+    - label: "Step 3b: Writes the OnTransitionTime attribute on the DUT"
       PICS: LVL.S.A0012
       command: "writeAttribute"
-      attribute: "on transition time"
+      attribute: "OnTransitionTime"
       arguments:
           value: OnTransitionTimeConfigValue
 
-    - label: "Reads the OnTransitionTime attribute from the DUT"
+    - label: "Step 3c: Reads the OnTransitionTime attribute from the DUT"
       PICS: LVL.S.A0012
       command: "readAttribute"
-      attribute: "on transition time"
+      attribute: "OnTransitionTime"
       response:
           value: OnTransitionTimeConfigValue
           constraints:
-              type: uint16
+              type: int16u
               notValue: OnTransitionTimeValue
 
-    - label: "Reads the OffTransitionTime attribute from the DUT"
+    - label: "Step 4a: Reads the OffTransitionTime attribute from the DUT"
       PICS: LVL.S.A0013
       command: "readAttribute"
-      attribute: "off transition time"
+      attribute: "OffTransitionTime"
       response:
           saveAs: OffTransitionTimeValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
-    - label: "Writes the OffTransitionTime attribute on the DUT"
+    - label: "Step 4b: Writes the OffTransitionTime attribute on the DUT"
       PICS: LVL.S.A0013
       command: "writeAttribute"
-      attribute: "off transition time"
+      attribute: "OffTransitionTime"
       arguments:
           value: OffTransitionTimeConfigValue
 
-    - label: "Reads the OffTransitionTime attribute from the DUT"
+    - label: "Step 4c: Reads the OffTransitionTime attribute from the DUT"
       PICS: LVL.S.A0013
       command: "readAttribute"
-      attribute: "off transition time"
+      attribute: "OffTransitionTime"
       response:
           value: OffTransitionTimeConfigValue
           constraints:
-              type: uint16
+              type: int16u
               notValue: OffTransitionTimeValue
 
-    - label: "Reads the DefaultMoveRate attribute from the DUT"
+    - label: "Step 5a: Reads the DefaultMoveRate attribute from the DUT"
       PICS: LVL.S.A0014
       command: "readAttribute"
-      attribute: "default move rate"
+      attribute: "DefaultMoveRate"
       response:
           saveAs: DefaultMoveRatevalue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
-    - label: "Writes the DefaultMoveRate attribute on the DUT"
+    - label: "Step 5b: Writes the DefaultMoveRate attribute on the DUT"
       PICS: LVL.S.A0014
       command: "writeAttribute"
-      attribute: "default move rate"
+      attribute: "DefaultMoveRate"
       arguments:
           value: DefaultMoveRateConfigValue
 
-    - label: "Reads the DefaultMoveRate attribute from the DUT"
+    - label: "Step 5c: Reads the DefaultMoveRate attribute from the DUT"
       PICS: LVL.S.A0014
       command: "readAttribute"
-      attribute: "default move rate"
+      attribute: "DefaultMoveRate"
       response:
           value: DefaultMoveRateConfigValue
           constraints:
-              type: uint8
+              type: int8u
               notValue: DefaultMoveRatevalue
 
-    - label: "Reads the StartUpCurrentLevel attribute from the DUT"
+    - label: "Step 6a: Reads the StartUpCurrentLevel attribute from the DUT"
       PICS: LVL.S.A4000
       command: "readAttribute"
-      attribute: "start up current level"
+      attribute: "StartUpCurrentLevel"
       response:
           saveAs: StartUpCurrentLevelValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 255
 
-    - label: "writes the StartUpCurrentLevel attribute on the DUT"
+    - label: "Step 6b: Rwrites the StartUpCurrentLevel attribute on the DUT"
       PICS: LVL.S.A4000
       command: "writeAttribute"
-      attribute: "start up current level"
+      attribute: "StartUpCurrentLevel"
       arguments:
           value: StartUpCurrentLevelConfigValue
 
-    - label: "reads the StartUpCurrentLevel attribute from the DUT"
+    - label: "Step 6c: Rreads the StartUpCurrentLevel attribute from the DUT"
       PICS: LVL.S.A4000
       command: "readAttribute"
-      attribute: "start up current level"
+      attribute: "StartUpCurrentLevel"
       response:
           value: StartUpCurrentLevelConfigValue
           constraints:
-              type: uint8
+              type: int8u
               notValue: StartUpCurrentLevelValue
 
+    #This is a reset step that is needed to reset the value of the attribute to the default values so as to not effect other test cases.
     - label: "writes back default value of OnOffTransitionTime attribute"
       PICS: LVL.S.A0010
       command: "writeAttribute"
-      attribute: "on off transition time"
+      attribute: "OnOffTransitionTime"
       arguments:
           value: 0

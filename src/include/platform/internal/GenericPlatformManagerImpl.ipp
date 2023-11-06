@@ -193,7 +193,7 @@ void GenericPlatformManagerImpl<ImplClass>::_RemoveEventHandler(PlatformManager:
 template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_HandleServerStarted()
 {
-    PlatformManagerDelegate * platformManagerDelegate       = PlatformMgr().GetDelegate();
+    PlatformManagerDelegate * platformManagerDelegate = PlatformMgr().GetDelegate();
 
     if (platformManagerDelegate != nullptr)
     {
@@ -216,26 +216,64 @@ void GenericPlatformManagerImpl<ImplClass>::_HandleServerShuttingDown()
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)
 {
-    ChipDeviceEvent event;
-    event.Type                    = DeviceEventType::kCallWorkFunct;
-    event.CallWorkFunct.WorkFunct = workFunct;
-    event.CallWorkFunct.Arg       = arg;
-
-    CHIP_ERROR status = Impl()->PostEvent(&event);
-    if (status != CHIP_NO_ERROR)
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCallWorkFunct };
+    event.CallWorkFunct = { .WorkFunct = workFunct, .Arg = arg };
+    CHIP_ERROR err      = Impl()->PostEvent(&event);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, status.Format());
+        ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, err.Format());
     }
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg)
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCallWorkFunct };
+    event.CallWorkFunct = { .WorkFunct = workFunct, .Arg = arg };
+    CHIP_ERROR err      = Impl()->PostBackgroundEvent(&event);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to schedule background work: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_PostBackgroundEvent(const ChipDeviceEvent * event)
+{
+    // Impl class must override to implement background event processing
+    return Impl()->PostEvent(event);
+}
+
+template <class ImplClass>
+void GenericPlatformManagerImpl<ImplClass>::_RunBackgroundEventLoop(void)
+{
+    // Impl class must override to implement background event processing
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_StartBackgroundEventLoopTask(void)
+{
+    // Impl class must override to implement background event processing
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_StopBackgroundEventLoopTask(void)
+{
+    // Impl class must override to implement background event processing
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent * event)
 {
-#if CHIP_PROGRESS_LOGGING
+#if (CHIP_DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS != 0)
     System::Clock::Timestamp start = System::SystemClock().GetMonotonicTimestamp();
-#endif // CHIP_PROGRESS_LOGGING
+#endif // CHIP_DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS != 0
 
     switch (event->Type)
     {
@@ -266,14 +304,13 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
         break;
     }
 
-    // TODO: make this configurable
-#if CHIP_PROGRESS_LOGGING
+#if (CHIP_DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS != 0)
     uint32_t deltaMs = System::Clock::Milliseconds32(System::SystemClock().GetMonotonicTimestamp() - start).count();
-    if (deltaMs > 100)
+    if (deltaMs > CHIP_DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS)
     {
         ChipLogError(DeviceLayer, "Long dispatch time: %" PRIu32 " ms, for event type %d", deltaMs, event->Type);
     }
-#endif // CHIP_PROGRESS_LOGGING
+#endif // CHIP_DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS != 0
 }
 
 template <class ImplClass>
@@ -293,9 +330,11 @@ template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::DispatchEventToApplication(const ChipDeviceEvent * event)
 {
     // Dispatch the event to each of the registered application event handlers.
-    for (AppEventHandler * eventHandler = mAppEventHandlerList; eventHandler != nullptr; eventHandler = eventHandler->Next)
+    for (AppEventHandler * eventHandler = mAppEventHandlerList; eventHandler != nullptr;)
     {
+        AppEventHandler * nextEventHandler = eventHandler->Next;
         eventHandler->Handler(event, eventHandler->Arg);
+        eventHandler = nextEventHandler;
     }
 }
 

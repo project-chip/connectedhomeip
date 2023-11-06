@@ -32,39 +32,27 @@ requirement.
 
 Usage examples:
 
-1. Compiles all targets
-
-    ```sh
-    ./scripts/build/build_examples.py --target all build
-    ```
-
-2. Compile the all clusters app for a ESP32 DevKitC
+1. Compile the all clusters app for a ESP32 DevKitC
 
     ```sh
     ./scripts/build/build_examples.py --target esp32-devkitc-all-clusters build
     ```
 
-3. Generate all the makefiles (but do not compile) using a specific output root
+2. Generate all the makefiles (but do not compile) using a specific output root
 
     ```sh
     ./scripts/build/build_examples.py --target linux-x64-chip-tool --out-prefix ./mydir gen
     ```
 
-4. Compile the qpg lock app and copy the output in a 'artifact' folder. Note the
+3. Compile the qpg lock app and copy the output in a 'artifact' folder. Note the
    argument order (artifact copying is an argument for the build command)
 
     ```sh
     ./scripts/build/build_examples.py --target qpg-lock build --copy-artifacts-to /tmp/artifacts
     ```
 
-5. Find out all possible targets for compiling the 'light' app:
+4. Find out possible target choices:
 
     ```sh
-    ./scripts/build/build_examples.py --target-glob '*light' --log-level fatal targets
-    ```
-
-6. Compile everything except linux or darwin:
-
-    ```sh
-    ./scripts/build/build_examples.py --skip-target-glob '{darwin,linux}-*' --log-level fatal build
+    ./scripts/build/build_examples.py--log-level fatal targets
     ```

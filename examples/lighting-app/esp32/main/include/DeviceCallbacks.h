@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- * @file DeviceCallbacks.h
- *
- * Implementations for the DeviceManager callbacks for this application
- *
- **/
-
 #pragma once
 
 #include <app/util/af-types.h>
@@ -43,4 +35,11 @@ private:
 #if CONFIG_LED_TYPE_RMT
     void OnColorControlAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
 #endif
+};
+
+class AppDeviceCallbacksDelegate : public DeviceCallbacksDelegate
+{
+public:
+    void OnIPv4ConnectivityEstablished() override;
+    void OnIPv4ConnectivityLost() override;
 };

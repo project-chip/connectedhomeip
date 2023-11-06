@@ -93,8 +93,11 @@ void TestToString(nlTestSuite * inSuite, void * inContext)
     {
         IPAddress::FromString("1223::3456:789a", ip);
         PeerAddress::UDP(ip, 8080).ToString(buff);
+        // IPV6 does not specify case
+        int res1 = strcmp(buff, "UDP:[1223::3456:789a]:8080");
+        int res2 = strcmp(buff, "UDP:[1223::3456:789A]:8080");
 
-        NL_TEST_ASSERT(inSuite, !strcmp(buff, "UDP:[1223::3456:789a]:8080"));
+        NL_TEST_ASSERT(inSuite, (!res1 || !res2));
     }
 
     {
@@ -121,7 +124,7 @@ const nlTest sTests[] =
 
 } // namespace
 
-int TestPeerAddress(void)
+int TestPeerAddress()
 {
     // clang-format off
     nlTestSuite theSuite =

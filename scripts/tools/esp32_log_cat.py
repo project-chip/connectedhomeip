@@ -27,8 +27,9 @@
 #
 
 import argparse
-import coloredlogs
 import logging
+
+import coloredlogs
 import serial
 
 

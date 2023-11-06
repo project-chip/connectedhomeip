@@ -21,9 +21,9 @@
 #include "app/util/attribute-storage.h"
 #include "lighting_service/lighting_service.rpc.pb.h"
 #include "pigweed/rpc_services/internal/StatusUtils.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {
@@ -41,14 +41,12 @@ public:
         DeviceLayer::StackLock lock;
 
         uint8_t on = request.on;
-        RETURN_STATUS_IF_NOT_OK(
-            emberAfWriteServerAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &on, ZCL_BOOLEAN_ATTRIBUTE_ID));
+        RETURN_STATUS_IF_NOT_OK(app::Clusters::OnOff::Attributes::OnOff::Set(1, on));
         if (mSupportLevel && request.has_level)
         {
             // Clip level to max
             uint8_t level = std::min(request.level, static_cast<uint32_t>(std::numeric_limits<uint8_t>::max()));
-            RETURN_STATUS_IF_NOT_OK(emberAfWriteServerAttribute(kEndpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID,
-                                                                ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, &level, ZCL_INT8U_ATTRIBUTE_TYPE));
+            RETURN_STATUS_IF_NOT_OK(app::Clusters::LevelControl::Attributes::CurrentLevel::Set(kEndpoint, level));
         }
 
         if (mSupportColor && request.has_color)
@@ -57,11 +55,8 @@ public:
             // Clip color to max
             uint8_t hue        = std::min(request.color.hue, kColorMax);
             uint8_t saturation = std::min(request.color.saturation, kColorMax);
-            RETURN_STATUS_IF_NOT_OK(emberAfWriteServerAttribute(
-                1, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, &hue, ZCL_INT8U_ATTRIBUTE_TYPE));
-            RETURN_STATUS_IF_NOT_OK(emberAfWriteServerAttribute(kEndpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                                                                ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID, &saturation,
-                                                                ZCL_INT8U_ATTRIBUTE_TYPE));
+            RETURN_STATUS_IF_NOT_OK(app::Clusters::ColorControl::Attributes::CurrentHue::Set(1, hue));
+            RETURN_STATUS_IF_NOT_OK(app::Clusters::ColorControl::Attributes::CurrentSaturation::Set(kEndpoint, saturation));
         }
         return pw::OkStatus();
     }
@@ -70,28 +65,27 @@ public:
     {
         DeviceLayer::StackLock lock;
 
-        uint8_t on;
-        uint8_t level;
+        bool on;
+        app::DataModel::Nullable<uint8_t> level;
         uint8_t hue;
         uint8_t saturation;
-        RETURN_STATUS_IF_NOT_OK(emberAfReadServerAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &on, sizeof(on)));
+        RETURN_STATUS_IF_NOT_OK(app::Clusters::OnOff::Attributes::OnOff::Get(1, &on));
         response.on = on;
 
         if (mSupportLevel)
         {
-            RETURN_STATUS_IF_NOT_OK(
-                emberAfReadServerAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, &level, sizeof(level)));
-            response.level     = level;
-            response.has_level = true;
+            RETURN_STATUS_IF_NOT_OK(app::Clusters::LevelControl::Attributes::CurrentLevel::Get(1, level));
+            if (!level.IsNull())
+            {
+                response.level     = level.Value();
+                response.has_level = true;
+            }
         }
 
         if (mSupportColor)
         {
-            RETURN_STATUS_IF_NOT_OK(emberAfReadServerAttribute(kEndpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                                                               ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, &hue, sizeof(hue)));
-            RETURN_STATUS_IF_NOT_OK(emberAfReadServerAttribute(kEndpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                                                               ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID, &saturation,
-                                                               sizeof(saturation)));
+            RETURN_STATUS_IF_NOT_OK(app::Clusters::ColorControl::Attributes::CurrentHue::Get(kEndpoint, &hue));
+            RETURN_STATUS_IF_NOT_OK(app::Clusters::ColorControl::Attributes::CurrentSaturation::Get(kEndpoint, &saturation));
             response.color.hue        = hue;
             response.color.saturation = saturation;
             response.has_color        = true;

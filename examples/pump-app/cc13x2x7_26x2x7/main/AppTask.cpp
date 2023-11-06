@@ -26,19 +26,19 @@
 #include <app/server/Server.h>
 
 #include "FreeRTOS.h"
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-
 #include <app/EventLogging.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <examples/platform/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
+#include <platform/cc13xx_26xx/OTAImageProcessorImpl.h>
 #endif
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/identify-server/identify-server.h>
@@ -81,7 +81,7 @@ AppTask AppTask::sAppTask;
 
 static DeviceCallbacks sDeviceCallbacks;
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 static DefaultOTARequestor sRequestorCore;
 static DefaultOTARequestorStorage sRequestorStorage;
 static DefaultOTARequestorDriver sRequestorUser;
@@ -105,7 +105,7 @@ static const chip::EndpointId sIdentifyEndpointId = 0;
 static const uint32_t sIdentifyBlinkRateMs        = 500;
 
 ::Identify stIdentify = { sIdentifyEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
-                          EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, AppTask::TriggerIdentifyEffectHandler };
+                          Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, AppTask::TriggerIdentifyEffectHandler };
 
 int AppTask::StartAppTask()
 {
@@ -115,7 +115,7 @@ int AppTask::StartAppTask()
     if (sAppEventQueue == NULL)
     {
         PLAT_LOG("Failed to allocate app event queue");
-        while (1)
+        while (true)
             ;
     }
 
@@ -124,7 +124,7 @@ int AppTask::StartAppTask()
         pdPASS)
     {
         PLAT_LOG("Failed to create app task");
-        while (1)
+        while (true)
             ;
     }
     return ret;
@@ -135,7 +135,7 @@ int AppTask::Init()
     LED_Params ledParams;
     Button_Params buttonParams;
 
-    cc13x2_26x2LogInit();
+    cc13xx_26xxLogInit();
 
     // Init Chip memory management before the stack
     Platform::MemoryInit();
@@ -144,7 +144,7 @@ int AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("PlatformMgr().InitChipStack() failed");
-        while (1)
+        while (true)
             ;
     }
 
@@ -152,21 +152,22 @@ int AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ThreadStackMgr().InitThreadStack() failed");
-        while (1)
+        while (true)
             ;
     }
 
-#ifdef CONFIG_OPENTHREAD_MTD_SED
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#elif CONFIG_OPENTHREAD_MTD
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-#else
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+#elif CONFIG_OPENTHREAD_MTD_SED
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+#else
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #endif
+
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
-        while (1)
+        while (true)
             ;
     }
 
@@ -174,7 +175,7 @@ int AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ThreadStackMgr().StartThreadTask() failed");
-        while (1)
+        while (true)
             ;
     }
 
@@ -222,11 +223,15 @@ int AppTask::Init()
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
+#ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(CC13X2_26X2::GetCC13X2_26X2DacProvider());
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
 
     ConfigurationMgr().LogDeviceConfig();
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     InitializeOTARequestor();
 #endif
 
@@ -238,7 +243,7 @@ int AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("CHIPDeviceManager::Init() failed: %s", ErrorStr(ret));
-        while (1)
+        while (true)
             ;
     }
 
@@ -251,7 +256,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     sAppTask.Init();
 
-    while (1)
+    while (true)
     {
         /* Task pend until we have stuff to do */
         if (xQueueReceive(sAppEventQueue, &event, portMAX_DELAY) == pdTRUE)
@@ -469,7 +474,7 @@ void AppTask::UpdateClusterState(void)
 void AppTask::UpdateCluster(intptr_t context)
 {
     EmberStatus status;
-    BitMask<PumpConfigurationAndControl::PumpStatus> pumpStatus;
+    BitMask<PumpConfigurationAndControl::PumpStatusBitmap> pumpStatus;
 
     ChipLogProgress(NotSpecified, "Update Cluster State");
 
@@ -477,34 +482,34 @@ void AppTask::UpdateCluster(intptr_t context)
     PumpConfigurationAndControl::Attributes::PumpStatus::Get(PCC_CLUSTER_ENDPOINT, &pumpStatus);
     if (PumpMgr().IsStopped())
     {
-        pumpStatus.Clear(PumpConfigurationAndControl::PumpStatus::kRunning);
+        pumpStatus.Clear(PumpConfigurationAndControl::PumpStatusBitmap::kRunning);
     }
     else
     {
-        pumpStatus.Set(PumpConfigurationAndControl::PumpStatus::kRunning);
+        pumpStatus.Set(PumpConfigurationAndControl::PumpStatusBitmap::kRunning);
     }
     PumpConfigurationAndControl::Attributes::PumpStatus::Set(PCC_CLUSTER_ENDPOINT, pumpStatus);
 
     status = PumpConfigurationAndControl::Attributes::ControlMode::Set(PCC_CLUSTER_ENDPOINT,
-                                                                       PumpConfigurationAndControl::PumpControlMode::kConstantFlow);
+                                                                       PumpConfigurationAndControl::ControlModeEnum::kConstantFlow);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Constant Flow error  %x", status);
     }
     status = PumpConfigurationAndControl::Attributes::ControlMode::Set(
-        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantPressure);
+        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::ControlModeEnum::kConstantPressure);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Constant Pressure error  %x", status);
     }
     status = PumpConfigurationAndControl::Attributes::ControlMode::Set(
-        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantSpeed);
+        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::ControlModeEnum::kConstantSpeed);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Constant Speed error  %x", status);
     }
     status = PumpConfigurationAndControl::Attributes::ControlMode::Set(
-        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantTemperature);
+        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::ControlModeEnum::kConstantTemperature);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Constant Temperature error  %x", status);
@@ -645,23 +650,23 @@ void AppTask::TriggerIdentifyEffectHandler(::Identify * identify)
 {
     switch (identify->mCurrentEffectIdentifier)
     {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
         PLAT_LOG("Starting blink identifier effect");
         IdentifyStartHandler(identify);
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
         PLAT_LOG("Breathe identifier effect not implemented");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
         PLAT_LOG("Okay identifier effect not implemented");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
         PLAT_LOG("Channel Change identifier effect not implemented");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
+    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
         PLAT_LOG("Finish identifier effect not implemented");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
+    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
         PLAT_LOG("Stop identifier effect");
         IdentifyStopHandler(identify);
         break;

@@ -28,8 +28,8 @@
 #include <vector>
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLVData.hpp>
-#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/core/TLVData.h>
+#include <lib/core/TLVUtilities.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/Protocols.h>

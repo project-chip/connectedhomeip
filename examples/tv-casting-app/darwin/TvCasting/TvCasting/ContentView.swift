@@ -20,7 +20,10 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         NavigationView {
-            CommissionerDiscoveryView()
+            if ProcessInfo.processInfo.environment["CHIP_CASTING_SIMPLIFIED"] == "0"
+            {
+                StartFromCacheView()
+            }
         }
     }
 }

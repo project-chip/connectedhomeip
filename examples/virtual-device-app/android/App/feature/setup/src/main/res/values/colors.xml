@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="edit_text_line_tint_color">@color/textColor</color>
+    <color name="setup_notification_background_tint">#D5E3FF</color>
+    <color name="setup_notification_icon_tint">#0C548D</color>
+</resources>

@@ -7,9 +7,8 @@ void registerClusterOtaSoftwareUpdateProviderInteractive(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<OTASoftwareUpdateSetFilePath>(), //
-        make_unique<OTASoftwareUpdateSetStatus>(),   //
-
+        make_unique<OTASoftwareUpdateSetParams>(),   //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Command for configuring darwin-framework-tool as an OTA provider.");
 }

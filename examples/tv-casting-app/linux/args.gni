@@ -29,3 +29,7 @@ chip_build_libshell = true
 chip_enable_additional_data_advertising = true
 
 chip_enable_rotating_device_id = true
+
+chip_max_discovered_ip_addresses = 20
+
+matter_enable_tracing_support = true

@@ -11,36 +11,81 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.3. [TC-DGGEN-2.3] Command received at server as DUT
+name: 88.2.3. [TC-DGGEN-2.3] Command Received [DUT as Server]
+
+PICS:
+    - DGGEN.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "General Diagnostics"
     endpoint: 0
 
+    PIXIT.DGGEN.ENABLEKEY:
+        type: octet_string
+        defaultValue: "hex:00112233445566778899aabbccddeeff"
+
 tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label:
-          "Provision TH with EnableKey with 128 bit value provided and matched a
-          value chosen by the manufacturer and configured on the DUT using
-          manufacturer-specific means. EventTrigger value is configured and
-          SHALL indicate the test or test mode which TH wants to trigger the
-          testing use by manufacturers."
+          "Step 2: TH reads TestEventTriggersEnabled attribute from General
+          Diagnostics Cluster"
+      command: "readAttribute"
+      attribute: "TestEventTriggersEnabled"
+      response:
+          saveAs: TestEventTriggersEnabledvalue
+          constraints:
+              type: boolean
+
+    - label:
+          "If this value is set to True, then proceed with step 3, otherwise
+          skip step 3."
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: true
+              - name: "Value2"
+                value: TestEventTriggersEnabledvalue
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
+
+    - label:
+          "Step 3: Invoke the TestEventTrigger command with EnableKey field set
+          to PIXIT.DGGEN.ENABLEKEY and EventTrigger field set to 0."
+      runIf: IsExpectedValue
       PICS: DGGEN.S.C00.Rsp
-      verification: |
-          1. Read if TestEventTriggersEnabled attribute is set to true using ./chip-tool generaldiagnostics read test-event-triggers-enabled  1 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: PIXIT.DGGEN.ENABLEKEY
+              - name: "EventTrigger"
+                value: 0
+      response:
+          error: INVALID_COMMAND
 
-
-           ./chip-tool generaldiagnostics read   test-event-triggers-enabled  1 0
-
-          Verify in TH log
-
-          [1655188892.957794][2868:2873] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0008 DataVersion: 3562689442
-          [1655188892.957869][2868:2873] CHIP:TOO:   TestEventTriggersEnabled: FALSE
-          [1655188892.957999][2868:2873] CHIP:EM: Sending Standalone Ack for MessageCounter:133140817 on exchange 23176i
-
-          2. when this attribute is false, do not need to verify rest of the below commands.
-          3. When this attribute is true, the Node has been configured with one or more test event triggers by virtue of the internally programmed EnableKey value by the product vendor
-          4. Use the manufacturer-provided EnableKey value and the EventTrigger value and send command using './chip-tool generaldiagnostics test-event-trigger <EnableKey> <EventTrigger destination-id> ' 1 0 and verify if the DUT generated the desired event.
-      disabled: true
+    - label:
+          "Invoke the TestEventTrigger command with EnableKey field set to
+          PIXIT.DGGEN.ENABLEKEY and EventTrigger field set to 0."
+      PICS: DGGEN.S.C00.Rsp
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: "hex:0000000000000000"
+              - name: "EventTrigger"
+                value: 0
+      response:
+          error: CONSTRAINT_ERROR

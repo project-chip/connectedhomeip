@@ -104,7 +104,6 @@ private:
 
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
-    Optional<Status> mScanStatus;
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 

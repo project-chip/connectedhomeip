@@ -1,0 +1,8 @@
+{
+    "TestExample": [
+        "examples/Test_Example_1",
+        "examples/Test_Example_2",
+        "examples/Test_Example_3"
+    ],
+    "collection": ["TestExample"]
+}

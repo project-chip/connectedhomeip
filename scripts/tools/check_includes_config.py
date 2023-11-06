@@ -18,7 +18,6 @@
 
 from typing import Dict, Set
 
-
 # IGNORE lists source files that are not checked at all.
 #
 # Each entry is a string giving a Python regular expression,
@@ -39,17 +38,20 @@ IGNORE: Set[str] = {
     '/darwin/',
     '/platform/Ameba/',
     '/platform/android/',
-    '/platform/CYW30739/',
+    '/platform/Beken/',
+    '/platform/Infineon/CYW30739/',
     '/platform/Darwin/',
-    '/platform/EFR32/',
+    '/platform/silabs/',
     '/platform/ESP32/',
     '/platform/fake/',
     '/platform/Linux/',
     '/platform/nxp/',
     '/platform/Tizen/',
-    '/platform/P6/',
+    '/platform/Infineon/PSOC6/',
     '/platform/bouffalolab/BL602',
     '/platform/webos/',
+    '/platform/mt793x/',
+    '/platform/ASR/',
     r'POSIX\.h$',
 }
 
@@ -147,7 +149,19 @@ ALLOW: Dict[str, Set[str]] = {
     # Uses platform-define to switch between list and array
     'src/lib/dnssd/minimal_mdns/ResponseSender.h': {'list'},
 
-    # Not really for embedded consumers; uses std::queue to keep track
+    # Not really for embedded consumers; uses std::deque to keep track
     # of a list of discovered things.
-    'src/controller/SetUpCodePairer.h': {'queue'},
+    'src/controller/SetUpCodePairer.h': {'deque'},
+
+    'src/controller/ExamplePersistentStorage.cpp': {'fstream'},
+
+    # Library meant for non-embedded
+    'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
+    'src/tracing/json/json_tracing.h': {'fstream'},
+
+    # Not intended for embedded clients
+    'src/lib/support/jsontlv/JsonToTlv.cpp': {'sstream'},
+    'src/lib/support/jsontlv/JsonToTlv.h': {'string'},
+    'src/lib/support/jsontlv/TlvToJson.h': {'string'},
+    'src/lib/support/jsontlv/TextFormat.h': {'string'}
 }

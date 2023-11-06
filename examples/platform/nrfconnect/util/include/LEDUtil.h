@@ -21,13 +21,13 @@
 
 // A lightweight wrapper for unused LEDs
 template <uint8_t size>
-class UnusedLedsWrapper
+class FactoryResetLEDsWrapper
 {
 public:
     using Gpio = uint32_t;
     using Leds = std::array<std::pair<Gpio, LEDWidget>, size>;
 
-    explicit UnusedLedsWrapper(std::array<Gpio, size> aLeds)
+    explicit FactoryResetLEDsWrapper(std::array<Gpio, size> aLeds)
     {
         auto idx{ 0 };
         for (const auto & led : aLeds)

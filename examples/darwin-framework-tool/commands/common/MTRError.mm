@@ -25,24 +25,7 @@
 #import <inet/InetError.h>
 #import <lib/support/TypeTraits.h>
 
-// Stolen for now from the framework, need to export this properly.
-@interface MTRErrorHolder : NSObject
-@property (nonatomic, readonly) CHIP_ERROR error;
-@end
-
-@implementation MTRErrorHolder
-
-- (instancetype)initWithError:(CHIP_ERROR)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    _error = error;
-    return self;
-}
-
-@end
+#import <objc/runtime.h>
 
 CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
 {
@@ -62,10 +45,16 @@ CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
         return CHIP_ERROR_INTERNAL;
     }
 
-    if (error.userInfo != nil) {
-        id underlyingError = error.userInfo[@"underlyingError"];
-        if (underlyingError != nil && [underlyingError isKindOfClass:[MTRErrorHolder class]]) {
-            return ((MTRErrorHolder *) underlyingError).error;
+    {
+        void * key = (__bridge void *) NSClassFromString(@"MTRErrorHolder");
+        id underlyingError = objc_getAssociatedObject(error, key);
+        if (underlyingError != nil) {
+            NSValue * chipErrorValue = [underlyingError valueForKey:@"error"];
+            if (chipErrorValue != nil) {
+                CHIP_ERROR chipError;
+                [chipErrorValue getValue:&chipError];
+                return chipError;
+            }
         }
     }
 
@@ -98,6 +87,7 @@ CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
             break;
         }
         // Weird error we did not create.  Fall through.
+        FALLTHROUGH;
     default:
         code = CHIP_ERROR_INTERNAL.AsInteger();
         break;

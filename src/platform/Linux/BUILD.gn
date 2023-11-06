@@ -41,10 +41,8 @@ static_library("Linux") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
+    "../GLibTypeDeleter.h",
     "../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.cpp",
-    "BLEManagerImpl.h",
-    "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPLinuxStorage.cpp",
@@ -60,14 +58,11 @@ static_library("Linux") {
     "ConnectivityUtils.h",
     "DeviceInstanceInfoProviderImpl.cpp",
     "DeviceInstanceInfoProviderImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningEthernetDriver.cpp",
     "PlatformManagerImpl.cpp",
@@ -78,25 +73,33 @@ static_library("Linux") {
     "SystemTimeSupport.cpp",
   ]
 
+  deps = [ "${chip_root}/src/setup_payload" ]
+
+  if (!chip_use_external_logging) {
+    sources += [ "Logging.cpp" ]
+    deps += [ "${chip_root}/src/platform/logging:headers" ]
+  }
+
   if (chip_enable_openthread) {
     sources += [ "NetworkCommissioningThreadDriver.cpp" ]
   }
 
   if (chip_enable_ble) {
     sources += [
+      "BLEManagerImpl.cpp",
+      "BLEManagerImpl.h",
+      "BlePlatformConfig.h",
       "bluez/AdapterIterator.cpp",
       "bluez/AdapterIterator.h",
+      "bluez/BluezConnection.cpp",
+      "bluez/BluezConnection.h",
+      "bluez/BluezEndpoint.cpp",
+      "bluez/BluezEndpoint.h",
       "bluez/ChipDeviceScanner.cpp",
       "bluez/ChipDeviceScanner.h",
-      "bluez/Helper.cpp",
-      "bluez/Helper.h",
-      "bluez/MainLoop.cpp",
-      "bluez/MainLoop.h",
       "bluez/Types.h",
     ]
   }
-
-  deps = [ "${chip_root}/src/setup_payload" ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
@@ -126,7 +129,6 @@ static_library("Linux") {
 
   if (chip_enable_openthread) {
     sources += [
-      "GlibTypeDeleter.h",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
@@ -139,10 +141,7 @@ static_library("Linux") {
   }
 
   if (chip_enable_wifi) {
-    sources += [
-      "GlibTypeDeleter.h",
-      "NetworkCommissioningWiFiDriver.cpp",
-    ]
+    sources += [ "NetworkCommissioningWiFiDriver.cpp" ]
 
     public_deps += [ "dbus/wpa" ]
   }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,19 +21,21 @@
 #include "app/ConcreteAttributePath.h"
 #include "protocols/interaction_model/Constants.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/BufferedReadCallback.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/EventLogging.h>
+#include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPCounter.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -43,6 +45,7 @@
 #include <nlunit-test.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
@@ -126,7 +129,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE(0x
     DECLARE_DYNAMIC_ATTRIBUTE(0x00000005, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
@@ -134,7 +137,7 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint4)
 DECLARE_DYNAMIC_ATTRIBUTE(kTestListLargeAttribute, ARRAY, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint4Clusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint4, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrsOnEndpoint4, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint4, testEndpoint4Clusters);
 
@@ -156,8 +159,6 @@ public:
     void OnReportEnd() override { mOnReportEnd = true; }
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablished = true; }
-
-    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override {}
 
     uint32_t mAttributeCount        = 0;
     uint32_t mEventCount            = 0;
@@ -197,6 +198,12 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, arraySize == 0);
     }
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+    else if (aPath.mAttributeId == Globals::Attributes::EventList::Id)
+    {
+        // Nothing to check for this one; depends on the endpoint.
+    }
+#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     else if (aPath.mAttributeId == Globals::Attributes::AttributeList::Id)
     {
         // Nothing to check for this one; depends on the endpoint.
@@ -231,7 +238,7 @@ class TestAttrAccess : public app::AttributeAccessInterface
 {
 public:
     // Register for the Test Cluster cluster on all endpoints.
-    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TestCluster::Id)
+    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
     {
         registerAttributeAccessOverride(this);
     }
@@ -272,7 +279,7 @@ void GenerateEvents(nlTestSuite * apSuite, chip::EventNumber & firstEventNumber,
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TestCluster::Events::TestEvent::Type content;
+    Clusters::UnitTesting::Events::TestEvent::Type content;
     content.arg1 = static_cast<uint8_t>(gIterationCount);
 
     for (int i = 0; i < 5; i++)
@@ -311,7 +318,7 @@ void TestReadEvents::TestEventChunking(nlTestSuite * apSuite, void * apContext)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
@@ -324,7 +331,7 @@ void TestReadEvents::TestEventChunking(nlTestSuite * apSuite, void * apContext)
 
     app::EventPathParams eventPath;
     eventPath.mEndpointId = kTestEndpointId;
-    eventPath.mClusterId  = app::Clusters::TestCluster::Id;
+    eventPath.mClusterId  = app::Clusters::UnitTesting::Id;
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpEventPathParamsList    = &eventPath;
@@ -378,7 +385,7 @@ void TestReadEvents::TestMixedEventsAndAttributesChunking(nlTestSuite * apSuite,
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
@@ -391,9 +398,9 @@ void TestReadEvents::TestMixedEventsAndAttributesChunking(nlTestSuite * apSuite,
     GenerateEvents(apSuite, firstEventNumber, lastEventNumber);
 
     app::EventPathParams eventPath;
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id);
     eventPath.mEndpointId = kTestEndpointId;
-    eventPath.mClusterId  = app::Clusters::TestCluster::Id;
+    eventPath.mClusterId  = app::Clusters::UnitTesting::Id;
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpAttributePathParamsList    = &attributePath;
@@ -425,12 +432,10 @@ void TestReadEvents::TestMixedEventsAndAttributesChunking(nlTestSuite * apSuite,
         ctx.DrainAndServiceIO();
 
         //
-        // Always returns the same number of attributes read (5 + revision +
-        // AttributeList + ClientGeneratedCommandList +
-        // ServerGeneratedCommandList = 9).
+        // Always returns the same number of attributes read (5 + revision + GlobalAttributesNotInMetadata).
         //
         NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 9);
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 6 + ArraySize(GlobalAttributesNotInMetadata));
         NL_TEST_ASSERT(apSuite, readCallback.mEventCount == static_cast<uint32_t>(lastEventNumber - firstEventNumber + 1));
 
         NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -457,7 +462,7 @@ void TestReadEvents::TestMixedEventsAndLargeAttributesChunking(nlTestSuite * apS
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
@@ -470,9 +475,9 @@ void TestReadEvents::TestMixedEventsAndLargeAttributesChunking(nlTestSuite * apS
     GenerateEvents(apSuite, firstEventNumber, lastEventNumber);
 
     app::EventPathParams eventPath;
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListLargeAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListLargeAttribute);
     eventPath.mEndpointId = kTestEndpointId;
-    eventPath.mClusterId  = app::Clusters::TestCluster::Id;
+    eventPath.mClusterId  = app::Clusters::UnitTesting::Id;
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpAttributePathParamsList    = &attributePath;
@@ -544,10 +549,10 @@ nlTestSuite sSuite =
 
 } // namespace
 
-int TestReadChunkingTests()
+int TestEventChunkingTests()
 {
     gSuite = &sSuite;
     return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestReadChunkingTests)
+CHIP_REGISTER_TEST_SUITE(TestEventChunkingTests)

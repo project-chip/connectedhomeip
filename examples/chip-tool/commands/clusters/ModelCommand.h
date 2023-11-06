@@ -19,7 +19,7 @@
 #pragma once
 
 #ifdef CONFIG_USE_LOCAL_STORAGE
-#include "../../config/PersistentStorage.h"
+#include <controller/ExamplePersistentStorage.h>
 #endif // CONFIG_USE_LOCAL_STORAGE
 
 #include "../common/CHIPCommand.h"
@@ -33,28 +33,31 @@ public:
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this), mSupportsMultipleEndpoints(supportsMultipleEndpoints)
     {}
 
-    void AddArguments()
+    void AddArguments(bool skipEndpoints = false)
     {
         AddArgument(
             "destination-id", 0, UINT64_MAX, &mDestinationId,
             "64-bit node or group identifier.\n  Group identifiers are detected by being in the 0xFFFF'FFFF'FFFF'xxxx range.");
-        if (mSupportsMultipleEndpoints)
+        if (skipEndpoints == false)
         {
-            AddArgument("endpoint-ids", 0, UINT16_MAX, &mEndPointId,
-                        "Comma-separated list of endpoint ids (e.g. \"1\" or \"1,2,3\").\n  Allowed to be 0xFFFF to indicate a "
-                        "wildcard endpoint.");
-        }
-        else
-        {
-            AddArgument("endpoint-id-ignored-for-group-commands", 0, UINT16_MAX, &mEndPointId,
-                        "Endpoint the command is targeted at.");
+            if (mSupportsMultipleEndpoints)
+            {
+                AddArgument("endpoint-ids", 0, UINT16_MAX, &mEndPointId,
+                            "Comma-separated list of endpoint ids (e.g. \"1\" or \"1,2,3\").\n  Allowed to be 0xFFFF to indicate a "
+                            "wildcard endpoint.");
+            }
+            else
+            {
+                AddArgument("endpoint-id-ignored-for-group-commands", 0, UINT16_MAX, &mEndPointId,
+                            "Endpoint the command is targeted at.");
+            }
         }
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(10)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(20)); }
 
     virtual CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endPointIds) = 0;
 
@@ -69,8 +72,9 @@ private:
     chip::NodeId mDestinationId;
     std::vector<chip::EndpointId> mEndPointId;
 
-    static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
-    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                    const chip::SessionHandle & sessionHandle);
+    static void OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;

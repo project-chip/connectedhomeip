@@ -14,137 +14,172 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.1.14. [TC-CADMIN-1.14] Open commissioning window twice on DUT using BCM
+    4.1.14. [TC-CADMIN-1.14] Open commissioning window twice on DUT using BCM
     then ECM [DUT - Commissioner]
+
+PICS:
+    - CADMIN.C
+    - CADMIN.C.C01.Tx
+    - CADMIN.C.C00.Tx
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
-    - label: "DUT_CR1 starts a commissioning process with TH_CE"
+    - label: "Note"
+      verification: |
+          For DUT as comissioner  test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          Reset Devices to factory defaults
+      disabled: true
+
+    - label: "Step 1: DUT_CR1 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
-          "1. Provision the device using your DUT controller (use above instructions) ,
+          "1. Provision TH_CE using DUT_CR1 (Chip-tool as DUT controller)
           "
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM and
-          TH_CR3 Commissions with TH_CE"
+          "Step 2: DUT_CR1 sends command to TH_CE to open a commissioning window
+          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
+          BCM and TH_CR3 Commissions with TH_CE"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On your DUT controller, open commissioning window using ECM
+          On DUT_CR1 , open commissioning window using BCM
 
-          Below is the example while using chip tool as controller
-          ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
-
-          [1635874557.409509][4549:4554] CHIP:SC: Success status report received. Session was established
-          [1635874557.409553][4549:4554] CHIP:IN: New secure session created for device 0x0000000000000001, key 76!!
-          [1635874557.409649][4549:4554] CHIP:CTL: OpenCommissioningWindow for device ID 1
-          [1635874557.416929][4549:4554] CHIP:DMG: ICR moving to [AddingComm]
-          [1635874557.417092][4549:4554] CHIP:DMG: ICR moving to [AddedComma]
-          [1635874557.417215][4549:4554] CHIP:IN: Prepared encrypted message 0xaaaac5947d10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 5541i with MessageCounter:0.
-          [1635874557.417271][4549:4554] CHIP:IN: Sending encrypted msg 0xaaaac5947d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 16129075 msec
-          [1635874557.417449][4549:4554] CHIP:DMG: ICR moving to [CommandSen]
-          [1635874557.417505][4549:4554] CHIP:CTL: Manual pairing code: [35484132896]
-          [1635874557.417577][4549:4554] CHIP:CTL: SetupQRCode: [MT:00000CQM00AT-F5A510]
+            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
 
-          On 3rd controller using chip tool connect using manual code
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
-          ./chip-tool pairing code 1 35484132896
+          Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
-          Verify you got below message
-          Device commissioning completed with success
+          [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
+          [1660901022.112389][3045:3045] CHIP:ZCL: Commissioning window is now open
+          [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
+
+
+
+          On TH_CR3, using chip tool connect to the accessory
+          ./chip-tool pairing onnetwork 1 20202021  --commissioner-name gamma
+
+          Verify you got below message on TH_CE (all-clusters-app) log
+          Commissioning completed successfully
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM and
-          TH_CR2 Commissions with TH_CE"
+          "Step 3: DUT_CR1 sends command to TH_CE to open a commissioning window
+          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
+          BCM and TH_CR2 Commissions with TH_CE"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On your DUT controller, open commissioning window using ECM
+          On DUT_CR1 , open commissioning window using BCM
 
-          Below is the example while using chip tool as controller
-          ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
+            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          [1635874557.409509][4549:4554] CHIP:SC: Success status report received. Session was established
-          [1635874557.409553][4549:4554] CHIP:IN: New secure session created for device 0x0000000000000001, key 76!!
-          [1635874557.409649][4549:4554] CHIP:CTL: OpenCommissioningWindow for device ID 1
-          [1635874557.416929][4549:4554] CHIP:DMG: ICR moving to [AddingComm]
-          [1635874557.417092][4549:4554] CHIP:DMG: ICR moving to [AddedComma]
-          [1635874557.417215][4549:4554] CHIP:IN: Prepared encrypted message 0xaaaac5947d10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 5541i with MessageCounter:0.
-          [1635874557.417271][4549:4554] CHIP:IN: Sending encrypted msg 0xaaaac5947d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 16129075 msec
-          [1635874557.417449][4549:4554] CHIP:DMG: ICR moving to [CommandSen]
-          [1635874557.417505][4549:4554] CHIP:CTL: Manual pairing code: [35484132896]
-          [1635874557.417577][4549:4554] CHIP:CTL: SetupQRCode: [MT:00000CQM00AT-F5A510]
 
-          On 2nd controller using chip tool connect using manual code
-          ./chip-tool pairing code 1 35484132896
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
-          Verify you got below message
-          Device commissioning completed with success
+          Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
+
+          [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
+          [1660901022.112389][3045:3045] CHIP:ZCL: Commissioning window is now open
+          [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
+
+
+
+
+          On TH_CR2 , using chip tool connect to the accessory
+
+          ./chip-tool pairing onnetwork 1 20202021  --commissioner-name beta
+
+          Verify you got below message on TH_CE (all-clusters-app) log
+
+          Commissioning completed successfully
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+          "Step 4: DUT_CR1 sends command to TH_CE to open a commissioning window
+          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
+          BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
-          On your DUT controller, open commissioning window using BCM
+          On DUT_CR1 , open commissioning window using BCM
 
-          Below is the example while using chip tool as controller
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          CHIP:DMG: InvokeResponseMessage =
-          [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
-          [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
-          [1650278416.248570][11064:11069] CHIP:DMG:         [
-          [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
-          [1650278416.248718][11064:11069] CHIP:DMG:                 {
-          [1650278416.248783][11064:11069] CHIP:DMG:                         CommandStatusIB =
-          [1650278416.248860][11064:11069] CHIP:DMG:                         {
-          [1650278416.248931][11064:11069] CHIP:DMG:                                 CommandPathIB =
-          [1650278416.249011][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249100][11064:11069] CHIP:DMG:                                         EndpointId = 0x0,
-          [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
-          [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
-          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
-          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
-          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
-          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
-          [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:
-          [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:
-          [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:
-          [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
-          [1650278416.250355][11064:11069] CHIP:DMG: },
-          [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
-          [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
+
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
+
+          Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
+
+
+          [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
+          [1660901022.112389][3045:3045] CHIP:ZCL: Commissioning window is now open
+          [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
     - label:
-          "Before the expiration of PIXIT.CADMIN.CwDuration seconds that is set
-          in step 4, DUT_CR1 sends command to TH_CE to TH_CE to open a 2nd
+          "Step 5: Before the expiration of PIXIT.CADMIN.CwDuration seconds that
+          is set in step 4, DUT_CR1 sends command to TH_CE to read WindowStatus
+          attribute"
+      PICS: CADMIN.C.A0000
+      verification: |
+          On DUT_CR1 , read WindowStatus
+
+            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+
+          ./chip-tool administratorcommissioning read window-status 1 0
+
+          Verify TH_CE successfully reads windowstatus
+
+          [1661483425.923623][6917:6917] CHIP:DMG: ReportDataMessage =
+          [1661483425.923649][6917:6917] CHIP:DMG: {
+          [1661483425.923667][6917:6917] CHIP:DMG:         AttributeReportIBs =
+          [1661483425.923698][6917:6917] CHIP:DMG:         [
+          [1661483425.923722][6917:6917] CHIP:DMG:                 AttributeReportIB =
+          [1661483425.923752][6917:6917] CHIP:DMG:                 {
+          [1661483425.923777][6917:6917] CHIP:DMG:                         AttributeDataIB =
+          [1661483425.923805][6917:6917] CHIP:DMG:                         {
+          [1661483425.923834][6917:6917] CHIP:DMG:                                 DataVersion = 0x2b727529,
+          [1661483425.923862][6917:6917] CHIP:DMG:                                 AttributePathIB =
+          [1661483425.923891][6917:6917] CHIP:DMG:                                 {
+          [1661483425.923921][6917:6917] CHIP:DMG:                                         Endpoint = 0x0,
+          [1661483425.923951][6917:6917] CHIP:DMG:                                         Cluster = 0x3c,
+          [1661483425.923981][6917:6917] CHIP:DMG:                                         Attribute = 0x0000_0000,
+          [1661483425.924009][6917:6917] CHIP:DMG:                                 }
+          [1661483425.924040][6917:6917] CHIP:DMG:
+          [1661483425.924070][6917:6917] CHIP:DMG:                                 Data = 2,
+          [1661483425.924097][6917:6917] CHIP:DMG:                         },
+          [1661483425.924126][6917:6917] CHIP:DMG:
+          [1661483425.924169][6917:6917] CHIP:DMG:                 },
+          [1661483425.924197][6917:6917] CHIP:DMG:
+          [1661483425.924218][6917:6917] CHIP:DMG:         ],
+          [1661483425.924244][6917:6917] CHIP:DMG:
+      disabled: true
+
+    - label:
+          "Step 6: Before the expiration of PIXIT.CADMIN.CwDuration seconds that
+          is set in step 4, DUT_CR1 sends command to TH_CE to open a 2nd
           commissioning window with a commissioning timeout of
           PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.C.C00.Tx
       verification: |
-          On your DUT controller, open commissioning window using ECM before the timer expiry of the above step
+          On DUT_CR1 chip tool, open commissioning window using ECM
 
-          Below is the example while using chip tool as controller
+            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
+
+          ./chip-tool pairing open-commissioning-window 1 1 200 1000 3840
+
+          Verify that the TH_CE is rejecting the opening of second commissioning session  with  the response status 0x01 failure in TH_CE Log
+
 
           CHIP:DMG: InvokeResponseMessage =
           [1650527622.373450][15824:15829] CHIP:DMG: {
@@ -165,7 +200,7 @@ tests:
           [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG:                                 {
           [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
-          [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x1,
+          [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x2,
           [1650527622.375320][15824:15829] CHIP:DMG:                                 },
           [1650527622.375426][15824:15829] CHIP:DMG:
           [1650527622.375527][15824:15829] CHIP:DMG:                         },
@@ -177,196 +212,93 @@ tests:
           [1650527622.376000][15824:15829] CHIP:DMG:         InteractionModelRevision = 1
           [1650527622.376058][15824:15829] CHIP:DMG: },
           [1650527622.376202][15824:15829] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1
-          [1650527622.376278][15824:15829] CHIP:TOO: Error: IM Error 0x00000601: Cluster-specific error: 0x01
-      disabled: true
-
-    - label: "DUT_CR1 sends command to TH_CE to read the list of Fabrics"
-      PICS: OPCREDS.C.A0001
-      verification: |
-          On 1st controller using chip tool, read fabrics list
-
-          ./chip-tool operationalcredentials read fabrics 1234 0 --fabric-filtered 0
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 268962768
-          [1650527361.425870][15792:15797] CHIP:TOO:   Fabrics: 3 entries
-          [1650527361.426777][15792:15797] CHIP:TOO:     [1]: {
-          [1650527361.426859][15792:15797] CHIP:TOO:       RootPublicKey: 0429A71383F336D80918C9EC655112513E428C073AF7FB44820EC793535302C6E3825C56EE6DD1A683EAA7B59E3F261B46FFA24A6D911E8D88839F4C1B3C84BA01
-          [1650527361.426923][15792:15797] CHIP:TOO:       VendorId: 65521
-          [1650527361.426979][15792:15797] CHIP:TOO:       FabricId: 1
-          [1650527361.427033][15792:15797] CHIP:TOO:       NodeId: 1
-          [1650527361.427088][15792:15797] CHIP:TOO:       Label:
-          [1650527361.427166][15792:15797] CHIP:TOO:       FabricIndex: 1
-          [1650527361.427376][15792:15797] CHIP:TOO:      }
-          [1650527361.427464][15792:15797] CHIP:TOO:     [2]: {
-          [1650527361.427532][15792:15797] CHIP:TOO:       RootPublicKey: 04781BCEE70118049ED61DD5B4E401CF1A09D2F78AE7F5770BE5506AD24238E5E0777277DABAFD062659651C95CC2CA7DEAACE40DB579A946CC07CADB141BE05D7
-          [1650527361.427595][15792:15797] CHIP:TOO:       VendorId: 65521
-          [1650527361.427649][15792:15797] CHIP:TOO:       FabricId: 1
-          [1650527361.427703][15792:15797] CHIP:TOO:       NodeId: 3
-          [1650527361.427756][15792:15797] CHIP:TOO:       Label:
-          [1650527361.427811][15792:15797] CHIP:TOO:       FabricIndex: 2
-          [1650527361.427868][15792:15797] CHIP:TOO:      }
-          [1650527361.427943][15792:15797] CHIP:TOO:     [3]: {
-          [1650527361.428008][15792:15797] CHIP:TOO:       RootPublicKey: 0403EDB5B461030A34EF7EA2F9DB0D46A36185E4755C365AF9344C4959F049EF21D55EAB903A2C7FBFC305EEFA42989250D7517A73E6156062390A60C0D4C41EBD
-          [1650527361.428067][15792:15797] CHIP:TOO:       VendorId: 65521
-          [1650527361.428122][15792:15797] CHIP:TOO:       FabricId: 1
-          [1650527361.428176][15792:15797] CHIP:TOO:       NodeId: 2
-          [1650527361.428229][15792:15797] CHIP:TOO:       Label:
-          [1650527361.428282][15792:15797] CHIP:TOO:       FabricIndex: 3
-          [1650527361.428335][15792:15797] CHIP:TOO:      }
+          [1650527622.376278][15824:15829] CHIP:TOO: Error: IM Error 0x00000601: Cluster-specific error: 0x01"
       disabled: true
 
     - label:
-          "Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that is
-          set in step 5"
+          "Step 7: Wait for the expiration of PIXIT.CADMIN.CwDuration seconds
+          that is set in step 4"
       verification: |
-          Wait for the expiration of PIXIT_COMM_WIN seconds
+          Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that is set in step 4
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to re-opens a commissioning window
-          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
-          ECM"
-      PICS: CADMIN.C.C00.Tx
-      verification: |
-          On your DUT controller, open commissioning window using ECM
-
-          Below is the example while using chip tool as controller
-
-          ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
-
-          [1635926152.609542][10140:10145] CHIP:SC: Success status report received. Session was established
-          [1635926152.609582][10140:10145] CHIP:IN: New secure session created for device 0x0000000000000001, key 42!!
-          [1635926152.609695][10140:10145] CHIP:CTL: OpenCommissioningWindow for device ID 1
-          [1635926152.617050][10140:10145] CHIP:DMG: ICR moving to [AddingComm]
-          [1635926152.617103][10140:10145] CHIP:DMG: ICR moving to [AddedComma]
-          [1635926152.617228][10140:10145] CHIP:IN: Prepared encrypted message 0xaaab02ca7d10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 6544i with MessageCounter:0.
-          [1635926152.617286][10140:10145] CHIP:IN: Sending encrypted msg 0xaaab02ca7d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 13888103 msec
-          [1635926152.617454][10140:10145] CHIP:DMG: ICR moving to [CommandSen]
-          [1635926152.617523][10140:10145] CHIP:CTL: Manual pairing code: [35484132896]
-          [1635926152.617611][10140:10145] CHIP:CTL: SetupQRCode: [MT:00000CQM00QHQP0JG00]
-      disabled: true
-
-    - label:
-          "Before the expiration of PIXIT.CADMIN.CwDuration seconds that is set
-          in step 8, TH_CR3 sends command to TH_CE to open a 2nd commissioning
+          "Step 8: DUT_CR1 sends command to TH_CE to re-opens a commissioning
           window with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds
           using ECM"
       PICS: CADMIN.C.C00.Tx
       verification: |
-          On the 3rd controller using chip tool, open commissioning window using ECM
+          On DUT_CR1  chip tool, open commissioning window using ECM
 
+            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
-          ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
+          ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
 
-          CHIP:DMG: InvokeResponseMessage =
-          [1650527622.373450][15824:15829] CHIP:DMG: {
-          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false,
-          [1650527622.373628][15824:15829] CHIP:DMG:         InvokeResponseIBs =
-          [1650527622.373734][15824:15829] CHIP:DMG:         [
-          [1650527622.373817][15824:15829] CHIP:DMG:                 InvokeResponseIB =
-          [1650527622.373913][15824:15829] CHIP:DMG:                 {
-          [1650527622.374001][15824:15829] CHIP:DMG:                         CommandStatusIB =
-          [1650527622.374087][15824:15829] CHIP:DMG:                         {
-          [1650527622.374182][15824:15829] CHIP:DMG:                                 CommandPathIB =
-          [1650527622.374296][15824:15829] CHIP:DMG:                                 {
-          [1650527622.374382][15824:15829] CHIP:DMG:                                         EndpointId = 0x0,
-          [1650527622.374490][15824:15829] CHIP:DMG:                                         ClusterId = 0x3c,
-          [1650527622.374593][15824:15829] CHIP:DMG:                                         CommandId = 0x1,
-          [1650527622.374682][15824:15829] CHIP:DMG:                                 },
-          [1650527622.374799][15824:15829] CHIP:DMG:
-          [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
-          [1650527622.374979][15824:15829] CHIP:DMG:                                 {
-          [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
-          [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x1,
-          [1650527622.375320][15824:15829] CHIP:DMG:                                 },
-          [1650527622.375426][15824:15829] CHIP:DMG:
-          [1650527622.375527][15824:15829] CHIP:DMG:                         },
-          [1650527622.375616][15824:15829] CHIP:DMG:
-          [1650527622.375704][15824:15829] CHIP:DMG:                 },
-          [1650527622.375786][15824:15829] CHIP:DMG:
-          [1650527622.375864][15824:15829] CHIP:DMG:         ],
-          [1650527622.375940][15824:15829] CHIP:DMG:
-          [1650527622.376000][15824:15829] CHIP:DMG:         InteractionModelRevision = 1
-          [1650527622.376058][15824:15829] CHIP:DMG: },
-          [1650527622.376202][15824:15829] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1
-          [1650527622.376278][15824:15829] CHIP:TOO: Error: IM Error 0x00000601: Cluster-specific error: 0x01
-      disabled: true
+          Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
 
-    - label: "DUT_CR1 sends command to TH_CE to read the list of Fabrics"
-      PICS: OPCREDS.C.A0001
-      verification: |
-          On 1st controller using chip tool, read fabrics list
-
-          ./chip-tool operationalcredentials read fabrics 1234 0 --fabric-filtered 0
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 268962768
-          [1650527361.425870][15792:15797] CHIP:TOO:   Fabrics: 3 entries
-          [1650527361.426777][15792:15797] CHIP:TOO:     [1]: {
-          [1650527361.426859][15792:15797] CHIP:TOO:       RootPublicKey: 0429A71383F336D80918C9EC655112513E428C073AF7FB44820EC793535302C6E3825C56EE6DD1A683EAA7B59E3F261B46FFA24A6D911E8D88839F4C1B3C84BA01
-          [1650527361.426923][15792:15797] CHIP:TOO:       VendorId: 65521
-          [1650527361.426979][15792:15797] CHIP:TOO:       FabricId: 1
-          [1650527361.427033][15792:15797] CHIP:TOO:       NodeId: 1
-          [1650527361.427088][15792:15797] CHIP:TOO:       Label:
-          [1650527361.427166][15792:15797] CHIP:TOO:       FabricIndex: 1
-          [1650527361.427376][15792:15797] CHIP:TOO:      }
-          [1650527361.427464][15792:15797] CHIP:TOO:     [2]: {
-          [1650527361.427532][15792:15797] CHIP:TOO:       RootPublicKey: 04781BCEE70118049ED61DD5B4E401CF1A09D2F78AE7F5770BE5506AD24238E5E0777277DABAFD062659651C95CC2CA7DEAACE40DB579A946CC07CADB141BE05D7
-          [1650527361.427595][15792:15797] CHIP:TOO:       VendorId: 65521
-          [1650527361.427649][15792:15797] CHIP:TOO:       FabricId: 1
-          [1650527361.427703][15792:15797] CHIP:TOO:       NodeId: 3
-          [1650527361.427756][15792:15797] CHIP:TOO:       Label:
-          [1650527361.427811][15792:15797] CHIP:TOO:       FabricIndex: 2
-          [1650527361.427868][15792:15797] CHIP:TOO:      }
-          [1650527361.427943][15792:15797] CHIP:TOO:     [3]: {
-          [1650527361.428008][15792:15797] CHIP:TOO:       RootPublicKey: 0403EDB5B461030A34EF7EA2F9DB0D46A36185E4755C365AF9344C4959F049EF21D55EAB903A2C7FBFC305EEFA42989250D7517A73E6156062390A60C0D4C41EBD
-          [1650527361.428067][15792:15797] CHIP:TOO:       VendorId: 65521
-          [1650527361.428122][15792:15797] CHIP:TOO:       FabricId: 1
-          [1650527361.428176][15792:15797] CHIP:TOO:       NodeId: 2
-          [1650527361.428229][15792:15797] CHIP:TOO:       Label:
-          [1650527361.428282][15792:15797] CHIP:TOO:       FabricIndex: 3
-          [1650527361.428335][15792:15797] CHIP:TOO:      }
+          [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
+          [1660901022.112389][3045:3045] CHIP:ZCL: Commissioning window is now open
+          [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
     - label:
-          "Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that is
-          set in step 9"
+          "Step 9: Before the expiration of PIXIT.CADMIN.CwDuration seconds that
+          is set in step 8, DUT_CR1 sends command to TH_CE to read WindowStatus
+          attribute"
+      PICS: CADMIN.C.A0000
       verification: |
-          Wait for the expiration of PIXIT_COMM_WIN seconds
+          On DUT_CR1 , read WindowStatus
+
+            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+
+          ./chip-tool administratorcommissioning read window-status 1 0
+          Verify TH_CE successfully reads windowstatus
+
+          [1661482777.283822][6453:6453] CHIP:DMG: ReportDataMessage =
+          [1661482777.283855][6453:6453] CHIP:DMG: {
+          [1661482777.283882][6453:6453] CHIP:DMG:         AttributeReportIBs =
+          [1661482777.283921][6453:6453] CHIP:DMG:         [
+          [1661482777.283951][6453:6453] CHIP:DMG:                 AttributeReportIB =
+          [1661482777.283995][6453:6453] CHIP:DMG:                 {
+          [1661482777.284036][6453:6453] CHIP:DMG:                         AttributeDataIB =
+          [1661482777.284080][6453:6453] CHIP:DMG:                         {
+          [1661482777.284122][6453:6453] CHIP:DMG:                                 DataVersion = 0xd3f3fc78,
+          [1661482777.284289][6453:6453] CHIP:DMG:                                 AttributePathIB =
+          [1661482777.284337][6453:6453] CHIP:DMG:                                 {
+          [1661482777.284385][6453:6453] CHIP:DMG:                                         Endpoint = 0x0,
+          [1661482777.284430][6453:6453] CHIP:DMG:                                         Cluster = 0x3c,
+          [1661482777.284479][6453:6453] CHIP:DMG:                                         Attribute = 0x0000_0000,
+          [1661482777.284522][6453:6453] CHIP:DMG:                                 }
+          [1661482777.284567][6453:6453] CHIP:DMG:
+          [1661482777.284612][6453:6453] CHIP:DMG:                                 Data = 1,
+          [1661482777.284655][6453:6453] CHIP:DMG:                         },
+          [1661482777.284699][6453:6453] CHIP:DMG:
+          [1661482777.284733][6453:6453] CHIP:DMG:                 },
+          [1661482777.284773][6453:6453] CHIP:DMG:
+          [1661482777.284803][6453:6453] CHIP:DMG:         ],
+          [1661482777.284841][6453:6453] CHIP:DMG:
+          [1661482777.284872][6453:6453] CHIP:DMG:         SuppressResponse = true,
+          [1661482777.284905][6453:6453] CHIP:DMG:         InteractionModelRevision = 1
+          [1661482777.284934][6453:6453] CHIP:DMG: }
+          [1661482777.284962][6453:6453] CHIP:DMG:
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
-      PICS: CADMIN.C.C00.Tx
-      verification: |
-          On your DUT controller, open commissioning window using ECM
-
-          Below is the example while using chip tool as controller
-
-          ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
-
-          [1635926434.941379][10165:10170] CHIP:SC: Success status report received. Session was established
-          [1635926434.941428][10165:10170] CHIP:IN: New secure session created for device 0x0000000000000001, key 44!!
-          [1635926434.941515][10165:10170] CHIP:CTL: OpenCommissioningWindow for device ID 1
-          [1635926434.949324][10165:10170] CHIP:DMG: ICR moving to [AddingComm]
-          [1635926434.949381][10165:10170] CHIP:DMG: ICR moving to [AddedComma]
-          [1635926434.949532][10165:10170] CHIP:IN: Prepared encrypted message 0xaaaad95dbd10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 19421i with MessageCounter:0.
-          [1635926434.949592][10165:10170] CHIP:IN: Sending encrypted msg 0xaaaad95dbd10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 14170436 msec
-          [1635926434.949727][10165:10170] CHIP:DMG: ICR moving to [CommandSen]
-          [1635926434.949788][10165:10170] CHIP:CTL: Manual pairing code: [35484132896]
-          [1635926434.949865][10165:10170] CHIP:CTL: SetupQRCode: [MT:00000CQM00OAX.7RA00]
-      disabled: true
-
-    - label:
-          "Before the expiration of PIXIT.CADMIN.CwDuration seconds that is set
-          in step 12, TH_CR2 sends command to TH_CE to open a second
+          "Step 10: Before the expiration of PIXIT.CADMIN.CwDuration seconds
+          that is set in step 8, TH_CR3 sends command to TH_CE to open a 2nd
           commissioning window with a commissioning timeout of
           PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.C.C00.Tx
       verification: |
-          On the 2nd controller using chip tool, open commissioning window using ECM
+          On TH_CR3 chip tool, open commissioning window using ECM
 
-          ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
+            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+
+
+          ./chip-tool pairing open-commissioning-window 1 1 200 1000 3840 --commissioner-name beta
+
+          Verify that the TH_CE is rejecting the opening of second commissioning session  with  the response status 0x01 failure in TH_CE Log
+
 
           CHIP:DMG: InvokeResponseMessage =
           [1650527622.373450][15824:15829] CHIP:DMG: {
@@ -387,7 +319,7 @@ tests:
           [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG:                                 {
           [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
-          [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x1,
+          [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x2,
           [1650527622.375320][15824:15829] CHIP:DMG:                                 },
           [1650527622.375426][15824:15829] CHIP:DMG:
           [1650527622.375527][15824:15829] CHIP:DMG:                         },
@@ -399,5 +331,205 @@ tests:
           [1650527622.376000][15824:15829] CHIP:DMG:         InteractionModelRevision = 1
           [1650527622.376058][15824:15829] CHIP:DMG: },
           [1650527622.376202][15824:15829] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1
-          [1650527622.376278][15824:15829] CHIP:TOO: Error: IM Error 0x00000601: Cluster-specific error: 0x01
+          [1650527622.376278][15824:15829] CHIP:TOO: Error: IM Error 0x00000601: Cluster-specific error: 0x01"
+      disabled: true
+
+    - label:
+          "Step 11: Wait for the expiration of PIXIT.CADMIN.CwDuration seconds
+          that is set in step 8"
+      verification: |
+          Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that is set in step 8
+      disabled: true
+
+    - label:
+          "Step 12: DUT_CR1 sends command to TH_CE to open a commissioning
+          window with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds
+          using ECM"
+      PICS: CADMIN.C.C00.Tx
+      verification: |
+          On DUT_CR1 chip tool, open commissioning window using ECM
+
+            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+
+          ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
+
+          Verify the Open commisioning window on the TH_CE(all-cluster-app) Log:
+
+          [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
+          [1660901022.112389][3045:3045] CHIP:ZCL: Commissioning window is now open
+          [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
+      disabled: true
+
+    - label:
+          "Step 13: Before the expiration of PIXIT.CADMIN.CwDuration seconds
+          that is set in step 12, TH_CR2 sends command to TH_CE to open a second
+          commissioning window with a commissioning timeout of
+          PIXIT.CADMIN.CwDuration seconds using ECM"
+      PICS: CADMIN.C.C00.Tx
+      verification: |
+          On TH_CR2 using chip tool connect to the accessory using ECM
+
+            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+
+
+          ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840  --commissioner-name beta
+
+          Verify that the TH_CE is rejecting the opening of second commissioning session  with  the response status 0x01 failure in TH_CE Log
+
+          CHIP:DMG: InvokeResponseMessage =
+          [1650527622.373450][15824:15829] CHIP:DMG: {
+          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false,
+          [1650527622.373628][15824:15829] CHIP:DMG:         InvokeResponseIBs =
+          [1650527622.373734][15824:15829] CHIP:DMG:         [
+          [1650527622.373817][15824:15829] CHIP:DMG:                 InvokeResponseIB =
+          [1650527622.373913][15824:15829] CHIP:DMG:                 {
+          [1650527622.374001][15824:15829] CHIP:DMG:                         CommandStatusIB =
+          [1650527622.374087][15824:15829] CHIP:DMG:                         {
+          [1650527622.374182][15824:15829] CHIP:DMG:                                 CommandPathIB =
+          [1650527622.374296][15824:15829] CHIP:DMG:                                 {
+          [1650527622.374382][15824:15829] CHIP:DMG:                                         EndpointId = 0x0,
+          [1650527622.374490][15824:15829] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1650527622.374593][15824:15829] CHIP:DMG:                                         CommandId = 0x1,
+          [1650527622.374682][15824:15829] CHIP:DMG:                                 },
+          [1650527622.374799][15824:15829] CHIP:DMG:
+          [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
+          [1650527622.374979][15824:15829] CHIP:DMG:                                 {
+          [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
+          [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x2,
+          [1650527622.375320][15824:15829] CHIP:DMG:                                 },
+          [1650527622.375426][15824:15829] CHIP:DMG:
+          [1650527622.375527][15824:15829] CHIP:DMG:                         },
+          [1650527622.375616][15824:15829] CHIP:DMG:
+          [1650527622.375704][15824:15829] CHIP:DMG:                 },
+          [1650527622.375786][15824:15829] CHIP:DMG:
+          [1650527622.375864][15824:15829] CHIP:DMG:         ],
+          [1650527622.375940][15824:15829] CHIP:DMG:
+          [1650527622.376000][15824:15829] CHIP:DMG:         InteractionModelRevision = 1
+          [1650527622.376058][15824:15829] CHIP:DMG: },
+          [1650527622.376202][15824:15829] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1
+          [1650527622.376278][15824:15829] CHIP:TOO: Error: IM Error 0x00000601: Cluster-specific error: 0x01"
+      disabled: true
+
+    - label:
+          "Step 14: Wait for the expiration of PIXIT.CADMIN.CwDuration seconds
+          that is set in step 12"
+      verification: |
+          Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that is set in step 12
+      disabled: true
+
+    - label:
+          "Step 15: DUT_CR1 sends command to TH_CE to read WindowStatus
+          attribute"
+      PICS: CADMIN.C.A0000
+      verification: |
+          On DUT_CR1 , read WindowStatus
+
+            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+
+          ./chip-tool administratorcommissioning read window-status 1 0
+          Verify TH_CE successfully reads windowstatus
+
+          [1661482777.283822][6453:6453] CHIP:DMG: ReportDataMessage =
+          [1661482777.283855][6453:6453] CHIP:DMG: {
+          [1661482777.283882][6453:6453] CHIP:DMG:         AttributeReportIBs =
+          [1661482777.283921][6453:6453] CHIP:DMG:         [
+          [1661482777.283951][6453:6453] CHIP:DMG:                 AttributeReportIB =
+          [1661482777.283995][6453:6453] CHIP:DMG:                 {
+          [1661482777.284036][6453:6453] CHIP:DMG:                         AttributeDataIB =
+          [1661482777.284080][6453:6453] CHIP:DMG:                         {
+          [1661482777.284122][6453:6453] CHIP:DMG:                                 DataVersion = 0xd3f3fc78,
+          [1661482777.284289][6453:6453] CHIP:DMG:                                 AttributePathIB =
+          [1661482777.284337][6453:6453] CHIP:DMG:                                 {
+          [1661482777.284385][6453:6453] CHIP:DMG:                                         Endpoint = 0x0,
+          [1661482777.284430][6453:6453] CHIP:DMG:                                         Cluster = 0x3c,
+          [1661482777.284479][6453:6453] CHIP:DMG:                                         Attribute = 0x0000_0000,
+          [1661482777.284522][6453:6453] CHIP:DMG:                                 }
+          [1661482777.284567][6453:6453] CHIP:DMG:
+          [1661482777.284612][6453:6453] CHIP:DMG:                                 Data = 0,
+          [1661482777.284655][6453:6453] CHIP:DMG:                         },
+          [1661482777.284699][6453:6453] CHIP:DMG:
+          [1661482777.284733][6453:6453] CHIP:DMG:                 },
+          [1661482777.284773][6453:6453] CHIP:DMG:
+          [1661482777.284803][6453:6453] CHIP:DMG:         ],
+          [1661482777.284841][6453:6453] CHIP:DMG:
+          [1661482777.284872][6453:6453] CHIP:DMG:         SuppressResponse = true,
+          [1661482777.284905][6453:6453] CHIP:DMG:         InteractionModelRevision = 1
+          [1661482777.284934][6453:6453] CHIP:DMG: }
+          [1661482777.284962][6453:6453] CHIP:DMG:
+      disabled: true
+
+    - label:
+          "Step 16: DUT_CR1 sends command to TH_CE to read AdminFabricIndex
+          attribute"
+      PICS: CADMIN.C.A0001
+      verification: |
+          On DUT_CR1 , read AdminFabricIndex
+
+            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+
+          ./chip-tool administratorcommissioning read admin-fabric-index  1 0
+
+          Verify on TH_CE(all-clusters-app) successfully reads the AdminFabricIndex
+
+          [1661484456.069189][6930:6930] CHIP:DMG: ReportDataMessage =
+          [1661484456.069213][6930:6930] CHIP:DMG: {
+          [1661484456.069232][6930:6930] CHIP:DMG:         AttributeReportIBs =
+          [1661484456.069259][6930:6930] CHIP:DMG:         [
+          [1661484456.069280][6930:6930] CHIP:DMG:                 AttributeReportIB =
+          [1661484456.069314][6930:6930] CHIP:DMG:                 {
+          [1661484456.069339][6930:6930] CHIP:DMG:                         AttributeDataIB =
+          [1661484456.069366][6930:6930] CHIP:DMG:                         {
+          [1661484456.069395][6930:6930] CHIP:DMG:                                 DataVersion = 0x5698b43f,
+          [1661484456.069427][6930:6930] CHIP:DMG:                                 AttributePathIB =
+          [1661484456.069459][6930:6930] CHIP:DMG:                                 {
+          [1661484456.069492][6930:6930] CHIP:DMG:                                         Endpoint = 0x0,
+          [1661484456.069524][6930:6930] CHIP:DMG:                                         Cluster = 0x3c,
+          [1661484456.069629][6930:6930] CHIP:DMG:                                         Attribute = 0x0000_0001,
+          [1661484456.069661][6930:6930] CHIP:DMG:                                 }
+          [1661484456.069695][6930:6930] CHIP:DMG:
+          [1661484456.069729][6930:6930] CHIP:DMG:                                 Data = NULL
+          [1661484456.069757][6930:6930] CHIP:DMG:                         },
+          [1661484456.069790][6930:6930] CHIP:DMG:
+          [1661484456.069815][6930:6930] CHIP:DMG:                 },
+          [1661484456.069844][6930:6930] CHIP:DMG:
+          [1661484456.069865][6930:6930] CHIP:DMG:         ],
+          [1661484456.069892][6930:6930] CHIP:DMG:
+      disabled: true
+
+    - label:
+          "Step 17: DUT_CR1 sends command to TH_CE to read AdminVendorId
+          attribute"
+      PICS: CADMIN.C.A0002
+      verification: |
+          On DUT_CR1 , read AdminVendorId
+
+            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+
+          Verify on TH_CE(all-clusters-app) successfully reads the AdminVendorId
+
+          ./chip-tool administratorcommissioning read admin-vendor-id 1 0
+
+          [1661484515.721772][6930:6930] CHIP:DMG: ReportDataMessage =
+          [1661484515.721809][6930:6930] CHIP:DMG: {
+          [1661484515.721838][6930:6930] CHIP:DMG:         AttributeReportIBs =
+          [1661484515.721880][6930:6930] CHIP:DMG:         [
+          [1661484515.721913][6930:6930] CHIP:DMG:                 AttributeReportIB =
+          [1661484515.721965][6930:6930] CHIP:DMG:                 {
+          [1661484515.722006][6930:6930] CHIP:DMG:                         AttributeDataIB =
+          [1661484515.722051][6930:6930] CHIP:DMG:                         {
+          [1661484515.722100][6930:6930] CHIP:DMG:                                 DataVersion = 0x5698b43f,
+          [1661484515.722146][6930:6930] CHIP:DMG:                                 AttributePathIB =
+          [1661484515.722191][6930:6930] CHIP:DMG:                                 {
+          [1661484515.722242][6930:6930] CHIP:DMG:                                         Endpoint = 0x0,
+          [1661484515.722292][6930:6930] CHIP:DMG:                                         Cluster = 0x3c,
+          [1661484515.722344][6930:6930] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1661484515.722394][6930:6930] CHIP:DMG:                                 }
+          [1661484515.722443][6930:6930] CHIP:DMG:
+          [1661484515.722494][6930:6930] CHIP:DMG:                                 Data = NULL
+          [1661484515.722542][6930:6930] CHIP:DMG:                         },
+          [1661484515.722589][6930:6930] CHIP:DMG:
+          [1661484515.722626][6930:6930] CHIP:DMG:                 },
+          [1661484515.722673][6930:6930] CHIP:DMG:
+          [1661484515.722705][6930:6930] CHIP:DMG:         ],
+          [1661484515.722746][6930:6930] CHIP:DMG:
       disabled: true

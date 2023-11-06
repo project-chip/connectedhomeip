@@ -27,6 +27,7 @@ class AmebaApp(Enum):
     ALL_CLUSTERS_MINIMAL = auto()
     LIGHT = auto()
     PIGWEED = auto()
+    LIGHT_SWITCH = auto()
 
     @property
     def ExampleName(self):
@@ -36,6 +37,8 @@ class AmebaApp(Enum):
             return 'all-clusters-minimal-app'
         elif self == AmebaApp.LIGHT:
             return 'lighting-app'
+        elif self == AmebaApp.LIGHT_SWITCH:
+            return 'light-switch-app'
         elif self == AmebaApp.PIGWEED:
             return 'pigweed-app'
         else:
@@ -49,6 +52,8 @@ class AmebaApp(Enum):
             return 'chip-ameba-all-clusters-minimal-app'
         elif self == AmebaApp.LIGHT:
             return 'chip-ameba-lighting-app'
+        elif self == AmebaApp.LIGHT_SWITCH:
+            return 'chip-ameba-light-switch-app'
         elif self == AmebaApp.PIGWEED:
             return 'chip-ameba-pigweed-app'
         else:

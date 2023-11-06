@@ -60,7 +60,7 @@ bool SerializedQNameIterator::Next(bool followIndirectPointers)
                 return false;
             }
 
-            size_t offset = ((*mCurrentPosition & 0x3F) << 8) | *(mCurrentPosition + 1);
+            size_t offset = static_cast<size_t>(((*mCurrentPosition & 0x3F) << 8) | *(mCurrentPosition + 1));
             if (offset > mLookBehindMax)
             {
                 // Potential infinite recursion.

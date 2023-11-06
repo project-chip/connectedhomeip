@@ -21,22 +21,28 @@
  *          Provides an implementation of the BLEManager singleton object
  *          for Linux platforms.
  */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <ble/CHIPBleServiceData.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <new>
-#include <platform/CommissionableDataProvider.h>
-#include <platform/internal/BLEManager.h>
+/**
+ * Note: BLEManager requires ConnectivityManager to be defined beforehand,
+ *       otherwise we will face circular dependency between them. */
+#include <platform/ConnectivityManager.h>
+
+/**
+ * Note: Use public include for BLEManager which includes our local
+ *       platform/<PLATFORM>/BLEManagerImpl.h after defining interface class. */
+#include "platform/internal/BLEManager.h"
 
 #include <cassert>
 #include <type_traits>
 #include <utility>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <ble/CHIPBleServiceData.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
 
-#include "bluez/Helper.h"
+#include "bluez/BluezEndpoint.h"
 
 using namespace ::nl;
 using namespace ::chip::Ble;
@@ -96,7 +102,10 @@ exit:
 void BLEManagerImpl::_Shutdown()
 {
     // ensure scan resources are cleared (e.g. timeout timers)
-    mDeviceScanner.reset();
+    mDeviceScanner.Shutdown();
+    // Release BLE connection resources (unregister from BlueZ).
+    ShutdownBluezBleLayer(mpEndpoint);
+    mFlags.Clear(Flags::kBluezBLELayerInitialized);
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
@@ -233,17 +242,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         HandleConnectionError(event->CHIPoBLEConnectionError.ConId, event->CHIPoBLEConnectionError.Reason);
         break;
     case DeviceEventType::kServiceProvisioningChange:
-        // If CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED is enabled, and there is a change to the
-        // device's provisioning state, then automatically disable CHIPoBLE advertising if the device
-        // is now fully provisioned.
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-        if (ConfigurationMgr().IsFullyProvisioned())
-        {
-            mFlags.Clear(Flags::kAdvertisingEnabled);
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
-        }
-#endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-
         // Force the advertising configuration to be refreshed to reflect new provisioning state.
         mFlags.Clear(Flags::kAdvertisingConfigured);
 
@@ -346,20 +344,28 @@ exit:
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
-    BluezConnection * connection = static_cast<BluezConnection *>(conId);
-    return (connection != nullptr) ? connection->mMtu : 0;
+    uint16_t mtu = 0;
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    mtu = conId->GetMTU();
+exit:
+    return mtu;
 }
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     bool result = false;
 
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
                  ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid characteristic ID"));
 
-    result = BluezSubscribeCharacteristic(conId);
+    VerifyOrExit(conId->SubscribeCharacteristic() == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "SubscribeCharacteristic() failed"));
+    result = true;
+
 exit:
     return result;
 }
@@ -368,26 +374,48 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
 {
     bool result = false;
 
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
                  ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid characteristic ID"));
 
-    result = BluezUnsubscribeCharacteristic(conId);
+    VerifyOrExit(conId->UnsubscribeCharacteristic() == CHIP_NO_ERROR,
+                 ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() failed"));
+    result = true;
+
 exit:
     return result;
 }
 
 bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
+    bool result = false;
+
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %p)", conId);
-    return CloseBluezConnection(conId);
+
+    VerifyOrExit(conId->CloseConnection() == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "CloseConnection() failed"));
+    result = true;
+
+exit:
+    return result;
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                                     chip::System::PacketBufferHandle pBuf)
 {
-    return SendBluezIndication(conId, std::move(pBuf));
+    bool result = false;
+
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    VerifyOrExit(conId->SendIndication(std::move(pBuf)) == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "SendIndication() failed"));
+    result = true;
+
+exit:
+    return result;
 }
 
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
@@ -395,12 +423,16 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
 {
     bool result = false;
 
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_RX),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));
 
-    result = BluezSendWriteRequest(conId, std::move(pBuf));
+    VerifyOrExit(conId->SendWriteRequest(std::move(pBuf)) == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "SendWriteRequest() failed"));
+    result = true;
+
 exit:
     return result;
 }
@@ -520,30 +552,18 @@ void BLEManagerImpl::CHIPoBluez_ConnectionClosed(BLE_CONNECTION_OBJECT conId)
 
 void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    BluezConnection * connection = static_cast<BluezConnection *>(conId);
-
-    VerifyOrExit(connection != nullptr, ChipLogError(DeviceLayer, "Connection is NULL in HandleTXCharCCCDWrite"));
-    VerifyOrExit(connection->mpC2 != nullptr, ChipLogError(DeviceLayer, "C2 is NULL in HandleTXCharCCCDWrite"));
+    VerifyOrReturn(conId != BLE_CONNECTION_UNINITIALIZED,
+                   ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
 
     // Post an event to the Chip queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
     // whether the client is enabling or disabling indications.
-    {
-        ChipDeviceEvent event;
-        event.Type = connection->mIsNotify ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
-        event.CHIPoBLESubscribe.ConId = connection;
-        PlatformMgr().PostEventOrDie(&event);
-    }
+    ChipDeviceEvent event;
+    event.Type = conId->IsNotifyAcquired() ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
+    event.CHIPoBLESubscribe.ConId = conId;
+    PlatformMgr().PostEventOrDie(&event);
 
-    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", connection->mIsNotify ? "subscribe" : "unsubscribe");
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
-        // TODO: fail connection
-    }
+    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received",
+                    (event.Type == DeviceEventType::kCHIPoBLESubscribe) ? "subscribe" : "unsubscribe");
 }
 
 void BLEManagerImpl::HandleTXComplete(BLE_CONNECTION_OBJECT conId)
@@ -563,16 +583,6 @@ void BLEManagerImpl::DriveBLEState()
     if (!mFlags.Has(Flags::kAsyncInitCompleted))
     {
         mFlags.Set(Flags::kAsyncInitCompleted);
-
-        // If CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED is enabled,
-        // disable CHIPoBLE advertising if the device is fully provisioned.
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-        if (ConfigurationMgr().IsFullyProvisioned())
-        {
-            mFlags.Clear(Flags::kAdvertisingEnabled);
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
-        }
-#endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
         ExitNow();
     }
 
@@ -591,6 +601,7 @@ void BLEManagerImpl::DriveBLEState()
     if (!mIsCentral && mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kAppRegistered))
     {
         err = BluezGattsAppRegister(mpEndpoint);
+        SuccessOrExit(err);
         mFlags.Set(Flags::kControlOpInProgress);
         ExitNow();
     }
@@ -678,10 +689,10 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
         return;
     }
 
-    mDeviceScanner               = Internal::ChipDeviceScanner::Create(mpEndpoint->mpAdapter, this);
     mBLEScanConfig.mBleScanState = scanType;
 
-    if (!mDeviceScanner)
+    CHIP_ERROR err = mDeviceScanner.Init(mpEndpoint->mpAdapter, this);
+    if (err != CHIP_NO_ERROR)
     {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INTERNAL);
@@ -689,7 +700,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
         return;
     }
 
-    CHIP_ERROR err = mDeviceScanner->StartScan(kNewConnectionScanTimeout);
+    err = mDeviceScanner.StartScan(kNewConnectionScanTimeout);
     if (err != CHIP_NO_ERROR)
     {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
@@ -712,7 +723,7 @@ void BLEManagerImpl::InitiateScan(intptr_t arg)
     sInstance.InitiateScan(static_cast<BleScanState>(arg));
 }
 
-void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator)
+void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator)
 {
     mBLEScanConfig.mDiscriminator = connDiscriminator;
     mBLEScanConfig.mAppState      = appState;
@@ -723,7 +734,12 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const u
 
 CHIP_ERROR BLEManagerImpl::CancelConnection()
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
+        CancelConnect(mpEndpoint);
+    // If in discovery mode, stop scan.
+    else if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
+        mDeviceScanner.StopScan();
+    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate)
@@ -762,13 +778,13 @@ void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * 
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info)
+void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info)
 {
-    ChipLogProgress(Ble, "New device scanned: %s", bluez_device1_get_address(device));
+    ChipLogProgress(Ble, "New device scanned: %s", bluez_device1_get_address(&device));
 
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
     {
-        if (info.GetDeviceDiscriminator() != mBLEScanConfig.mDiscriminator)
+        if (!mBLEScanConfig.mDiscriminator.MatchesLongDiscriminator(info.GetDeviceDiscriminator()))
         {
             return;
         }
@@ -776,7 +792,7 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::Chi
     }
     else if (mBLEScanConfig.mBleScanState == BleScanState::kScanForAddress)
     {
-        if (strcmp(bluez_device1_get_address(device), mBLEScanConfig.mAddress.c_str()) != 0)
+        if (strcmp(bluez_device1_get_address(&device), mBLEScanConfig.mAddress.c_str()) != 0)
         {
             return;
         }
@@ -784,33 +800,45 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::Chi
     }
     else
     {
-        // Internal consistency eerror
+        // Internal consistency error
         ChipLogError(Ble, "Unknown discovery type. Ignoring scanned device.");
         return;
     }
 
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimeout, mpEndpoint);
-    mDeviceScanner->StopScan();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    mDeviceScanner.StopScan();
 
     ConnectDevice(device, mpEndpoint);
 }
 
 void BLEManagerImpl::OnScanComplete()
 {
-    if (mBLEScanConfig.mBleScanState != BleScanState::kScanForDiscriminator &&
-        mBLEScanConfig.mBleScanState != BleScanState::kScanForAddress)
+    switch (mBLEScanConfig.mBleScanState)
     {
+    case BleScanState::kNotScanning:
         ChipLogProgress(Ble, "Scan complete notification without an active scan.");
-        return;
+        break;
+    case BleScanState::kScanForAddress:
+    case BleScanState::kScanForDiscriminator:
+        mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+        ChipLogProgress(Ble, "Scan complete. No matching device found.");
+        break;
+    case BleScanState::kConnecting:
+        break;
     }
+}
 
-    BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_TIMEOUT);
-    mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+void BLEManagerImpl::OnScanError(CHIP_ERROR err)
+{
+    BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
+    ChipLogError(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

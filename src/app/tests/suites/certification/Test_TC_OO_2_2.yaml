@@ -14,13 +14,16 @@
 
 name: 3.2.2. [TC-OO-2.2] Primary functionality with server as DUT
 
+PICS:
+    - OO.S
+
 config:
     nodeId: 0x12344321
     cluster: "On/Off"
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,62 +31,62 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Send Off Command"
+    - label: "Step 2a: Send Off Command"
       PICS: OO.S.C00.Rsp
       command: "Off"
 
-    - label: "Check on/off attribute value is false after off command"
+    - label: "Step 2b: Check on/off attribute value is false after off command"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 0
 
-    - label: "Send On Command"
+    - label: "Step 3a: Send On Command"
       PICS: OO.S.C01.Rsp
       command: "On"
 
-    - label: "Check on/off attribute value is true after on command"
+    - label: "Step 3b: Check on/off attribute value is true after on command"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
-    - label: "Send On Command"
+    - label: "Step 3c: Send On Command"
       PICS: OO.S.C01.Rsp
       command: "On"
 
-    - label: "Check on/off attribute value is true after on command"
+    - label: "Step 3d: Check on/off attribute value is true after on command"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
-    - label: "Send Off Command"
+    - label: "Step 4a: Send Off Command"
       PICS: OO.S.C00.Rsp
       command: "Off"
 
-    - label: "Check on/off attribute value is false after off command"
+    - label: "Step 4b: Check on/off attribute value is false after off command"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 0
 
-    - label: "Send Off Command"
+    - label: "Step 4c: Send Off Command"
       PICS: OO.S.C00.Rsp
       command: "Off"
 
-    - label: "Check on/off attribute value is false after off command"
+    - label: "Step 4d: Check on/off attribute value is false after off command"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 0
 
-    - label: "Send Toggle Command"
+    - label: "Step 5c: Send Toggle Command"
       PICS: OO.S.C02.Rsp
       command: "Toggle"
 
@@ -95,7 +98,8 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label: "Check on/off attribute value is true after toggle command"
+    - label:
+          "Step 5d: Check on/off attribute value is true after toggle command"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
@@ -121,10 +125,10 @@ tests:
       response:
           value: 0
 
-    - label: "Operate on device to set OnOff attribute manually to on"
+    - label: "Step 6a: Operate on device to set OnOff attribute manually to on"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && OO.M.ManuallyControlled
+      PICS: PICS_USER_PROMPT && OO.M.ManuallyControlled && OO.S.A0000
       arguments:
           values:
               - name: "message"
@@ -133,17 +137,17 @@ tests:
                 value: "y"
 
     # Skipped this step because the above test need manual input
-    - label: "Check on/off attribute value is true after on command"
-      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A0000
+    - label: "Step 6b: Check on/off attribute value is true after on command"
+      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A0000 && OO.M.ManuallyControlled
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
-    - label: "Operate on device to set OnOff attribute manually to off"
+    - label: "Step 6c: Operate on device to set OnOff attribute manually to off"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && OO.M.ManuallyControlled
+      PICS: PICS_USER_PROMPT && OO.M.ManuallyControlled && OO.S.A0000
       arguments:
           values:
               - name: "message"
@@ -152,8 +156,8 @@ tests:
                 value: "y"
 
     # Skipped the step because the above test need manual input
-    - label: "Check on/off attribute value is false after off command"
-      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A0000
+    - label: "Step 6d: Check on/off attribute value is false after off command"
+      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A0000 && OO.M.ManuallyControlled
       command: "readAttribute"
       attribute: "OnOff"
       response:

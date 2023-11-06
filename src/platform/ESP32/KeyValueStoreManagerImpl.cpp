@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,7 +58,7 @@ bool HashIfLongKey(const char * key, char * keyHash)
     Encoding::BytesToHex(hashBuffer, NVS_KEY_NAME_MAX_SIZE / 2, keyHash, NVS_KEY_NAME_MAX_SIZE, flags);
     keyHash[NVS_KEY_NAME_MAX_SIZE - 1] = 0;
 
-    ChipLogDetail(DeviceLayer, "Using hash:%s for nvs key:%s", keyHash, key);
+    ChipLogDetail(DeviceLayer, "Using hash:%s for nvs key:%s", keyHash, StringOrNullMarker(key));
     return true;
 }
 } // namespace
@@ -75,7 +75,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     VerifyOrReturnError(offset_bytes == 0, CHIP_ERROR_NOT_IMPLEMENTED);
 
     Internal::ScopedNvsHandle handle;
-    ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READONLY));
+    ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READONLY, CHIP_DEVICE_CONFIG_CHIP_KVS_NAMESPACE_PARTITION));
 
     char keyHash[NVS_KEY_NAME_MAX_SIZE];
     VerifyOrDo(HashIfLongKey(key, keyHash) == false, key = keyHash);
@@ -95,7 +95,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     VerifyOrReturnError(value, CHIP_ERROR_INVALID_ARGUMENT);
 
     Internal::ScopedNvsHandle handle;
-    ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READWRITE));
+    ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READWRITE, CHIP_DEVICE_CONFIG_CHIP_KVS_NAMESPACE_PARTITION));
 
     char keyHash[NVS_KEY_NAME_MAX_SIZE];
     VerifyOrDo(HashIfLongKey(key, keyHash) == false, key = keyHash);
@@ -112,7 +112,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
     Internal::ScopedNvsHandle handle;
 
-    ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READWRITE));
+    ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READWRITE, CHIP_DEVICE_CONFIG_CHIP_KVS_NAMESPACE_PARTITION));
 
     char keyHash[NVS_KEY_NAME_MAX_SIZE];
     VerifyOrDo(HashIfLongKey(key, keyHash) == false, key = keyHash);
@@ -129,7 +129,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::EraseAll(void)
 {
     Internal::ScopedNvsHandle handle;
 
-    ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READWRITE));
+    ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READWRITE, CHIP_DEVICE_CONFIG_CHIP_KVS_NAMESPACE_PARTITION));
     ReturnMappedErrorOnFailure(nvs_erase_all(handle));
     ReturnMappedErrorOnFailure(nvs_commit(handle));
 

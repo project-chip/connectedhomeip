@@ -19,10 +19,7 @@
 
 #include <platform/CHIPDeviceConfig.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
 #include <glib.h>
-#include <memory>
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
@@ -40,10 +37,13 @@ public:
     virtual ~ChipDeviceScannerDelegate() {}
 
     // Called when a CHIP device was found
-    virtual void OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
+    virtual void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
 
     // Called when a scan was completed (stopped or timed out)
     virtual void OnScanComplete() = 0;
+
+    // Call on scan error
+    virtual void OnScanError(CHIP_ERROR) = 0;
 };
 
 /// Allows scanning for CHIP devices
@@ -52,43 +52,43 @@ public:
 class ChipDeviceScanner
 {
 public:
-    /// NOTE: prefer to use the  ::Create method instead direct constructor calling.
-    ChipDeviceScanner(GDBusObjectManager * manager, BluezAdapter1 * adapter, GCancellable * cancellable,
-                      ChipDeviceScannerDelegate * delegate);
-
-    ChipDeviceScanner(ChipDeviceScanner &&)      = default;
-    ChipDeviceScanner(const ChipDeviceScanner &) = delete;
+    ChipDeviceScanner()                                      = default;
+    ChipDeviceScanner(ChipDeviceScanner &&)                  = default;
+    ChipDeviceScanner(const ChipDeviceScanner &)             = delete;
     ChipDeviceScanner & operator=(const ChipDeviceScanner &) = delete;
 
-    ~ChipDeviceScanner();
+    ~ChipDeviceScanner() { Shutdown(); }
+
+    /// Initialize the scanner.
+    CHIP_ERROR Init(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate);
+
+    /// Release any resources associated with the scanner.
+    void Shutdown();
 
     /// Initiate a scan for devices, with the given timeout
+    ///
+    /// This method must be called while in the Matter context (from the Matter event
+    /// loop, or while holding the Matter stack lock).
     CHIP_ERROR StartScan(System::Clock::Timeout timeout);
 
     /// Stop any currently running scan
     CHIP_ERROR StopScan();
 
-    /// Create a new device scanner
-    ///
-    /// Convenience method to allocate any required variables.
-    /// On success, maintains a reference to the provided adapter.
-    static std::unique_ptr<ChipDeviceScanner> Create(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate);
-
 private:
     static void TimerExpiredCallback(chip::System::Layer * layer, void * appState);
-    static int MainLoopStartScan(ChipDeviceScanner * self);
-    static int MainLoopStopScan(ChipDeviceScanner * self);
+    static CHIP_ERROR MainLoopStartScan(ChipDeviceScanner * self);
+    static CHIP_ERROR MainLoopStopScan(ChipDeviceScanner * self);
     static void SignalObjectAdded(GDBusObjectManager * manager, GDBusObject * object, ChipDeviceScanner * self);
     static void SignalInterfaceChanged(GDBusObjectManagerClient * manager, GDBusObjectProxy * object, GDBusProxy * aInterface,
                                        GVariant * aChangedProperties, const gchar * const * aInvalidatedProps,
                                        ChipDeviceScanner * self);
 
     /// Check if a given device is a CHIP device and if yes, report it as discovered
-    void ReportDevice(BluezDevice1 * device);
+    void ReportDevice(BluezDevice1 & device);
 
     /// Check if a given device is a CHIP device and if yes, remove it from the adapter
     /// so that it can be re-discovered if it's still advertising.
-    void RemoveDevice(BluezDevice1 * device);
+    void RemoveDevice(BluezDevice1 & device);
 
     GDBusObjectManager * mManager         = nullptr;
     BluezAdapter1 * mAdapter              = nullptr;
@@ -96,12 +96,13 @@ private:
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     gulong mObjectAddedSignal             = 0;
     gulong mInterfaceChangedSignal        = 0;
+    bool mIsInitialized                   = false;
     bool mIsScanning                      = false;
     bool mIsStopping                      = false;
+    /// Used to track if timer has already expired and doesn't need to be canceled.
+    bool mTimerExpired = false;
 };
 
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

@@ -104,7 +104,7 @@ gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_deta
 if [ "$enable_pybindings" == true ]; then
     ninja -v -C "$OUTPUT_ROOT" pycontroller
 else
-    ninja -v -C "$OUTPUT_ROOT" chip-library
+    ninja -v -C "$OUTPUT_ROOT" chip-core
 fi
 
 # Create a virtual environment that has access to the built python tools
@@ -115,7 +115,7 @@ virtualenv --clear "$ENVIRONMENT_ROOT"
 if [ "$enable_pybindings" == true ]; then
     WHEEL=("$OUTPUT_ROOT"/pybindings/pycontroller/pychip-*.whl)
 else
-    WHEEL=("$OUTPUT_ROOT"/controller/python/chip_library*.whl)
+    WHEEL=("$OUTPUT_ROOT"/controller/python/chip_core*.whl)
 fi
 
 source "$ENVIRONMENT_ROOT"/bin/activate

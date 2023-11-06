@@ -35,7 +35,7 @@ struct NullOptionalType
 {
     explicit NullOptionalType() = default;
 };
-constexpr NullOptionalType NullOptional{};
+inline constexpr NullOptionalType NullOptional{};
 
 /**
  * Pairs an object with a boolean value to determine if the object value
@@ -184,6 +184,8 @@ public:
         return (mHasValue == other.mHasValue) && (!other.mHasValue || (mValue.mData == other.mValue.mData));
     }
     bool operator!=(const Optional & other) const { return !(*this == other); }
+    bool operator==(const T & other) const { return HasValue() && Value() == other; }
+    bool operator!=(const T & other) const { return !(*this == other); }
 
     /** Convenience method to create an optional without a valid value. */
     static Optional<T> Missing() { return Optional<T>(); }

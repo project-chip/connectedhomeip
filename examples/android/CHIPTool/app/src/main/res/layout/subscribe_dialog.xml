@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+  <TextView
+      android:id="@+id/titleText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/subscribe_dialog_title_text"
+      android:textSize="22sp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+  <EditText
+      android:id="@+id/minIntervalEd"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hint="@string/subscribe_dialog_min_interval_hint"
+      android:inputType="number"
+      android:textSize="16sp"
+      android:layout_marginTop="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/titleText" />
+
+  <EditText
+      android:id="@+id/maxIntervalEd"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hint="@string/subscribe_dialog_max_interval_hint"
+      android:inputType="number"
+      android:textSize="16sp"
+      android:layout_marginBottom="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/minIntervalEd" />
+  <TextView
+      android:id="@+id/titleKeepSubscriptions"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="@string/subscribe_dialog_keep_subscriptions_hint"
+      android:textSize="16sp"
+      android:layout_marginTop="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/maxIntervalEd"
+      />
+  <Spinner
+      android:id="@+id/keepSubscriptionsSp"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hint="@string/subscribe_dialog_keep_subscriptions_hint"
+      android:entries="@array/chip_select_menu"
+      android:inputType="text"
+      android:spinnerMode="dropdown"
+      android:textSize="16sp"
+      android:layout_marginTop="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/titleKeepSubscriptions" />
+  <TextView
+      android:id="@+id/titleIsFabricFilter"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="@string/subscribe_dialog_is_fabric_filtered_hint"
+      android:textSize="16sp"
+      android:layout_marginTop="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/keepSubscriptionsSp"
+      />
+
+  <Spinner
+      android:id="@+id/isFabricFilteredSp"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hint="@string/subscribe_dialog_is_fabric_filtered_hint"
+      android:inputType="text"
+      android:entries="@array/chip_select_menu"
+      android:spinnerMode="dropdown"
+      android:textSize="16sp"
+      android:layout_marginBottom="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/titleIsFabricFilter"
+      app:layout_constraintBottom_toTopOf="@+id/eventMinEd"/>
+
+  <EditText
+      android:id="@+id/eventMinEd"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hint="@string/subscribe_dialog_event_min_hint"
+      android:inputType="number"
+      android:textSize="16sp"
+      android:layout_marginBottom="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/isFabricFilteredSp"
+      app:layout_constraintBottom_toTopOf="@+id/subscribeBtn"/>
+
+  <Button
+      android:id="@+id/subscribeBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/subscribe_dialog_subscribe_btn_text"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

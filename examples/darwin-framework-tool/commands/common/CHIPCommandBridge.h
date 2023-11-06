@@ -21,20 +21,36 @@
 #include <commands/common/Command.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <map>
+#include <set>
 #include <string>
 
 #include "../provider/OTAProviderDelegate.h"
 
 #pragma once
 
-constexpr const char kIdentityAlpha[] = "alpha";
-constexpr const char kIdentityBeta[]  = "beta";
-constexpr const char kIdentityGamma[] = "gamma";
+inline constexpr const char kIdentityAlpha[] = "alpha";
+inline constexpr const char kIdentityBeta[] = "beta";
+inline constexpr const char kIdentityGamma[] = "gamma";
 
-class CHIPCommandBridge : public Command
-{
+class CHIPCommandBridge : public Command {
 public:
-    CHIPCommandBridge(const char * commandName) : Command(commandName) { AddArgument("commissioner-name", &mCommissionerName); }
+    CHIPCommandBridge(const char * commandName)
+        : Command(commandName)
+    {
+        AddArgument("commissioner-name", &mCommissionerName);
+        AddArgument("commissioner-nodeId", 0, UINT64_MAX, &mCommissionerNodeId,
+            "Sets the commisser node ID of the given "
+            "commissioner-name. Interactive mode will only set a single commissioner on the inital command. "
+            "The commissioner node ID will be persisted until a different one is specified.");
+        AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
+            "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
+            "directory.");
+        AddArgument(
+            "storage-directory", &mStorageDirectory, "This option does nothing. It is here for API compatibility with chip-tool.");
+        AddArgument("commissioner-vendor-id", 0, UINT16_MAX, &mCommissionerVendorId,
+            "The vendor id to use for darwin-framework-tool. If not provided, chip::VendorId::TestVendor1 (65521, 0xFFF1) will be "
+            "used.");
+    }
 
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;
@@ -95,9 +111,13 @@ protected:
 
     static std::set<CHIPCommandBridge *> sDeferredCleanups;
 
+    void StopCommissioners();
+
+    void RestartCommissioners();
+
 private:
-    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
-                                      const chip::Credentials::AttestationTrustStore * trustStore);
+    CHIP_ERROR InitializeCommissioner(
+        std::string key, chip::FabricId fabricId, const chip::Credentials::AttestationTrustStore * trustStore);
     void ShutdownCommissioner();
     uint16_t CurrentCommissionerIndex();
 
@@ -109,6 +129,8 @@ private:
     CHIP_ERROR MaybeSetUpStack();
     void MaybeTearDownStack();
 
+    CHIP_ERROR GetPAACertsFromFolder(NSArray<NSData *> * __autoreleasing * paaCertsResult);
+
     // Our three controllers: alpha, beta, gamma.
     static std::map<std::string, MTRDeviceController *> mControllers;
 
@@ -118,6 +140,9 @@ private:
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
     chip::Optional<char *> mCommissionerName;
-    bool mWaitingForResponse{ true };
+    chip::Optional<uint64_t> mCommissionerNodeId;
+    bool mWaitingForResponse { true };
     static dispatch_queue_t mOTAProviderCallbackQueue;
+    chip::Optional<char *> mPaaTrustStorePath;
+    chip::Optional<chip::VendorId> mCommissionerVendorId;
 };

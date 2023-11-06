@@ -22,12 +22,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR InvokeRequests::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR InvokeRequests::Parser::PrettyPrint() const
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     size_t numCommandDatas = 0;
@@ -46,7 +46,7 @@ CHIP_ERROR InvokeRequests::Parser::CheckSchemaValidity() const
             CommandDataIB::Parser commandData;
             ReturnErrorOnFailure(commandData.Init(reader));
             PRETTY_PRINT_INCDEPTH();
-            ReturnErrorOnFailure(commandData.CheckSchemaValidity());
+            ReturnErrorOnFailure(commandData.PrettyPrint());
             PRETTY_PRINT_DECDEPTH();
         }
 
@@ -68,7 +68,7 @@ CHIP_ERROR InvokeRequests::Parser::CheckSchemaValidity() const
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 CommandDataIB::Builder & InvokeRequests::Builder::CreateCommandData()
 {
@@ -79,10 +79,10 @@ CommandDataIB::Builder & InvokeRequests::Builder::CreateCommandData()
     return mCommandData;
 }
 
-InvokeRequests::Builder & InvokeRequests::Builder::EndOfInvokeRequests()
+CHIP_ERROR InvokeRequests::Builder::EndOfInvokeRequests()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

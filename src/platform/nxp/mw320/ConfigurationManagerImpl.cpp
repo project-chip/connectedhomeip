@@ -27,10 +27,11 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConfigurationManager.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/nxp/mw320/MW320Config.h>
 
-//#include "core_cm7.h"
+// #include "core_cm7.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -48,15 +49,10 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
-ConfigurationManager & ConfigurationMgr()
-{
-    return ConfigurationManagerImpl::GetDefaultInstance();
-}
-
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
-    bool failSafeArmed;
+    uint32_t rebootCount = 0;
 
     // Initialize the generic implementation base class.
     // err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();
@@ -64,17 +60,40 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     SuccessOrExit(err);
 
     // TODO: Initialize the global GroupKeyStore object here
-
-    // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
+    if (MW320Config::ConfigValueExists(MW320Config::kCounterKey_RebootCount))
     {
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
+        err = GetRebootCount(rebootCount);
+        SuccessOrExit(err);
+        err = StoreRebootCount(rebootCount + 1);
+        SuccessOrExit(err);
     }
+    else
+    {
+        // The first boot after factory reset of the Node.
+        err = StoreRebootCount(1);
+        SuccessOrExit(err);
+    }
+
+    if (!MW320Config::ConfigValueExists(MW320Config::kCounterKey_BootReason))
+    {
+        err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
+        SuccessOrExit(err);
+    }
+
     err = CHIP_NO_ERROR;
 
 exit:
     return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
+{
+    return ReadConfigValue(MW320Config::kCounterKey_BootReason, bootReason);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
+{
+    return WriteConfigValue(MW320Config::kCounterKey_BootReason, bootReason);
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset()
@@ -121,6 +140,16 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
 
 exit:
     return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return ReadConfigValue(MW320Config::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+    return WriteConfigValue(MW320Config::kCounterKey_RebootCount, rebootCount);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
@@ -198,6 +227,11 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
     //__NVIC_SystemReset(void);
+}
+
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

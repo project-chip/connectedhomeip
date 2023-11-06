@@ -31,6 +31,8 @@ static_library("dnssd") {
 
   sources = [
     "Advertiser.h",
+    "IPAddressSorter.cpp",
+    "IPAddressSorter.h",
     "Resolver.h",
     "ServiceNaming.cpp",
     "ServiceNaming.h",
@@ -56,7 +58,8 @@ static_library("dnssd") {
     ]
     public_deps += [
       "${chip_root}/src/lib/dnssd/minimal_mdns",
-      "${chip_root}/src/trace",
+      "${chip_root}/src/tracing",
+      "${chip_root}/src/tracing:macros",
     ]
   } else if (chip_mdns == "platform") {
     sources += [
@@ -67,4 +70,6 @@ static_library("dnssd") {
   } else {
     assert(false, "Unknown Dnssd advertiser implementation.")
   }
+
+  cflags = [ "-Wconversion" ]
 }

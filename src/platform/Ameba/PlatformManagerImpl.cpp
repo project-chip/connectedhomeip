@@ -39,7 +39,7 @@ CHIP_ERROR InitLwIPCoreLock(void);
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 extern "C" {
-extern int rtw_get_random_bytes(void * dst, size_t size);
+extern int rtw_get_random_bytes(void * dst, uint32_t size);
 }
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
@@ -58,8 +58,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
 
     CHIP_ERROR err;
-
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
 
     // Make sure the LwIP core lock has been initialized
     err = Internal::InitLwIPCoreLock();

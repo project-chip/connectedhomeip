@@ -38,7 +38,7 @@ from enum import IntEnum
 
 sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../controller/python'))
-from chip.tlv import TLVReader, TLVWriter, uint  # noqa: E402
+from chip.tlv import TLVReader, TLVWriter, uint  # noqa: E402 isort:skip
 
 HEADER_MAGIC = 0x1BEEF11E
 FIXED_HEADER_FORMAT = '<IQI'
@@ -262,7 +262,7 @@ def show_header(args: object):
     print(f'Magic: {magic:x}')
     print(f'Total Size: {total_size}')
     print(f'Header Size: {header_size}')
-    print(f'Header TLV:')
+    print('Header TLV:')
 
     for tag in header_tlv:
         tag_name = HeaderTag(tag).name.replace('_', ' ').title()

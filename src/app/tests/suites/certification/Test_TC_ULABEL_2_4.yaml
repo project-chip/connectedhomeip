@@ -17,6 +17,9 @@ name:
     92.5. [TC-ULABEL-2.4] User Label cluster empty entry verification
     [DUT-server]
 
+PICS:
+    - ULABEL.S
+
 config:
     nodeId: 0x12344321
     cluster: "User Label"
@@ -31,38 +34,38 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH writes LabelList attribute of the DUT"
+    - label: "Step 1: TH writes LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "writeAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       arguments:
           value:
               [
-                  { label: "room", value: "bedroom 1" },
-                  { label: "Orientation", value: "east" },
+                  { Label: "room", Value: "bedroom 1" },
+                  { Label: "Orientation", Value: "east" },
               ]
 
-    - label: "TH reads LabelList attribute of the DUT"
+    - label: "Step 2: TH reads LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "readAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       response:
           value:
               [
-                  { label: "room", value: "bedroom 1" },
-                  { label: "Orientation", value: "east" },
+                  { Label: "room", Value: "bedroom 1" },
+                  { Label: "Orientation", Value: "east" },
               ]
 
-    - label: "TH writes LabelList attribute of the DUT"
+    - label: "Step 3: TH writes LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "writeAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       arguments:
-          value: []
+          value: [{ Label: "", Value: "" }]
 
-    - label: "TH reads LabelList attribute of the DUT"
+    - label: "Step 4: TH reads LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "readAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       response:
-          value: []
+          value: [{ Label: "", Value: "" }]

@@ -21,6 +21,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/config.h>
 #include <app/util/error-mapping.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/Constants.h>
@@ -36,16 +37,17 @@ using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using chip::app::Clusters::OTAProviderDelegate;
 using Protocols::InteractionModel::Status;
 
-// EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT is only defined if the
+// EMBER_AF_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT is only defined if the
 // cluster is actually enabled in the ZAP config.  To allow operation in setups
 // where that's not the case (and custom dispatch is used), define it here as
 // needed.
-#ifndef EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT
-#define EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT 0
-#endif // EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT
+#ifndef EMBER_AF_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT
+#define EMBER_AF_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT 0
+#endif // EMBER_AF_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT
 
 static constexpr size_t kOtaProviderDelegateTableSize =
-    EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    EMBER_AF_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kOtaProviderDelegateTableSize <= kEmberInvalidEndpointIndex, "OtaProvider Delegate table size error");
 
 namespace {
 constexpr size_t kLocationLen          = 2;   // The expected length of the location parameter in QueryImage
@@ -57,8 +59,9 @@ OTAProviderDelegate * gDelegateTable[kOtaProviderDelegateTableSize] = { nullptr 
 
 OTAProviderDelegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, OtaSoftwareUpdateProvider::Id);
-    return (ep == 0xFFFF ? nullptr : gDelegateTable[ep]);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, OtaSoftwareUpdateProvider::Id,
+                                                       EMBER_AF_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kOtaProviderDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool SendStatusIfDelegateNull(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path)
@@ -148,8 +151,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
                                                                const app::ConcreteCommandPath & commandPath,
                                                                const Commands::QueryImage::DecodableType & commandData)
 {
-    auto & vendorId            = commandData.vendorId;
-    auto & productId           = commandData.productId;
+    auto & vendorId            = commandData.vendorID;
+    auto & productId           = commandData.productID;
     auto & hardwareVersion     = commandData.hardwareVersion;
     auto & softwareVersion     = commandData.softwareVersion;
     auto & protocolsSupported  = commandData.protocolsSupported;
@@ -225,8 +228,9 @@ namespace OTAProvider {
 
 void SetDelegate(EndpointId endpoint, OTAProviderDelegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, OtaSoftwareUpdateProvider::Id);
-    if (ep != 0xFFFF)
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, OtaSoftwareUpdateProvider::Id,
+                                                       EMBER_AF_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (ep < kOtaProviderDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }

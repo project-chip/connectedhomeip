@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,268 +15,201 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *        NVM Writes are time-consuming so instead of blocking the main tasks (e.g.: Matter)
- *        buffer the writes in a RAM buffer that gets to be written in the Idle Task
- */
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "FunctionLib.h"
-#include "RamStorage.h"
-
-#ifndef RAM_STORAGE_LOG
-#define RAM_STORAGE_LOG 0
-#endif
-
+#include <openthread/platform/memory.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#if RAM_STORAGE_LOG
-#include "fsl_debug_console.h"
-#define RAM_STORAGE_PRINTF(...)                                                                                                    \
-    PRINTF("[%s] ", __FUNCTION__);                                                                                                 \
-    PRINTF(__VA_ARGS__);                                                                                                           \
-    PRINTF("\n\r");
+#include <platform/nxp/k32w/k32w0/RamStorage.h>
+
+#include "pdm_ram_storage_glue.h"
+
+#if PDM_SAVE_IDLE
+#include "fsl_os_abstraction.h"
+#define mutex_lock(descr, timeout) OSA_MutexLock(descr->header.mutexHandle, timeout)
+#define mutex_unlock(descr) OSA_MutexUnlock(descr->header.mutexHandle)
+#define mutex_destroy(descr) OSA_MutexDestroy(descr->header.mutexHandle)
 #else
-#define RAM_STORAGE_PRINTF(...)
+#define mutex_lock(...)
+#define mutex_unlock(...)
+#define mutex_destroy(...)
 #endif
 
-/* increment size for dynamic memory re-allocation in case the
- * initial RAM buffer size gets insufficient
- */
-constexpr size_t kRamBufferReallocSize  = 512;
-constexpr size_t kRamBufferMaxAllocSize = 10240;
+#if PDM_USE_DYNAMIC_MEMORY
+#define ot_free otPlatFree
+#else
+#define ot_free(...)
+#endif
 
-ramBufferDescriptor * getRamBuffer(uint16_t nvmId, uint16_t initialSize)
+#if PDM_SAVE_IDLE
+// Segment data size is: D_SEGMENT_MEMORY_SIZE (4096) - D_PDM_NVM_SEGMENT_HEADER_SIZE (size of internal header).
+// Subtract 64 to have more margin.
+#define PDM_SEGMENT_SIZE (4096 - 64)
+#endif
+
+namespace chip::DeviceLayer::Internal {
+
+RamStorageKey::RamStorageKey(RamStorage * storage, uint8_t keyId, uint8_t internalId)
 {
-    ramBufferDescriptor * ramDescr = NULL;
-    bool bLoadDataFromNvm          = false;
-    uint16_t bytesRead             = 0;
-    uint16_t recordSize            = 0;
-    uint16_t allocSize             = initialSize;
-
-    /* Check if dataset is present and get its size */
-    if (PDM_bDoesDataExist(nvmId, &recordSize))
-    {
-        bLoadDataFromNvm = true;
-        while (recordSize > allocSize)
-        {
-            // increase size until NVM data fits
-            allocSize += kRamBufferReallocSize;
-        }
-    }
-
-    if (allocSize <= kRamBufferMaxAllocSize)
-    {
-        ramDescr = (ramBufferDescriptor *) malloc(allocSize);
-        if (ramDescr)
-        {
-            ramDescr->ramBufferLen    = 0;
-            ramDescr->ramBufferMaxLen = allocSize - kRamDescHeaderSize;
-
-            if (bLoadDataFromNvm)
-            {
-                /* Try to load the dataset in RAM */
-                if (PDM_E_STATUS_OK != PDM_eReadDataFromRecord(nvmId, ramDescr, recordSize, &bytesRead))
-                {
-                    memset(ramDescr, 0, allocSize);
-                }
-            }
-        }
-    }
-
-    return ramDescr;
+    mStorage = storage;
+    mId      = GetInternalId(keyId, internalId);
 }
 
-static rsError ramStorageAdd(ramBufferDescriptor * pBuffer, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength)
+CHIP_ERROR RamStorageKey::Read(uint8_t * buf, uint16_t & sizeToRead) const
 {
-    rsError error                     = RS_ERROR_NONE;
-    struct settingsBlock currentBlock = { 0 };
-    const uint16_t newBlockLength     = sizeof(settingsBlock) + aValueLength;
-
-    if (pBuffer->ramBufferLen + newBlockLength <= pBuffer->ramBufferMaxLen)
-    {
-        currentBlock.key    = aKey;
-        currentBlock.length = aValueLength;
-
-        memcpy(&pBuffer->pRamBuffer[pBuffer->ramBufferLen], &currentBlock, sizeof(settingsBlock));
-        memcpy(&pBuffer->pRamBuffer[pBuffer->ramBufferLen + sizeof(settingsBlock)], aValue, aValueLength);
-        pBuffer->ramBufferLen += newBlockLength;
-
-        error = RS_ERROR_NONE;
-    }
-    else
-    {
-        error = RS_ERROR_NO_BUFS;
-    }
-
-    RAM_STORAGE_PRINTF("key = %d lengthWriten = %d err = %d", aKey, aValueLength, error);
-
-    return error;
+    return mStorage->Read(mId, 0, buf, &sizeToRead);
 }
 
-rsError ramStorageGet(const ramBufferDescriptor * pBuffer, uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength)
+CHIP_ERROR RamStorageKey::Write(const uint8_t * buf, uint16_t length)
 {
-    uint16_t i                        = 0;
-    uint16_t valueLength              = 0;
-    uint16_t readLength               = 0;
-    int currentIndex                  = 0;
-    struct settingsBlock currentBlock = { 0 };
-    rsError error                     = RS_ERROR_NOT_FOUND;
-
-    while (i < pBuffer->ramBufferLen)
-    {
-        memcpy(&currentBlock, &pBuffer->pRamBuffer[i], sizeof(settingsBlock));
-
-        if (aKey == currentBlock.key)
-        {
-            if (currentIndex == aIndex)
-            {
-                readLength = currentBlock.length;
-
-                // Perform read only if an input buffer was passed in
-                if (aValue != NULL && aValueLength != NULL)
-                {
-                    // Adjust read length if input buffer size is smaller
-                    if (readLength > *aValueLength)
-                    {
-                        readLength = *aValueLength;
-                    }
-
-                    memcpy(aValue, &pBuffer->pRamBuffer[i + sizeof(settingsBlock)], readLength);
-                }
-
-                valueLength = currentBlock.length;
-                error       = RS_ERROR_NONE;
-                break;
-            }
-
-            currentIndex++;
-        }
-
-        i += sizeof(settingsBlock) + currentBlock.length;
-    }
-
-    if (aValueLength != NULL)
-    {
-        *aValueLength = valueLength;
-    }
-
-    RAM_STORAGE_PRINTF("key = %d err = %d", aKey, error);
-
-    return error;
+    return mStorage->Write(mId, buf, length);
 }
 
-static rsError ramStorageSetInternal(ramBufferDescriptor * pBuffer, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength)
+CHIP_ERROR RamStorageKey::Delete()
 {
-    uint16_t i                        = 0;
-    uint16_t currentBlockLength       = 0;
-    uint16_t nextBlockStart           = 0;
-    struct settingsBlock currentBlock = { 0 };
-
-    // Delete all entries of aKey
-    while (i < pBuffer->ramBufferLen)
-    {
-        memcpy(&currentBlock, &pBuffer->pRamBuffer[i], sizeof(settingsBlock));
-        currentBlockLength = sizeof(settingsBlock) + currentBlock.length;
-
-        if (aKey == currentBlock.key)
-        {
-            nextBlockStart = i + currentBlockLength;
-
-            if (nextBlockStart < pBuffer->ramBufferLen)
-            {
-                memmove(&pBuffer->pRamBuffer[i], &pBuffer->pRamBuffer[nextBlockStart], pBuffer->ramBufferLen - nextBlockStart);
-            }
-
-            VerifyOrDie(pBuffer->ramBufferLen >= currentBlockLength);
-            pBuffer->ramBufferLen -= currentBlockLength;
-        }
-        else
-        {
-            i += currentBlockLength;
-        }
-    }
-
-    return ramStorageAdd(pBuffer, aKey, aValue, aValueLength);
+    return mStorage->Delete(mId, -1);
 }
 
-rsError ramStorageSet(ramBufferDescriptor ** pBuffer, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength)
+CHIP_ERROR RamStorage::Init(uint16_t aInitialSize, bool extendedSearch)
 {
-    rsError err               = RS_ERROR_NONE;
-    uint16_t allocSize        = (*pBuffer)->ramBufferMaxLen;
-    ramBufferDescriptor * ptr = NULL;
+    CHIP_ERROR err;
 
-    if (allocSize <= (*pBuffer)->ramBufferLen + aValueLength)
+    mBuffer         = getRamBuffer(mPdmId, aInitialSize, extendedSearch);
+    mExtendedSearch = extendedSearch;
+
+    return mBuffer ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+}
+
+void RamStorage::FreeBuffer()
+{
+    if (mBuffer)
     {
-        while ((allocSize < (*pBuffer)->ramBufferLen + aValueLength))
+        mutex_lock(mBuffer, osaWaitForever_c);
+        if (mBuffer->buffer)
         {
-            /* Need to realocate the memory buffer, increase size by kRamBufferReallocSize until NVM data fits */
-            allocSize += kRamBufferReallocSize;
+            ot_free(mBuffer->buffer);
+            mBuffer->buffer = nullptr;
         }
-
-        allocSize += kRamDescHeaderSize;
-
-        if (kRamBufferMaxAllocSize <= kRamBufferMaxAllocSize)
-        {
-            ptr = (ramBufferDescriptor *) realloc((void *) (*pBuffer), allocSize);
-            VerifyOrExit((NULL != ptr), err = RS_ERROR_NO_BUFS);
-            *pBuffer                    = ptr;
-            (*pBuffer)->ramBufferMaxLen = allocSize;
-        }
-        else
-        {
-            err = RS_ERROR_NO_BUFS;
-        }
+        mutex_unlock(mBuffer);
+        mutex_destroy(mBuffer);
+        ot_free(mBuffer);
+        mBuffer = nullptr;
     }
+}
 
-    err = ramStorageSetInternal(*pBuffer, aKey, aValue, aValueLength);
+CHIP_ERROR RamStorage::Read(uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength) const
+{
+    CHIP_ERROR err;
+    rsError status;
+
+    mutex_lock(mBuffer, osaWaitForever_c);
+    status = ramStorageGet(mBuffer, aKey, aIndex, aValue, aValueLength);
+    SuccessOrExit(err = MapStatusToChipError(status));
 
 exit:
+    mutex_unlock(mBuffer);
     return err;
 }
 
-rsError ramStorageDelete(ramBufferDescriptor * pBuffer, uint16_t aKey, int aIndex)
+CHIP_ERROR RamStorage::Write(uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength)
 {
-    uint16_t i                        = 0;
-    int currentIndex                  = 0;
-    uint16_t nextBlockStart           = 0;
-    uint16_t currentBlockLength       = 0;
-    struct settingsBlock currentBlock = { 0 };
-    rsError error                     = RS_ERROR_NOT_FOUND;
+    CHIP_ERROR err;
+    rsError status = RS_ERROR_NONE;
+    PDM_teStatus pdmStatus;
 
-    while (i < pBuffer->ramBufferLen)
-    {
-        memcpy(&currentBlock, &pBuffer->pRamBuffer[i], sizeof(settingsBlock));
-        currentBlockLength = sizeof(settingsBlock) + currentBlock.length;
+    mutex_lock(mBuffer, osaWaitForever_c);
+    // Delete all occurrences of "key" and resize buffer if needed
+    // before scheduling writing of new value.
+    ramStorageDelete(mBuffer, aKey, -1);
+#if PDM_USE_DYNAMIC_MEMORY
+    status = ramStorageResize(mBuffer, aKey, aValue, aValueLength);
+    SuccessOrExit(err = MapStatusToChipError(status));
+#endif
+    status = ramStorageSet(mBuffer, aKey, aValue, aValueLength);
+    SuccessOrExit(err = MapStatusToChipError(status));
+    pdmStatus = PDM_SaveRecord(mPdmId, mBuffer);
+    SuccessOrExit(err = MapPdmStatusToChipError(pdmStatus));
 
-        if (aKey == currentBlock.key)
-        {
-            if (currentIndex == aIndex)
-            {
-                nextBlockStart = i + currentBlockLength;
-
-                if (nextBlockStart < pBuffer->ramBufferLen)
-                {
-                    memmove(&pBuffer->pRamBuffer[i], &pBuffer->pRamBuffer[nextBlockStart], pBuffer->ramBufferLen - nextBlockStart);
-                }
-
-                VerifyOrDie(pBuffer->ramBufferLen >= currentBlockLength);
-                pBuffer->ramBufferLen -= currentBlockLength;
-
-                error = RS_ERROR_NONE;
-                break;
-            }
-            else
-            {
-                currentIndex++;
-            }
-        }
-
-        i += currentBlockLength;
-    }
-    RAM_STORAGE_PRINTF("key = %d err = %d", aKey, error);
-    return error;
+exit:
+    mutex_unlock(mBuffer);
+    return err;
 }
+
+CHIP_ERROR RamStorage::Delete(uint16_t aKey, int aIndex)
+{
+    CHIP_ERROR err;
+    rsError status = RS_ERROR_NONE;
+    PDM_teStatus pdmStatus;
+
+    mutex_lock(mBuffer, osaWaitForever_c);
+    status = ramStorageDelete(mBuffer, aKey, aIndex);
+    SuccessOrExit(err = MapStatusToChipError(status));
+    pdmStatus = PDM_SaveRecord(mPdmId, mBuffer);
+    SuccessOrExit(err = MapPdmStatusToChipError(pdmStatus));
+
+exit:
+    mutex_unlock(mBuffer);
+    return err;
+}
+
+void RamStorage::OnFactoryReset()
+{
+    uint16_t i = 0;
+    uint16_t length;
+
+    mutex_lock(mBuffer, osaWaitForever_c);
+    // Have to cover the extended search case, in which a large RAM
+    // buffer is saved at multiple PDM ids.
+    if (mExtendedSearch)
+    {
+        while (PDM_bDoesDataExist(mPdmId + i, &length))
+        {
+            ChipLogProgress(DeviceLayer, "Ram Storage: delete PDM id: %x", mPdmId + i);
+            PDM_vDeleteDataRecord(mPdmId + i);
+            i++;
+        }
+    }
+    else
+    {
+        PDM_vDeleteDataRecord(mPdmId);
+    }
+    mutex_unlock(mBuffer);
+    FreeBuffer();
+}
+
+CHIP_ERROR RamStorage::MapStatusToChipError(rsError rsStatus) const
+{
+    CHIP_ERROR err;
+
+    switch (rsStatus)
+    {
+    case RS_ERROR_NONE:
+        err = CHIP_NO_ERROR;
+        break;
+    case RS_ERROR_NOT_FOUND:
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        break;
+    default:
+        err = CHIP_ERROR_BUFFER_TOO_SMALL;
+        break;
+    }
+
+    return err;
+}
+
+CHIP_ERROR RamStorage::MapPdmStatusToChipError(PDM_teStatus status) const
+{
+    CHIP_ERROR err;
+
+    switch (status)
+    {
+    case PDM_E_STATUS_OK:
+        err = CHIP_NO_ERROR;
+        break;
+    default:
+        err = CHIP_ERROR(ChipError::Range::kPlatform, status);
+        break;
+    }
+
+    return err;
+}
+
+} // namespace chip::DeviceLayer::Internal

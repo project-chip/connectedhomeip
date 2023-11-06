@@ -1,4 +1,4 @@
-{{#chip_tests (getTests)}}
+{{#chip_tests "ciTests.json" includeAllClusters=true}}
 {{#chip_tests_config}}
 "Argument Name {{name}}"
 "Argument Type {{type}}"

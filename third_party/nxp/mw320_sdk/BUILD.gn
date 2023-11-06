@@ -31,6 +31,13 @@ group("mw320_sdk") {
   public_deps = [ mw320_sdk_target ]
 }
 
+if (chip_crypto == "tinycrypt") {
+  assert(
+      mbedtls_repo ==
+          "//third_party/connectedhomeip/third_party/nxp/libs/mbedtls",
+      "mbedtls_repo must be set to nxp mbedtls-tinycrypt library when chip_crypto == \"tinycrypt\"")
+}
+
 config("mbedtls_mw320_config") {
   defines = [
     "MBEDTLS_CONFIG_FILE=<src/platform/nxp/mw320/mw320-chip-mbedtls-config.h>",
@@ -62,7 +69,18 @@ config("mbedtls_mw320_config") {
 
     #    "MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED",
   ]
-  if (mbedtls_use_tinycrypt) {
+
+  if (chip_with_factory_data == 1) {
+    defines += [
+      "MBEDTLS_X509_CRT_PARSE_C",
+      "MBEDTLS_X509_USE_C",
+      "MBEDTLS_PK_PARSE_C",
+      "MBEDTLS_PLATFORM_C",
+    ]
+  }
+
+  #if (mbedtls_use_tinycrypt) {
+  if (chip_crypto == "tinycrypt") {
     defines += [
       "MBEDTLS_USE_TINYCRYPT",
       "MBEDTLS_OPTIMIZE_TINYCRYPT_ASM",
@@ -71,7 +89,8 @@ config("mbedtls_mw320_config") {
 
   include_dirs = [ chip_root ]
 
-  if (mbedtls_use_tinycrypt) {
+  #if (mbedtls_use_tinycrypt) {
+  if (chip_crypto == "tinycrypt") {
     include_dirs += [ "${mbedtls_repo}/repo/include/tinycrypt" ]
   }
 }
@@ -79,7 +98,8 @@ config("mbedtls_mw320_config") {
 mbedtls_target("mbedtls") {
   import("${mw320_sdk_build_root}/mw320_sdk.gni")
 
-  if (mbedtls_use_tinycrypt) {
+  #if (mbedtls_use_tinycrypt) {
+  if (chip_crypto == "tinycrypt") {
     if (!defined(sources)) {
       sources = []
     }

@@ -1,0 +1,135 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Subscribe Tests - Administrator Commissioning Cluster
+
+config:
+    nodeId: 0x12344321
+    cluster: "Administrator Commissioning"
+    endpoint: 0
+    ourVendorId:
+        type: int16u
+        defaultValue: 0xFFF1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Get ourfabric index"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: ourFabricIndex
+
+    - label: "Subscribe WindowStatus Attribute"
+      command: "subscribeAttribute"
+      attribute: "WindowStatus"
+      minInterval: 2
+      maxInterval: 50
+      response:
+          value: 0
+
+    - label: "Open the commissioning window 1"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Check for first attribute report for WindowStatus"
+      command: "waitForReport"
+      attribute: "WindowStatus"
+      response:
+          value: 2
+
+    - label: "Close the commissioning window 1"
+      command: "RevokeCommissioning"
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Check for second attribute report for WindowStatus"
+      command: "waitForReport"
+      attribute: "WindowStatus"
+      response:
+          value: 0
+
+    - label: "Subscribe AdminVendorId Attribute"
+      command: "subscribeAttribute"
+      attribute: "AdminVendorId"
+      minInterval: 2
+      maxInterval: 50
+      response:
+          value: null
+
+    - label: "Open the commissioning window 2"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Check for first attribute report for AdminVendorId"
+      command: "waitForReport"
+      attribute: "AdminVendorId"
+      response:
+          value: ourVendorId
+
+    - label: "Close the commissioning window 2"
+      command: "RevokeCommissioning"
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Check for second attribute report for AdminVendorId"
+      command: "waitForReport"
+      attribute: "AdminVendorId"
+      response:
+          value: null
+
+    - label: "Subscribe AdminFabricIndex Attribute"
+      command: "subscribeAttribute"
+      attribute: "AdminFabricIndex"
+      minInterval: 2
+      maxInterval: 50
+      response:
+          value: null
+
+    - label: "Open the commissioning window 3"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Check for first attribute report for AdminFabricIndex"
+      command: "waitForReport"
+      attribute: "AdminFabricIndex"
+      response:
+          value: ourFabricIndex
+
+    - label: "Close the commissioning window 2"
+      command: "RevokeCommissioning"
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Check for second attribute report for AdminFabricIndex"
+      command: "waitForReport"
+      attribute: "AdminFabricIndex"
+      response:
+          value: null

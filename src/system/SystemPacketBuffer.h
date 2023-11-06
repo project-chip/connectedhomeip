@@ -90,8 +90,8 @@ struct pbuf
  *      PacketBuffer objects may be chained to accommodate larger payloads.  Chaining, however, is not transparent, and users of the
  *      class must explicitly decide to support chaining.  Examples of classes written with chaining support are as follows:
  *
- *          @ref chip::chipTLVReader
- *          @ref chip::chipTLVWriter
+ *          @ref chip::TLVReader
+ *          @ref chip::TLVWriter
  *
  * ### PacketBuffer format
  *
@@ -123,7 +123,7 @@ public:
     /**
      * The maximum size buffer an application can allocate with no protocol header reserve.
      */
-#if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     static constexpr uint16_t kMaxSizeWithoutReserve = LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE);
 #else
     static constexpr uint16_t kMaxSizeWithoutReserve = CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX;
@@ -382,6 +382,14 @@ private:
     PacketBuffer * Consume(uint16_t aConsumeLength);
     void Clear();
     void SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead);
+
+    /**
+     * Get a pointer to the start of the reserved space (which comes before the
+     * payload).  The actual reserved space is the ReservedSize() bytes starting
+     * at this pointer.
+     */
+    uint8_t * ReserveStart();
+    const uint8_t * ReserveStart() const;
 
     friend class PacketBufferHandle;
     friend class ::PacketBufferTest;
@@ -662,7 +670,7 @@ protected:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 private:
-    PacketBufferHandle(const PacketBufferHandle &) = delete;
+    PacketBufferHandle(const PacketBufferHandle &)             = delete;
     PacketBufferHandle & operator=(const PacketBufferHandle &) = delete;
 
     // The caller's ownership is transferred to this.

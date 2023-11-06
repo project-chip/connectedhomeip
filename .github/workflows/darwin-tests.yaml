@@ -17,6 +17,7 @@ name: Darwin Tests
 on:
     push:
     pull_request:
+    merge_group:
     workflow_dispatch:
 
 concurrency:
@@ -25,34 +26,37 @@ concurrency:
         'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     test_suites_chip_tool_darwin:
         name: Test Suites - Darwin
-        timeout-minutes: 150
 
         strategy:
             matrix:
-                build_variant: [no-ble-asan]
+                build_variant: [no-ble-asan-clang]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
+
+            # We can't use the pigweed clang to build the Darwin framework once we start using
+            # Swift, because it does not handle CLANG_ENABLE_MODULES correctly.
+            #
+            # But the Xcode clang does not handle LSan correctly.  Since we can't easily apply
+            # LSAN_OPTIONS to just everything except darwin-framework-tool, instead disable asan for
+            # it.
+            BUILD_VARIANT_FRAMEWORK_TOOL: no-ble
+            LSAN_OPTIONS: detect_leaks=1 malloc_context_size=40 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform darwin
+            - name: Checkout
+              uses: actions/checkout@v4
             - name: Setup Environment
               # coreutils for stdbuf
-              run: brew install openssl pkg-config coreutils
+              run: brew install coreutils
             - name:
                   Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
@@ -60,49 +64,50 @@ jobs:
                   sudo chown ${USER} /cores || true
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
                   mkdir objdir-clone || true
-            - name: Fix pkgconfig link
-              working-directory: /usr/local/lib/pkgconfig
-              run: |
-                  pwd
-                  ls -la /usr/local/Cellar/
-                  ls -la /usr/local/Cellar/openssl@1.1
-                  OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
-                  ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
-            - name: Bootstrap
-              timeout-minutes: 25
-              run: scripts/build/gn_bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
-              if: ${{ always() && !env.ACT }}
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+                platform: darwin
+                bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}
+
+            - name: Run macOS Darwin Framework Tool Build Debug
+              working-directory: src/darwin/Framework
+              # Keep whatever Xcode settings
+              # for OTHER_CFLAGS exist by using ${inherited}.
+              #
+              # Enable -Wconversion by hand as well, because it seems to not be
+              # enabled by default in the Xcode config.
+              #
+              # Disable availability annotations, since we are not building against a system
+              # Matter.framework.
+              run: xcodebuild -target "darwin-framework-tool" -sdk macosx -configuration Debug OTHER_CFLAGS='${inherited} -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
+            - name: Clean Build
+              run: xcodebuild clean
+              working-directory: src/darwin/Framework
             - name: Build Apps
-              timeout-minutes: 75
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target darwin-x64-darwin-framework-tool-${BUILD_VARIANT} \
+                        --target darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL} \
                         --target darwin-x64-all-clusters-${BUILD_VARIANT} \
                         --target darwin-x64-lock-${BUILD_VARIANT} \
                         --target darwin-x64-ota-provider-${BUILD_VARIANT} \
                         --target darwin-x64-ota-requestor-${BUILD_VARIANT} \
                         --target darwin-x64-tv-app-${BUILD_VARIANT} \
+                        --target darwin-x64-bridge-${BUILD_VARIANT} \
+                        --target darwin-x64-lit-icd-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Run Tests
-              timeout-minutes: 65
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
-                     --chip-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT}/darwin-framework-tool \
-                     --target-skip-glob '{TestGroupMessaging,TestAccessControlConstraints}' \
+                     --chip-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
+                     --target-skip-glob '{TestAccessControlConstraints}' \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -111,26 +116,45 @@ jobs:
                      --ota-provider-app ./out/darwin-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
                      --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                  "
+            - name: Run OTA Test
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                  "./scripts/tests/run_darwin_framework_ota_test.py \
+                     run \
+                     --darwin-framework-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
+                     --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --ota-data-file /tmp/rawImage \
+                     --ota-image-file /tmp/otaImage \
+                     --ota-destination-file /tmp/downloadedImage \
+                     --ota-candidate-file /tmp/otaCandidateJSON \
                   "
             - name: Uploading core files
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: crash-core-darwin-${{ matrix.build_variant }}
                   path: /cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: crash-log-darwin-${{ matrix.build_variant }}
                   path: ~/Library/Logs/DiagnosticReports/
-            - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v2
+            - name: Uploading framework build log
+              uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: framework-build-log-darwin-${BUILD_VARIANT_FRAMEWORK_TOOL}
+                  path: out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin_framework_build.log
+            - name: Uploading objdir for debugging
+              uses: actions/upload-artifact@v3
+              if: ${{ failure() && !env.ACT }}
+              with:
+                  name: crash-objdir-darwin-${{ matrix.build_variant }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5

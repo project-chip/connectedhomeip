@@ -38,13 +38,41 @@ DeviceInfoProvider * gDeviceInfoProvider = nullptr;
 CHIP_ERROR DeviceInfoProvider::SetUserLabelList(EndpointId endpoint,
                                                 const AttributeList<UserLabelType, kMaxUserLabelListLength> & labelList)
 {
-    size_t index = 0;
+    size_t index          = 0;
+    size_t previousLength = 0;
+    size_t currentLength  = labelList.size();
 
-    ReturnErrorOnFailure(SetUserLabelLength(endpoint, labelList.size()));
+    CHIP_ERROR err = GetUserLabelLength(endpoint, previousLength);
+    VerifyOrReturnError(err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND || err == CHIP_NO_ERROR, err);
+
+    ReturnErrorOnFailure(SetUserLabelLength(endpoint, currentLength));
 
     for (const UserLabelType & label : labelList)
     {
         ReturnErrorOnFailure(SetUserLabelAt(endpoint, index++, label));
+    }
+
+    // If the list becomes smaller than previous list for a given endpoint, all "over-size" keys
+    // (keys for [current_length..previous_length-1]) should be deleted, to recover space.
+    for (size_t i = currentLength; i < previousLength; i++)
+    {
+        ReturnErrorOnFailure(DeleteUserLabelAt(endpoint, i));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceInfoProvider::ClearUserLabelList(EndpointId endpoint)
+{
+    size_t length;
+
+    CHIP_ERROR err = GetUserLabelLength(endpoint, length);
+    VerifyOrReturnError(err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
+    ReturnErrorOnFailure(err);
+
+    for (size_t i = 0; i < length; i++)
+    {
+        ReturnErrorOnFailure(DeleteUserLabelAt(endpoint, i));
     }
 
     return CHIP_NO_ERROR;

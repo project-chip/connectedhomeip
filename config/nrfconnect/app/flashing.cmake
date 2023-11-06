@@ -39,10 +39,15 @@ add_custom_command(OUTPUT "${FLASHBUNDLE_FLASHER_PLATFORM}"
     COMMAND ${CMAKE_COMMAND} ARGS -E copy "${PROJECT_SOURCE_DIR}/third_party/connectedhomeip/scripts/flashing/nrfconnect_firmware_utils.py" "${FLASHBUNDLE_FLASHER_PLATFORM}"
     VERBATIM)
 
+if (merged_hex_to_flash)
+  set(flashbundle_hex_to_copy "zephyr/${merged_hex_to_flash}")
+else()
+  set(flashbundle_hex_to_copy "zephyr/${KERNEL_HEX_NAME}")
+endif()
+
 add_custom_command(OUTPUT "${FLASHBUNDLE_FIRMWARE}"
-    DEPENDS zephyr/${KERNEL_HEX_NAME}
-    COMMAND ${CMAKE_COMMAND} ARGS -DFLASHBUNDLE_FIRMWARE=${FLASHBUNDLE_FIRMWARE} -DKERNEL_HEX_NAME=${KERNEL_HEX_NAME} -P "${CHIP_ROOT}/config/nrfconnect/app/copy-flashbundle-firmware.cmake"
-    VERBATIM)
+    DEPENDS ${flashbundle_hex_to_copy}
+    COMMAND ${CMAKE_COMMAND} -E copy "${flashbundle_hex_to_copy}" "${FLASHBUNDLE_FIRMWARE}")
 
 add_custom_command(OUTPUT "${CMAKE_PROJECT_NAME}/${CMAKE_PROJECT_NAME}.flash.py"
     COMMAND ${python}

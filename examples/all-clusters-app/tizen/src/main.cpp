@@ -21,25 +21,37 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/util/af.h>
+#include <platform/Tizen/NetworkCommissioningDriver.h>
+#include <static-supported-temperature-levels.h>
 
 #include <TizenServiceAppMain.h>
 #include <binding-handler.h>
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Clusters;
+using namespace chip::DeviceLayer;
 
 // Network commissioning
 namespace {
 constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
+
+NetworkCommissioning::TizenEthernetDriver sEthernetDriver;
+Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sEthernetDriver);
+
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 } // namespace
 
 void ApplicationInit()
 {
     // Enable secondary endpoint only when we need it.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+
+    sEthernetNetworkCommissioningInstance.Init();
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
+
+void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {

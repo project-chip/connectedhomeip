@@ -20,7 +20,6 @@
 #include <PigweedLogger.h>
 #include <PigweedLoggerMutex.h>
 #include <cstring>
-#include <init_efrPlatform.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -30,6 +29,7 @@
 #include <pigweed/RpcService.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <sl_system_kernel.h>
 #include <task.h>
 
@@ -181,7 +181,7 @@ void RunRpcService(void *)
 
 int main(void)
 {
-    init_efrPlatform();
+    chip::DeviceLayer::Silabs::GetPlatform().Init();
     PigweedLogger::init();
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
@@ -189,15 +189,15 @@ int main(void)
 
     chip::DeviceLayer::PlatformMgr().InitChipStack();
 
-    EFR32_LOG("***** CHIP EFR32 device tests *****\r\n");
+    SILABS_LOG("***** CHIP EFR32 device tests *****\r\n");
 
     // Start RPC service which runs the tests.
     sTestTaskHandle = xTaskCreateStatic(RunRpcService, "RPC_TEST_TASK", ArraySize(sTestTaskStack), nullptr, TEST_TASK_PRIORITY,
                                         sTestTaskStack, &sTestTaskBuffer);
-    EFR32_LOG("Starting FreeRTOS scheduler");
+    SILABS_LOG("Starting FreeRTOS scheduler");
     sl_system_kernel_start();
 
     // Should never get here.
-    EFR32_LOG("vTaskStartScheduler() failed");
+    SILABS_LOG("vTaskStartScheduler() failed");
     return -1;
 }

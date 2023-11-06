@@ -1,0 +1,133 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/asr.gni")
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${asr_sdk_build_root}/asr_sdk.gni")
+import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/third_party/asr/asr_executable.gni")
+
+import("//cfg.gni")
+
+assert(current_os == "freertos")
+
+asr_project_dir = "${chip_root}/examples/light-switch-app/asr"
+examples_plat_dir = "${chip_root}/examples/platform/asr"
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = false
+}
+
+asr_sdk_sources("light_switch_app_sdk_sources") {
+  include_dirs = [
+    "${chip_root}/src/platform/ASR",
+    "${asr_project_dir}/include",
+    "${examples_plat_dir}",
+  ]
+
+  defines = [
+    "ASR_LOG_ENABLED=1",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
+  ]
+
+  if (chip_enable_factory_data) {
+    defines += [
+      "CONFIG_ENABLE_ASR_FACTORY_DATA_PROVIDER=1",
+      "CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER=1",
+    ]
+  }
+
+  if (chip_lwip_ip6_hook) {
+    defines += [
+      "CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT",
+      "CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT",
+    ]
+  }
+
+  sources = [ "${asr_project_dir}/include/CHIPProjectConfig.h" ]
+
+  public_configs = [ "${asr_sdk_build_root}:asr_sdk_config" ]
+}
+
+asr_executable("light_switch_app") {
+  include_dirs = []
+  defines = []
+  output_name = "chip-asr-light-switch-example.out"
+
+  public_deps = [
+    ":light_switch_app_sdk_sources",
+    "${chip_root}/examples/common/QRCode",
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  include_dirs += [
+    "include",
+    "${examples_plat_dir}",
+    "${asr_project_dir}/include",
+    "${chip_root}/src/lib",
+  ]
+
+  sources = [
+    "${examples_plat_dir}/ButtonHandler.cpp",
+    "${examples_plat_dir}/CHIPDeviceManager.cpp",
+    "${examples_plat_dir}/LEDWidget.cpp",
+    "${examples_plat_dir}/init_Matter.cpp",
+    "${examples_plat_dir}/init_asrPlatform.cpp",
+    "${examples_plat_dir}/shell/matter_shell.cpp",
+    "src/AppTask.cpp",
+    "src/BindingHandler.cpp",
+    "src/DeviceCallbacks.cpp",
+    "src/LightSwitch.cpp",
+    "src/main.cpp",
+  ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [ "${examples_plat_dir}/init_OTARequestor.cpp" ]
+  }
+
+  defines = [ "ASR_NETWORK_LAYER_BLE=${chip_config_network_layer_ble}" ]
+
+  if (chip_build_libshell) {
+    defines += [ "CONFIG_ENABLE_CHIP_SHELL" ]
+    sources += [ "${examples_plat_dir}/shell/launch_shell.cpp" ]
+    include_dirs += [ "${examples_plat_dir}/shell" ]
+  }
+
+  public_deps +=
+      [ "${chip_root}/examples/light-switch-app/light-switch-common" ]
+
+  output_dir = root_out_dir
+
+  if (chip_print_memory_usage) {
+    ldflags = [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+}
+
+group("asr") {
+  deps = [ ":light_switch_app" ]
+}
+
+group("default") {
+  deps = [ ":asr" ]
+}

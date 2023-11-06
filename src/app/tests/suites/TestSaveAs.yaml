@@ -16,7 +16,7 @@ name: Test Cluster Tests
 
 config:
     nodeId: 0x12344321
-    cluster: "Test Cluster"
+    cluster: "Unit Testing"
     endpoint: 1
 
 tests:
@@ -29,7 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Send Test Add Arguments Command"
-      command: "testAddArguments"
+      command: "TestAddArguments"
       arguments:
           values:
               - name: "arg1"
@@ -43,7 +43,7 @@ tests:
                 value: 20
 
     - label: "Send Test Add Arguments Command"
-      command: "testAddArguments"
+      command: "TestAddArguments"
       arguments:
           values:
               - name: "arg1"
@@ -56,7 +56,7 @@ tests:
                 value: TestAddArgumentDefaultValue
 
     - label: "Send Test Add Arguments Command"
-      command: "testAddArguments"
+      command: "TestAddArguments"
       arguments:
           values:
               - name: "arg1"
@@ -802,3 +802,38 @@ tests:
       attribute: "octet_string"
       arguments:
           value: readAttributeOctetStringDefaultValue
+
+    # Tests for null values
+    - label: "Read attribute nullable_boolean Default Value"
+      command: "readAttribute"
+      attribute: "nullable_boolean"
+      response:
+          saveAs: readAttributeNullableBooleanDefaultValue
+          value: false
+
+    - label: "Write attribute nullable_boolean to null"
+      command: "writeAttribute"
+      attribute: "nullable_boolean"
+      arguments:
+          value: null
+
+    - label: "Read attribute nullable_boolean null Value"
+      command: "readAttribute"
+      attribute: "nullable_boolean"
+      response:
+          saveAs: readAttributeNullableBooleanNullValue
+          value: null
+
+    - label:
+          "Read attribute nullable_boolean null Value again and compare it to
+          the previously saved value"
+      command: "readAttribute"
+      attribute: "nullable_boolean"
+      response:
+          value: readAttributeNullableBooleanNullValue
+
+    - label: "Write attribute nullable_boolean Default Value"
+      command: "writeAttribute"
+      attribute: "nullable_boolean"
+      arguments:
+          value: readAttributeNullableBooleanDefaultValue

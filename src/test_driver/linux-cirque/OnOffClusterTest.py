@@ -17,8 +17,8 @@ limitations under the License.
 
 import logging
 import os
-import time
 import sys
+import time
 
 from helper.CHIPTestBase import CHIPVirtualHome
 
@@ -42,14 +42,14 @@ CIRQUE_URL = "http://localhost:5000"
 DEVICE_CONFIG = {
     'device0': {
         'type': 'CHIP-Server',
-        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['Thread', 'Interactive', 'Mount'],
         'rcp_mode': True,
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     },
     'device1': {
         'type': 'CHIP-Tool',
-        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['Thread', 'Interactive', 'Mount'],
         'rcp_mode': True,
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
@@ -115,8 +115,11 @@ class TestOnOffCluster(CHIPVirtualHome):
         for device_id in server_ids:
             self.logger.info("checking device log for {}".format(
                 self.get_device_pretty_id(device_id)))
-            self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), ["Thread initialized.", "LightingManager::InitiateAction(ON_ACTION)", "LightingManager::InitiateAction(OFF_ACTION)"]),
-                            "Datamodel test failed: cannot find matching string from device {}".format(device_id))
+            self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), [
+                "Thread initialized.",
+                "LightingManager::InitiateAction(ON_ACTION)",
+                "LightingManager::InitiateAction(OFF_ACTION)"
+            ]), "Datamodel test failed: cannot find matching string from device {}".format(device_id))
 
 
 if __name__ == "__main__":

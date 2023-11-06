@@ -14,6 +14,10 @@
 
 name: 24.6.1. [TC-LVL-6.1] Stop Verification (DUT as Server)
 
+PICS:
+    - LVL.S
+    - LVL.S.M.VarRate
+
 config:
     nodeId: 0x12344321
     cluster: "Level Control"
@@ -28,69 +32,67 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Precondition Send On Command"
+    #Adding below step resolve the issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/499
+    - label:
+          "Precondition: write default value of OnOffTransitionTime attribute"
+      PICS: LVL.S.A0010
+      command: "writeAttribute"
+      attribute: "OnOffTransitionTime"
+      arguments:
+          value: 0
+
+    - label: "Step 1a: H writes 0 to the Options attribute"
+      PICS: LVL.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
+    - label: "Step 1b: TH sends On command to DUT"
       cluster: "On/Off"
       PICS: OO.S.C01.Rsp
       command: "On"
 
-    - label: "Check on/off attribute value is true after on command"
-      cluster: "On/Off"
-      PICS: OO.S.A0000
-      command: "readAttribute"
-      attribute: "OnOff"
-      response:
-          value: 1
-
-    - label: "Reads Minlevel attribute from DUT"
-      PICS: LVL.S.A0002
-      command: "readAttribute"
-      attribute: "min level"
-      response:
-          saveAs: MinlevelValue
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 255
-
-    - label: "Sends MoveToLevelWithOnOff command to DUT"
-      PICS: LVL.S.C04.Rsp
-      command: "MoveToLevelWithOnOff"
+    - label:
+          "Step 2a: TH sends a MoveToLevel command to DUT, with Level =50 and
+          TransitionTime =0 (immediate)"
+      PICS: LVL.S.C00.Rsp
+      command: "MoveToLevel"
       arguments:
           values:
-              - name: "level"
-                value: 1
-              - name: "transitionTime"
+              - name: "Level"
+                value: 50
+              - name: "TransitionTime"
                 value: 0
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
-    - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.A0000
+    - label: "Step 2b: TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.A0000 && LVL.S.C00.Rsp
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
-          saveAs: CurrentLevelValue
-          constraints:
-              minValue: 0
-              maxValue: 255
+          value: 50
 
-    - label: "Sends a move up command to DUT"
+    - label:
+          "Step 2c: TH sends a Move command to the DUT, with the MoveMode field
+          set to 0x00 (move up) and the Rate field set to 0x05 (5 units/s)"
       PICS: LVL.S.C01.Rsp
       command: "Move"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 0
-              - name: "rate"
+              - name: "Rate"
                 value: 5
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
-    - label: "Wait 5000ms"
+    - label: "Step 2d: Wait 5000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -98,20 +100,20 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "Sends stop command to DUT"
+    - label: "Step 3: Sends stop command to DUT"
       PICS: LVL.S.C03.Rsp
       command: "Stop"
       arguments:
           values:
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
     - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && LVL.S.C03.Rsp
       arguments:
           values:
               - name: "message"
@@ -119,29 +121,30 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads CurrentLevel attribute from DUT"
+    - label: "Step 4: TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C01.Rsp && LVL.S.C03.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           constraints:
-              minValue: 22
-              maxValue: 28
-              notValue: CurrentLevelValue
+              minValue: 64
+              maxValue: 86
 
-    - label: "Sends a move up command to DUT"
+    - label:
+          "Step 5: TH sends a Move command to the DUT, with the MoveMode field
+          set to 0x00 (move up) and the Rate field set to 0x05 (5 units/s)"
       PICS: LVL.S.C01.Rsp
       command: "Move"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 0
-              - name: "rate"
+              - name: "Rate"
                 value: 5
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
     - label: "Wait 5000ms"
       cluster: "DelayCommands"
@@ -151,19 +154,20 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "Sends stop command to DUT"
-      command: "Stop"
+    - label: "Step 6: TH sends a StopWithOnOff command to the DUT"
+      PICS: LVL.S.C07.Rsp
+      command: "StopWithOnOff"
       arguments:
           values:
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
     - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && LVL.S.C07.Rsp
       arguments:
           values:
               - name: "message"
@@ -171,15 +175,14 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads CurrentLevel attribute from DUT"
+    - label: "Step 7: Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C01.Rsp && LVL.S.C07.Rsp && LVL.S.A0000
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "CurrentLevel"
       response:
           constraints:
-              minValue: 45
-              maxValue: 55
-              notValue: CurrentLevelValue
+              minValue: 85
+              maxValue: 115
 
     - label: "Precondition send Off Command"
       cluster: "On/Off"

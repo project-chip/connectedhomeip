@@ -11,141 +11,534 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 113.1.1. [TC-DRLK-1.1] Global Attributes [DUT-Server]
 
+PICS:
+    - DRLK.S
+
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Door Lock"
+    endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
+    - label: "Step 2: TH reads the ClusterRevision from DUT"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 7
+          constraints:
+              type: int16u
 
-    - label: "TH reads the ClusterRevision from DUT"
-      verification: |
-          ./chip-tool doorlock read cluster-revision 1 1
-          Verify on the TH Log:
+    - label: "Step 3a: TH reads the FeatureMap from DUT"
+      PICS:
+          " !DRLK.S.F00 && !DRLK.S.F01 && !DRLK.S.F02 && !DRLK.S.F04 &&
+          !DRLK.S.F05 && !DRLK.S.F06 && !DRLK.S.F07 && !DRLK.S.F08 &&
+          !DRLK.S.F0a && !DRLK.S.F0b && !DRLK.S.F0c "
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
 
-          [1654670381.498137][2934:2939] CHIP:DMG:
-          [1654670381.498163][2934:2939] CHIP:DMG:        SuppressResponse = true,
-          [1654670381.498189][2934:2939] CHIP:DMG:        InteractionModelRevision = 1
-          [1654670381.498214][2934:2939] CHIP:DMG: }
-          [1654670381.498373][2934:2939] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFFD DataVersion: 1454093977
-          [1654670381.498486][2934:2939] CHIP:TOO:   ClusterRevision: 6
-      disabled: true
+    - label:
+          "Step 3b: Given DRLK.S.F00(PIN) ensure featuremap has the correct bit
+          set"
+      PICS: DRLK.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
 
-    - label: "TH reads the FeatureMap from DUT"
-      verification: |
-          ./chip-tool doorlock read feature-map 1 1
-          Verify on the TH Log:
+    - label:
+          "Step 3c: Given DRLK.S.F01(RID) ensure featuremap has the correct bit
+          set"
+      PICS: DRLK.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
 
-          [1656418178.505801][10046:10051] CHIP:DMG:      ],
-          [1656418178.505844][10046:10051] CHIP:DMG:
-          [1656418178.505880][10046:10051] CHIP:DMG:      SuppressResponse = true,
-          [1656418178.505917][10046:10051] CHIP:DMG:      InteractionModelRevision = 1
-          [1656418178.505951][10046:10051] CHIP:DMG: }
-          [1656418178.506139][10046:10051] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFFC DataVersion: 1077483880
-          [1656418178.506228][10046:10051] CHIP:TOO:   FeatureMap: 435
-      disabled: true
+    - label:
+          "Step 3d: Given DRLK.S.F02(FGP) ensure featuremap has the correct bit
+          set"
+      PICS: DRLK.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
 
-    - label: "TH reads AttributeList from DUT"
-      verification: |
-          ./chip-tool doorlock read attribute-list 1 1
-          Verify on the TH Log:
+    - label:
+          "Step 3e: Given DRLK.S.F04(WDSCH) ensure featuremap has the correct
+          bit set"
+      PICS: DRLK.S.F04
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x10]
 
-          [1656418220.810680][10056:10061] CHIP:DMG:      ],
-          [1656418220.810827][10056:10061] CHIP:DMG:
-          [1656418220.810851][10056:10061] CHIP:DMG:      SuppressResponse = true,
-          [1656418220.810876][10056:10061] CHIP:DMG:      InteractionModelRevision = 1
-          [1656418220.810898][10056:10061] CHIP:DMG: }
-          [1656418220.812834][10056:10061] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFFB DataVersion: 1077483880
-          [1656418220.812948][10056:10061] CHIP:TOO:   AttributeList: 31 entries
-          [1656418220.812982][10056:10061] CHIP:TOO:     [1]: 0
-          [1656418220.813007][10056:10061] CHIP:TOO:     [2]: 1
-          [1656418220.813031][10056:10061] CHIP:TOO:     [3]: 2
-          [1656418220.813055][10056:10061] CHIP:TOO:     [4]: 3
-          [1656418220.813079][10056:10061] CHIP:TOO:     [5]: 17
-          [1656418220.813103][10056:10061] CHIP:TOO:     [6]: 18
-          [1656418220.813126][10056:10061] CHIP:TOO:     [7]: 19
-          [1656418220.813150][10056:10061] CHIP:TOO:     [8]: 20
-          [1656418220.813174][10056:10061] CHIP:TOO:     [9]: 21
-          [1656418220.813198][10056:10061] CHIP:TOO:     [10]: 22
-          [1656418220.813222][10056:10061] CHIP:TOO:     [11]: 23
-          [1656418220.813246][10056:10061] CHIP:TOO:     [12]: 24
-          [1656418220.813270][10056:10061] CHIP:TOO:     [13]: 25
-          [1656418220.813294][10056:10061] CHIP:TOO:     [14]: 26
-          [1656418220.813317][10056:10061] CHIP:TOO:     [15]: 27
-          [1656418220.813341][10056:10061] CHIP:TOO:     [16]: 28
-          [1656418220.813365][10056:10061] CHIP:TOO:     [17]: 33
-          [1656418220.813389][10056:10061] CHIP:TOO:     [18]: 35
-          [1656418220.813413][10056:10061] CHIP:TOO:     [19]: 36
-          [1656418220.813437][10056:10061] CHIP:TOO:     [20]: 37
-          [1656418220.813460][10056:10061] CHIP:TOO:     [21]: 38
-          [1656418220.813484][10056:10061] CHIP:TOO:     [22]: 41
-          [1656418220.813508][10056:10061] CHIP:TOO:     [23]: 43
-          [1656418220.813531][10056:10061] CHIP:TOO:     [24]: 48
-          [1656418220.813555][10056:10061] CHIP:TOO:     [25]: 49
-          [1656418220.813579][10056:10061] CHIP:TOO:     [26]: 51
-          [1656418220.813603][10056:10061] CHIP:TOO:     [27]: 65528
-          [1656418220.813627][10056:10061] CHIP:TOO:     [28]: 65529
-          [1656418220.813652][10056:10061] CHIP:TOO:     [29]: 65531
-          [1656418220.813676][10056:10061] CHIP:TOO:     [30]: 65532
-          [1656418220.813699][10056:10061] CHIP:TOO:     [31]: 65533
-      disabled: true
+    - label:
+          "Step 3f: Given DRLK.S.F05(DPS) ensure featuremap has the correct bit
+          set"
+      PICS: DRLK.S.F05
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x20]
 
-    - label: "TH reads EventList from DUT"
-      verification: |
+    - label:
+          "Step 3g: Given DRLK.S.F06(FACE) ensure featuremap has the correct bit
+          set"
+      PICS: DRLK.S.F06
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x40]
 
-      disabled: true
+    - label:
+          "Step 3h: Given DRLK.S.F07(COTA) ensure featuremap has the correct bit
+          set"
+      PICS: DRLK.S.F07
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x80]
 
-    - label: "TH reads AcceptedCommandList from DUT"
-      verification: |
-          ./chip-tool doorlock read accepted-command-list 1 1
-          Verify on the TH Log:
+    - label:
+          "Step 3i: Given DRLK.S.F08(USR) ensure featuremap has the correct bit
+          set"
+      PICS: DRLK.S.F08
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x100]
 
-          [1656418338.200497][10068:10073] CHIP:DMG:      ],
-          [1656418338.200598][10068:10073] CHIP:DMG:
-          [1656418338.200622][10068:10073] CHIP:DMG:      SuppressResponse = true,
-          [1656418338.200646][10068:10073] CHIP:DMG:      InteractionModelRevision = 1
-          [1656418338.200669][10068:10073] CHIP:DMG: }
-          [1656418338.201816][10068:10073] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFF9 DataVersion: 1077483880
-          [1656418338.201910][10068:10073] CHIP:TOO:   AcceptedCommandList: 18 entries
-          [1656418338.201943][10068:10073] CHIP:TOO:     [1]: 0
-          [1656418338.201968][10068:10073] CHIP:TOO:     [2]: 1
-          [1656418338.201992][10068:10073] CHIP:TOO:     [3]: 3
-          [1656418338.202016][10068:10073] CHIP:TOO:     [4]: 11
-          [1656418338.202040][10068:10073] CHIP:TOO:     [5]: 12
-          [1656418338.202064][10068:10073] CHIP:TOO:     [6]: 13
-          [1656418338.202088][10068:10073] CHIP:TOO:     [7]: 14
-          [1656418338.202112][10068:10073] CHIP:TOO:     [8]: 15
-          [1656418338.202135][10068:10073] CHIP:TOO:     [9]: 16
-          [1656418338.202159][10068:10073] CHIP:TOO:     [10]: 17
-          [1656418338.202183][10068:10073] CHIP:TOO:     [11]: 18
-          [1656418338.202207][10068:10073] CHIP:TOO:     [12]: 19
-          [1656418338.202231][10068:10073] CHIP:TOO:     [13]: 26
-          [1656418338.202255][10068:10073] CHIP:TOO:     [14]: 27
-          [1656418338.202278][10068:10073] CHIP:TOO:     [15]: 29
-          [1656418338.202302][10068:10073] CHIP:TOO:     [16]: 34
-          [1656418338.202326][10068:10073] CHIP:TOO:     [17]: 36
-          [1656418338.202350][10068:10073] CHIP:TOO:     [18]: 38
-      disabled: true
+    - label:
+          "Step 3j: Given DRLK.S.F0a(YDSCH) ensure featuremap has the correct
+          bit set"
+      PICS: DRLK.S.F0a
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x400]
 
-    - label: "TH reads GeneratedCommandList from DUT"
-      verification: |
-          ./chip-tool doorlock read generated-command-list 1 1
-          Verify on the TH Log:
+    - label:
+          "Step 3k: Given DRLK.S.F0b(HDSCH) ensure featuremap has the correct
+          bit set"
+      PICS: DRLK.S.F0b
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x800]
 
-          [1654673615.346710][3233:3239] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFF8 DataVersion: 3738767914
-          [1654673615.346798][3233:3239] CHIP:TOO:   GeneratedCommandList: 6 entries
-          [1654673615.346834][3233:3239] CHIP:TOO:     [1]: 12
-          [1654673615.346864][3233:3239] CHIP:TOO:     [2]: 15
-          [1654673615.346891][3233:3239] CHIP:TOO:     [3]: 18
-          [1654673615.346927][3233:3239] CHIP:TOO:     [4]: 28
-          [1654673615.346965][3233:3239] CHIP:TOO:     [5]: 35
-          [1654673615.347012][3233:3239] CHIP:TOO:     [6]: 37
-      disabled: true
+    - label:
+          "Step 3l: Given DRLK.S.F0c(UBOLT) ensure featuremap has the correct
+          bit set"
+      PICS: DRLK.S.F0c
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1000]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [0, 1, 2, 37, 38, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 37, 38, 65528, 65529, 65531, 65532, 65533]
+
+    - label:
+          "Step 4b: TH reads Feature dependent(DRLK.S.F05) attributes in
+          AttributeList"
+      PICS: DRLK.S.F05
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label:
+          "Step 4c: TH reads Feature dependent(DRLK.S.F08) attributes in
+          AttributeList"
+      PICS: DRLK.S.F08
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [17, 27, 28]
+
+    - label:
+          "Step 4d: TH reads Feature dependent(DRLK.S.F00) attributes in
+          AttributeList"
+      PICS: DRLK.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [18, 23, 24]
+
+    - label:
+          "Step 4e: TH reads Feature dependent(DRLK.S.F01) attributes in
+          AttributeList"
+      PICS: DRLK.S.F01
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [19, 25, 26]
+
+    - label:
+          "Step 4f: TH reads Feature dependent(DRLK.S.F04) attribute in
+          AttributeList"
+      PICS: DRLK.S.F04
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [20]
+
+    - label:
+          "Step 4g: TH reads Feature dependent(DRLK.S.F0a) attribute in
+          AttributeList"
+      PICS: DRLK.S.F0a
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [21]
+
+    - label:
+          "Step 4h: TH reads Feature dependent(DRLK.S.F0b) attribute in
+          AttributeList"
+      PICS: DRLK.S.F0b
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [22]
+
+    - label:
+          "Step 4i: TH reads Feature dependent(DRLK.S.F00 or DRLK.S.F01)
+          attributes in AttributeList"
+      PICS: DRLK.S.F00 || DRLK.S.F01
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [48, 49]
+
+    - label:
+          "Step 4j: TH reads Feature dependent(DRLK.S.F07 or DRLK.S.F00)
+          attribute in AttributeList"
+      PICS: DRLK.S.F07 || DRLK.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [51]
+
+    - label: "Step 4k: TH reads optional attribute(Language) in AttributeList"
+      PICS: DRLK.S.A0021
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [33]
+
+    - label:
+          "Step 4l: TH reads optional attribute(LEDSettings) in AttributeList"
+      PICS: DRLK.S.A0022
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [34]
+
+    - label:
+          "Step 4m: TH reads optional attribute(AutoRelockTime) in AttributeList"
+      PICS: DRLK.S.A0023
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [35]
+
+    - label:
+          "Step 4n: TH reads optional attribute(SoundVolume) in AttributeList"
+      PICS: DRLK.S.A0024
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [36]
+
+    - label:
+          "Step 4o: TH reads optional attribute(DefaultConfigurationRegister) in
+          AttributeList"
+      PICS: DRLK.S.A0027
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [39]
+
+    - label:
+          "Step 4p: TH reads optional attribute(EnableLocalProgramming) in
+          AttributeList"
+      PICS: DRLK.S.A0028
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [40]
+
+    - label:
+          "Step 4q: TH reads optional attribute(EnableOneTouchLocking) in
+          AttributeList"
+      PICS: DRLK.S.A0029
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [41]
+
+    - label:
+          "Step 4r: TH reads optional attribute(EnableInsideStatusLED) in
+          AttributeList"
+      PICS: DRLK.S.A002a
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [42]
+
+    - label:
+          "Step 4s: TH reads optional attribute(EnablePrivacyModeButton) in
+          AttributeList"
+      PICS: DRLK.S.A002b
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [43]
+
+    - label:
+          "Step 4t: TH reads optional attribute(LocalProgrammingFeatures) in
+          AttributeList"
+      PICS: DRLK.S.A002c
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [44]
+
+    - label: "Step 5a: TH reads EventList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 2, 3]
+
+    - label:
+          "Step 5b: TH reads optional event(Door position sensor) in EventList"
+      PICS: DRLK.S.F05 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label:
+          "Step 5c: TH reads optional event(User commands and database) in
+          EventList"
+      PICS: DRLK.S.F08 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [4]
+
+    - label: "Step 6a: TH reads AcceptedCommandList from DUT"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1]
+
+    - label:
+          "Step 6b: TH reads Feature dependent commands(DRLK.S.F04) in
+          AcceptedCommandList"
+      PICS: DRLK.S.F04
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [11, 12, 13]
+
+    - label:
+          "Step 6c: TH reads Feature dependent commands(DRLK.S.F0a) in
+          AcceptedCommandList"
+      PICS: DRLK.S.F0a
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [14, 15, 16]
+
+    - label:
+          "Step 6d: TH reads Feature dependent commands(DRLK.S.F0b) in
+          AcceptedCommandList"
+      PICS: DRLK.S.F0b
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [17, 18, 19]
+
+    - label:
+          "Step 6e: TH reads Feature dependent commands(DRLK.S.F0c) in
+          AcceptedCommandList"
+      PICS: DRLK.S.F0c
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [39]
+
+    - label:
+          "Step 6f: TH reads Feature dependent commands(DRLK.S.F08) in
+          AcceptedCommandList"
+      PICS: DRLK.S.F08
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [26, 27, 29, 34, 36, 38]
+
+    - label:
+          "Step 6g: TH reads optional commands(DRLK.S.C03.Rsp) in
+          AcceptedCommandList"
+      PICS: DRLK.S.C03.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label:
+          "Step 7a: TH reads Feature dependent command(DRLK.S.F04) in
+          GeneratedCommandList"
+      PICS: DRLK.S.F04
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [12]
+
+    - label:
+          "Step 7b: TH reads Feature dependent command(DRLK.S.F0a) in
+          GeneratedCommandList"
+      PICS: DRLK.S.F0a
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [15]
+
+    - label:
+          "Step 7c: TH reads Feature dependent command(DRLK.S.F0b) in
+          GeneratedCommandList"
+      PICS: DRLK.S.F0b
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [18]
+
+    - label:
+          "Step 7d: TH reads Feature dependent command(DRLK.S.F08) in
+          GeneratedCommandList"
+      PICS: DRLK.S.F08
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [28, 35, 37]

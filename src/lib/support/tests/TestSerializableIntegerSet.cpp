@@ -172,7 +172,7 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()                                   //
 };
 
-int TestSerializableIntegerSet(void)
+int TestSerializableIntegerSet()
 {
     nlTestSuite theSuite = { "CHIP SerializableIntegerSet tests", &sTests[0], Setup, Teardown };
 

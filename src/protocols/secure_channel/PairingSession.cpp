@@ -18,7 +18,7 @@
 
 #include <protocols/secure_channel/PairingSession.h>
 
-#include <lib/core/CHIPTLVTypes.h>
+#include <lib/core/TLVTypes.h>
 #include <lib/support/SafeInt.h>
 
 namespace chip {
@@ -63,11 +63,15 @@ void PairingSession::Finish()
     if (err == CHIP_NO_ERROR)
     {
         VerifyOrDie(mSecureSessionHolder);
-        mDelegate->OnSessionEstablished(mSecureSessionHolder.Get().Value());
+        // Make sure to null out mDelegate so we don't send it any other
+        // notifications.
+        auto * delegate = mDelegate;
+        mDelegate       = nullptr;
+        delegate->OnSessionEstablished(mSecureSessionHolder.Get().Value());
     }
     else
     {
-        mDelegate->OnSessionEstablishmentError(err);
+        NotifySessionEstablishmentError(err);
     }
 }
 
@@ -91,6 +95,7 @@ CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessa
     ReturnErrorOnFailure(tlvWriter.StartContainer(tag, TLV::kTLVType_Structure, mrpParamsContainer));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mrpLocalConfig.mIdleRetransTimeout.count()));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), mrpLocalConfig.mActiveRetransTimeout.count()));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), mrpLocalConfig.mActiveThresholdTime.count()));
     return tlvWriter.EndContainer(mrpParamsContainer);
 }
 
@@ -111,7 +116,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
 
     ChipLogDetail(SecureChannel, "Found MRP parameters in the message");
 
-    // Both TLV elements in the structure are optional. If the first element is present, process it and move
+    // All TLV elements in the structure are optional. If the first element is present, process it and move
     // the TLV reader to the next element.
     if (TLV::TagNumFromTag(tlvReader.GetTag()) == 1)
     {
@@ -127,9 +132,26 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
         ReturnErrorOnFailure(err);
     }
 
-    VerifyOrReturnError(TLV::TagNumFromTag(tlvReader.GetTag()) == 2, CHIP_ERROR_INVALID_TLV_TAG);
-    ReturnErrorOnFailure(tlvReader.Get(tlvElementValue));
-    mRemoteMRPConfig.mActiveRetransTimeout = System::Clock::Milliseconds32(tlvElementValue);
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == 2)
+    {
+        ReturnErrorOnFailure(tlvReader.Get(tlvElementValue));
+        mRemoteMRPConfig.mActiveRetransTimeout = System::Clock::Milliseconds32(tlvElementValue);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        CHIP_ERROR err = tlvReader.Next();
+        if (err == CHIP_END_OF_TLV)
+        {
+            return tlvReader.ExitContainer(containerType);
+        }
+        ReturnErrorOnFailure(err);
+    }
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == 3)
+    {
+        ReturnErrorOnFailure(tlvReader.Get(tlvElementValue));
+        mRemoteMRPConfig.mActiveThresholdTime = System::Clock::Milliseconds16(tlvElementValue);
+    }
+    // Future proofing - Don't error out if there are other tags
 
     return tlvReader.ExitContainer(containerType);
 }
@@ -163,6 +185,44 @@ void PairingSession::Clear()
     mSecureSessionHolder.Release();
     mPeerSessionId.ClearValue();
     mSessionManager = nullptr;
+}
+
+void PairingSession::NotifySessionEstablishmentError(CHIP_ERROR error)
+{
+    if (mDelegate == nullptr)
+    {
+        // Already notified success or error.
+        return;
+    }
+
+    auto * delegate = mDelegate;
+    mDelegate       = nullptr;
+    delegate->OnSessionEstablishmentError(error);
+}
+
+void PairingSession::OnSessionReleased()
+{
+    if (mRole == CryptoContext::SessionRole::kInitiator)
+    {
+        NotifySessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
+        return;
+    }
+
+    // Send the error notification async, because our delegate is likely to want
+    // to create a new session to listen for new connection attempts, and doing
+    // that under an OnSessionReleased notification is not safe.
+    if (!mSessionManager)
+    {
+        return;
+    }
+
+    mSessionManager->SystemLayer()->ScheduleWork(
+        [](auto * systemLayer, auto * appState) -> void {
+            ChipLogError(Inet, "ASYNC CASE Session establishment failed");
+            auto * _this = static_cast<PairingSession *>(appState);
+            _this->NotifySessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
+        },
+        this);
 }
 
 } // namespace chip

@@ -20,6 +20,9 @@
 
 #include <cstring>
 
+#include <app_control.h>
+
+#include <core/CHIPBuildConfig.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 
 namespace {
@@ -36,7 +39,7 @@ static constexpr Option sOptions[] = {
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     { "ble-device", false },
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     { "wifi", true },
 #endif
 #if CHIP_ENABLE_OPENTHREAD
@@ -65,6 +68,38 @@ static constexpr Option sOptions[] = {
 #endif
 };
 
+bool ParseAppExtraData(app_control_h app_control, const char * key, void * userData)
+{
+    auto * args = static_cast<std::vector<std::string> *>(userData);
+
+    for (const auto & option : sOptions)
+    {
+        if (strcmp(key, option.name) != 0)
+        {
+            continue;
+        }
+
+        char * value = nullptr;
+        if (app_control_get_extra_data(app_control, option.name, &value) == APP_CONTROL_ERROR_NONE && value != nullptr)
+        {
+            if (!option.isBoolean)
+            {
+                args->push_back(std::string("--") + option.name);
+                args->push_back(value);
+            }
+            else if (strcmp(value, "true") == 0)
+            {
+                args->push_back(std::string("--") + option.name);
+            }
+            // Release memory allocated by app_control_get_extra_data()
+            free(value);
+        }
+    }
+
+    // Continue iterating over all extra data
+    return true;
+}
+
 }; // namespace
 
 void OptionsProxy::Parse(const char * argv0, app_control_h app_control)
@@ -75,24 +110,7 @@ void OptionsProxy::Parse(const char * argv0, app_control_h app_control)
         mArgs.push_back(argv0);
     }
 
-    for (const auto & option : sOptions)
-    {
-        char * value = nullptr;
-        if (app_control_get_extra_data(app_control, option.name, &value) == APP_CONTROL_ERROR_NONE && value != nullptr)
-        {
-            if (!option.isBoolean)
-            {
-                mArgs.push_back(std::string("--") + option.name);
-                mArgs.push_back(value);
-            }
-            else if (strcmp(value, "true") == 0)
-            {
-                mArgs.push_back(std::string("--") + option.name);
-            }
-            // Release memory allocated by app_control_get_extra_data()
-            free(value);
-        }
-    }
+    app_control_foreach_extra_data(app_control, ParseAppExtraData, &mArgs);
 
     // Convert vector of strings into NULL-terminated vector of char pointers
     mArgv.reserve(mArgs.size() + 1);

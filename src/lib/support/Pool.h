@@ -291,13 +291,30 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
+class HeapObjectPoolExitHandling
+{
+public:
+    // If IgnoreLeaksOnExit is called, some time after all static initializers have
+    // run, HeapObjectPool will not assert that everything in it has been
+    // released if its destructor runs under exit() (i.e. when the application
+    // is quitting anyway).
+    static void IgnoreLeaksOnExit();
+
+protected:
+    static bool sIgnoringLeaksOnExit;
+
+private:
+    static void ExitHandler();
+    static bool sExitHandlerRegistered;
+};
+
 /**
  * A class template used for allocating objects from the heap.
  *
  *  @tparam     T   type to be allocated.
  */
 template <class T>
-class HeapObjectPool : public internal::Statistics, public internal::PoolCommon<T>
+class HeapObjectPool : public internal::Statistics, public internal::PoolCommon<T>, public HeapObjectPoolExitHandling
 {
 public:
     HeapObjectPool() {}
@@ -307,15 +324,22 @@ public:
 #ifdef __clang__
 #if __has_feature(address_sanitizer)
 #define __SANITIZE_ADDRESS__ 1
-#endif
-#endif
-#endif
+#else
+#define __SANITIZE_ADDRESS__ 0
+#endif // __has_feature(address_sanitizer)
+#else
+#define __SANITIZE_ADDRESS__ 0
+#endif // __clang__
+#endif // __SANITIZE_ADDRESS__
 #if __SANITIZE_ADDRESS__
         // Free all remaining objects so that ASAN can catch specific use-after-free cases.
         ReleaseAll();
 #else  // __SANITIZE_ADDRESS__
-       // Verify that no live objects remain, to prevent potential use-after-free.
-        VerifyOrDie(Allocated() == 0);
+        if (!sIgnoringLeaksOnExit)
+        {
+            // Verify that no live objects remain, to prevent potential use-after-free.
+            VerifyOrDie(Allocated() == 0);
+        }
 #endif // __SANITIZE_ADDRESS__
     }
 
@@ -354,25 +378,26 @@ public:
         if (object != nullptr)
         {
             internal::HeapObjectListNode * node = mObjects.FindNode(object);
-            if (node != nullptr)
+            // Releasing an object that is not allocated indicates likely memory
+            // corruption; better to safe-crash than proceed at this point.
+            VerifyOrDie(node != nullptr);
+
+            node->mObject = nullptr;
+            Platform::Delete(object);
+
+            // The node needs to be released immediately if we are not in the middle of iteration.
+            // Otherwise cleanup is deferred until all iteration on this pool completes and it's safe to release nodes.
+            if (mObjects.mIterationDepth == 0)
             {
-                node->mObject = nullptr;
-                Platform::Delete(object);
-
-                // The node needs to be released immediately if we are not in the middle of iteration.
-                // Otherwise cleanup is deferred until all iteration on this pool completes and it's safe to release nodes.
-                if (mObjects.mIterationDepth == 0)
-                {
-                    node->Remove();
-                    Platform::Delete(node);
-                }
-                else
-                {
-                    mObjects.mHaveDeferredNodeRemovals = true;
-                }
-
-                DecreaseUsage();
+                node->Remove();
+                Platform::Delete(node);
             }
+            else
+            {
+                mObjects.mHaveDeferredNodeRemovals = true;
+            }
+
+            DecreaseUsage();
         }
     }
 

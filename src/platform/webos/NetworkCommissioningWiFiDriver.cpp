@@ -156,7 +156,7 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
 
-    ChipLogProgress(NetworkProvisioning, "LinuxNetworkCommissioningDelegate: SSID: %s", networkId.data());
+    ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: SSID: %.*s", static_cast<int>(networkId.size()), networkId.data());
 
     err = ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(mStagingNetwork.ssid, mStagingNetwork.ssidLen),
                                                         ByteSpan(mStagingNetwork.credentials, mStagingNetwork.credentialsLen),
@@ -179,13 +179,7 @@ void LinuxWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * cal
     CHIP_ERROR err = DeviceLayer::ConnectivityMgrImpl().StartWiFiScan(ssid, callback);
     if (err != CHIP_NO_ERROR)
     {
-        mScanStatus.SetValue(Status::kUnknownError);
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
-    }
-    else
-    {
-        // On linux platform, once "scan" is started, we can say the result will always be success.
-        mScanStatus.SetValue(Status::kSuccess);
     }
 }
 

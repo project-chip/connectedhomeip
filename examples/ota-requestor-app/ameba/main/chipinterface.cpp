@@ -25,16 +25,12 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
-
-void * __dso_handle = 0;
 
 using chip::ByteSpan;
 using chip::EndpointId;
@@ -52,7 +48,6 @@ using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 using namespace ::chip;
-using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
@@ -85,8 +80,6 @@ static void InitServer(intptr_t context)
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     NetWorkCommissioningInstInit();
 }
 

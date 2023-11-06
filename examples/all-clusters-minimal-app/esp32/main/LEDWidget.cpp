@@ -24,9 +24,9 @@
  */
 
 #include "LEDWidget.h"
-
+#if CONFIG_HAVE_DISPLAY
 #include "ScreenManager.h"
-
+#endif
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_timer.h"

@@ -18,6 +18,13 @@
 
 #import "MTRDeviceControllerStartupParams.h"
 #import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
+#import <Matter/MTRDeviceController.h>
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+#import <Matter/MTRDeviceControllerParameters.h>
+#else
+#import "MTRDeviceControllerParameters_Wrapper.h"
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/DataModelTypes.h>
@@ -36,23 +43,86 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRDeviceControllerStartupParams ()
 // We want to be able to write to operationalCertificate in
 // MTRDeviceControllerStartupParamsInternal.
-@property (strong, nonatomic, nullable) NSData * operationalCertificate;
+@property (nonatomic, copy, nullable) MTRCertificateDERBytes operationalCertificate;
+
+// uniqueIdentifier, so that we always have one.
+@property (nonatomic, strong, readonly) NSUUID * uniqueIdentifier;
 
 // Init method that just copies the values of all our ivars.
 - (instancetype)initWithParams:(MTRDeviceControllerStartupParams *)params;
 @end
 
+@interface MTRDeviceControllerAbstractParameters ()
+// Allow init from our subclasses.
+- (instancetype)_initInternal;
+@end
+
+@interface MTRDeviceControllerParameters ()
+
+- (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
+                   storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
+                       uniqueIdentifier:(NSUUID *)uniqueIdentifier
+                                    ipk:(NSData *)ipk
+                               vendorID:(NSNumber *)vendorID
+                     operationalKeypair:(id<MTRKeypair>)operationalKeypair
+                 operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+                intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
+                        rootCertificate:(MTRCertificateDERBytes)rootCertificate;
+
+// When we have other subclasses of MTRDeviceControllerParameters, we may
+// need to make more things nullable here and/or add more fields.  But for now
+// we know exactly what information we have.
+@property (nonatomic, copy, readonly) NSData * ipk;
+@property (nonatomic, copy, readonly) NSNumber * vendorID;
+@property (nonatomic, copy, readonly) MTRCertificateDERBytes rootCertificate;
+@property (nonatomic, copy, readonly, nullable) MTRCertificateDERBytes intermediateCertificate;
+@property (nonatomic, copy, readonly) MTRCertificateDERBytes operationalCertificate;
+@property (nonatomic, strong, readonly) id<MTRKeypair> operationalKeypair;
+
+@property (nonatomic, strong, nullable, readonly) id<MTROperationalCertificateIssuer> operationalCertificateIssuer;
+@property (nonatomic, strong, nullable, readonly) dispatch_queue_t operationalCertificateIssuerQueue;
+
+@property (nonatomic, strong, readonly) id<MTRDeviceControllerStorageDelegate> storageDelegate;
+@property (nonatomic, strong, readonly) dispatch_queue_t storageDelegateQueue;
+@property (nonatomic, strong, readonly) NSUUID * uniqueIdentifier;
+
+@property (nonatomic, strong, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
+@property (nonatomic, strong, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
+
+@end
+
+MTR_HIDDEN
 @interface MTRDeviceControllerStartupParamsInternal : MTRDeviceControllerStartupParams
 
 // Fabric table we can use to do things like allocate operational keys.
-@property (nonatomic, readonly) chip::FabricTable * fabricTable;
+@property (nonatomic, assign, readonly) chip::FabricTable * fabricTable;
 
-// Fabric index we're starting on.  Only has a value when starting on an
-// existing fabric.
-@property (nonatomic, readonly) chip::Optional<chip::FabricIndex> fabricIndex;
+// Fabric index we're starting on.  Only has a value when starting against an
+// existing fabric table entry.
+@property (nonatomic, assign, readonly) chip::Optional<chip::FabricIndex> fabricIndex;
 
 // Key store we're using with our fabric table, for sanity checks.
-@property (nonatomic, readonly) chip::Crypto::OperationalKeystore * keystore;
+@property (nonatomic, assign, readonly) chip::Crypto::OperationalKeystore * keystore;
+
+@property (nonatomic, assign, readonly) BOOL advertiseOperational;
+
+@property (nonatomic, assign, readonly) BOOL allowMultipleControllersPerFabric;
+
+@property (nonatomic, nullable) NSArray<MTRCertificateDERBytes> * productAttestationAuthorityCertificates;
+@property (nonatomic, nullable) NSArray<MTRCertificateDERBytes> * certificationDeclarationCertificates;
+
+/**
+ * A storage delegate that can be provided when initializing the startup params.
+ * This must be provided if and only if the controller factory was initialized
+ * without storage.
+ */
+@property (nonatomic, strong, nullable, readonly) id<MTRDeviceControllerStorageDelegate> storageDelegate;
+
+/**
+ * The queue to use for storageDelegate.  This will be nil if and only if
+ * storageDelegate is nil.
+ */
+@property (nonatomic, strong, nullable, readonly) dispatch_queue_t storageDelegateQueue;
 
 /**
  * Helper method that checks that our keypairs match our certificates.
@@ -73,6 +143,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initForNewFabric:(chip::FabricTable *)fabricTable
                         keystore:(chip::Crypto::OperationalKeystore *)keystore
+            advertiseOperational:(BOOL)advertiseOperational
                           params:(MTRDeviceControllerStartupParams *)params;
 
 /**
@@ -81,14 +152,29 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initForExistingFabric:(chip::FabricTable *)fabricTable
                           fabricIndex:(chip::FabricIndex)fabricIndex
                              keystore:(chip::Crypto::OperationalKeystore *)keystore
+                 advertiseOperational:(BOOL)advertiseOperational
                                params:(MTRDeviceControllerStartupParams *)params;
 
-- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricId:(uint64_t)fabricId ipk:(NSData *)ipk NS_UNAVAILABLE;
-- (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
-                    operationalCertificate:(NSData *)operationalCertificate
-                   intermediateCertificate:(nullable NSData *)intermediateCertificate
-                           rootCertificate:(NSData *)rootCertificate
-                                       ipk:(NSData *)ipk NS_UNAVAILABLE;
+/**
+ * Initialize for controller bringup with per-controller storage.
+ */
+- (instancetype)initForNewController:(MTRDeviceController *)controller
+                         fabricTable:(chip::FabricTable *)fabricTable
+                            keystore:(chip::Crypto::OperationalKeystore *)keystore
+                advertiseOperational:(BOOL)advertiseOperational
+                              params:(MTRDeviceControllerParameters *)params
+                               error:(CHIP_ERROR &)error;
+
+/**
+ * Should use initForExistingFabric or initForNewFabric or initForController to initialize
+ * internally.
+ */
+- (instancetype)initWithIPK:(NSData *)ipk fabricID:(NSNumber *)fabricID nocSigner:(id<MTRKeypair>)nocSigner NS_UNAVAILABLE;
+- (instancetype)initWithIPK:(NSData *)ipk
+         operationalKeypair:(id<MTRKeypair>)operationalKeypair
+     operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+    intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
+            rootCertificate:(MTRCertificateDERBytes)rootCertificate NS_UNAVAILABLE;
 @end
 
 NS_ASSUME_NONNULL_END

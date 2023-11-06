@@ -19,9 +19,9 @@ package com.matter.tv.server.tvapp;
 
 public class ChannelInfo {
 
-  public static final int kSuccess = -1; // todo: what will be the value of no error?
-  public static final int kMultipleMatches = 0;
-  public static final int kNoMatches = 1;
+  public static final int kSuccess = 0;
+  public static final int kMultipleMatches = 1;
+  public static final int kNoMatches = 2;
 
   public int status;
   public int majorNumber;

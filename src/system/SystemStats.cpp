@@ -29,6 +29,7 @@
 #include <system/SystemStats.h>
 
 #include <lib/support/SafeInt.h>
+#include <platform/LockTracker.h>
 
 #include <string.h>
 
@@ -42,16 +43,18 @@ static const Label sStatsStrings[chip::System::Stats::kNumEntries] = {
 #include "lwippools.h"
 #undef LWIP_PBUF_MEMPOOL
 #else
-    "SystemLayer_NumPacketBufs",
+    "Packet Buffers",
 #endif
-    "SystemLayer_NumTimersInUse",
+    "Timers",
 #if INET_CONFIG_NUM_TCP_ENDPOINTS
-    "InetLayer_NumTCPEpsInUse",
+    "TCP endpoints",
 #endif
 #if INET_CONFIG_NUM_UDP_ENDPOINTS
-    "InetLayer_NumUDPEpsInUse",
+    "UDP endpoints",
 #endif
-    "ExchangeMgr_NumContextsInUse", "ExchangeMgr_NumUMHandlersInUse", "ExchangeMgr_NumBindings", "MessageLayer_NumConnectionsInUse",
+    "Exchange contexts",
+    "Unsolicited message handlers",
+    "Platform events",
 };
 
 count_t sResourcesInUse[kNumEntries];
@@ -76,11 +79,6 @@ void UpdateSnapshot(Snapshot & aSnapshot)
 {
     memcpy(&aSnapshot.mResourcesInUse, &sResourcesInUse, sizeof(aSnapshot.mResourcesInUse));
     memcpy(&aSnapshot.mHighWatermarks, &sHighWatermarks, sizeof(aSnapshot.mHighWatermarks));
-
-#if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
-    chip::System::Timer::GetStatistics(aSnapshot.mResourcesInUse[kSystemLayer_NumTimers],
-                                       aSnapshot.mHighWatermarks[kSystemLayer_NumTimers]);
-#endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 
     SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 }

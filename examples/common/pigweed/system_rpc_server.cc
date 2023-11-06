@@ -70,7 +70,7 @@ Status Start()
             hdlc::Frame & frame = result.value();
             if (frame.address() == hdlc::kDefaultRpcAddress)
             {
-                server.ProcessPacket(frame.data(), hdlc_channel_output);
+                server.ProcessPacket(frame.data());
             }
         }
     }

@@ -319,7 +319,7 @@ int TestTeardown(void * inContext)
 
 } // namespace
 
-int TestMinimalMdnsAllocator(void)
+int TestMinimalMdnsAllocator()
 {
     nlTestSuite theSuite = { "MinimalMdnsAllocator", &sTests[0], &TestSetup, &TestTeardown };
     nlTestRunner(&theSuite, nullptr);

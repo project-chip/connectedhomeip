@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/UnitTestContext.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
@@ -117,7 +118,7 @@ void TestGeneratingAdditionalDataPayloadWithRotatingDeviceId(nlTestSuite * inSui
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
     AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
     additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter = kLifetimeCounter;
-    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan{ kUniqueId, sizeof(kUniqueId) };
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan(kUniqueId);
 
     char output[kAdditionalDataPayloadLength];
     NL_TEST_ASSERT(inSuite,
@@ -132,7 +133,7 @@ void TestGeneratingAdditionalDataPayloadWithRotatingDeviceIdAndMaxLifetimeCounte
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
     AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
     additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter = std::numeric_limits<uint16_t>::max();
-    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan{ kUniqueId, sizeof(kUniqueId) };
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan(kUniqueId);
 
     char output[kAdditionalDataPayloadLength];
     NL_TEST_ASSERT(inSuite,
@@ -160,7 +161,7 @@ void TestGeneratingRotatingDeviceIdAsString(nlTestSuite * inSuite, void * inCont
     size_t rotatingDeviceIdValueOutputSize = 0;
     AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
     additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter = kLifetimeCounter;
-    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan{ kUniqueId, sizeof(kUniqueId) };
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan(kUniqueId);
     err = AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
         additionalDataPayloadParams, rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer),
         rotatingDeviceIdValueOutputSize);
@@ -169,8 +170,7 @@ void TestGeneratingRotatingDeviceIdAsString(nlTestSuite * inSuite, void * inCont
     // Parsing out the lifetime counter value
     long lifetimeCounter;
     char lifetimeCounterStr[3];
-    strncpy(lifetimeCounterStr, rotatingDeviceIdHexBuffer, 2);
-    lifetimeCounterStr[2] = 0;
+    Platform::CopyString(lifetimeCounterStr, rotatingDeviceIdHexBuffer);
 
     char * parseEnd;
     lifetimeCounter = strtol(lifetimeCounterStr, &parseEnd, 16);
@@ -184,7 +184,7 @@ void TestGeneratingRotatingDeviceIdAsStringWithNullInputs(nlTestSuite * inSuite,
     size_t rotatingDeviceIdValueOutputSize = 0;
     AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
     additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter = 0;
-    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = MutableByteSpan{ nullptr, sizeof(kUniqueId) };
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan();
     err = AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
         additionalDataPayloadParams, rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer),
         rotatingDeviceIdValueOutputSize);
@@ -198,7 +198,7 @@ void TestGeneratingRotatingDeviceIdWithSmallBuffer(nlTestSuite * inSuite, void *
     size_t rotatingDeviceIdValueOutputSize = 0;
     AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
     additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter = kLifetimeCounter;
-    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan{ kUniqueId, sizeof(kUniqueId) };
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan(kUniqueId);
     err = AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
         additionalDataPayloadParams, rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer),
         rotatingDeviceIdValueOutputSize);

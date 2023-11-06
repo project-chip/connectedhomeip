@@ -29,7 +29,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
@@ -53,7 +53,9 @@ AdditionalDataPayloadGenerator::generateAdditionalDataPayload(AdditionalDataPayl
     TLVWriter innerWriter;
 
     // Initialize TLVWriter
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    auto tempBuffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize);
+    VerifyOrReturnError(!tempBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+    writer.Init(std::move(tempBuffer));
 
     ReturnErrorOnFailure(writer.OpenContainer(AnonymousTag(), kTLVType_Structure, innerWriter));
 

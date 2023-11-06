@@ -29,7 +29,6 @@
 #include <ti/drivers/Board.h>
 #include <ti/drivers/GPIO.h>
 #include <ti/drivers/NVS.h>
-#include <ti/drivers/UART.h>
 
 #include <ti/drivers/AESECB.h>
 #include <ti/drivers/ECDH.h>
@@ -38,7 +37,7 @@
 #include <ti/drivers/SHA2.h>
 
 #include <bget.h>
-#define TOTAL_ICALL_HEAP_SIZE (0xc800)
+#define TOTAL_ICALL_HEAP_SIZE (0xc700)
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -52,10 +51,21 @@ uint32_t heapSize = TOTAL_ICALL_HEAP_SIZE;
 // ================================================================================
 extern "C" void vApplicationStackOverflowHook(void)
 {
-    while (1)
+    while (true)
     {
         ;
     }
+}
+
+/* Wrapper functions for using the queue registry regardless of whether it is enabled or disabled */
+extern "C" void vQueueAddToRegistryWrapper(QueueHandle_t xQueue, const char * pcQueueName)
+{
+    /* This function is intentionally left empty as the Queue Registry is disabled */
+}
+
+extern "C" void vQueueUnregisterQueueWrapper(QueueHandle_t xQueue)
+{
+    /* This function is intentionally left empty as the Queue Registry is disabled */
 }
 
 // ================================================================================
@@ -72,8 +82,6 @@ int main(void)
 
     NVS_init();
 
-    UART_init();
-
     ECDH_init();
 
     ECDSA_init();
@@ -89,13 +97,13 @@ int main(void)
     {
         // can't log until the kernel is started
         // PLAT_LOG("GetAppTask().StartAppTask() failed");
-        while (1)
+        while (true)
             ;
     }
 
     vTaskStartScheduler();
 
     // Should never get here.
-    while (1)
+    while (true)
         ;
 }

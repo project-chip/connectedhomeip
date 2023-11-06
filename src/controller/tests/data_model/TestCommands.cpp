@@ -24,14 +24,14 @@
 
 #include "app/data-model/NullObject.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVUtilities.hpp>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVUtilities.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -78,22 +78,21 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     ChipLogDetail(Controller, "Received Cluster Command: Endpoint=%x Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
                   aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
 
-    if (aCommandPath.mClusterId == TestCluster::Id &&
-        aCommandPath.mCommandId == TestCluster::Commands::TestSimpleArgumentRequest::Type::GetCommandId())
+    if (aCommandPath.mClusterId == Clusters::UnitTesting::Id &&
+        aCommandPath.mCommandId == Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type::GetCommandId())
     {
-        TestCluster::Commands::TestSimpleArgumentRequest::DecodableType dataRequest;
+        Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::DecodableType dataRequest;
 
         if (DataModel::Decode(aReader, dataRequest) != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Unable to decode the request");
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure, "Unable to decode the request");
             return;
         }
 
         if (responseDirective == kSendDataResponse)
         {
-            TestCluster::Commands::TestStructArrayArgumentResponse::Type dataResponse;
-            TestCluster::Structs::NestedStructList::Type nestedStructList[4];
+            Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::Type dataResponse;
+            Clusters::UnitTesting::Structs::NestedStructList::Type nestedStructList[4];
 
             uint8_t i = 0;
             for (auto & item : nestedStructList)
@@ -116,14 +115,18 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         }
         else if (responseDirective == kSendMultipleSuccessStatusCodes)
         {
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Success,
+                                    "No error but testing status success case");
+
             // TODO: Right now all but the first AddStatus call fail, so this
             // test is not really testing what it should.
-            for (size_t i = 0; i < 4; ++i)
+            for (size_t i = 0; i < 3; ++i)
             {
-                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Success);
+                (void) apCommandObj->FallibleAddStatus(aCommandPath, Protocols::InteractionModel::Status::Success,
+                                                       "No error but testing status success case");
             }
             // And one failure on the end.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+            (void) apCommandObj->FallibleAddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
         }
         else if (responseDirective == kSendError)
         {
@@ -131,11 +134,13 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         }
         else if (responseDirective == kSendMultipleErrors)
         {
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+
             // TODO: Right now all but the first AddStatus call fail, so this
             // test is not really testing what it should.
-            for (size_t i = 0; i < 4; ++i)
+            for (size_t i = 0; i < 3; ++i)
             {
-                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+                (void) apCommandObj->FallibleAddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
             }
         }
         else if (responseDirective == kSendSuccessStatusCodeWithClusterStatus)
@@ -163,7 +168,7 @@ InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & 
         return Status::UnsupportedEndpoint;
     }
 
-    if (aCommandPath.mClusterId != TestCluster::Id)
+    if (aCommandPath.mClusterId != Clusters::UnitTesting::Id)
     {
         return Status::UnsupportedCluster;
     }
@@ -197,9 +202,9 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
     // We want to send a TestSimpleArgumentRequest::Type, but get a
     // TestStructArrayArgumentResponse in return, so need to shadow the actual
     // ResponseType that TestSimpleArgumentRequest has.
-    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    struct FakeRequest : public Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type
     {
-        using ResponseType = TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType;
+        using ResponseType = Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType;
     };
 
     FakeRequest request;
@@ -250,7 +255,7 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
 
 void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, void * apContext)
 {
-    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    struct FakeRequest : public Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type
     {
         using ResponseType = DataModel::NullObjectType;
     };
@@ -289,7 +294,7 @@ void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, vo
 
 void TestCommandInteraction::TestMultipleSuccessNoDataResponses(nlTestSuite * apSuite, void * apContext)
 {
-    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    struct FakeRequest : public Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type
     {
         using ResponseType = DataModel::NullObjectType;
     };
@@ -328,7 +333,7 @@ void TestCommandInteraction::TestMultipleSuccessNoDataResponses(nlTestSuite * ap
 
 void TestCommandInteraction::TestAsyncResponse(nlTestSuite * apSuite, void * apContext)
 {
-    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    struct FakeRequest : public Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type
     {
         using ResponseType = DataModel::NullObjectType;
     };
@@ -385,7 +390,7 @@ void TestCommandInteraction::TestAsyncResponse(nlTestSuite * apSuite, void * apC
 void TestCommandInteraction::TestFailure(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    TestCluster::Commands::TestSimpleArgumentRequest::Type request;
+    Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type request;
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
     bool onSuccessWasCalled = false;
@@ -418,7 +423,7 @@ void TestCommandInteraction::TestFailure(nlTestSuite * apSuite, void * apContext
 
 void TestCommandInteraction::TestMultipleFailures(nlTestSuite * apSuite, void * apContext)
 {
-    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    struct FakeRequest : public Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type
     {
         using ResponseType = DataModel::NullObjectType;
     };
@@ -457,7 +462,7 @@ void TestCommandInteraction::TestMultipleFailures(nlTestSuite * apSuite, void * 
 
 void TestCommandInteraction::TestSuccessNoDataResponseWithClusterStatus(nlTestSuite * apSuite, void * apContext)
 {
-    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    struct FakeRequest : public Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type
     {
         using ResponseType = DataModel::NullObjectType;
     };
@@ -498,7 +503,7 @@ void TestCommandInteraction::TestSuccessNoDataResponseWithClusterStatus(nlTestSu
 void TestCommandInteraction::TestFailureWithClusterStatus(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    TestCluster::Commands::TestSimpleArgumentRequest::Type request;
+    Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type request;
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
     bool onSuccessWasCalled = false;

@@ -57,8 +57,6 @@ target_sources(${APP_TARGET} PRIVATE
                main/LightingManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${MBED_COMMON}/util/DFUManager.cpp
 )

@@ -27,8 +27,8 @@
 
 #include <system/SystemConfig.h>
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 #include <system/TimeSource.h>
@@ -78,7 +78,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestTimeSource(void)
+int TestTimeSource()
 {
     nlTestSuite theSuite = {
         "chip-timesource", &sTests[0], nullptr /* setup */, nullptr /* teardown */

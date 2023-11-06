@@ -22,14 +22,14 @@
 
 #pragma once
 
+#include <messaging/ExchangeDelegate.h>
+#include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/MessageCounterManagerInterface.h>
 
 namespace chip {
 namespace secure_channel {
-
-class ExchangeManager;
 
 class MessageCounterManager : public Messaging::UnsolicitedMessageHandler,
                               public Messaging::ExchangeDelegate,

@@ -25,7 +25,7 @@
 #include "CastingUtils.h"
 #if defined(ENABLE_CHIP_SHELL)
 #include "CastingShellCommands.h"
-#include <lib/shell/Engine.h>
+#include <lib/shell/Engine.h> // nogncheck
 #include <thread>
 #endif
 
@@ -41,7 +41,6 @@ using namespace chip;
 using chip::ArgParser::HelpOptions;
 using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
-using namespace chip::app::Clusters::ContentLauncher::Commands;
 
 #if defined(ENABLE_CHIP_SHELL)
 using chip::Shell::Engine;
@@ -85,7 +84,7 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
     ChipLogError(Support, "PASE PBKDF iterations set to %u", static_cast<unsigned>(spake2pIterationCount));
 
     return provider.Init(options.spake2pVerifier, options.spake2pSalt, spake2pIterationCount, setupPasscode,
-                         options.payload.discriminator);
+                         options.payload.discriminator.GetLongValue());
 }
 
 // To hold SPAKE2+ verifier, discriminator, passcode
@@ -97,9 +96,9 @@ Commands gCommands;
 
 CHIP_ERROR ProcessClusterCommand(int argc, char ** argv)
 {
-    if (!CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->IsInitialized())
+    if (!CastingServer::GetInstance()->GetActiveTargetVideoPlayer()->IsInitialized())
     {
-        CastingServer::GetInstance()->SetDefaultFabricIndex();
+        CastingServer::GetInstance()->SetDefaultFabricIndex(OnConnectionSuccess, OnConnectionFailure, OnNewOrUpdatedEndpoint);
     }
     gCommands.Run(argc, argv);
     return CHIP_NO_ERROR;
@@ -135,21 +134,34 @@ int main(int argc, char * argv[])
         SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
     }
 
+    SuccessOrExit(err = CastingServer::GetInstance()->PreInit());
+
     // Enter commissioning mode, open commissioning window
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(CHIP_NO_ERROR == initParams.InitializeStaticResourcesBeforeServerInit());
     VerifyOrDie(CHIP_NO_ERROR == chip::Server::GetInstance().Init(initParams));
 
-    // Send discover commissioners request
-    SuccessOrExit(err = CastingServer::GetInstance()->DiscoverCommissioners());
+    if (argc > 1)
+    {
+        ChipLogProgress(AppServer, "Command line parameters detected. Skipping auto-start.");
+    }
+    else if (ConnectToCachedVideoPlayer() == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "Skipping commissioner discovery / User directed commissioning flow.");
+    }
+    else
+    {
+        // Send discover commissioners request
+        SuccessOrExit(err = CastingServer::GetInstance()->DiscoverCommissioners());
 
-    // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
-    DeviceLayer::SystemLayer().StartTimer(
-        chip::System::Clock::Milliseconds32(kCommissionerDiscoveryTimeoutInMs),
-        [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
+        // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
+        DeviceLayer::SystemLayer().StartTimer(
+            chip::System::Clock::Milliseconds32(kCommissionerDiscoveryTimeoutInMs),
+            [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
+    }
 
     registerClusters(gCommands, &gCredIssuerCommands);
-    registerClusterSubscriptions(gCommands, &gCredIssuerCommands);
+    registerCommandsSubscriptions(gCommands, &gCredIssuerCommands);
 
     if (argc > 1)
     {

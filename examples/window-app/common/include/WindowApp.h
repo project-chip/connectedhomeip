@@ -121,6 +121,7 @@ public:
         void TiltSchedulePositionSet(chip::Percent100ths position) { SchedulePositionSet(position, true); }
         void TiltScheduleOperationalStateSet(OperationalState opState) { ScheduleOperationalStateSet(opState, true); }
 
+        void UpdateTargetPosition(OperationalState direction, bool isTilt);
         void StepToward(OperationalState direction, bool isTilt);
 
         Type CycleType();

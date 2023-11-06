@@ -23,26 +23,31 @@ import org.json.JSONObject;
 
 /** Represents the reported value of an attribute in object form, TLV and JSON. */
 public final class EventState {
+  public static final int MILLIS_SINCE_BOOT = 0;
+  public static final int MILLIS_SINCE_EPOCH = 1;
   private static final String TAG = "EventState";
 
-  private long eventNumber;
-  private int priorityLevel;
-  private long systemTimeStamp;
+  private final long eventNumber;
+  private final int priorityLevel;
+  private final int timestampType;
+  private final long timestampValue;
 
-  private Object valueObject;
-  private byte[] tlv;
+  private final Object valueObject;
+  private final byte[] tlv;
   private JSONObject json;
 
   public EventState(
       long eventNumber,
       int priorityLevel,
-      long systemTimeStamp,
+      int timestampType,
+      long timestampValue,
       Object valueObject,
       byte[] tlv,
       String jsonString) {
     this.eventNumber = eventNumber;
     this.priorityLevel = priorityLevel;
-    this.systemTimeStamp = systemTimeStamp;
+    this.timestampType = timestampType;
+    this.timestampValue = timestampValue;
 
     this.valueObject = valueObject;
     this.tlv = tlv;
@@ -61,8 +66,12 @@ public final class EventState {
     return priorityLevel;
   }
 
-  public long getSystemTimeStamp() {
-    return systemTimeStamp;
+  public int getTimestampType() {
+    return timestampType;
+  }
+
+  public long getTimestampValue() {
+    return timestampValue;
   }
 
   public Object getValue() {

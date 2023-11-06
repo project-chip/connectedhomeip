@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 namespace app {

@@ -14,13 +14,16 @@
 
 name: 12.2.1. [TC-TSUIC-2.1] Attributes with server as DUT
 
+PICS:
+    - TSUIC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Thermostat User Interface Configuration"
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,30 +31,31 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read the mandatory attribute: TemperatureDisplayMode"
+    - label: "Step 2: Read the mandatory attribute: TemperatureDisplayMode"
       PICS: TSUIC.S.A0000
       command: "readAttribute"
-      attribute: "temperature display mode"
+      attribute: "TemperatureDisplayMode"
       response:
           constraints:
               type: enum8
               minValue: 0
               maxValue: 1
 
-    - label: "Read the mandatory attribute: KeypadLockout"
+    - label: "Step 3: Read the mandatory attribute: KeypadLockout"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       response:
           constraints:
               type: enum8
               minValue: 0
               maxValue: 5
 
-    - label: "Read the optional attribute: ScheduleProgrammingVisibility"
+    - label:
+          "Step 4: Read the optional attribute: ScheduleProgrammingVisibility"
       PICS: TSUIC.S.A0002
       command: "readAttribute"
-      attribute: "schedule programming visibility"
+      attribute: "ScheduleProgrammingVisibility"
       response:
           constraints:
               type: enum8

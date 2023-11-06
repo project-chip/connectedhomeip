@@ -50,15 +50,15 @@ OptionDef gCmdOptionDefs[] =
 };
 
 const char * const gCmdOptionHelp =
-    "  -c, --cert <cert-file>\n"
+    "  -c, --cert <file/str>\n"
     "\n"
-    "       A file containing an untrusted CHIP certificate to be used during\n"
-    "       validation. Usually, it is Intermediate CA certificate.\n"
+    "       File or string containing an untrusted CHIP certificate to be used during\n"
+    "       validation. Usually, it is Intermediate CA certificate (ICAC).\n"
     "\n"
-    "  -t, --trusted-cert <cert-file>\n"
+    "  -t, --trusted-cert <file/str>\n"
     "\n"
-    "       A file containing a trusted CHIP certificate to be used during\n"
-    "       validation. Usually, it is trust anchor root certificate.\n"
+    "       File or string containing a trusted CHIP certificate to be used during\n"
+    "       validation. Usually, it is trust anchor root certificate (RCAC).\n"
     "\n"
     ;
 
@@ -72,15 +72,17 @@ OptionSet gCmdOptions =
 
 HelpOptions gHelpOptions(
     CMD_NAME,
-    "Usage: " CMD_NAME " [ <options...> ] <target-cert-file>\n",
+    "Usage: " CMD_NAME " [ <options...> ] <file/str>\n",
     CHIP_VERSION_STRING "\n" COPYRIGHT_STRING,
     "Validate a chain of CHIP certificates.\n"
     "\n"
     "ARGUMENTS\n"
     "\n"
-    "  <target-cert-file>\n"
+    "  <file/str>\n"
     "\n"
-    "      A file containing the certificate to be validated.\n"
+    "      File or string containing the certificate to be validated.\n"
+    "      The formats of all input certificates are auto-detected and can be any of:\n"
+    "      X.509 PEM, X.509 DER, X.509 HEX, CHIP base-64, CHIP raw TLV or CHIP HEX.\n"
     "\n"
 );
 
@@ -191,6 +193,7 @@ bool Cmd_ValidateCert(int argc, char * argv[])
     uint32_t currentTime;
     res = chip::UnixEpochToChipEpochTime(static_cast<uint32_t>(time(nullptr)), currentTime);
     context.mEffectiveTime.Set<CurrentChipEpochTime>(currentTime);
+    context.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     VerifyTrueOrExit(res);
 
     err = certSet.FindValidCert(certToBeValidated->mSubjectDN, certToBeValidated->mSubjectKeyId, context, &validatedCert);

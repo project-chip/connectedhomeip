@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="menu_item_bg_color">#171717</color>
+    <color name="device_image_tint">@android:color/white</color>
+</resources>

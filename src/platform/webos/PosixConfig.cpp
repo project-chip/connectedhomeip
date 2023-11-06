@@ -72,7 +72,6 @@ const PosixConfig::Key PosixConfig::kConfigKey_FabricSecret       = { kConfigNam
 const PosixConfig::Key PosixConfig::kConfigKey_GroupKeyIndex      = { kConfigNamespace_ChipConfig, "group-key-index" };
 const PosixConfig::Key PosixConfig::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const PosixConfig::Key PosixConfig::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
-const PosixConfig::Key PosixConfig::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const PosixConfig::Key PosixConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
@@ -266,7 +265,8 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, bool val)
     err = storage->Commit();
     SuccessOrExit(err);
 
-    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %s", key.Namespace, key.Name, val ? "true" : "false");
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %s", StringOrNullMarker(key.Namespace), StringOrNullMarker(key.Name),
+                    val ? "true" : "false");
 
 exit:
     return err;
@@ -287,7 +287,8 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint16_t val)
     err = storage->Commit();
     SuccessOrExit(err);
 
-    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %u (0x%X)", key.Namespace, key.Name, val, val);
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %u (0x%X)", StringOrNullMarker(key.Namespace), StringOrNullMarker(key.Name), val,
+                    val);
 
 exit:
     return err;
@@ -308,7 +309,8 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint32_t val)
     err = storage->Commit();
     SuccessOrExit(err);
 
-    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu32 " (0x%" PRIX32 ")", key.Namespace, key.Name, val, val);
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu32 " (0x%" PRIX32 ")", StringOrNullMarker(key.Namespace),
+                    StringOrNullMarker(key.Name), val, val);
 
 exit:
     return err;
@@ -329,7 +331,8 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint64_t val)
     err = storage->Commit();
     SuccessOrExit(err);
 
-    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu64 " (0x%" PRIX64 ")", key.Namespace, key.Name, val, val);
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu64 " (0x%" PRIX64 ")", StringOrNullMarker(key.Namespace),
+                    StringOrNullMarker(key.Name), val, val);
 
 exit:
     return err;
@@ -352,7 +355,8 @@ CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str)
         err = storage->Commit();
         SuccessOrExit(err);
 
-        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = \"%s\"", key.Namespace, key.Name, str);
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = \"%s\"", StringOrNullMarker(key.Namespace), StringOrNullMarker(key.Name),
+                        str);
     }
 
     else
@@ -407,8 +411,8 @@ CHIP_ERROR PosixConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_
         err = storage->Commit();
         SuccessOrExit(err);
 
-        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %u)", key.Namespace, key.Name,
-                        static_cast<unsigned int>(dataLen));
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %u)", StringOrNullMarker(key.Namespace),
+                        StringOrNullMarker(key.Name), static_cast<unsigned int>(dataLen));
     }
     else
     {
@@ -439,7 +443,7 @@ CHIP_ERROR PosixConfig::ClearConfigValue(Key key)
     err = storage->Commit();
     SuccessOrExit(err);
 
-    ChipLogProgress(DeviceLayer, "NVS erase: %s/%s", key.Namespace, key.Name);
+    ChipLogProgress(DeviceLayer, "NVS erase: %s/%s", StringOrNullMarker(key.Namespace), StringOrNullMarker(key.Name));
 
 exit:
     return err;

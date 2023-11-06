@@ -14,27 +14,27 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-# (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 
+# (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 idf_component_register(PRIV_INCLUDE_DIRS
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/light-switch-app"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
                       SRC_DIRS
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/light-switch-app/zap-generated"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/route_hook"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/ota"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/common"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/shell_extension"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/icd"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/access-control-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/administrator-commissioning-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/basic"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/basic-information"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/bindings"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/descriptor"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/diagnostic-logs-server"
@@ -58,10 +58,18 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ota-requestor"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/group-key-mgmt-server"
-                      PRIV_REQUIRES chip QRCode bt app_update)
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/time-synchronization-server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/icd-management-server"
+                      PRIV_REQUIRES chip QRCode bt app_update driver nvs_flash spi_flash)
+get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
+
+include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
+
+chip_app_component_codegen("${CHIP_ROOT}/examples/light-switch-app/light-switch-common/light-switch-app.matter")
+chip_app_component_zapgen("${CHIP_ROOT}/examples/light-switch-app/light-switch-common/light-switch-app.zap")
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
-target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H")
+target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )

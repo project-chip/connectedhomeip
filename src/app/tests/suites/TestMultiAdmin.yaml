@@ -17,20 +17,20 @@ name: Test Multi Admin
 config:
     nodeId: 0x12344321
     nodeIdForDuplicateCommissioning:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0x11
     nodeId2:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0xCAFE
     nodeId3:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0xC00FEE
     endpoint: 0
     discriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 3840
     payload:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
 
 tests:
@@ -70,7 +70,7 @@ tests:
           error: FAILURE
 
     - label: "Open Commissioning Window from alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -90,7 +90,6 @@ tests:
                 value: payload
       response:
           error: FAILURE
-          clusterError: 0x09 #OperationalCertStatus::kFabricConflict
 
     - label: "Check that we just have the one fabric and did not add a new one"
       identity: "alpha"
@@ -99,15 +98,15 @@ tests:
       attribute: "Fabrics"
       fabricFiltered: false
       response:
-          value: [{ "nodeID": nodeId }]
+          value: [{ "NodeID": nodeId }]
 
     - label: "Close Commissioning Window after failed commissioning"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "RevokeCommissioning"
       timedInteractionTimeoutMs: 10000
 
     - label: "Open Commissioning Window from alpha again"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -137,7 +136,7 @@ tests:
 
     - label: "Open Commissioning Window from beta"
       identity: "beta"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -167,7 +166,7 @@ tests:
 
     - label: "read the mandatory attribute: NodeLabel from alpha"
       identity: "alpha"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "readAttribute"
       attribute: "NodeLabel"
       response:
@@ -176,7 +175,7 @@ tests:
 
     - label: "write the mandatory attribute NodeLabel from beta"
       identity: "beta"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "NodeLabel"
       arguments:
@@ -184,7 +183,7 @@ tests:
 
     - label: "read the mandatory attribute: NodeLabel from gamma"
       identity: "gamma"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "readAttribute"
       attribute: "NodeLabel"
       response:
@@ -193,7 +192,7 @@ tests:
 
     - label: "write the mandatory attribute NodeLabel back to default"
       identity: "alpha"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "NodeLabel"
       arguments:

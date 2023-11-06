@@ -1,6 +1,5 @@
 /*
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,9 +23,9 @@
 extern "C" {
 #endif
 
-int cc13x2_26x2LogInit(void);
-void cc13x2_26x2Log(const char * aFormat, ...);
-#define PLAT_LOG(...) cc13x2_26x2Log(__VA_ARGS__);
+int cc13xx_26xxLogInit(void);
+void cc13xx_26xxLog(const char * aFormat, ...);
+#define PLAT_LOG(...) cc13xx_26xxLog(__VA_ARGS__);
 
 #ifdef __cplusplus
 }

@@ -20,6 +20,7 @@
 #include "TvApp-JNI.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/util/config.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 
@@ -90,7 +91,7 @@ void KeypadInputManager::InitializeWithObjects(jobject managerObject)
 
 uint32_t KeypadInputManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         return mDynamicEndpointFeatureMap;
     }

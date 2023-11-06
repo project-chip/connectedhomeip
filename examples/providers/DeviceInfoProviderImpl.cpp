@@ -16,10 +16,11 @@
  */
 #include <DeviceInfoProviderImpl.h>
 
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/SafeInt.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <stdlib.h>
@@ -119,22 +120,21 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelLength(EndpointId endpoint, size_t val)
 {
-    DefaultStorageKeyAllocator keyAlloc;
-
-    return mStorage->SyncSetKeyValue(keyAlloc.UserLabelLengthKey(endpoint), &val, static_cast<uint16_t>(sizeof(val)));
+    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::UserLabelLengthKey(endpoint).KeyName(), &val,
+                                     static_cast<uint16_t>(sizeof(val)));
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::GetUserLabelLength(EndpointId endpoint, size_t & val)
 {
-    DefaultStorageKeyAllocator keyAlloc;
     uint16_t len = static_cast<uint16_t>(sizeof(val));
 
-    return mStorage->SyncGetKeyValue(keyAlloc.UserLabelLengthKey(endpoint), &val, len);
+    return mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::UserLabelLengthKey(endpoint).KeyName(), &val, len);
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel)
 {
-    DefaultStorageKeyAllocator keyAlloc;
+    VerifyOrReturnError(CanCastTo<uint32_t>(index), CHIP_ERROR_INVALID_ARGUMENT);
+
     uint8_t buf[UserLabelTLVMaxSize()];
     TLV::TLVWriter writer;
     writer.Init(buf);
@@ -145,8 +145,15 @@ CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t in
     ReturnErrorOnFailure(writer.PutString(kLabelValueTag, userLabel.value));
     ReturnErrorOnFailure(writer.EndContainer(outerType));
 
-    return mStorage->SyncSetKeyValue(keyAlloc.UserLabelIndexKey(endpoint, index), buf,
-                                     static_cast<uint16_t>(writer.GetLengthWritten()));
+    return mStorage->SyncSetKeyValue(
+        DefaultStorageKeyAllocator::UserLabelIndexKey(endpoint, static_cast<uint32_t>(index)).KeyName(), buf,
+        static_cast<uint16_t>(writer.GetLengthWritten()));
+}
+
+CHIP_ERROR DeviceInfoProviderImpl::DeleteUserLabelAt(EndpointId endpoint, size_t index)
+{
+    return mStorage->SyncDeleteKeyValue(
+        DefaultStorageKeyAllocator::UserLabelIndexKey(endpoint, static_cast<uint32_t>(index)).KeyName());
 }
 
 DeviceInfoProvider::UserLabelIterator * DeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)
@@ -169,12 +176,13 @@ bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mIndex < mTotal, false);
+    VerifyOrReturnError(CanCastTo<uint32_t>(mIndex), false);
 
-    DefaultStorageKeyAllocator keyAlloc;
     uint8_t buf[UserLabelTLVMaxSize()];
     uint16_t len = static_cast<uint16_t>(sizeof(buf));
 
-    err = mProvider.mStorage->SyncGetKeyValue(keyAlloc.UserLabelIndexKey(mEndpoint, mIndex), buf, len);
+    err = mProvider.mStorage->SyncGetKeyValue(
+        DefaultStorageKeyAllocator::UserLabelIndexKey(mEndpoint, static_cast<uint32_t>(mIndex)).KeyName(), buf, len);
     VerifyOrReturnError(err == CHIP_NO_ERROR, false);
 
     TLV::ContiguousBufferTLVReader reader;
@@ -309,40 +317,40 @@ bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarTy
     switch (mIndex)
     {
     case 0:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kBuddhist;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
         break;
     case 1:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kChinese;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kChinese;
         break;
     case 2:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kCoptic;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kCoptic;
         break;
     case 3:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kEthiopian;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kEthiopian;
         break;
     case 4:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kGregorian;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian;
         break;
     case 5:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kHebrew;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kHebrew;
         break;
     case 6:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kIndian;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kIndian;
         break;
     case 7:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kJapanese;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kJapanese;
         break;
     case 8:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kKorean;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kKorean;
         break;
     case 9:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kPersian;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kPersian;
         break;
     case 10:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kTaiwanese;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kTaiwanese;
         break;
     case 11:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kIslamic;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kIslamic;
         break;
     default:
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;

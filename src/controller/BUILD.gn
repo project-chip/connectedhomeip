@@ -13,14 +13,15 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/python.gni")
 
-config("config") {
-  # TODO: this should be a dependency on src/controller/data_model however this is circular:
-  #    zzz_generated/controller-clusters depend on src/controller
-  #    src/controller neeeds zzz_generated/controller-cluster for includes
-  include_dirs = [ "${chip_root}/zzz_generated/" ]
+source_set("nodatamodel") {
+  sources = [ "EmptyDataModelHandler.cpp" ]
+
+  public_deps = [ "${chip_root}/src/app" ]
 }
 
 static_library("controller") {
@@ -28,15 +29,13 @@ static_library("controller") {
 
   sources = [ "CHIPCluster.h" ]
 
-  if (chip_controller) {
+  if (chip_controller && chip_build_controller) {
     sources += [
       "AbstractDnssdDiscoveryController.cpp",
       "AutoCommissioner.cpp",
       "AutoCommissioner.h",
       "CHIPCommissionableNodeController.cpp",
       "CHIPCommissionableNodeController.h",
-      "CHIPDeviceController.cpp",
-      "CHIPDeviceController.h",
       "CHIPDeviceControllerFactory.cpp",
       "CHIPDeviceControllerFactory.h",
       "CommissioneeDeviceProxy.cpp",
@@ -44,16 +43,23 @@ static_library("controller") {
       "CommissionerDiscoveryController.cpp",
       "CommissionerDiscoveryController.h",
       "CommissioningDelegate.cpp",
-      "CommissioningWindowOpener.cpp",
-      "CommissioningWindowOpener.h",
       "DeviceDiscoveryDelegate.h",
       "DevicePairingDelegate.h",
-      "EmptyDataModelHandler.cpp",
       "ExampleOperationalCredentialsIssuer.cpp",
       "ExampleOperationalCredentialsIssuer.h",
       "SetUpCodePairer.cpp",
       "SetUpCodePairer.h",
     ]
+    if (chip_enable_read_client) {
+      sources += [
+        "CHIPDeviceController.cpp",
+        "CHIPDeviceController.h",
+        "CommissioningWindowOpener.cpp",
+        "CommissioningWindowOpener.h",
+        "CurrentFabricRemover.cpp",
+        "CurrentFabricRemover.h",
+      ]
+    }
   }
 
   cflags = [ "-Wconversion" ]
@@ -68,13 +74,12 @@ static_library("controller") {
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
-    "${chip_root}/src/trace",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/tracing:macros",
     "${chip_root}/src/transport",
   ]
 
   deps = [ "${chip_root}/src/lib/address_resolve" ]
-
-  public_configs = [ ":config" ]
 
   defines = []
 }

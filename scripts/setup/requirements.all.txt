@@ -1,0 +1,53 @@
+pip-tools>=7.0.0
+virtualenv
+
+# core build requirements
+-r requirements.build.txt
+
+# esp-idf
+-c constraints.esp32.txt
+-r requirements.esp32.txt
+
+-r requirements.zephyr.txt
+-r requirements.cirque.txt
+-r requirements.memory.txt
+
+# device controller wheel package
+wheel; sys_platform == 'linux'
+pgi; sys_platform == 'linux'
+pyobjc-core; sys_platform == 'darwin'
+pyobjc-framework-cocoa; sys_platform == 'darwin'
+pyobjc-framework-corebluetooth; sys_platform == 'darwin'
+
+# python unit tests run directly without installing
+# built venv
+#
+# TODO: this should change in the Future
+diskcache
+lark
+websockets
+
+# mobly tests
+portpicker
+mobly
+
+# pigweed
+ipython
+appnope
+appdirs
+coloredlogs
+watchdog
+build==0.8.0
+mypy==0.971
+mypy-protobuf==3.5.0
+protobuf==4.24.4
+types-protobuf==4.24.0.2
+
+cryptography
+
+# python unit tests
+colorama
+
+# update tornado for pw_watch
+tornado
+

@@ -1,8 +1,9 @@
 import argparse
-import sys
 import os
-import serial
+import sys
+
 import pw_tokenizer
+import serial
 
 
 def parse_args():
@@ -52,7 +53,7 @@ def decode_string(tstr, detok):
         if s.find('$') == 0:
             return None
         return s
-    except:
+    except ValueError:
         return None
 
 
@@ -75,19 +76,18 @@ def decode_serial(serialport, outfile, database):
     if input:
 
         try:
-            while(True):
-                if(input.in_waiting > 0):
-                    # read line from serial port and ascii decode
-                    line = input.readline().decode('ascii').strip()
-                    # find token start and detokenize
-                    idx = line.rfind(']')
-                    dstr = decode_string(line[idx + 1:], detokenizer)
-                    if dstr:
-                        line = line[:idx+1] + dstr
-                    print(line, file=sys.stdout)
-                    if output:
-                        print(line, file=output)
-        except:
+            while (True):
+                # read line from serial port and ascii decode
+                line = input.readline().decode('ascii').strip()
+                # find token start and detokenize
+                idx = line.rfind(']')
+                dstr = decode_string(line[idx + 1:], detokenizer)
+                if dstr:
+                    line = line[:idx+1] + dstr
+                print(line, file=sys.stdout)
+                if output:
+                    print(line, file=output)
+        except Exception:
             print("Serial error or program closed", file=sys.stderr)
 
         if output:
@@ -119,7 +119,7 @@ def decode_file(infile, outfile, database):
                     # ascii decode line
                     # serial terminals may include non ascii characters
                     line = line.decode('ascii').strip()
-                except:
+                except Exception:
                     continue
                 # find token start and detokenize
                 idx = line.rfind(']')

@@ -31,6 +31,8 @@ struct TestHarnessDACProviderData
     chip::Optional<ByteSpan> paiCert;
     chip::Optional<ByteSpan> certificationDeclaration;
     chip::Optional<ByteSpan> firmwareInformation;
+    chip::Optional<CharSpan> description;
+    chip::Optional<bool> isSuccessCase;
 };
 
 class TestHarnessDACProvider : public DeviceAttestationCredentialsProvider
@@ -43,6 +45,8 @@ public:
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer) override;
     CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer) override;
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_signature_buffer) override;
+    CharSpan GetDescription() { return mDescription; }
+    bool IsSuccessCase() { return mIsSuccessCase; }
 
     void Init(const char * filepath);
     void Init(const TestHarnessDACProviderData & data);
@@ -54,6 +58,8 @@ private:
     ByteSpan mPaiCert;
     ByteSpan mCertificationDeclaration;
     ByteSpan mFirmwareInformation;
+    CharSpan mDescription;
+    bool mIsSuccessCase;
 };
 
 } // namespace Examples

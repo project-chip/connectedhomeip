@@ -22,7 +22,7 @@ using namespace chip;
 using namespace chip::app::Clusters;
 
 CHIP_ERROR LaunchURLCommand::Invoke(const char * contentUrl, const char * contentDisplayStr,
-                                    Optional<ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
+                                    Optional<ContentLauncher::Structs::BrandingInformationStruct::Type> brandingInformation,
                                     std::function<void(CHIP_ERROR)> responseCallback)
 {
     ContentLauncher::Commands::LaunchURL::Type request;
@@ -32,7 +32,7 @@ CHIP_ERROR LaunchURLCommand::Invoke(const char * contentUrl, const char * conten
     return MediaCommandBase::Invoke(request, responseCallback);
 }
 
-CHIP_ERROR LaunchContentCommand::Invoke(ContentLauncher::Structs::ContentSearch::Type search, bool autoPlay,
+CHIP_ERROR LaunchContentCommand::Invoke(ContentLauncher::Structs::ContentSearchStruct::Type search, bool autoPlay,
                                         Optional<chip::CharSpan> data, std::function<void(CHIP_ERROR)> responseCallback)
 {
     ContentLauncher::Commands::LaunchContent::Type request;

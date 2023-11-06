@@ -1,0 +1,54 @@
+# Copyright (c) 2022-2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# === This BUILD file is auto-generated, modify the GnBuildGenerator task instead of editing this file manually. ===
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/java/rules.gni")
+
+java_prebuilt("annotation") {
+  jar_path = "artifacts/jsr305-3.0.2.jar"
+}
+
+java_prebuilt("json") {
+  jar_path = "artifacts/json-20220924.jar"
+}
+
+java_prebuilt("kotlin-stdlib") {
+  jar_path = "artifacts/kotlin-stdlib-1.8.20.jar"
+}
+
+java_prebuilt("kotlin-test") {
+  jar_path = "artifacts/kotlin-test-1.8.20.jar"
+}
+
+java_prebuilt("kotlinx-coroutines-core-jvm") {
+  jar_path = "artifacts/kotlinx-coroutines-core-jvm-1.7.3.jar"
+}
+
+java_prebuilt("protobuf-java") {
+  jar_path = "artifacts/protobuf-java-3.22.0.jar"
+}
+
+java_prebuilt("truth") {
+  jar_path = "artifacts/truth-1.1.3.jar"
+}
+
+java_prebuilt("junit-4") {
+  jar_path = "artifacts/junit-4.13.2.jar"
+}
+
+java_prebuilt("gson") {
+  jar_path = "artifacts/gson-2.9.1.jar"
+}

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/OperationalDeviceProxy.h>
+#include <app/OperationalSessionSetup.h>
 #include <app/data-model/NullObject.h>
 #include <controller/CHIPDeviceController.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -120,14 +120,15 @@ private:
         kOpenCommissioningWindow,
     };
 
-    CHIP_ERROR OpenCommissioningWindowInternal(OperationalDeviceProxy * device);
+    CHIP_ERROR OpenCommissioningWindowInternal(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnPIDReadResponse(void * context, uint16_t value);
     static void OnVIDReadResponse(void * context, VendorId value);
     static void OnVIDPIDReadFailureResponse(void * context, CHIP_ERROR error);
     static void OnOpenCommissioningWindowSuccess(void * context, const app::DataModel::NullObjectType &);
     static void OnOpenCommissioningWindowFailure(void * context, CHIP_ERROR error);
-    static void OnDeviceConnectedCallback(void * context, OperationalDeviceProxy * device);
-    static void OnDeviceConnectionFailureCallback(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnDeviceConnectedCallback(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                          const SessionHandle & sessionHandle);
+    static void OnDeviceConnectionFailureCallback(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     DeviceController * const mController = nullptr;
     Step mNextStep                       = Step::kAcceptCommissioningStart;

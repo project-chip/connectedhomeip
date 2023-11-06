@@ -28,7 +28,7 @@ public class TvApp {
     nativeInit();
   }
 
-  private void postClusterInit(int clusterId, int endpoint) {
+  private void postClusterInit(long clusterId, int endpoint) {
     Log.d(TAG, "postClusterInit for " + clusterId + " at " + endpoint);
     if (mCallback != null) {
       mCallback.onClusterInit(this, clusterId, endpoint);
@@ -36,6 +36,8 @@ public class TvApp {
   }
 
   public native void nativeInit();
+
+  public native void initializeCommissioner(UserPrompter userPrompter);
 
   // called before Matter server is inited
   public native void preServerInit();
@@ -68,18 +70,6 @@ public class TvApp {
   public native void setDACProvider(DACProvider provider);
 
   public native void setChipDeviceEventProvider(DeviceEventProvider provider);
-
-  public native int addContentApp(
-      String vendorName,
-      int vendorId,
-      String appName,
-      int productId,
-      String appVersion,
-      ContentAppEndpointManager manager);
-
-  public native void sendTestMessage(int endpoint, String message);
-
-  public native void setUserPrompter(UserPrompter userPrompter);
 
   static {
     System.loadLibrary("TvApp");

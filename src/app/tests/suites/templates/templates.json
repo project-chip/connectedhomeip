@@ -2,11 +2,16 @@
     "name": "CHIP Tests templates",
     "version": "chip-v1",
     "helpers": [
-        "../../../zap-templates/common/StringHelper.js",
-        "../../../zap-templates/templates/app/helper.js",
-        "../../../zap-templates/templates/chip/helper.js",
-        "../../../zap-templates/common/ClusterTestGeneration.js"
+        "common/StringHelper.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js",
+        "common/ClusterTestGeneration.js"
     ],
+    "resources": {
+        "pics-metafile": "../../../tests/suites/certification/PICS.yaml",
+        "certification-metadir": "../../../tests/suites/certification",
+        "test-metadir": "../../../tests/suites"
+    },
     "override": "../../../zap-templates/common/override.js",
     "partials": [
         {

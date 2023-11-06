@@ -73,13 +73,11 @@ import os
 import pathlib
 import sys
 
-import numpy as np  # type: ignore
-
 import memdf.collect
 import memdf.report
 import memdf.select
 import memdf.util
-
+import numpy as np  # type: ignore
 from memdf import Config, ConfigDescription, DFs, SectionDF, SegmentDF
 
 PLATFORM_CONFIG_DIR = pathlib.Path('scripts/tools/memory/platform')

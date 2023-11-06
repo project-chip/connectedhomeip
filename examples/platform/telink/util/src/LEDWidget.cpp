@@ -18,26 +18,34 @@
 
 #include "LEDWidget.h"
 
-#include <zephyr.h>
+#include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
 
-const struct device * LEDWidget::mPort = NULL;
+LOG_MODULE_REGISTER(LEDWidget);
 
-void LEDWidget::InitGpio(const device * port)
+static LEDWidget::LEDWidgetStateUpdateHandler sStateUpdateCallback;
+
+void LEDWidget::SetStateUpdateCallback(LEDWidgetStateUpdateHandler stateUpdateCb)
 {
-    mPort = port;
-    __ASSERT(device_is_ready(mPort), "%s is not ready\n", mPort->name);
+    if (stateUpdateCb)
+        sStateUpdateCallback = stateUpdateCb;
 }
 
-void LEDWidget::Init(gpio_pin_t gpioNum)
+void LEDWidget::Init(gpio_dt_spec gpio)
 {
-    mLastChangeTimeMS = 0;
-    mBlinkOnTimeMS    = 0;
-    mBlinkOffTimeMS   = 0;
-    mGPIONum          = gpioNum;
-    mState            = false;
+    mBlinkOnTimeMS  = 0;
+    mBlinkOffTimeMS = 0;
+    mGPIO           = gpio;
+    mState          = false;
 
-    int ret = gpio_pin_configure(mPort, mGPIONum, GPIO_OUTPUT_ACTIVE);
-    __ASSERT(ret >= 0, "GPIO pin %d configure - fail. Status%d\n", mGPIONum, ret);
+    int ret = gpio_pin_configure_dt(&mGPIO, GPIO_OUTPUT_ACTIVE);
+    if (ret < 0)
+    {
+        LOG_ERR("GPIO pin %d configure - fail. Status%d\n", mGPIO.pin, ret);
+    }
+
+    k_timer_init(&mLedTimer, &LEDWidget::LedStateTimerHandler, nullptr);
+    k_timer_user_data_set(&mLedTimer, this);
 
     Set(false);
 }
@@ -49,7 +57,8 @@ void LEDWidget::Invert(void)
 
 void LEDWidget::Set(bool state)
 {
-    mLastChangeTimeMS = mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
+    k_timer_stop(&mLedTimer);
+    mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
     DoSet(state);
 }
 
@@ -60,29 +69,45 @@ void LEDWidget::Blink(uint32_t changeRateMS)
 
 void LEDWidget::Blink(uint32_t onTimeMS, uint32_t offTimeMS)
 {
+    k_timer_stop(&mLedTimer);
+
     mBlinkOnTimeMS  = onTimeMS;
     mBlinkOffTimeMS = offTimeMS;
-    Animate();
-}
 
-void LEDWidget::Animate()
-{
     if (mBlinkOnTimeMS != 0 && mBlinkOffTimeMS != 0)
     {
-        int64_t nowMS      = k_uptime_get();
-        int64_t stateDurMS = mState ? mBlinkOnTimeMS : mBlinkOffTimeMS;
-
-        if (nowMS > mLastChangeTimeMS + stateDurMS)
-        {
-            DoSet(!mState);
-            mLastChangeTimeMS = nowMS;
-        }
+        DoSet(!mState);
+        ScheduleStateChange();
     }
+}
+
+void LEDWidget::ScheduleStateChange()
+{
+    k_timer_start(&mLedTimer, K_MSEC(mState ? mBlinkOnTimeMS : mBlinkOffTimeMS), K_NO_WAIT);
 }
 
 void LEDWidget::DoSet(bool state)
 {
     mState  = state;
-    int ret = gpio_pin_set(mPort, mGPIONum, state);
-    __ASSERT(ret >= 0, "GPIO pin %d set -fail. Status: %d\n", mGPIONum, ret);
+    int ret = gpio_pin_set_dt(&mGPIO, state);
+    if (ret < 0)
+    {
+        LOG_ERR("GPIO pin %d set -fail. Status: %d\n", mGPIO.pin, ret);
+    }
+}
+
+void LEDWidget::UpdateState()
+{
+    /* Prevent from keep updating the state if LED was set to solid On/Off value */
+    if (mBlinkOnTimeMS != 0 && mBlinkOffTimeMS != 0)
+    {
+        DoSet(!mState);
+        ScheduleStateChange();
+    }
+}
+
+void LEDWidget::LedStateTimerHandler(k_timer * timer)
+{
+    if (sStateUpdateCallback)
+        sStateUpdateCallback(reinterpret_cast<LEDWidget *>(timer->user_data));
 }

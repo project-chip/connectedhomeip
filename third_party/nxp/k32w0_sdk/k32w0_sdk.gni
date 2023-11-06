@@ -20,6 +20,7 @@ import("//build_overrides/openthread.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/nxp/k32w/k32w0/args.gni")
 
 declare_args() {
@@ -37,9 +38,24 @@ declare_args() {
   board = "k32w061dk6"
   chip_with_ntag = 1
   chip_with_high_power = 0
+  chip_with_factory_data = 0
+  use_fro_32k = 0
+  use_custom_factory_provider = 0
+  chip_crypto_flavor = "NXP-Ultrafast-P256"
+  chip_reduce_ssbl_size = false
+  chip_enable_ota_firmware_processor = 1
+  chip_enable_ota_factory_data_processor = 0
+  chip_with_pdm_encryption = 1
+  ota_custom_entry_address = "0x000C1000"
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
+
+if (chip_crypto == "platform") {
+  assert(chip_crypto_flavor == "tinycrypt" ||
+             chip_crypto_flavor == "NXP-Ultrafast-P256",
+         "choose tinycrypt or NXP-Ultrafast-P256 as crypto platform")
+}
 
 # Defines an k32w SDK build target.
 #
@@ -64,6 +80,20 @@ template("k32w0_sdk") {
                chip_with_ot_cli == 0 && chip_with_se05x == 0),
       "Please disable low power if expansion board, openthread CLI or SE is needed!")
 
+  assert(
+      use_custom_factory_provider == 0 || chip_with_factory_data == 1,
+      "Please set chip_with_factory_data=1 if using custom factory provider.")
+
+  assert(
+      chip_enable_ota_factory_data_processor == 0 ||
+          chip_enable_ota_firmware_processor == 1,
+      "Please set chip_enable_ota_firmware_processor=1 if using default factory data processor.")
+
+  assert(
+      chip_enable_ota_factory_data_processor == 0 ||
+          chip_with_factory_data == 1,
+      "Please set chip_with_factory_data=1 if using default factory data processor.")
+
   if (build_for_k32w041am == 1 || build_for_k32w041a == 1 ||
       build_for_k32w041 == 1) {
     build_for_k32w061 = 0
@@ -75,8 +105,7 @@ template("k32w0_sdk") {
            "Please build for only one platform")
     device = "K32W061"
     board = "k32w061dk6"
-    chip_with_ntag = 1
-    chip_with_high_power = 0
+    chip_with_ntag = 0
   }
   if (build_for_k32w041am == 1) {
     assert(build_for_k32w041am == 1 && build_for_k32w061 == 0 &&
@@ -84,7 +113,6 @@ template("k32w0_sdk") {
            "Please build for only one platform")
     device = "K32W041AM"
     board = "k32w041amdk6"
-    chip_with_high_power = 1
     chip_with_ntag = 0
   }
   if (build_for_k32w041a == 1) {
@@ -93,7 +121,6 @@ template("k32w0_sdk") {
            "Please build for only one platform")
     device = "K32W041A"
     board = "k32w041adk6"
-    chip_with_high_power = 1
     chip_with_ntag = 0
   }
   if (build_for_k32w041 == 1) {
@@ -103,13 +130,29 @@ template("k32w0_sdk") {
     device = "K32W041"
     board = "k32w041dk6"
     chip_with_ntag = 0
-    chip_with_high_power = 0
   }
 
   print("device:", device)
   print("board:", board)
   print("ntag:", chip_with_ntag)
-  print("high power:", chip_with_high_power)
+  print("increased TX power:", chip_with_high_power)
+  print("FRO32k: ", use_fro_32k)
+  print("low power: ", chip_with_low_power)
+  print("OTA default firmware processor: ", chip_enable_ota_firmware_processor)
+  print("OTA default factory data processor: ",
+        chip_enable_ota_factory_data_processor)
+  print("PDM Encryption: ", chip_with_pdm_encryption)
+
+  if (chip_with_low_power == 1 && chip_logging == true) {
+    print(
+        "WARNING: enabling logs in low power might break the LP timings. Use at your own risk!")
+    print("WARNING: set chip_logging=false to disable logging.")
+  }
+
+  if (chip_crypto == "platform") {
+    print("ECC crypto lib: ", chip_crypto_flavor)
+  }
+
   device_lowercase = string_replace(board, "dk6", "")
 
   sdk_target_name = target_name
@@ -124,6 +167,15 @@ template("k32w0_sdk") {
     # headers are not fatal.  Therefore don't add them directly to include_dirs;
     # we will add them to cflags below instead.
     _sdk_include_dirs = []
+
+    # Directories specified with -isystem options are scanned in left-to-right order.
+    # sha256_alt.h is present in both these paths, but the one from port/matter will
+    # be selected, which is intended. Both paths are needed, because some header
+    # files are not overwritten (e.g. aes_alt.h).
+    _sdk_include_dirs += [
+      "${k32w0_sdk_root}/middleware/mbedtls/port/matter",
+      "${k32w0_sdk_root}/middleware/mbedtls/port/ksdk",
+    ]
 
     if (chip_with_DK6) {
       if (chip_with_low_power != 0) {
@@ -152,11 +204,31 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/components/serial_manager",
       "${k32w0_sdk_root}/components/uart",
       "${k32w0_sdk_root}/devices/${device}",
-      "${k32w0_sdk_root}/devices/${device}/drivers",
+      "${k32w0_sdk_root}/devices/K32W061/drivers",
+      "${k32w0_sdk_root}/drivers/common",
+      "${k32w0_sdk_root}/drivers/lpc_gpio",
+      "${k32w0_sdk_root}/drivers/aes",
+      "${k32w0_sdk_root}/drivers/jn_iocon",
+      "${k32w0_sdk_root}/drivers/lpc_adc",
+      "${k32w0_sdk_root}/drivers/aes",
+      "${k32w0_sdk_root}/drivers/jn_flash",
+      "${k32w0_sdk_root}/drivers/sha",
+      "${k32w0_sdk_root}/drivers/flexcomm",
+      "${k32w0_sdk_root}/drivers/lpc_dma",
+      "${k32w0_sdk_root}/drivers/pint",
+      "${k32w0_sdk_root}/drivers/inputmux",
+      "${k32w0_sdk_root}/drivers/spifi",
+      "${k32w0_sdk_root}/drivers/jn_rtc",
+      "${k32w0_sdk_root}/drivers/fmeas",
+      "${k32w0_sdk_root}/drivers/jn_rng",
+      "${k32w0_sdk_root}/drivers/ctimer",
+      "${k32w0_sdk_root}/drivers/wwdt",
+      "${k32w0_sdk_root}/drivers/gint",
+      "${k32w0_sdk_root}/utilities/debug_console/str",
+      "${k32w0_sdk_root}/utilities/debug_console",
       "${k32w0_sdk_root}/devices/${device}/utilities",
       "${k32w0_sdk_root}/devices/${device}/utilities/debug_console",
       "${k32w0_sdk_root}/devices/${device}/utilities/str",
-      "${k32w0_sdk_root}/middleware/mbedtls/port/ksdk",
       "${k32w0_sdk_root}/middleware/wireless/ble_controller/interface",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/application/common",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/application/common/gatt_db",
@@ -201,12 +273,11 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}//middleware/wireless/bluetooth/host/lib/lib_ble_5-0_host_matter_cm4_noFP.a",
       "${k32w0_sdk_root}/middleware/wireless/ieee-802.15.4/lib/libMiniMac_Sched.a",
       "${k32w0_sdk_root}/middleware/wireless/framework/PDM/Library/libPDM_extFlash.a",
-      "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4.a",
       "${k32w0_sdk_root}/middleware/wireless/framework/XCVR/lib/libRadio.a",
+      "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4.a",
     ]
 
     defines = [
-      "gPWR_CpuClk_48MHz=1",
       "gMainThreadPriority_c=5",
       "CPU_JN518X",
       "CPU_JN518X_REV=2",
@@ -221,8 +292,7 @@ template("k32w0_sdk") {
       "USE_SDK_OSA=0",
       "gSerialManagerMaxInterfaces_c=2",
       "FSL_RTOS_FREE_RTOS=1",
-      "gTotalHeapSize_c=0xC8BC",
-      "gUartDebugConsole_d=1",
+      "gTotalHeapSize_c=0xF000",
       "DEBUG_SERIAL_INTERFACE_INSTANCE=0",
       "APP_SERIAL_INTERFACE_INSTANCE=1",
       "gOTA_externalFlash_d=1",
@@ -231,6 +301,7 @@ template("k32w0_sdk") {
       "gOtaVerifyWrite_d=0",
       "gExternalFlashIsCiphered_d=1",
       "PDM_USE_DYNAMIC_MEMORY=1",
+      "PDM_SAVE_IDLE=1",
       "gBootData_None_c=1",
       "PROGRAM_PAGE_SZ=256",
       "configFRTOS_MEMORY_SCHEME=4",
@@ -238,7 +309,6 @@ template("k32w0_sdk") {
       "ENABLE_RAM_VECTOR_TABLE=1",
       "gTMR_Enabled_d=1",
       "gTimestamp_Enabled_d=0",
-      "K32W_LOG_ENABLED=1",
       "CHIP_ENABLE_OPENTHREAD=1",
       "gOtaMemPoolId_c=1",
       "PoolsDetails_c=_block_size_ 32 _number_of_blocks_ 6 _pool_id_(0) _eol_ _block_size_ 256 _number_of_blocks_ 3 _pool_id_(0) _eol_ _block_size_ 512 _number_of_blocks_ 2 _pool_id_(0) _eol_ _block_size_ 768 _number_of_blocks_ 1 _pool_id_(0) _eol_ _block_size_ 268  _number_of_blocks_ 8 _pool_id_(gOtaMemPoolId_c) _eol_",
@@ -259,7 +329,48 @@ template("k32w0_sdk") {
       "HEAP_SIZE=gTotalHeapSize_c",
       "gLoggingActive_d=0",
       "gLogRingPlacementOffset_c=0xF000",
+      "gSecLibUseSha256Alt_d=1",
+      "gOTA_UseSecLibAes=1",
+      "gResetSystemReset_d=1",
     ]
+
+    # If OTA default processors are enabled, then OTA custom entry structure
+    # will be saved in external flash: gOTACustomOtaEntryMemory=OTACustomStorage_ExtFlash (1)
+    if (chip_enable_ota_firmware_processor == 1) {
+      defines += [
+        "gOTAAllowCustomStartAddress=1",
+        "gOTAUseCustomOtaEntry=1",
+        "gOTACustomOtaEntryMemory=1",
+        "OTA_ENTRY_TOP_ADDR=${ota_custom_entry_address}",
+      ]
+
+      if (chip_enable_ota_factory_data_processor == 1) {
+        defines += [ "CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR=1" ]
+      }
+    }
+
+    if (chip_crypto == "platform" &&
+        chip_crypto_flavor == "NXP-Ultrafast-P256") {
+      defines += [ "EC_P256_DSPEXT=1" ]
+    }
+
+    if (use_fro_32k == 1) {
+      defines += [
+        "gClkUseFro32K=1",
+        "gPWR_CpuClk_48MHz=0",
+      ]
+    } else {
+      defines += [
+        "gClkUseFro32K=0",
+        "gPWR_CpuClk_48MHz=1",
+      ]
+    }
+
+    if (chip_with_pdm_encryption == 1) {
+      defines += [ "PDM_ENCRYPTION=1" ]
+    } else {
+      defines += [ "PDM_ENCRYPTION=0" ]
+    }
 
     if (chip_mdns == "platform") {
       defines += [
@@ -295,7 +406,7 @@ template("k32w0_sdk") {
       } else {
         defines += [
           "gKeyBoardSupported_d=1",
-          "gKBD_KeysCount_c=1",
+          "gKBD_KeysCount_c=2",
         ]
       }
 
@@ -314,19 +425,32 @@ template("k32w0_sdk") {
 
     if (chip_with_low_power == 1) {
       defines += [
+        "chip_with_low_power=1",
         "cPWR_UsePowerDownMode=1",
         "cPWR_FullPowerDownMode=1",
         "DBG_PostStepTickAssess=0",
-        "gApp_SystemClockCalibration=1",
         "gPWR_FreqScalingWFI=0",
         "mAppUseTickLessMode_c=1",
-        "App_SuppressTickInStopMode=0",
         "cPWR_DiscardRunningTimerForPowerDown=1",
       ]
+
+      if (chip_logging == false) {
+        defines += [
+          "K32W_LOG_ENABLED=0",
+          "gUartDebugConsole_d=0",
+        ]
+      } else {
+        defines += [
+          "K32W_LOG_ENABLED=1",
+          "gUartDebugConsole_d=1",
+        ]
+      }
     } else {
       defines += [
         "cPWR_UsePowerDownMode=0",
         "cPWR_FullPowerDownMode=0",
+        "K32W_LOG_ENABLED=1",
+        "gUartDebugConsole_d=1",
       ]
     }
 
@@ -358,6 +482,10 @@ template("k32w0_sdk") {
       ]
     }
 
+    if (chip_with_factory_data == 1) {
+      defines += [ "CONFIG_CHIP_LOAD_REAL_FACTORY_DATA=1" ]
+    }
+
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
@@ -380,7 +508,15 @@ template("k32w0_sdk") {
         "-Wno-parentheses-equality",
       ]
     } else {
-      cflags += [ "-fno-optimize-strlen" ]
+      cflags += [
+        "-fno-optimize-strlen",
+
+        # TODO After upgrading the compiler we started to see new error from address
+        # warning. To allow PR that rolls up compiler we have suppress this warning
+        # as an error temporarily.
+        # see https://github.com/project-chip/connectedhomeip/issues/26221
+        "-Wno-error=address",
+      ]
     }
 
     # Now add our "system-header" include dirs
@@ -401,31 +537,29 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/components/serial_manager/serial_manager.c",
       "${k32w0_sdk_root}/components/serial_manager/serial_port_uart.c",
       "${k32w0_sdk_root}/components/uart/usart_adapter.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_adc.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_aes.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_clock.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_common.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_ctimer.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_flash.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_flexcomm.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_fmeas.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_gpio.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_i2c.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_i2c_freertos.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_inputmux.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_pint.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_power.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_reset.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_rng.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_rtc.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_sha.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_spifi.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_usart.c",
-      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_wtimer.c",
       "${k32w0_sdk_root}/devices/${device}/mcuxpresso/startup_${device_lowercase}.c",
       "${k32w0_sdk_root}/devices/${device}/system_${device}.c",
-      "${k32w0_sdk_root}/devices/${device}/utilities/debug_console/fsl_debug_console.c",
-      "${k32w0_sdk_root}/devices/${device}/utilities/str/fsl_str.c",
+      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_clock.c",
+      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_power.c",
+      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_reset.c",
+      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_wtimer.c",
+      "${k32w0_sdk_root}/drivers/aes/fsl_aes.c",
+      "${k32w0_sdk_root}/drivers/common/fsl_common.c",
+      "${k32w0_sdk_root}/drivers/ctimer/fsl_ctimer.c",
+      "${k32w0_sdk_root}/drivers/flexcomm/fsl_flexcomm.c",
+      "${k32w0_sdk_root}/drivers/flexcomm/fsl_i2c.c",
+      "${k32w0_sdk_root}/drivers/flexcomm/fsl_i2c_freertos.c",
+      "${k32w0_sdk_root}/drivers/flexcomm/fsl_usart.c",
+      "${k32w0_sdk_root}/drivers/fmeas/fsl_fmeas.c",
+      "${k32w0_sdk_root}/drivers/inputmux/fsl_inputmux.c",
+      "${k32w0_sdk_root}/drivers/jn_flash/fsl_flash.c",
+      "${k32w0_sdk_root}/drivers/jn_rng/fsl_rng.c",
+      "${k32w0_sdk_root}/drivers/jn_rtc/fsl_rtc.c",
+      "${k32w0_sdk_root}/drivers/lpc_adc/fsl_adc.c",
+      "${k32w0_sdk_root}/drivers/lpc_gpio/fsl_gpio.c",
+      "${k32w0_sdk_root}/drivers/pint/fsl_pint.c",
+      "${k32w0_sdk_root}/drivers/sha/fsl_sha.c",
+      "${k32w0_sdk_root}/drivers/spifi/fsl_spifi.c",
       "${k32w0_sdk_root}/middleware/wireless/ble_controller/config/controller_config.c",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/application/common/ble_conn_manager.c",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/application/common/ble_host_tasks.c",
@@ -452,6 +586,7 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/middleware/wireless/framework/RNG/Source/RNG.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/Reset/Reset.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/SecLib.c",
+      "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/SecLib_ecp256_sw.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/SerialManager/Source/SerialManager.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/SerialManager/Source/UART_Serial_Adapter.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/TimersManager/Source/TMR_Adapter.c",
@@ -464,6 +599,8 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/queue.c",
       "${k32w0_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/tasks.c",
       "${k32w0_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/timers.c",
+      "${k32w0_sdk_root}/utilities/debug_console/fsl_debug_console.c",
+      "${k32w0_sdk_root}/utilities/debug_console/str/fsl_str.c",
     ]
 
     if (chip_with_DK6) {

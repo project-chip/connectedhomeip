@@ -37,8 +37,8 @@
 #include <string.h>
 
 #include <inet/InetError.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
@@ -97,7 +97,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestSystemErrorStr(void)
+int TestSystemErrorStr()
 {
     // clang-format off
     nlTestSuite theSuite =

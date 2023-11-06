@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="General"/>
+
+  <bitmap name="Feature" type="bitmap32">
+      <cluster code="0x0004"/>
+      <field name="GroupNames" mask="0x1"/>
+  </bitmap>
+
+  <bitmap name="NameSupportBitmap" type="bitmap8">
+      <cluster code="0x0004"/>
+      <field name="GroupNames" mask="0x80"/>
+  </bitmap>
+
+  <cluster>
+    <name>Groups</name>
+    <domain>General</domain>
+    <description>Attributes and commands for group configuration and manipulation.</description>
+    <code>0x0004</code>
+    <define>GROUPS_CLUSTER</define>
+
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="4"/>
+
+    <attribute side="server" code="0x0000" define="GROUP_NAME_SUPPORT" type="NameSupportBitmap" min="0x00" max="0x80" writable="false" optional="false">NameSupport</attribute>
+
+    <command source="client" code="0x00" name="AddGroup" response="AddGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups add">
+      <description>
+        Command description for AddGroup
+      </description>
+      <access op="invoke" role="manage"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="GroupName" type="char_string" length="16"/>
+    </command>
+
+    <command source="client" code="0x01" name="ViewGroup" response="ViewGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups view">
+      <description>
+        Command description for ViewGroup
+      </description>
+      <arg name="GroupID" type="group_id"/>
+    </command>
+
+    <command source="client" code="0x02" name="GetGroupMembership" response="GetGroupMembershipResponse" cliFunctionName="zclGroupsGetCommand" isFabricScoped="true" optional="false" cli="zcl groups get">
+      <description>
+        Command description for GetGroupMembership
+      </description>
+      <arg name="GroupList" type="group_id" array="true"/>
+    </command>
+
+    <command source="client" code="0x03" name="RemoveGroup" response="RemoveGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups remove">
+      <description>
+        Command description for RemoveGroup
+      </description>
+      <access op="invoke" role="manage"/>
+      <arg name="GroupID" type="group_id"/>
+    </command>
+
+    <command source="client" code="0x04" name="RemoveAllGroups" isFabricScoped="true" optional="false" cli="zcl groups rmall">
+      <description>
+        Command description for RemoveAllGroups
+      </description>
+      <access op="invoke" role="manage"/>
+    </command>
+
+    <command source="client" code="0x05" name="AddGroupIfIdentifying" isFabricScoped="true" optional="false" cli="zcl groups add-if-id">
+      <description>
+        Command description for AddGroupIfIdentifying
+      </description>
+      <access op="invoke" role="manage"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="GroupName" length="16" type="char_string"/>
+    </command>
+
+    <command source="server" code="0x00" name="AddGroupResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Command description for AddGroupResponse
+      </description>
+      <arg name="Status" type="enum8"/>
+      <arg name="GroupID" type="group_id"/>
+    </command>
+
+    <command source="server" code="0x01" name="ViewGroupResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Command description for ViewGroupResponse
+      </description>
+      <arg name="Status" type="enum8"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="GroupName" length="16" type="char_string"/>
+    </command>
+
+    <command source="server" code="0x02" name="GetGroupMembershipResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Command description for GetGroupMembershipResponse
+      </description>
+      <arg name="Capacity" type="int8u" isNullable="true"/>
+      <arg name="GroupList" type="group_id" array="true"/>
+    </command>
+
+    <command source="server" code="0x03" name="RemoveGroupResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Command description for RemoveGroupResponse
+      </description>
+      <arg name="Status" type="enum8"/>
+      <arg name="GroupID" type="group_id"/>
+    </command>
+  </cluster>
+</configurator>

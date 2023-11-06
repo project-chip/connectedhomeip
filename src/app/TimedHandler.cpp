@@ -20,7 +20,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/TimedRequestMessage.h>
 #include <app/StatusResponse.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemClock.h>
 #include <system/TLVPacketBufferBackingStore.h>
@@ -114,8 +114,8 @@ CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * a
     TimedRequestMessage::Parser parser;
     ReturnErrorOnFailure(parser.Init(reader));
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnErrorOnFailure(parser.CheckSchemaValidity());
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    parser.PrettyPrint();
 #endif
 
     uint16_t timeoutMs;

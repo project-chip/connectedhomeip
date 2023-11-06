@@ -18,10 +18,32 @@ from enum import Enum, auto
 from .gn import GnBuilder
 
 
+class K32WBoard(Enum):
+    K32W0 = auto()
+    K32W1 = auto()
+
+    def Name(self):
+        if self == K32WBoard.K32W0:
+            return 'k32w0x'
+        elif self == K32WBoard.K32W1:
+            return 'k32w1'
+        else:
+            raise Exception('Unknown board type: %r' % self)
+
+    def FolderName(self):
+        if self == K32WBoard.K32W0:
+            return 'k32w/k32w0'
+        elif self == K32WBoard.K32W1:
+            return 'k32w/k32w1'
+        else:
+            raise Exception('Unknown board type: %r' % self)
+
+
 class K32WApp(Enum):
     LIGHT = auto()
     LOCK = auto()
     SHELL = auto()
+    CONTACT = auto()
 
     def ExampleName(self):
         if self == K32WApp.LIGHT:
@@ -30,23 +52,25 @@ class K32WApp(Enum):
             return 'lock-app'
         elif self == K32WApp.SHELL:
             return 'shell'
-        else:
-            raise Exception('Unknown app type: %r' % self)
-
-    def AppNamePrefix(self):
-        if self == K32WApp.LIGHT:
-            return 'chip-k32w0x-light-example'
-        elif self == K32WApp.LOCK:
-            return 'chip-k32w0x-lock-example'
-        elif self == K32WApp.SHELL:
-            return 'chip-k32w0x-shell-example'
         elif self == K32WApp.CONTACT:
-            return 'chip-k32w0x-contact-example'
+            return "contact-sensor-app"
         else:
             raise Exception('Unknown app type: %r' % self)
 
-    def BuildRoot(self, root):
-        return os.path.join(root, 'examples', self.ExampleName(), 'nxp', 'k32w', 'k32w0')
+    def NameSuffix(self):
+        if self == K32WApp.LIGHT:
+            return 'light-example'
+        elif self == K32WApp.LOCK:
+            return 'lock-example'
+        elif self == K32WApp.SHELL:
+            return 'shell-example'
+        elif self == K32WApp.CONTACT:
+            return 'contact-example'
+        else:
+            raise Exception('Unknown app type: %r' % self)
+
+    def BuildRoot(self, root, board):
+        return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName())
 
 
 class K32WBuilder(GnBuilder):
@@ -55,30 +79,36 @@ class K32WBuilder(GnBuilder):
                  root,
                  runner,
                  app: K32WApp = K32WApp.LIGHT,
+                 board: K32WBoard = K32WBoard.K32W0,
                  release: bool = False,
                  low_power: bool = False,
                  tokenizer: bool = False,
                  disable_ble: bool = False,
                  disable_ota: bool = False,
+                 disable_logs: bool = False,
                  se05x: bool = False,
-                 tinycrypt: bool = False):
+                 tinycrypt: bool = False,
+                 crypto_platform: bool = False,
+                 openthread_ftd: bool = False):
         super(K32WBuilder, self).__init__(
-            root=app.BuildRoot(root),
+            root=app.BuildRoot(root, board),
             runner=runner)
         self.code_root = root
         self.app = app
+        self.board = board
         self.low_power = low_power
         self.tokenizer = tokenizer
         self.release = release
         self.disable_ble = disable_ble
         self.disable_ota = disable_ota
+        self.disable_logs = disable_logs
         self.se05x = se05x
         self.tinycrypt = tinycrypt
+        self.crypto_platform = crypto_platform
+        self.openthread_ftd = openthread_ftd
 
     def GnBuildArgs(self):
-        args = [
-            'k32w0_sdk_root="%s"' % os.environ['NXP_K32W0_SDK_ROOT'],
-        ]
+        args = []
 
         if self.low_power:
             args.append('chip_with_low_power=1')
@@ -97,24 +127,29 @@ class K32WBuilder(GnBuilder):
         if self.disable_ota:
             args.append('chip_enable_ota_requestor=false')
 
+        if self.disable_logs:
+            args.append('chip_logging=false')
+
         if self.se05x:
             args.append('chip_with_se05x=true')
 
         if self.tinycrypt:
-            args.append('chip_crypto=\"tinycrypt\" mbedtls_repo=\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\"')
+            args.append('chip_crypto=\"platform\" chip_crypto_flavor=\"tinycrypt\"')
+
+        if self.crypto_platform:
+            args.append('chip_crypto=\"platform\"')
+
+        if self.openthread_ftd:
+            args.append('chip_openthread_ftd=true')
 
         return args
 
     def generate(self):
-        self._Execute([os.path.join(
-            self.code_root, 'third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh')])
-
         super(K32WBuilder, self).generate()
 
     def build_outputs(self):
-        items = {}
-        for extension in ["", ".map", ".hex"]:
-            name = '%s%s' % (self.app.AppNamePrefix(), extension)
-            items[name] = os.path.join(self.output_dir, name)
-
-        return items
+        name = 'chip-%s-%s' % (self.board.Name(), self.app.NameSuffix())
+        return {
+            '%s.elf' % name: os.path.join(self.output_dir, name),
+            '%s.map' % name: os.path.join(self.output_dir, '%s.map' % name)
+        }

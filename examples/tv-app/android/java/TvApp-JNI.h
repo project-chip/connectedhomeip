@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "MyUserPrompter-JNI.h"
 #include <jni.h>
 
 class TvAppJNI
@@ -25,6 +26,7 @@ class TvAppJNI
 public:
     void InitializeWithObjects(jobject app);
     void PostClusterInit(int clusterId, int endpoint);
+    void InitializeCommissioner(JNIMyUserPrompter * userPrompter);
 
 private:
     friend TvAppJNI & TvAppJNIMgr();

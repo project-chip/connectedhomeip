@@ -252,7 +252,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestCHIPCallback(void)
+int TestCHIPCallback()
 {
     // clang-format off
     nlTestSuite theSuite =

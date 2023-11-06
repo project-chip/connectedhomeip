@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/config/standalone/args.gni")
 import("${chip_root}/examples/platform/cc13x2_26x2/args.gni")
 
 ti_simplelink_sdk_target = get_label_info(":sdk", "label_no_toolchain")
@@ -29,6 +30,7 @@ chip_enable_ota_requestor = false
 
 # Disable FTD Build for all-clusters app to save Flash
 chip_openthread_ftd = false
+openthread_external_platform = "${chip_root}/third_party/openthread/platforms/cc13x2_26x2:libopenthread-cc13x2_cc26x2"
 
 # Disable CHIP Logging
 chip_progress_logging = false

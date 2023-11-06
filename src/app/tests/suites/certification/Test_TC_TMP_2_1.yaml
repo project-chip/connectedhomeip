@@ -14,13 +14,16 @@
 
 name: 7.2.1. [TC-TMP-2.1] Attributes with server as DUT
 
+PICS:
+    - TMP.S
+
 config:
     nodeId: 0x12344321
     cluster: "Temperature Measurement"
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,42 +31,44 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the mandatory attribute: MeasuredValue"
+    - label: "Step 2: Read the mandatory attribute: MinMeasuredValue"
+      PICS: TMP.S.A0001
+      command: "readAttribute"
+      attribute: "MinMeasuredValue"
+      response:
+          saveAs: CurrentMinMeasured
+          constraints:
+              type: int16s
+              minValue: -27315
+              maxValue: 32766
+
+    - label: "Step 3: Read the mandatory attribute: MaxMeasuredValue"
+      PICS: TMP.S.A0002
+      command: "readAttribute"
+      attribute: "MaxMeasuredValue"
+      response:
+          saveAs: CurrentMaxMeasured
+          constraints:
+              type: int16s
+              minValue: CurrentMinMeasured
+              maxValue: 32767
+
+    - label: "Step 4: Read the mandatory attribute: MeasuredValue"
       PICS: TMP.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
           constraints:
-              type: int16
-              minValue: -27315
-              maxValue: 32767
+              type: int16s
+              minValue: CurrentMinMeasured
+              maxValue: CurrentMaxMeasured
 
-    - label: "read the mandatory attribute: MinMeasuredValue"
-      PICS: TMP.S.A0001
-      command: "readAttribute"
-      attribute: "MinMeasuredValue"
-      response:
-          constraints:
-              type: int16
-              minValue: -27315
-              maxValue: 32767
-
-    - label: "read the mandatory attribute: MaxMeasuredValue"
-      PICS: TMP.S.A0002
-      command: "readAttribute"
-      attribute: "MaxMeasuredValue"
-      response:
-          constraints:
-              type: int16
-              minValue: -27314
-              maxValue: 32767
-
-    - label: "read the optional attribute: Tolerance"
+    - label: "Step 6: Read the optional attribute: Tolerance"
       PICS: TMP.S.A0003
       command: "readAttribute"
       attribute: "Tolerance"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 2048

@@ -26,6 +26,7 @@
 #pragma once
 
 #include <access/AccessControl.h>
+#include <app/AppBuildConfig.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <lib/core/CHIPCore.h>
@@ -46,6 +47,7 @@
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/DataVersionFilter.h>
 #include <app/EventPathParams.h>
 #include <app/ObjectList.h>
@@ -56,8 +58,11 @@
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
+#include <app/reporting/ReportScheduler.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/basic-types.h>
+
+#include <app/CASESessionManager.h>
 
 namespace chip {
 namespace app {
@@ -72,7 +77,8 @@ namespace app {
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
                                public CommandHandler::Callback,
-                               public ReadHandler::ManagementCallback
+                               public ReadHandler::ManagementCallback,
+                               public FabricTable::Delegate
 {
 public:
     /**
@@ -102,25 +108,36 @@ public:
      *  Initialize the InteractionModel Engine.
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
+     *  @param[in]    apFabricTable    A pointer to the FabricTable object.
+     *  @param[in]    apCASESessionMgr An optional pointer to a CASESessionManager (used for re-subscriptions).
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
+                    reporting::ReportScheduler * reportScheduler, CASESessionManager * apCASESessionMgr = nullptr,
+                    SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr);
 
     void Shutdown();
 
-    Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
+    Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; }
 
+    /**
+     * Returns a pointer to the CASESessionManager. This can return nullptr if one wasn't
+     * provided in the call to Init().
+     */
+    CASESessionManager * GetCASESessionManager() const { return mpCASESessionMgr; }
+
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
      * Tears down an active subscription.
      *
      * @retval #CHIP_ERROR_KEY_NOT_FOUND If the subscription is not found.
      * @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR ShutdownSubscription(SubscriptionId aSubscriptionId);
+    CHIP_ERROR ShutdownSubscription(const ScopedNodeId & aPeerNodeId, SubscriptionId aSubscriptionId);
 
     /**
      * Tears down active subscriptions for a given peer node ID.
@@ -128,10 +145,15 @@ public:
     void ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
 
     /**
-     * Expire active transactions and release related objects for the given fabric index.
-     * This is used for releasing transactions that won't be closed when a fabric is removed.
+     * Tears down all active subscriptions for a given fabric.
      */
-    void CloseTransactionsFromFabricIndex(FabricIndex aFabricIndex);
+    void ShutdownSubscriptions(FabricIndex aFabricIndex);
+
+    /**
+     * Tears down all active subscriptions.
+     */
+    void ShutdownAllSubscriptions();
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
@@ -149,11 +171,18 @@ public:
     ReadHandler * ActiveHandlerAt(unsigned int aIndex);
 
     /**
+     * Returns the write handler at a particular index within the active handler list.
+     */
+    WriteHandler * ActiveWriteHandlerAt(unsigned int aIndex);
+
+    /**
      * The Magic number of this InteractionModelEngine, the magic number is set during Init()
      */
     uint32_t GetMagicNumber() const { return mMagic; }
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
+
+    reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
     void ReleaseAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList);
 
@@ -208,6 +237,7 @@ public:
     void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
      * Add a read client to the internally tracked list of weak references. This list is used to
      * correctly dispatch unsolicited reports to the right matching handler by subscription ID.
@@ -228,6 +258,7 @@ public:
      * Return the number of active read clients being tracked by the engine.
      */
     size_t GetNumActiveReadClients();
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     /**
      * Returns the number of dirty subscriptions. Including the subscriptions that are generating reports.
@@ -267,6 +298,13 @@ public:
      * @retval the minimal value of guaranteed subscriptions per fabic.
      */
     uint16_t GetMinGuaranteedSubscriptionsPerFabric() const;
+
+    // virtual method from FabricTable::Delegate
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+
+    SubscriptionResumptionStorage * GetSubscriptionResumptionStorage() { return mpSubscriptionResumptionStorage; };
+
+    CHIP_ERROR ResumeSubscriptions();
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
@@ -315,6 +353,7 @@ public:
     //
     void ShutdownActiveReads()
     {
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
         for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
         {
             readClient->mpImEngine = nullptr;
@@ -328,6 +367,7 @@ public:
         // After that, we just null out our tracker.
         //
         mpActiveReadClientList = nullptr;
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
         mReadHandlers.ReleaseAll();
     }
@@ -336,6 +376,7 @@ public:
 private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
+    friend class TestInteractionModelEngine;
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandHandler & apCommandObj) override;
@@ -346,16 +387,41 @@ private:
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 
     /**
-     * Called when Interaction Model receives a Command Request message.  Errors processing
-     * the Command Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
-     * expected to set it to success if it does not want an automatic status response message to be sent.
+     * Called when Interaction Model receives a Command Request message.
      */
-    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                      System::PacketBufferHandle && aPayload, bool aIsTimedInvoke,
-                                      Protocols::InteractionModel::Status & aStatus);
+    Status OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                  System::PacketBufferHandle && aPayload, bool aIsTimedInvoke);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
+
+    /**
+     * This parses the attribute path list to ensure it is well formed. If so, for each path in the list, it will expand to a list
+     * of concrete paths and walk each path to check if it has privileges to read that attribute.
+     *
+     * If there is AT LEAST one "existent path" (as the spec calls it) that has sufficient privilege, aHasValidAttributePath
+     * will be set to true. Otherwise, it will be set to false.
+     *
+     * aRequestedAttributePathCount will be updated to reflect the number of attribute paths in the request.
+     *
+     *
+     */
+    static CHIP_ERROR ParseAttributePaths(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                          AttributePathIBs::Parser & aAttributePathListParser, bool & aHasValidAttributePath,
+                                          size_t & aRequestedAttributePathCount);
+
+    /**
+     * This parses the event path list to ensure it is well formed. If so, for each path in the list, it will expand to a list
+     * of concrete paths and walk each path to check if it has privileges to read that event.
+     *
+     * If there is AT LEAST one "existent path" (as the spec calls it) that has sufficient privilege, aHasValidEventPath
+     * will be set to true. Otherwise, it will be set to false.
+     *
+     * aRequestedEventPathCount will be updated to reflect the number of event paths in the request.
+     */
+    static CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                      EventPathIBs::Parser & aEventPathListParser, bool & aHasValidEventPath,
+                                      size_t & aRequestedEventPathCount);
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
@@ -386,8 +452,8 @@ private:
     /**This function handles processing of un-solicited ReportData messages on the client, which can
      * only occur post subscription establishment
      */
-    CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                       System::PacketBufferHandle && aPayload);
+    Status OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                   System::PacketBufferHandle && aPayload);
 
     void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
@@ -488,6 +554,15 @@ private:
      */
     Status EnsureResourceForRead(FabricIndex aFabricIndex, size_t aRequestedAttributePathCount, size_t aRequestedEventPathCount);
 
+    /**
+     * Helper for various ShutdownSubscriptions functions.  The subscriptions
+     * that match all the provided arguments will be shut down.
+     */
+    void ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex = NullOptional,
+                                       const Optional<NodeId> & aPeerNodeId       = NullOptional);
+
+    static void ResumeSubscriptionsTimerCallback(System::Layer * apSystemLayer, void * apAppState);
+
     template <typename T, size_t N>
     void ReleasePool(ObjectList<T> *& aObjectList, ObjectPool<ObjectList<T>, N> & aObjectPool);
     template <typename T, size_t N>
@@ -501,6 +576,7 @@ private:
     ObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
+    reporting::ReportScheduler * mReportScheduler = nullptr;
 
     static constexpr size_t kReservedHandlersForReads = kMinSupportedReadRequestsPerFabric * (CHIP_CONFIG_MAX_FABRICS);
     static constexpr size_t kReservedPathsForReads    = kMinSupportedPathsPerReadRequest * kReservedHandlersForReads;
@@ -530,7 +606,9 @@ private:
 
     ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> mReadHandlers;
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
     ReadClient * mpActiveReadClientList = nullptr;
+#endif
 
     ReadHandler::ApplicationCallback * mpReadHandlerApplicationCallback = nullptr;
 
@@ -549,7 +627,18 @@ private:
     bool mForceHandlerQuota = false;
 #endif
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    bool HasSubscriptionsToResume();
+    uint32_t ComputeTimeSecondsTillNextSubscriptionResumption();
+    uint32_t mNumSubscriptionResumptionRetries = 0;
+    bool mSubscriptionResumptionScheduled      = false;
+#endif
+
     FabricTable * mpFabricTable;
+
+    CASESessionManager * mpCASESessionMgr = nullptr;
+
+    SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
 
     // A magic number for tracking values between stack Shutdown()-s and Init()-s.
     // An ObjectHandle is valid iff. its magic equals to this one.
@@ -588,6 +677,13 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState);
 
 /**
+ *  Check whether concrete attribute path is an "existent attribute path" in spec terms.
+ *  @param[in]    aPath                 The concrete path of the data being read.
+ *  @retval  boolean   true if the concrete attribute path indicates an attribute that exists on the node.
+ */
+bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath);
+
+/**
  *  Get the registered attribute access override. nullptr when attribute access override is not found.
  *
  * TODO(#16806): This function and registerAttributeAccessOverride can be member functions of InteractionModelEngine.
@@ -616,7 +712,12 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint);
  *
  * @retval The metadata of the attribute, will return null if the given attribute does not exists.
  */
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath);
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aPath);
+
+/**
+ * Returns the event support status for the given event, as an interaction model status.
+ */
+Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath);
 
 } // namespace app
 } // namespace chip

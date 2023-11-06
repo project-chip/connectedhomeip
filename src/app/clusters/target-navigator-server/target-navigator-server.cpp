@@ -28,12 +28,14 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/data-model/Encode.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/config.h>
+#include <platform/CHIPDeviceConfig.h>
+
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-#include <app/data-model/Encode.h>
-#include <app/util/attribute-storage.h>
-#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -41,9 +43,11 @@ using namespace chip::app::Clusters::TargetNavigator;
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kTargetNavigatorDelegateTableSize =
     EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kTargetNavigatorDelegateTableSize <= kEmberInvalidEndpointIndex, "TargetNavigator Delegate table size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -66,8 +70,9 @@ Delegate * GetDelegate(EndpointId endpoint)
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(Zcl, "TargetNavigator NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, TargetNavigator::Id);
-    return ((ep == 0xFFFF || ep >= EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, TargetNavigator::Id,
+                                                       EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kTargetNavigatorDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -88,9 +93,10 @@ namespace TargetNavigator {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, TargetNavigator::Id);
-    // if endpoint is found and is not a dynamic endpoint
-    if (ep != 0xFFFF && ep < EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT)
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, TargetNavigator::Id,
+                                                       EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
+    // if endpoint is found
+    if (ep < kTargetNavigatorDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }
@@ -191,7 +197,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfTargetNavigatorClusterNavigateTargetCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        command->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
