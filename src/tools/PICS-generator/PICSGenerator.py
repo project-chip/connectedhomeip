@@ -27,6 +27,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     groupKeyManagementCluster = "Group Key Management Cluster"
     nodeOperationalCredentialsCluster = "Node Operational Credentials Cluster"
     basicInformationCluster = "Basic Information Cluster"
+    networkCommissioningCluster = "Network Commissioning Cluster"
 
     if otaProviderCluster in clusterName:
         clusterName = "OTA Software Update"
@@ -37,7 +38,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     elif groupKeyManagementCluster == clusterName:
         clusterName = "Group Communication"
 
-    elif nodeOperationalCredentialsCluster == clusterName or basicInformationCluster == clusterName:
+    elif nodeOperationalCredentialsCluster == clusterName or basicInformationCluster == clusterName or networkCommissioningCluster == clusterName:
         clusterName = clusterName.replace("Cluster", "").strip()
 
     # Determine if file has already been handled and use this file
