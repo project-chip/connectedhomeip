@@ -44,12 +44,12 @@ public:
 /*
 * Set Operational State instance from the application layer.
 */
-void SetInstance(EndpointId aEndpoint, OperationalState::Instance * aInstance);
+void SetOPInstance(EndpointId aEndpoint, OperationalState::Instance * aInstance);
 
 /**
  * Get Operational State instance for Microwave Oven Control Cluster to know what the current state is.
  */
-OperationalState::Instance * GetInstance(EndpointId aEndpoint);
+OperationalState::Instance * GetOPInstance(EndpointId aEndpoint);
 
 
 

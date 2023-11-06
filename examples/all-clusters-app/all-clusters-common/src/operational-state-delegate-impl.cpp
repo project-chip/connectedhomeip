@@ -132,7 +132,7 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
     gOperationalStateInstance->Init();
 
     //add for microwave testing
-    MicrowaveOvenControl::SetInstance(operationalStateEndpoint , gOperationalStateInstance);
+    MicrowaveOvenControl::SetOPInstance(operationalStateEndpoint , gOperationalStateInstance);
 }
 
 // Init RVC Operational State cluster
