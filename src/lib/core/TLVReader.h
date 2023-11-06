@@ -167,7 +167,10 @@ public:
      * Advances the TLVReader object to the next TLV element to be read, asserting the tag of
      * the new element.
      *
-     * This is a convenience method that combines the behavior of Next() and Expect().
+     * This is a convenience method that combines the behavior of Next() and Expect(...).
+     *
+     * Note that if this method returns an error, the reader may or may not have been advanced already.
+     * In use cases where this is important, separate calls to Next() and Expect(...) should be made.
      *
      * @retval #CHIP_NO_ERROR              If the reader was successfully positioned on a new element
      *                                     matching the expected parameters.
@@ -179,6 +182,7 @@ public:
      * Checks that the TLV reader is positioned at an element with the expected tag.
      *
      * @retval #CHIP_NO_ERROR              If the reader is positioned on the expected element.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the reader is not positioned on an element.
      * @retval #CHIP_ERROR_UNEXPECTED_TLV_ELEMENT
      *                                      If the tag associated with the new element does not match the
      *                                      value of the @p expectedTag argument.
@@ -189,7 +193,10 @@ public:
      * Advances the TLVReader object to the next TLV element to be read, asserting the type and tag of
      * the new element.
      *
-     * This is a convenience method that combines the behavior of Next() and Expect().
+     * This is a convenience method that combines the behavior of Next() and Expect(...).
+     *
+     * Note that if this method returns an error, the reader may or may not have been advanced already.
+     * In use cases where this is important, separate calls to Next() and Expect(...) should be made.
      *
      * @retval #CHIP_NO_ERROR              If the reader was successfully positioned on a new element
      *                                     matching the expected parameters.

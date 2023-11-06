@@ -340,4 +340,24 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
                              features=features, attributes=attributes, accepted_commands=accepted_commands,
                              generated_commands=generated_commands, events=events)
             clusters[id] = new
+
+    # workaround for aliased clusters not appearing in the xml. Remove this once https://github.com/csa-data-model/projects/issues/373 is addressed
+    aliased_clusters = {0x040C: 'Carbon Monoxide Concentration Measurement',
+                        0x040D: 'Carbon Dioxide Concentration Measurement',
+                        0x0413: 'Nitrogen Dioxide Concentration Measurement',
+                        0x0415: 'Ozone Concentration Measurement',
+                        0x042A: 'PM2.5 Concentration Measurement',
+                        0x042B: 'Formaldehyde Concentration Measurement',
+                        0x042C: 'PM1 Concentration Measurement',
+                        0x042D: 'PM10 Concentration Measurement',
+                        0x042E: 'Total Volatile Organic Compounds Concentration Measurement',
+                        0x042F: 'Radon Concentration Measurement'}
+    alias_base_name = 'Concentration Measurement Clusters'
+    for id, alias_name in aliased_clusters.items():
+        base = derived_clusters[alias_base_name]
+        new = deepcopy(base)
+        new.derived = alias_base_name
+        new.name = alias_name
+        clusters[id] = new
+
     return clusters, problems

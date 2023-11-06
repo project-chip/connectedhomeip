@@ -59,7 +59,9 @@ public:
         ChipLogProgress(Discovery, "   Supports TCP:                  %s", result.supportsTcp ? "YES" : "NO");
         ChipLogProgress(Discovery, "   MRP IDLE retransmit timeout:   %u ms", result.mrpRemoteConfig.mIdleRetransTimeout.count());
         ChipLogProgress(Discovery, "   MRP ACTIVE retransmit timeout: %u ms", result.mrpRemoteConfig.mActiveRetransTimeout.count());
-        ChipLogProgress(Discovery, "   MRP ACTIVE Threshold timet:    %u ms", result.mrpRemoteConfig.mActiveThresholdTime.count());
+        ChipLogProgress(Discovery, "   MRP ACTIVE Threshold time:     %u ms", result.mrpRemoteConfig.mActiveThresholdTime.count());
+        ChipLogProgress(Discovery, "   ICD is operating as a:         %s", result.isICDOperatingAsLIT ? "LIT" : "SIT");
+
         NotifyDone();
     }
 
