@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class GroupsCluster(private val endpointId: UShort) {
+class GroupsCluster(private val controller: MatterController, private val endpointId: UShort) {
   class AddGroupResponse(val status: UInt, val groupID: UShort)
 
   class ViewGroupResponse(val status: UInt, val groupID: UShort, val groupName: String)
@@ -41,6 +42,8 @@ class GroupsCluster(private val endpointId: UShort) {
     groupName: String,
     timedInvokeTimeoutMs: Int? = null
   ): AddGroupResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -49,6 +52,8 @@ class GroupsCluster(private val endpointId: UShort) {
   }
 
   suspend fun viewGroup(groupID: UShort, timedInvokeTimeoutMs: Int? = null): ViewGroupResponse {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -60,6 +65,8 @@ class GroupsCluster(private val endpointId: UShort) {
     groupList: List<UShort>,
     timedInvokeTimeoutMs: Int? = null
   ): GetGroupMembershipResponse {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -68,6 +75,8 @@ class GroupsCluster(private val endpointId: UShort) {
   }
 
   suspend fun removeGroup(groupID: UShort, timedInvokeTimeoutMs: Int? = null): RemoveGroupResponse {
+    val commandId = 3L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -76,6 +85,8 @@ class GroupsCluster(private val endpointId: UShort) {
   }
 
   suspend fun removeAllGroups(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 4L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -88,6 +99,8 @@ class GroupsCluster(private val endpointId: UShort) {
     groupName: String,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 5L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class PressureMeasurementCluster(private val endpointId: UShort) {
+class PressureMeasurementCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class MeasuredValueAttribute(val value: Short?)
 
   class MinMeasuredValueAttribute(val value: Short?)
