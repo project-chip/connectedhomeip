@@ -29,29 +29,23 @@ namespace Clusters {
 namespace MicrowaveOvenControl {
 
 
-/**
- * Interface to help manage the supported of the Microwave Oven Control Cluster.
+/** @brief Set Operational State instance from the application layer.
+ *
+ * Set operational state instance
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param aInstance    Instance of Operaiotn State
  */
-class MicrowaveOvenControlServer
-{
-public:
-    virtual ~MicrowaveOvenControlServer() = default;
-
-    MicrowaveOvenControlServer() {}
-};
-
-
-/*
-* Set Operational State instance from the application layer.
-*/
 void SetOPInstance(EndpointId aEndpoint, OperationalState::Instance * aInstance);
 
-/**
- * Get Operational State instance for Microwave Oven Control Cluster to know what the current state is.
+/** @brief Get Operational State instance for Microwave Oven Control Cluster to know what the current state is.
+ *
+ * Get operational state instance
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @return Return a pointer of operational state instance which is being initialized.
  */
 OperationalState::Instance * GetOPInstance(EndpointId aEndpoint);
-
-
 
 
 } // namespace MicrowaveOvenControl
