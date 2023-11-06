@@ -53,6 +53,7 @@ dependencies {
     implementation(Deps.AndroidX.appcompat)
     implementation(Deps.AndroidX.fragment)
     implementation(Deps.AndroidX.Lifecycle.viewmodel)
+    implementation(Deps.AndroidX.Lifecycle.livedata)
 
     implementation(Deps.Kotlin.serialization)
 
