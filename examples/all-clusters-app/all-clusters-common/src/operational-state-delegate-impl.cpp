@@ -15,8 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <operational-state-delegate-impl.h>
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
+#include <operational-state-delegate-impl.h>
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -131,8 +131,8 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 
     gOperationalStateInstance->Init();
 
-    //add for microwave testing
-    MicrowaveOvenControl::SetOPInstance(operationalStateEndpoint , gOperationalStateInstance);
+    // add for microwave testing
+    MicrowaveOvenControl::SetOPInstance(operationalStateEndpoint, gOperationalStateInstance);
 }
 
 // Init RVC Operational State cluster

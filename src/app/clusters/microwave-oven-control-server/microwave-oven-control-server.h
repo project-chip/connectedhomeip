@@ -19,15 +19,14 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af-enums.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
+#include <app/util/af-enums.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
-
 
 /** @brief Set Operational State instance from the application layer.
  *
@@ -46,7 +45,6 @@ void SetOPInstance(EndpointId aEndpoint, OperationalState::Instance * aInstance)
  * @return Return a pointer of operational state instance which is being initialized.
  */
 OperationalState::Instance * GetOPInstance(EndpointId aEndpoint);
-
 
 } // namespace MicrowaveOvenControl
 } // namespace Clusters
