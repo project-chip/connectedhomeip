@@ -671,12 +671,12 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                     "[BUG] Should read commissioning info (part 2), but report is not ReadCommissioningInfo2. THIS IS A BUG.");
             }
 
-            ReadCommissioningInfo2 mDeviceCommissioningInfo2 = report.Get<ReadCommissioningInfo2>();
-            mParams.SetSupportsConcurrentConnection(mDeviceCommissioningInfo2.supportsConcurrentConnection);
+            ReadCommissioningInfo2 commissioningInfo = report.Get<ReadCommissioningInfo2>();
+            mParams.SetSupportsConcurrentConnection(commissioningInfo.supportsConcurrentConnection);
 
             if (mParams.GetCheckForMatchingFabric())
             {
-                chip::NodeId nodeId = mDeviceCommissioningInfo2.nodeId;
+                chip::NodeId nodeId = commissioningInfo.nodeId;
                 if (nodeId != kUndefinedNodeId)
                 {
                     mParams.SetRemoteNodeId(nodeId);
@@ -685,7 +685,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
             if (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
             {
-                if (mDeviceCommissioningInfo2.isIcd)
+                if (commissioningInfo.isIcd)
                 {
                     mNeedIcdRegistraion = true;
                     ChipLogDetail(Controller, "AutoCommissioner: Device is ICD");

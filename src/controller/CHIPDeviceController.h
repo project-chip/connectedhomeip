@@ -87,7 +87,6 @@ inline constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTI
 // Raw functions for cluster callbacks
 void OnBasicFailure(void * context, CHIP_ERROR err);
 void OnBasicSuccess(void * context, const chip::app::DataModel::NullObjectType &);
-void NonConcurrentTimeout(void * context, CHIP_ERROR error);
 
 struct ControllerInitParams
 {

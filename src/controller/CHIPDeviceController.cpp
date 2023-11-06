@@ -1616,7 +1616,16 @@ void OnBasicFailure(void * context, CHIP_ERROR error)
 
 void NonConcurrentTimeout(void * context, CHIP_ERROR error)
 {
-    ChipLogProgress(Controller, "Non-Concurrent Mode: Expected NetworkResponse Timeout, do nothing");
+    if (error == CHIP_ERROR_TIMEOUT)
+    {
+        ChipLogProgress(Controller, "Non-Concurrent Mode: Expected NetworkResponse Timeout, do nothing");
+    }
+    else
+    {
+        ChipLogProgress(Controller, "Non-Concurrent Mode: Received failure response %s\n", chip::ErrorStr(error));
+        DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+        commissioner->CommissioningStageComplete(error);
+    }
 }
 
 void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
@@ -2125,6 +2134,7 @@ void DeviceCommissioner::ParseCommissioningInfo2()
     {
         // May not be present so don't return the error code, non fatal, default concurrent
         ChipLogError(Controller, "Failed to read SupportsConcurrentConnection: %" CHIP_ERROR_FORMAT, err.Format());
+        info.supportsConcurrentConnection = true;
     }
  
     return_err = ParseFabrics(info);
@@ -2267,7 +2277,7 @@ void DeviceCommissioner::OnArmFailSafe(void * context,
 void DeviceCommissioner::NonConcurrentNetworkResponse(
     void * context, const NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
 {
-    // In Non Concurrent mode the commissioing network should have been shutdown and not sent the
+    // In Non Concurrent mode the commissioning network should have been shut down and not sent the
     // ConnectNetworkResponse. In case it does send it this handles the message
     ChipLogProgress(Controller, "NonConcurrent Mode : Received Unexpected ConnectNetwork response, ignoring. Status=%u", to_underlying(data.networkingStatus));
 }
