@@ -102,7 +102,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturn(mOtaProviderDelegate.HasValidObjectRef(),
-                 commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
+                   commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
 
     VerifyOrReturn(mBdxOTASender != nullptr, commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
 
@@ -111,7 +111,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     chip::JniLocalReferenceManager manager(env);
 
-    jobject otaProviderDelegate = nullptr;
+    jobject otaProviderDelegate      = nullptr;
     jmethodID handleQueryImageMethod = nullptr;
 
     jobject boxedHardwareVersion     = nullptr;
@@ -138,16 +138,16 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
 
     NodeId nodeId = commandObj->GetSubjectDescriptor().subject;
 
-    FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
-    ScopedNodeId ourNodeId  = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetLocalScopedNodeId();
-    VendorId vendorId            = commandData.vendorID;
-    uint16_t productId           = commandData.productID;
-    uint32_t softwareVersion     = commandData.softwareVersion;
-    DataModel::DecodableList<OTADownloadProtocol> protocolsSupported  = commandData.protocolsSupported;
-    Optional<uint16_t> hardwareVersion     = commandData.hardwareVersion;
-    Optional<chip::CharSpan> location            = commandData.location;
-    Optional<bool> requestorCanConsent = commandData.requestorCanConsent;
-    Optional<chip::ByteSpan> metadataForProvider = commandData.metadataForProvider;
+    FabricIndex fabricIndex  = commandObj->GetAccessingFabricIndex();
+    ScopedNodeId ourNodeId   = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetLocalScopedNodeId();
+    VendorId vendorId        = commandData.vendorID;
+    uint16_t productId       = commandData.productID;
+    uint32_t softwareVersion = commandData.softwareVersion;
+    DataModel::DecodableList<OTADownloadProtocol> protocolsSupported = commandData.protocolsSupported;
+    Optional<uint16_t> hardwareVersion                               = commandData.hardwareVersion;
+    Optional<chip::CharSpan> location                                = commandData.location;
+    Optional<bool> requestorCanConsent                               = commandData.requestorCanConsent;
+    Optional<chip::ByteSpan> metadataForProvider                     = commandData.metadataForProvider;
 
     bool isBDXProtocolSupported = false;
 
@@ -176,7 +176,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     if (!isBDXProtocolSupported)
     {
         errorResponse.status = OTAQueryStatus::kDownloadProtocolNotSupported;
-        err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        err                  = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
         ExitNow();
     }
 
@@ -229,7 +229,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     if (!hasUpdate)
     {
         errorResponse.status = OTAQueryStatus::kNotAvailable;
-        err = CHIP_ERROR_INTERNAL;
+        err                  = CHIP_ERROR_INTERNAL;
         ExitNow();
     }
 
@@ -340,7 +340,7 @@ void OTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * comman
     jlong jDelayedActionTime = 0;
 
     VerifyOrReturn(mOtaProviderDelegate.HasValidObjectRef(),
-                 commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
+                   commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
 
     nodeId = commandObj->GetSubjectDescriptor().subject;
 
@@ -388,7 +388,8 @@ void OTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * comma
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrReturn(mOtaProviderDelegate.HasValidObjectRef(), commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
+    VerifyOrReturn(mOtaProviderDelegate.HasValidObjectRef(),
+                   commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure));
 
     NodeId nodeId = commandObj->GetSubjectDescriptor().subject;
 
@@ -399,7 +400,7 @@ void OTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * comma
     jobject otaProviderDelegate = mOtaProviderDelegate.ObjectRef();
     jmethodID handleNotifyUpdateAppliedMethod;
     err = JniReferences::GetInstance().FindMethod(env, otaProviderDelegate, "handleNotifyUpdateApplied", "(J)V",
-                                                             &handleNotifyUpdateAppliedMethod);
+                                                  &handleNotifyUpdateAppliedMethod);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find handleNotifyUpdateApplied method"));
 
     env->CallVoidMethod(otaProviderDelegate, handleNotifyUpdateAppliedMethod, static_cast<jlong>(nodeId));
