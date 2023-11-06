@@ -11534,7 +11534,7 @@
           "apiMaturity": "provisional",
           "commands": [
             {
-              "name": "SupressRequest",
+              "name": "SuppressRequest",
               "code": 0,
               "mfgCode": null,
               "source": "client",
