@@ -54,7 +54,7 @@ namespace Clusters {
 namespace MicrowaveOvenControl {
 
 
-/** 
+/**
  * Get operational state instance
  */
 OperationalState::Instance * GetOPInstance(EndpointId aEndpoint)
@@ -65,7 +65,7 @@ OperationalState::Instance * GetOPInstance(EndpointId aEndpoint)
 }
 
 
-/** 
+/**
  * Set operational state instance
  */
 void SetOPInstance(EndpointId aEndpoint, OperationalState::Instance * aInstance)
@@ -109,13 +109,13 @@ bool emberAfMicrowaveOvenControlClusterSetCookingParametersCallback(
         goto exit;
     }
 
-    opState = gOperationalStateInstance->GetCurrentOperationalState();   
+    opState = gOperationalStateInstance->GetCurrentOperationalState();
     if(opState == to_underlying(OperationalStateEnum::kStopped))
     {
         auto & CookMode = commandData.cookMode;
         auto & CookTime = commandData.cookTime;
-        auto & PowerSetting = commandData.powerSetting; 
-        
+        auto & PowerSetting = commandData.powerSetting;
+
         if(CookMode.HasValue())
         {
             //TODO: set Microwave Oven cooking mode by CookMode.Value().
@@ -176,7 +176,7 @@ bool emberAfMicrowaveOvenControlClusterSetCookingParametersCallback(
                 ChipLogError(Zcl,"Failed to get MaxPower");
                 goto exit;
             }
-            
+
             if(PowerSetting.Value() < kMinCookPower || PowerSetting.Value() > kMaxCookPower)
             {
                 status = Status::InvalidCommand;
@@ -241,8 +241,8 @@ bool emberAfMicrowaveOvenControlClusterAddMoreTimeCallback(
     }
 
     opState = gOperationalStateInstance->GetCurrentOperationalState();
-    if(opState == to_underlying(OperationalStateEnum::kStopped) || 
-    opState == to_underlying(OperationalStateEnum::kRunning) || 
+    if(opState == to_underlying(OperationalStateEnum::kStopped) ||
+    opState == to_underlying(OperationalStateEnum::kRunning) ||
     opState == to_underlying(OperationalStateEnum::kPaused))
     {
         //add cooking time by TimeToAdd command
