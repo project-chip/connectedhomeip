@@ -1440,12 +1440,12 @@ void InitNetworkIdentitySubject(ChipDN & name)
     VerifyOrDie(err == CHIP_NO_ERROR); // AddAttribute can't fail in this case
 }
 
-static CHIP_ERROR CalculateKeyIdentifierSha256(const P256PublicKeySpan & publicKey, MutableCertificateKeyId keyId)
+static CHIP_ERROR CalculateKeyIdentifierSha256(const P256PublicKeySpan & publicKey, MutableCertificateKeyId outKeyId)
 {
     uint8_t hash[kSHA256_Hash_Length];
-    static_assert(keyId.size() <= sizeof(hash)); // truncating 32 bytes down to 20
+    static_assert(outKeyId.size() <= sizeof(hash)); // truncating 32 bytes down to 20
     ReturnErrorOnFailure(Hash_SHA256(publicKey.data(), publicKey.size(), hash));
-    memcpy(keyId.data(), hash, keyId.size());
+    memcpy(outKeyId.data(), hash, outKeyId.size());
     return CHIP_NO_ERROR;
 }
 
@@ -1480,21 +1480,21 @@ CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId keyId)
+CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId outKeyId)
 {
     ChipCertificateData certData;
     ReturnErrorOnFailure(DecodeChipCert(cert, certData, CertDecodeFlags::kGenerateTBSHash));
     ReturnErrorOnFailure(ValidateChipNetworkIdentity(certData));
-    ReturnErrorOnFailure(CalculateKeyIdentifierSha256(certData.mPublicKey, keyId));
+    ReturnErrorOnFailure(CalculateKeyIdentifierSha256(certData.mPublicKey, outKeyId));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExtractIdentifierFromChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId keyId)
+CHIP_ERROR ExtractIdentifierFromChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId outKeyId)
 {
     ChipCertificateData certData;
     ReturnErrorOnFailure(DecodeChipCert(cert, certData));
     ReturnErrorOnFailure(ValidateCertificateType(certData, CertType::kNetworkIdentity));
-    ReturnErrorOnFailure(CalculateKeyIdentifierSha256(certData.mPublicKey, keyId));
+    ReturnErrorOnFailure(CalculateKeyIdentifierSha256(certData.mPublicKey, outKeyId));
     return CHIP_NO_ERROR;
 }
 
@@ -1525,22 +1525,22 @@ static CHIP_ERROR EncodeCompactIdentityCert(TLVWriter & writer, Tag tag, const P
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & compactIdentityCert)
+CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert)
 {
-    VerifyOrReturnError(!compactIdentityCert.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(CanCastTo<uint32_t>(compactIdentityCert.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!outCompactCert.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(CanCastTo<uint32_t>(outCompactCert.size()), CHIP_ERROR_INVALID_ARGUMENT);
 
     Crypto::P256ECDSASignature signature;
     ReturnErrorOnFailure(GenerateNetworkIdentitySignature(keypair, signature));
 
     TLVWriter writer;
-    writer.Init(compactIdentityCert);
+    writer.Init(outCompactCert);
 
     P256PublicKeySpan publicKeySpan(keypair.Pubkey().ConstBytes());
     P256ECDSASignatureSpan signatureSpan(signature.ConstBytes());
     ReturnErrorOnFailure(EncodeCompactIdentityCert(writer, AnonymousTag(), publicKeySpan, signatureSpan));
 
-    compactIdentityCert.reduce_size(writer.GetLengthWritten());
+    outCompactCert.reduce_size(writer.GetLengthWritten());
     return CHIP_NO_ERROR;
 }
 

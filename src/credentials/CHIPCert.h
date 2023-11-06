@@ -563,7 +563,7 @@ CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert);
  * @see ValidateChipNetworkIdentity
  * @see ExtractIdentifierFromChipNetworkIdentity
  */
-CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId keyId);
+CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId outKeyId);
 
 struct FutureExtension
 {
@@ -623,12 +623,12 @@ CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParam
  * @brief Generates a Network (Client) Identity certificate in TLV-encoded form.
  *
  * @param keypair The key pair underlying the identity.
- * @param cert Buffer to store the signed certificate in compact-pdc-identity TLV format.
- *             Must be at least `kMaxCHIPCompactNetworkIdentityLength` bytes long.
+ * @param outCompactCert Buffer to store the signed certificate in compact-pdc-identity TLV format.
+ *                       Must be at least `kMaxCHIPCompactNetworkIdentityLength` bytes long.
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & cert);
+CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert);
 
 /**
  * @brief
@@ -866,7 +866,7 @@ CHIP_ERROR ExtractSubjectDNFromX509Cert(const ByteSpan & x509Cert, ChipDN & dn);
  * @return CHIP_NO_ERROR on success, CHIP_ERROR_WRONG_CERT_TYPE if the certificate is
  *         not a Network (Client) Identity, or another CHIP_ERROR if parsing fails.
  */
-CHIP_ERROR ExtractIdentifierFromChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId keyId);
+CHIP_ERROR ExtractIdentifierFromChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId outKeyId);
 
 } // namespace Credentials
 } // namespace chip
