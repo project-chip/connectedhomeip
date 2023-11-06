@@ -107,7 +107,7 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
     # console.print(f"DeviceTypeList: {listOfDeviceTypes}")
     # console.print(f"PartsList: {partsListFromWildcardRead}")
 
-    endpointLabel = f"Endpoint: {endpoint}\lDeviceTypeList: {listOfDeviceTypes}\lPartsList: {partsListFromWildcardRead}\l"
+    endpointLabel = f"Endpoint: {endpoint}\lDeviceTypeList: {listOfDeviceTypes}\lPartsList: {partsListFromWildcardRead}\l"  # noqa: W605
 
     nextNodeRef = ""
     nodeRef = f"ep{endpoint}"
@@ -122,7 +122,7 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
         try:
             clusterName = Clusters.ClusterObjects.ALL_CLUSTERS[clusterId].__name__
         except KeyError:
-            clusterName = f"Custom server\l0x{clusterId:08X}"
+            clusterName = f"Custom server\l0x{clusterId:08X}"  # noqa: W605
 
         AddServerOrClientNode(graphSection, endpoint, clusterName, "olivedrab", nodeRef)
 
@@ -138,7 +138,7 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
         try:
             clusterName = Clusters.ClusterObjects.ALL_CLUSTERS[clusterId].__name__
         except KeyError:
-            clusterName = f"Custom client\l0x{clusterId:08X}"
+            clusterName = f"Custom client\l0x{clusterId:08X}"  # noqa: W605
 
         AddServerOrClientNode(graphSection, endpoint, clusterName, "orange", nodeRef)
 
