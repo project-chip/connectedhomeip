@@ -72,7 +72,7 @@ class PlayServicesUser(EcosystemCapture):
     async def analyze_capture(self) -> None:
         """"Show the start and end times of commissioning boundaries"""
         try:
-            self.logcat_fd = open(self.platform.streams["LogcatStreamer"].logcat_artifact, "r")
+            self.logcat_fd = open(self.logcat_stream.logcat_artifact, "r")
             while True:
                 for line in self.logcat_fd.readlines():
                     self.proc_line(line)
