@@ -53,7 +53,11 @@ public:
     Status UnregisterClient(PersistentStorageDelegate & storage, FabricIndex fabric_index, chip::NodeId node_id,
                             Optional<chip::ByteSpan> verificationKey, bool is_admin);
 
-    void TableIsEmptyForFabric();
+    /**
+     * @brief Triggers table update events to notify subscribers that an entry was added or removed
+     *        from the ICDMonitoringTable.
+     */
+    void TriggerICDMTableUpdatedEvent();
 
     Status StayActiveRequest(FabricIndex fabric_index);
 

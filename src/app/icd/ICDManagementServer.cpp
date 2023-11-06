@@ -66,7 +66,7 @@ Status ICDManagementServer::RegisterClient(PersistentStorageDelegate & storage, 
     if (isFirstEntryForFabric)
     {
         // Notify subscribers that the first entry for the fabric was successfully added
-        app::ICDNotifier::GetInstance().BroadcastICDManagementEvent(app::ICDListener::ICDManagementEvents::kTableUpdated);
+        TriggerICDMTableUpdatedEvent();
     }
 
     return InteractionModel::Status::Success;
@@ -95,7 +95,7 @@ Status ICDManagementServer::UnregisterClient(PersistentStorageDelegate & storage
 
     if (table.IsEmpty())
     {
-        TableIsEmptyForFabric();
+        TriggerICDMTableUpdatedEvent();
     }
 
     return InteractionModel::Status::Success;
@@ -109,7 +109,7 @@ Status ICDManagementServer::StayActiveRequest(FabricIndex fabric_index)
     return InteractionModel::Status::UnsupportedCommand;
 }
 
-void ICDManagementServer::TableIsEmptyForFabric()
+void ICDManagementServer::TriggerICDMTableUpdatedEvent()
 {
     app::ICDNotifier::GetInstance().BroadcastICDManagementEvent(app::ICDListener::ICDManagementEvents::kTableUpdated);
 }
