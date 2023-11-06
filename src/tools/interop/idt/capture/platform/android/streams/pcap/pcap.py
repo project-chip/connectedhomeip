@@ -37,9 +37,11 @@ class AndroidPcap(AndroidStream):
     def __init__(self, platform: "Android"):
         self.logger = logger
         self.platform = platform
-        self.pcap_artifact = create_standard_log_name("android_tcpdump", "pcap", parent=platform.artifact_dir)
-        self.pcap_phone_out_path = f"/sdcard/Movies/{os.path.basename(self.pcap_artifact)}"
-        self.pcap_phone_bin_location = "tcpdump" if platform.capabilities.c_has_tcpdump else "/sdcard/Movies/tcpdump"
+        self.target_dir = "/sdcard/Download"
+        self.pcap_artifact = create_standard_log_name("android_tcpdump", "pcap", parent=self.platform.artifact_dir)
+        self.pcap_phone_out_path = f"{self.target_dir}/{os.path.basename(self.pcap_artifact)}"
+        self.pcap_phone_bin_location = "tcpdump" if platform.capabilities.c_has_tcpdump \
+            else f"{self.target_dir}/tcpdump"
         self.pcap_command = f"shell {self.pcap_phone_bin_location} -w {self.pcap_phone_out_path}"
         self.pcap_proc = platform.get_adb_background_command(self.pcap_command)
         self.pcap_pull = False
@@ -68,6 +70,7 @@ class AndroidPcap(AndroidStream):
         if not os.path.exists(os.path.join(self.build_dir, "tcpdump")):
             self.logger.warning("tcpdump bin not found, attempting to build, please wait a few moments!")
             if is_mac():
+                # TODO: Implement for macOS.
                 self.logger.critical("Build Android tcpdump on macOS not supported!")
                 return
             safe_mkdir(self.build_dir)
@@ -75,10 +78,10 @@ class AndroidPcap(AndroidStream):
             Bash(f"{build_script} 2>&1 >> BUILD_LOG.txt", sync=True, cwd=self.build_dir).start_command()
         else:
             self.logger.warning("Reusing existing tcpdump build")
-        if not self.platform.run_adb_command("shell ls /sdcard/Movies/tcpdump").finished_success():
+        if not self.platform.run_adb_command(f"shell ls {self.target_dir}/tcpdump").finished_success():
             self.logger.warning("Pushing tcpdump to device")
-            self.platform.run_adb_command(f'push {os.path.join(self.build_dir, "tcpdump")} /sdcard/Movies/')
-            self.platform.run_adb_command("chmod +x /sdcard/Movies/tcpdump")
+            self.platform.run_adb_command(f"push {os.path.join(self.build_dir, 'tcpdump')} f{self.target_dir}")
+            self.platform.run_adb_command(f"chmod +x {self.target_dir}/tcpdump")
         else:
             self.logger.info("tcpdump already in the expected location, not pushing!")
         self.logger.info("Starting Android pcap command")
@@ -86,8 +89,9 @@ class AndroidPcap(AndroidStream):
         self.pcap_pull = True
 
     async def run_observer(self) -> None:
-        # TODO: Implement
-        pass
+        while True:
+            # TODO: Implement, need to restart w/ new out file (no append) and keep pull manifest, much like `screen`
+            await asyncio.sleep(120)
 
     async def stop(self):
         self.logger.info("Stopping android pcap proc")

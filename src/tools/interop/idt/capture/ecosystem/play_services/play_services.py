@@ -102,7 +102,7 @@ class PlayServices(EcosystemCapture):
             while True:
                 self.analysis.do_analysis(self.logcat_fd.readlines())
                 # Releasing async event loop for other analysis / monitor topics
-                await asyncio.sleep(0)
+                await asyncio.sleep(0.5)
         except asyncio.CancelledError:
             self.logger.info("Closing logcat stream")
             if self.logcat_fd is not None:

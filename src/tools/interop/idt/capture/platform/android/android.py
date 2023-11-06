@@ -19,6 +19,7 @@ import ipaddress
 import os
 import traceback
 import typing
+from asyncio import Task
 
 from capture.base import PlatformLogStreamer
 from utils.shell import Bash, log
@@ -195,12 +196,15 @@ class Android(PlatformLogStreamer):
 
     async def run_observers(self) -> None:
         try:
-            observer_tasks = []
+            observer_tasks: [Task] = []
             for stream_name, stream in self.streams.items():
                 observer_tasks.append(asyncio.create_task(stream.run_observer()))
             while True:
-                self.logger.info("Android observers are up")
-                await asyncio.sleep(20)
+                self.logger.info("Android root observer task checking sub tasks")
+                for task in observer_tasks:
+                    if task.done() or task.cancelled():
+                        self.logger.error(f"An android monitoring task has died, consider restarting! {task.__str__()}")
+                await asyncio.sleep(30)
         except asyncio.CancelledError:
             self.logger.info("Cancelling observer tasks")
             for observer_tasks in observer_tasks:
