@@ -22,8 +22,8 @@
 #
 # This script can be manipulated using following kConfigs:
 # - To merge generated factory data with final zephyr.hex file set kConfig CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE=y
-# - To use default certification paths set CONFIG_CHIP_FACTORY_DATA_USE_DEFAULTS_CERTS_PATH=y 
-# 
+# - To use default certification paths set CONFIG_CHIP_FACTORY_DATA_USE_DEFAULTS_CERTS_PATH=y
+#
 # During generation process a some file will be created in zephyr's build directory:
 # - <factory_data_target>.json a file containing all factory data written in JSON format.
 #
@@ -86,7 +86,7 @@ endif()
 # add Password-Authenticated Key Exchange parameters
 string(APPEND script_args "--spake2_it \"${CONFIG_CHIP_DEVICE_SPAKE2_IT}\"\n")
 string(APPEND script_args "--spake2_salt \"${CONFIG_CHIP_DEVICE_SPAKE2_SALT}\"\n")
-string(APPEND script_args "--discriminator ${CONFIG_CHIP_DEVICE_DISCRIMINATOR}\n")
+string(APPEND script_args "--discriminator 0x${CONFIG_CHIP_DEVICE_DISCRIMINATOR}\n")
 string(APPEND script_args "--passcode ${CONFIG_CHIP_DEVICE_SPAKE2_PASSCODE}\n")
 string(APPEND script_args "--include_passcode\n")
 string(APPEND script_args "--overwrite\n")
@@ -135,7 +135,7 @@ endfunction()
 #
 # This function creates a .hex and .cbor files from given JSON factory data file.
 #
-# 
+#
 # During generation process some files will be created in zephyr's build directory:
 # - <factory_data_target>.hex a file containing all factory data in CBOR format.
 # - <factory_data_target>.bin a binary file containing all raw factory data in CBOR format.
@@ -173,7 +173,7 @@ endfunction()
 
 # Generate factory data partition using given args
 #
-# 
+#
 # During generation process a some file will be created in zephyr's build directory:
 # - merged.hex a file containing firmware and factory data merged to single file
 # - factory_data.hex a file containing only a factory data partition including proper offset
@@ -195,17 +195,17 @@ set(OUTPUT_FILE_PATH ${APPLICATION_BINARY_DIR}/zephyr)
 
 # create a JSON file with all factory data
 nrfconnect_create_factory_data_json(factory_data
-                                    ${FACTORY_DATA_SCRIPT_PATH} 
-                                    ${FACTORY_DATA_SCHEMA_PATH} 
+                                    ${FACTORY_DATA_SCRIPT_PATH}
+                                    ${FACTORY_DATA_SCHEMA_PATH}
                                     ${OUTPUT_FILE_PATH})
 
-# create a .hex file with factory data in CBOR format based on the JSON file created previously 
+# create a .hex file with factory data in CBOR format based on the JSON file created previously
 nrfconnect_create_factory_data_hex_file(factory_data_hex
                                         factory_data
-                                        ${GENERATE_CBOR_SCRIPT_PATH} 
+                                        ${GENERATE_CBOR_SCRIPT_PATH}
                                         ${OUTPUT_FILE_PATH})
 
-if(CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)                                   
+if(CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
     # set custom target for merging factory_data hex file
     set_property(GLOBAL PROPERTY factory_data_PM_HEX_FILE ${OUTPUT_FILE_PATH}/factory_data.hex)
     set_property(GLOBAL PROPERTY factory_data_PM_TARGET factory_data_hex)
