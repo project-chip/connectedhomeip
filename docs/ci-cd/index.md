@@ -17,7 +17,7 @@ Script:
 https://github.com/project-chip/connectedhomeip/blob/master/scripts/tools/summarize_fail.py
 
 Fail Definitions:
-https://github.com/project-chip/connectedhomeip/blob/master/scripts/tools/build_fail_defs.yaml
+https://github.com/project-chip/connectedhomeip/blob/master/scripts/tools/build_fail_definitions.yaml
 
 #### Summary
 
