@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class DiagnosticLogsCluster(private val endpointId: UShort) {
+class DiagnosticLogsCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class RetrieveLogsResponse(
     val status: UInt,
     val logContent: ByteArray,
@@ -41,6 +45,8 @@ class DiagnosticLogsCluster(private val endpointId: UShort) {
     transferFileDesignator: String?,
     timedInvokeTimeoutMs: Int? = null
   ): RetrieveLogsResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

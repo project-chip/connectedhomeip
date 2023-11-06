@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class AccountLoginCluster(private val endpointId: UShort) {
+class AccountLoginCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class GetSetupPINResponse(val setupPIN: String)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -32,33 +36,23 @@ class AccountLoginCluster(private val endpointId: UShort) {
 
   suspend fun getSetupPIN(
     tempAccountIdentifier: String,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeoutMs: Int
   ): GetSetupPINResponse {
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }
+    val commandId = 0L
+
+    // Implementation needs to be added here
   }
 
-  suspend fun login(
-    tempAccountIdentifier: String,
-    setupPIN: String,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }
+  suspend fun login(tempAccountIdentifier: String, setupPIN: String, timedInvokeTimeoutMs: Int) {
+    val commandId = 2L
+
+    // Implementation needs to be added here
   }
 
-  suspend fun logout(timedInvokeTimeoutMs: Int? = null) {
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }
+  suspend fun logout(timedInvokeTimeoutMs: Int) {
+    val commandId = 3L
+
+    // Implementation needs to be added here
   }
 
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
