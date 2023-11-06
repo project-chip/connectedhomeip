@@ -43,7 +43,7 @@ public:
     class FabricSceneInfo
     {
     public:
-        Structs::SceneInfoStruct::Type * GetFabricSceneInfo(EndpointId endpoint);
+        Span<Structs::SceneInfoStruct::Type> GetFabricSceneInfo(EndpointId endpoint);
         Structs::SceneInfoStruct::Type * GetSceneInfoStruct(EndpointId endpoint, FabricIndex fabric);
         CHIP_ERROR SetSceneInfoStruct(EndpointId endpoint, FabricIndex fabric, Structs::SceneInfoStruct::Type & sceneInfoStruct);
         void ClearSceneInfoStruct(EndpointId endpoint, FabricIndex fabric);

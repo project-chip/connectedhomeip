@@ -160,12 +160,18 @@ CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
 /// @brief Gets the SceneInfoStruct array associated to an endpoint
 /// @param endpoint target endpoint
 /// @param fabric target fabric
-/// @return Nullptr if not found, pointer to the SceneInfoStruct array otherwise
-Structs::SceneInfoStruct::Type * ScenesServer::FabricSceneInfo::GetFabricSceneInfo(EndpointId endpoint)
+/// @return Optional with no value not found, Span of SceneInfoStruct
+Span<Structs::SceneInfoStruct::Type> ScenesServer::FabricSceneInfo::GetFabricSceneInfo(EndpointId endpoint)
 {
     size_t endpointIndex = 0;
-    VerifyOrReturnValue(CHIP_NO_ERROR == FindFabricSceneInfoIndex(endpoint, endpointIndex), nullptr);
-    return mSceneInfoStructs[endpointIndex];
+    Span<Structs::SceneInfoStruct::Type> FabricSceneInfoSpan;
+    CHIP_ERROR status = FindFabricSceneInfoIndex(endpoint, endpointIndex);
+    if (CHIP_NO_ERROR == status)
+    {
+        FabricSceneInfoSpan =
+            Span<Structs::SceneInfoStruct::Type>(&mSceneInfoStructs[endpointIndex][0], mSceneInfoStructsCount[endpointIndex]);
+    }
+    return FabricSceneInfoSpan;
 }
 
 /// @brief Gets the SceneInfoStruct for a specific fabric for a specific endpoint
@@ -200,7 +206,8 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::SetSceneInfoStruct(EndpointId endpoint
     uint8_t sceneInfoStructIndex = 0;
     if (CHIP_ERROR_NOT_FOUND == FindSceneInfoStructIndex(fabric, endpointIndex, sceneInfoStructIndex))
     {
-        VerifyOrReturnError(mSceneInfoStructsCount[endpointIndex] < kScenesServerMaxFabricCount, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(mSceneInfoStructsCount[endpointIndex] < ArraySize(mSceneInfoStructs[endpointIndex]),
+                            CHIP_ERROR_NO_MEMORY);
         sceneInfoStructIndex = mSceneInfoStructsCount[endpointIndex];
 
         // Increment number of populated ScenesInfoStructs
@@ -222,19 +229,21 @@ void ScenesServer::FabricSceneInfo::ClearSceneInfoStruct(EndpointId endpoint, Fa
     ReturnOnFailure(FindSceneInfoStructIndex(fabric, endpointIndex, sceneInfoStructIndex));
 
     uint8_t nextIndex = static_cast<uint8_t>(sceneInfoStructIndex + 1);
-    uint8_t moveNum   = static_cast<uint8_t>(kScenesServerMaxFabricCount - nextIndex);
+    uint8_t moveNum   = static_cast<uint8_t>(ArraySize(mSceneInfoStructs[endpointIndex]) - nextIndex);
     // Compress the endpoint's SceneInfoStruct array
     if (moveNum)
     {
-        memmove(&mSceneInfoStructs[endpointIndex][sceneInfoStructIndex], &mSceneInfoStructs[endpointIndex][nextIndex],
-                sizeof(Structs::SceneInfoStruct::Type) * moveNum);
+        for (size_t i = 0; i < moveNum; ++i)
+        {
+            mSceneInfoStructs[endpointIndex][sceneInfoStructIndex + i] = mSceneInfoStructs[endpointIndex][nextIndex + i];
+        }
     }
 
     // Decrement the SceneInfoStruct count
     mSceneInfoStructsCount[endpointIndex]--;
 
     // Clear the last populated SceneInfoStruct
-    mSceneInfoStructs[endpointIndex][mSceneInfoStructsCount[endpointIndex]].fabricIndex       = 0;
+    mSceneInfoStructs[endpointIndex][mSceneInfoStructsCount[endpointIndex]].fabricIndex       = kUndefinedFabricIndex;
     mSceneInfoStructs[endpointIndex][mSceneInfoStructsCount[endpointIndex]].sceneCount        = 0;
     mSceneInfoStructs[endpointIndex][mSceneInfoStructsCount[endpointIndex]].currentScene      = 0;
     mSceneInfoStructs[endpointIndex][mSceneInfoStructsCount[endpointIndex]].currentGroup      = 0;
@@ -252,7 +261,7 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
 
     uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, Scenes::Id, EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (index < kScenesServerMaxEndpointCount)
+    if (index < ArraySize(mSceneInfoStructs))
     {
         endpointIndex = index;
         return CHIP_NO_ERROR;
@@ -264,11 +273,11 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
 /// @param[in] fabric target fabric index
 /// @param[in] endpointIndex index of the corresponding FabricSceneInfo for an endpoint, corresponds to a row in the
 /// mSceneInfoStructs array
-/// @param[out] index index of the corresponding SceneInfoStruct if found, mFabricSceneInfo[endpoint] number of fabrics otherwise
+/// @param[out] index index of the corresponding SceneInfoStruct if found, mFabricSceneInfo[endpoint] out of bounds index otherwise
 /// @return CHIP_NO_ERROR or CHIP_ERROR_NOT_FOUND, CHIP_ERROR_INVALID_ARGUMENT if invalid fabric or endpoint
 CHIP_ERROR ScenesServer::FabricSceneInfo::FindSceneInfoStructIndex(FabricIndex fabric, size_t endpointIndex, uint8_t & index)
 {
-    VerifyOrReturnError(endpointIndex < kScenesServerMaxEndpointCount, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(endpointIndex < ArraySize(mSceneInfoStructs), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(kUndefinedFabricIndex != fabric, CHIP_ERROR_INVALID_ARGUMENT);
 
     index = 0;
@@ -690,14 +699,10 @@ CHIP_ERROR ScenesServer::Read(const ConcreteReadAttributePath & aPath, Attribute
     {
     case Attributes::FabricSceneInfo::Id: {
         return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-            for (auto & info : Server::GetInstance().GetFabricTable())
+            Span<Structs::SceneInfoStruct::Type> FabricSceneInfoSpan = mFabricSceneInfo.GetFabricSceneInfo(aPath.mEndpointId);
+            for (auto & info : FabricSceneInfoSpan)
             {
-                auto fabric                                = info.GetFabricIndex();
-                Structs::SceneInfoStruct::Type * SceneInfo = GetSceneInfoStruct(aPath.mEndpointId, fabric);
-                if (nullptr != SceneInfo)
-                {
-                    ReturnErrorOnFailure(encoder.Encode(*SceneInfo));
-                }
+                ReturnErrorOnFailure(encoder.Encode(info));
             }
             return CHIP_NO_ERROR;
         });
@@ -898,10 +903,11 @@ void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::R
     // Update Attributes
     Structs::SceneInfoStruct::Type * sceneInfo =
         GetSceneInfoStruct(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex());
+
     Optional<bool> sceneValid;
-    if (nullptr != sceneInfo)
+    if (nullptr != sceneInfo && req.groupID == sceneInfo->currentGroup)
     {
-        sceneValid = (req.groupID == sceneInfo->currentGroup) ? Optional<bool>(false) : Optional<bool>();
+        sceneValid.Emplace(false);
     }
 
     ReturnOnFailure(
