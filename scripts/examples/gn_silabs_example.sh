@@ -92,7 +92,7 @@ if [ "$#" == "0" ]; then
             Build wifi example with extension board SiWx917. (Default false)
         use_wf200
             Build wifi example with extension board wf200. (Default false)
-        'import("//with_pw_rpc.gni")'
+        use_pw_rpc
             Use to build the example with pigweed RPC
         ota_periodic_query_timeout_sec
             Periodic query timeout variable for OTA in seconds
@@ -240,6 +240,10 @@ else
             --slc_generate)
                 optArgs+="slc_generate=true "
                 USE_SLC=true
+                shift
+                ;;
+            --use_pw_rpc)
+                optArgs+="import(\"//with_pw_rpc.gni\") "
                 shift
                 ;;
             --slc_reuse_files)
