@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class BridgedDeviceBasicInformationCluster(private val endpointId: UShort) {
+class BridgedDeviceBasicInformationCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class ProductAppearanceAttribute(
     val value: BridgedDeviceBasicInformationClusterProductAppearanceStruct?
   )
@@ -60,12 +64,12 @@ class BridgedDeviceBasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNodeLabelAttribute(value: String) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeNodeLabelAttribute(value: String, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeNodeLabelAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeNodeLabelAttribute(minInterval: Int, maxInterval: Int): CharString {
