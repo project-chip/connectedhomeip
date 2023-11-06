@@ -84,7 +84,7 @@ limitations under the License.
 
     <command source="server" code="0x0A" name="PlaybackResponse" optional="false">
       <description>This command SHALL be generated in response to various Playback Request commands.</description>
-      <arg name="Status" type="MediaPlaybackStatusEnum"/>
+      <arg name="Status" type="StatusEnum"/>
       <arg name="Data"   type="char_string" optional="true"/>
     </command>
 
@@ -104,7 +104,7 @@ limitations under the License.
     <item name="Buffering"  value="0x03"/>
   </enum>
 
-  <enum name="MediaPlaybackStatusEnum" type="enum8">
+  <enum name="StatusEnum" type="enum8">
     <cluster code="0x0506"/>
     <item name="Success"                value="0x00"/>
     <item name="InvalidStateForCommand" value="0x01"/>

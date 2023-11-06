@@ -21,6 +21,14 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <system/SystemStats.h>
 
+#if CHIP_HAVE_CONFIG_H
+#include <crypto/CryptoBuildConfig.h>
+#endif // CHIP_HAVE_CONFIG_H
+
+#if CHIP_CRYPTO_MBEDTLS
+#include <mbedtls/memory_buffer_alloc.h>
+#endif
+
 using namespace chip;
 
 namespace chip {
@@ -46,6 +54,15 @@ CHIP_ERROR StatPeakHandler(int argc, char ** argv)
         streamer_printf(streamer_get(), "Heap allocated bytes: %u\r\n", static_cast<unsigned>(heapWatermark));
     }
 
+#if CHIP_CRYPTO_MBEDTLS && defined(MBEDTLS_MEMORY_DEBUG)
+    size_t maxUsed   = 0;
+    size_t maxBlocks = 0;
+
+    mbedtls_memory_buffer_alloc_max_get(&maxUsed, &maxBlocks);
+
+    streamer_printf(streamer_get(), "mbedTLS heap allocated bytes: %u\r\n", static_cast<unsigned>(maxUsed));
+#endif
+
     return CHIP_NO_ERROR;
 }
 
@@ -63,6 +80,10 @@ CHIP_ERROR StatResetHandler(int argc, char ** argv)
     {
         ReturnErrorOnFailure(DeviceLayer::GetDiagnosticDataProvider().ResetWatermarks());
     }
+
+#if CHIP_CRYPTO_MBEDTLS && defined(MBEDTLS_MEMORY_DEBUG)
+    mbedtls_memory_buffer_alloc_max_reset();
+#endif
 
     return CHIP_NO_ERROR;
 }

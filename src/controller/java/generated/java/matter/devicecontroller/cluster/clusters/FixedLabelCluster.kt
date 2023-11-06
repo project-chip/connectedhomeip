@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class FixedLabelCluster(private val endpointId: UShort) {
+class FixedLabelCluster(private val controller: MatterController, private val endpointId: UShort) {
   class LabelListAttribute(val value: List<FixedLabelClusterLabelStruct>)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)

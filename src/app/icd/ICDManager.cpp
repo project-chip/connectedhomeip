@@ -52,6 +52,12 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     VerifyOrDie(stateObserver != nullptr);
     VerifyOrDie(symmetricKeystore != nullptr);
 
+    bool supportLIT = SupportsFeature(Feature::kLongIdleTimeSupport);
+    VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kCheckInProtocolSupport), AppServer,
+                       "The CheckIn protocol feature is required for LIT support");
+    VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kUserActiveModeTrigger), AppServer,
+                       "The user ActiveMode trigger feature is required for LIT support");
+
     mStorage       = storage;
     mFabricTable   = fabricTable;
     mStateObserver = stateObserver;
@@ -82,7 +88,7 @@ void ICDManager::Shutdown()
     mFabricTable      = nullptr;
 }
 
-bool ICDManager::SupportsCheckInProtocol()
+bool ICDManager::SupportsFeature(Feature feature)
 {
     bool success        = false;
     uint32_t featureMap = 0;
@@ -90,7 +96,7 @@ bool ICDManager::SupportsCheckInProtocol()
 #ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
     success = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
 #endif
-    return success ? ((featureMap & to_underlying(Feature::kCheckInProtocolSupport)) != 0) : false;
+    return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 }
 
 void ICDManager::UpdateICDMode()
@@ -101,7 +107,7 @@ void ICDManager::UpdateICDMode()
 
     // The Check In Protocol Feature is required and the slow polling interval shall also be greater than 15 seconds
     // to run an ICD in LIT mode.
-    if (GetSlowPollingInterval() > GetSITPollingThreshold() && SupportsCheckInProtocol())
+    if (GetSlowPollingInterval() > GetSITPollingThreshold() && SupportsFeature(Feature::kLongIdleTimeSupport))
     {
         VerifyOrDie(mStorage != nullptr);
         VerifyOrDie(mFabricTable != nullptr);

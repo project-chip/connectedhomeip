@@ -254,7 +254,9 @@ tests:
       cluster: "Descriptor"
       attribute: "DeviceTypeList"
 
-    - label: "Step 8: TH1 reads basic cluster - expect UNSUPPORTED_ACCESS"
+    - label:
+          "Step 8: TH1 reads DUT Endpoint 0 Basic Information cluster VendorID
+          attribute - expect UNSUPPORTED_ACCESS"
       command: "readAttribute"
       cluster: "Basic Information"
       attribute: "VendorID"
@@ -291,7 +293,9 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 10: TH2 reads basic cluster - expect SUCCESS"
+    - label:
+          "Step 10: TH2 reads DUT Endpoint 0 Basic Information cluster VendorID
+          attribute - expect SUCCESS"
       identity: "beta"
       PICS: PICS_SDK_CI_ONLY
       command: "readAttribute"
@@ -299,7 +303,9 @@ tests:
       attribute: "VendorID"
 
     #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
-    - label: "Step 10: TH2 reads basic cluster - expect SUCCESS"
+    - label:
+          "Step 10: TH2 reads DUT Endpoint 0 Basic Information cluster VendorID
+          attribute - expect SUCCESS"
       verification: |
           ./chip-tool basicinformation read vendor-id 2 0 --commissioner-name beta
 
