@@ -21,15 +21,18 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     xmlPath = xmlTemplatePathStr
     fileName = ""
 
+    print(f"Handling PICS for {clusterName}")
+
     # Map clusters to common XML template if needed
     otaProviderCluster = "OTA Software Update Provider Cluster"
+    otaRequestorCluster = "OTA Software Update Requestor Cluster"
     onOffCluster = "On/Off Cluster"
     groupKeyManagementCluster = "Group Key Management Cluster"
     nodeOperationalCredentialsCluster = "Node Operational Credentials Cluster"
     basicInformationCluster = "Basic Information Cluster"
     networkCommissioningCluster = "Network Commissioning Cluster"
 
-    if otaProviderCluster in clusterName:
+    if otaProviderCluster in clusterName or otaRequestorCluster in clusterName:
         clusterName = "OTA Software Update"
 
     elif onOffCluster == clusterName:
@@ -374,23 +377,38 @@ rootNodeEndpointID = 0
 inputJson = {}
 clusterInfoDict = {}
 
-with open(clusterInfoInputPathStr, 'r') as clusterInfoInputFile:
+print("Generating cluster data dict from JSON input")
+
+with open(clusterInfoInputPathStr, 'rb') as clusterInfoInputFile:
     clusterInfoJson = json.load(clusterInfoInputFile)
 
-for cluster in clusterInfoJson["ClusterIdentifiers"]:
-    clusterInfoDict[clusterInfoJson["ClusterIdentifiers"][f"{cluster}"]["Identifier"].lower()] = {
-        "Name": cluster,
-        "PICS_Code": clusterInfoJson["ClusterIdentifiers"][f"{cluster}"]["PICS Code"],
-    }
+    for cluster in clusterInfoJson:
+        clusterData = clusterInfoJson[f"{cluster}"]["Data created by Script"]
+
+        try:
+            # Check if cluster id is a value hex value
+            clusterIdValid = int(clusterData["Id"].lower(), 16)
+
+            # Add cluster data to dict
+            clusterInfoDict[clusterData["Id"].lower()] = {
+                "Name": clusterData["Cluster Name"],
+                "PICS_Code": clusterData["PICS Code"],
+            }
+
+        except ValueError:
+            print(f"Ignore ClusterID: {clusterData['Id']} - {clusterData['Cluster Name']}") 
 
 # Load PICS XML templates
+print("Capture list of PICS XML templates")
 xmlFileList = os.listdir(xmlTemplatePathStr)
 
 # Setup output path
 baseOutputPath = pathlib.Path(baseOutputPathStr)
 if not baseOutputPath.exists():
+    print("Create output folder")
     baseOutputPath.mkdir()
 else:
+    print("Clean output folder")
     cleanDirectory(baseOutputPath)
 
 
