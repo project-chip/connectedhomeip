@@ -26,7 +26,8 @@ https://github.com/project-chip/connectedhomeip/blob/daily_pass_percentage/docs/
 #### Improvement Ideas
 
 -   Keep fail signature list updated to track causes of all common fails
--   Make script artifact more known and accessible so it can be easily shared and used by everyone
+-   Make script artifact more known and accessible so it can be easily shared
+    and used by everyone
 -   Deliver daily fail summaries in short form through a Slack bot for easy
     access
 
