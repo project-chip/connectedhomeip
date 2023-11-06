@@ -23,7 +23,6 @@
 #include <platform/ConfigurationManager.h>
 #include <string>
 
-static_assert(chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength == 6, "Spec mandates only 64-bit mac addresses");
 constexpr const char * kNullHexMACAddress = "000000000000";
 
 using namespace chip;
@@ -53,6 +52,13 @@ std::string getMacAddress()
 CHIP_ERROR WakeOnLanManager::HandleGetMacAddress(chip::app::AttributeValueEncoder & aEncoder)
 {
     ChipLogProgress(Zcl, "WakeOnLanManager::HandleGetMacAddress");
+
+    // Spec REQUIRES 48-bit mac addresses. This means at least Thread devices will
+    // fail here.
+    if (chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength != 6) {
+        ChipLogError(Zcl, "WakeOnLanManager: primary MAC address is not 48-bit");
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
 
     return aEncoder.Encode(CharSpan::fromCharString(getMacAddress().c_str()));
 }
