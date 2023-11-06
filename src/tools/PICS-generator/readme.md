@@ -1,10 +1,14 @@
-### Setup ###
-The script uses the json based data model in order to convert cluster identifiers into PICS Codes. The file can be downloaded here: https://groups.csa-iot.org/wg/matter-csg/document/27290 
+# Setup
+The script uses the json based data model in order to convert cluster identifiers into PICS Codes. The file can be downloaded here: https://groups.csa-iot.org/wg/matter-csg/document/27290
+
+NOTE: The tool has been verified using the "Specification_version 0.7-spring2024.json" version.
 
 The script uses the PICS XML templates for generate the PICS output, the PICS templates can be downloaded here:
 https://groups.csa-iot.org/wg/matter-csg/document/26122
 
-### How to run ###
+NOTE: The tool has been verified using V24 PICS (used for Matter 1.2 certification)
+
+# How to run
 In order to use the script the Python CHIP controller must be build, use the instructions at https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/python_chip_controller_building.md#building
 
 cd into "connectedhomeip" folder
