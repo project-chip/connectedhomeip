@@ -79,9 +79,9 @@ void TestLookupResult(nlTestSuite * inSuite, void * inContext)
 
     // Ensure test expectations regarding ordering is matched
 
-    IpScore lowScore = ScoreIpAddress(lowResult.address.GetIPAddress(), Inet::InterfaceId::Null());
+    IpScore lowScore    = ScoreIpAddress(lowResult.address.GetIPAddress(), Inet::InterfaceId::Null());
     IpScore mediumScore = ScoreIpAddress(mediumResult.address.GetIPAddress(), Inet::InterfaceId::Null());
-    IpScore highScore = ScoreIpAddress(highResult.address.GetIPAddress(), Inet::InterfaceId::Null());
+    IpScore highScore   = ScoreIpAddress(highResult.address.GetIPAddress(), Inet::InterfaceId::Null());
 
     NL_TEST_ASSERT(inSuite, to_underlying(lowScore) < to_underlying(mediumScore));
     NL_TEST_ASSERT(inSuite, to_underlying(mediumScore) < to_underlying(highScore));
