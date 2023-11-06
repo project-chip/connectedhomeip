@@ -27,7 +27,7 @@ namespace Credentials {
 inline constexpr size_t kMaxCHIPCertDecodeBufLength = kMaxDERCertLength - Crypto::kMax_ECDSA_Signature_Length_Der;
 
 // The TBSCerticate of a Network (Client) Identity has a fixed (smaller) size.
-inline constexpr size_t kNetworkIdenitityTBSLength = 244;
+inline constexpr size_t kNetworkIdentityTBSLength = 244;
 
 // Constants for Network (Client) Identities as per section 11.24 (Wi-Fi
 // Authentication with Per-Device Credentials) of the Matter spec.

@@ -290,7 +290,7 @@ bool SetCertSerialNumber(X509 * cert, uint64_t value = kUseRandomSerialNumber)
         }
 
         // Avoid negative numbers.
-        value = rnd & 0x7FFFFFFFFFFFFFFF;
+        value = rnd & 0x7FFFFFFFFFFFFFFFULL;
     }
 
     // Store the serial number as an ASN1 integer value within the certificate.
@@ -860,7 +860,7 @@ bool MakeCert(CertType certType, const ToolChipDN * subjectDN, X509 * caCert, EV
               EVP_PKEY * newKey, CertStructConfig & certConfig)
 {
     bool res  = true;
-    bool isCA = (certType != CertType::kNode && certType != CertType::kNetworkIdentity);
+    bool isCA = (certType == CertType::kRoot || certType == CertType::kICA);
 
     VerifyOrExit(subjectDN != nullptr, res = false);
     VerifyOrExit(caCert != nullptr, res = false);
@@ -1051,84 +1051,83 @@ CHIP_ERROR MakeCertTLV(CertType certType, const ToolChipDN * subjectDN, X509 * c
 
     ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
 
-    // serial number
-    if (!useCompactIdentityFormat && certConfig.IsSerialNumberPresent())
-    {
-        ASN1_INTEGER * asn1Integer = X509_get_serialNumber(x509Cert);
-        uint64_t serialNumber;
-        uint8_t serialNumberArray[sizeof(uint64_t)];
-        VerifyOrReturnError(1 == ASN1_INTEGER_get_uint64(&serialNumber, asn1Integer), CHIP_ERROR_INVALID_ARGUMENT);
-        Encoding::BigEndian::Put64(serialNumberArray, serialNumber);
-        ReturnErrorOnFailure(writer.PutBytes(ContextTag(kTag_SerialNumber), serialNumberArray, sizeof(serialNumberArray)));
-    }
-
-    // signature algorithm
     if (!useCompactIdentityFormat)
     {
-        ReturnErrorOnFailure(writer.Put(ContextTag(kTag_SignatureAlgorithm), certConfig.GetSignatureAlgorithmTLVEnum()));
-    }
-
-    // issuer Name
-    if (!useCompactIdentityFormat && certConfig.IsIssuerPresent())
-    {
-        if (certType == CertType::kRoot)
+        // serial number
+        if (certConfig.IsSerialNumberPresent())
         {
-            ReturnErrorOnFailure(subjectDN->EncodeToTLV(writer, ContextTag(kTag_Issuer)));
+            ASN1_INTEGER * asn1Integer = X509_get_serialNumber(x509Cert);
+            uint64_t serialNumber;
+            uint8_t serialNumberArray[sizeof(uint64_t)];
+            VerifyOrReturnError(1 == ASN1_INTEGER_get_uint64(&serialNumber, asn1Integer), CHIP_ERROR_INVALID_ARGUMENT);
+            Encoding::BigEndian::Put64(serialNumberArray, serialNumber);
+            ReturnErrorOnFailure(writer.PutBytes(ContextTag(kTag_SerialNumber), serialNumberArray, sizeof(serialNumberArray)));
+        }
+
+        // signature algorithm
+        ReturnErrorOnFailure(writer.Put(ContextTag(kTag_SignatureAlgorithm), certConfig.GetSignatureAlgorithmTLVEnum()));
+
+        // issuer Name
+        if (certConfig.IsIssuerPresent())
+        {
+            if (certType == CertType::kRoot)
+            {
+                ReturnErrorOnFailure(subjectDN->EncodeToTLV(writer, ContextTag(kTag_Issuer)));
+            }
+            else
+            {
+                uint8_t caChipCertBuf[kMaxCHIPCertLength];
+                MutableByteSpan caChipCert(caChipCertBuf);
+                VerifyOrReturnError(true == X509ToChipCert(caCert, caChipCert), CHIP_ERROR_INVALID_ARGUMENT);
+                ChipDN issuerDN;
+                ReturnErrorOnFailure(ExtractSubjectDNFromChipCert(caChipCert, issuerDN));
+                ReturnErrorOnFailure(issuerDN.EncodeToTLV(writer, ContextTag(kTag_Issuer)));
+            }
+        }
+
+        // validity
+        uint32_t validFromChipEpoch;
+        uint32_t validToChipEpoch;
+
+        VerifyOrReturnError(
+            true ==
+                CalendarToChipEpochTime(static_cast<uint16_t>(validFrom.tm_year + 1900), static_cast<uint8_t>(validFrom.tm_mon + 1),
+                                        static_cast<uint8_t>(validFrom.tm_mday), static_cast<uint8_t>(validFrom.tm_hour),
+                                        static_cast<uint8_t>(validFrom.tm_min), static_cast<uint8_t>(validFrom.tm_sec),
+                                        validFromChipEpoch),
+            CHIP_ERROR_INVALID_ARGUMENT);
+        if (validDays == kCertValidDays_NoWellDefinedExpiration)
+        {
+            validToChipEpoch = 0;
         }
         else
         {
-            uint8_t caChipCertBuf[kMaxCHIPCertLength];
-            MutableByteSpan caChipCert(caChipCertBuf);
-            VerifyOrReturnError(true == X509ToChipCert(caCert, caChipCert), CHIP_ERROR_INVALID_ARGUMENT);
-            ChipDN issuerDN;
-            ReturnErrorOnFailure(ExtractSubjectDNFromChipCert(caChipCert, issuerDN));
-            ReturnErrorOnFailure(issuerDN.EncodeToTLV(writer, ContextTag(kTag_Issuer)));
+            VerifyOrReturnError(CanCastTo<uint32_t>(validFromChipEpoch + validDays * kSecondsPerDay - 1),
+                                CHIP_ERROR_INVALID_ARGUMENT);
+            validToChipEpoch = validFromChipEpoch + validDays * kSecondsPerDay - 1;
         }
-    }
+        if (!certConfig.IsValidityCorrect())
+        {
+            uint32_t validTemp = validFromChipEpoch;
+            validFromChipEpoch = validToChipEpoch;
+            validToChipEpoch   = validTemp;
+        }
+        if (certConfig.IsValidityNotBeforePresent())
+        {
+            ReturnErrorOnFailure(writer.Put(ContextTag(kTag_NotBefore), validFromChipEpoch));
+        }
+        if (certConfig.IsValidityNotAfterPresent())
+        {
+            ReturnErrorOnFailure(writer.Put(ContextTag(kTag_NotAfter), validToChipEpoch));
+        }
 
-    // validity
-    uint32_t validFromChipEpoch;
-    uint32_t validToChipEpoch;
+        // subject Name
+        if (certConfig.IsSubjectPresent())
+        {
+            ReturnErrorOnFailure(subjectDN->EncodeToTLV(writer, ContextTag(kTag_Subject)));
+        }
 
-    VerifyOrReturnError(true ==
-                            CalendarToChipEpochTime(
-                                static_cast<uint16_t>(validFrom.tm_year + 1900), static_cast<uint8_t>(validFrom.tm_mon + 1),
-                                static_cast<uint8_t>(validFrom.tm_mday), static_cast<uint8_t>(validFrom.tm_hour),
-                                static_cast<uint8_t>(validFrom.tm_min), static_cast<uint8_t>(validFrom.tm_sec), validFromChipEpoch),
-                        CHIP_ERROR_INVALID_ARGUMENT);
-    if (validDays == kCertValidDays_NoWellDefinedExpiration)
-    {
-        validToChipEpoch = 0;
-    }
-    else
-    {
-        VerifyOrReturnError(CanCastTo<uint32_t>(validFromChipEpoch + validDays * kSecondsPerDay - 1), CHIP_ERROR_INVALID_ARGUMENT);
-        validToChipEpoch = validFromChipEpoch + validDays * kSecondsPerDay - 1;
-    }
-    if (!certConfig.IsValidityCorrect())
-    {
-        uint32_t validTemp = validFromChipEpoch;
-        validFromChipEpoch = validToChipEpoch;
-        validToChipEpoch   = validTemp;
-    }
-    if (!useCompactIdentityFormat && certConfig.IsValidityNotBeforePresent())
-    {
-        ReturnErrorOnFailure(writer.Put(ContextTag(kTag_NotBefore), validFromChipEpoch));
-    }
-    if (!useCompactIdentityFormat && certConfig.IsValidityNotAfterPresent())
-    {
-        ReturnErrorOnFailure(writer.Put(ContextTag(kTag_NotAfter), validToChipEpoch));
-    }
-
-    // subject Name
-    if (!useCompactIdentityFormat && certConfig.IsSubjectPresent())
-    {
-        ReturnErrorOnFailure(subjectDN->EncodeToTLV(writer, ContextTag(kTag_Subject)));
-    }
-
-    // public key algorithm
-    if (!useCompactIdentityFormat)
-    {
+        // public key algorithm
         ReturnErrorOnFailure(writer.Put(ContextTag(kTag_PublicKeyAlgorithm), GetOIDEnum(kOID_PubKeyAlgo_ECPublicKey)));
 
         // public key curve Id
@@ -1161,7 +1160,6 @@ CHIP_ERROR MakeCertTLV(CertType certType, const ToolChipDN * subjectDN, X509 * c
                         ReturnErrorOnFailure(writer.PutBoolean(ContextTag(kTag_BasicConstraints_IsCA),
                                                                certConfig.IsExtensionBasicCACorrect() ? isCA : !isCA));
                     }
-                    // TODO
                     if (pathLen != kPathLength_NotSpecified)
                     {
                         ReturnErrorOnFailure(

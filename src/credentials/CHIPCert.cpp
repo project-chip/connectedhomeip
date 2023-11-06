@@ -1440,12 +1440,13 @@ void InitNetworkIdentitySubject(ChipDN & name)
     VerifyOrDie(err == CHIP_NO_ERROR); // AddAttribute can't fail in this case
 }
 
-static void CalculateKeyIdentifierSha256(const P256PublicKeySpan & publicKey, MutableCertificateKeyId keyId)
+static CHIP_ERROR CalculateKeyIdentifierSha256(const P256PublicKeySpan & publicKey, MutableCertificateKeyId keyId)
 {
     uint8_t hash[kSHA256_Hash_Length];
     static_assert(keyId.size() <= sizeof(hash)); // truncating 32 bytes down to 20
-    chip::Crypto::Hash_SHA256(publicKey.data(), publicKey.size(), hash);
+    ReturnErrorOnFailure(Hash_SHA256(publicKey.data(), publicKey.size(), hash));
     memcpy(keyId.data(), hash, keyId.size());
+    return CHIP_NO_ERROR;
 }
 
 static CHIP_ERROR ValidateChipNetworkIdentity(const ChipCertificateData & certData)
@@ -1484,7 +1485,7 @@ CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert, MutableCertificate
     ChipCertificateData certData;
     ReturnErrorOnFailure(DecodeChipCert(cert, certData, CertDecodeFlags::kGenerateTBSHash));
     ReturnErrorOnFailure(ValidateChipNetworkIdentity(certData));
-    CalculateKeyIdentifierSha256(certData.mPublicKey, keyId);
+    ReturnErrorOnFailure(CalculateKeyIdentifierSha256(certData.mPublicKey, keyId));
     return CHIP_NO_ERROR;
 }
 
@@ -1493,7 +1494,7 @@ CHIP_ERROR ExtractIdentifierFromChipNetworkIdentity(const ByteSpan & cert, Mutab
     ChipCertificateData certData;
     ReturnErrorOnFailure(DecodeChipCert(cert, certData));
     ReturnErrorOnFailure(ValidateCertificateType(certData, CertType::kNetworkIdentity));
-    CalculateKeyIdentifierSha256(certData.mPublicKey, keyId);
+    ReturnErrorOnFailure(CalculateKeyIdentifierSha256(certData.mPublicKey, keyId));
     return CHIP_NO_ERROR;
 }
 
@@ -1501,10 +1502,10 @@ static CHIP_ERROR GenerateNetworkIdentitySignature(const P256Keypair & keypair, 
 {
     // Create a buffer and writer to capture the TBS (to-be-signed) portion of the certificate.
     chip::Platform::ScopedMemoryBuffer<uint8_t> asn1TBSBuf;
-    VerifyOrReturnError(asn1TBSBuf.Alloc(kNetworkIdenitityTBSLength), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(asn1TBSBuf.Alloc(kNetworkIdentityTBSLength), CHIP_ERROR_NO_MEMORY);
 
     ASN1Writer writer;
-    writer.Init(asn1TBSBuf.Get(), kNetworkIdenitityTBSLength);
+    writer.Init(asn1TBSBuf.Get(), kNetworkIdentityTBSLength);
 
     // Generate the TBSCertificate and sign it
     ReturnErrorOnFailure(EncodeNetworkIdentityTBSCert(keypair.Pubkey(), writer));
@@ -1537,7 +1538,6 @@ CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableBy
 
     P256PublicKeySpan publicKeySpan(keypair.Pubkey().ConstBytes());
     P256ECDSASignatureSpan signatureSpan(signature.ConstBytes());
-    VerifyOrDie(signature.Length() == signatureSpan.size());
     ReturnErrorOnFailure(EncodeCompactIdentityCert(writer, AnonymousTag(), publicKeySpan, signatureSpan));
 
     compactIdentityCert.reduce_size(writer.GetLengthWritten());

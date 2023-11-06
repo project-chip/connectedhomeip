@@ -687,7 +687,7 @@ CHIP_ERROR DecodeChipCert(TLVReader & reader, ChipCertificateData & certData, Bi
 
         // Hash the encoded TBS certificate. Only SHA256 is supported.
         VerifyOrReturnError(certData.mSigAlgoOID == kOID_SigAlgo_ECDSAWithSHA256, CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
-        chip::Crypto::Hash_SHA256(asn1TBSBuf.Get(), tbsWriter.GetLengthWritten(), certData.mTBSHash);
+        ReturnErrorOnFailure(Hash_SHA256(asn1TBSBuf.Get(), tbsWriter.GetLengthWritten(), certData.mTBSHash));
         certData.mCertFlags.Set(CertFlags::kTBSHashPresent);
     }
     else
