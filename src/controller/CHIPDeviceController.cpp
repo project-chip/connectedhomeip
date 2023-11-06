@@ -1618,11 +1618,11 @@ void NonConcurrentTimeout(void * context, CHIP_ERROR error)
 {
     if (error == CHIP_ERROR_TIMEOUT)
     {
-        ChipLogProgress(Controller, "Non-Concurrent Mode: Expected NetworkResponse Timeout, do nothing");
+        ChipLogProgress(Controller, "Non-concurrent mode: Expected NetworkResponse Timeout, do nothing");
     }
     else
     {
-        ChipLogProgress(Controller, "Non-Concurrent Mode: Received failure response %s\n", chip::ErrorStr(error));
+        ChipLogProgress(Controller, "Non-concurrent mode: Received failure response %s\n", chip::ErrorStr(error));
         DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
         commissioner->CommissioningStageComplete(error);
     }

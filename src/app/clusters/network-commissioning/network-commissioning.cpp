@@ -125,7 +125,7 @@ void Instance::InvokeCommand(HandlerContext & ctxt)
         bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
         if (!supportsConcurrentConnection)
         {
-            ChipLogProgress(NetworkProvisioning, "Commands::ConnectNetwork::Id PostCloseAllBLEConnectionsToOperationalNetworkEvent");    
+            ChipLogProgress(NetworkProvisioning, "Closing BLE connections due to non-concurrent mode");    
             DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
         }
 #endif
@@ -529,7 +529,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
     if (!supportsConcurrentConnection)
     {
-        ChipLogProgress(NetworkProvisioning, "Instance::OnResult Non-Concurrent Mode, ConnectNetworkResponse will NOT be sent");    
+        ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, ConnectNetworkResponse will NOT be sent");    
         // Do not send the ConnectNetworkResponse if in non-concurrent mode
     }
     else
