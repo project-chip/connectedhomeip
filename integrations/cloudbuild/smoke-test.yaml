@@ -12,7 +12,7 @@ steps:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - "-c"
-          - source ./scripts/bootstrap.sh
+          - source ./scripts/bootstrap.sh -p all,nrfconnect
       id: Bootstrap
       waitFor:
           - Submodules
