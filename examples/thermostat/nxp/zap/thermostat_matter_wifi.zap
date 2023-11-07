@@ -3063,7 +3063,7 @@
               "code": 4,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "NameSupportBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -4092,5 +4092,6 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }

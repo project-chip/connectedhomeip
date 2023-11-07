@@ -32221,15 +32221,6 @@ public class ChipClusters {
         }, FAN_MODE_SEQUENCE_ATTRIBUTE_ID, true);
     }
 
-    public void writeFanModeSequenceAttribute(DefaultClusterCallback callback, Integer value) {
-      writeFanModeSequenceAttribute(callback, value, 0);
-    }
-
-    public void writeFanModeSequenceAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), FAN_MODE_SEQUENCE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
     public void subscribeFanModeSequenceAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FAN_MODE_SEQUENCE_ATTRIBUTE_ID);
@@ -45752,15 +45743,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, SUPPORTED_STREAMING_PROTOCOLS_ATTRIBUTE_ID, true);
-    }
-
-    public void writeSupportedStreamingProtocolsAttribute(DefaultClusterCallback callback, Long value) {
-      writeSupportedStreamingProtocolsAttribute(callback, value, 0);
-    }
-
-    public void writeSupportedStreamingProtocolsAttribute(DefaultClusterCallback callback, Long value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), SUPPORTED_STREAMING_PROTOCOLS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeSupportedStreamingProtocolsAttribute(

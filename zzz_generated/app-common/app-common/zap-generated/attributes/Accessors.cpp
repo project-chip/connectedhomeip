@@ -20753,9 +20753,9 @@ namespace Attributes {
 
 namespace SupportedStreamingProtocols {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<uint32_t>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ContentLauncher::Id, Id, readable, sizeof(temp));
@@ -20767,9 +20767,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap> value)
 {
-    using Traits = NumericAttributeTraits<uint32_t>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;

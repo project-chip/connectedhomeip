@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class GeneralDiagnosticsCluster(private val endpointId: UShort) {
+class GeneralDiagnosticsCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class TimeSnapshotResponse(val systemTimeUs: ULong, val UTCTimeUs: ULong?)
 
   class NetworkInterfacesAttribute(val value: List<GeneralDiagnosticsClusterNetworkInterface>)
@@ -43,6 +47,8 @@ class GeneralDiagnosticsCluster(private val endpointId: UShort) {
     eventTrigger: ULong,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -51,6 +57,8 @@ class GeneralDiagnosticsCluster(private val endpointId: UShort) {
   }
 
   suspend fun timeSnapshot(timedInvokeTimeoutMs: Int? = null): TimeSnapshotResponse {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

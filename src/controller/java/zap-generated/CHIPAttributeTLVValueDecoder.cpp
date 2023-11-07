@@ -29527,7 +29527,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             jobject value;
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
-            jlong jnivalue                 = static_cast<jlong>(cppValue);
+            jlong jnivalue                 = static_cast<jlong>(cppValue.Raw());
             chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(valueClassName.c_str(), valueCtorSignature.c_str(),
                                                                         jnivalue, value);
             return value;
