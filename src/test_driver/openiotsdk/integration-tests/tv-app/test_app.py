@@ -326,7 +326,7 @@ def test_tv_ctrl(device, controller):
                                 dict(match=channels[1].name),
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == Channel.Enums.ChannelStatusEnum.kSuccess
+    assert res.status == Channel.Enums.StatusEnum.kSuccess
 
     err, res = read_zcl_attribute(devCtrl, "Channel", "CurrentChannel", nodeId, endpoint)
     assert err == 0

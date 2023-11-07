@@ -181,11 +181,13 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetProductId(chip::Optional<uint16_t>(897))
         .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"))
         .SetTcpSupported(chip::Optional<bool>(true))
+        .SetICDOperatingAsLIT(chip::Optional<bool>(true))
         // 3600005 is more than the max so should be adjusted down
         .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600005_ms32, 65535_ms16));
 QNamePart txtCommissionableNodeParamsLargeEnhancedParts[] = { "D=22",          "VP=555+897",       "CM=2",       "DT=70000",
                                                               "DN=testy-test", "RI=id_that_spins", "PI=Pair me", "PH=3",
-                                                              "SAI=3600000",   "SII=3600000",      "SAT=65535",  "T=1" };
+                                                              "SAI=3600000",   "SII=3600000",      "SAT=65535",  "T=1",
+                                                              "ICD=1" };
 FullQName txtCommissionableNodeParamsLargeEnhancedName    = FullQName(txtCommissionableNodeParamsLargeEnhancedParts);
 TxtResourceRecord txtCommissionableNodeParamsLargeEnhanced =
     TxtResourceRecord(instanceName, txtCommissionableNodeParamsLargeEnhancedName);

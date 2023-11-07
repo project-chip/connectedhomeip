@@ -3239,12 +3239,18 @@
               # end, so the name can just change here.
               - LightSensorTypeEnum
           Channel:
-              - ChannelStatusEnum
+              # StatusEnum was originally named ChannelStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
               - LineupInfoTypeEnum
           TargetNavigator:
               - TargetNavigatorStatusEnum
           MediaPlayback:
-              - MediaPlaybackStatusEnum
+              # StatusEnum was originally named MediaPlaybackStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
               - PlaybackStateEnum
           MediaInput:
               - InputTypeEnum
@@ -3979,7 +3985,10 @@
                   - Photodiode
                   - CMOS
           Channel:
-              ChannelStatusEnum:
+              # StatusEnum was originally named ChannelStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - MultipleMatches
                   - NoMatches
@@ -3991,7 +4000,10 @@
                   - TargetNotFound
                   - NotAllowed
           MediaPlayback:
-              MediaPlaybackStatusEnum:
+              # StatusEnum was originally named MediaPlaybackStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - InvalidStateForCommand
                   - NotAllowed

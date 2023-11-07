@@ -29,7 +29,7 @@ except ImportError:
     from pregenerate import FindPregenerationTargets, TargetFilter
 
 from pregenerate.executors import DryRunner, ShellRunner
-from pregenerate.types import IdlFileType
+from pregenerate.type_definitions import IdlFileType
 
 try:
     import coloredlogs

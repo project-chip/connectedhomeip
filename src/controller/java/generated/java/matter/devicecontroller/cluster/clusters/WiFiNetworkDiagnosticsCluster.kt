@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class WiFiNetworkDiagnosticsCluster(private val endpointId: UShort) {
+class WiFiNetworkDiagnosticsCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class BssidAttribute(val value: ByteArray?)
 
   class SecurityTypeAttribute(val value: UInt?)
@@ -55,6 +59,8 @@ class WiFiNetworkDiagnosticsCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun resetCounts(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

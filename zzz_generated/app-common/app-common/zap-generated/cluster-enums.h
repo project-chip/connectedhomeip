@@ -3751,19 +3751,6 @@ namespace WakeOnLan {} // namespace WakeOnLan
 
 namespace Channel {
 
-// Enum for ChannelStatusEnum
-enum class ChannelStatusEnum : uint8_t
-{
-    kSuccess         = 0x00,
-    kMultipleMatches = 0x01,
-    kNoMatches       = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
-
 // Enum for LineupInfoTypeEnum
 enum class LineupInfoTypeEnum : uint8_t
 {
@@ -3773,6 +3760,19 @@ enum class LineupInfoTypeEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 1,
+};
+
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
+{
+    kSuccess         = 0x00,
+    kMultipleMatches = 0x01,
+    kNoMatches       = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
 };
 
 // Bitmap for Feature
@@ -3801,22 +3801,6 @@ enum class TargetNavigatorStatusEnum : uint8_t
 
 namespace MediaPlayback {
 
-// Enum for MediaPlaybackStatusEnum
-enum class MediaPlaybackStatusEnum : uint8_t
-{
-    kSuccess                = 0x00,
-    kInvalidStateForCommand = 0x01,
-    kNotAllowed             = 0x02,
-    kNotActive              = 0x03,
-    kSpeedOutOfRange        = 0x04,
-    kSeekOutOfRange         = 0x05,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 6,
-};
-
 // Enum for PlaybackStateEnum
 enum class PlaybackStateEnum : uint8_t
 {
@@ -3829,6 +3813,22 @@ enum class PlaybackStateEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
+};
+
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
+{
+    kSuccess                = 0x00,
+    kInvalidStateForCommand = 0x01,
+    kNotAllowed             = 0x02,
+    kNotActive              = 0x03,
+    kSpeedOutOfRange        = 0x04,
+    kSeekOutOfRange         = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 6,
 };
 
 // Bitmap for Feature

@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class FanControlCluster(private val endpointId: UShort) {
+class FanControlCluster(private val controller: MatterController, private val endpointId: UShort) {
   class PercentSettingAttribute(val value: UByte?)
 
   class SpeedSettingAttribute(val value: UByte?)
@@ -38,6 +39,8 @@ class FanControlCluster(private val endpointId: UShort) {
     lowestOff: Boolean?,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -49,12 +52,12 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeFanModeAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeFanModeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeFanModeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeFanModeAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -73,12 +76,12 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePercentSettingAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writePercentSettingAttribute(value: UByte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writePercentSettingAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribePercentSettingAttribute(
@@ -108,12 +111,12 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeSpeedSettingAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeSpeedSettingAttribute(value: UByte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeSpeedSettingAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeSpeedSettingAttribute(
@@ -143,12 +146,12 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRockSettingAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeRockSettingAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeRockSettingAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeRockSettingAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -167,12 +170,12 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeWindSettingAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeWindSettingAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeWindSettingAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeWindSettingAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -183,12 +186,12 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeAirflowDirectionAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeAirflowDirectionAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeAirflowDirectionAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeAirflowDirectionAttribute(minInterval: Int, maxInterval: Int): UByte {
