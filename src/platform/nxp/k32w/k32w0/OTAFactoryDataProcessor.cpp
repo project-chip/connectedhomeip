@@ -91,6 +91,8 @@ CHIP_ERROR OTAFactoryDataProcessor::ApplyAction()
      * provider getter to access the factory data provider instance. The instance is created
      * by the application, so it's easier to access it this way.*/
     provider = static_cast<FactoryProvider *>(DeviceLayer::GetDeviceInstanceInfoProvider());
+    SuccessOrExit(error = ((provider != nullptr) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ADDRESS));
+
     error = provider->Validate();
 
 exit:
