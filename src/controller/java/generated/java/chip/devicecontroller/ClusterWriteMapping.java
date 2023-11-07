@@ -2355,28 +2355,6 @@ public class ClusterWriteMapping {
       writeFanControlFanModeCommandParams
     );
     writeFanControlInteractionInfo.put("writeFanModeAttribute", writeFanControlFanModeAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeFanControlFanModeSequenceCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo fanControlfanModeSequenceCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeFanControlFanModeSequenceCommandParams.put(
-        "value",
-        fanControlfanModeSequenceCommandParameterInfo
-    );
-    InteractionInfo writeFanControlFanModeSequenceAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.FanControlCluster) cluster).writeFanModeSequenceAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeFanControlFanModeSequenceCommandParams
-    );
-    writeFanControlInteractionInfo.put("writeFanModeSequenceAttribute", writeFanControlFanModeSequenceAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeFanControlPercentSettingCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo fanControlpercentSettingCommandParameterInfo =
         new CommandParameterInfo(

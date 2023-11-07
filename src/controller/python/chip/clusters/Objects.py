@@ -25298,8 +25298,8 @@ class FanControl(Cluster):
             kOffLowHigh = 0x01
             kOffLowMedHighAuto = 0x02
             kOffLowHighAuto = 0x03
-            kOffOnAuto = 0x04
-            kOffOn = 0x05
+            kOffHighAuto = 0x04
+            kOffHigh = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
