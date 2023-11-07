@@ -50,8 +50,8 @@ public:
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
 
     void AbortTransfer(chip::bdx::StatusCode reason);
-
-    bool IsInBDXSession() { return mInitialized; }
+  
+    void Reset();
 
 protected:
     CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * _Nonnull ec, const chip::PayloadHeader & payloadHeader,
@@ -69,8 +69,6 @@ private:
     CHIP_ERROR OnTransferSessionEnd(chip::bdx::TransferSession::OutputEvent & event);
 
     CHIP_ERROR OnBlockReceived(chip::bdx::TransferSession::OutputEvent & event);
-
-    void Reset();
 
     // The fabric index of the node with which the BDX session is established.
     chip::Optional<chip::FabricIndex> mFabricIndex;

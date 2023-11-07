@@ -1402,7 +1402,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     error:(NSError * _Nullable)error
 {
     if (self->_diagnosticLogsTransferHandler != nil) {
+        self->_diagnosticLogsTransferHandler->Reset();
         delete (self->_diagnosticLogsTransferHandler);
+        self->_diagnosticLogsTransferHandler = nil;
     }
     dispatch_async(queue, ^{
         completion(filepath, error);
@@ -1437,10 +1439,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         [self _invokeCompletionWithError:completion queue:queue error:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil]];
     }
 
-    if (self->_diagnosticLogsTransferHandler != nil && self->_diagnosticLogsTransferHandler->IsInBDXSession()) {
-        [self _invokeCompletionWithError:completion queue:queue error:[NSError errorWithDomain:MTRInteractionErrorDomain code:MTRInteractionErrorCodeBusy userInfo:nil]];
-    }
-
     self->_diagnosticLogsTransferHandler = new MTRDiagnosticLogsTransferHandler(filePath, ^(bool result) {
         if (result == YES) {
             [self _invokeCompletion:completion filepath:filePath queue:queue error:nil];
@@ -1471,7 +1469,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             [cluster retrieveLogsRequestWithParams:requestParams expectedValues:nil expectedValueInterval:nil
                                         completion:^(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable response, NSError * _Nullable error) {
                                             // If we are in a BDX session and there is no error, do nothing. Completion will be called when BDX succeeds or fails.
-                                            if (self->_diagnosticLogsTransferHandler != nil && self->_diagnosticLogsTransferHandler->IsInBDXSession() && error == nil) {
+                                            if (self->_diagnosticLogsTransferHandler != nil && error == nil) {
                                                 return;
                                             }
 

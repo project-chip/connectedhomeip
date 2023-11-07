@@ -77,7 +77,6 @@ CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnTransferSessionBegin(TransferSess
     acceptData.Length = mTransfer.GetTransferLength();
 
     mTransfer.AcceptTransfer(acceptData);
-    mInitialized = true;
     return CHIP_NO_ERROR;
 }
 
@@ -93,7 +92,6 @@ CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnTransferSessionEnd(TransferSessio
     } else if (event.EventType != TransferSession::OutputEventType::kMsgToSend || !event.msgTypeData.HasMessageType(MessageType::BlockAckEOF)) {
         error = CHIP_ERROR_INTERNAL;
     }
-    Reset();
 
     // Notify the MTRDevice via the callback that the BDX transfer has completed with error or success.
     if (mCallback) {
@@ -225,7 +223,6 @@ void MTRDiagnosticLogsTransferHandler::AbortTransfer(chip::bdx::StatusCode reaso
 void MTRDiagnosticLogsTransferHandler::Reset()
 {
     assertChipStackLockedByCurrentThread();
-    mInitialized = false;
     mFileURL = nil;
     mFileHandle = nil;
 
