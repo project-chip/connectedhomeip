@@ -129,7 +129,15 @@ void ICDManager::UpdateICDMode()
             }
         }
     }
-    mICDMode = tempMode;
+
+    if (mICDMode != tempMode)
+    {
+        mICDMode = tempMode;
+        // ICDMode changed, restart DNS-SD advertising, because SII and ICD key are affected by this change.
+        // StartServer will take care of setting the operational and commissionable advertissements
+        app::DnssdServer::Instance().StartServer();
+        // app::DnssdServer::Instance().AdvertiseOperational();
+    }
 
     // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
     if (mICDMode == ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
