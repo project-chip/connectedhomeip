@@ -361,6 +361,14 @@ void emberAfBooleanStateClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfIcdManagementClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Oven Operational State Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOvenOperationalStateClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Mode Select Cluster Init
  *
  * Cluster Init
@@ -3993,6 +4001,82 @@ void emberAfIcdManagementClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfIcdManagementClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Oven Operational State Cluster
+//
+
+/** @brief Oven Operational State Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOvenOperationalStateClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Oven Operational State Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterOvenOperationalStateClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Oven Operational State Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOvenOperationalStateClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Oven Operational State Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterOvenOperationalStateClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Oven Operational State Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterOvenOperationalStateClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Oven Operational State Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterOvenOperationalStateClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Oven Operational State Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfOvenOperationalStateClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Oven Operational State Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfOvenOperationalStateClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Mode Select Cluster
@@ -8997,6 +9081,30 @@ bool emberAfIcdManagementClusterUnregisterClientCallback(
 bool emberAfIcdManagementClusterStayActiveRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::IcdManagement::Commands::StayActiveRequest::DecodableType & commandData);
+/**
+ * @brief Oven Operational State Cluster Pause Command callback (from client)
+ */
+bool emberAfOvenOperationalStateClusterPauseCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OvenOperationalState::Commands::Pause::DecodableType & commandData);
+/**
+ * @brief Oven Operational State Cluster Stop Command callback (from client)
+ */
+bool emberAfOvenOperationalStateClusterStopCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OvenOperationalState::Commands::Stop::DecodableType & commandData);
+/**
+ * @brief Oven Operational State Cluster Start Command callback (from client)
+ */
+bool emberAfOvenOperationalStateClusterStartCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OvenOperationalState::Commands::Start::DecodableType & commandData);
+/**
+ * @brief Oven Operational State Cluster Resume Command callback (from client)
+ */
+bool emberAfOvenOperationalStateClusterResumeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OvenOperationalState::Commands::Resume::DecodableType & commandData);
 /**
  * @brief Mode Select Cluster ChangeToMode Command callback (from client)
  */

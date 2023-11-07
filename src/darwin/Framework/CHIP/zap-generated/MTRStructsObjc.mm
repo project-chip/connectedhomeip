@@ -2872,6 +2872,129 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTROvenOperationalStateClusterErrorStateStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorStateID = @(0);
+
+        _errorStateLabel = nil;
+
+        _errorStateDetails = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROvenOperationalStateClusterErrorStateStruct alloc] init];
+
+    other.errorStateID = self.errorStateID;
+    other.errorStateLabel = self.errorStateLabel;
+    other.errorStateDetails = self.errorStateDetails;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: errorStateID:%@; errorStateLabel:%@; errorStateDetails:%@; >", NSStringFromClass([self class]), _errorStateID, _errorStateLabel, _errorStateDetails];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTROvenOperationalStateClusterOperationalStateStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _operationalStateID = @(0);
+
+        _operationalStateLabel = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROvenOperationalStateClusterOperationalStateStruct alloc] init];
+
+    other.operationalStateID = self.operationalStateID;
+    other.operationalStateLabel = self.operationalStateLabel;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: operationalStateID:%@; operationalStateLabel:%@; >", NSStringFromClass([self class]), _operationalStateID, _operationalStateLabel];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTROvenOperationalStateClusterOperationalErrorEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorState = [MTROvenOperationalStateClusterErrorStateStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROvenOperationalStateClusterOperationalErrorEvent alloc] init];
+
+    other.errorState = self.errorState;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: errorState:%@; >", NSStringFromClass([self class]), _errorState];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTROvenOperationalStateClusterOperationCompletionEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _completionErrorCode = @(0);
+
+        _totalOperationalTime = nil;
+
+        _pausedTime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROvenOperationalStateClusterOperationCompletionEvent alloc] init];
+
+    other.completionErrorCode = self.completionErrorCode;
+    other.totalOperationalTime = self.totalOperationalTime;
+    other.pausedTime = self.pausedTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: completionErrorCode:%@; totalOperationalTime:%@; pausedTime:%@; >", NSStringFromClass([self class]), _completionErrorCode, _totalOperationalTime, _pausedTime];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRModeSelectClusterSemanticTagStruct
 - (instancetype)init
 {

@@ -148,6 +148,9 @@ static constexpr ClusterId Id = 0x00000045;
 namespace IcdManagement {
 static constexpr ClusterId Id = 0x00000046;
 } // namespace IcdManagement
+namespace OvenOperationalState {
+static constexpr ClusterId Id = 0x00000048;
+} // namespace OvenOperationalState
 namespace ModeSelect {
 static constexpr ClusterId Id = 0x00000050;
 } // namespace ModeSelect

@@ -1495,6 +1495,62 @@ public static class IcdManagementClusterMonitoringRegistrationStruct {
     return output.toString();
   }
 }
+public static class OvenOperationalStateClusterErrorStateStruct {
+  public Integer errorStateID;
+  public Optional<String> errorStateLabel;
+  public Optional<String> errorStateDetails;
+  public OvenOperationalStateClusterErrorStateStruct(
+    Integer errorStateID,
+    Optional<String> errorStateLabel,
+    Optional<String> errorStateDetails
+  ) {
+    this.errorStateID = errorStateID;
+    this.errorStateLabel = errorStateLabel;
+    this.errorStateDetails = errorStateDetails;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OvenOperationalStateClusterErrorStateStruct {\n");
+    output.append("\terrorStateID: ");
+    output.append(errorStateID);
+    output.append("\n");
+    output.append("\terrorStateLabel: ");
+    output.append(errorStateLabel);
+    output.append("\n");
+    output.append("\terrorStateDetails: ");
+    output.append(errorStateDetails);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class OvenOperationalStateClusterOperationalStateStruct {
+  public Integer operationalStateID;
+  public Optional<String> operationalStateLabel;
+  public OvenOperationalStateClusterOperationalStateStruct(
+    Integer operationalStateID,
+    Optional<String> operationalStateLabel
+  ) {
+    this.operationalStateID = operationalStateID;
+    this.operationalStateLabel = operationalStateLabel;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OvenOperationalStateClusterOperationalStateStruct {\n");
+    output.append("\toperationalStateID: ");
+    output.append(operationalStateID);
+    output.append("\n");
+    output.append("\toperationalStateLabel: ");
+    output.append(operationalStateLabel);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ModeSelectClusterSemanticTagStruct {
   public Integer mfgCode;
   public Integer value;

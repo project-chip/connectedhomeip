@@ -267,6 +267,20 @@ static constexpr EventId Id = 0x00000000;
 } // namespace Events
 } // namespace BooleanState
 
+namespace OvenOperationalState {
+namespace Events {
+
+namespace OperationalError {
+static constexpr EventId Id = 0x00000000;
+} // namespace OperationalError
+
+namespace OperationCompletion {
+static constexpr EventId Id = 0x00000001;
+} // namespace OperationCompletion
+
+} // namespace Events
+} // namespace OvenOperationalState
+
 namespace RefrigeratorAlarm {
 namespace Events {
 

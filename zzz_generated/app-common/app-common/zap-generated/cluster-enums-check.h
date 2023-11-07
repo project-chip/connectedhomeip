@@ -1215,6 +1215,35 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenOperationalState::ErrorStateEnum val)
+{
+    using EnumType = OvenOperationalState::ErrorStateEnum;
+    switch (val)
+    {
+    case EnumType::kNoError:
+    case EnumType::kUnableToStartOrResume:
+    case EnumType::kUnableToCompleteOperation:
+    case EnumType::kCommandInvalidInState:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenOperationalState::OperationalStateEnum val)
+{
+    using EnumType = OvenOperationalState::OperationalStateEnum;
+    switch (val)
+    {
+    case EnumType::kPreheating:
+    case EnumType::kPreheated:
+    case EnumType::kCoolingDown:
+    case EnumType::kSelfCleaning:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherControls::NumberOfRinsesEnum val)
 {
     using EnumType = LaundryWasherControls::NumberOfRinsesEnum;

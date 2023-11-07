@@ -471,6 +471,20 @@ typedef void (*IcdManagementEventListListAttributeCallback)(void * context,
                                                             const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*IcdManagementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*OvenOperationalStatePhaseListListAttributeCallback)(
+    void * context, const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> & data);
+typedef void (*OvenOperationalStateOperationalStateListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OvenOperationalState::Structs::OperationalStateStruct::DecodableType> & data);
+typedef void (*OvenOperationalStateGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*OvenOperationalStateAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*OvenOperationalStateEventListListAttributeCallback)(void * context,
+                                                                   const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*OvenOperationalStateAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*ModeSelectSupportedModesListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & data);
