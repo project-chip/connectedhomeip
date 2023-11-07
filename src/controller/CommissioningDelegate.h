@@ -144,7 +144,7 @@ public:
         return mDeviceRegulatoryLocation;
     }
 
-    // Value to determine if the node supports Concurrent Connections as read from the GeneralCommissioning cluster. 
+    // Value to determine if the node supports Concurrent Connections as read from the GeneralCommissioning cluster.
     // In the AutoCommissioner, this is automatically set from from the kReadCommissioningInfo or kReadCommissioningInfo2 stage.
     Optional<bool> GetSupportsConcurrentConnection() const { return mSupportsConcurrentConnection; }
 
@@ -314,7 +314,7 @@ public:
         mSupportsConcurrentConnection.SetValue(concurrentConnection);
         return *this;
     }
- 
+
     // The lifetime of the buffer countryCode is pointing to should exceed the
     // lifetime of CommissioningParameters object.
     CommissioningParameters & SetCountryCode(CharSpan countryCode)

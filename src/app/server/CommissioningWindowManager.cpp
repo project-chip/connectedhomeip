@@ -89,7 +89,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         ChipLogProgress(AppServer, "Received kCloseAllBleConnections");
         mServer->GetBleLayerObject()->CloseAllBleConnections();
     }
-#endif    
+#endif
 }
 
 void CommissioningWindowManager::Shutdown()

@@ -2136,7 +2136,7 @@ void DeviceCommissioner::ParseCommissioningInfo2()
         ChipLogError(Controller, "Failed to read SupportsConcurrentConnection: %" CHIP_ERROR_FORMAT, err.Format());
         info.supportsConcurrentConnection = true;
     }
- 
+
     return_err = ParseFabrics(info);
 
     if (return_err == CHIP_NO_ERROR)
@@ -2954,7 +2954,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         GeneralCommissioning::Attributes::SupportsConcurrentConnection::TypeInfo::Type supportsConcurrentConnection;
         supportsConcurrentConnection = params.GetSupportsConcurrentConnection().Value();
         ChipLogProgress(Controller,"SendCommand kWiFiNetworkEnable, supportsConcurrentConnection=%d", supportsConcurrentConnection);
-        if (supportsConcurrentConnection) 
+        if (supportsConcurrentConnection)
         {
            err = SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
         }
@@ -2962,7 +2962,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         {
             // Concurrent Connections not allowed. Send the ConnectNetwork command but do not wait for the
             // ConnectNetworkResponse on the Commissioing network as it will not be present. Stop the timeout
-            // and run what would have been in the onConnectNetworkResponse callback. 
+            // and run what would have been in the onConnectNetworkResponse callback.
             SendCommand(proxy, request, NonConcurrentNetworkResponse, NonConcurrentTimeout, endpoint, NullOptional);
             // As there will be no ConnectNetworkResponse, it is an implicit kSuccess so a default report is fine
             CommissioningDelegate::CommissioningReport report;

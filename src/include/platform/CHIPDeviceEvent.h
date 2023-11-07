@@ -169,7 +169,7 @@ enum PublicEventTypes
     kCHIPoBLEConnectionClosed,
 
     /**
-     * Request BLE connections to be closed. 
+     * Request BLE connections to be closed.
      * This is used in the supportsConcurrentConnection = False case.
      */
     kCloseAllBleConnections,
