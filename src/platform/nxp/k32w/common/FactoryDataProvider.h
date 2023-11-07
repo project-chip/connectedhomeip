@@ -91,14 +91,6 @@ public:
         kMaxId
     };
 
-#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
-#if !CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS
-#error "CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS must be > 0 if custom provider is enabled."
-#endif
-    static constexpr uint16_t kNumberOfIds = FactoryDataId::kMaxId + CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS;
-#else
-    static constexpr uint16_t kNumberOfIds = FactoryDataId::kMaxId;
-#endif
     static uint32_t kFactoryDataStart;
     static uint32_t kFactoryDataSize;
     static uint32_t kFactoryDataPayloadStart;
@@ -113,6 +105,8 @@ public:
     virtual CHIP_ERROR Init()                                                                          = 0;
     virtual CHIP_ERROR SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) = 0;
     CHIP_ERROR Validate();
+
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t & length, uint32_t * offset=nullptr);
 
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
@@ -145,9 +139,7 @@ public:
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
 
 protected:
-    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t & length, uint32_t * offset=nullptr);
-
-    uint16_t maxLengths[kNumberOfIds];
+    uint16_t maxLengths[FactoryDataId::kMaxId];
     Header mHeader;
 };
 

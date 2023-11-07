@@ -97,12 +97,6 @@ CHIP_ERROR FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t * pBuf
 
         if (searchedType == type)
         {
-            if ((type >= FactoryDataProvider::kNumberOfIds) || (length > maxLengths[type]))
-            {
-                ChipLogError(DeviceLayer, "Failed validity check for factory data with: id=%d, length=%d", type, length);
-                break;
-            }
-
             ReturnErrorCodeIf(bufLength < length, CHIP_ERROR_BUFFER_TOO_SMALL);
             memcpy(pBuf, (void *) (addr + kValueOffset), length);
 
