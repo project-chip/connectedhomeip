@@ -41,11 +41,7 @@ CHIP_ERROR FactoryDataProviderImpl::Init()
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint32_t sum     = 0;
 
-#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
-    ReturnErrorOnFailure(SetCustomIds());
-#endif
-
-    for (uint8_t i = 1; i < FactoryDataProvider::kNumberOfIds; i++)
+    for (uint8_t i = 1; i < FactoryDataProvider::FactoryDataId::kMaxId; i++)
     {
         sum += maxLengths[i];
     }

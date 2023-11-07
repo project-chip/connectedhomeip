@@ -97,7 +97,6 @@ k32w0_executable("light_app") {
 
     defines = [
       "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1",
-      "CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS=3",
     ]
   }
 
