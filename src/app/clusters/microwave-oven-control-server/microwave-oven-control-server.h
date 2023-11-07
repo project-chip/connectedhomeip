@@ -37,7 +37,7 @@ namespace MicrowaveOvenControl {
  */
 void SetOPInstance(EndpointId aEndpoint, OperationalState::Instance * aInstance);
 
-/** @brief Get Operational State instance for Microwave Oven Control Cluster to know what the current state is.
+/** @brief Get Operational State instance.
  *
  * Get operational state instance
  *
