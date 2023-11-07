@@ -54,6 +54,7 @@ qpg_executable("lock_app") {
     "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
     "${examples_plat_dir}/app/main.cpp",
     "${examples_plat_dir}/ota/ota.cpp",
+    "${examples_plat_dir}/powercycle_counting.c",
     "src/AppTask.cpp",
     "src/BoltLockManager.cpp",
     "src/ZclCallbacks.cpp",
@@ -83,7 +84,7 @@ qpg_executable("lock_app") {
     "${examples_plat_dir}/ota",
   ]
 
-  defines = []
+  defines = [ "GP_APP_DIVERSITY_POWERCYCLECOUNTING" ]
 
   if (chip_enable_pw_rpc) {
     defines += [

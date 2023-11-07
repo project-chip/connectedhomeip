@@ -42,8 +42,7 @@ declare_args() {
   # OTA parameters
   matter_device_vid = ""
   matter_device_pid = ""
-  matter_device_software_version = ""
-  matter_device_software_version_string = ""
+  matter_ota_test_image = false
 }
 
 assert(qpg_sdk_root != "", "qpg_sdk_root must be specified")
@@ -105,13 +104,10 @@ template("qpg_sdk") {
     if (matter_device_pid != "") {
       defines += [ "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${matter_device_pid}" ]
     }
-    if (matter_device_software_version_string != "") {
-      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${matter_device_software_version_string}\"" ]
+    if (matter_ota_test_image) {
+      defines += [ "OTA_TEST_IMAGE" ]
     }
-    if (matter_device_software_version != "") {
-      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${matter_device_software_version}" ]
-    }
-
+  
     if (qpg_target_ic == "qpg6200") {
       defines += [ "QPG_6200" ]
     } else {

@@ -110,7 +110,7 @@ class QpgBuilder(GnBuilder):
         if self.enable_rpcs:
             args.append('import("//with_pw_rpc.gni")')
         if self.update_image:
-            args.append('matter_device_software_version_string=\"1.1_OTA_TEST\" matter_device_software_version=4')
+            args.append('matter_ota_test_image=true')
         return args
 
     def build_outputs(self):
