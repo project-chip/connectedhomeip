@@ -365,7 +365,7 @@ limitations under the License.
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x004F" define="PRESETS_EDITABLE" type="" writable="false" default="false" optional="true" apiMaturity="provisional">
+    <attribute side="server" code="0x004F" define="PRESETS_EDITABLE" type="boolean" writable="false" default="false" optional="true" apiMaturity="provisional">
       <description>PresetsEditable</description>
     </attribute>
     <attribute side="server" code="0x0050" define="ACTIVE_PRESET_HANDLE" type="octet_string" length="16" writable="false" default="null" isNullable="true" optional="true" apiMaturity="provisional">
@@ -443,7 +443,7 @@ limitations under the License.
       <description>
         Start Editing Schedules
       </description>
-      <arg name="TimeoutSeconds" type="uint16" max="120"/>
+      <arg name="TimeoutSeconds" type="int16u" max="120"/>
       <access op="invoke" privilege="manage"/>
     </command>
     <command source="client" code="0x08" name="CancelSchedulesEditRequest" optional="true" apiMaturity="provisional">
@@ -462,7 +462,7 @@ limitations under the License.
       <description>
         Start Editing Presets
       </description>
-      <arg name="TimeoutSeconds" type="uint16" max="120"/>
+      <arg name="TimeoutSeconds" type="int16u" max="120"/>
       <access op="invoke" privilege="manage"/>
     </command>
     <command source="client" code="0x0B" name="CancelPresetsEditRequest" optional="true" apiMaturity="provisional">
