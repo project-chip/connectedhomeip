@@ -21,7 +21,7 @@ limitations under the License.
     <cluster code="0x0048"/>
     <item name="Preheating"       value="0x40"/>
     <item name="Preheated"        value="0x41"/>
-				<item name="CoolingDown"      value="0x42"/>
+    <item name="CoolingDown"      value="0x42"/>
     <item name="SelfCleaning"     value="0x43"/>
   </enum>
 
