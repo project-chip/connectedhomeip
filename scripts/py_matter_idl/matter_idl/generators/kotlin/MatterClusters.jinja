@@ -58,9 +58,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 {% set typeLookup = idl | createLookupContext(cluster) %}
-class {{cluster.name}}Cluster(private val endpointId: UShort) {
+class {{cluster.name}}Cluster(private val controller: MatterController, private val endpointId: UShort) {
 
 {%- set already_handled_command = [] -%}
 {%- for command in cluster.commands | sort(attribute='code') -%}
@@ -101,19 +102,32 @@ class {{cluster.name}}Cluster(private val endpointId: UShort) {
   {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}
 {%- if not loop.last -%}, {% endif %}  
 {%- endfor -%}
+{%- if command.is_timed_invoke -%}
+  , timedInvokeTimeoutMs: Int)
+{%- else -%}
   , timedInvokeTimeoutMs: Int? = null)
+{%- endif -%}
+{%- else -%}
+{%- if command.is_timed_invoke -%}
+  timedInvokeTimeoutMs: Int)
 {%- else -%}
   timedInvokeTimeoutMs: Int? = null)
+{%- endif -%}
 {%- endif -%}
 {%- if command | hasResponse -%}
     : {{callbackName}} {
 {%- else %} {
-{%- endif %}  
+{%- endif %}
+    val commandId = {{command.code}}L
+{% if command.is_timed_invoke %}
+    // Implementation needs to be added here
+{%- else %}
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
+{%- endif %}    
   }
 {% endfor -%}
 
@@ -132,19 +146,24 @@ class {{cluster.name}}Cluster(private val endpointId: UShort) {
 {% endif -%}
 {%- if attribute.is_writable %}
 {%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
-{%- set encodable2 = attribute.definition | asEncodable(typeLookup) -%}
-{%- if not attribute.requires_timed_write %}
-  suspend fun write{{ attribute.definition.name | upfirst }}Attribute(
-    value: {{ encode_value_without_optional_nullable(cluster, encodable, 0) }}
-  ) {
-    // Implementation needs to be added here
-  }
-{% endif %}
+{%- set encodable2 = attribute.definition | asEncodable(typeLookup) %}
   suspend fun write{{ attribute.definition.name | upfirst }}Attribute(
     value: {{ encode_value_without_optional_nullable(cluster, encodable2, 0) }},
+{%- if attribute.requires_timed_write -%}
     timedWriteTimeoutMs: Int
+{%- else %}
+    timedWriteTimeoutMs: Int? = null
+{%- endif %}    
   ) {
+{%- if attribute.requires_timed_write %}
     // Implementation needs to be added here
+{%- else %}
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }    
+{%- endif %}    
   }
 {% endif %}
 {%- if attribute.is_subscribable %}

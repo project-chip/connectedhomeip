@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class AudioOutputCluster(private val endpointId: UShort) {
+class AudioOutputCluster(private val controller: MatterController, private val endpointId: UShort) {
   class OutputListAttribute(val value: List<AudioOutputClusterOutputInfoStruct>)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -31,6 +32,8 @@ class AudioOutputCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun selectOutput(index: UByte, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -39,6 +42,8 @@ class AudioOutputCluster(private val endpointId: UShort) {
   }
 
   suspend fun renameOutput(index: UByte, name: String, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

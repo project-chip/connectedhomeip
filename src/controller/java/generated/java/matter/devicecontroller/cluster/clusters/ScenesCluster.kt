@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ScenesCluster(private val endpointId: UShort) {
+class ScenesCluster(private val controller: MatterController, private val endpointId: UShort) {
   class AddSceneResponse(val status: UShort, val groupID: UShort, val sceneID: UByte)
 
   class ViewSceneResponse(
@@ -79,6 +80,8 @@ class ScenesCluster(private val endpointId: UShort) {
     extensionFieldSets: List<ScenesClusterExtensionFieldSet>,
     timedInvokeTimeoutMs: Int? = null
   ): AddSceneResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -91,6 +94,8 @@ class ScenesCluster(private val endpointId: UShort) {
     sceneID: UByte,
     timedInvokeTimeoutMs: Int? = null
   ): ViewSceneResponse {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -103,6 +108,8 @@ class ScenesCluster(private val endpointId: UShort) {
     sceneID: UByte,
     timedInvokeTimeoutMs: Int? = null
   ): RemoveSceneResponse {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -114,6 +121,8 @@ class ScenesCluster(private val endpointId: UShort) {
     groupID: UShort,
     timedInvokeTimeoutMs: Int? = null
   ): RemoveAllScenesResponse {
+    val commandId = 3L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -126,6 +135,8 @@ class ScenesCluster(private val endpointId: UShort) {
     sceneID: UByte,
     timedInvokeTimeoutMs: Int? = null
   ): StoreSceneResponse {
+    val commandId = 4L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -139,6 +150,8 @@ class ScenesCluster(private val endpointId: UShort) {
     transitionTime: UShort?,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 5L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -150,6 +163,8 @@ class ScenesCluster(private val endpointId: UShort) {
     groupID: UShort,
     timedInvokeTimeoutMs: Int? = null
   ): GetSceneMembershipResponse {
+    val commandId = 6L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -165,6 +180,8 @@ class ScenesCluster(private val endpointId: UShort) {
     extensionFieldSets: List<ScenesClusterExtensionFieldSet>,
     timedInvokeTimeoutMs: Int? = null
   ): EnhancedAddSceneResponse {
+    val commandId = 64L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -177,6 +194,8 @@ class ScenesCluster(private val endpointId: UShort) {
     sceneID: UByte,
     timedInvokeTimeoutMs: Int? = null
   ): EnhancedViewSceneResponse {
+    val commandId = 65L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -192,6 +211,8 @@ class ScenesCluster(private val endpointId: UShort) {
     sceneIdentifierTo: UByte,
     timedInvokeTimeoutMs: Int? = null
   ): CopySceneResponse {
+    val commandId = 66L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

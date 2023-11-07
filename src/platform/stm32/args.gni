@@ -24,6 +24,7 @@ chip_device_platform = "stm32"
 # add board protector for stm32wb
 chip_with_lwip = false
 mbedtls_target = "${stm32_sdk_build_root}:mbedtls"
+openthread_external_mbedtls = mbedtls_target
 
 # GLOBAL CONFIG
 chip_monolithic_tests = false
