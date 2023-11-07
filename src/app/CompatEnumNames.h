@@ -34,6 +34,10 @@ using OTADownloadProtocol  = DownloadProtocolEnum;
 using OTAQueryStatus       = StatusEnum;
 } // namespace OtaSoftwareUpdateProvider
 
+namespace MediaPlayback {
+using MediaPlaybackStatusEnum = StatusEnum;
+}
+
 namespace OtaSoftwareUpdateRequestor {
 // https://github.com/project-chip/connectedhomeip/pull/29459 renamed these
 // enums to follow the spec names.
