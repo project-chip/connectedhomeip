@@ -25,6 +25,27 @@ limitations under the License.
         <field name="LongIdleTimeSupport" mask="0x4"/>
     </bitmap>
 
+    <bitmap name="UserActiveModeTriggerBitmap" type="bitmap32">
+        <cluster code="0x0046"/>
+        <field name="PowerCycle" mask="0x1"/>
+        <field name="SettingsMenu" mask="0x2"/>
+        <field name="CustomInstruction" mask="0x4"/>
+        <field name="DeviceManual" mask="0x8"/>
+        <field name="ActuateSensor" mask="0x10"/>
+        <field name="ActuateSensorSeconds" mask="0x20"/>
+        <field name="ActuateSensorTimes" mask="0x40"/>
+        <field name="ActuateSensorLightsBlink" mask="0x80"/>
+        <field name="ResetButton" mask="0x100"/>
+        <field name="ResetButtonLightsBlink" mask="0x200"/>
+        <field name="ResetButtonSeconds" mask="0x400"/>
+        <field name="ResetButtonTimes" mask="0x800"/>
+        <field name="SetupButton" mask="0x1000"/>
+        <field name="SetupButtonSeconds" mask="0x2000"/>
+        <field name="SetupButtonLightsBlink" mask="0x4000"/>
+        <field name="SetupButtonTimes" mask="0x8000"/>
+        <field name="AppDefinedButton" mask="0x10000"/>   
+    </bitmap>
+
     <struct name = "MonitoringRegistrationStruct" isFabricScoped="true">
         <cluster code="0x0046"/>
         <item fieldId="1" name="CheckInNodeID" type="node_id" isFabricSensitive="true"/>
@@ -42,10 +63,10 @@ limitations under the License.
         <!-- Cluster feature map -->
         <globalAttribute side="server" code="0xFFFC" value="0x0000"/>
         <!-- Current cluster version -->
-        <globalAttribute side="either" code="0xFFFD" value="1"/>
+        <globalAttribute side="either" code="0xFFFD" value="2"/>
 
-        <attribute side="server" code="0x00" define="IDLE_MODE_INTERVAL" type="int32u" min="1" max="64800" default="1" writable="false" optional="false" isNullable="false">IdleModeInterval</attribute>
-        <attribute side="server" code="0x01" define="ACTIVE_MODE_INTERVAL" type="int32u" default="300" writable="false" optional="false" isNullable="false">ActiveModeInterval</attribute>
+        <attribute side="server" code="0x00" define="IDLE_MODE_DURATION" type="int32u" min="1" max="64800" default="1" writable="false" optional="false" isNullable="false">IdleModeDuration</attribute>
+        <attribute side="server" code="0x01" define="ACTIVE_MODE_DURATION" type="int32u" default="300" writable="false" optional="false" isNullable="false">ActiveModeDuration</attribute>
         <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="int16u" default="300" writable="false" optional="false" isNullable="false">ActiveModeThreshold</attribute>
         <attribute side="server" code="0x03" define="REGISTERED_CLIENTS" type="ARRAY" entryType="MonitoringRegistrationStruct" writable="false" optional="true" isNullable="false">
             <description>RegisteredClients</description>
@@ -56,6 +77,8 @@ limitations under the License.
             <access op="read" privilege="administer"/>
         </attribute>
         <attribute side="server" code="0x05" define="CLIENTS_SUPPORTED_PER_FABRIC" type="int16u" min="1" default="1" writable="false" optional="true" isNullable="false">ClientsSupportedPerFabric</attribute>
+        <attribute side="server" code="0x06" define="USER_ACTIVE_MODE_TRIGGER_HINT" type="UserActiveModeTriggerBitmap" writable="false" optional="true" isNullable="false">UserActiveModeTriggerHint</attribute>
+        <attribute side="server" code="0x07" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="char_string" length="128" writable="false" optional="true" isNullable="false">UserActiveModeTriggerInstruction</attribute>
 
         <command source="client" code="0x00" name="RegisterClient" response="RegisterClientResponse" isFabricScoped="true" optional="true">
             <description> Register a client to the end device </description>

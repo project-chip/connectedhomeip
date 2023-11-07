@@ -136,6 +136,7 @@ def BuildHostTarget():
         TargetPart('refrigerator', app=HostApp.REFRIGERATOR),
         TargetPart('rvc', app=HostApp.RVC),
         TargetPart('air-purifier', app=HostApp.AIR_PURIFIER),
+        TargetPart('lit-icd', app=HostApp.LIT_ICD)
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -576,6 +577,8 @@ def BuildQorvoTarget():
         TargetPart('persistent-storage', app=QpgApp.PERSISTENT_STORAGE),
     ])
 
+    target.AppendModifier('updateimage', update_image=True)
+
     return target
 
 
@@ -617,6 +620,7 @@ def BuildTizenTarget():
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("asan", use_asan=True)
     target.AppendModifier("ubsan", use_ubsan=True)
+    target.AppendModifier('with-ui', with_ui=True)
 
     return target
 

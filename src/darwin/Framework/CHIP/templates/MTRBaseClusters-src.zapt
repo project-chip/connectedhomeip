@@ -49,18 +49,6 @@ public:
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
 @implementation MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
-- (instancetype)initWithDevice:(MTRBaseDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 {{#zcl_commands}}
 {{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
@@ -151,7 +139,8 @@ MTR{{cluster}}Cluster{{command}}Params
                                         completion:completion];
 }
 
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completion:(MTRStatusCompletion)completion
 {
   [self write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:nil completion:completion];
@@ -292,7 +281,8 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
         completionHandler(static_cast<{{asObjectiveCClass type parent.name compatRemapClusterName=true}} *>(value), error);
       }];
 }
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value completionHandler:(MTRStatusCompletion)completionHandler
 {
   [self writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:value params:nil completion:completionHandler];

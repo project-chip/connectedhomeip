@@ -20,6 +20,7 @@
 #include "matter_shell.h"
 #include "rsi_rom_egpio.h"
 #include "silabs_utils.h"
+#include "sl_si91x_usart.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,43 +30,27 @@ extern "C" {
 #include <stddef.h>
 #include <string.h>
 
-extern ARM_DRIVER_USART Driver_USART0;
-static ARM_DRIVER_USART * UARTdrv = &Driver_USART0;
+#define USART_BAUDRATE 115200 // Baud rate <9600-7372800>
+#define UART_CONSOLE_ERR -1   // Negative value in case of UART Console action failed. Triggers a failure for PW_RPC
 
-ARM_USART_CAPABILITIES drv_capabilities;
+sl_usart_handle_t usart_handle;
 
-#define BAUD_VALUE 115200
-#define UART_CONSOLE_ERR -1 // Negative value in case of UART Console action failed. Triggers a failure for PW_RPC
+void callback_event(uint32_t event);
 
-void ARM_USART_SignalEvent(uint32_t event);
-
-void Read_Capabilities(void)
-{
-    drv_capabilities = UARTdrv->GetCapabilities();
-}
-
-void ARM_USART_SignalEvent(uint32_t event)
+/*******************************************************************************
+ * Callback function triggered on data Transfer and reception
+ ******************************************************************************/
+void callback_event(uint32_t event)
 {
     switch (event)
     {
-    case ARM_USART_EVENT_SEND_COMPLETE:
+    case SL_USART_EVENT_SEND_COMPLETE:
         break;
-    case ARM_USART_EVENT_RECEIVE_COMPLETE:
+    case SL_USART_EVENT_RECEIVE_COMPLETE:
 #ifdef ENABLE_CHIP_SHELL
         chip::NotifyShellProcessFromISR();
-#endif
-    case ARM_USART_EVENT_TRANSFER_COMPLETE:
-    case ARM_USART_EVENT_TX_COMPLETE:
-    case ARM_USART_EVENT_TX_UNDERFLOW:
-    case ARM_USART_EVENT_RX_OVERFLOW:
-    case ARM_USART_EVENT_RX_TIMEOUT:
-    case ARM_USART_EVENT_RX_BREAK:
-    case ARM_USART_EVENT_RX_FRAMING_ERROR:
-    case ARM_USART_EVENT_RX_PARITY_ERROR:
-    case ARM_USART_EVENT_CTS:
-    case ARM_USART_EVENT_DSR:
-    case ARM_USART_EVENT_DCD:
-    case ARM_USART_EVENT_RI:
+#endif;
+    case SL_USART_EVENT_TRANSFER_COMPLETE:
         break;
     }
 }
@@ -73,71 +58,45 @@ void ARM_USART_SignalEvent(uint32_t event)
 void uartConsoleInit(void)
 {
     int32_t status = 0;
-    Read_Capabilities();
 
-    status = UARTdrv->Initialize(ARM_USART_SignalEvent);
-    // Setting the GPIO 30 of the radio board (TX)
-    // Setting the GPIO 29 of the radio board (RX)
-    RSI_EGPIO_HostPadsGpioModeEnable(30);
-    RSI_EGPIO_HostPadsGpioModeEnable(29);
+    sl_si91x_usart_control_config_t usart_config;
+    usart_config.baudrate      = USART_BAUDRATE;
+    usart_config.mode          = SL_USART_MODE_ASYNCHRONOUS;
+    usart_config.parity        = SL_USART_NO_PARITY;
+    usart_config.stopbits      = SL_USART_STOP_BITS_1;
+    usart_config.hwflowcontrol = SL_USART_FLOW_CONTROL_NONE;
+    usart_config.databits      = SL_USART_DATA_BITS_8;
+    usart_config.misc_control  = SL_USART_MISC_CONTROL_NONE;
+    usart_config.usart_module  = USART_0;
+    usart_config.config_enable = ENABLE;
+    usart_config.synch_mode    = DISABLE;
+    sl_si91x_usart_control_config_t get_config;
 
     // Initialized board UART
     DEBUGINIT();
-    if (status != ARM_DRIVER_OK)
+
+    // Initialize the UART
+    status = sl_si91x_usart_init((usart_peripheral_t) usart_config.usart_module, &usart_handle);
+    if (status != SL_STATUS_OK)
     {
-        DEBUGOUT("\r\n UART Initialization Failed, Error Code : %d\r\n", status);
-    }
-    else
-    {
-        DEBUGOUT("\r\n UART Initialization Success\r\n");
+        DEBUGOUT("sl_si91x_usart_initialize: Error Code : %lu \n", status);
     }
 
-    // Power up the UART peripheral
-    status = UARTdrv->PowerControl(ARM_POWER_FULL);
-    if (status != ARM_DRIVER_OK)
+    // Configure the USART configurations
+    status = sl_si91x_usart_set_configuration(usart_handle, &usart_config);
+    if (status != SL_STATUS_OK)
     {
-        DEBUGOUT("\r\n Failed to Set Power to UART, Error Code : %d\r\n", status);
-    }
-    else
-    {
-        DEBUGOUT("\r\n Configured Power to UART \r\n");
+        DEBUGOUT("sl_si91x_usart_set_configuration: Error Code : %lu \n", status);
     }
 
-    // Enable Receiver and Transmitter lines
-    status = UARTdrv->Control(ARM_USART_CONTROL_TX, 1);
-    if (status != ARM_DRIVER_OK)
+    // Register user callback function
+    status = sl_si91x_usart_register_event_callback(callback_event);
+    if (status != SL_STATUS_OK)
     {
-        DEBUGOUT("\r\n Failed to Set  Transmitter lines to UART, Error Code : %d\r\n", status);
-    }
-    else
-    {
-        DEBUGOUT("\r\n Set  Transmitter lines to UART is sucess \r\n");
-    }
-
-    status = UARTdrv->Control(ARM_USART_CONTROL_RX, 1);
-    if (status != ARM_DRIVER_OK)
-    {
-        DEBUGOUT("\r\n Failed to Set  Receiver lines to UART, Error Code : %d \r\n", status);
-    }
-    else
-    {
-        DEBUGOUT("\r\n Set  Receiver lines to UART\r\n");
-    }
-
-    UARTdrv->Control(ARM_USART_MODE_ASYNCHRONOUS | ARM_USART_DATA_BITS_8 | ARM_USART_PARITY_NONE | ARM_USART_STOP_BITS_1 |
-                         ARM_USART_FLOW_CONTROL_NONE,
-                     BAUD_VALUE);
-    if (status != ARM_DRIVER_OK)
-    {
-        DEBUGOUT("\r\n Failed to Receive data , Error Code : %d \r\n", status);
-    }
-    else
-    {
-        DEBUGOUT("\r\n Receives data success  \r\n");
+        DEBUGOUT("sl_si91x_usart_register_event_callback: Error Code : %lu \n", status);
     }
 
     NVIC_EnableIRQ(USART0_IRQn);
-
     NVIC_SetPriority(USART0_IRQn, 7);
 }
 
@@ -154,8 +113,8 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
         return UART_CONSOLE_ERR;
     }
 
-    status = UARTdrv->Send(Buf, BufLength);
-    if (status != ARM_DRIVER_OK)
+    status = sl_si91x_usart_send_data(usart_handle, Buf, BufLength);
+    if (status != SL_STATUS_OK)
     {
         return status;
     }
@@ -174,8 +133,9 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
     {
         return UART_CONSOLE_ERR;
     }
-    status = UARTdrv->Receive(Buf, NbBytesToRead);
-    if (status != ARM_DRIVER_OK)
+
+    status = sl_si91x_usart_receive_data(usart_handle, Buf, NbBytesToRead);
+    if (status != SL_STATUS_OK)
     {
         return status;
     }

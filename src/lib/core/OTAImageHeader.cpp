@@ -163,7 +163,7 @@ CHIP_ERROR OTAImageHeaderParser::DecodeTlv(OTAImageHeader & header)
         ReturnErrorOnFailure(tlvReader.Next());
     }
 
-    VerifyOrReturnError(tlvReader.GetTag() == TLV::ContextTag(Tag::kImageDigestType), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    ReturnErrorOnFailure(tlvReader.Expect(TLV::ContextTag(Tag::kImageDigestType)));
     ReturnErrorOnFailure(tlvReader.Get(header.mImageDigestType));
     ReturnErrorOnFailure(tlvReader.Next(TLV::ContextTag(Tag::kImageDigest)));
     ReturnErrorOnFailure(tlvReader.Get(header.mImageDigest));

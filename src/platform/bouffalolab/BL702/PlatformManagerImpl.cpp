@@ -23,7 +23,10 @@
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/bouffalolab/BL702/wifi_mgmr_portable.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -62,8 +65,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     CHIP_ERROR err;
     TaskHandle_t backup_eventLoopTask;
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     otRadio_opt_t opt;

@@ -40,10 +40,10 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     switch (*value)
     {
     case to_underlying(DlLockState::kLocked):
-        BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
+        // BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
         break;
     case to_underlying(DlLockState::kUnlocked):
-        BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
+        // BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
         break;
     default:
         break;
@@ -82,9 +82,11 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const N
 {
     bool returnValue = false;
 
+    ChipLogProgress(Zcl, "Door Lock App: Lock Command endpoint=%d", endpointId);
+
     if (BoltLockMgr().ValidatePIN(pinCode, err))
     {
-        BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
+        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::LOCK_ACTION);
         returnValue = true;
     }
 
@@ -97,9 +99,11 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const
 {
     bool returnValue = false;
 
+    ChipLogProgress(Zcl, "Door Lock App: UnLock Command endpoint=%d", endpointId);
+
     if (BoltLockMgr().ValidatePIN(pinCode, err))
     {
-        BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
+        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::UNLOCK_ACTION);
         returnValue = true;
     }
 
@@ -122,4 +126,10 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     logOnFailure(DoorLock::Attributes::NumberOfPINUsersSupported::Set(endpoint, CONFIG_LOCK_NUM_USERS), "number of PIN users");
     logOnFailure(DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::Set(endpoint, CONFIG_LOCK_NUM_CREDENTIALS_PER_USER),
                  "number of credentials per user");
+}
+
+void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId)
+{
+    // Apply the relock state in the application control
+    BoltLockMgr().InitiateAction(AppEvent::kEventType_Timer, BoltLockManager::LOCK_ACTION);
 }

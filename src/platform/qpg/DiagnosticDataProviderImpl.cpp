@@ -24,6 +24,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/PlatformManager.h>
 #include <platform/qpg/DiagnosticDataProviderImpl.h>
 
@@ -178,6 +179,28 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveNetworkFaults(GeneralFaults<kMax
     ReturnErrorOnFailure(networkFaults.add(to_underlying(NetworkFaultEnum::kConnectionFailed)));
 #endif
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
+{
+    NetworkInterface * ifp = new NetworkInterface();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
+    ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
+    ifp->isOperational             = true;
+    ifp->offPremiseServicesReachableIPv4.SetNull();
+    ifp->offPremiseServicesReachableIPv6.SetNull();
+    ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
+    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
+    ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
+    ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
+#else
+    ifp->isOperational = false;
+    ifp->type          = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kUnspecified;
+#endif
+    *netifpp = ifp;
     return CHIP_NO_ERROR;
 }
 

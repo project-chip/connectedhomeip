@@ -118,7 +118,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     CHIP_ERROR err   = CHIP_NO_ERROR;
     cy_rslt_t result = CY_RSLT_SUCCESS;
     cy_wcm_mac_t mac;
-    result = cy_wcm_get_mac_addr(CY_WCM_INTERFACE_TYPE_STA, &mac, 1);
+    result = cy_wcm_get_mac_addr(CY_WCM_INTERFACE_TYPE_STA, &mac);
     if (result != CY_RSLT_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;

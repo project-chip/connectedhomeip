@@ -75,7 +75,7 @@ struct BluezEndpoint
     char * mpAdvPath;
     char * mpServicePath;
 
-    // Objects (interfaces) subscibed to by this service
+    // Objects (interfaces) subscribed to by this service
     GDBusObjectManager * mpObjMgr = nullptr;
     BluezAdapter1 * mpAdapter     = nullptr;
     BluezDevice1 * mpDevice       = nullptr;
@@ -87,6 +87,9 @@ struct BluezEndpoint
     BluezGattCharacteristic1 * mpC2;
     // additional data characteristics
     BluezGattCharacteristic1 * mpC3;
+
+    // Objects (interfaces) used by LE advertisement
+    BluezLEAdvertisement1 * mpAdv;
 
     // map device path to the connection
     GHashTable * mpConnMap;

@@ -284,7 +284,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     uint8_t scene_count = 0;
     uint16_t max_scenes_per_fabric;
     uint16_t max_scenes_per_endpoint;
-    SceneStorageId scene_map[kMaxScenesPerFabric];
+    SceneStorageId scene_map[CHIP_CONFIG_MAX_SCENES_TABLE_SIZE];
 
     FabricSceneData(EndpointId endpoint = kInvalidEndpointId, FabricIndex fabric = kUndefinedFabricIndex,
                     uint16_t maxScenesPerFabric = kMaxScenesPerFabric, uint16_t maxScenesPerEndpoint = kMaxScenesPerEndpoint) :
