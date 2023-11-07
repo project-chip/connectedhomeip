@@ -26,8 +26,7 @@ from basic_composition_support import BasicCompositionTests
 from chip.clusters.Attribute import ValueDecodeFailure
 from chip.tlv import uint
 from conformance_support import ConformanceDecision, conformance_allowed
-from global_attribute_ids import (ACCEPTED_COMMAND_LIST_ID, ATTRIBUTE_LIST_ID, CLUSTER_REVISION_ID, FEATURE_MAP_ID,
-                                  GENERATED_COMMAND_LIST_ID)
+from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
                                     async_test_body, default_matter_test_main)
 from mobly import asserts
@@ -179,15 +178,17 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             validators: list[Callable]
 
         ATTRIBUTES_TO_CHECK = [
-            RequiredMandatoryAttribute(id=CLUSTER_REVISION_ID, name="ClusterRevision", validators=[check_int_in_range(1, 0xFFFF)]),
-            RequiredMandatoryAttribute(id=FEATURE_MAP_ID, name="FeatureMap", validators=[check_int_in_range(0, 0xFFFF_FFFF)]),
-            RequiredMandatoryAttribute(id=ATTRIBUTE_LIST_ID, name="AttributeList",
+            RequiredMandatoryAttribute(id=GlobalAttributeIds.CLUSTER_REVISION_ID, name="ClusterRevision",
+                                       validators=[check_int_in_range(1, 0xFFFF)]),
+            RequiredMandatoryAttribute(id=GlobalAttributeIds.FEATURE_MAP_ID, name="FeatureMap",
+                                       validators=[check_int_in_range(0, 0xFFFF_FFFF)]),
+            RequiredMandatoryAttribute(id=GlobalAttributeIds.ATTRIBUTE_LIST_ID, name="AttributeList",
                                        validators=[check_non_empty_list_of_ints_in_range(0, 0xFFFF_FFFF), check_no_duplicates]),
             # TODO: Check for EventList
             # RequiredMandatoryAttribute(id=0xFFFA, name="EventList", validator=check_list_of_ints_in_range(0, 0xFFFF_FFFF)),
-            RequiredMandatoryAttribute(id=ACCEPTED_COMMAND_LIST_ID, name="AcceptedCommandList",
+            RequiredMandatoryAttribute(id=GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID, name="AcceptedCommandList",
                                        validators=[check_list_of_ints_in_range(0, 0xFFFF_FFFF), check_no_duplicates]),
-            RequiredMandatoryAttribute(id=GENERATED_COMMAND_LIST_ID, name="GeneratedCommandList",
+            RequiredMandatoryAttribute(id=GlobalAttributeIds.GENERATED_COMMAND_LIST_ID, name="GeneratedCommandList",
                                        validators=[check_list_of_ints_in_range(0, 0xFFFF_FFFF), check_no_duplicates]),
         ]
 
@@ -229,7 +230,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         if success:
             for endpoint_id, endpoint in self.endpoints_tlv.items():
                 for cluster_id, cluster in endpoint.items():
-                    attribute_list = cluster[ATTRIBUTE_LIST_ID]
+                    attribute_list = cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
                     for attribute_id in attribute_list:
                         location = AttributePathLocation(endpoint_id, cluster_id, attribute_id)
                         has_attribute = attribute_id in cluster
@@ -276,7 +277,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         mei_range_min = 0x0001_0000
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                globals = [a for a in cluster[ATTRIBUTE_LIST_ID] if a >= global_range_min and a < mei_range_min]
+                globals = [a for a in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if a >= global_range_min and a < mei_range_min]
                 unexpected_globals = sorted(list(set(globals) - set(allowed_globals)))
                 for unexpected in unexpected_globals:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
@@ -290,7 +291,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                 if cluster_id not in chip.clusters.ClusterObjects.ALL_ATTRIBUTES:
                     # Skip clusters that are not part of the standard generated corpus (e.g. MS clusters)
                     continue
-                standard_attributes = [a for a in cluster[ATTRIBUTE_LIST_ID] if a <= attribute_standard_range_max]
+                standard_attributes = [a for a in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
+                                       if a <= attribute_standard_range_max]
                 allowed_standard_attributes = chip.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
                 unexpected_standard_attributes = sorted(list(set(standard_attributes) - set(allowed_standard_attributes)))
                 for unexpected in unexpected_standard_attributes:
@@ -303,7 +305,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         # This is de-facto already covered in the check above, assuming the spec hasn't defined any values in this range, but we should make sure
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                bad_range_values = [a for a in cluster[ATTRIBUTE_LIST_ID] if a >
+                bad_range_values = [a for a in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if a >
                                     attribute_standard_range_max and a < global_range_min]
                 for bad in bad_range_values:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=bad)
@@ -317,8 +319,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             for cluster_id, cluster in endpoint.items():
                 if cluster_id not in chip.clusters.ClusterObjects.ALL_CLUSTERS:
                     continue
-                standard_accepted_commands = [a for a in cluster[ACCEPTED_COMMAND_LIST_ID] if a <= command_standard_range_max]
-                standard_generated_commands = [a for a in cluster[GENERATED_COMMAND_LIST_ID] if a <= command_standard_range_max]
+                standard_accepted_commands = [
+                    a for a in cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] if a <= command_standard_range_max]
+                standard_generated_commands = [
+                    a for a in cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID] if a <= command_standard_range_max]
                 if cluster_id in chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS:
                     allowed_accepted_commands = [a for a in chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]]
                 else:
@@ -355,8 +359,9 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             bad_prefix_min = 0xFFF1_0000
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                attr_prefixes = [a & 0xFFFF_0000 for a in cluster[ATTRIBUTE_LIST_ID]]
-                cmd_values = cluster[ACCEPTED_COMMAND_LIST_ID] + cluster[GENERATED_COMMAND_LIST_ID]
+                attr_prefixes = [a & 0xFFFF_0000 for a in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]]
+                cmd_values = cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] + \
+                    cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID]
                 cmd_prefixes = [a & 0xFFFF_0000 for a in cmd_values]
                 bad_attrs = [a for a in attr_prefixes if a >= bad_prefix_min]
                 bad_cmds = [a for a in cmd_prefixes if a >= bad_prefix_min]
@@ -376,7 +381,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         suffix_mask = 0x0000_FFFF
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                manufacturer_range_values = [a for a in cluster[ATTRIBUTE_LIST_ID] if a > mei_range_min]
+                manufacturer_range_values = [a for a in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if a > mei_range_min]
                 for manufacturer_value in manufacturer_range_values:
                     suffix = manufacturer_value & suffix_mask
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
@@ -394,8 +399,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                accepted_manufacturer_range_values = [a for a in cluster[ACCEPTED_COMMAND_LIST_ID] if a > mei_range_min]
-                generated_manufacturer_range_values = [a for a in cluster[GENERATED_COMMAND_LIST_ID] if a > mei_range_min]
+                accepted_manufacturer_range_values = [
+                    a for a in cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] if a > mei_range_min]
+                generated_manufacturer_range_values = [
+                    a for a in cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID] if a > mei_range_min]
                 all_command_manufacturer_range_values = accepted_manufacturer_range_values + generated_manufacturer_range_values
                 for manufacturer_value in all_command_manufacturer_range_values:
                     suffix = manufacturer_value & suffix_mask
@@ -440,7 +447,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             for cluster_id, cluster in endpoint.items():
                 if cluster_id not in chip.clusters.ClusterObjects.ALL_CLUSTERS:
                     continue
-                feature_map = cluster[FEATURE_MAP_ID]
+                feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
                 feature_mask = 0
                 try:
                     feature_map_enum = chip.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id].Bitmaps.Feature
@@ -729,14 +736,16 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                                         problem='Standard cluster found on device, but is not present in spec data')
                     continue
 
-                feature_map = cluster[FEATURE_MAP_ID]
-                attribute_list = cluster[ATTRIBUTE_LIST_ID]
-                all_command_list = cluster[ACCEPTED_COMMAND_LIST_ID] + cluster[GENERATED_COMMAND_LIST_ID]
+                feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
+                attribute_list = cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
+                all_command_list = cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] + \
+                    cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID]
 
                 # Feature conformance checking
                 feature_masks = [1 << i for i in range(32) if feature_map & (1 << i)]
                 for f in feature_masks:
-                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=FEATURE_MAP_ID)
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                                                     attribute_id=GlobalAttributeIds.FEATURE_MAP_ID)
                     if f not in clusters[cluster_id].features.keys():
                         self.record_error(self.get_test_name(), location=location, problem=f'Unknown feature with mask 0x{f:02x}')
                         success = False
@@ -782,7 +791,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
                 def check_spec_conformance_for_commands(command_type: CommandType) -> bool:
                     success = True
-                    global_attribute_id = ACCEPTED_COMMAND_LIST_ID if command_type == CommandType.ACCEPTED else GENERATED_COMMAND_LIST_ID
+                    global_attribute_id = GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID if command_type == CommandType.ACCEPTED else GlobalAttributeIds.GENERATED_COMMAND_LIST_ID
                     xml_commands_dict = clusters[cluster_id].accepted_commands if command_type == CommandType.ACCEPTED else clusters[cluster_id].generated_commands
                     command_list = cluster[global_attribute_id]
                     for command_id in command_list:

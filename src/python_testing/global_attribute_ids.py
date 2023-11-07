@@ -17,8 +17,12 @@
 
 # This file should be removed once we have a good way to get this from the codegen or XML
 
-ATTRIBUTE_LIST_ID = 0xFFFB
-ACCEPTED_COMMAND_LIST_ID = 0xFFF9
-GENERATED_COMMAND_LIST_ID = 0xFFF8
-FEATURE_MAP_ID = 0xFFFC
-CLUSTER_REVISION_ID = 0xFFFD
+from enum import IntEnum
+
+
+class GlobalAttributeIds(IntEnum):
+    ATTRIBUTE_LIST_ID = 0xFFFB
+    ACCEPTED_COMMAND_LIST_ID = 0xFFF9
+    GENERATED_COMMAND_LIST_ID = 0xFFF8
+    FEATURE_MAP_ID = 0xFFFC
+    CLUSTER_REVISION_ID = 0xFFFD
