@@ -1193,8 +1193,8 @@ static id _Nullable DecodeEventPayloadForWiFiNetworkDiagnosticsCluster(EventId a
 
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.associationFailure)];
-            value.associationFailure = memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.associationFailureCause)];
+            value.associationFailureCause = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
@@ -2039,6 +2039,30 @@ static id _Nullable DecodeEventPayloadForDishwasherAlarmCluster(EventId aEventId
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForMicrowaveOvenModeCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::MicrowaveOvenMode;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForMicrowaveOvenControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::MicrowaveOvenControl;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OperationalState;
@@ -2261,6 +2285,7 @@ static id _Nullable DecodeEventPayloadForBooleanSensorConfigurationCluster(Event
 {
     using namespace Clusters::BooleanSensorConfiguration;
     switch (aEventId) {
+#if MTR_ENABLE_PROVISIONAL
     case Events::AlarmsStateChanged::Id: {
         Events::AlarmsStateChanged::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -2287,6 +2312,8 @@ static id _Nullable DecodeEventPayloadForBooleanSensorConfigurationCluster(Event
 
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
     case Events::SensorFault::Id: {
         Events::SensorFault::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -2298,6 +2325,7 @@ static id _Nullable DecodeEventPayloadForBooleanSensorConfigurationCluster(Event
 
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -2310,6 +2338,7 @@ static id _Nullable DecodeEventPayloadForValveConfigurationAndControlCluster(Eve
 {
     using namespace Clusters::ValveConfigurationAndControl;
     switch (aEventId) {
+#if MTR_ENABLE_PROVISIONAL
     case Events::ValveStateChanged::Id: {
         Events::ValveStateChanged::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -2327,6 +2356,8 @@ static id _Nullable DecodeEventPayloadForValveConfigurationAndControlCluster(Eve
 
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
     case Events::ValveFault::Id: {
         Events::ValveFault::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -2344,6 +2375,7 @@ static id _Nullable DecodeEventPayloadForValveConfigurationAndControlCluster(Eve
 
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -3547,6 +3579,12 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::DishwasherAlarm::Id: {
         return DecodeEventPayloadForDishwasherAlarmCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::MicrowaveOvenMode::Id: {
+        return DecodeEventPayloadForMicrowaveOvenModeCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::MicrowaveOvenControl::Id: {
+        return DecodeEventPayloadForMicrowaveOvenControlCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::OperationalState::Id: {
         return DecodeEventPayloadForOperationalStateCluster(aPath.mEventId, aReader, aError);

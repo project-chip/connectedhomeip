@@ -17,352 +17,255 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.controller.MatterController
+import matter.devicecontroller.cluster.structs.*
 
-class ActionsCluster(private val endpointId: UShort) {
+class ActionsCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class ActionListAttribute(val value: List<ActionsClusterActionStruct>)
+
+  class EndpointListsAttribute(val value: List<ActionsClusterEndpointListStruct>)
+
+  class GeneratedCommandListAttribute(val value: List<UInt>)
+
+  class AcceptedCommandListAttribute(val value: List<UInt>)
+
+  class EventListAttribute(val value: List<UInt>)
+
+  class AttributeListAttribute(val value: List<UInt>)
+
+  suspend fun instantAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun instantActionWithTransition(
+    actionID: UShort,
+    invokeID: UInt?,
+    transitionTime: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 1L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun startAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 2L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun startActionWithDuration(
+    actionID: UShort,
+    invokeID: UInt?,
+    duration: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 3L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun stopAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 4L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun pauseAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 5L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun pauseActionWithDuration(
+    actionID: UShort,
+    invokeID: UInt?,
+    duration: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 6L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun resumeAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 7L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun enableAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 8L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun enableActionWithDuration(
+    actionID: UShort,
+    invokeID: UInt?,
+    duration: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 9L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun disableAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 10L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun disableActionWithDuration(
+    actionID: UShort,
+    invokeID: UInt?,
+    duration: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 11L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readActionListAttribute(): ActionListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeActionListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ActionListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEndpointListsAttribute(): EndpointListsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEndpointListsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EndpointListsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSetupURLAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSetupURLAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 37u
-  }
-
-  fun instantAction(callback: DefaultClusterCallback, actionID: Integer, invokeID: Long?) {
-    // Implementation needs to be added here
-  }
-
-  fun instantAction(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun instantActionWithTransition(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    transitionTime: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun instantActionWithTransition(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    transitionTime: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun startAction(callback: DefaultClusterCallback, actionID: Integer, invokeID: Long?) {
-    // Implementation needs to be added here
-  }
-
-  fun startAction(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun startActionWithDuration(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    duration: Long
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun startActionWithDuration(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    duration: Long,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stopAction(callback: DefaultClusterCallback, actionID: Integer, invokeID: Long?) {
-    // Implementation needs to be added here
-  }
-
-  fun stopAction(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun pauseAction(callback: DefaultClusterCallback, actionID: Integer, invokeID: Long?) {
-    // Implementation needs to be added here
-  }
-
-  fun pauseAction(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun pauseActionWithDuration(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    duration: Long
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun pauseActionWithDuration(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    duration: Long,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun resumeAction(callback: DefaultClusterCallback, actionID: Integer, invokeID: Long?) {
-    // Implementation needs to be added here
-  }
-
-  fun resumeAction(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun enableAction(callback: DefaultClusterCallback, actionID: Integer, invokeID: Long?) {
-    // Implementation needs to be added here
-  }
-
-  fun enableAction(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun enableActionWithDuration(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    duration: Long
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun enableActionWithDuration(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    duration: Long,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun disableAction(callback: DefaultClusterCallback, actionID: Integer, invokeID: Long?) {
-    // Implementation needs to be added here
-  }
-
-  fun disableAction(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun disableActionWithDuration(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    duration: Long
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun disableActionWithDuration(
-    callback: DefaultClusterCallback,
-    actionID: Integer,
-    invokeID: Long?,
-    duration: Long,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  interface ActionListAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.ActionsClusterActionStruct>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EndpointListsAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.ActionsClusterEndpointListStruct>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readActionListAttribute(callback: ActionListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeActionListAttribute(
-    callback: ActionListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEndpointListsAttribute(callback: EndpointListsAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEndpointListsAttribute(
-    callback: EndpointListsAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSetupURLAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSetupURLAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

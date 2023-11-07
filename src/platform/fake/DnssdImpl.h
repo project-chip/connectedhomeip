@@ -169,7 +169,7 @@ struct ExpectedCall
         }
     }
 
-    static constexpr size_t kMaxTxtRecords                = 12;
+    static constexpr size_t kMaxTxtRecords                = 13;
     static constexpr size_t kMaxSubtypes                  = 10;
     CallType callType                                     = CallType::kUnknown;
     DnssdServiceProtocol protocol                         = DnssdServiceProtocol::kDnssdProtocolUnknown;

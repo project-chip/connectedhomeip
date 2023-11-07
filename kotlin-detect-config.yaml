@@ -46,6 +46,7 @@ style:
             - "**/src/controller/java/tests/matter/tlv/TlvReaderTest.kt"
             - "**/src/controller/java/tests/matter/tlv/TlvReadWriteTest.kt"
             - "**/src/controller/java/tests/matter/tlv/TlvWriterTest.kt"
+            - "**/src/controller/java/generated/java/**/*"
     WildcardImport:
         excludes:
             - "**/examples/android/CHIPTest/app/src/androidTest/java/com/tcl/chip/chiptest/ExampleInstrumentedTest.kt"

@@ -43,6 +43,10 @@ config FLASH
 config FPROTECT
     default y
 
+choice LIBC_IMPLEMENTATION
+    default MINIMAL_LIBC
+endchoice
+
 # nRF7002DK uses SPI NOR external flash
 if BOARD_NRF7002DK_NRF5340_CPUAPP
 
@@ -138,6 +142,9 @@ config FLASH_SIMULATOR_STATS
 
 # Enable custom command to erase settings partition.
 config ENABLE_MGMT_PERUSER
+    default y
+
+config ZCBOR
     default y
 
 config BOOT_MGMT_CUSTOM_STORAGE_ERASE

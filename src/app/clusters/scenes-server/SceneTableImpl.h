@@ -28,8 +28,17 @@
 namespace chip {
 namespace scenes {
 
-static constexpr uint16_t kMaxScenesPerFabric   = (MATTER_SCENES_TABLE_SIZE - 1) / 2;
+#ifdef MATTER_SCENES_TABLE_SIZE
 static constexpr uint16_t kMaxScenesPerEndpoint = MATTER_SCENES_TABLE_SIZE;
+#else
+static constexpr uint16_t kMaxScenesPerEndpoint = CHIP_CONFIG_MAX_SCENES_TABLE_SIZE;
+#endif
+
+static_assert(kMaxScenesPerEndpoint <= CHIP_CONFIG_MAX_SCENES_TABLE_SIZE,
+              "CHIP_CONFIG_MAX_SCENES_TABLE_SIZE is smaller than the zap configuration, please increase "
+              "CHIP_CONFIG_MAX_SCENES_TABLE_SIZE in CHIPConfig.h if you really need more scenes");
+static_assert(kMaxScenesPerEndpoint >= 16, "Per spec, kMaxScenesPerEndpoint must be at least 16");
+static constexpr uint16_t kMaxScenesPerFabric = (kMaxScenesPerEndpoint - 1) / 2;
 
 using clusterId = chip::ClusterId;
 

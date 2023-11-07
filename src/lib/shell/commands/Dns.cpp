@@ -59,8 +59,10 @@ public:
                         result.mrpRemoteConfig.mIdleRetransTimeout.count());
         streamer_printf(streamer_get(), "   MRP ACTIVE retransmit timeout: %u ms\r\n",
                         result.mrpRemoteConfig.mActiveRetransTimeout.count());
-        streamer_printf(streamer_get(), "   MRP ACTIVE Threshold timet:    %u ms\r\n",
+        streamer_printf(streamer_get(), "   MRP ACTIVE Threshold time:     %u ms\r\n",
                         result.mrpRemoteConfig.mActiveThresholdTime.count());
+
+        streamer_printf(streamer_get(), "   ICD is operating as a:         %s\r\n", result.isICDOperatingAsLIT ? "LIT" : "SIT");
 
         // Schedule a retry. Not called directly so we do not recurse in OnNodeAddressResolved
         DeviceLayer::SystemLayer().ScheduleLambda([this] {
@@ -116,7 +118,18 @@ public:
         if (retryInterval.HasValue())
             streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", retryInterval.Value());
 
+        if (nodeData.resolutionData.GetMrpRetryActiveThreshold().HasValue())
+        {
+            streamer_printf(streamer_get(), "   MRP retry active threshold time: %" PRIu32 "ms\r\n",
+                            nodeData.resolutionData.GetMrpRetryActiveThreshold().Value());
+        }
         streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.resolutionData.supportsTcp ? "yes" : "no");
+
+        if (nodeData.resolutionData.isICDOperatingAsLIT.HasValue())
+        {
+            streamer_printf(streamer_get(), "   ICD is operating as a: %s\r\n",
+                            nodeData.resolutionData.isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
+        }
         streamer_printf(streamer_get(), "   IP addresses:\r\n");
         for (uint8_t i = 0; i < nodeData.resolutionData.numIPs; i++)
         {

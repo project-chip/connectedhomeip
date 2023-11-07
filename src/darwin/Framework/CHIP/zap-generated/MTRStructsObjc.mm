@@ -1848,7 +1848,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _associationFailure = @(0);
+        _associationFailureCause = @(0);
 
         _status = @(0);
     }
@@ -1859,7 +1859,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRWiFiNetworkDiagnosticsClusterAssociationFailureEvent alloc] init];
 
-    other.associationFailure = self.associationFailure;
+    other.associationFailureCause = self.associationFailureCause;
     other.status = self.status;
 
     return other;
@@ -1867,10 +1867,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: associationFailure:%@; status:%@; >", NSStringFromClass([self class]), _associationFailure, _status];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: associationFailureCause:%@; status:%@; >", NSStringFromClass([self class]), _associationFailureCause, _status];
     return descriptionString;
 }
 
+- (void)setAssociationFailure:(NSNumber * _Nonnull)associationFailure
+{
+    self.associationFailureCause = associationFailure;
+}
+
+- (NSNumber * _Nonnull)associationFailure
+{
+    return self.associationFailureCause;
+}
 @end
 
 @implementation MTRWiFiNetworkDiagnosticsClusterConnectionStatusEvent
@@ -3586,6 +3595,69 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: active:%@; inactive:%@; state:%@; mask:%@; >", NSStringFromClass([self class]), _active, _inactive, _state, _mask];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMicrowaveOvenModeClusterModeTagStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mfgCode = nil;
+
+        _value = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMicrowaveOvenModeClusterModeTagStruct alloc] init];
+
+    other.mfgCode = self.mfgCode;
+    other.value = self.value;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMicrowaveOvenModeClusterModeOptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = @"";
+
+        _mode = @(0);
+
+        _modeTags = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMicrowaveOvenModeClusterModeOptionStruct alloc] init];
+
+    other.label = self.label;
+    other.mode = self.mode;
+    other.modeTags = self.modeTags;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; mode:%@; modeTags:%@; >", NSStringFromClass([self class]), _label, _mode, _modeTags];
     return descriptionString;
 }
 

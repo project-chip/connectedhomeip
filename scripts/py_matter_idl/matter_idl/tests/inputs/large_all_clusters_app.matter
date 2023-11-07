@@ -3105,7 +3105,7 @@ server cluster WakeOnLan = 1283 {
 }
 
 server cluster Channel = 1284 {
-  enum ChannelStatusEnum : ENUM8 {
+  enum StatusEnum : ENUM8 {
     kSuccess = 0;
     kMultipleMatches = 1;
     kNoMatches = 2;
@@ -3472,7 +3472,7 @@ server cluster AudioOutput = 1291 {
 }
 
 server cluster ApplicationLauncher = 1292 {
-  enum ApplicationLauncherStatusEnum : ENUM8 {
+  enum StatusEnum : ENUM8 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;

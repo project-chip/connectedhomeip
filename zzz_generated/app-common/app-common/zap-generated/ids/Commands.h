@@ -434,6 +434,14 @@ namespace TestEventTrigger {
 static constexpr CommandId Id = 0x00000000;
 } // namespace TestEventTrigger
 
+namespace TimeSnapshot {
+static constexpr CommandId Id = 0x00000001;
+} // namespace TimeSnapshot
+
+namespace TimeSnapshotResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace TimeSnapshotResponse
+
 } // namespace Commands
 } // namespace GeneralDiagnostics
 
@@ -744,6 +752,20 @@ static constexpr CommandId Id = 0x00000001;
 
 } // namespace Commands
 } // namespace DishwasherAlarm
+
+namespace MicrowaveOvenControl {
+namespace Commands {
+
+namespace SetCookingParameters {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SetCookingParameters
+
+namespace AddMoreTime {
+static constexpr CommandId Id = 0x00000001;
+} // namespace AddMoreTime
+
+} // namespace Commands
+} // namespace MicrowaveOvenControl
 
 namespace OperationalState {
 namespace Commands {

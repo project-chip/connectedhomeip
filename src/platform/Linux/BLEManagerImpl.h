@@ -204,7 +204,7 @@ private:
     char mDeviceName[kMaxDeviceNameLength + 1];
     bool mIsCentral            = false;
     BluezEndpoint * mpEndpoint = nullptr;
-    std::unique_ptr<ChipDeviceScanner> mDeviceScanner;
+    ChipDeviceScanner mDeviceScanner;
 };
 
 /**

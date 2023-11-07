@@ -45,6 +45,12 @@ public:
         kExchangeContextOpen     = 0x03,
     };
 
+    enum class ICDManagementEvents : uint8_t
+    {
+        kTableUpdated              = 0x01,
+        kStayActiveRequestReceived = 0x02,
+    };
+
     virtual ~ICDListener() {}
 
     /**
@@ -68,6 +74,14 @@ public:
      * @param request : The request source
      */
     virtual void OnActiveRequestWithdrawal(KeepActiveFlags request) = 0;
+
+    /**
+     * @brief This function is called for all subscribers of the ICDNotifier when it calls BroadcastICDManagementEvent
+     * It informs the subscriber that an ICD Management action has happened and needs to be processed
+     *
+     * @param event : The event type
+     */
+    virtual void OnICDManagementServerEvent(ICDManagementEvents event){};
 };
 
 class ICDNotifier
@@ -85,6 +99,7 @@ public:
     void BroadcastNetworkActivityNotification();
     void BroadcastActiveRequestNotification(ICDListener::KeepActiveFlags request);
     void BroadcastActiveRequestWithdrawal(ICDListener::KeepActiveFlags request);
+    void BroadcastICDManagementEvent(ICDListener::ICDManagementEvents event);
 
     static ICDNotifier & GetInstance() { return sICDNotifier; }
 

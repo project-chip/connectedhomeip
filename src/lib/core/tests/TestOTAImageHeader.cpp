@@ -83,13 +83,13 @@ void TestHappyPath(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.mVendorId == 0xDEAD);
     NL_TEST_ASSERT(inSuite, header.mProductId == 0xBEEF);
     NL_TEST_ASSERT(inSuite, header.mSoftwareVersion == 0xFFFFFFFF);
-    NL_TEST_ASSERT(inSuite, header.mSoftwareVersionString.data_equal(CharSpan::fromCharString("1.0")));
+    NL_TEST_ASSERT(inSuite, header.mSoftwareVersionString.data_equal("1.0"_span));
     NL_TEST_ASSERT(inSuite, header.mPayloadSize == strlen("test payload"));
     NL_TEST_ASSERT(inSuite, header.mMinApplicableVersion.HasValue());
     NL_TEST_ASSERT(inSuite, header.mMinApplicableVersion.Value() == 1);
     NL_TEST_ASSERT(inSuite, header.mMaxApplicableVersion.HasValue());
     NL_TEST_ASSERT(inSuite, header.mMaxApplicableVersion.Value() == 2);
-    NL_TEST_ASSERT(inSuite, header.mReleaseNotesURL.data_equal(CharSpan::fromCharString("https://rn")));
+    NL_TEST_ASSERT(inSuite, header.mReleaseNotesURL.data_equal("https://rn"_span));
     NL_TEST_ASSERT(inSuite, header.mImageDigestType == OTAImageDigestType::kSha256);
     NL_TEST_ASSERT(inSuite, header.mImageDigest.size() == 256 / 8);
 }
@@ -169,13 +169,13 @@ void TestSmallBlocks(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, header.mVendorId == 0xDEAD);
         NL_TEST_ASSERT(inSuite, header.mProductId == 0xBEEF);
         NL_TEST_ASSERT(inSuite, header.mSoftwareVersion == 0xFFFFFFFF);
-        NL_TEST_ASSERT(inSuite, header.mSoftwareVersionString.data_equal(CharSpan::fromCharString("1.0")));
+        NL_TEST_ASSERT(inSuite, header.mSoftwareVersionString.data_equal("1.0"_span));
         NL_TEST_ASSERT(inSuite, header.mPayloadSize == strlen("test payload"));
         NL_TEST_ASSERT(inSuite, header.mMinApplicableVersion.HasValue());
         NL_TEST_ASSERT(inSuite, header.mMinApplicableVersion.Value() == 1);
         NL_TEST_ASSERT(inSuite, header.mMaxApplicableVersion.HasValue());
         NL_TEST_ASSERT(inSuite, header.mMaxApplicableVersion.Value() == 2);
-        NL_TEST_ASSERT(inSuite, header.mReleaseNotesURL.data_equal(CharSpan::fromCharString("https://rn")));
+        NL_TEST_ASSERT(inSuite, header.mReleaseNotesURL.data_equal("https://rn"_span));
         NL_TEST_ASSERT(inSuite, header.mImageDigestType == OTAImageDigestType::kSha256);
         NL_TEST_ASSERT(inSuite, header.mImageDigest.size() == 256 / 8);
     }

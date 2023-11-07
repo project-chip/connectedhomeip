@@ -34,6 +34,10 @@ using OTADownloadProtocol  = DownloadProtocolEnum;
 using OTAQueryStatus       = StatusEnum;
 } // namespace OtaSoftwareUpdateProvider
 
+namespace MediaPlayback {
+using MediaPlaybackStatusEnum = StatusEnum;
+}
+
 namespace OtaSoftwareUpdateRequestor {
 // https://github.com/project-chip/connectedhomeip/pull/29459 renamed these
 // enums to follow the spec names.
@@ -41,6 +45,15 @@ using OTAAnnouncementReason = AnnouncementReasonEnum;
 using OTAChangeReasonEnum   = ChangeReasonEnum;
 using OTAUpdateStateEnum    = UpdateStateEnum;
 } // namespace OtaSoftwareUpdateRequestor
+
+namespace ApplicationLauncher {
+// https://github.com/project-chip/connectedhomeip/pull/30134 renamed this
+using ApplicationLauncherStatusEnum = StatusEnum;
+} // namespace ApplicationLauncher
+
+namespace Channel {
+using ChannelStatusEnum = StatusEnum;
+} // namespace Channel
 
 } // namespace Clusters
 } // namespace app

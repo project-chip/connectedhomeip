@@ -342,6 +342,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback
+    : public Callback::Callback<CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallbackType>
+{
+public:
+    CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback(jobject javaCallback);
+
+    ~CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback
     : public Callback::Callback<CHIPTimeSynchronizationClusterSetTimeZoneResponseCallbackType>
 {

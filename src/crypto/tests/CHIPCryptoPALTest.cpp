@@ -2201,8 +2201,15 @@ static void TestSKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = ExtractSKIDFromX509Cert(cert, skidOut);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, skidSpan.data_equal(skidOut));
+        if (!skidSpan.empty())
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, skidSpan.data_equal(skidOut));
+        }
+        else
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
+        }
     }
 }
 
@@ -2228,8 +2235,15 @@ static void TestAKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = ExtractAKIDFromX509Cert(cert, akidOut);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, akidSpan.data_equal(akidOut));
+        if (!akidSpan.empty())
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, akidSpan.data_equal(akidOut));
+        }
+        else
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
+        }
     }
 }
 
@@ -2414,13 +2428,10 @@ static void TestSubject_x509Extraction(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_02.AddAttribute_MatterFabricId(0xFAB000000000001D));
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
-                       subjectDN_Node02_02.AddAttribute_CommonName(
-                           chip::CharSpan::fromCharString("TEST CERT COMMON NAME Attr for Node02_02"), false));
+                       subjectDN_Node02_02.AddAttribute_CommonName("TEST CERT COMMON NAME Attr for Node02_02"_span, false));
     ChipDN subjectDN_Node02_04;
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterCASEAuthTag(0xABCE1002));
-    NL_TEST_ASSERT(inSuite,
-                   CHIP_NO_ERROR ==
-                       subjectDN_Node02_04.AddAttribute_CommonName(chip::CharSpan::fromCharString("TestCert02_04"), false));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_CommonName("TestCert02_04"_span, false));
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterFabricId(0xFAB000000000001D));
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterCASEAuthTag(0xABCD0003));
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterNodeId(0xDEDEDEDE00020004));

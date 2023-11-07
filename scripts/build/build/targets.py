@@ -136,6 +136,7 @@ def BuildHostTarget():
         TargetPart('refrigerator', app=HostApp.REFRIGERATOR),
         TargetPart('rvc', app=HostApp.RVC),
         TargetPart('air-purifier', app=HostApp.AIR_PURIFIER),
+        TargetPart('lit-icd', app=HostApp.LIT_ICD)
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -575,6 +576,8 @@ def BuildQorvoTarget():
         TargetPart('shell', app=QpgApp.SHELL),
         TargetPart('persistent-storage', app=QpgApp.PERSISTENT_STORAGE),
     ])
+
+    target.AppendModifier('updateimage', update_image=True)
 
     return target
 
