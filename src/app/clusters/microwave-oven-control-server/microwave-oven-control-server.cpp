@@ -173,7 +173,7 @@ bool emberAfMicrowaveOvenControlClusterSetCookingParametersCallback(
             if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
             {
                 status = Status::InvalidCommand;
-                ChipLogError(Zcl, "Failed to set cookTime with value = %ld", CookTime.Value());
+                ChipLogError(Zcl, "Failed to set cookTime");
                 goto exit;
             }
         }
@@ -184,7 +184,7 @@ bool emberAfMicrowaveOvenControlClusterSetCookingParametersCallback(
             if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
             {
                 status = Status::InvalidCommand;
-                ChipLogError(Zcl, "Failed to set cookTime with value = %d", kDefaultCookTime);
+                ChipLogError(Zcl, "Failed to set cookTime");
                 goto exit;
             }
         }
@@ -197,7 +197,7 @@ bool emberAfMicrowaveOvenControlClusterSetCookingParametersCallback(
             if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
             {
                 status = Status::InvalidCommand;
-                ChipLogError(Zcl, "Failed to set cooking power with value = %d", PowerSetting.Value());
+                ChipLogError(Zcl, "Failed to set cooking power");
                 goto exit;
             }
         }
@@ -208,7 +208,7 @@ bool emberAfMicrowaveOvenControlClusterSetCookingParametersCallback(
             if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
             {
                 status = Status::InvalidCommand;
-                ChipLogError(Zcl, "Failed to set cooking power with value = %d", kDefaultCookPower);
+                ChipLogError(Zcl, "Failed to set cooking power");
                 goto exit;
             }
         }
@@ -269,14 +269,14 @@ bool emberAfMicrowaveOvenControlClusterAddMoreTimeCallback(
             if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
             {
                 status = Status::InvalidInState;
-                ChipLogError(Zcl, "Failed to set cookTime with value = %ld", addedCookTime);
+                ChipLogError(Zcl, "Failed to set cookTime");
                 goto exit;
             }
         }
         else
         {
             status = Status::ConstraintError;
-            ChipLogError(Zcl, "Failed to set cookTime, cookTime value is out of range");
+            ChipLogError(Zcl, "Failed to set cookTime");
             goto exit;
         }
     }
