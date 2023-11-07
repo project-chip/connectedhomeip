@@ -18802,14 +18802,6 @@ public class ChipClusters {
         readFanModeSequenceAttribute(chipClusterPtr, callback);
     }
 
-    public void writeFanModeSequenceAttribute(DefaultClusterCallback callback, Integer value) {
-        writeFanModeSequenceAttribute(chipClusterPtr, callback, value, null);
-    }
-
-    public void writeFanModeSequenceAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-        writeFanModeSequenceAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
-    }
-
     public void subscribeFanModeSequenceAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
         subscribeFanModeSequenceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
@@ -19022,8 +19014,6 @@ public class ChipClusters {
     private native void subscribeFanModeAttribute(long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readFanModeSequenceAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void writeFanModeSequenceAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeFanModeSequenceAttribute(long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
