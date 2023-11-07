@@ -637,7 +637,7 @@ void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
         Internal::BLEManagerImpl sInstance;
         sInstance.SwitchToIeee802154();
-#else 
+#else
         ThreadStackMgrImpl().SetRadioBlocked(false);
         ThreadStackMgrImpl().SetThreadEnabled(true);
 #endif
