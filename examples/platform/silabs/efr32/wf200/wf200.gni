@@ -1,11 +1,10 @@
 import("//build_overrides/chip.gni")
-
-examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
-wifi_sdk_dir = "${chip_root}/src/platform/silabs/efr32/wifi"
+import("//build_overrides/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 wf200_plat_incs = [ "${examples_plat_dir}/wf200" ]
 wf200_plat_src = [
-  "${wifi_sdk_dir}/wfx_notify.cpp",
+  "${silabs_plat_efr32_wifi_dir}/wfx_notify.cpp",
   "${examples_plat_dir}/wf200/sl_wfx_task.c",
   "${examples_plat_dir}/wf200/wf200_init.c",
   "${examples_plat_dir}/wf200/efr_spi.c",

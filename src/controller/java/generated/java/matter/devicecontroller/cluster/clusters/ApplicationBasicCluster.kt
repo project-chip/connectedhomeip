@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ApplicationBasicCluster(private val endpointId: UShort) {
+class ApplicationBasicCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class ApplicationAttribute(val value: ApplicationBasicClusterApplicationStruct)
 
   class AllowedVendorListAttribute(val value: List<UShort>)

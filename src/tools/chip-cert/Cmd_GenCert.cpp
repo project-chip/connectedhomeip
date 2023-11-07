@@ -35,6 +35,7 @@ namespace {
 using namespace chip::ArgParser;
 using namespace chip::Credentials;
 using namespace chip::ASN1;
+using namespace chip::literals;
 
 #define CMD_NAME "chip-cert gen-cert"
 
@@ -104,6 +105,7 @@ const char * const gCmdOptionHelp =
     "           c - CA certificate\n"
     "           n - node certificate\n"
     "           f - firmware signing certificate\n"
+    "           p - Wi-Fi PDC identity\n"
     "\n"
     "   -i, --subject-chip-id <hex-digits>\n"
     "\n"
@@ -340,6 +342,19 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
             {
                 gCertType = CertType::kRoot;
                 gSelfSign = true;
+            }
+            else if (*arg == 'p')
+            {
+                gCertType = CertType::kNetworkIdentity;
+                gSelfSign = true;
+                gSubjectDN.AddAttribute_CommonName("*"_span, false);
+                // Not Before Jan 1 00:00:01 2000 GMT
+                gValidFrom         = { 0 };
+                gValidFrom.tm_year = (2000 - 1900);
+                gValidFrom.tm_mday = 1;
+                gValidFrom.tm_sec  = 1;
+                // Not After Dec 31 23:59:59 9999 GMT
+                gValidDays = kCertValidDays_NoWellDefinedExpiration;
             }
         }
 
@@ -1176,7 +1191,9 @@ bool Cmd_GenCert(int argc, char * argv[])
                    gFutureExtensionsCount, newCert.get(), newKey.get(), gCertConfig);
     VerifyTrueOrExit(res);
 
-    if (gCertConfig.IsErrorTestCaseEnabled() && IsChipCertFormat(gOutCertFormat))
+    // Always use MakeCertTLV() instead of the standard WriteCert() / ConvertX509CertToChipCert() for
+    // Network (Client) Identities in CHIP format so that we can write it in the compact-pdc-identity format.
+    if (IsChipCertFormat(gOutCertFormat) && (gCertConfig.IsErrorTestCaseEnabled() || gCertType == CertType::kNetworkIdentity))
     {
         uint32_t chipCertBufLen                = kMaxCHIPCertLength + gCertConfig.GetExtraCertLength();
         std::unique_ptr<uint8_t[]> chipCertBuf = std::unique_ptr<uint8_t[]>(new uint8_t[chipCertBufLen]);
