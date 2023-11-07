@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2021 Project CHIP Authors
+Copyright (c) 2023 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ limitations under the License.
     <code>0x0006</code>
     <define>ON_OFF_CLUSTER</define>
     <description>Attributes and commands for switching devices between 'On' and 'Off' states.</description>
-    <globalAttribute side="either" code="0xFFFD" value="5"/>
+    <globalAttribute side="either" code="0xFFFD" value="6"/>
 
     <attribute side="server" code="0x0000" define="ON_OFF"               type="boolean" default="0" reportable="true"              >OnOff</attribute>
     <attribute side="server" code="0x4000" define="GLOBAL_SCENE_CONTROL" type="boolean" default="1"                 optional="true">GlobalSceneControl</attribute>
@@ -80,7 +80,7 @@ limitations under the License.
     <command source="client" code="0x40" name="OffWithEffect" optional="true">
       <description>The OffWithEffect command allows devices to be turned off using enhanced ways of fading.</description>
       <arg name="EffectIdentifier" type="EffectIdentifierEnum"/>
-      <arg name="EffectVariant" type="int8u"/>
+      <arg name="EffectVariant" type="enum8"/>
     </command>
 
     <command source="client" code="0x41" name="OnWithRecallGlobalScene" optional="true">
@@ -99,5 +99,6 @@ limitations under the License.
     <cluster code="0x0006" />
     <field name="Lighting" mask="0x01" />
     <field name="DeadFrontBehavior" mask="0x02" />
+    <field name="OffOnly" mask="0x04" />
   </bitmap>
 </configurator>

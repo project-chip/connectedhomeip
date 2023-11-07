@@ -53,6 +53,8 @@
 
 #include <platform/CHIPDeviceBuildConfig.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/List.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CommissioningWindowOpener.h>
@@ -125,8 +127,17 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 @implementation MTRDeviceController
 
-- (nullable instancetype)initWithParameters:(MTRDeviceControllerParameters *)parameters error:(NSError * __autoreleasing *)error
+- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
 {
+    if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
+        MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
+
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
+        }
+        return nil;
+    }
+
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     if (!factory.isRunning) {
         auto * params = [[MTRDeviceControllerFactoryParams alloc] initWithoutStorage];
@@ -136,7 +147,9 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         }
     }
 
-    return [factory initializeController:self withParameters:parameters error:error];
+    auto * parametersForFactory = static_cast<MTRDeviceControllerParameters *>(parameters);
+
+    return [factory initializeController:self withParameters:parametersForFactory error:error];
 }
 
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
@@ -678,6 +691,57 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         if (commissioningParams.countryCode != nil) {
             params.SetCountryCode(AsCharSpan(commissioningParams.countryCode));
         }
+
+        // Set up the right timezone and DST information.  For timezone, just
+        // use our current timezone and don't schedule any sort of timezone
+        // change.
+        auto * tz = [NSTimeZone localTimeZone];
+        using TimeZoneType = chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type;
+        TimeZoneType timeZone;
+        timeZone.validAt = 0;
+        timeZone.offset = static_cast<int32_t>(tz.secondsFromGMT - tz.daylightSavingTimeOffset);
+        timeZone.name.Emplace(AsCharSpan(tz.name));
+
+        params.SetTimeZone(chip::app::DataModel::List<TimeZoneType>(&timeZone, 1));
+
+        // For DST, there is no limit to the number of transitions we could try
+        // to add, but in practice devices likely support only 2 and
+        // AutoCommissioner caps the list at 10.  Let's do up to 4 transitions
+        // for now.
+        using DSTOffsetType = chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type;
+
+        DSTOffsetType dstOffsets[4];
+        size_t dstOffsetCount = 0;
+        auto nextOffset = tz.daylightSavingTimeOffset;
+        uint64_t nextValidStarting = 0;
+        auto * nextTransition = tz.nextDaylightSavingTimeTransition;
+        for (auto & dstOffset : dstOffsets) {
+            ++dstOffsetCount;
+            dstOffset.offset = static_cast<int32_t>(nextOffset);
+            dstOffset.validStarting = nextValidStarting;
+            if (nextTransition != nil) {
+                uint32_t transitionEpochS;
+                if (DateToMatterEpochSeconds(nextTransition, transitionEpochS)) {
+                    using Microseconds64 = chip::System::Clock::Microseconds64;
+                    using Seconds32 = chip::System::Clock::Seconds32;
+                    dstOffset.validUntil.SetNonNull(Microseconds64(Seconds32(transitionEpochS)).count());
+                } else {
+                    // Out of range; treat as "forever".
+                    dstOffset.validUntil.SetNull();
+                }
+            } else {
+                dstOffset.validUntil.SetNull();
+            }
+
+            if (dstOffset.validUntil.IsNull()) {
+                break;
+            }
+
+            nextOffset = [tz daylightSavingTimeOffsetForDate:nextTransition];
+            nextValidStarting = dstOffset.validUntil.Value();
+            nextTransition = [tz nextDaylightSavingTimeTransitionAfterDate:nextTransition];
+        }
+        params.SetDSTOffsets(chip::app::DataModel::List<DSTOffsetType>(dstOffsets, dstOffsetCount));
 
         chip::NodeId deviceId = [nodeID unsignedLongLongValue];
         self->_operationalCredentialsDelegate->SetDeviceID(deviceId);

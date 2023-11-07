@@ -17,22 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  *    {{description}}
  */
 {{availability (asUpperCamelCase name preserveAcronyms=true)}}
-@interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRCluster
-
-/**
-{{#zcl_commands}}
-{{#first}}
- * For all instance methods that take a completion (i.e. command invocations),
- * the completion will be called on the provided queue.
-{{/first}}
-{{else}}
- * The queue is currently unused, but may be used in the future for calling completions
- * for command invocations if commands are added to this cluster.
-{{/zcl_commands}}
- */
-- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
-                              endpointID:(NSNumber *)endpointID
-                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
+@interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRGenericCluster
 
 {{#zcl_commands}}
 {{#if (is_str_equal source 'client')}}
@@ -66,7 +51,8 @@ NS_ASSUME_NONNULL_BEGIN
 {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/inline}}
 - (NSDictionary<NSString *, id> * _Nullable)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {{> availability}};
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs {{> availability}};
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params {{> availability}};
 {{/if}}
@@ -75,6 +61,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+@interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} (Availability)
+
+/**
+{{#zcl_commands}}
+{{#first}}
+ * For all instance methods that take a completion (i.e. command invocations),
+ * the completion will be called on the provided queue.
+{{/first}}
+{{else}}
+ * The queue is currently unused, but may be used in the future for calling completions
+ * for command invocations if commands are added to this cluster.
+{{/zcl_commands}}
+ */
+- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 
 @end
 
@@ -125,7 +130,8 @@ NS_ASSUME_NONNULL_BEGIN
 {{~#*inline "attributeDecls"}}
 {{#unless (isStrEqual attribute (asUpperCamelCase name preserveAcronyms=true))}}
 - (NSDictionary<NSString *, id> *)readAttribute{{attribute}}WithParams:(MTRReadParams * _Nullable)params {{availability cluster attribute=attribute deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use readAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithParams on MTRCluster" (asUpperCamelCase parent.name preserveAcronyms=true))}};
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)writeAttribute{{attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs {{availability cluster attribute=attribute deprecationMessage=(concat "Please use writeAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithValue on MTRCluster" (asUpperCamelCase parent.name preserveAcronyms=true))}};
 - (void)writeAttribute{{attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params {{availability cluster attribute=attribute deprecationMessage=(concat "Please use writeAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithValue on MTRCluster" (asUpperCamelCase parent.name preserveAcronyms=true))}};
 {{/if}}

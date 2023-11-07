@@ -2538,6 +2538,73 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ attestationRequestedViaDevice ] timeout:kTimeoutInSeconds];
 }
 
+- (void)test028_TimeZoneAndDST
+{
+    // Time synchronization is marked provisional so far, so we can only test it
+    // when MTR_ENABLE_PROVISIONAL is set.
+#if MTR_ENABLE_PROVISIONAL
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * device = GetConnectedDevice();
+    __auto_type * cluster = [[MTRBaseClusterTimeSynchronization alloc] initWithDevice:device endpointID:@(0) queue:queue];
+
+    XCTestExpectation * readTimeZoneExpectation = [self expectationWithDescription:@"Read TimeZone attribute"];
+    __block NSArray<MTRTimeSynchronizationClusterTimeZoneStruct *> * timeZone;
+    [cluster readAttributeTimeZoneWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        timeZone = value;
+        [readTimeZoneExpectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ readTimeZoneExpectation ] timeout:kTimeoutInSeconds];
+
+    __block NSArray<MTRTimeSynchronizationClusterDSTOffsetStruct *> * dstOffset;
+    XCTestExpectation * readDSTOffsetExpectation = [self expectationWithDescription:@"Read DSTOffset attribute"];
+    [cluster readAttributeDSTOffsetWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        dstOffset = value;
+        [readDSTOffsetExpectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ readDSTOffsetExpectation ] timeout:kTimeoutInSeconds];
+
+    // Check that the first DST offset entry matches what we expect.  If we
+    // happened to cross a DST boundary during execution of this function, some
+    // of these checks will fail, but that seems pretty low-probability.
+
+    XCTAssertTrue(dstOffset.count > 0);
+    MTRTimeSynchronizationClusterDSTOffsetStruct * currentDSTOffset = dstOffset[0];
+
+    __auto_type * utcTz = [NSTimeZone timeZoneForSecondsFromGMT:0];
+    __auto_type * dateComponents = [[NSDateComponents alloc] init];
+    dateComponents.timeZone = utcTz;
+    dateComponents.year = 2000;
+    dateComponents.month = 1;
+    dateComponents.day = 1;
+    NSCalendar * gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDate * matterEpoch = [gregorianCalendar dateFromComponents:dateComponents];
+
+    NSDate * nextReportedDSTTransition;
+    if (currentDSTOffset.validUntil == nil) {
+        nextReportedDSTTransition = nil;
+    } else {
+        double validUntilMicroSeconds = currentDSTOffset.validUntil.doubleValue;
+        nextReportedDSTTransition = [NSDate dateWithTimeInterval:validUntilMicroSeconds / 1e6 sinceDate:matterEpoch];
+    }
+
+    __auto_type * tz = [NSTimeZone localTimeZone];
+    NSDate * nextDSTTransition = tz.nextDaylightSavingTimeTransition;
+    XCTAssertEqualObjects(nextReportedDSTTransition, nextDSTTransition);
+
+    XCTAssertEqual(currentDSTOffset.offset.intValue, tz.daylightSavingTimeOffset);
+
+    // Now check the timezone info we got.  We always set exactly one timezone.
+    XCTAssertEqual(timeZone.count, 1);
+    MTRTimeSynchronizationClusterTimeZoneStruct * currentTimeZone = timeZone[0];
+    XCTAssertEqual(tz.secondsFromGMT, currentTimeZone.offset.intValue + currentDSTOffset.offset.intValue);
+#endif // MTR_ENABLE_PROVISIONAL
+}
+
 - (void)test900_SubscribeAllAttributes
 {
     MTRBaseDevice * device = GetConnectedDevice();

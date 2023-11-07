@@ -74,10 +74,10 @@
 
 - release: "Initial release"
   versions:
-      ios: "16.1"
-      macos: "13.0"
-      watchos: "9.1"
-      tvos: "16.1"
+      iOS: "16.1"
+      macOS: "13.0"
+      watchOS: "9.1"
+      tvOS: "16.1"
   introduced:
       clusters:
           - Identify
@@ -3239,12 +3239,18 @@
               # end, so the name can just change here.
               - LightSensorTypeEnum
           Channel:
-              - ChannelStatusEnum
+              # StatusEnum was originally named ChannelStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
               - LineupInfoTypeEnum
           TargetNavigator:
               - TargetNavigatorStatusEnum
           MediaPlayback:
-              - MediaPlaybackStatusEnum
+              # StatusEnum was originally named MediaPlaybackStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
               - PlaybackStateEnum
           MediaInput:
               - InputTypeEnum
@@ -3258,7 +3264,10 @@
           AudioOutput:
               - OutputTypeEnum
           ApplicationLauncher:
-              - ApplicationLauncherStatusEnum
+              # StatusEnum was originally named ApplicationLauncherStatusEnum, but we
+              # generate the same API for the names with/without the cluster name at the
+              # beginning, so the name can just change here.
+              - StatusEnum
           ApplicationBasic:
               - ApplicationStatusEnum
           TestCluster:
@@ -3976,7 +3985,10 @@
                   - Photodiode
                   - CMOS
           Channel:
-              ChannelStatusEnum:
+              # StatusEnum was originally named ChannelStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - MultipleMatches
                   - NoMatches
@@ -3988,7 +4000,10 @@
                   - TargetNotFound
                   - NotAllowed
           MediaPlayback:
-              MediaPlaybackStatusEnum:
+              # StatusEnum was originally named MediaPlaybackStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - InvalidStateForCommand
                   - NotAllowed
@@ -4137,7 +4152,10 @@
                   - Internal
                   - Other
           ApplicationLauncher:
-              ApplicationLauncherStatusEnum:
+              # StatusEnum was originally named ApplicationLauncherStatusEnum, but we
+              # generate the same API for the names with/without the cluster name at the
+              # beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - AppNotAvailable
                   - SystemBusy
@@ -4722,10 +4740,10 @@
 
 - release: "First dot-release"
   versions:
-      ios: "16.2"
-      macos: "13.1"
-      watchos: "9.2"
-      tvos: "16.2"
+      iOS: "16.2"
+      macOS: "13.1"
+      watchOS: "9.2"
+      tvOS: "16.2"
   introduced:
       attributes:
           TestCluster:
@@ -4778,10 +4796,10 @@
 
 - release: "First major API revamp"
   versions:
-      ios: "16.4"
-      macos: "13.3"
-      watchos: "9.4"
-      tvos: "16.4"
+      iOS: "16.4"
+      macOS: "13.3"
+      watchOS: "9.4"
+      tvOS: "16.4"
   introduced:
       clusters:
           - OTASoftwareUpdateProvider
@@ -6723,10 +6741,10 @@
 
 - release: "First after major API revamp"
   versions:
-      ios: "16.5"
-      macos: "13.4"
-      watchos: "9.5"
-      tvos: "16.5"
+      iOS: "16.5"
+      macOS: "13.4"
+      watchOS: "9.5"
+      tvOS: "16.5"
   introduced:
       ids:
           attributes:
@@ -7031,10 +7049,10 @@
 
 - release: "Fall 2023"
   versions:
-      ios: "17.0"
-      macos: "14.0"
-      watchos: "10.0"
-      tvos: "17.0"
+      iOS: "17.0"
+      macOS: "14.0"
+      watchOS: "10.0"
+      tvOS: "17.0"
   introduced:
       attributes:
           BasicInformation:
@@ -7515,10 +7533,10 @@
 
 - release: "Fall 2023 #2"
   versions:
-      ios: "17.1"
-      macos: "14.1"
-      watchos: "10.1"
-      tvos: "17.1"
+      iOS: "17.1"
+      macOS: "14.1"
+      watchOS: "10.1"
+      tvOS: "17.1"
   introduced:
       bitmaps:
           TimeFormatLocalization:
@@ -7583,10 +7601,10 @@
 
 - release: "Fall 2023 #3"
   versions:
-      ios: "17.2"
-      macos: "14.2"
-      watchos: "10.2"
-      tvos: "17.2"
+      iOS: "17.2"
+      macOS: "14.2"
+      watchOS: "10.2"
+      tvOS: "17.2"
   introduced:
       command payloads:
           TimeSynchronization:
@@ -7728,3 +7746,84 @@
 
 - release: "Future"
   versions: "future"
+  introduced:
+      event fields:
+          WiFiNetworkDiagnostics:
+              AssociationFailure:
+                  - associationFailureCause
+      bitmaps:
+          Scenes:
+              - CopyModeBitmap
+              - NameSupportBitmap
+          AdministratorCommissioning:
+              - Feature
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap:
+                  - SupplyFault
+          Scenes:
+              CopyModeBitmap:
+                  - CopyAllScenes
+              NameSupportBitmap:
+                  - SceneNames
+          SoftwareDiagnostics:
+              Feature:
+                  - Watermarks
+          AdministratorCommissioning:
+              Feature:
+                  - Basic
+  deprecated:
+      event fields:
+          WiFiNetworkDiagnostics:
+              AssociationFailure:
+                  - associationFailure
+      bitmaps:
+          Scenes:
+              - ScenesCopyMode
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap:
+                  - Supplyfault
+          SoftwareDiagnostics:
+              Feature:
+                  - WaterMarks
+  provisional:
+      clusters:
+          # Targeting Spring 2024 Matter release
+          - MicrowaveOvenControl
+          - MicrowaveOvenMode
+      attributes:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              - SupportedWiFiBands
+              - SupportedThreadFeatures
+              - ThreadVersion
+      commands:
+          GeneralDiagnostics:
+              # Targeting Spring 2024 Matter release
+              - TimeSnapshot
+              - TimeSnapshotResponse
+      bitmaps:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              - ThreadCapabilitiesBitmap
+      bitmap values:
+          OnOff:
+              Feature:
+                  # Targeting Spring 2024 Matter release
+                  - OffOnly
+  renames:
+      event fields:
+          WiFiNetworkDiagnostics:
+              AssociationFailure:
+                  associationFailureCause: associationFailure
+      bitmaps:
+          Scenes:
+              CopyModeBitmap: ScenesCopyMode
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap:
+                  SupplyFault: Supplyfault
+          SoftwareDiagnostics:
+              Feature:
+                  Watermarks: WaterMarks
