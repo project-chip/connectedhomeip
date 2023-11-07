@@ -871,7 +871,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
                                                      attribute_id=GlobalAttributeIds.CLUSTER_REVISION_ID)
                     self.record_error(self.get_test_name(
-                    ), location=location, problem=f'Revision found on cluster ({cluster[GlobalAttirbuteIds.CLUSTER_REVISION_ID]}) does not match revision listed in the spec ({clusters[cluster_id].revision})')
+                    ), location=location, problem=f'Revision found on cluster ({cluster[GlobalAttributeIds.CLUSTER_REVISION_ID]}) does not match revision listed in the spec ({clusters[cluster_id].revision})')
                     success = False
         if not success:
             # TODO: Right now, we have failures in all-cluster, so we can't fail this test and keep it in CI. For now, just log.
