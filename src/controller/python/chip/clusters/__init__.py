@@ -31,11 +31,18 @@ from .Objects import (AccessControl, AccountLogin, Actions, ActivatedCarbonFilte
                       DoorLock, ElectricalMeasurement, EnergyEvse, EthernetNetworkDiagnostics, FanControl, FaultInjection,
                       FixedLabel, FlowMeasurement, FormaldehydeConcentrationMeasurement, GeneralCommissioning, GeneralDiagnostics,
                       GroupKeyManagement, Groups, HepaFilterMonitoring, IcdManagement, Identify, IlluminanceMeasurement,
+<<<<<<< HEAD
                       KeypadInput, LaundryDryerControls, LaundryWasherControls, LaundryWasherMode, LevelControl,
                       LocalizationConfiguration, LowPower, MediaInput, MediaPlayback, MicrowaveOvenControl, MicrowaveOvenMode,
                       ModeSelect, NetworkCommissioning, NitrogenDioxideConcentrationMeasurement, OccupancySensing, OnOff,
                       OnOffSwitchConfiguration, OperationalCredentials, OperationalState, OtaSoftwareUpdateProvider,
                       OtaSoftwareUpdateRequestor, OvenCavityOperationalState, OvenMode, OzoneConcentrationMeasurement,
+=======
+                      KeypadInput, LaundryWasherControls, LaundryWasherMode, LevelControl, LocalizationConfiguration, LowPower,
+                      MediaInput, MediaPlayback, ModeSelect, NetworkCommissioning, NitrogenDioxideConcentrationMeasurement,
+                      OccupancySensing, OnOff, OnOffSwitchConfiguration, OperationalCredentials, OperationalState,
+                      OtaSoftwareUpdateProvider, OtaSoftwareUpdateRequestor, OvenCavityOperationalState, OzoneConcentrationMeasurement,
+>>>>>>> 08e84a9c13 (Initial OpState work)
                       Pm1ConcentrationMeasurement, Pm10ConcentrationMeasurement, Pm25ConcentrationMeasurement, PowerSource,
                       PowerSourceConfiguration, PressureMeasurement, ProxyConfiguration, ProxyDiscovery, ProxyValid,
                       PulseWidthModulation, PumpConfigurationAndControl, RadonConcentrationMeasurement, RefrigeratorAlarm,
@@ -59,7 +66,11 @@ __all__ = [Attribute, CHIPClusters, Command, AccessControl, AccountLogin, Action
            LaundryWasherControls, LaundryWasherMode, LevelControl, LocalizationConfiguration, LowPower, MediaInput, MediaPlayback, MicrowaveOvenControl,
            MicrowaveOvenMode, ModeSelect, NetworkCommissioning, NitrogenDioxideConcentrationMeasurement,
            OccupancySensing, OnOff, OnOffSwitchConfiguration, OperationalCredentials, OperationalState,
+<<<<<<< HEAD
            OtaSoftwareUpdateProvider, OtaSoftwareUpdateRequestor, OvenCavityOperationalState, OvenMode,
+=======
+           OtaSoftwareUpdateProvider, OtaSoftwareUpdateRequestor,OvenCavityOperationalState,
+>>>>>>> 08e84a9c13 (Initial OpState work)
            OzoneConcentrationMeasurement, Pm1ConcentrationMeasurement, Pm10ConcentrationMeasurement,
            Pm25ConcentrationMeasurement, PowerSource, PowerSourceConfiguration, PressureMeasurement, ProxyConfiguration,
            ProxyDiscovery, ProxyValid, PulseWidthModulation, PumpConfigurationAndControl, RadonConcentrationMeasurement,
