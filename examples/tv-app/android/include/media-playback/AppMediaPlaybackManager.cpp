@@ -165,7 +165,7 @@ Commands::PlaybackResponse::Type AppMediaPlaybackManager::HandleMediaRequest(Med
     // Ideally should not come here
     ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleMediaRequest");
     Commands::PlaybackResponse::Type response;
-    response.status = MediaPlaybackStatusEnum::kInvalidStateForCommand;
+    response.status = StatusEnum::kInvalidStateForCommand;
     return response;
 }
 

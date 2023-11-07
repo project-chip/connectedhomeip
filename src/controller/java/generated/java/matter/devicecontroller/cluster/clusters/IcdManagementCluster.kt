@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class IcdManagementCluster(private val endpointId: UShort) {
+class IcdManagementCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class RegisterClientResponse(val ICDCounter: UInt)
 
   class RegisteredClientsAttribute(
@@ -41,6 +45,8 @@ class IcdManagementCluster(private val endpointId: UShort) {
     verificationKey: ByteArray?,
     timedInvokeTimeoutMs: Int? = null
   ): RegisterClientResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -53,6 +59,8 @@ class IcdManagementCluster(private val endpointId: UShort) {
     verificationKey: ByteArray?,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -61,6 +69,8 @@ class IcdManagementCluster(private val endpointId: UShort) {
   }
 
   suspend fun stayActiveRequest(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 3L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

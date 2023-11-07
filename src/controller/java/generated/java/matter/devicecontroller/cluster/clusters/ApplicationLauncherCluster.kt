@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ApplicationLauncherCluster(private val endpointId: UShort) {
+class ApplicationLauncherCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class LauncherResponse(val status: UInt, val data: ByteArray?)
 
   class CatalogListAttribute(val value: List<UShort>?)
@@ -39,6 +43,8 @@ class ApplicationLauncherCluster(private val endpointId: UShort) {
     data: ByteArray?,
     timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -50,6 +56,8 @@ class ApplicationLauncherCluster(private val endpointId: UShort) {
     application: ApplicationLauncherClusterApplicationStruct?,
     timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -61,6 +69,8 @@ class ApplicationLauncherCluster(private val endpointId: UShort) {
     application: ApplicationLauncherClusterApplicationStruct?,
     timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
