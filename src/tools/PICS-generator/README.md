@@ -1,3 +1,7 @@
+---
+orphan: true
+---
+
 # Setup
 
 This tool uses the python environment used by the python_testing efforts, which
