@@ -76,7 +76,7 @@ config HEAP_MEM_POOL_SIZE
     default 256
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
-    default 10240
+    default 12288
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE 
     default 12288
