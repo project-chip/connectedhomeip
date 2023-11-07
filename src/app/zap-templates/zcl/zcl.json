@@ -380,6 +380,12 @@
             "CurrentPhase",
             "CountdownTime"
         ],
+        "Oven Operational State": [
+            "OperationalState",
+            "OperationalError",
+            "CurrentPhase",
+            "CountdownTime"
+        ],
         "RVC Operational State": [
             "OperationalState",
             "OperationalError",
