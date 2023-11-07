@@ -374,36 +374,9 @@ static BOOL CommandNeedsTimedInvokeInICDManagementCluster(AttributeId aAttribute
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInTimerCluster(AttributeId aAttributeId)
+static BOOL CommandNeedsTimedInvokeInOvenOperationalStateCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::Timer;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInOvenCavityOperationalStateCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::OvenCavityOperationalState;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInOvenModeCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::OvenMode;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInLaundryDryerControlsCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::LaundryDryerControls;
+    using namespace Clusters::OvenOperationalState;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -566,90 +539,6 @@ static BOOL CommandNeedsTimedInvokeInHEPAFilterMonitoringCluster(AttributeId aAt
 static BOOL CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ActivatedCarbonFilterMonitoring;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInBooleanStateConfigurationCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::BooleanStateConfiguration;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInValveConfigurationAndControlCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::ValveConfigurationAndControl;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInElectricalEnergyMeasurementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::ElectricalEnergyMeasurement;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::DemandResponseLoadControl;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInDeviceEnergyManagementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::DeviceEnergyManagement;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInEnergyEVSECluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::EnergyEvse;
-    switch (aAttributeId) {
-    case Commands::Disable::Id: {
-        return YES;
-    }
-    case Commands::EnableCharging::Id: {
-        return YES;
-    }
-    case Commands::EnableDischarging::Id: {
-        return YES;
-    }
-    case Commands::StartDiagnostics::Id: {
-        return YES;
-    }
-    case Commands::SetTargets::Id: {
-        return YES;
-    }
-    case Commands::GetTargets::Id: {
-        return YES;
-    }
-    case Commands::ClearTargets::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInEnergyPreferenceCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::EnergyPreference;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1022,24 +911,6 @@ static BOOL CommandNeedsTimedInvokeInAccountLoginCluster(AttributeId aAttributeI
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInContentControlCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::ContentControl;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInContentAppObserverCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::ContentAppObserver;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL CommandNeedsTimedInvokeInElectricalMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectricalMeasurement;
@@ -1191,17 +1062,8 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::IcdManagement::Id: {
         return CommandNeedsTimedInvokeInICDManagementCluster(commandID);
     }
-    case Clusters::Timer::Id: {
-        return CommandNeedsTimedInvokeInTimerCluster(commandID);
-    }
-    case Clusters::OvenCavityOperationalState::Id: {
-        return CommandNeedsTimedInvokeInOvenCavityOperationalStateCluster(commandID);
-    }
-    case Clusters::OvenMode::Id: {
-        return CommandNeedsTimedInvokeInOvenModeCluster(commandID);
-    }
-    case Clusters::LaundryDryerControls::Id: {
-        return CommandNeedsTimedInvokeInLaundryDryerControlsCluster(commandID);
+    case Clusters::OvenOperationalState::Id: {
+        return CommandNeedsTimedInvokeInOvenOperationalStateCluster(commandID);
     }
     case Clusters::ModeSelect::Id: {
         return CommandNeedsTimedInvokeInModeSelectCluster(commandID);
@@ -1256,27 +1118,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(commandID);
-    }
-    case Clusters::BooleanStateConfiguration::Id: {
-        return CommandNeedsTimedInvokeInBooleanStateConfigurationCluster(commandID);
-    }
-    case Clusters::ValveConfigurationAndControl::Id: {
-        return CommandNeedsTimedInvokeInValveConfigurationAndControlCluster(commandID);
-    }
-    case Clusters::ElectricalEnergyMeasurement::Id: {
-        return CommandNeedsTimedInvokeInElectricalEnergyMeasurementCluster(commandID);
-    }
-    case Clusters::DemandResponseLoadControl::Id: {
-        return CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(commandID);
-    }
-    case Clusters::DeviceEnergyManagement::Id: {
-        return CommandNeedsTimedInvokeInDeviceEnergyManagementCluster(commandID);
-    }
-    case Clusters::EnergyEvse::Id: {
-        return CommandNeedsTimedInvokeInEnergyEVSECluster(commandID);
-    }
-    case Clusters::EnergyPreference::Id: {
-        return CommandNeedsTimedInvokeInEnergyPreferenceCluster(commandID);
     }
     case Clusters::DoorLock::Id: {
         return CommandNeedsTimedInvokeInDoorLockCluster(commandID);
@@ -1388,12 +1229,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::AccountLogin::Id: {
         return CommandNeedsTimedInvokeInAccountLoginCluster(commandID);
-    }
-    case Clusters::ContentControl::Id: {
-        return CommandNeedsTimedInvokeInContentControlCluster(commandID);
-    }
-    case Clusters::ContentAppObserver::Id: {
-        return CommandNeedsTimedInvokeInContentAppObserverCluster(commandID);
     }
     case Clusters::ElectricalMeasurement::Id: {
         return CommandNeedsTimedInvokeInElectricalMeasurementCluster(commandID);
