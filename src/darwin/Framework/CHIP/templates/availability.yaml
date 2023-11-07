@@ -7760,6 +7760,10 @@
                   - Success
                   - URLNotAvailable
                   - AuthFailed
+          FanControl:
+              FanModeSequenceEnum:
+                  - OffHighAuto
+                  - OffHigh
       bitmaps:
           Scenes:
               - CopyModeBitmap
@@ -7795,6 +7799,11 @@
       enums:
           ContentLauncher:
               - ContentLaunchStatusEnum
+      enum values:
+          FanControl:
+              FanModeSequenceEnum:
+                  - OffOnAuto
+                  - OffOn
       bitmaps:
           Scenes:
               - ScenesCopyMode
@@ -7847,6 +7856,17 @@
               # value name is generated for the old enum name.
               ContentLaunchStatusEnum:
                   URLNotAvailable: UrlNotAvailable
+          FanControl:
+              FanModeSequenceEnum:
+                  OffHighAuto: OffOnAuto
+                  OffHigh: OffOn
+              # FanModeSequenceType is the old name of
+              # FanModeSequenceEnum; we need this rename annotation
+              # here so we don't lose the old values under that old
+              # name.
+              FanModeSequenceType:
+                  OffHighAuto: OffOnAuto
+                  OffHigh: OffOn
       bitmaps:
           Scenes:
               CopyModeBitmap: ScenesCopyMode
