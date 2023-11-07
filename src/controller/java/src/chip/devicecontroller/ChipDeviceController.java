@@ -120,6 +120,20 @@ public class ChipDeviceController {
     setAttestationTrustStoreDelegate(deviceControllerPtr, attestationTrustStoreDelegate);
   }
 
+  /**
+   * Set the delegate of OTA Provider for firmware Update
+   *
+   * @param aOTAProviderDelegate Delegate for OTA Provider
+   */
+  public void startOTAProvider(OTAProviderDelegate aOTAProviderDelegate) {
+    startOTAProvider(deviceControllerPtr, aOTAProviderDelegate);
+  }
+
+  /** Disable OTA Provider server cluster */
+  public void finishOTAProvider() {
+    finishOTAProvider(deviceControllerPtr);
+  }
+
   public void pairDevice(
       BluetoothGatt bleServer,
       int connId,
@@ -1151,6 +1165,10 @@ public class ChipDeviceController {
 
   private native void setAttestationTrustStoreDelegate(
       long deviceControllerPtr, AttestationTrustStoreDelegate delegate);
+
+  private native void startOTAProvider(long deviceControllerPtr, OTAProviderDelegate delegate);
+
+  private native void finishOTAProvider(long deviceControllerPtr);
 
   private native void pairDevice(
       long deviceControllerPtr,

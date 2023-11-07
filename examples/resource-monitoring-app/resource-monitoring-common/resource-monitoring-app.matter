@@ -501,8 +501,8 @@ server cluster TimeFormatLocalization = 44 {
     kCalendarFormat = 0x1;
   }
 
-  attribute HourFormatEnum hourFormat = 0;
-  attribute CalendarTypeEnum activeCalendarType = 1;
+  attribute access(write: manage) HourFormatEnum hourFormat = 0;
+  attribute access(write: manage) CalendarTypeEnum activeCalendarType = 1;
   readonly attribute CalendarTypeEnum supportedCalendarTypes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1618,8 +1618,8 @@ provisional server cluster FanControl = 514 {
     kOffLowHigh = 1;
     kOffLowMedHighAuto = 2;
     kOffLowHighAuto = 3;
-    kOffOnAuto = 4;
-    kOffOn = 5;
+    kOffHighAuto = 4;
+    kOffHigh = 5;
   }
 
   enum StepDirectionEnum : enum8 {
@@ -1648,7 +1648,7 @@ provisional server cluster FanControl = 514 {
   }
 
   attribute FanModeEnum fanMode = 0;
-  attribute FanModeSequenceEnum fanModeSequence = 1;
+  readonly attribute FanModeSequenceEnum fanModeSequence = 1;
   attribute nullable percent percentSetting = 2;
   readonly attribute percent percentCurrent = 3;
   readonly attribute command_id generatedCommandList[] = 65528;

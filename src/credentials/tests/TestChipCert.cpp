@@ -2149,10 +2149,46 @@ static void TestChipCert_ExtractPublicKeyAndSKID(nlTestSuite * inSuite, void * i
 
 static void TestChipCert_PDCIdentityValidation(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR err;
+    CertificateKeyIdStorage keyId;
 
-    err = ValidateChipNetworkIdentity(sTestCert_PDCID01_Chip);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    // Test with both the full and compact TLV representations
+    for (auto && cert : { sTestCert_PDCID01_Chip, sTestCert_PDCID01_ChipCompact })
+    {
+        // Validate only
+        NL_TEST_ASSERT(inSuite, ValidateChipNetworkIdentity(cert) == CHIP_NO_ERROR);
+
+        // Validate and calculate identifier
+        keyId.fill(0xaa);
+        NL_TEST_ASSERT(inSuite, ValidateChipNetworkIdentity(cert, keyId) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, CertificateKeyId(keyId).data_equal(sTestCert_PDCID01_KeyId));
+
+        // Extract identifier only
+        keyId.fill(0xaa);
+        NL_TEST_ASSERT(inSuite, ExtractIdentifierFromChipNetworkIdentity(cert, keyId) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, CertificateKeyId(keyId).data_equal(sTestCert_PDCID01_KeyId));
+    }
+}
+
+static void TestChipCert_PDCIdentityGeneration(nlTestSuite * inSuite, void * inContext)
+{
+    // Generate a new keypair
+    P256Keypair keypair;
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
+
+    // Generate an identity certificate based on the keypair
+    uint8_t buffer[kMaxCHIPCompactNetworkIdentityLength];
+    MutableByteSpan cert(buffer);
+    NL_TEST_ASSERT(inSuite, NewChipNetworkIdentity(keypair, cert) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ValidateChipNetworkIdentity(cert) == CHIP_NO_ERROR);
+
+    // It should round-trip to X.509 DER and back, and remain valid.
+    uint8_t derBuffer[kMaxDERCertLength];
+    MutableByteSpan derCert(derBuffer);
+    NL_TEST_ASSERT(inSuite, ConvertChipCertToX509Cert(cert, derCert) == CHIP_NO_ERROR);
+    uint8_t tlvBuffer[kMaxCHIPCertLength];
+    MutableByteSpan tlvCert(tlvBuffer); // won't be compact after round-tripping
+    NL_TEST_ASSERT(inSuite, ConvertX509CertToChipCert(derCert, tlvCert) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ValidateChipNetworkIdentity(tlvCert) == CHIP_NO_ERROR);
 }
 
 /**
@@ -2214,6 +2250,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test extracting Subject DN from chip certificate", TestChipCert_ExtractSubjectDNFromChipCert),
     NL_TEST_DEF("Test extracting PublicKey and SKID from chip certificate", TestChipCert_ExtractPublicKeyAndSKID),
     NL_TEST_DEF("Test PDC Identity Validation", TestChipCert_PDCIdentityValidation),
+    NL_TEST_DEF("Test PDC Identity Generation", TestChipCert_PDCIdentityGeneration),
     NL_TEST_SENTINEL()
 };
 // clang-format on
