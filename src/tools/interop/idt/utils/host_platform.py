@@ -61,6 +61,10 @@ def command_is_available(cmd_name) -> bool:
 
 
 def verify_host_dependencies(deps: [str]) -> None:
+    if not command_is_available("which"):
+        # TODO: Check $PATH explicitly as well
+        logger.critical("which is required to verify host dependencies, exiting as its not available!")
+        sys.exit(1)
     missing_deps = []
     for dep in deps:
         logger.info(f"Verifying host dependency {dep}")
