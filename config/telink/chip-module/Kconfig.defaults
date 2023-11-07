@@ -161,6 +161,9 @@ endchoice
 if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
 config BOARD_TLSR9X_NON_RETENTION_RAM_CODE
     default y if PM
+
+config TELINK_B9x_MATTER_RETENTION_LAYOUT
+    default y if PM
 endif
 
 # Config dynamic interrupts to have posibility to switch between BLE/Thread radio drivers

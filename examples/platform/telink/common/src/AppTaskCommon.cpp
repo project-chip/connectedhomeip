@@ -54,7 +54,7 @@ const struct gpio_dt_spec sBleStartButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_
 #if APP_USE_THREAD_START_BUTTON
 const struct gpio_dt_spec sThreadStartButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_3), gpios);
 #endif
-#if APP_USE_EXAMPLE_START_BUTTON
+#if APP_USE_EXAMPLE_START_BUTTON 
 const struct gpio_dt_spec sExampleActionButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_4), gpios);
 #endif
 #else
@@ -140,11 +140,13 @@ public:
     void OnCommissioningSessionStarted() override { isComissioningStarted = true; }
     void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
     void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override { sIsCommissioningFailed = true; }
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     void OnCommissioningWindowClosed() override
     {
         if (!isComissioningStarted)
             chip::DeviceLayer::Internal::BLEMgr().Shutdown();
     }
+#endif
 };
 
 AppCallbacks sCallbacks;
@@ -239,6 +241,10 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
     }
 
     AppEvent event = {};
+
+#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    StartThreadButtonEventHandler();
+#endif
 
     while (true)
     {
@@ -611,7 +617,7 @@ void AppTaskCommon::FactoryResetTimerEventHandler(AppEvent * aEvent)
     LOG_INF("Factory Reset Trigger Counter is cleared");
 }
 
-#if APP_USE_THREAD_START_BUTTON
+#if APP_USE_THREAD_START_BUTTON || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 void AppTaskCommon::StartThreadButtonEventHandler(void)
 {
     AppEvent event;
@@ -628,8 +634,13 @@ void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
         // Switch context from BLE to Thread
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
         Internal::BLEManagerImpl sInstance;
         sInstance.SwitchToIeee802154();
+#else 
+        ThreadStackMgrImpl().SetRadioBlocked(false);
+        ThreadStackMgrImpl().SetThreadEnabled(true);
+#endif
         StartDefaultThreadNetwork();
     }
     else
