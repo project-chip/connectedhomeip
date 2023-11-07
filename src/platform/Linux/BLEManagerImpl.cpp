@@ -101,8 +101,10 @@ exit:
 
 void BLEManagerImpl::_Shutdown()
 {
-    // ensure scan resources are cleared (e.g. timeout timers)
+    // Ensure scan resources are cleared (e.g. timeout timers).
     mDeviceScanner.Shutdown();
+    // Stop advertising and free resources.
+    mBLEAdvertisement.Shutdown();
     // Release BLE connection resources (unregister from BlueZ).
     ShutdownBluezBleLayer(mpEndpoint);
     mFlags.Clear(Flags::kBluezBLELayerInitialized);
@@ -200,16 +202,6 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
     mIsCentral = aIsCentral;
 
     return err;
-}
-
-CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
-{
-    return StartBluezAdv(mpEndpoint);
-}
-
-CHIP_ERROR BLEManagerImpl::StopBLEAdvertising()
-{
-    return StopBluezAdv(mpEndpoint);
 }
 
 void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
@@ -620,15 +612,15 @@ void BLEManagerImpl::DriveBLEState()
             // be called again, and execution will proceed to the code below.
             if (!mFlags.Has(Flags::kAdvertisingConfigured))
             {
-                err = BluezAdvertisementSetup(mpEndpoint);
+                err = mBLEAdvertisement.Init(mpEndpoint, mBLEAdvConfig);
                 ExitNow();
             }
 
             // Start advertising.  This is also an asynchronous step.
-            err = StartBLEAdvertising();
+            err = mBLEAdvertisement.Start();
             SuccessOrExit(err);
 
-            sInstance.mFlags.Set(Flags::kAdvertising);
+            mFlags.Set(Flags::kAdvertising);
             ExitNow();
         }
     }
@@ -638,7 +630,7 @@ void BLEManagerImpl::DriveBLEState()
     {
         if (mFlags.Has(Flags::kAdvertising))
         {
-            err = StopBLEAdvertising();
+            err = mBLEAdvertisement.Stop();
             SuccessOrExit(err);
             mFlags.Set(Flags::kControlOpInProgress);
 

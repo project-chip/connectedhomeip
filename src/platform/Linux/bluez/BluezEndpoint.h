@@ -107,10 +107,7 @@ struct BluezEndpoint
 CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const BLEAdvConfig & aBleAdvConfig,
                              BluezEndpoint *& apEndpoint);
 CHIP_ERROR ShutdownBluezBleLayer(BluezEndpoint * apEndpoint);
-CHIP_ERROR StartBluezAdv(BluezEndpoint * apEndpoint);
-CHIP_ERROR StopBluezAdv(BluezEndpoint * apEndpoint);
 CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint);
-CHIP_ERROR BluezAdvertisementSetup(BluezEndpoint * apEndpoint);
 
 CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice, BluezEndpoint * apEndpoint);
 void CancelConnect(BluezEndpoint * apEndpoint);

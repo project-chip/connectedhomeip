@@ -28,6 +28,7 @@
 #include <ble/BleLayer.h>
 #include <platform/internal/BLEManager.h>
 
+#include "bluez/BluezAdvertisement.h"
 #include "bluez/BluezEndpoint.h"
 #include "bluez/ChipDeviceScanner.h"
 #include "bluez/Types.h"
@@ -187,9 +188,6 @@ private:
         kMaxAdvertisementDataSetSize = 31  // TODO: verify this
     };
 
-    CHIP_ERROR StartBLEAdvertising();
-    CHIP_ERROR StopBLEAdvertising();
-
     void DriveBLEState();
     static void DriveBLEState(intptr_t arg);
 
@@ -204,6 +202,7 @@ private:
     char mDeviceName[kMaxDeviceNameLength + 1];
     bool mIsCentral            = false;
     BluezEndpoint * mpEndpoint = nullptr;
+    BluezAdvertisement mBLEAdvertisement;
     ChipDeviceScanner mDeviceScanner;
 };
 
