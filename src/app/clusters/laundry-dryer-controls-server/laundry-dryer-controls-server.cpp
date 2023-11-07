@@ -96,7 +96,8 @@ EmberAfStatus LaundryDryerControlsServer::SetSelectedDrynessLevel(EndpointId end
     return res;
 }
 
-EmberAfStatus LaundryDryerControlsServer::GetSelectedDrynessLevel(EndpointId endpointId, DataModel::Nullable<DrynessLevelEnum>  & selectedDrynessLevel)
+EmberAfStatus LaundryDryerControlsServer::GetSelectedDrynessLevel(EndpointId endpointId,
+                                                                  DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel)
 {
     return SelectedDrynessLevel::Get(endpointId, selectedDrynessLevel);
 }
@@ -122,7 +123,7 @@ CHIP_ERROR LaundryDryerControlsServer::Read(const ConcreteReadAttributePath & aP
 }
 
 CHIP_ERROR LaundryDryerControlsServer::ReadSupportedDrynessLevels(const ConcreteReadAttributePath & aPath,
-                                                            AttributeValueEncoder & aEncoder)
+                                                                  AttributeValueEncoder & aEncoder)
 {
     Delegate * delegate = GetDelegate(aPath.mEndpointId);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
@@ -153,8 +154,8 @@ void MatterLaundryDryerControlsPluginServerInitCallback()
 }
 
 Status MatterLaundryDryerControlsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                                           EmberAfAttributeType attributeType, uint16_t size,
-                                                                           uint8_t * value)
+                                                                          EmberAfAttributeType attributeType, uint16_t size,
+                                                                          uint8_t * value)
 {
     Delegate * delegate = GetDelegate(attributePath.mEndpointId);
     VerifyOrDie((delegate != nullptr) && "Dryer Controls implementation requires a registered delegate for validation.");

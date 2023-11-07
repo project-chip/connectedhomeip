@@ -22,12 +22,9 @@
 using namespace chip;
 using namespace chip::app::Clusters::LaundryDryerControls;
 
-
-const DrynessLevelEnum LaundryDryerControlDelegate::supportedDrynessLevelOptions[] = {
-    DrynessLevelEnum::kLow,
-    DrynessLevelEnum::kNormal,
-    DrynessLevelEnum::kMax
-};
+const DrynessLevelEnum LaundryDryerControlDelegate::supportedDrynessLevelOptions[] = { DrynessLevelEnum::kLow,
+                                                                                       DrynessLevelEnum::kNormal,
+                                                                                       DrynessLevelEnum::kMax };
 
 LaundryDryerControlDelegate LaundryDryerControlDelegate::instance;
 
