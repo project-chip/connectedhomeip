@@ -56,6 +56,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "TH1 reads the fabric index"
+      cluster: "Operational Credentials"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: th1FabricIndex
+
     - label: "Read FeatureMap FabricScene bit (global attribute 65532)"
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -141,7 +149,6 @@ tests:
 
     - label: "TH sends a RemoveAllGroups command to DUT."
       cluster: "Groups"
-      endpoint: endpoint
       command: "RemoveAllGroups"
 
     - label: "TH sends a AddGroup command to DUT for G1."

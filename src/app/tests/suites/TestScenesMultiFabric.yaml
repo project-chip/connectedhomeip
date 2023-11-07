@@ -228,7 +228,6 @@ tests:
 
     - label: "TH1 sends a RemoveAllGroups command to DUT."
       cluster: "Groups"
-      endpoint: endpoint
       command: "RemoveAllGroups"
 
     - label: "TH1 sends a AddGroup command to DUT for G1."
