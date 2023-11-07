@@ -133,6 +133,14 @@ const char * StageToString(CommissioningStage stage)
         return "ThreadNetworkEnable";
         break;
 
+    case kICDSymmetricKeyGeneration: //:< Generates symmetric key for ICD management
+        return "ICDSymmetricKeyGeneration";
+        break;
+
+    case kICDRegistration: ///< Register for ICD management
+        return "ICDRegistration";
+        break;
+
     case kFindOperational:
         return "FindOperational";
         break;

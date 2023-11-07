@@ -132,6 +132,11 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         params.SetDSTOffsets(mDSTOffsetList);
     }
 
+    if (!mIgnoreIcd)
+    {
+        params.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+    }
+
     return params;
 }
 

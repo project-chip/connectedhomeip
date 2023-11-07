@@ -403,7 +403,8 @@ DeviceCommissioner::DeviceCommissioner() :
     mOnDeviceConnectionRetryCallback(OnDeviceConnectionRetryFn, this),
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
-    mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
+    mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this),
+    mICDRegistrationOnSymmetricKeyGenerationCompletedCallback(OnICDSymmetricKeyGenerationCompleted, this), mSetUpCodePairer(this)
 {
     mPairingDelegate           = nullptr;
     mDeviceBeingCommissioned   = nullptr;
@@ -415,6 +416,14 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     ReturnErrorOnFailure(DeviceController::Init(params));
 
     mPairingDelegate = params.pairingDelegate;
+
+    mICDRegistrationDelegate = params.icdRegistrationDelegate;
+    if (mICDRegistrationDelegate == nullptr)
+    {
+        ChipLogProgress(
+            Controller,
+            "*** Missing ICDRegistrationDelegate at DeviceCommissioner init: the controller cannot commission an ICD device!");
+    }
 
     // Configure device attestation validation
     mDeviceAttestationVerifier = params.deviceAttestationVerifier;
@@ -1175,6 +1184,47 @@ void DeviceCommissioner::OnFailedToExtendedArmFailSafeDeviceAttestation(void * c
     commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
 }
 
+void DeviceCommissioner::OnICDSymmetricKeyGenerationCompleted(void * context, CHIP_ERROR error, NodeId controllerNodeId,
+                                                              uint64_t subjectId, ICDRegistrationDelegate::ICDKey key,
+                                                              Optional<ICDRegistrationDelegate::ICDKey> verificationKey)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to generate symmetric key for ICD registration. Error %s", ErrorStr(error));
+        commissioner->CommissioningStageComplete(error);
+        return;
+    }
+    if (commissioner->mDeviceBeingCommissioned == nullptr)
+    {
+        ChipLogError(Controller, "No device is being commissioned at this time.");
+        commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL);
+        return;
+    }
+    CommissioningDelegate::CommissioningReport report;
+    ICDSymmetricKeyInfo info = ICDSymmetricKeyInfo{
+        .controllerNodeId = controllerNodeId,
+        .subjectId        = subjectId,
+        .key              = key,
+        .verificationKey  = verificationKey,
+    };
+    report.Set<ICDSymmetricKeyInfo>(info);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+}
+
+void DeviceCommissioner::OnICDManagementRegisterClientResponse(
+    void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+
+    CommissioningDelegate::CommissioningReport report;
+    ICDRegistrationInfo info;
+    info.icdCounter = data.ICDCounter;
+    report.Set<ICDRegistrationInfo>(info);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+}
+
 bool DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                                            Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
                                            OnExtendFailsafeFailure onFailure)
@@ -1706,10 +1756,21 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
         return;
     }
     mPairingDelegate->OnCommissioningComplete(nodeId, completionStatus.err);
+
     PeerId peerId(GetCompressedFabricId(), nodeId);
     if (completionStatus.err == CHIP_NO_ERROR)
     {
         mPairingDelegate->OnCommissioningSuccess(peerId);
+        if (mICDRegistrationDelegate != nullptr)
+        {
+            // If the commissionee is an ICD device, and we enabled ICD registration during
+            // commissioning, then we should have an ICD Counter now.
+            auto optionalIcdCounter = mCommissioningDelegate->GetCommissioningParameters().GetICDCounter();
+            if (optionalIcdCounter.HasValue())
+            {
+                mICDRegistrationDelegate->ReadyForSubscription(GetNodeId(), optionalIcdCounter.Value());
+            }
+        }
     }
     else
     {
@@ -2950,6 +3011,47 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         {
             // We won't get any async callbacks here, so just complete our stage.
             ChipLogError(Controller, "Failed to send Thread ConnectNetwork command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
+    }
+    break;
+    case CommissioningStage::kICDSymmetricKeyGeneration: {
+        if (mICDRegistrationDelegate == nullptr)
+        {
+            ChipLogError(Controller, "No ICD Registration Delegate provided, the commissioner cannot do ICD registration!");
+            CommissioningStageComplete(CHIP_ERROR_INCORRECT_STATE);
+            return;
+        }
+
+        mICDRegistrationDelegate->GenerateSymmetricKey(proxy->GetDeviceId(),
+                                                       &mICDRegistrationOnSymmetricKeyGenerationCompletedCallback);
+    }
+    break;
+    case CommissioningStage::kICDRegistration: {
+        IcdManagement::Commands::RegisterClient::Type request;
+
+        if (!(params.GetICDControllerNodeId().HasValue() && params.GetICDSubjectId().HasValue() &&
+              params.GetICDSymmetricKey().HasValue()))
+        {
+            ChipLogError(Controller, "No ICD Registration Information provided!");
+            CommissioningStageComplete(CHIP_ERROR_INCORRECT_STATE);
+            return;
+        }
+
+        request.checkInNodeID    = params.GetICDControllerNodeId().Value();
+        request.monitoredSubject = params.GetICDSubjectId().Value();
+        request.key              = params.GetICDSymmetricKey().Value();
+        if (params.GetICDVerificationKey().HasValue())
+        {
+            request.verificationKey = MakeOptional<ByteSpan>(params.GetICDVerificationKey().Value());
+        }
+
+        CHIP_ERROR err = SendCommand(proxy, request, OnICDManagementRegisterClientResponse, OnBasicFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send IcdManagement.RegisterClient command: %" CHIP_ERROR_FORMAT, err.Format());
             CommissioningStageComplete(err);
             return;
         }

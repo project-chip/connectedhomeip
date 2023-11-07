@@ -65,6 +65,7 @@ public:
                     "Bypass the attestation verifier. If not provided or false, the attestation verifier is not bypassed."
                     " If true, the commissioning will continue in case of attestation verification failure.");
         AddArgument("case-auth-tags", 1, UINT32_MAX, &mCASEAuthTags, "The CATs to be encoded in the NOC sent to the commissionee");
+        AddArgument("ignore-icd", 0, 1, &mIgnoreIcd, "Whether to ignore ICD during commissioning.", Argument::kOptional);
 
         switch (networkType)
         {
@@ -228,10 +229,12 @@ private:
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type> mDSTOffsetList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>>
         mComplex_DSTOffsets;
+
     uint16_t mRemotePort;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
     uint16_t mIndex;
+    uint16_t mIgnoreIcd;
     chip::ByteSpan mOperationalDataset;
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;

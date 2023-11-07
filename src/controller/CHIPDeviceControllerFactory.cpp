@@ -294,6 +294,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params)
 {
     controllerParams.operationalCredentialsDelegate       = params.operationalCredentialsDelegate;
+    controllerParams.icdRegistrationDelegate              = params.icdRegistrationDelegate;
     controllerParams.operationalKeypair                   = params.operationalKeypair;
     controllerParams.hasExternallyOwnedOperationalKeypair = params.hasExternallyOwnedOperationalKeypair;
     controllerParams.controllerNOC                        = params.controllerNOC;
@@ -356,6 +357,7 @@ CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, Device
     commissionerParams.pairingDelegate           = params.pairingDelegate;
     commissionerParams.defaultCommissioner       = params.defaultCommissioner;
     commissionerParams.deviceAttestationVerifier = params.deviceAttestationVerifier;
+    commissionerParams.icdRegistrationDelegate   = params.icdRegistrationDelegate;
 
     CHIP_ERROR err = commissioner.Init(commissionerParams);
 

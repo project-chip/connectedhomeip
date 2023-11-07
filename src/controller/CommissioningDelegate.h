@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/OperationalSessionSetup.h>
 #include <controller/CommissioneeDeviceProxy.h>
+#include <controller/ICDRegistrationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/Variant.h>
@@ -58,6 +59,8 @@ enum CommissioningStage : uint8_t
     kFailsafeBeforeThreadEnable, ///< Extend the fail-safe before doing kThreadNetworkEnable
     kWiFiNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
     kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
+    kICDSymmetricKeyGeneration,  ///< Generates symmetric key for ICD management
+    kICDRegistration,            ///< Register for ICD management
     kFindOperational,            ///< Perform operational discovery and establish a CASE session with the device
     kSendComplete,               ///< Send CommissioningComplete (0x30:4) command to the device
     kCleanup,                    ///< Call delegates with status, free memory, clear timers and state
@@ -507,6 +510,41 @@ public:
         return *this;
     }
 
+    Optional<NodeId> GetICDControllerNodeId() const { return mICDControllerNodeId; }
+    CommissioningParameters & SetICDControllerNodeId(NodeId icdControllerNodeId)
+    {
+        mICDControllerNodeId = MakeOptional(icdControllerNodeId);
+        return *this;
+    }
+
+    Optional<uint64_t> GetICDSubjectId() const { return mICDSubjectId; }
+    CommissioningParameters & SetICDSubjectId(uint64_t icdSubjectId)
+    {
+        mICDSubjectId = MakeOptional(icdSubjectId);
+        return *this;
+    }
+
+    Optional<ICDRegistrationDelegate::ICDKey> GetICDSymmetricKey() const { return mICDSymmetricKey; }
+    CommissioningParameters & SetICDSymmetricKey(ICDRegistrationDelegate::ICDKey icdSymmetricKey)
+    {
+        mICDSymmetricKey = MakeOptional(icdSymmetricKey);
+        return *this;
+    }
+
+    Optional<ICDRegistrationDelegate::ICDKey> GetICDVerificationKey() const { return mICDVerificationKey; }
+    CommissioningParameters & SetICDVerificationKey(ICDRegistrationDelegate::ICDKey icdVerificationKey)
+    {
+        mICDVerificationKey = MakeOptional(icdVerificationKey);
+        return *this;
+    }
+
+    Optional<uint32_t> GetICDCounter() const { return mICDCounter; }
+    CommissioningParameters & SetICDCounter(uint32_t icdCounter)
+    {
+        mICDCounter = MakeOptional(icdCounter);
+        return *this;
+    }
+
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
     void ClearExternalBufferDependentValues()
@@ -527,6 +565,10 @@ public:
         mDAC.ClearValue();
         mTimeZone.ClearValue();
         mDSTOffsets.ClearValue();
+        mICDControllerNodeId.ClearValue();
+        mICDSubjectId.ClearValue();
+        mICDSymmetricKey.ClearValue();
+        mICDVerificationKey.ClearValue();
     }
 
 private:
@@ -566,6 +608,13 @@ private:
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
+
+    Optional<NodeId> mICDControllerNodeId;
+    Optional<uint64_t> mICDSubjectId;
+    Optional<ICDRegistrationDelegate::ICDKey> mICDSymmetricKey;
+    Optional<ICDRegistrationDelegate::ICDKey> mICDVerificationKey;
+    Optional<uint32_t> mICDCounter;
+
     ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
     bool mCheckForMatchingFabric                     = false;
 };
@@ -662,6 +711,19 @@ struct TimeZoneResponseInfo
     bool requiresDSTOffsets;
 };
 
+struct ICDSymmetricKeyInfo
+{
+    NodeId controllerNodeId = kUndefinedNodeId;
+    uint64_t subjectId      = 0;
+    ICDRegistrationDelegate::ICDKey key;
+    Optional<ICDRegistrationDelegate::ICDKey> verificationKey;
+};
+
+struct ICDRegistrationInfo
+{
+    uint32_t icdCounter = 0;
+};
+
 struct AttestationErrorInfo
 {
     AttestationErrorInfo(Credentials::AttestationVerificationResult result) : attestationResult(result) {}
@@ -712,9 +774,10 @@ public:
      * kSendComplete: CommissioningErrorInfo if there is an error
      * kCleanup: none
      */
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
-                                         ReadCommissioningInfo, ReadCommissioningInfo2, AttestationErrorInfo,
-                                         CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo>
+    struct CommissioningReport
+        : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
+                  ReadCommissioningInfo2, AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo,
+                  TimeZoneResponseInfo, ICDSymmetricKeyInfo, ICDRegistrationInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

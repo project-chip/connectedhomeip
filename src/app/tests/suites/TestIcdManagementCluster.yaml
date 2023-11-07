@@ -85,11 +85,19 @@ tests:
       response:
           error: NOT_FOUND
 
-    - label: "Read RegisteredClients"
+    # chip-tool will reigster itself to ICD in the tests.
+    - label: "Read RegisteredClients For Registration During Commissioning"
       command: "readAttribute"
       attribute: "RegisteredClients"
       response:
-          value: []
+          value: [{ CheckInNodeID: 112233, MonitoredSubject: 1 }]
+
+    - label: "Unregister Client Registered During Commissioning"
+      command: "UnregisterClient"
+      arguments:
+          values:
+              - name: "CheckInNodeID"
+                value: 112233
 
     - label: "Register 1.0 (key too short)"
       command: "RegisterClient"
