@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,10 +16,10 @@
  *    limitations under the License.
  */
 
-#include "LockManager.h"
+#include <LockManager.h>
 
-#include "AppConfig.h"
-#include "AppTask.h"
+#include <AppConfig.h>
+#include <AppTask.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
@@ -76,6 +75,10 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
             LockParams.numberOfHolidaySchedules, kMaxHolidaySchedules);
         return APP_ERROR_ALLOCATION_FAILED;
     }
+
+#if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
+    ReadConfigValues();
+#endif
 
     k_timer_init(&mActuatorTimer, &LockManager::ActuatorTimerEventHandler, nullptr);
     k_timer_user_data_set(&mActuatorTimer, this);
@@ -409,6 +412,7 @@ bool LockManager::IsValidHolidayScheduleIndex(uint8_t scheduleIndex)
     return (scheduleIndex < kMaxHolidaySchedules);
 }
 
+#if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
 bool LockManager::ReadConfigValues()
 {
     size_t outLen;
@@ -443,6 +447,7 @@ bool LockManager::ReadConfigValues()
 
     return true;
 }
+#endif
 
 bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
 {
@@ -534,6 +539,7 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 
     userInStorage.credentials = chip::Span<const CredentialStruct>(mCredentials[userIndex], totalCredentials);
 
+#if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
     // Save user information in NVM flash
     CHIP_ERROR err = ZephyrConfig::WriteConfigValueBin(LockSettingsStorage::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
                                       sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
@@ -549,6 +555,7 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
                                       sizeof(mUserNames));
     if (err != CHIP_NO_ERROR)
     ChipLogError(Zcl, "Failed to write kConfigKey_LockUserName. User data will be resetted during reboot. Not enough storage space \n");
+#endif
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
 
@@ -632,6 +639,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     credentialInStorage.credentialData =
         chip::ByteSpan{ mCredentialData[to_underlying(credentialType)][credentialIndex], credentialData.size() };
 
+#if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
     // Save credential information in NVM flash
     CHIP_ERROR err = ZephyrConfig::WriteConfigValueBin(LockSettingsStorage::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
                                       sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes);
@@ -642,6 +650,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                                       sizeof(mCredentialData));
     if (err != CHIP_NO_ERROR)
     ChipLogError(Zcl, "Failed to write kConfigKey_CredentialData. User data will be resetted during reboot. Not enough storage space \n");                              
+#endif
 
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
 
@@ -695,13 +704,14 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     scheduleInStorage.schedule.endMinute   = endMinute;
     scheduleInStorage.status               = status;
 
+#if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
     // Save schedule information in NVM flash
-
     CHIP_ERROR err = ZephyrConfig::WriteConfigValueBin(
         LockSettingsStorage::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
         sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser * LockParams.numberOfUsers);
     if (err != CHIP_NO_ERROR)
     ChipLogError(Zcl, "Failed to write kConfigKey_WeekDaySchedules. User data will be resetted during reboot. Not enough storage space \n");
+#endif
 
     return DlStatus::kSuccess;
 }
@@ -747,12 +757,14 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     scheduleInStorage.schedule.localEndTime   = localEndTime;
     scheduleInStorage.status                  = status;
 
+#if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
     // Save schedule information in NVM flash
     CHIP_ERROR err = ZephyrConfig::WriteConfigValueBin(
         LockSettingsStorage::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
         sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser * LockParams.numberOfUsers);
     if (err != CHIP_NO_ERROR)
     ChipLogError(Zcl, "Failed to write kConfigKey_YearDaySchedules. User data will be resetted during reboot. Not enough storage space \n");
+#endif
 
     return DlStatus::kSuccess;
 }
@@ -793,12 +805,14 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
     scheduleInStorage.schedule.operatingMode  = operatingMode;
     scheduleInStorage.status                  = status;
 
+#if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
     // Save schedule information in NVM flash
     CHIP_ERROR err = ZephyrConfig::WriteConfigValueBin(LockSettingsStorage::kConfigKey_HolidaySchedules,
                                       reinterpret_cast<const uint8_t *>(&(mHolidaySchedule)),
                                       sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
     if (err != CHIP_NO_ERROR)
     ChipLogError(Zcl, "Failed to write kConfigKey_YearDaySchedules. User data will be resetted during reboot. Not enough storage space \n");
+#endif
 
     return DlStatus::kSuccess;
 }

@@ -124,17 +124,8 @@ CHIP_ERROR AppTask::Init(void)
         return err;
     }
 
-    LockMgr().ReadConfigValues();
-
     // Disable auto-relock time feature.
     DoorLockServer::Instance().SetAutoRelockTime(kExampleEndpointId, 0);
-
-    err = ConnectivityMgr().SetBLEDeviceName("Telink Lock");
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("SetBLEDeviceName fail");
-        return err;
-    }
 
     return CHIP_NO_ERROR;
 }
@@ -203,6 +194,5 @@ void AppTask::LockStateChanged(LockManager::State_t state)
         sLockLED.Blink(10, 90);
 #endif
         break;
-
     }
 }

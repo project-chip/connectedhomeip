@@ -32,9 +32,6 @@
 
 class AppTask : public AppTaskCommon
 {
-public:
-    // void UpdateClusterState(BoltLockManager::State state, BoltLockManager::OperationSource source);
-
 private:
     friend AppTask & GetAppTask(void);
     friend class AppTaskCommon;

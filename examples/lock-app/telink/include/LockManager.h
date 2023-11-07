@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,8 @@
 #include <stdint.h>
 #include <zephyr/kernel.h>
 
-#include "AppEventCommon.h"
+#include <AppEventCommon.h>
+#include <LockManagerConfig.h>
 
 #include <lib/core/CHIPError.h>
 
@@ -190,8 +191,6 @@ public:
 
     const char * lockStateToString(DlLockState lockState) const;
 
-    bool ReadConfigValues();
-
 private:
     friend LockManager & LockMgr();
     State_t mState                           = kState_NotFulyLocked;
@@ -200,6 +199,10 @@ private:
 
     OperationSource mActuatorOperationSource = OperationSource::kButton;
     k_timer mActuatorTimer                   = {};
+
+#if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
+    bool ReadConfigValues();
+#endif
 
     bool setLockState(chip::EndpointId endpointId, DlLockState lockState, OperationSource source,
                     OperationErrorEnum & err, const Nullable<chip::FabricIndex> & fabricIdx,
