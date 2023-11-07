@@ -133,8 +133,7 @@ public:
         }
         if (nodeData.resolutionData.maxPathsPerInvoke.HasValue())
         {
-            streamer_printf(streamer_get(), "   Max paths per invoke: %u\r\n",
-                            nodeData.resolutionData.maxPathsPerInvoke.Value());
+            streamer_printf(streamer_get(), "   Max paths per invoke: %u\r\n", nodeData.resolutionData.maxPathsPerInvoke.Value());
         }
         streamer_printf(streamer_get(), "   IP addresses:\r\n");
         for (uint8_t i = 0; i < nodeData.resolutionData.numIPs; i++)

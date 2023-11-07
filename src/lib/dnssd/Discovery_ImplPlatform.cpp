@@ -573,7 +573,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     ADD_TXT_RECORD(SessionActiveInterval);
     ADD_TXT_RECORD(SessionActiveThreshold);
     ADD_TXT_RECORD(TcpSupported);
-    ADD_TXT_RECORD(LongIdleTimeICD); // Optional, will not be added if related 'params' doesn't have a value
+    ADD_TXT_RECORD(LongIdleTimeICD);   // Optional, will not be added if related 'params' doesn't have a value
     ADD_TXT_RECORD(MaxPathsPerInvoke); // Optional, will not be added if related 'params' doesn't have a value
 
     ADD_PTR_RECORD(CompressedFabricId);
@@ -594,7 +594,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     ADD_TXT_RECORD(SessionActiveInterval);
     ADD_TXT_RECORD(SessionActiveThreshold);
     ADD_TXT_RECORD(TcpSupported);
-    ADD_TXT_RECORD(LongIdleTimeICD); // Optional, will not be added if related 'params' doesn't have a value
+    ADD_TXT_RECORD(LongIdleTimeICD);   // Optional, will not be added if related 'params' doesn't have a value
     ADD_TXT_RECORD(MaxPathsPerInvoke); // Optional, will not be added if related 'params' doesn't have a value
 
     ADD_PTR_RECORD(VendorId);

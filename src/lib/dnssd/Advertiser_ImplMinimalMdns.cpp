@@ -291,7 +291,8 @@ private:
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtFields[numTxtFields++] = storage.operatingICDAsLITBuf;
         }
-        if (params.GetMaxPathsPerInvoke() > 1) {
+        if (params.GetMaxPathsPerInvoke() > 1)
+        {
             size_t writtenCharactersNumber = static_cast<size_t>(
                 snprintf(storage.maxPathsPerInvoke, sizeof(storage.maxPathsPerInvoke), "MPI=%d", params.GetMaxPathsPerInvoke()));
             VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < sizeof(storage.maxPathsPerInvoke)),

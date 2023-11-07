@@ -126,8 +126,7 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
 
         if (dnsSdInfo->resolutionData.GetMaxPathsPerInvoke().HasValue())
         {
-            ChipLogProgress(Discovery, "\tMax path per invoke\t%u",
-                            dnsSdInfo->resolutionData.GetMaxPathsPerInvoke().Value());
+            ChipLogProgress(Discovery, "\tMax path per invoke\t%u", dnsSdInfo->resolutionData.GetMaxPathsPerInvoke().Value());
         }
         else
         {

@@ -33,8 +33,8 @@ struct ResolveResult
 {
     Transport::PeerAddress address;
     ReliableMessageProtocolConfig mrpRemoteConfig;
-    bool supportsTcp         = false;
-    bool isICDOperatingAsLIT = false;
+    bool supportsTcp           = false;
+    bool isICDOperatingAsLIT   = false;
     uint16_t maxPathsPerInvoke = 1;
 
     ResolveResult() : address(Transport::Type::kUdp), mrpRemoteConfig(GetDefaultMRPConfig()) {}

@@ -423,6 +423,11 @@ void ResetRetryActiveThreshold(DiscoveredNodeData & nodeData)
     nodeData.resolutionData.mrpRetryActiveThreshold.ClearValue();
 }
 
+void ResetRetryActiveThreshold(ResolvedNodeData & nodeData)
+{
+    nodeData.resolutionData.mrpRetryActiveThreshold.ClearValue();
+}
+
 // Test SAI (formally CRI)
 template <class NodeData>
 void TxtFieldSessionIdleInterval(nlTestSuite * inSuite, void * inContext)

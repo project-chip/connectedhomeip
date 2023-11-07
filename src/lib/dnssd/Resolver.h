@@ -152,14 +152,12 @@ struct CommonResolutionData
         }
         if (maxPathsPerInvoke.HasValue())
         {
-            ChipLogProgress(Discovery, "\tMax path per invoke\t%u",
-                            maxPathsPerInvoke.Value());
+            ChipLogProgress(Discovery, "\tMax path per invoke\t%u", maxPathsPerInvoke.Value());
         }
         else
         {
             ChipLogProgress(Discovery, "\tMax path per invoke\tNot present default 1 used");
         }
-
     }
 };
 
