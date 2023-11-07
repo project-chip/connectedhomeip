@@ -14,11 +14,12 @@
 
 # !!!!!!!!!! TEST INFORMATION !!!!!!!!!!!!!!!!!!
 # This test file tests the FabricSceneInfo attribute of the scenes cluster
-# This test also covers multi fabric support for scenes cluster
 
 name: Scenes FabricSceneInfo testing
 
 PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - APPDEVICE.S
     - S.S
     - S.S.F03
     - S.S.A0007
@@ -27,6 +28,18 @@ config:
     nodeId: 0x12344321
     cluster: "Scenes"
     endpoint: 1
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
     G1:
         type: group_id
         defaultValue: 0x0001
@@ -35,7 +48,7 @@ config:
         defaultValue: 0x0002
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "Commission DUT to TH1"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -59,7 +72,6 @@ tests:
               type: list
 
     - label: "TH reads from the DUT the (0x0006) SceneTableSize attribute"
-      PICS: S.S.A0006
       command: "readAttribute"
       attribute: "SceneTableSize"
       response:
@@ -274,7 +286,7 @@ tests:
                       SceneCount: 1,
                       CurrentScene: 0x00,
                       CurrentGroup: 0x00,
-                      FabricIndex: 1,
+                      FabricIndex: th1FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity - 1,
                   },
@@ -298,8 +310,8 @@ tests:
                   {
                       SceneCount: 1,
                       CurrentScene: 0x01,
-                      CurrentGroup: 0x01,
-                      FabricIndex: 1,
+                      CurrentGroup: G1,
+                      FabricIndex: th1FabricIndex,
                       SceneValid: true,
                       RemainingCapacity: fabricCapacity - 1,
                   },
@@ -374,8 +386,8 @@ tests:
                   {
                       SceneCount: 2,
                       CurrentScene: 0x01,
-                      CurrentGroup: 0x01,
-                      FabricIndex: 1,
+                      CurrentGroup: G1,
+                      FabricIndex: th1FabricIndex,
                       SceneValid: true,
                       RemainingCapacity: fabricCapacity - 2,
                   },
@@ -399,8 +411,8 @@ tests:
                   {
                       SceneCount: 2,
                       CurrentScene: 0x01,
-                      CurrentGroup: 0x02,
-                      FabricIndex: 1,
+                      CurrentGroup: G2,
+                      FabricIndex: th1FabricIndex,
                       SceneValid: true,
                       RemainingCapacity: fabricCapacity - 2,
                   },
@@ -409,7 +421,6 @@ tests:
     - label:
           "Configures the DUT to a different state, should invalidate the scene"
       cluster: "Level Control"
-      PICS: PICS_SDK_CI_ONLY
       command: "MoveToLevelWithOnOff"
       arguments:
           values:
@@ -431,8 +442,8 @@ tests:
                   {
                       SceneCount: 2,
                       CurrentScene: 0x01,
-                      CurrentGroup: 0x02,
-                      FabricIndex: 1,
+                      CurrentGroup: G2,
+                      FabricIndex: th1FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity - 2,
                   },
@@ -464,8 +475,8 @@ tests:
                   {
                       SceneCount: 3,
                       CurrentScene: 0x02,
-                      CurrentGroup: 0x01,
-                      FabricIndex: 1,
+                      CurrentGroup: G1,
+                      FabricIndex: th1FabricIndex,
                       SceneValid: true,
                       RemainingCapacity: fabricCapacity - 3,
                   },
@@ -489,15 +500,14 @@ tests:
                   {
                       SceneCount: 3,
                       CurrentScene: 0x01,
-                      CurrentGroup: 0x02,
-                      FabricIndex: 1,
+                      CurrentGroup: G2,
+                      FabricIndex: th1FabricIndex,
                       SceneValid: true,
                       RemainingCapacity: fabricCapacity - 3,
                   },
               ]
 
     - label: "Remove Active scene"
-      PICS: S.S.C02.Rsp
       command: "RemoveScene"
       arguments:
           values:
@@ -523,16 +533,14 @@ tests:
                   {
                       SceneCount: 2,
                       CurrentScene: 0x01,
-                      CurrentGroup: 0x02,
-                      FabricIndex: 1,
+                      CurrentGroup: G2,
+                      FabricIndex: th1FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity - 2,
                   },
               ]
 
     - label: "Remove all scenes from G1"
-      runIf: ContinueTest
-      PICS: S.S.C03.Rsp
       command: "RemoveAllScenes"
       arguments:
           values:
@@ -554,10 +562,9 @@ tests:
                   {
                       SceneCount: 0,
                       CurrentScene: 0x01,
-                      CurrentGroup: 0x02,
-                      FabricIndex: 1,
+                      CurrentGroup: G2,
+                      FabricIndex: th1FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity,
                   },
               ]
-# TODO : Add multi Fabric / multi node tests
