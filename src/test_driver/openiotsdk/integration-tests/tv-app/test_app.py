@@ -527,7 +527,7 @@ def test_tv_ctrl(device, controller):
                                 None,
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == MediaPlayback.Enums.MediaPlaybackStatusEnum.kSuccess
+    assert res.status == MediaPlayback.Enums.StatusEnum.kSuccess
 
     err, res = read_zcl_attribute(devCtrl, "MediaPlayback", "CurrentState", nodeId, TV_CTRL_TEST_APP_ENDPOINT_ID)
     assert err == 0
@@ -537,7 +537,7 @@ def test_tv_ctrl(device, controller):
                                 None,
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == MediaPlayback.Enums.MediaPlaybackStatusEnum.kSuccess
+    assert res.status == MediaPlayback.Enums.StatusEnum.kSuccess
 
     err, res = read_zcl_attribute(devCtrl, "MediaPlayback", "CurrentState", nodeId, TV_CTRL_TEST_APP_ENDPOINT_ID)
     assert err == 0
@@ -547,7 +547,7 @@ def test_tv_ctrl(device, controller):
                                 None,
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == MediaPlayback.Enums.MediaPlaybackStatusEnum.kSuccess
+    assert res.status == MediaPlayback.Enums.StatusEnum.kSuccess
 
     err, res = read_zcl_attribute(devCtrl, "MediaPlayback", "CurrentState", nodeId, TV_CTRL_TEST_APP_ENDPOINT_ID)
     assert err == 0

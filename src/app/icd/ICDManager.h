@@ -67,11 +67,16 @@ public:
     static System::Clock::Milliseconds32 GetSlowPollingInterval() { return kSlowPollingInterval; }
     static System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
 
+#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    void SetTestFeatureMapValue(uint32_t featureMap) { mFeatureMap = featureMap; };
+#endif
+
     // Implementation of ICDListener functions.
     // Callers must origin from the chip task context or be holding the ChipStack lock.
     void OnNetworkActivity() override;
     void OnKeepActiveRequest(KeepActiveFlags request) override;
     void OnActiveRequestWithdrawal(KeepActiveFlags request) override;
+    void OnICDManagementServerEvent(ICDManagementEvents event) override;
 
 protected:
     friend class TestICDManager;
@@ -108,6 +113,11 @@ private:
     ICDStateObserver * mStateObserver              = nullptr;
     bool mTransitionToIdleCalled                   = false;
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
+
+#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    // feature map that can be changed at runtime for testing purposes
+    uint32_t mFeatureMap = 0;
+#endif
 };
 
 } // namespace app

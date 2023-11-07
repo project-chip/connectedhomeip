@@ -33612,7 +33612,18 @@ class MediaPlayback(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class MediaPlaybackStatusEnum(MatterIntEnum):
+        class PlaybackStateEnum(MatterIntEnum):
+            kPlaying = 0x00
+            kPaused = 0x01
+            kNotPlaying = 0x02
+            kBuffering = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 4,
+
+        class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
             kInvalidStateForCommand = 0x01
             kNotAllowed = 0x02
@@ -33624,17 +33635,6 @@ class MediaPlayback(Cluster):
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 6,
-
-        class PlaybackStateEnum(MatterIntEnum):
-            kPlaying = 0x00
-            kPaused = 0x01
-            kNotPlaying = 0x02
-            kBuffering = 0x03
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 4,
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -33803,11 +33803,11 @@ class MediaPlayback(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=MediaPlayback.Enums.StatusEnum),
                         ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            status: 'MediaPlayback.Enums.MediaPlaybackStatusEnum' = 0
+            status: 'MediaPlayback.Enums.StatusEnum' = 0
             data: 'typing.Optional[str]' = None
 
         @dataclass

@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class LocalizationConfigurationCluster(private val endpointId: UShort) {
+class LocalizationConfigurationCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class SupportedLocalesAttribute(val value: List<String>)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -34,12 +38,12 @@ class LocalizationConfigurationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeActiveLocaleAttribute(value: String) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeActiveLocaleAttribute(value: String, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeActiveLocaleAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeActiveLocaleAttribute(minInterval: Int, maxInterval: Int): CharString {

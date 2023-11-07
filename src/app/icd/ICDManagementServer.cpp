@@ -1,4 +1,5 @@
 #include "ICDManagementServer.h"
+#include <app/icd/ICDNotifier.h>
 
 using namespace chip;
 using namespace chip::Protocols;
@@ -11,6 +12,7 @@ Status ICDManagementServer::RegisterClient(PersistentStorageDelegate & storage, 
                                            uint64_t monitored_subject, chip::ByteSpan key,
                                            Optional<chip::ByteSpan> verification_key, bool is_admin)
 {
+    bool isFirstEntryForFabric = false;
     ICDMonitoringTable table(storage, fabric_index, GetClientsSupportedPerFabric(), mSymmetricKeystore);
 
     // Get current entry, if exists
@@ -29,6 +31,9 @@ Status ICDManagementServer::RegisterClient(PersistentStorageDelegate & storage, 
     {
         // New entry
         VerifyOrReturnError(entry.index < table.Limit(), InteractionModel::Status::ResourceExhausted);
+
+        // Check if it's going to be the first entry for fabric
+        isFirstEntryForFabric = table.IsEmpty();
     }
     else
     {
@@ -58,6 +63,12 @@ Status ICDManagementServer::RegisterClient(PersistentStorageDelegate & storage, 
     VerifyOrReturnError(CHIP_ERROR_INVALID_ARGUMENT != err, InteractionModel::Status::ConstraintError);
     VerifyOrReturnError(CHIP_NO_ERROR == err, InteractionModel::Status::Failure);
 
+    if (isFirstEntryForFabric)
+    {
+        // Notify subscribers that the first entry for the fabric was successfully added
+        TriggerICDMTableUpdatedEvent();
+    }
+
     return InteractionModel::Status::Success;
 }
 
@@ -82,13 +93,25 @@ Status ICDManagementServer::UnregisterClient(PersistentStorageDelegate & storage
     err = table.Remove(entry.index);
     VerifyOrReturnError(CHIP_NO_ERROR == err, InteractionModel::Status::Failure);
 
+    if (table.IsEmpty())
+    {
+        TriggerICDMTableUpdatedEvent();
+    }
+
     return InteractionModel::Status::Success;
 }
 
 Status ICDManagementServer::StayActiveRequest(FabricIndex fabric_index)
 {
     // TODO: Implementent stay awake logic for end device
+    // https://github.com/project-chip/connectedhomeip/issues/24259
+    app::ICDNotifier::GetInstance().BroadcastICDManagementEvent(app::ICDListener::ICDManagementEvents::kStayActiveRequestReceived);
     return InteractionModel::Status::UnsupportedCommand;
+}
+
+void ICDManagementServer::TriggerICDMTableUpdatedEvent()
+{
+    app::ICDNotifier::GetInstance().BroadcastICDManagementEvent(app::ICDListener::ICDManagementEvents::kTableUpdated);
 }
 
 } // namespace chip

@@ -491,7 +491,7 @@ class _TestStepWithPlaceholders:
                         # the the value type for the target field.
                         if is_typed_constraint(constraint):
                             value[key][constraint] = self._update_value_with_definition(
-                                constraint_value, mapping_type)
+                                constraint_value, mapping)
                 else:
                     # This key, value pair does not rely on cluster specifications.
                     pass

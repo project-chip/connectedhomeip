@@ -2649,22 +2649,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TargetNavigator::Target
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::MediaPlaybackStatusEnum val)
-{
-    using EnumType = MediaPlayback::MediaPlaybackStatusEnum;
-    switch (val)
-    {
-    case EnumType::kSuccess:
-    case EnumType::kInvalidStateForCommand:
-    case EnumType::kNotAllowed:
-    case EnumType::kNotActive:
-    case EnumType::kSpeedOutOfRange:
-    case EnumType::kSeekOutOfRange:
-        return val;
-    default:
-        return static_cast<EnumType>(6);
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::PlaybackStateEnum val)
 {
     using EnumType = MediaPlayback::PlaybackStateEnum;
@@ -2677,6 +2661,22 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::Playback
         return val;
     default:
         return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::StatusEnum val)
+{
+    using EnumType = MediaPlayback::StatusEnum;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kInvalidStateForCommand:
+    case EnumType::kNotAllowed:
+    case EnumType::kNotActive:
+    case EnumType::kSpeedOutOfRange:
+    case EnumType::kSeekOutOfRange:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
     }
 }
 
