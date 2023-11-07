@@ -3247,7 +3247,10 @@
           TargetNavigator:
               - TargetNavigatorStatusEnum
           MediaPlayback:
-              - MediaPlaybackStatusEnum
+              # StatusEnum was originally named MediaPlaybackStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
               - PlaybackStateEnum
           MediaInput:
               - InputTypeEnum
@@ -3997,7 +4000,10 @@
                   - TargetNotFound
                   - NotAllowed
           MediaPlayback:
-              MediaPlaybackStatusEnum:
+              # StatusEnum was originally named MediaPlaybackStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - InvalidStateForCommand
                   - NotAllowed
@@ -7745,6 +7751,11 @@
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   - associationFailureCause
+      enum values:
+          FanControl:
+              FanModeSequenceEnum:
+                  - OffHighAuto
+                  - OffHigh
       bitmaps:
           Scenes:
               - CopyModeBitmap
@@ -7771,6 +7782,11 @@
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   - associationFailure
+      enum values:
+          FanControl:
+              FanModeSequenceEnum:
+                  - OffOnAuto
+                  - OffOn
       bitmaps:
           Scenes:
               - ScenesCopyMode
@@ -7811,6 +7827,18 @@
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   associationFailureCause: associationFailure
+      enum values:
+          FanControl:
+              FanModeSequenceEnum:
+                  OffHighAuto: OffOnAuto
+                  OffHigh: OffOn
+              # FanModeSequenceType is the old name of
+              # FanModeSequenceEnum; we need this rename annotation
+              # here so we don't lose the old values under that old
+              # name.
+              FanModeSequenceType:
+                  OffHighAuto: OffOnAuto
+                  OffHigh: OffOn
       bitmaps:
           Scenes:
               CopyModeBitmap: ScenesCopyMode

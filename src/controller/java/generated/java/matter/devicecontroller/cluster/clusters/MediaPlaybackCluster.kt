@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class MediaPlaybackCluster(private val endpointId: UShort) {
+class MediaPlaybackCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class PlaybackResponse(val status: UInt, val data: String?)
 
   class StartTimeAttribute(val value: ULong?)
@@ -41,6 +45,8 @@ class MediaPlaybackCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun play(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -49,6 +55,8 @@ class MediaPlaybackCluster(private val endpointId: UShort) {
   }
 
   suspend fun pause(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -57,6 +65,8 @@ class MediaPlaybackCluster(private val endpointId: UShort) {
   }
 
   suspend fun stop(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -65,6 +75,8 @@ class MediaPlaybackCluster(private val endpointId: UShort) {
   }
 
   suspend fun startOver(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    val commandId = 3L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -73,6 +85,8 @@ class MediaPlaybackCluster(private val endpointId: UShort) {
   }
 
   suspend fun previous(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    val commandId = 4L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -81,6 +95,8 @@ class MediaPlaybackCluster(private val endpointId: UShort) {
   }
 
   suspend fun next(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    val commandId = 5L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -89,6 +105,8 @@ class MediaPlaybackCluster(private val endpointId: UShort) {
   }
 
   suspend fun rewind(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    val commandId = 6L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -97,6 +115,8 @@ class MediaPlaybackCluster(private val endpointId: UShort) {
   }
 
   suspend fun fastForward(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    val commandId = 7L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -108,6 +128,8 @@ class MediaPlaybackCluster(private val endpointId: UShort) {
     deltaPositionMilliseconds: ULong,
     timedInvokeTimeoutMs: Int? = null
   ): PlaybackResponse {
+    val commandId = 8L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -119,6 +141,8 @@ class MediaPlaybackCluster(private val endpointId: UShort) {
     deltaPositionMilliseconds: ULong,
     timedInvokeTimeoutMs: Int? = null
   ): PlaybackResponse {
+    val commandId = 9L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -127,6 +151,8 @@ class MediaPlaybackCluster(private val endpointId: UShort) {
   }
 
   suspend fun seek(position: ULong, timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    val commandId = 11L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

@@ -14,7 +14,7 @@
 
 from typing import Optional
 
-from matter_idl.generators.types import GetDataTypeSizeInBits, IsSignedDataType
+from matter_idl.generators.type_definitions import GetDataTypeSizeInBits, IsSignedDataType
 from matter_idl.matter_idl_types import AccessPrivilege, Attribute, AttributeQuality, DataType, Field, FieldQuality
 
 
