@@ -12768,7 +12768,7 @@ static id _Nullable DecodeAttributeValueForContentLauncherCluster(AttributeId aA
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedInt:cppValue];
+        value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
         return value;
     }
     default: {
