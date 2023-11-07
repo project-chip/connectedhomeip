@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
+class PumpConfigurationAndControlCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class MaxPressureAttribute(val value: Short?)
 
   class MaxSpeedAttribute(val value: UShort?)
@@ -245,12 +249,12 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLifetimeRunningHoursAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeLifetimeRunningHoursAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeLifetimeRunningHoursAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeLifetimeRunningHoursAttribute(
@@ -272,12 +276,12 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLifetimeEnergyConsumedAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeLifetimeEnergyConsumedAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeLifetimeEnergyConsumedAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeLifetimeEnergyConsumedAttribute(
@@ -291,12 +295,12 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOperationModeAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeOperationModeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeOperationModeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeOperationModeAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -307,12 +311,12 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeControlModeAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeControlModeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeControlModeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeControlModeAttribute(minInterval: Int, maxInterval: Int): UByte {

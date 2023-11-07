@@ -49,18 +49,6 @@ public:
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
 @implementation MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
-- (instancetype)initWithDevice:(MTRBaseDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 {{#zcl_commands}}
 {{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}

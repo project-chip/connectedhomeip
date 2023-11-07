@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ChannelCluster(private val endpointId: UShort) {
+class ChannelCluster(private val controller: MatterController, private val endpointId: UShort) {
   class ChangeChannelResponse(val status: UInt, val data: String?)
 
   class ChannelListAttribute(val value: List<ChannelClusterChannelInfoStruct>?)
@@ -40,6 +41,8 @@ class ChannelCluster(private val endpointId: UShort) {
     match: String,
     timedInvokeTimeoutMs: Int? = null
   ): ChangeChannelResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -52,6 +55,8 @@ class ChannelCluster(private val endpointId: UShort) {
     minorNumber: UShort,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -60,6 +65,8 @@ class ChannelCluster(private val endpointId: UShort) {
   }
 
   suspend fun skipChannel(count: Short, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 3L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

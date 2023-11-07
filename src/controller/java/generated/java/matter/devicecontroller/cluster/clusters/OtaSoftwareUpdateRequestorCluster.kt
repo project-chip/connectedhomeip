@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class OtaSoftwareUpdateRequestorCluster(private val endpointId: UShort) {
+class OtaSoftwareUpdateRequestorCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class DefaultOTAProvidersAttribute(
     val value: List<OtaSoftwareUpdateRequestorClusterProviderLocation>
   )
@@ -42,6 +46,8 @@ class OtaSoftwareUpdateRequestorCluster(private val endpointId: UShort) {
     endpoint: UShort,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -60,16 +66,14 @@ class OtaSoftwareUpdateRequestorCluster(private val endpointId: UShort) {
   }
 
   suspend fun writeDefaultOTAProvidersAttribute(
-    value: List<OtaSoftwareUpdateRequestorClusterProviderLocation>
-  ) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeDefaultOTAProvidersAttribute(
     value: List<OtaSoftwareUpdateRequestorClusterProviderLocation>,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeDefaultOTAProvidersAttribute(

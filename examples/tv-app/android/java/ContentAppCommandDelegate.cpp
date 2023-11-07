@@ -302,7 +302,7 @@ PlaybackResponseType ContentAppCommandDelegate::FormatMediaPlaybackResponse(Json
     }
     else
     {
-        playbackResponse.status = static_cast<app::Clusters::MediaPlayback::MediaPlaybackStatusEnum>(value[statusFieldId].asInt());
+        playbackResponse.status = static_cast<app::Clusters::MediaPlayback::StatusEnum>(value[statusFieldId].asInt());
         std::string dataFieldId =
             std::to_string(to_underlying(app::Clusters::MediaPlayback::Commands::PlaybackResponse::Fields::kData));
         if (!value[dataFieldId].empty())
