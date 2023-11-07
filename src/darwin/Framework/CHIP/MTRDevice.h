@@ -38,7 +38,7 @@ typedef NS_ENUM(NSInteger, MTRDiagnosticLogType) {
     MTRDiagnosticLogTypeEndUserSupport = 0, // End user support log is requested
     MTRDiagnosticLogTypeNetworkDiagnostics = 1, // Network Diagnostics log is requested
     MTRDiagnosticLogTypeCrash = 2 // Crash log is requested
-};
+} MTR_NEWLY_AVAILABLE;
 
 @protocol MTRDeviceDelegate;
 
@@ -269,7 +269,8 @@ typedef NS_ENUM(NSInteger, MTRDiagnosticLogType) {
 - (void)downloadLogOfType:(MTRDiagnosticLogType)type
                   timeout:(NSTimeInterval)timeout
                     queue:(dispatch_queue_t)queue
-               completion:(void (^)(NSURL * _Nullable logResult, NSError * error))completion;
+               completion:(void (^)(NSURL * _Nullable logResult, NSError * error))completion
+    MTR_NEWLY_AVAILABLE;
 
 @end
 
