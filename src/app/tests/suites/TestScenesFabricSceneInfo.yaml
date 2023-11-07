@@ -35,8 +35,7 @@ config:
         defaultValue: 0x0002
 
 tests:
-    - label:
-          "Commission DUT to TH"
+    - label: "Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -52,8 +51,7 @@ tests:
               type: bitmap32
               hasMasksSet: [0x8]
 
-    - label:
-          "Read the FabricSceneInfo attribute (0x0007) "
+    - label: "Read the FabricSceneInfo attribute (0x0007) "
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:
@@ -116,9 +114,8 @@ tests:
                         EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
                         EpochStartTime2: 1110002,
                     }
-    
-    - label:
-        "Preparation step for using the Write Group Keys command."
+
+    - label: "Preparation step for using the Write Group Keys command."
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -135,8 +132,7 @@ tests:
       endpoint: endpoint
       command: "RemoveAllGroups"
 
-    - label:
-          "TH sends a AddGroup command to DUT for G1."
+    - label: "TH sends a AddGroup command to DUT for G1."
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -152,8 +148,7 @@ tests:
               - name: "GroupID"
                 value: G1
 
-    - label:
-          "TH sends a AddGroup command to DUT for G2."
+    - label: "TH sends a AddGroup command to DUT for G2."
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -169,8 +164,7 @@ tests:
               - name: "GroupID"
                 value: G2
 
-    - label:
-          "TH confirms the Fabric Capacity is Maximum"
+    - label: "TH confirms the Fabric Capacity is Maximum"
       command: "GetSceneMembership"
       arguments:
           values:
@@ -185,8 +179,7 @@ tests:
               - name: "GroupID"
                 value: G1
 
-    - label:
-          "TH sends an AddScene command to DUT for Scene 1 G1"
+    - label: "TH sends an AddScene command to DUT for Scene 1 G1"
       command: "AddScene"
       arguments:
           values:
@@ -222,7 +215,8 @@ tests:
                 value: 0x01
 
     - label:
-          "TH confirms the Scene was added to the Scene table by GetSceneMembership"
+          "TH confirms the Scene was added to the Scene table by
+          GetSceneMembership"
       command: "GetSceneMembership"
       arguments:
           values:
@@ -236,7 +230,7 @@ tests:
                 value: fabricCapacity -1
               - name: "GroupID"
                 value: G1
-      
+
     - label: "TH confirms the Scene Was properly added with ViewScene"
       command: "ViewScene"
       arguments:
@@ -261,22 +255,12 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [
-                                    {
-                                        AttributeID: 0x0000,
-                                        AttributeValue: 0x01,
-                                    },
-                                ],
+                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [
-                                    {
-                                        AttributeID: 0x0000,
-                                        AttributeValue: 0x64,
-                                    },
-                                ],
+                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
                         },
                     ]
 
@@ -295,7 +279,7 @@ tests:
                       RemainingCapacity: fabricCapacity - 1,
                   },
               ]
-              
+
     - label: "TH sends a RecallScene command for Scene 1 Group 1"
       command: "RecallScene"
       arguments:
@@ -321,9 +305,7 @@ tests:
                   },
               ]
 
-    
-    - label:
-          "TH sends an AddScene command to DUT for Scene 1 G1"
+    - label: "TH sends an AddScene command to DUT for Scene 1 G1"
       command: "AddScene"
       arguments:
           values:
@@ -374,22 +356,12 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [
-                                    {
-                                        AttributeID: 0x0000,
-                                        AttributeValue: 0x00,
-                                    },
-                                ],
+                                [{ AttributeID: 0x0000, AttributeValue: 0x00 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [
-                                    {
-                                        AttributeID: 0x0000,
-                                        AttributeValue: 0xFA,
-                                    },
-                                ],
+                                [{ AttributeID: 0x0000, AttributeValue: 0xFA }],
                         },
                     ]
 
@@ -434,7 +406,8 @@ tests:
                   },
               ]
 
-    - label: "Configures the DUT to a different state, should invalidate the scene"
+    - label:
+          "Configures the DUT to a different state, should invalidate the scene"
       cluster: "Level Control"
       PICS: PICS_SDK_CI_ONLY
       command: "MoveToLevelWithOnOff"
@@ -557,8 +530,7 @@ tests:
                   },
               ]
 
-    - label:
-          "Remove all scenes from G1"
+    - label: "Remove all scenes from G1"
       runIf: ContinueTest
       PICS: S.S.C03.Rsp
       command: "RemoveAllScenes"
@@ -588,5 +560,4 @@ tests:
                       RemainingCapacity: fabricCapacity,
                   },
               ]
-
 # TODO : Add multi Fabric / multi node tests

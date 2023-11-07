@@ -592,8 +592,8 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
     ReturnErrorOnFailure(sceneTable->SetSceneTableEntry(fabricIdx, scene));
 
     // Update SceneInfo Attribute
-    ReturnErrorOnFailure(
-        UpdateFabricSceneInfo(endpointID, fabricIdx, MakeOptional(groupID), MakeOptional(sceneID), MakeOptional(true)));
+    ReturnErrorOnFailure(UpdateFabricSceneInfo(endpointID, fabricIdx, MakeOptional(groupID), MakeOptional(sceneID),
+                                               MakeOptional(static_cast<bool>(true))));
 
     return CHIP_NO_ERROR;
 }
