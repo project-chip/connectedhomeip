@@ -77,6 +77,7 @@ target_sources(app PRIVATE
                src/AppTask.cpp
                src/ZclCallbacks.cpp
                src/LockManager.cpp
+               src/LockSettingsStorage.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp

@@ -24,6 +24,8 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
+#include <LockSettingsStorage.h>
+
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 LockManager LockManager::sLock;
@@ -38,40 +40,40 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 
     if (LockParams.numberOfUsers > kMaxUsers)
     {
-        ChipLogError(Zcl,"Max number of users is greater than %d, the maximum amount of users currently supported on this platform",
-                   kMaxUsers);
+        ChipLogError(Zcl,"Max number of users %d is greater than %d, the maximum amount of users currently supported on this platform",
+                   LockParams.numberOfUsers, kMaxUsers);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
     if (LockParams.numberOfCredentialsPerUser > kMaxCredentialsPerUser)
     {
-       ChipLogError(Zcl,"Max number of credentials per user is greater than %d, the maximum amount of users currently supported on this "
+       ChipLogError(Zcl,"Max number of credentials per user %d is greater than %d, the maximum amount of users currently supported on this "
                    "platform",
-                   kMaxCredentialsPerUser);
+                   LockParams.numberOfCredentialsPerUser, kMaxCredentialsPerUser);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
     if (LockParams.numberOfWeekdaySchedulesPerUser > kMaxWeekdaySchedulesPerUser)
     {
         ChipLogError(Zcl,
-            "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
-            kMaxWeekdaySchedulesPerUser);
+            "Max number of schedules %d is greater than %d, the maximum amount of schedules currently supported on this platform",
+            LockParams.numberOfWeekdaySchedulesPerUser, kMaxWeekdaySchedulesPerUser);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
     if (LockParams.numberOfYeardaySchedulesPerUser > kMaxYeardaySchedulesPerUser)
     {
         ChipLogError(Zcl,
-            "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
-            kMaxYeardaySchedulesPerUser);
+            "Max number of schedules %d is greater than %d, the maximum amount of schedules currently supported on this platform",
+            LockParams.numberOfYeardaySchedulesPerUser, kMaxYeardaySchedulesPerUser);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
     if (LockParams.numberOfHolidaySchedules > kMaxHolidaySchedules)
     {
         ChipLogError(Zcl,
-            "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
-            kMaxHolidaySchedules);
+            "Max number of schedules %d is greater than %d, the maximum amount of schedules currently supported on this platform",
+            LockParams.numberOfHolidaySchedules, kMaxHolidaySchedules);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
@@ -81,10 +83,8 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
     return CHIP_NO_ERROR;
 }
 
-/* Action related to mechanical operation. Called from ZCL and button */
-bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSource source, chip::EndpointId endpointId, 
-                    const Nullable<chip::FabricIndex> & fabricIdx, 
-                    const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pinCode)
+/* Action related to mechanical operation. Called from button */
+bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSource source, chip::EndpointId endpointId)
 {
     bool status = false;
     switch (aAction)
@@ -93,7 +93,8 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
             if (mState != kState_LockCompleted)
             {
                 mState = kState_LockInitiated;
-                status = setLockState(kExampleEndpointId, DlLockState::kLocked, source, fabricIdx, nodeId, pinCode);
+                status = DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked,
+                    source, NullNullable, NullNullable, NullNullable, NullNullable);
                 if (status)
                 {
                     LOG_INF("Lock Action: Lock action initiated successfully. Waiting for actuator");
@@ -117,18 +118,20 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
             {
                 if (DoorLockServer::Instance().SupportsUnbolt(kExampleEndpointId))
                 {
-                    status = setLockState(kExampleEndpointId, DlLockState::kUnlatched, source, fabricIdx, nodeId, pinCode);
+                    status = DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kUnlatched,
+                        source, NullNullable, NullNullable, NullNullable, NullNullable);
                     if (status)
                     {
                         LOG_INF("Unlock Action: Step 1: Unbolt completed");
                         mState = kState_UnlatchInitiated;
                         if (mStateChangeCallback) 
                             mStateChangeCallback(mState);
-                        status = setLockState(kExampleEndpointId, DlLockState::kUnlocked, source, fabricIdx, nodeId, pinCode);
+                        status = DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kUnlocked,
+                            source, NullNullable, NullNullable, NullNullable, NullNullable);
                         if (status)
                         {
                             LOG_INF("Unlock Action: Step 2: Unlock completed");
-                            mState = kState_UnlatchInitiated;
+                            mState = kState_UnlockInitiated;
                             if (mStateChangeCallback) 
                                 mStateChangeCallback(mState);
                             k_timer_start(&mActuatorTimer, K_MSEC(kActuatorMovementTimeMs), K_NO_WAIT);
@@ -149,7 +152,8 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                 }
                 else 
                 {
-                    status = setLockState(kExampleEndpointId, DlLockState::kUnlocked, source, fabricIdx, nodeId, pinCode);
+                    status = DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kUnlocked,
+                        source, NullNullable, NullNullable, NullNullable, NullNullable);
                     if (status)
                     {
                         LOG_INF("Unlock Action: Unlock initiated");
@@ -173,7 +177,128 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
         case UNBOLT_ACTION:
             if (mState != kState_UnlatchCompleted)
             {
-                status = setLockState(kExampleEndpointId, DlLockState::kUnlatched, source, fabricIdx, nodeId, pinCode);
+                status = DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kUnlatched,
+                        source, NullNullable, NullNullable, NullNullable, NullNullable);
+                if (status)
+                {
+                    LOG_INF("Unbolt Action: Unbolt initiated");
+                    mState = kState_UnlatchInitiated;
+                    k_timer_start(&mActuatorTimer, K_MSEC(kActuatorMovementTimeMs), K_NO_WAIT);
+                }
+                else
+                {
+                    LOG_INF("Unbolt Action: Unbolt failed. no action performed");
+                    mState = kState_NotFulyLocked;
+                }
+                if (mStateChangeCallback) 
+                    mStateChangeCallback(mState);
+            }
+            else
+            {
+                LOG_INF("Unbolt Action: Lock is already in unbolt state. no action performed");
+            }
+        break;
+        default:
+            LOG_INF("Unknown lock state. no action performed");
+            mState = kState_NotFulyLocked;
+        break;
+    }
+    return status;
+}
+
+/* Action related to mechanical operation. Called from ZCL */
+bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSource source, chip::EndpointId endpointId,
+                                OperationErrorEnum & err, const Nullable<chip::FabricIndex> & fabricIdx,
+                                const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pinCode)
+{
+    bool status = false;
+    switch (aAction)
+    {
+        case LOCK_ACTION:
+            if (mState != kState_LockCompleted)
+            {
+                mState = kState_LockInitiated;
+                status = setLockState(kExampleEndpointId, DlLockState::kLocked, source, err, fabricIdx, nodeId, pinCode);
+                if (status)
+                {
+                    LOG_INF("Lock Action: Lock action initiated successfully. Waiting for actuator");
+                    k_timer_start(&mActuatorTimer, K_MSEC(kActuatorMovementTimeMs), K_NO_WAIT);
+                }
+                else
+                {
+                    LOG_INF("Lock Action: Lock action failed to initiate. No action performed");
+                    mState = kState_NotFulyLocked;
+                }
+                if (mStateChangeCallback) 
+                    mStateChangeCallback(mState);
+            }
+            else
+            {
+                LOG_INF("Lock Action: Lock is already locked. No action performed");
+            }
+        break;
+        case UNLOCK_ACTION:
+            if (mState != kState_UnlockCompleted)
+            {
+                if (DoorLockServer::Instance().SupportsUnbolt(kExampleEndpointId))
+                {
+                    status = setLockState(kExampleEndpointId, DlLockState::kUnlatched, source, err, fabricIdx, nodeId, pinCode);
+                    if (status)
+                    {
+                        LOG_INF("Unlock Action: Step 1: Unbolt completed");
+                        mState = kState_UnlatchInitiated;
+                        if (mStateChangeCallback) 
+                            mStateChangeCallback(mState);
+                        status = setLockState(kExampleEndpointId, DlLockState::kUnlocked, source, err, fabricIdx, nodeId, pinCode);
+                        if (status)
+                        {
+                            LOG_INF("Unlock Action: Step 2: Unlock completed");
+                            mState = kState_UnlockInitiated;
+                            if (mStateChangeCallback) 
+                                mStateChangeCallback(mState);
+                            k_timer_start(&mActuatorTimer, K_MSEC(kActuatorMovementTimeMs), K_NO_WAIT);
+                        }
+                        else
+                        {
+                            LOG_INF("Unlock Action: Step 2: Unlock failed. no action performed");
+                            mState = kState_NotFulyLocked;
+                        }
+                    }
+                    else
+                    {
+                        LOG_INF("Unlock Action: Step 1: Unbolt failed. no action performed");
+                        mState = kState_NotFulyLocked;
+                    }
+                    if (mStateChangeCallback) 
+                        mStateChangeCallback(mState);
+                }
+                else 
+                {
+                    status = setLockState(kExampleEndpointId, DlLockState::kUnlocked, source, err, fabricIdx, nodeId, pinCode);
+                    if (status)
+                    {
+                        LOG_INF("Unlock Action: Unlock initiated");
+                        mState = kState_UnlockInitiated;
+                        k_timer_start(&mActuatorTimer, K_MSEC(kActuatorMovementTimeMs), K_NO_WAIT);
+                    }
+                    else
+                    {
+                        LOG_INF("Unlock Action: Unlock failed. no action performed");
+                        mState = kState_NotFulyLocked;
+                    }
+                    if (mStateChangeCallback) 
+                        mStateChangeCallback(mState);
+                }
+            }
+            else
+            {
+                LOG_INF("Unlock Action: Lock is already unlocked. no action performed");
+            }
+        break;
+        case UNBOLT_ACTION:
+            if (mState != kState_UnlatchCompleted)
+            {
+                status = setLockState(kExampleEndpointId, DlLockState::kUnlatched, source, err, fabricIdx, nodeId, pinCode);
                 if (status)
                 {
                     LOG_INF("Unbolt Action: Unbolt initiated");
@@ -286,35 +411,35 @@ bool LockManager::IsValidHolidayScheduleIndex(uint8_t scheduleIndex)
 
 bool LockManager::ReadConfigValues()
 {
-    // size_t outLen;
-    // SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
-    //                                  sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
+    size_t outLen;
+    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
+                                       sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
 
-    // SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
-    //                                  sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes, outLen);
+    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
+                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes, outLen);
 
-    // SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
-    //                                  sizeof(mUserNames), outLen);
+    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
+                                     sizeof(mUserNames), outLen);
 
-    // SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
-    //                                  sizeof(mCredentialData), outLen);
+    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
+                                     sizeof(mCredentialData), outLen);
 
-    // SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
-    //                                  sizeof(CredentialStruct) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser,
-    //                                  outLen);
+    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
+                                     sizeof(CredentialStruct) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser,
+                                     outLen);
 
-    // SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
-    //                                  sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
-    //                                      LockParams.numberOfUsers,
-    //                                  outLen);
+    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
+                                     sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
+                                         LockParams.numberOfUsers,
+                                     outLen);
 
-    // SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
-    //                                  sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
-    //                                      LockParams.numberOfUsers,
-    //                                  outLen);
+    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
+                                     sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
+                                         LockParams.numberOfUsers,
+                                     outLen);
 
-    // SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *>(&(mHolidaySchedule)),
-    //                                  sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, outLen);
+    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *>(&(mHolidaySchedule)),
+                                     sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, outLen);
 
     return true;
 }
@@ -334,7 +459,7 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
     user.userStatus = userInDb.userStatus;
     if (UserStatusEnum::kAvailable == user.userStatus)
     {
-        ChipLogDetail(Zcl, "Found unoccupied user [endpoint=%d]", endpointId);
+        ChipLogProgress(Zcl, "Found unoccupied user [endpoint=%d]", endpointId);
         return true;
     }
 
@@ -350,9 +475,9 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
     user.modificationSource = DlAssetSource::kMatterIM;
     user.lastModifiedBy     = userInDb.lastModifiedBy;
 
-    ChipLogDetail(Zcl,
+    ChipLogProgress(Zcl,
                   "Found occupied user "
-                  "[endpoint=%d,name=\"%.*s\",credentialsCount=%u,uniqueId=%lx,type=%u,credentialRule=%u,"
+                  "[endpoint=%d,name=\"%.*s\",credentialsCount=%u,uniqueId=%x,type=%u,credentialRule=%u,"
                   "createdBy=%d,lastModifiedBy=%d]",
                   endpointId, static_cast<int>(user.userName.size()), user.userName.data(), user.credentials.size(),
                   user.userUniqueId, to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy,
@@ -410,14 +535,20 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
     userInStorage.credentials = chip::Span<const CredentialStruct>(mCredentials[userIndex], totalCredentials);
 
     // Save user information in NVM flash
-    // SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
-    //                                   sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
+    CHIP_ERROR err = ZephyrConfig::WriteConfigValueBin(LockSettingsStorage::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
+                                      sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
+    if (err != CHIP_NO_ERROR)
+    ChipLogError(Zcl, "Failed to write kConfigKey_LockUser. User data will be resetted during reboot. Not enough storage space \n");
 
-    // SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials),
-    //                                   sizeof(CredentialStruct) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser);
+    err = ZephyrConfig::WriteConfigValueBin(LockSettingsStorage::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials),
+                                      sizeof(CredentialStruct) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser);
+    if (err != CHIP_NO_ERROR)
+    ChipLogError(Zcl, "Failed to write kConfigKey_UserCredentials. User data will be resetted during reboot. Not enough storage space \n");
 
-    // SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
-    //                                   sizeof(mUserNames));
+    ZephyrConfig::WriteConfigValueBin(LockSettingsStorage::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
+                                      sizeof(mUserNames));
+    if (err != CHIP_NO_ERROR)
+    ChipLogError(Zcl, "Failed to write kConfigKey_LockUserName. User data will be resetted during reboot. Not enough storage space \n");
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
 
@@ -446,11 +577,11 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     const auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
 
     credential.status = credentialInStorage.status;
-    ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
+    ChipLogProgress(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
 
     if (DlCredentialStatus::kAvailable == credential.status)
     {
-        ChipLogDetail(Zcl, "Found unoccupied credential ");
+        ChipLogProgress(Zcl, "Found unoccupied credential ");
         return true;
     }
     credential.credentialType = credentialInStorage.credentialType;
@@ -462,7 +593,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     credential.creationSource     = DlAssetSource::kMatterIM;
     credential.modificationSource = DlAssetSource::kMatterIM;
 
-    ChipLogDetail(Zcl, "Found occupied credential [type=%u,dataSize=%u]", to_underlying(credential.credentialType),
+    ChipLogProgress(Zcl, "Found occupied credential [type=%u,dataSize=%u]", to_underlying(credential.credentialType),
                   credential.credentialData.size());
 
     return true;
@@ -502,11 +633,15 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
         chip::ByteSpan{ mCredentialData[to_underlying(credentialType)][credentialIndex], credentialData.size() };
 
     // Save credential information in NVM flash
-    // SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
-    //                                   sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes);
+    CHIP_ERROR err = ZephyrConfig::WriteConfigValueBin(LockSettingsStorage::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
+                                      sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes);
+    if (err != CHIP_NO_ERROR)
+    ChipLogError(Zcl, "Failed to write kConfigKey_Credential. User data will be resetted during reboot. Not enough storage space \n");
 
-    // SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
-    //                                   sizeof(mCredentialData));
+    err = ZephyrConfig::WriteConfigValueBin(LockSettingsStorage::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
+                                      sizeof(mCredentialData));
+    if (err != CHIP_NO_ERROR)
+    ChipLogError(Zcl, "Failed to write kConfigKey_CredentialData. User data will be resetted during reboot. Not enough storage space \n");                              
 
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
 
@@ -561,9 +696,12 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     scheduleInStorage.status               = status;
 
     // Save schedule information in NVM flash
-    // SilabsConfig::WriteConfigValueBin(
-    //     SilabsConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
-    //     sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser * LockParams.numberOfUsers);
+
+    CHIP_ERROR err = ZephyrConfig::WriteConfigValueBin(
+        LockSettingsStorage::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
+        sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser * LockParams.numberOfUsers);
+    if (err != CHIP_NO_ERROR)
+    ChipLogError(Zcl, "Failed to write kConfigKey_WeekDaySchedules. User data will be resetted during reboot. Not enough storage space \n");
 
     return DlStatus::kSuccess;
 }
@@ -610,9 +748,11 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
-    // SilabsConfig::WriteConfigValueBin(
-    //     SilabsConfig::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
-    //     sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser * LockParams.numberOfUsers);
+    CHIP_ERROR err = ZephyrConfig::WriteConfigValueBin(
+        LockSettingsStorage::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
+        sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser * LockParams.numberOfUsers);
+    if (err != CHIP_NO_ERROR)
+    ChipLogError(Zcl, "Failed to write kConfigKey_YearDaySchedules. User data will be resetted during reboot. Not enough storage space \n");
 
     return DlStatus::kSuccess;
 }
@@ -654,9 +794,11 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
     scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
-    // SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_HolidaySchedules,
-    //                                   reinterpret_cast<const uint8_t *>(&(mHolidaySchedule)),
-    //                                   sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
+    CHIP_ERROR err = ZephyrConfig::WriteConfigValueBin(LockSettingsStorage::kConfigKey_HolidaySchedules,
+                                      reinterpret_cast<const uint8_t *>(&(mHolidaySchedule)),
+                                      sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
+    if (err != CHIP_NO_ERROR)
+    ChipLogError(Zcl, "Failed to write kConfigKey_YearDaySchedules. User data will be resetted during reboot. Not enough storage space \n");
 
     return DlStatus::kSuccess;
 }
@@ -680,24 +822,25 @@ const char * LockManager::lockStateToString(DlLockState lockState) const
     return "Unknown";
 }
 
-bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockState, OperationSource source,
-                               const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId, 
-                               const Optional<chip::ByteSpan> & pin)
+bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockState, OperationSource source, 
+                                OperationErrorEnum & err, const Nullable<chip::FabricIndex> & fabricIdx, 
+                                const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin)
 {
-
     // Assume pin is required until told otherwise
     bool requirePin = true;
+    uint16_t userIndex = 0;
+    uint16_t credentialIndex = 0;
     chip::app::Clusters::DoorLock::Attributes::RequirePINforRemoteOperation::Get(endpointId, &requirePin);
 
     // If a pin code is not given
     if (!pin.HasValue())
     {
-        ChipLogDetail(Zcl, "Door Lock App: PIN code is not specified [endpointId=%d]", endpointId);
+        ChipLogProgress(Zcl, "Door Lock App: PIN code is not specified [endpointId=%d]", endpointId);
 
         // If a pin code is not required
         if (!requirePin)
         {
-            ChipLogDetail(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", lockStateToString(lockState),
+            ChipLogProgress(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", lockStateToString(lockState),
                           endpointId);
 
             DoorLockServer::Instance().SetLockState(endpointId, lockState, source, NullNullable, NullNullable,
@@ -707,17 +850,12 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
         }
 
         ChipLogError(Zcl, "Door Lock App: PIN code is not specified, but it is required [endpointId=%d]", endpointId);
-
+        err = OperationErrorEnum::kRestricted;
         return false;
     }
-
-    uint16_t userIndex = 0;
-    uint16_t credentialIndex = 0;
-
     // Check the PIN code
     for (const auto & currentCredential : mLockCredentials[to_underlying(CredentialTypeEnum::kPin)])
     {
-        
         if (currentCredential.status == DlCredentialStatus::kAvailable)
         {
             continue;
@@ -731,11 +869,12 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
                 EmberAfPluginDoorLockUserInfo user;
                 if (!emberAfPluginDoorLockGetUser(endpointId, i, user))
                 {
-                    ChipLogError(Zcl, "[findUserIndexByCredential] Unable to get user: app error [userIndex=%d]", i);
+                    ChipLogError(Zcl, "[setLockState] Unable to get user: app error [userIndex=%d]", i);
+                    err = OperationErrorEnum::kInvalidCredential;
                     return false;
                 }
 
-                        // Go through occupied users only
+                // Go through occupied users only
                 if (UserStatusEnum::kAvailable == user.userStatus)
                 {
                     continue;
@@ -752,19 +891,21 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
                     if (!emberAfPluginDoorLockGetCredential(endpointId, credential.credentialIndex, CredentialTypeEnum::kPin, credentialInfo))
                     {
                         ChipLogError(Zcl,
-                                    "[findUserIndexByCredential] Unable to get credential: app error "
+                                    "[setLockState] Unable to get credential: app error "
                                     "[userIndex=%d,credentialIndex=%d,credentialType=%u]",
                                     i, credential.credentialIndex, to_underlying(CredentialTypeEnum::kPin));
+                        err = OperationErrorEnum::kInvalidCredential;
                         return false;
                     }
 
                     if (credentialInfo.status != DlCredentialStatus::kOccupied)
                     {
                         ChipLogError(Zcl,
-                                    "[findUserIndexByCredential] Users/Credentials database error: credential index attached to user is "
+                                    "[setLockState] Users/Credentials database error: credential index attached to user is "
                                     "not occupied "
                                     "[userIndex=%d,credentialIndex=%d,credentialType=%u]",
                                     i, credential.credentialIndex, to_underlying(CredentialTypeEnum::kPin));
+                        err = OperationErrorEnum::kInvalidCredential;
                         return false;
                     }
 
@@ -772,29 +913,27 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
                     {
                         userIndex       = i;
                         credentialIndex = credential.credentialIndex;
-                        //userInfo        = user;
-                    }
-                }
-            }            
-            ChipLogDetail(Zcl,
+                        ChipLogProgress(Zcl,
                           "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",
                           lockStateToString(lockState), endpointId);
 
-            LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin, credentialIndex } };
-            auto userCredentials = chip::app::DataModel::MakeNullable<List<const LockOpCredentials>>(userCredential);
+                        LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin, credentialIndex } };
+                        auto userCredentials = chip::app::DataModel::MakeNullable<List<const LockOpCredentials>>(userCredential);
 
-            DoorLockServer::Instance().SetLockState(endpointId, lockState, source, 
-            chip::app::DataModel::MakeNullable(static_cast<uint16_t>(userIndex)), userCredentials, fabricIdx, nodeId);
-
-            return true;
+                        DoorLockServer::Instance().SetLockState(endpointId, lockState, source, 
+                        chip::app::DataModel::MakeNullable(static_cast<uint16_t>(userIndex)), userCredentials, fabricIdx, nodeId);
+                        return true;
+                    }
+                }
+            }
         }
     }
 
-    ChipLogDetail(Zcl,
+    ChipLogProgress(Zcl,
                   "Door Lock App: specified PIN code was not found in the database, ignoring command to set lock state to \"%s\" "
                   "[endpointId=%d]",
                   lockStateToString(lockState), endpointId);
 
-    //err = OperationErrorEnum::kInvalidCredential;
+    err = OperationErrorEnum::kInvalidCredential;
     return false;
 }

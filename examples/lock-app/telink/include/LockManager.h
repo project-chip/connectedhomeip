@@ -141,8 +141,11 @@ public:
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
                     TelinkDoorLock::LockInitParams::LockParam lockParam, StateChangeCallback callback);
 
+    bool LockAction(int32_t appSource, Action_t aAction, OperationSource source, chip::EndpointId endpointId);
+
     bool LockAction(int32_t appSource, Action_t aAction, OperationSource source, chip::EndpointId endpointId,
-                    const Nullable<chip::FabricIndex> & fabricIdx = NullNullable, const Nullable<chip::NodeId> & nodeId = NullNullable, 
+                    OperationErrorEnum & err, const Nullable<chip::FabricIndex> & fabricIdx = NullNullable,
+                    const Nullable<chip::NodeId> & nodeId = NullNullable,
                     const Optional<chip::ByteSpan> & pinCode = NullNullable);
 
     bool IsLocked() const { return mState == State_t::kState_LockCompleted; }
@@ -199,8 +202,8 @@ private:
     k_timer mActuatorTimer                   = {};
 
     bool setLockState(chip::EndpointId endpointId, DlLockState lockState, OperationSource source,
-                    const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId, 
-                    const Optional<chip::ByteSpan> & pin);
+                    OperationErrorEnum & err, const Nullable<chip::FabricIndex> & fabricIdx,
+                    const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin);
 
     static void ActuatorTimerEventHandler(k_timer * timer);
     static void ActuatorAppEventHandler(const AppEvent & event);

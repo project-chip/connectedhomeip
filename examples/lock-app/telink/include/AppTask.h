@@ -19,7 +19,7 @@
 #pragma once
 
 #include "AppTaskCommon.h"
-// #include "BoltLockManager.h"
+#include "AppConfig.h"
 #include "LockManager.h"
 
 #define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
@@ -51,4 +51,3 @@ inline AppTask & GetAppTask(void)
 {
     return AppTask::sAppTask;
 }
-CHIP_ERROR InitDoorLockHandler();
