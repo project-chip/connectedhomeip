@@ -54,7 +54,7 @@ const struct gpio_dt_spec sBleStartButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_
 #if APP_USE_THREAD_START_BUTTON
 const struct gpio_dt_spec sThreadStartButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_3), gpios);
 #endif
-#if APP_USE_EXAMPLE_START_BUTTON 
+#if APP_USE_EXAMPLE_START_BUTTON
 const struct gpio_dt_spec sExampleActionButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_4), gpios);
 #endif
 #else

@@ -75,9 +75,6 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
 config HEAP_MEM_POOL_SIZE
     default 256
 
-config COMMON_LIBC_MALLOC_ARENA_SIZE
-    default 12288
-
 config COMMON_LIBC_MALLOC_ARENA_SIZE 
     default 12288
 
@@ -157,7 +154,7 @@ choice B9X_BLE_CTRL_MAC_TYPE
     default B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
 endchoice
 
-#Board retention config
+# Board retention config
 if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
 config BOARD_TLSR9X_NON_RETENTION_RAM_CODE
     default y if PM
