@@ -2129,7 +2129,8 @@ void DeviceCommissioner::ParseCommissioningInfo2()
     CHIP_ERROR return_err = CHIP_NO_ERROR;
 
     using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
-    CHIP_ERROR err = mAttributeCache->Get<SupportsConcurrentConnection::TypeInfo>(kRootEndpointId, info.supportsConcurrentConnection);
+    CHIP_ERROR err =
+        mAttributeCache->Get<SupportsConcurrentConnection::TypeInfo>(kRootEndpointId, info.supportsConcurrentConnection);
     if (err != CHIP_NO_ERROR)
     {
         // May not be present so don't return the error code, non fatal, default concurrent
@@ -2233,7 +2234,7 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo2 & info)
     else if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
         // This key is optional so not an error
-        err = CHIP_NO_ERROR;
+        err        = CHIP_NO_ERROR;
         info.isIcd = false;
     }
     else if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
@@ -2279,7 +2280,8 @@ void DeviceCommissioner::NonConcurrentNetworkResponse(
 {
     // In Non Concurrent mode the commissioning network should have been shut down and not sent the
     // ConnectNetworkResponse. In case it does send it this handles the message
-    ChipLogProgress(Controller, "NonConcurrent Mode : Received Unexpected ConnectNetwork response, ignoring. Status=%u", to_underlying(data.networkingStatus));
+    ChipLogProgress(Controller, "NonConcurrent Mode : Received Unexpected ConnectNetwork response, ignoring. Status=%u",
+                    to_underlying(data.networkingStatus));
 }
 
 void DeviceCommissioner::OnSetRegulatoryConfigResponse(
@@ -2513,8 +2515,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         app::AttributePathParams readPaths[3];
 
         // Mandatory attribute
-        readPaths[numberOfAttributes++] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
-                                                                   app::Clusters::GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id);
+        readPaths[numberOfAttributes++] =
+            app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
+                                     app::Clusters::GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id);
 
         // Read the current fabrics
         if (params.GetCheckForMatchingFabric())
@@ -2953,10 +2956,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         CHIP_ERROR err = CHIP_NO_ERROR;
         GeneralCommissioning::Attributes::SupportsConcurrentConnection::TypeInfo::Type supportsConcurrentConnection;
         supportsConcurrentConnection = params.GetSupportsConcurrentConnection().Value();
-        ChipLogProgress(Controller,"SendCommand kWiFiNetworkEnable, supportsConcurrentConnection=%d", supportsConcurrentConnection);
+        ChipLogProgress(Controller, "SendCommand kWiFiNetworkEnable, supportsConcurrentConnection=%d",
+                        supportsConcurrentConnection);
         if (supportsConcurrentConnection)
         {
-           err = SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
+            err = SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
         }
         else
         {

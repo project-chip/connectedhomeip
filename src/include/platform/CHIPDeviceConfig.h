@@ -309,10 +309,10 @@
  * needs to be paired again.
  */
 #ifndef WIFI_START_CHECK_TIME_USEC
-#define WIFI_START_CHECK_TIME_USEC      100000  // 100ms
+#define WIFI_START_CHECK_TIME_USEC 100000 // 100ms
 #endif
 #ifndef WIFI_START_CHECK_ATTEMPTS
-#define WIFI_START_CHECK_ATTEMPTS       5
+#define WIFI_START_CHECK_ATTEMPTS 5
 #endif
 
 /**

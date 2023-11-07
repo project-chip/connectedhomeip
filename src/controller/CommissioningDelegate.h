@@ -663,10 +663,10 @@ struct ReadCommissioningInfo
 
 struct ReadCommissioningInfo2
 {
-    NodeId nodeId                       = kUndefinedNodeId;
-    bool isIcd                          = false;
-    bool checkInProtocolSupport         = false;
-    bool supportsConcurrentConnection   = true;
+    NodeId nodeId                     = kUndefinedNodeId;
+    bool isIcd                        = false;
+    bool checkInProtocolSupport       = false;
+    bool supportsConcurrentConnection = true;
 };
 
 struct TimeZoneResponseInfo

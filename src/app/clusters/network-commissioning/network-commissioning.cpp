@@ -724,7 +724,7 @@ void Instance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kWiFiDeviceAvailable)
     {
-       this_->HandleNonConcurrentConnectNetwork();
+        this_->HandleNonConcurrentConnectNetwork();
     }
 }
 

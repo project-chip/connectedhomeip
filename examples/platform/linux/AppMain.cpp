@@ -20,9 +20,9 @@
 #include <platform/PlatformManager.h>
 
 #include "app/clusters/network-commissioning/network-commissioning.h"
+#include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <app/server/Dnssd.h>
 #include <app/util/endpoint-config-api.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
