@@ -142,13 +142,13 @@ limitations under the License.
           <description>ThreadVersion</description>
         </attribute>
 
-        <command source="client" code="0x00" name="ScanNetworks" optional="false" response="ScanNetworksResponse" cli="chip network_commissioning scannetworks">
+        <command source="client" code="0x00" name="ScanNetworks" optional="true" response="ScanNetworksResponse" cli="chip network_commissioning scannetworks">
             <description>Detemine the set of networks the device sees as available.</description>
             <arg name="SSID" type="octet_string" length="32" isNullable="true" optional="true"/>
             <arg name="Breadcrumb" type="int64u" optional="true"/>
             <access op="invoke" privilege="administer"/>
         </command>
-        <command source="server" code="0x01" name="ScanNetworksResponse" optional="false" cli="chip network_commissioning scannetworksresponse">
+        <command source="server" code="0x01" name="ScanNetworksResponse" optional="true" cli="chip network_commissioning scannetworksresponse">
             <description>Relay the set of networks the device sees as available back to the client.</description>
             <arg name="NetworkingStatus" type="NetworkCommissioningStatusEnum"/>
             <arg name="DebugText" type="char_string" optional="true"/>
@@ -171,7 +171,7 @@ limitations under the License.
             <arg name="Breadcrumb" type="int64u" optional="true"/>
             <access op="invoke" privilege="administer"/>
         </command>
-        <command source="client" code="0x04" name="RemoveNetwork" optional="false" response="NetworkConfigResponse" cli="chip network_commissioning removenetwork">
+        <command source="client" code="0x04" name="RemoveNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning removenetwork">
             <description>Remove the definition of a given network (including its credentials).</description>
             <arg name="NetworkID" type="octet_string" length="32"/>
             <arg name="Breadcrumb" type="int64u" optional="true"/>
@@ -185,19 +185,19 @@ limitations under the License.
             <arg name="ClientIdentity" type="octet_string" length="140" optional="true"/>
             <arg name="PossessionSignature" type="octet_string" length="64" optional="true"/>
         </command>
-        <command source="client" code="0x06" name="ConnectNetwork" optional="false" response="ConnectNetworkResponse" cli="chip network_commissioning connectnetwork">
+        <command source="client" code="0x06" name="ConnectNetwork" optional="true" response="ConnectNetworkResponse" cli="chip network_commissioning connectnetwork">
             <description>Connect to the specified network, using previously-defined credentials.</description>
             <arg name="NetworkID" type="octet_string" length="32"/>
             <arg name="Breadcrumb" type="int64u" optional="true"/>
             <access op="invoke" privilege="administer"/>
         </command>
-        <command source="server" code="0x07" name="ConnectNetworkResponse" optional="false" cli="chip network_commissioning connectnetworkresponse">
+        <command source="server" code="0x07" name="ConnectNetworkResponse" optional="true" cli="chip network_commissioning connectnetworkresponse">
             <description>Command that indicates whether we have succcessfully connected to a network.</description>
             <arg name="NetworkingStatus" type="NetworkCommissioningStatusEnum"/>
             <arg name="DebugText" type="char_string" optional="true"/>
             <arg name="ErrorValue" type="int32s" isNullable="true"/>
         </command>
-        <command source="client" code="0x08" name="ReorderNetwork" optional="false" response="NetworkConfigResponse" cli="chip network_commissioning connectnetwork">
+        <command source="client" code="0x08" name="ReorderNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning connectnetwork">
             <description>Modify the order in which networks will be presented in the Networks attribute.</description>
             <arg name="NetworkID" type="octet_string" length="32"/>
             <arg name="NetworkIndex" type="int8u"/>
