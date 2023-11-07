@@ -114,7 +114,6 @@ CHIP_ERROR Responder::PrepareForTransfer(System::Layer * layer, TransferRole rol
 void Responder::ResetTransfer()
 {
     mTransfer.Reset();
-    mSystemLayer = nullptr;
     ChipLogProgress(BDX, "Stop polling for messages");
     mStopPolling = true;
 }
@@ -136,7 +135,6 @@ CHIP_ERROR Initiator::InitiateTransfer(System::Layer * layer, TransferRole role,
 void Initiator::ResetTransfer()
 {
     mTransfer.Reset();
-    mSystemLayer = nullptr;
     ChipLogProgress(BDX, "Stop polling for messages");
     mStopPolling = true;
 }

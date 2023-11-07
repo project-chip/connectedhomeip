@@ -1437,7 +1437,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         [self _invokeCompletionWithError:completion queue:queue error:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil]];
     }
 
-    if (self->_diagnosticLogsTransferHandler != nullptr && self->_diagnosticLogsTransferHandler->IsInBDXSession()) {
+    if (self->_diagnosticLogsTransferHandler != nil && self->_diagnosticLogsTransferHandler->IsInBDXSession()) {
         [self _invokeCompletionWithError:completion queue:queue error:[NSError errorWithDomain:MTRInteractionErrorDomain code:MTRInteractionErrorCodeBusy userInfo:nil]];
     }
 
@@ -1471,7 +1471,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             [cluster retrieveLogsRequestWithParams:requestParams expectedValues:nil expectedValueInterval:nil
                                         completion:^(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable response, NSError * _Nullable error) {
                                             // If we are in a BDX session and there is no error, do nothing. Completion will be called when BDX succeeds or fails.
-                                            if (self->_diagnosticLogsTransferHandler->IsInBDXSession() && error == nil) {
+                                            if (self->_diagnosticLogsTransferHandler != nil && self->_diagnosticLogsTransferHandler->IsInBDXSession() && error == nil) {
                                                 return;
                                             }
 

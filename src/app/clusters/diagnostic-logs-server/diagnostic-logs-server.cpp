@@ -24,6 +24,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/util/config.h>
 #include <lib/support/ScopedBuffer.h>
 #include <messaging/ExchangeContext.h>
 
