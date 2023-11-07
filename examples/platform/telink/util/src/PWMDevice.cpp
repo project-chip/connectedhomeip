@@ -133,7 +133,8 @@ void PWMDevice::Set(bool aOn)
 
 void PWMDevice::UpdateLight(void)
 {
-    if (!device_is_ready(mPwmDevice->dev)) {
+    if (!device_is_ready(mPwmDevice->dev))
+    {
         return;
     }
     constexpr uint32_t kPwmWidthUs  = 20000u;

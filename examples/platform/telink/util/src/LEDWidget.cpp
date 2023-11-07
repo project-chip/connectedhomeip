@@ -38,9 +38,12 @@ void LEDWidget::Init(gpio_dt_spec gpio)
     mGPIO           = gpio;
     mState          = false;
 
-    if (!gpio_is_ready_dt(&mGPIO)) {
+    if (!gpio_is_ready_dt(&mGPIO))
+    {
         LOG_ERR("GPIO device not ready");
-    } else {
+    }
+    else
+    {
         int ret = gpio_pin_configure_dt(&mGPIO, GPIO_OUTPUT_ACTIVE);
         if (ret < 0)
         {
@@ -92,7 +95,8 @@ void LEDWidget::ScheduleStateChange()
 
 void LEDWidget::DoSet(bool state)
 {
-    if (!gpio_is_ready_dt(&mGPIO)) {
+    if (!gpio_is_ready_dt(&mGPIO))
+    {
         return;
     }
     mState  = state;
