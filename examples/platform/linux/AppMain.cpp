@@ -239,7 +239,7 @@ void InitNetworkCommissioning()
 using chip::Shell::Engine;
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 /*
  * The device shall check every kWiFiStartCheckTimeUsec whether Wi-Fi management
  * has been fully initialized. If after kWiFiStartCheckAttempts Wi-Fi management
@@ -304,7 +304,7 @@ void StopSignalHandler(int signal)
 
 } // namespace
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 static bool EnsureWiFiIsStarted()
 {
     for (int cnt = 0; cnt < kWiFiStartCheckAttempts; cnt++)
@@ -468,18 +468,14 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (LinuxDeviceOptions::GetInstance().mWiFi)
     {
-        bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
-        if (supportsConcurrentConnection)
+        // Start WiFi management in Concurrent mode
+        DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
+        if (!EnsureWiFiIsStarted())
         {
-            // Start WiFi management in Concurrent mode
-            DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
-            if (!EnsureWiFiIsStarted())
-            {
-                ChipLogError(NotSpecified, "Wi-Fi Management taking too long to start - device configuration will be reset.");
-            }
+            ChipLogError(NotSpecified, "Wi-Fi Management taking too long to start - device configuration will be reset.");
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA

@@ -64,13 +64,9 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         Cleanup();
         mServer->GetSecureSessionManager().ExpireAllPASESessions();
         // That should have cleared out mPASESession.
-#if CONFIG_NETWORK_LAYER_BLE
+#if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
         // If in NonConcurrentConnection, this will already have been completed
-        bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
-        if (supportsConcurrentConnection)
-        {
-            mServer->GetBleLayerObject()->CloseAllBleConnections();
-        }
+        mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)

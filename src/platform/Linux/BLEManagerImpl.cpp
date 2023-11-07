@@ -662,13 +662,9 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogProgress(Ble, "Got notification regarding chip connection closure");
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     // In Non-Concurrent mode start the Wi-Fi, as BLE has been stopped
-    bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
-    if (!supportsConcurrentConnection)
-    {
-        DeviceLayer::ConnectivityMgrImpl().StartNonConcurrentWiFiManagement();
-    }
+    DeviceLayer::ConnectivityMgrImpl().StartNonConcurrentWiFiManagement();
 #endif
 }
 
