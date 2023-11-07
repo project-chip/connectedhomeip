@@ -6547,18 +6547,6 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterLaundryDryerControls
 
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedDrynessLevelsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeLaundryDryerControlsID) attributeID:@(MTRAttributeIDTypeClusterLaundryDryerControlsAttributeSupportedDrynessLevelsID) params:params];

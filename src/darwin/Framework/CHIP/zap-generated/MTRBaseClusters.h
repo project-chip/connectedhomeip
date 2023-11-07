@@ -4728,14 +4728,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @end
 
-/**
- * Cluster Laundry Dryer Controls
- *
- * This cluster supports remotely monitoring and controling the different typs of
-            functionality available to a drying device, such as a laundry dryer.
- */
-MTR_PROVISIONALLY_AVAILABLE
-@interface MTRBaseClusterLaundryDryerControls : MTRCluster
+@interface MTRBaseClusterICDManagement (Availability)
 
 /**
  * For all instance methods (reads, writes, commands) that take a completion,
@@ -4743,7 +4736,18 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
-                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_PROVISIONALLY_AVAILABLE;
+                                   queue:(dispatch_queue_t)queue MTR_PROVISIONALLY_AVAILABLE;
+
+@end
+
+/**
+ * Cluster Laundry Dryer Controls
+ *
+ * This cluster supports remotely monitoring and controling the different typs of
+            functionality available to a drying device, such as a laundry dryer.
+ */
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRBaseClusterLaundryDryerControls : MTRGenericBaseCluster
 
 - (void)readAttributeSupportedDrynessLevelsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeSupportedDrynessLevelsWithParams:(MTRSubscribeParams *)params
@@ -4797,6 +4801,18 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+@interface MTRBaseClusterLaundryDryerControls (Availability)
+
+/**
+ * For all instance methods (reads, writes, commands) that take a completion,
+ * the completion will be called on the provided queue.
+ */
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue MTR_PROVISIONALLY_AVAILABLE;
 
 @end
 

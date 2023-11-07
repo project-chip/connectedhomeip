@@ -24,7 +24,7 @@ class LaundryDryerControlsCluster(
   private val controller: MatterController,
   private val endpointId: UShort
 ) {
-  class SupportedDrynessLevelsAttribute(val value: List<UInt>)
+  class SupportedDrynessLevelsAttribute(val value: List<UInt>?)
 
   class SelectedDrynessLevelAttribute(val value: UInt?)
 
