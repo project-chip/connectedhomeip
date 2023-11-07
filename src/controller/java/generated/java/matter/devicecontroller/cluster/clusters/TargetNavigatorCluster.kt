@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class TargetNavigatorCluster(private val endpointId: UShort) {
+class TargetNavigatorCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class NavigateTargetResponse(val status: UInt, val data: String?)
 
   class TargetListAttribute(val value: List<TargetNavigatorClusterTargetInfoStruct>)
@@ -37,6 +41,8 @@ class TargetNavigatorCluster(private val endpointId: UShort) {
     data: String?,
     timedInvokeTimeoutMs: Int? = null
   ): NavigateTargetResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

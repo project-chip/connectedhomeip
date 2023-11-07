@@ -270,6 +270,12 @@ enum InternalEventTypes
     kCHIPoBLEUnsubscribe,
     kCHIPoBLEWriteReceived,
     kCHIPoBLEIndicateConfirm,
+
+    /**
+     * Post this event in case of a BLE connection error. This event should be posted
+     * if the BLE central disconnects without unsubscribing from the BLE characteristic.
+     * This event should populate CHIPoBLEConnectionError structure.
+     */
     kCHIPoBLEConnectionError,
     kCHIPoBLENotifyConfirm
 };

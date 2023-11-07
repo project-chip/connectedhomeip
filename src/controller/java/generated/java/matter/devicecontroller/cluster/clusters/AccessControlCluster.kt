@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class AccessControlCluster(private val endpointId: UShort) {
+class AccessControlCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class AclAttribute(val value: List<AccessControlClusterAccessControlEntryStruct>)
 
   class ExtensionAttribute(val value: List<AccessControlClusterAccessControlExtensionStruct>?)
@@ -40,15 +44,15 @@ class AccessControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeAclAttribute(value: List<AccessControlClusterAccessControlEntryStruct>) {
-    // Implementation needs to be added here
-  }
-
   suspend fun writeAclAttribute(
     value: List<AccessControlClusterAccessControlEntryStruct>,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeAclAttribute(minInterval: Int, maxInterval: Int): AclAttribute {
@@ -66,16 +70,14 @@ class AccessControlCluster(private val endpointId: UShort) {
   }
 
   suspend fun writeExtensionAttribute(
-    value: List<AccessControlClusterAccessControlExtensionStruct>
-  ) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeExtensionAttribute(
     value: List<AccessControlClusterAccessControlExtensionStruct>,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeExtensionAttribute(minInterval: Int, maxInterval: Int): ExtensionAttribute {

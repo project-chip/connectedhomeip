@@ -149,10 +149,6 @@
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/wifi-host-driver
 	url = https://github.com/Infineon/wifi-host-driver
 	platforms = infineon
-[submodule "p6/wifi-mw-core"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/wifi-mw-core
-	url = https://github.com/Infineon/wifi-mw-core
-	platforms = infineon
 [submodule "p6/TARGET_CY8CKIT-062S2-43012"]
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/TARGET_CY8CKIT-062S2-43012
 	url = https://github.com/Infineon/TARGET_CY8CKIT-062S2-43012
@@ -249,7 +245,7 @@
 	path = third_party/silabs/wiseconnect-wifi-bt-sdk
 	url = https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git
 	branch = 2.8.2
-	platforms = efr32,silabs_docker
+	platforms = efr32
 [submodule "third_party/silabs/wifi_sdk"]
 	path = third_party/silabs/wifi_sdk
 	url = https://github.com/SiliconLabs/wiseconnect.git
@@ -324,3 +320,7 @@
 	url = https://github.com/STMicroelectronics/STM32CubeWB.git
 	branch = v1.17.0
 	platforms = stm32
+[submodule "p6/lwip-network-interface-integration"]
+	path = third_party/infineon/psoc6/psoc6_sdk/libs/lwip-network-interface-integration
+	url = https://github.com/Infineon/lwip-network-interface-integration.git
+	platforms = infineon

@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class GeneralCommissioningCluster(private val endpointId: UShort) {
+class GeneralCommissioningCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class ArmFailSafeResponse(val errorCode: UInt, val debugText: String)
 
   class SetRegulatoryConfigResponse(val errorCode: UInt, val debugText: String)
@@ -43,6 +47,8 @@ class GeneralCommissioningCluster(private val endpointId: UShort) {
     breadcrumb: ULong,
     timedInvokeTimeoutMs: Int? = null
   ): ArmFailSafeResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -56,6 +62,8 @@ class GeneralCommissioningCluster(private val endpointId: UShort) {
     breadcrumb: ULong,
     timedInvokeTimeoutMs: Int? = null
   ): SetRegulatoryConfigResponse {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -66,6 +74,8 @@ class GeneralCommissioningCluster(private val endpointId: UShort) {
   suspend fun commissioningComplete(
     timedInvokeTimeoutMs: Int? = null
   ): CommissioningCompleteResponse {
+    val commandId = 4L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -77,12 +87,12 @@ class GeneralCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeBreadcrumbAttribute(value: ULong) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeBreadcrumbAttribute(value: ULong, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeBreadcrumbAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeBreadcrumbAttribute(minInterval: Int, maxInterval: Int): ULong {

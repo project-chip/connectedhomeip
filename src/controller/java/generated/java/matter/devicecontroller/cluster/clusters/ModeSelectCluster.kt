@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ModeSelectCluster(private val endpointId: UShort) {
+class ModeSelectCluster(private val controller: MatterController, private val endpointId: UShort) {
   class StandardNamespaceAttribute(val value: UInt?)
 
   class SupportedModesAttribute(val value: List<ModeSelectClusterModeOptionStruct>)
@@ -37,6 +38,8 @@ class ModeSelectCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun changeToMode(newMode: UByte, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -86,12 +89,12 @@ class ModeSelectCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeStartUpModeAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeStartUpModeAttribute(value: UByte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeStartUpModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeStartUpModeAttribute(
@@ -105,12 +108,12 @@ class ModeSelectCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOnModeAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeOnModeAttribute(value: UByte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeOnModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeOnModeAttribute(minInterval: Int, maxInterval: Int): OnModeAttribute {

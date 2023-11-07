@@ -32,9 +32,6 @@ exclude_patterns = [
     "examples/thermostat/nxp/linux-se05x/README.md",
     "examples/common/m5stack-tft/repo",
     "docs/guides/README.md",
-    "scripts/tools/memory/memdf/README.md",
-    "scripts/tools/memory/platform/README.md",
-    "scripts/tools/memory/README-GitHub-CI.md",
 ]
 
 
@@ -67,6 +64,7 @@ myst_enable_extensions = ["html_image"]
 
 external_content_contents = [
     (MATTER_BASE / "docs", "[!_R]*"),
+    (MATTER_BASE, "data_model/**/*.md"),
     (MATTER_BASE, "README.md"),
     (MATTER_BASE, "examples/**/*.md"),
     (MATTER_BASE, "examples/**/*.png"),
@@ -82,5 +80,6 @@ external_content_link_prefixes = [
     "README",  # cannot detect README.md
     "scripts/",
     "examples/android/",
+    "data_model/",
 ]
 external_content_link_extensions = [".md", ".png", ".jpg", ".svg"]
