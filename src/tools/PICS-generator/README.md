@@ -36,9 +36,9 @@ certification)
 The tool does, as mentioned above, have external dependencies, these are
 provided to the tool using these arguments:
 
--   --cluster-data is the absolute path to the JSON file contaning the cluster
+-   --cluster-data is the absolute path to the JSON file containing the cluster
     data
--   --pics-template is the absolute path to the folder contaning the PICS
+-   --pics-template is the absolute path to the folder containing the PICS
     templates
 -   --pics-output is the absolute path to the output folder to be used
 
@@ -63,7 +63,7 @@ added.
 --paa-trust-store-path credentials/production/paa-root-certs
 ```
 
-If a device has alreasy been commissioned, the tool can be executed like this:
+If a device has already been commissioned, the tool can be executed like this:
 
 ```
 python3 'src/python_testing/PICSGenerator.py' --cluster-data <pathToClusterJson> --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath>
