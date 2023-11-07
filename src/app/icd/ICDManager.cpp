@@ -58,6 +58,10 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kUserActiveModeTrigger), AppServer,
                        "The user ActiveMode trigger feature is required for LIT support");
 
+    // Disabling check until LIT support is compelte
+    // VerifyOrDieWithMsg((supportLIT == false) && (GetSlowPollingInterval() <= GetSITPollingThreshold()) , AppServer,
+    //                    "LIT support is required for slow polling intervals superior to 15 seconds");
+
     mStorage       = storage;
     mFabricTable   = fabricTable;
     mStateObserver = stateObserver;
@@ -90,13 +94,16 @@ void ICDManager::Shutdown()
 
 bool ICDManager::SupportsFeature(Feature feature)
 {
-    bool success        = false;
-    uint32_t featureMap = 0;
     // Can't use attribute accessors/Attributes::FeatureMap::Get in unit tests
 #ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    success = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
-#endif
+    bool success        = false;
+    uint32_t featureMap = 0;
+    success             = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
+#else
+    return ((mFeatureMap & to_underlying(feature)) != 0);
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
 void ICDManager::UpdateICDMode()
@@ -105,9 +112,8 @@ void ICDManager::UpdateICDMode()
 
     ICDMode tempMode = ICDMode::SIT;
 
-    // The Check In Protocol Feature is required and the slow polling interval shall also be greater than 15 seconds
-    // to run an ICD in LIT mode.
-    if (GetSlowPollingInterval() > GetSITPollingThreshold() && SupportsFeature(Feature::kLongIdleTimeSupport))
+    // Device can only switch to the LIT operating mode if LIT support is present
+    if (SupportsFeature(Feature::kLongIdleTimeSupport))
     {
         VerifyOrDie(mStorage != nullptr);
         VerifyOrDie(mFabricTable != nullptr);
@@ -315,5 +321,23 @@ void ICDManager::OnNetworkActivity()
 {
     this->UpdateOperationState(OperationalState::ActiveMode);
 }
+
+void ICDManager::OnICDManagementServerEvent(ICDManagementEvents event)
+{
+    switch (event)
+    {
+    case ICDManagementEvents::kTableUpdated:
+        this->UpdateICDMode();
+        break;
+
+    case ICDManagementEvents::kStayActiveRequestReceived:
+        // TODO : Implement the StayActiveRequest
+        // https://github.com/project-chip/connectedhomeip/issues/24259
+        break;
+    default:
+        break;
+    }
+}
+
 } // namespace app
 } // namespace chip
