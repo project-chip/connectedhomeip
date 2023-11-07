@@ -18,55 +18,36 @@ limitations under the License.
   <domain name="CHIP"/>
 
   <enum name="OperationalStateEnum" type="enum8">
-    <cluster code="0x0060"/>
-    <item name="Stopped" value="0x00"/>
-    <item name="Running" value="0x01"/>
-    <item name="Paused"  value="0x02"/>
-    <item name="Error"   value="0x03"/>
+    <cluster code="0x0048"/>
+    <item name="Running"          value="0x40"/>
+    <item name="Preheating"       value="0x41"/>
+    <item name="Preheated"        value="0x42"/>
+				<item name="CoolingDown"      value="0x43"/>
+    <item name="SelfCleaning"     value="0x44"/>
   </enum>
-
-  <enum name="ErrorStateEnum" type="enum8">
-    <cluster code="0x0060"/>
-    <cluster code="0x0048"/>
-    <item name="NoError"                    value="0x00"/>
-    <item name="UnableToStartOrResume"      value="0x01"/>
-    <item name="UnableToCompleteOperation"  value="0x02"/>
-    <item name="CommandInvalidInState"      value="0x03"/>
-  </enum>
-
-  <struct name="OperationalStateStruct">
-    <cluster code="0x0060"/>
-    <cluster code="0x0061"/>
-    <cluster code="0x0048"/>
-    <item name="OperationalStateID"    type="enum8" optional="false"/>
-    <item name="OperationalStateLabel" type="char_string" optional="true" length="64"/>
-  </struct>
-
-  <struct name="ErrorStateStruct">
-    <cluster code="0x0060"/>
-    <cluster code="0x0061"/>
-    <cluster code="0x0048"/>
-    <item name="ErrorStateID" type="enum8" optional="false" />
-    <item name="ErrorStateLabel" type="char_string" optional="true" length="64" />
-    <item name="ErrorStateDetails" type="char_string" optional="true" length="64" />
-  </struct>
 
   <cluster>
-    <domain>General</domain>
-    <name>Operational State</name>
-    <code>0x0060</code>
-    <define>OPERATIONAL_STATE_CLUSTER</define>
+    <domain>Appliances</domain>
+    <name>Oven Operational State</name>
+    <code>0x0048</code>
+    <define>OPERATIONAL_STATE_OVEN_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
-    <description>This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation.</description>
+    <description>This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven.</description>
 
     <globalAttribute side="server" code="0xFFFD" value="1" />
 
     <attribute side="server" code="0x0000" define="PHASE_LIST"              type="ARRAY" entryType="char_string"                                     writable="false" isNullable="true"  optional="false">PhaseList</attribute>
     <attribute side="server" code="0x0001" define="CURRENT_PHASE"           type="int8u"                                    min="0x00" max="0x1F"    writable="false" isNullable="true"  optional="false">CurrentPhase</attribute>
-    <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="elapsed_s"                                min="0x00" max="259200"  writable="false" isNullable="true"  optional="true">CountdownTime</attribute>
+    <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="elapsed_s"                                min="0"    max="259200"  writable="false" isNullable="true"  optional="true">CountdownTime</attribute>
     <attribute side="server" code="0x0003" define="OPERATIONAL_STATE_LIST"  type="ARRAY" entryType="OperationalStateStruct"                          writable="false"                    optional="false">OperationalStateList</attribute>
-    <attribute side="server" code="0x0004" define="OPERATIONAL_STATE"       type="OperationalStateEnum"                                              writable="false"                    optional="false">OperationalState</attribute>
+
+<!--
+The type of this attribute in the spec is OperationalStateEnum, but the OperationalStateEnum in our XML
+excludes the values from the base OperationalState cluster.  Just use ENUM8 for the type, so it allows
+both values from this cluster and from the base cluster.
+-->
+    <attribute side="server" code="0x0004" define="OPERATIONAL_STATE"       type="enum8"                                                             writable="false"                    optional="false">OperationalState</attribute>
     <attribute side="server" code="0x0005" define="OPERATIONAL_ERROR"       type="ErrorStateStruct"                                                  writable="false"                    optional="false">OperationalError</attribute>
 
     <command source="client" code="0x00" name="Pause" response="OperationalCommandResponse" optional="true">
@@ -97,9 +78,9 @@ limitations under the License.
 
      <event side="server" code="0x01" priority="info" name="OperationCompletion" optional="true">
       <description>OperationCompletion</description>
-      <field id="0" name="CompletionErrorCode"  type="enum8" />
-      <field id="1" name="TotalOperationalTime" type="elapsed_s" isNullable="true" optional="true"/>
-      <field id="2" name="PausedTime"           type="elapsed_s" isNullable="true" optional="true"/>
+      <field id="0" name="CompletionErrorCode"  type="enum8"                            optional="false"/>
+      <field id="1" name="TotalOperationalTime" type="elapsed_s"      isNullable="true" optional="true"/>
+      <field id="2" name="PausedTime"           type="elapsed_s"      isNullable="true" optional="true"/>
     </event>
 
   </cluster>

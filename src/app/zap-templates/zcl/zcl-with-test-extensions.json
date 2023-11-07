@@ -74,6 +74,7 @@
         "onoff-switch-configuration-cluster.xml",
         "operational-credentials-cluster.xml",
         "operational-state-cluster.xml",
+        "operational-state-oven-cluster.xml",
         "operational-state-rvc-cluster.xml",
         "oven-mode-cluster.xml",
         "pressure-measurement-cluster.xml",
@@ -360,6 +361,12 @@
             "FeatureMap"
         ],
         "Operational State": [
+            "OperationalState",
+            "OperationalError",
+            "CurrentPhase",
+            "CountdownTime"
+        ],
+        "Oven Operational State": [
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
