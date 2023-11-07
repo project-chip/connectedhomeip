@@ -73,7 +73,7 @@ constexpr uint32_t kIdentifyFinishOffRateMs     = 50;
 constexpr uint32_t kIdentifyChannelChangeRateMs = 1000;
 constexpr uint32_t kIdentifyBreatheRateMs       = 1000;
 
-const struct pwm_dt_spec sPwmIdentifySpecGreenLed = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led3));
+const struct pwm_dt_spec sPwmIdentifySpecGreenLed = PWM_DT_SPEC_GET_OR(DT_ALIAS(pwm_led3), {});
 #endif
 
 #if APP_SET_NETWORK_COMM_ENDPOINT_SEC
@@ -261,7 +261,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Initialize status LED
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
     LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
-    sStatusLED.Init(GPIO_DT_SPEC_GET(DT_ALIAS(system_state_led), gpios));
+    sStatusLED.Init(GPIO_DT_SPEC_GET_OR(DT_ALIAS(system_state_led), gpios, {}));
 
     UpdateStatusLED();
 #endif
