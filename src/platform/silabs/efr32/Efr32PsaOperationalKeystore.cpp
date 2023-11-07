@@ -313,9 +313,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::CommitOpKeypairForFabric(FabricIndex fab
     // There's a good chance we'll need the key again soon
     mCachedKey->Load(id);
 
-    mPendingKeypair         = nullptr;
-    mIsPendingKeypairActive = false;
-    mPendingFabricIndex     = kUndefinedFabricIndex;
+    ResetPendingKey(true /* keepOpaqueKey */);
 
     return CHIP_NO_ERROR;
 }

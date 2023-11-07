@@ -94,11 +94,14 @@ protected:
     bool mIsInitialized                      = false;
 
 private:
-    void ResetPendingKey()
+    void ResetPendingKey(bool keepOpaqueKey = false)
     {
         if (mPendingKeypair != nullptr)
         {
-            mPendingKeypair->Delete();
+            if (!keepOpaqueKey)
+            {
+                mPendingKeypair->Delete();
+            }
             Platform::Delete(mPendingKeypair);
         }
         mPendingKeypair         = nullptr;
