@@ -900,7 +900,7 @@ void ApplicationInit()
     Light2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
 
     TempSensor1.SetReachable(true);
-    TempSensor1.SetReachable(true);
+    TempSensor2.SetReachable(true);
 
     TempSensor1.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
     TempSensor2.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
