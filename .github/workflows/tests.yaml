@@ -143,6 +143,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/operational-credentials-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/operational-state-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/operational-state-oven-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/operational-state-rvc-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/oven-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/pressure-measurement-cluster.xml \
