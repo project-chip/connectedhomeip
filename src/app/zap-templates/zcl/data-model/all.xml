@@ -53,6 +53,7 @@
    <xi:include href="chip/onoff-cluster.xml" />
    <xi:include href="chip/operational-credentials-cluster.xml" />
    <xi:include href="chip/operational-state-cluster.xml" />
+   <xi:include href="chip/operational-state-oven-cluster.xml" />
    <xi:include href="chip/operational-state-rvc-cluster.xml" />
    <xi:include href="chip/pressure-measurement-cluster.xml" />
    <xi:include href="chip/power-source-cluster.xml" />
