@@ -33,10 +33,8 @@
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <tracing/macros.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::NetworkCommissioning;
+#include <array>
+#include <utility>
 
 namespace chip {
 namespace app {
@@ -46,8 +44,12 @@ namespace NetworkCommissioning {
 using namespace DeviceLayer::NetworkCommissioning;
 
 namespace {
-// For WiFi and Thread scan results, each item will cose ~60 bytes in TLV, thus 15 is a safe upper bound of scan results.
+
+// For WiFi and Thread scan results, each item will cost ~60 bytes in TLV, thus 15 is a safe upper bound of scan results.
 constexpr size_t kMaxNetworksInScanResponse = 15;
+
+// Note: CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE can be 0, this disables debug text
+using DebugTextStorage = std::array<char, CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE>;
 
 enum ValidWiFiCredentialLength
 {
@@ -58,11 +60,44 @@ enum ValidWiFiCredentialLength
     kWPAPSKHex = 64,
 };
 
+template <typename T, typename Func>
+static void EnumerateAndRelease(Iterator<T> * iterator, Func func)
+{
+    if (iterator != nullptr)
+    {
+        T element;
+        while (iterator->Next(element) && func(element) == Loop::Continue)
+        {
+            /* continue */
+        }
+        iterator->Release();
+    }
+}
+
 } // namespace
+
+Instance::Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) :
+    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
+    mFeatureFlags(Feature::kWiFiNetworkInterface), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
+{
+    mpDriver.Set<WiFiDriver *>(apDelegate);
+}
+
+Instance::Instance(EndpointId aEndpointId, ThreadDriver * apDelegate) :
+    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
+    mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
+{
+    mpDriver.Set<ThreadDriver *>(apDelegate);
+}
+
+Instance::Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) :
+    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
+    mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(apDelegate)
+{}
 
 CHIP_ERROR Instance::Init()
 {
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     ReturnErrorOnFailure(mpBaseDriver->Init(this));
@@ -140,22 +175,15 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
     case Attributes::Networks::Id:
         return aEncoder.EncodeList([this](const auto & encoder) {
-            auto networks  = mpBaseDriver->GetNetworks();
             CHIP_ERROR err = CHIP_NO_ERROR;
             Structs::NetworkInfoStruct::Type networkForEncode;
-            NetworkCommissioning::Network network;
-            for (; networks != nullptr && networks->Next(network);)
-            {
+            EnumerateAndRelease(mpBaseDriver->GetNetworks(), [&](const Network & network) {
                 networkForEncode.networkID = ByteSpan(network.networkID, network.networkIDLen);
                 networkForEncode.connected = network.connected;
-                SuccessOrExit(err = encoder.Encode(networkForEncode));
-            }
-        exit:
-            if (networks != nullptr)
-            {
-                networks->Release();
-            }
 
+                err = encoder.Encode(networkForEncode);
+                return (err == CHIP_NO_ERROR) ? Loop::Continue : Loop::Break;
+            });
             return err;
         });
 
@@ -213,8 +241,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
     }
 }
 
-void Instance::OnNetworkingStatusChange(NetworkCommissioning::Status aCommissioningError, Optional<ByteSpan> aNetworkId,
-                                        Optional<int32_t> aConnectStatus)
+void Instance::OnNetworkingStatusChange(Status aCommissioningError, Optional<ByteSpan> aNetworkId, Optional<int32_t> aConnectStatus)
 {
     if (aNetworkId.HasValue() && aNetworkId.Value().size() > kMaxNetworkIDLen)
     {
@@ -290,9 +317,9 @@ void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & respon
 {
     if (!debugText.empty())
     {
-        response.debugText.SetValue(CharSpan(debugText.data(), debugText.size()));
+        response.debugText.SetValue(debugText);
     }
-    if (response.networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
+    if (response.networkingStatus == Status::kSuccess)
     {
         response.networkIndex.SetValue(networkIndex);
     }
@@ -355,17 +382,14 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
     }
 
     Commands::NetworkConfigResponse::Type response;
-    MutableCharSpan debugText;
-#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
-    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
-    debugText = MutableCharSpan(debugTextBuffer);
-#endif
+    DebugTextStorage debugTextBuffer;
+    MutableCharSpan debugText(debugTextBuffer);
     uint8_t outNetworkIndex = 0;
     response.networkingStatus =
         mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    if (response.networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
+    if (response.networkingStatus == Status::kSuccess)
     {
         UpdateBreadcrumb(req.breadcrumb);
     }
@@ -378,17 +402,14 @@ void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Comman
     VerifyOrReturn(CheckFailSafeArmed(ctx));
 
     Commands::NetworkConfigResponse::Type response;
-    MutableCharSpan debugText;
-#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
-    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
-    debugText = MutableCharSpan(debugTextBuffer);
-#endif
+    DebugTextStorage debugTextBuffer;
+    MutableCharSpan debugText(debugTextBuffer);
     uint8_t outNetworkIndex = 0;
     response.networkingStatus =
         mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    if (response.networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
+    if (response.networkingStatus == Status::kSuccess)
     {
         UpdateBreadcrumb(req.breadcrumb);
     }
@@ -415,16 +436,13 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
     VerifyOrReturn(CheckFailSafeArmed(ctx));
 
     Commands::NetworkConfigResponse::Type response;
-    MutableCharSpan debugText;
-#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
-    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
-    debugText = MutableCharSpan(debugTextBuffer);
-#endif
+    DebugTextStorage debugTextBuffer;
+    MutableCharSpan debugText(debugTextBuffer);
     uint8_t outNetworkIndex   = 0;
     response.networkingStatus = mpWirelessDriver->RemoveNetwork(req.networkID, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    if (response.networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
+    if (response.networkingStatus == Status::kSuccess)
     {
         UpdateBreadcrumb(req.breadcrumb);
     }
@@ -433,7 +451,7 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("HandleConnectNetwork", "NetworkCommissioning");
-    if (req.networkID.size() > DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen)
+    if (req.networkID.size() > kMaxNetworkIDLen)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidValue);
         return;
@@ -452,15 +470,12 @@ void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::Reorde
 {
     MATTER_TRACE_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
     Commands::NetworkConfigResponse::Type response;
-    MutableCharSpan debugText;
-#if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
-    char debugTextBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
-    debugText = MutableCharSpan(debugTextBuffer);
-#endif
+    DebugTextStorage debugTextBuffer;
+    MutableCharSpan debugText(debugTextBuffer);
     response.networkingStatus = mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex, debugText);
     FillDebugTextAndNetworkIndex(response, debugText, req.networkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    if (response.networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
+    if (response.networkingStatus == Status::kSuccess)
     {
         UpdateBreadcrumb(req.breadcrumb);
     }
@@ -500,7 +515,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     mLastNetworkingStatusValue.SetNonNull(commissioningError);
 
     commandHandle->AddResponse(mPath, response);
-    if (commissioningError == NetworkCommissioningStatusEnum::kSuccess)
+    if (commissioningError == Status::kSuccess)
     {
         CommitSavedBreadcrumb();
     }
@@ -525,7 +540,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
     TLV::TLVWriter * writer;
     TLV::TLVType listContainerType;
     ThreadScanResponse scanResponse;
-    chip::Platform::ScopedMemoryBuffer<ThreadScanResponse> scanResponseArray;
+    Platform::ScopedMemoryBuffer<ThreadScanResponse> scanResponseArray;
     size_t scanResponseArrayLength = 0;
     uint8_t extendedAddressBuffer[Thread::kSizeExtendedPanId];
 
@@ -611,9 +626,9 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to encode response: %s", err.AsString());
+        ChipLogError(Zcl, "Failed to encode response: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    if (status == NetworkCommissioningStatusEnum::kSuccess)
+    if (status == Status::kSuccess)
     {
         CommitSavedBreadcrumb();
     }
@@ -672,9 +687,9 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to encode response: %s", err.AsString());
+        ChipLogError(Zcl, "Failed to encode response: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    if (status == NetworkCommissioningStatusEnum::kSuccess)
+    if (status == Status::kSuccess)
     {
         CommitSavedBreadcrumb();
     }
@@ -719,39 +734,34 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 {
     using namespace Clusters::NetworkCommissioning::Commands;
 
-    constexpr CommandId acceptedCommandsListWiFi[] = {
-        ScanNetworks::Id, AddOrUpdateWiFiNetwork::Id, RemoveNetwork::Id, ConnectNetwork::Id, ReorderNetwork::Id,
-    };
-    constexpr CommandId acceptedCommandsListThread[] = {
-        ScanNetworks::Id, AddOrUpdateThreadNetwork::Id, RemoveNetwork::Id, ConnectNetwork::Id, ReorderNetwork::Id,
-    };
-
     if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
     {
-        for (const auto & cmd : acceptedCommandsListThread)
+        for (auto && cmd : {
+                 ScanNetworks::Id,
+                 AddOrUpdateThreadNetwork::Id,
+                 RemoveNetwork::Id,
+                 ConnectNetwork::Id,
+                 ReorderNetwork::Id,
+             })
         {
-            if (callback(cmd, context) != Loop::Continue)
-            {
-                break;
-            }
+            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
         }
-
-        return CHIP_NO_ERROR;
     }
-
-    if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
+    else if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
     {
-        for (const auto & cmd : acceptedCommandsListWiFi)
+        for (auto && cmd : {
+                 ScanNetworks::Id,
+                 AddOrUpdateWiFiNetwork::Id,
+                 RemoveNetwork::Id,
+                 ConnectNetwork::Id,
+                 ReorderNetwork::Id,
+             })
         {
-            if (callback(cmd, context) != Loop::Continue)
-            {
-                break;
-            }
+            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
         }
-
-        return CHIP_NO_ERROR;
     }
 
+exit:
     return CHIP_NO_ERROR;
 }
 
@@ -759,20 +769,15 @@ CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & clus
 {
     using namespace Clusters::NetworkCommissioning::Commands;
 
-    constexpr CommandId generatedCommandsListWireless[] = { ScanNetworksResponse::Id, NetworkConfigResponse::Id,
-                                                            ConnectNetworkResponse::Id };
-
     if (mFeatureFlags.HasAny(Feature::kWiFiNetworkInterface, Feature::kThreadNetworkInterface))
     {
-        for (const auto & cmd : generatedCommandsListWireless)
+        for (auto && cmd : { ScanNetworksResponse::Id, NetworkConfigResponse::Id, ConnectNetworkResponse::Id })
         {
-            if (callback(cmd, context) != Loop::Continue)
-            {
-                break;
-            }
+            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
         }
     }
 
+exit:
     return CHIP_NO_ERROR;
 }
 
@@ -788,7 +793,7 @@ uint8_t NullNetworkDriver::GetMaxNetworks()
     return 1;
 }
 
-DeviceLayer::NetworkCommissioning::NetworkIterator * NullNetworkDriver::GetNetworks()
+NetworkIterator * NullNetworkDriver::GetNetworks()
 {
     // Instance::Read accepts nullptr as an empty NetworkIterator.
     return nullptr;
