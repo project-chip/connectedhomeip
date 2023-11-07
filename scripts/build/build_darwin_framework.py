@@ -97,8 +97,6 @@ def build_darwin_framework(args):
         command += ["{}={}".format(option, "YES" if options[option] else "NO")]
 
     defines = 'GCC_PREPROCESSOR_DEFINITIONS=${inherited} MTR_NO_AVAILABILITY=1'
-    if args.enable_provisional_framework_features:
-        defines += ' MTR_ENABLE_PROVISIONAL=1'
 
     command += [defines]
 
@@ -174,7 +172,6 @@ if __name__ == "__main__":
     parser.add_argument('--ble', action=argparse.BooleanOptionalAction)
     parser.add_argument('--clang', action=argparse.BooleanOptionalAction)
     parser.add_argument('--enable-encoding-sentinel-enum-values', action=argparse.BooleanOptionalAction)
-    parser.add_argument('--enable-provisional-framework-features', action=argparse.BooleanOptionalAction)
 
     args = parser.parse_args()
     build_darwin_framework(args)
