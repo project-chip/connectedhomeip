@@ -101,7 +101,11 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 #endif
 
+#ifdef CONFIG_BT
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE CONFIG_BT
+#else
+#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0
+#endif
 
 // ========== Platform-specific Configuration =========
 

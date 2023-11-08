@@ -11968,6 +11968,7 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             MACAddress(0L),
+            LinkLocalAddress(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

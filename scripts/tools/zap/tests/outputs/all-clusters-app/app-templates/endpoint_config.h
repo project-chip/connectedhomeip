@@ -1182,7 +1182,7 @@
             { ZAP_SIMPLE_DEFAULT(3), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },   /* ClusterRevision */                                 \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Wake on LAN (server) */                                                                       \
-            { ZAP_EMPTY_DEFAULT(), 0x00000000, 33, ZAP_TYPE(CHAR_STRING), 0 }, /* MACAddress */                                    \
+            { ZAP_EMPTY_DEFAULT(), 0x00000000, 13, ZAP_TYPE(CHAR_STRING), 0 }, /* MACAddress */                                    \
             { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 },   /* FeatureMap */                                    \
             { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },     /* ClusterRevision */                               \
                                                                                                                                    \
@@ -2721,7 +2721,7 @@
       .clusterId = 0x00000503, \
       .attributes = ZAP_ATTRIBUTE_INDEX(536), \
       .attributeCount = 3, \
-      .clusterSize = 39, \
+      .clusterSize = 19, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr, \
@@ -3024,7 +3024,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 27, 345 }, { ZAP_CLUSTER_INDEX(27), 44, 3717 }, { ZAP_CLUSTER_INDEX(71), 7, 127 },                 \
+        { ZAP_CLUSTER_INDEX(0), 27, 345 }, { ZAP_CLUSTER_INDEX(27), 44, 3697 }, { ZAP_CLUSTER_INDEX(71), 7, 127 },                 \
             { ZAP_CLUSTER_INDEX(78), 2, 4 },                                                                                       \
     }
 
@@ -3037,7 +3037,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (37)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (4193)
+#define ATTRIBUTE_MAX_SIZE (4173)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)
