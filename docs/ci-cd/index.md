@@ -11,7 +11,5 @@
 ## To Do
 
 -   Cert image auto build
--   Include Darwin Test fail definitions in fail summary script - for starters,
-    Test Reliable Message Protocol
 
 ## General Improvement Ideas
