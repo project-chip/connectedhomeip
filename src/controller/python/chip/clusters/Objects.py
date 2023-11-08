@@ -34566,7 +34566,7 @@ class KeypadInput(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 14,
 
-        class KeypadInputStatusEnum(MatterIntEnum):
+        class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
             kUnsupportedKey = 0x01
             kInvalidKeyInCurrentState = 0x02
@@ -34610,10 +34610,10 @@ class KeypadInput(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=KeypadInput.Enums.KeypadInputStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=KeypadInput.Enums.StatusEnum),
                     ])
 
-            status: 'KeypadInput.Enums.KeypadInputStatusEnum' = 0
+            status: 'KeypadInput.Enums.StatusEnum' = 0
 
     class Attributes:
         @dataclass

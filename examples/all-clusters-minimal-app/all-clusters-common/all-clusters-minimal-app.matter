@@ -3420,7 +3420,7 @@ server cluster KeypadInput = 1289 {
     kData = 118;
   }
 
-  enum KeypadInputStatusEnum : enum8 {
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kUnsupportedKey = 1;
     kInvalidKeyInCurrentState = 2;
@@ -3444,7 +3444,7 @@ server cluster KeypadInput = 1289 {
   }
 
   response struct SendKeyResponse = 1 {
-    KeypadInputStatusEnum status = 0;
+    StatusEnum status = 0;
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
