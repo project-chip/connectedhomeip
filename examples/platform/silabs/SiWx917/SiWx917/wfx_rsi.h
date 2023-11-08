@@ -92,6 +92,9 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_rsi_reset_count();
 int32_t wfx_rsi_disconnect();
 int32_t wfx_wifi_rsi_init(void);
+#if SL_ICD_ENABLED
+int32_t wfx_rsi_power_save();
+#endif /* SL_ICD_ENABLED */
 
 #ifdef __cplusplus
 }

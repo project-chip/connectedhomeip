@@ -148,12 +148,12 @@ template("siwx917_sdk") {
       "SILABS_LOG_ENABLED=${silabs_log_enabled}",
       "SL_HEAP_SIZE=32768",
       "SL_WIFI=1",
-      "CCP_SI917_BRINGUP",
-      "SL_COMPONENT_CATALOG_PRESENT",
-      "RS911X_WIFI",
+      "CCP_SI917_BRINGUP=1",
+      "SL_COMPONENT_CATALOG_PRESENT=1",
+      "RS911X_WIFI=1",
       "RSI_WLAN_ENABLE",
       "RSI_WITH_OS",
-      "RSI_M4_INTERFACE",  #Enable CCP bus Interface
+      "RSI_M4_INTERFACE=1",  #Enable CCP bus Interface
       "RSI_WLAN_API_ENABLE",
       "LITTLE_ENDIAN_ORDER",
       "_CHIP_9118",
@@ -167,31 +167,39 @@ template("siwx917_sdk") {
       "PLATFORM_HEADER=\"platform-header.h\"",
       "USE_NVM3=1",
       "RSI_ARM_CM4F",
-      "SIWX_917",
-      "CHIP_9117",
+      "SIWX_917=1",
+      "CHIP_9117=1",
       "BLE_ENABLE=1",
       "RSI_LITTLE_ENDIAN=1",
       "TINYCRYPT_PRIMITIVES",
       "OPTIMIZE_TINYCRYPT_ASM",
       "__error_t_defined",
-      "RSI_SAMPLE_HAL",
-      "ENABLE_IPMU_APIS",
+      "RSI_SAMPLE_HAL=1",
+      "ENABLE_IPMU_APIS=1",
       "ROM_BYPASS",
-      "DEBUG_UART",
-      "FLASH_BASED_EXECUTION_ENABLE",
-      "TA_DEEP_SLEEP_COMMON_FLASH",
-      "SL_WIFI_COMPONENT_INCLUDED",
+      "DEBUG_UART=1",
+      "FLASH_BASED_EXECUTION_ENABLE=1",
+      "TA_DEEP_SLEEP_COMMON_FLASH=1",
+      "SL_WIFI_COMPONENT_INCLUDED=1",
       "CHIP_917=1",
       "ROMDRIVER_PRESENT=1",
       "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",
       "SL_PLATFORM_EXAMPLES_ENABLE",
       "SI91X_DEVICE=1",
       "SI917_RADIO_BOARD=1",
-      "FLASH_PAGE_SIZE",
-      "SL_NVM3_PRESENT",
+    "FLASH_PAGE_SIZE=1",
+      "SL_NVM3_PRESENT=1",
       "ROM_WIRELESS",
-      "BRD4325A",  #TODO: should be removed after SoC macro clean-up
-      "CONNECTIVITY_PLATFORM",
+      "BRD4325A=1",  #TODO: should be removed after SoC macro clean-up
+      "SI917_SOC=1",
+      "EXT_IRQ_COUNT=75",
+      "FLASH_PAGE_SIZE=1",
+      "SI917_COMMON_FLASH=1",
+      "SRAM_BASE=0x0c",
+      "SRAM_SIZE=0x00040000",
+      "DEBUG_ENABLE=1",
+      "ENABLE_DEBUG_MODULE=1",
+      "SI917=1",
     ]
 
     if (silabs_board == "BRD4325B") {
@@ -271,8 +279,12 @@ template("siwx917_sdk") {
 
     if (chip_enable_icd_server) {
       defines += [
-        "SL_CATALOG_POWER_MANAGER_PRESENT",
-        "SL_CATALOG_SLEEPTIMER_PRESENT",
+        "WIFI_DEBUG_ENABLED=1",
+        "SL_ICD_ENABLED=1",
+        "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold_ms}",
+        "SL_ACTIVE_MODE_INTERVAL=${sl_active_mode_interval_ms}",
+        "SL_IDLE_MODE_INTERVAL=${sl_idle_mode_interval_s}",
+        "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
       ]
     }
 

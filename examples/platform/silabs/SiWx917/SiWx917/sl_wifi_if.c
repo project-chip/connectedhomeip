@@ -35,6 +35,13 @@
 #include "task.h"
 #include "wfx_host_events.h"
 
+#include "rsi_m4.h"
+#include "rsi_board.h"
+
+#include "ble_config.h"
+#include "rsi_rom_power_save.h"
+#include "sl_si91x_button_config.h"
+
 #if (EXP_BOARD)
 #include "rsi_bt_common_apis.h"
 #endif
@@ -194,6 +201,90 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
 }
 
 #if SL_ICD_ENABLED
+void IRQ026_Handler()
+{
+  RSI_PS_GetWkpUpStatus();
+
+  /*Clear interrupt */
+  RSI_PS_ClrWkpUpStatus(NPSS_TO_MCU_WIRELESS_INTR);
+
+  return;
+}
+
+void wakeup_source_config(void)
+{
+    /*Configure the NPSS GPIO mode to wake up  */
+    RSI_NPSSGPIO_SetPinMux(NPSS_GPIO_2, NPSSGPIO_PIN_MUX_MODE2);
+
+    /*Configure the NPSS GPIO direction to input */
+    RSI_NPSSGPIO_SetDir(NPSS_GPIO_2, NPSS_GPIO_DIR_INPUT);
+
+    /*Configure the NPSS GPIO interrupt polarity */
+    RSI_NPSSGPIO_SetPolarity(NPSS_GPIO_2, NPSS_GPIO_INTR_LOW);
+
+    /*Enable the REN*/
+    RSI_NPSSGPIO_InputBufferEn(NPSS_GPIO_2, 1);
+
+    /* Set the GPIO to wake from deep sleep */
+    RSI_NPSSGPIO_SetWkpGpio(NPSS_GPIO_2_INTR);
+
+    /* Un mask the NPSS GPIO interrupt*/
+    RSI_NPSSGPIO_IntrUnMask(NPSS_GPIO_2_INTR);
+
+    /*Select wake up sources */
+    RSI_PS_SetWkpSources(GPIO_BASED_WAKEUP);
+
+    /*Enable the NPSS GPIO interrupt slot*/
+    NVIC_EnableIRQ(NPSS_TO_MCU_GPIO_INTR_IRQn);
+}
+
+/******************************************************************
+ * @fn   M4_sleep_wakeup()
+ * @brief
+ *       Setting the M4 to sleep
+ *
+ * @param[in] None
+ * @return
+ *        None
+ *********************************************************************/
+void M4_sleep_wakeup() {
+  if (RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN))
+  {
+    /* Configure RAM Usage and Retention Size */
+    sl_si91x_configure_ram_retention(WISEMCU_256KB_RAM_IN_USE, WISEMCU_RETAIN_DEFAULT_RAM_DURING_SLEEP);
+    SILABS_LOG("M4 going to sleep");
+    sl_si91x_trigger_sleep(SLEEP_WITH_RETENTION,
+                           DISABLE_LF_MODE,
+                           WKP_RAM_USAGE_LOCATION,
+                           (uint32_t)RSI_PS_RestoreCpuContext,
+                           IVT_OFFSET_ADDR,
+                           RSI_WAKEUP_FROM_FLASH_MODE);
+    sli_m4_ta_interrupt_init();
+    fpuInit();
+    wakeup_source_config();
+    silabsInitLog();
+    /*Start of M4 init after wake up  */
+    SILABS_LOG("M4 wakeup successful");
+  }
+}
+
+/******************************************************************
+ * @fn   InitWakeupSource()
+ * @brief
+ *       Setting the Wakeup Source of the M4
+ *
+ * @param[in] None
+ * @return
+ *        None
+ *********************************************************************/
+void InitWakeupSource() {
+  /* Configure Wakeup-Source */
+  RSI_PS_SetWkpSources(WIRELESS_BASED_WAKEUP);
+  NVIC_SetPriority(WIRELESS_WAKEUP_IRQHandler, WIRELESS_WAKEUP_IRQHandler_Priority);
+
+  /* Enable NVIC */
+  NVIC_EnableIRQ(WIRELESS_WAKEUP_IRQHandler);
+}
 /******************************************************************
  * @fn   wfx_rsi_power_save()
  * @brief
@@ -213,7 +304,7 @@ int32_t wfx_rsi_power_save()
         return status;
     }
 
-    sl_wifi_performance_profile_t wifi_profile = { ASSOCIATED_POWER_SAVE };
+    sl_wifi_performance_profile_t wifi_profile = { .profile = ASSOCIATED_POWER_SAVE };
     status                                     = sl_wifi_set_performance_profile(&wifi_profile);
     if (status != RSI_SUCCESS)
     {
@@ -264,7 +355,19 @@ static sl_status_t wfx_rsi_init(void)
         SILABS_LOG("wfx_rsi_init failed %x", status);
         return status;
     }
-#endif
+#else // For SoC
+#if SL_ICD_ENABLED 
+    uint8_t xtal_enable = 1;
+    status              = sl_si91x_m4_ta_secure_handshake(SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
+    if (status != SL_STATUS_OK) {
+        SILABS_LOG("Failed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
+    return;
+    }
+    SILABS_LOG("m4_ta_secure_handshake Success\r\n");
+    InitWakeupSource();
+#endif /* SL_ICD_ENABLED */
+#endif /* !RSI_M4_INTERFACE */
+
     status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, (sl_mac_address_t *) &wfx_rsi.sta_mac.octet[0]);
     if (status != SL_STATUS_OK)
     {
@@ -473,6 +576,10 @@ static sl_status_t wfx_rsi_do_join(void)
         wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTING;
 
         sl_wifi_set_join_callback(join_callback_handler, NULL);
+
+        // Setting the listen interval to 0 which will set it to DTIM interval
+        sl_wifi_listen_interval_t sleep_interval = { .listen_interval = 0};
+        status = sl_wifi_set_listen_interval(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
 
         /* Try to connect Wifi with given Credentials
          * untill there is a success or maximum number of tries allowed

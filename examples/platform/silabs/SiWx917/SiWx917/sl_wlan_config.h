@@ -28,7 +28,22 @@
 //! Disable feature
 #define RSI_DISABLE 0
 
-#define SI91X_LISTEN_INTERVAL 0
+//#define SI91X_LISTEN_INTERVAL   0
+#if COMMON_FLASH_EN
+#define IVT_OFFSET_ADDR 0x81C2000  //0x8012000 /*<!Application IVT location VTOR offset>        */
+#define WKP_RAM_USAGE_LOCATION 0x24061EFC //0x24061000 /*<!Bootloader RAM usage location upon wake up  */
+#else // For Dual Flash
+#define IVT_OFFSET_ADDR 0x8012000 /*<!Application IVT location VTOR offset>        */
+#define WKP_RAM_USAGE_LOCATION 0x24061000 /*<!Bootloader RAM usage location upon wake up  */
+#endif  // COMMON_FLASH_EN
+
+#define WIRELESS_WAKEUP_IRQHandler NPSS_TO_MCU_WIRELESS_INTR_IRQn
+#define WIRELESS_WAKEUP_IRQHandler_Priority 17
+
+/* Constants required to manipulate the NVIC. */
+#define portNVIC_SHPR3_REG (*((volatile uint32_t *)0xe000ed20))
+#define portNVIC_PENDSV_PRI  (((uint32_t)(0x3f << 4)) << 16UL)
+#define portNVIC_SYSTICK_PRI (((uint32_t)(0x3f << 4)) << 24UL)
 
 static const sl_wifi_device_configuration_t config = {
     .boot_option = LOAD_NWP_FW,
@@ -76,14 +91,15 @@ static const sl_wifi_device_configuration_t config = {
 #else
                      .ext_tcp_ip_feature_bit_map = (RSI_EXT_TCPIP_FEATURE_BITMAP | SL_SI91X_CONFIG_FEAT_EXTENTION_VALID),
 #endif
-                     //! ENABLE_BLE_PROTOCOL in bt_feature_bit_map
+                     //!ENABLE_BLE_PROTOCOL in bt_feature_bit_map
                      .ble_feature_bit_map =
-                         ((SL_SI91X_BLE_MAX_NBR_PERIPHERALS(RSI_BLE_MAX_NBR_PERIPHERALS) |
-                           SL_SI91X_BLE_MAX_NBR_CENTRALS(RSI_BLE_MAX_NBR_CENTRALS) |
-                           SL_SI91X_BLE_MAX_NBR_ATT_SERV(RSI_BLE_MAX_NBR_ATT_SERV) |
-                           SL_SI91X_BLE_MAX_NBR_ATT_REC(RSI_BLE_MAX_NBR_ATT_REC)) |
-                          SL_SI91X_FEAT_BLE_CUSTOM_FEAT_EXTENTION_VALID | SL_SI91X_BLE_PWR_INX(RSI_BLE_PWR_INX) |
-                          SL_SI91X_BLE_PWR_SAVE_OPTIONS(RSI_BLE_PWR_SAVE_OPTIONS) | SL_SI91X_916_BLE_COMPATIBLE_FEAT_ENABLE
+                       ((SL_SI91X_BLE_MAX_NBR_PERIPHERALS(RSI_BLE_MAX_NBR_PERIPHERALS)
+                         | SL_SI91X_BLE_MAX_NBR_CENTRALS(RSI_BLE_MAX_NBR_CENTRALS)
+                         | SL_SI91X_BLE_MAX_NBR_ATT_SERV(RSI_BLE_MAX_NBR_ATT_SERV)
+                         | SL_SI91X_BLE_MAX_NBR_ATT_REC(RSI_BLE_MAX_NBR_ATT_REC))
+                        | SL_SI91X_FEAT_BLE_CUSTOM_FEAT_EXTENTION_VALID | SL_SI91X_BLE_PWR_INX(RSI_BLE_PWR_INX)
+                        | SL_SI91X_BLE_PWR_SAVE_OPTIONS(RSI_BLE_PWR_SAVE_OPTIONS)
+                        | SL_SI91X_916_BLE_COMPATIBLE_FEAT_ENABLE
 #if RSI_BLE_GATT_ASYNC_ENABLE
                           | SL_SI91X_BLE_GATT_ASYNC_ENABLE
 #endif

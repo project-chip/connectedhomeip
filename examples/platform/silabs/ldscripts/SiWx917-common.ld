@@ -40,7 +40,7 @@ SECTIONS
 	{
 		KEEP(*(.isr_vector))
      	KEEP(*(.reset_handler))
-		*(EXCLUDE_FILE(*sl_si91x_bus.o *sl_si91x_driver.o *sli_si91x_multithreaded.o *rsi_hal_mcu_m4_ram.o ) .text*)
+		*(EXCLUDE_FILE(*sl_si91x_bus.o *sl_si91x_driver.o *sli_si91x_multithreaded.o *rsi_deepsleep_soc.o *rsi_hal_mcu_m4_ram.o *croutine.o *event_groups.o *list.o *queue.o *stream_buffer.o *tasks.o *timers.o *cmsis_os2.o *freertos_umm_malloc_host.o *port.o *heap_*.o) .text*)
 		
     /* .ctors */
     *crtbegin.o(.ctors)
@@ -131,6 +131,18 @@ SECTIONS
 		*sl_si91x_driver.o(.text*)
 		*sli_si91x_multithreaded.o(.text*)
 		*rsi_hal_mcu_m4_ram.o(.text*)
+		*rsi_deepsleep_soc.o(.text*)
+		*croutine.o(.text*)
+		*event_groups.o(.text*)
+		*list.o(.text*)
+		*queue.o(.text*)
+		*cmsis_os2.o(.text*)
+		*stream_buffer.o(.text*)
+		*tasks.o(.text*)
+		*timers.o(.text*)
+		*freertos_umm_malloc_host.o(.text*)
+		*port.o(.text*)
+		*heap_*.o(.text*)
 
     . = ALIGN(4);
     /* preinit data */
@@ -224,7 +236,7 @@ SECTIONS
     KEEP(*(.simee*))
   } > rom
 
-  linker_nvm_end = __main_flash_end__;
+  linker_nvm_end = __main_flash_end__ - 4096;
   linker_nvm_begin = linker_nvm_end - SIZEOF(.nvm);
   linker_nvm_size = SIZEOF(.nvm);
   linker_storage_end = linker_nvm_begin;
@@ -237,4 +249,3 @@ SECTIONS
   app_flash_end = 0x81c2000 + 0x200000;
   ASSERT( (linker_nvm_begin + SIZEOF(.nvm)) <= app_flash_end, "NVM3 is excessing the flash size !")
 }
-
