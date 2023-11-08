@@ -705,8 +705,7 @@ static CHIP_ERROR ConfigureBluezAdv(const BluezAdvertisement::Configuration & aB
     apEndpoint->mpAdvertisingUUID = g_strdup(aBleAdvConfig.mpAdvertisingUUID);
     apEndpoint->mAdapterId        = aBleAdvConfig.mAdapterId;
     apEndpoint->mType             = aBleAdvConfig.mType;
-    apEndpoint->mDuration         = aBleAdvConfig.mDuration;
-    apEndpoint->mDuration         = aBleAdvConfig.mDuration;
+    apEndpoint->mDurationMs         = aBleAdvConfig.mDurationMs;
 
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(apEndpoint->mDeviceIdInfo);
     SuccessOrExit(err);

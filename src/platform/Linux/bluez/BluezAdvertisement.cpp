@@ -103,7 +103,7 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     // 0xffff means no appearance
     bluez_leadvertisement1_set_appearance(adv, 0xffff);
 
-    bluez_leadvertisement1_set_duration(adv, mDuration);
+    bluez_leadvertisement1_set_duration(adv, mDurationMs);
     // empty duration, we don't have a clear notion what it would mean to timeslice between toble and anyone else
     bluez_leadvertisement1_set_timeout(adv, 0);
     // empty secondary channel for now
@@ -350,8 +350,7 @@ CHIP_ERROR BluezAdvertisement::ConfigureBluezAdv(const Configuration & aConfig)
     mpAdapterName     = g_strdup(aConfig.mpBleName);
     mpAdvertisingUUID = g_strdup(aConfig.mpAdvertisingUUID);
     mType             = aConfig.mType;
-    mDuration         = aConfig.mDuration;
-    mDuration         = aConfig.mDuration;
+    mDurationMs         = aConfig.mDurationMs;
 
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
     SuccessOrExit(err);

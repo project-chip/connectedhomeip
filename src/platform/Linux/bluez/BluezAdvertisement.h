@@ -49,7 +49,7 @@ public:
         uint64_t mDeviceId;
         uint8_t mPairingStatus;
         ChipAdvType mType;
-        uint16_t mDuration;
+        uint16_t mDurationMs;
         const char * mpAdvertisingUUID;
     };
 
@@ -86,8 +86,8 @@ private:
     char * mpAdapterName     = nullptr;
     char * mpAdvertisingUUID = nullptr;
     chip::Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
-    ChipAdvType mType;  ///< Advertisement type.
-    uint16_t mDuration; ///< Advertisement interval (in ms).
+    ChipAdvType mType;
+    uint16_t mDurationMs;
     bool mIsAdvertising = false;
 
     // Allow BluezConnection to access our private members
