@@ -26,6 +26,10 @@ class TC_ICDM_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_ICDM_2_1(self):
+        
+        if not self.check_pics("ICDM.S"):
+            logger.info("Test skipped because PICS ICDM.S is not set")
+            return
 
         endpoint = self.user_params.get("endpoint", 0)
 
@@ -33,7 +37,7 @@ class TC_ICDM_2_1(MatterBaseTest):
         attributes = Clusters.IcdManagement.Attributes
         idleModeDuration = 0
 
-        # Idle Mode Interval attribute test
+        # Idle Mode Duration attribute test
         if (self.check_pics("ICDM.S.A0000")):
             self.print_step(2, "Read IdleModeDuration Attribute")
 
@@ -44,7 +48,7 @@ class TC_ICDM_2_1(MatterBaseTest):
         else:
             asserts.assert_true(False, "IdleModeDuration is a mandatory attribute and must be present in the PICS file")
 
-        # Active Mode Interval attribute test
+        # Active Mode Duration attribute test
         if (self.check_pics("ICDM.S.A0001")):
             self.print_step(2, "Read ActiveModeDuration Attribute")
 
@@ -80,8 +84,10 @@ class TC_ICDM_2_1(MatterBaseTest):
         if (self.check_pics("ICDM.S.A0003")):
             self.print_step(2, "Read ICDCounter Attribute")
 
-            await self.read_icdm_attribute_expect_success(endpoint=endpoint,
+            ICDCounter = await self.read_icdm_attribute_expect_success(endpoint=endpoint,
                                                           attribute=attributes.ICDCounter)
+            asserts.assert_true(0 <= ICDCounter <= 4294967295,
+                                "ICDCounter attribute does not fit in a uint32.")                                              
 
         # ClientsSupportedPerFabric attribute test
         if (self.check_pics("ICDM.S.A0003")):
@@ -89,8 +95,11 @@ class TC_ICDM_2_1(MatterBaseTest):
 
             clientsSupportedPerFabric = await self.read_icdm_attribute_expect_success(endpoint=endpoint,
                                                                                       attribute=attributes.ClientsSupportedPerFabric)
+            asserts.assert_true(0 <= clientsSupportedPerFabric <= 65535,
+                                "ActiveModeThreshold ClientsSupportedPerFabric does not fit in a uint16.")
             asserts.assert_greater_equal(clientsSupportedPerFabric, 1,
-                                         "ActiveModeThreshold attribute is smaller than minimum value (300).")
+                                         "ClientsSupportedPerFabric attribute is smaller than minimum value (1).")
+
 
 
 if __name__ == "__main__":
