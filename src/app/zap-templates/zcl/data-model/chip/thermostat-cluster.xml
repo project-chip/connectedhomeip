@@ -26,10 +26,10 @@ limitations under the License.
     <field name="Setback" mask="0x10"/>
     <field name="AutoMode" mask="0x20"/>
     <field name="LocalTemperatureNotExposed" mask="0x40"/>
-    <field name="Matter Schedule Configuration" mask="0x80"/>
+    <field name="MatterScheduleConfiguration" mask="0x80"/>
     <field name="Presets" mask="0x100"/>
     <field name="Setpoints" mask="0x200"/>
-    <field name="Queued Presets Supported" mask="0x400"/>
+    <field name="QueuedPresetsSupported" mask="0x400"/>
   </bitmap>
 
   <bitmap name="DayOfWeek" type="bitmap8">
@@ -199,7 +199,7 @@ limitations under the License.
     <define>THERMOSTAT_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="6"/>
+    <globalAttribute side="either" code="0xFFFD" value="7"/>
     <attribute side="server" code="0x0000" define="LOCAL_TEMPERATURE" type="int16s" min="0x954D" max="0x7FFF" writable="false" reportable="true" optional="false" isNullable="true">LocalTemperature</attribute>
     <attribute side="server" code="0x0001" define="OUTDOOR_TEMPERATURE" type="int16s" min="0x954D" max="0x7FFF" writable="false" optional="true" isNullable="true">OutdoorTemperature</attribute>
     <attribute side="server" code="0x0002" define="THERMOSTAT_OCCUPANCY" type="bitmap8" min="0x00" max="0x01" writable="false" default="0x01" optional="true">Occupancy</attribute>
@@ -358,7 +358,7 @@ limitations under the License.
       <description>NumberOfScheduleTransitions</description>
     </attribute>
     <attribute side="server" code="0x004D" define="NUMBER_OF_SCHEDULE_TRANSITIONS_PER_DAY" type="int8u" writable="false" default="0x00" isNullable="true" optional="true" apiMaturity="provisional">
-      <description>NumberOfScheduleTransitions</description>
+      <description>NumberOfScheduleTransitionsPerDay</description>
     </attribute>
     <attribute side="server" code="0x004E" define="PRESETS" type="ARRAY" entryType="PresetStruct" optional="true" apiMaturity="provisional">
       <description>Presets</description>
