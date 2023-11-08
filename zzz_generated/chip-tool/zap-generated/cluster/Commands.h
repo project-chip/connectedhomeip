@@ -8810,6 +8810,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MACAddress                                                        | 0x0000 |
+| * LinkLocalAddress                                                  | 0x0001 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -17663,7 +17664,8 @@ void registerClusterFanControl(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<chip::app::Clusters::FanControl::FanModeEnum>>(
             Id, "fan-mode", 0, UINT8_MAX, Attributes::FanMode::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::Clusters::FanControl::FanModeSequenceEnum>>(
-            Id, "fan-mode-sequence", 0, UINT8_MAX, Attributes::FanModeSequence::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+            Id, "fan-mode-sequence", 0, UINT8_MAX, Attributes::FanModeSequence::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
             Id, "percent-setting", 0, UINT8_MAX, Attributes::PercentSetting::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::Percent>>(Id, "percent-current", 0, UINT8_MAX, Attributes::PercentCurrent::Id,
@@ -19821,6 +19823,7 @@ void registerClusterWakeOnLan(Commands & commands, CredentialIssuerCommands * cr
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "macaddress", Attributes::MACAddress::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "link-local-address", Attributes::LinkLocalAddress::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -19830,6 +19833,8 @@ void registerClusterWakeOnLan(Commands & commands, CredentialIssuerCommands * cr
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "macaddress", Attributes::MACAddress::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::ByteSpan>>(Id, "link-local-address", Attributes::LinkLocalAddress::Id,
+                                                    WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -19845,6 +19850,7 @@ void registerClusterWakeOnLan(Commands & commands, CredentialIssuerCommands * cr
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "macaddress", Attributes::MACAddress::Id, credsIssuerConfig),                       //
+        make_unique<SubscribeAttribute>(Id, "link-local-address", Attributes::LinkLocalAddress::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -20280,9 +20286,9 @@ void registerClusterContentLauncher(Commands & commands, CredentialIssuerCommand
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CharSpan>>>(
             Id, "accept-header", Attributes::AcceptHeader::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "supported-streaming-protocols", 0, UINT32_MAX,
-                                              Attributes::SupportedStreamingProtocols::Id, WriteCommandType::kWrite,
-                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap>>>(
+            Id, "supported-streaming-protocols", 0, UINT32_MAX, Attributes::SupportedStreamingProtocols::Id,
+            WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //

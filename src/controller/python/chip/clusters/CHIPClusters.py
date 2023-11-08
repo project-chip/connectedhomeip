@@ -7180,7 +7180,6 @@ class ChipClusters:
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000002: {
                 "attributeName": "PercentSetting",
@@ -9675,6 +9674,12 @@ class ChipClusters:
                 "type": "str",
                 "reportable": True,
             },
+            0x00000001: {
+                "attributeName": "LinkLocalAddress",
+                "attributeId": 0x00000001,
+                "type": "bytes",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -10235,7 +10240,6 @@ class ChipClusters:
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",

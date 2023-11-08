@@ -34,6 +34,7 @@ NOT_TERM = 'notTerm'
 FEATURE_TAG = 'feature'
 ATTRIBUTE_TAG = 'attribute'
 COMMAND_TAG = 'command'
+CONDITION_TAG = 'condition'
 
 
 class ConformanceException(Exception):
@@ -65,6 +66,14 @@ def conformance_allowed(conformance_decision: ConformanceDecision, allow_provisi
     if conformance_decision == ConformanceDecision.PROVISIONAL:
         return allow_provisional
     return True
+
+
+class zigbee:
+    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
+        return ConformanceDecision.NOT_APPLICABLE
+
+    def __str__(self):
+        return "Zigbee"
 
 
 class mandatory:
@@ -307,6 +316,8 @@ def parse_callable_from_xml(element: ElementTree.Element, params: ConformancePar
                 raise ConformanceException(f'Conformance specifies attribute or command not in table: {name}')
         elif element.tag == COMMAND_TAG:
             return command(params.command_map[element.get('name')], element.get('name'))
+        elif element.tag == CONDITION_TAG and element.get('name').lower() == 'zigbee':
+            return zigbee()
         else:
             raise ConformanceException(
                 f'Unexpected xml conformance element with no children {str(element.tag)} {str(element.attrib)}')

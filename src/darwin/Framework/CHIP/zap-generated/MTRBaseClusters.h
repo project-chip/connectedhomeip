@@ -10834,6 +10834,12 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                                  reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 + (void)readAttributeMACAddressWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+- (void)readAttributeLinkLocalAddressWithCompletion:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeLinkLocalAddressWithParams:(MTRSubscribeParams *)params
+                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                       reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeLinkLocalAddressWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -15839,8 +15845,14 @@ typedef NS_ENUM(uint8_t, MTRFanControlFanModeSequence) {
     MTRFanControlFanModeSequenceOffLowHigh MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x01,
     MTRFanControlFanModeSequenceOffLowMedHighAuto MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x02,
     MTRFanControlFanModeSequenceOffLowHighAuto MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x03,
-    MTRFanControlFanModeSequenceOffOnAuto MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x04,
-    MTRFanControlFanModeSequenceOffOn MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x05,
+    MTRFanControlFanModeSequenceOffHighAuto MTR_NEWLY_AVAILABLE = 0x04,
+    MTRFanControlFanModeSequenceOffOnAuto MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
+        MTR_NEWLY_DEPRECATED("Please use MTRFanControlFanModeSequenceOffHighAuto")
+    = 0x04,
+    MTRFanControlFanModeSequenceOffHigh MTR_NEWLY_AVAILABLE = 0x05,
+    MTRFanControlFanModeSequenceOffOn MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
+        MTR_NEWLY_DEPRECATED("Please use MTRFanControlFanModeSequenceOffHigh")
+    = 0x05,
 } MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 typedef NS_ENUM(uint8_t, MTRFanControlFanModeSequenceType) {
@@ -15848,8 +15860,8 @@ typedef NS_ENUM(uint8_t, MTRFanControlFanModeSequenceType) {
     MTRFanControlFanModeSequenceTypeOffLowHigh MTR_DEPRECATED("Please use MTRFanControlFanModeSequenceOffLowHigh", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x01,
     MTRFanControlFanModeSequenceTypeOffLowMedHighAuto MTR_DEPRECATED("Please use MTRFanControlFanModeSequenceOffLowMedHighAuto", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x02,
     MTRFanControlFanModeSequenceTypeOffLowHighAuto MTR_DEPRECATED("Please use MTRFanControlFanModeSequenceOffLowHighAuto", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x03,
-    MTRFanControlFanModeSequenceTypeOffOnAuto MTR_DEPRECATED("Please use MTRFanControlFanModeSequenceOffOnAuto", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x04,
-    MTRFanControlFanModeSequenceTypeOffOn MTR_DEPRECATED("Please use MTRFanControlFanModeSequenceOffOn", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x05,
+    MTRFanControlFanModeSequenceTypeOffOnAuto MTR_DEPRECATED("Please use MTRFanControlFanModeSequenceOffHighAuto", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x04,
+    MTRFanControlFanModeSequenceTypeOffOn MTR_DEPRECATED("Please use MTRFanControlFanModeSequenceOffHigh", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x05,
 } MTR_DEPRECATED("Please use MTRFanControlFanModeSequence", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0));
 
 typedef NS_ENUM(uint8_t, MTRFanControlStepDirection) {
@@ -16503,12 +16515,6 @@ typedef NS_OPTIONS(uint32_t, MTRKeypadInputFeature) {
     MTRKeypadInputFeatureNumberKeys MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-typedef NS_ENUM(uint8_t, MTRContentLauncherContentLaunchStatus) {
-    MTRContentLauncherContentLaunchStatusSuccess MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRContentLauncherContentLaunchStatusUrlNotAvailable MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRContentLauncherContentLaunchStatusAuthFailed MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
 typedef NS_ENUM(uint8_t, MTRContentLauncherMetricType) {
     MTRContentLauncherMetricTypePixels MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,
     MTRContentLauncherMetricTypePIXELS MTR_DEPRECATED("Please use MTRContentLauncherMetricTypePixels", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00,
@@ -16533,15 +16539,44 @@ typedef NS_ENUM(uint8_t, MTRContentLauncherParameter) {
     MTRContentLauncherParameterVideo MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0D,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRContentLauncherStatus) {
+    MTRContentLauncherStatusSuccess MTR_NEWLY_AVAILABLE = 0x00,
+    MTRContentLauncherStatusURLNotAvailable MTR_NEWLY_AVAILABLE = 0x01,
+    MTRContentLauncherStatusAuthFailed MTR_NEWLY_AVAILABLE = 0x02,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRContentLauncherContentLaunchStatus) {
+    MTRContentLauncherContentLaunchStatusSuccess MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRContentLauncherStatusSuccess")
+    = 0x00,
+    MTRContentLauncherContentLaunchStatusUrlNotAvailable MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRContentLauncherStatusURLNotAvailable")
+    = 0x01,
+    MTRContentLauncherContentLaunchStatusAuthFailed MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRContentLauncherStatusAuthFailed")
+    = 0x02,
+} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRContentLauncherStatus");
+
 typedef NS_OPTIONS(uint32_t, MTRContentLauncherFeature) {
     MTRContentLauncherFeatureContentSearch MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
     MTRContentLauncherFeatureURLPlayback MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_OPTIONS(uint32_t, MTRContentLauncherSupportedProtocolsBitmap) {
+    MTRContentLauncherSupportedProtocolsBitmapDASH MTR_NEWLY_AVAILABLE = 0x1,
+    MTRContentLauncherSupportedProtocolsBitmapHLS MTR_NEWLY_AVAILABLE = 0x2,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_OPTIONS(uint32_t, MTRContentLauncherSupportedStreamingProtocol) {
-    MTRContentLauncherSupportedStreamingProtocolDASH MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
-    MTRContentLauncherSupportedStreamingProtocolHLS MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRContentLauncherSupportedStreamingProtocolDASH MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRContentLauncherSupportedProtocolsBitmapDASH")
+    = 0x1,
+    MTRContentLauncherSupportedStreamingProtocolHLS MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRContentLauncherSupportedProtocolsBitmapHLS")
+    = 0x2,
+} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRContentLauncherSupportedProtocolsBitmap");
 
 typedef NS_ENUM(uint8_t, MTRAudioOutputOutputType) {
     MTRAudioOutputOutputTypeHDMI MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,

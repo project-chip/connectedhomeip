@@ -17717,6 +17717,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::MACAddress::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, MACAddress);
+    case Attributes::LinkLocalAddress::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, linkLocalAddress);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

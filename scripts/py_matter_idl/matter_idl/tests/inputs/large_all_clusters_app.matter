@@ -3398,7 +3398,7 @@ server cluster ContentLauncher = 1290 {
     kURLPlayback = 0x2;
   }
 
-  bitmap SupportedStreamingProtocol : BITMAP32 {
+  bitmap SupportedProtocolsBitmap : BITMAP32 {
     kDash = 0x1;
     kHls = 0x2;
   }

@@ -1828,7 +1828,7 @@ server cluster RelativeHumidityMeasurement = 1029 {
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 server cluster WakeOnLan = 1283 {
-  readonly attribute char_string<32> MACAddress = 0;
+  readonly attribute char_string<12> MACAddress = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2196,12 +2196,6 @@ server cluster KeypadInput = 1289 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 server cluster ContentLauncher = 1290 {
-  enum ContentLaunchStatusEnum : enum8 {
-    kSuccess = 0;
-    kUrlNotAvailable = 1;
-    kAuthFailed = 2;
-  }
-
   enum MetricTypeEnum : enum8 {
     kPixels = 0;
     kPercentage = 1;
@@ -2224,12 +2218,18 @@ server cluster ContentLauncher = 1290 {
     kVideo = 13;
   }
 
+  enum StatusEnum : enum8 {
+    kSuccess = 0;
+    kURLNotAvailable = 1;
+    kAuthFailed = 2;
+  }
+
   bitmap Feature : bitmap32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
   }
 
-  bitmap SupportedStreamingProtocol : bitmap32 {
+  bitmap SupportedProtocolsBitmap : bitmap32 {
     kDASH = 0x1;
     kHLS = 0x2;
   }
@@ -2241,13 +2241,13 @@ server cluster ContentLauncher = 1290 {
   }
 
   struct AdditionalInfoStruct {
-    char_string name = 0;
-    char_string value = 1;
+    char_string<256> name = 0;
+    char_string<8192> value = 1;
   }
 
   struct ParameterStruct {
     ParameterEnum type = 0;
-    char_string value = 1;
+    char_string<1024> value = 1;
     optional AdditionalInfoStruct externalIDList[] = 2;
   }
 
@@ -2256,13 +2256,13 @@ server cluster ContentLauncher = 1290 {
   }
 
   struct StyleInformationStruct {
-    optional char_string imageURL = 0;
-    optional char_string color = 1;
+    optional char_string<8192> imageURL = 0;
+    optional char_string<9> color = 1;
     optional DimensionStruct size = 2;
   }
 
   struct BrandingInformationStruct {
-    char_string providerName = 0;
+    char_string<256> providerName = 0;
     optional StyleInformationStruct background = 1;
     optional StyleInformationStruct logo = 2;
     optional StyleInformationStruct progressBar = 3;
@@ -2271,7 +2271,7 @@ server cluster ContentLauncher = 1290 {
   }
 
   readonly attribute char_string acceptHeader[] = 0;
-  attribute bitmap32 supportedStreamingProtocols = 1;
+  readonly attribute SupportedProtocolsBitmap supportedStreamingProtocols = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2292,7 +2292,7 @@ server cluster ContentLauncher = 1290 {
   }
 
   response struct LauncherResponse = 2 {
-    ContentLaunchStatusEnum status = 0;
+    StatusEnum status = 0;
     optional char_string data = 1;
   }
 

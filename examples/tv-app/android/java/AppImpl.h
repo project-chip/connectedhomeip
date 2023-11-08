@@ -76,7 +76,7 @@ using ContentLauncherDelegate     = app::Clusters::ContentLauncher::Delegate;
 using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
-using SupportedStreamingProtocol  = app::Clusters::ContentLauncher::SupportedStreamingProtocol;
+using SupportedProtocolsBitmap    = app::Clusters::ContentLauncher::SupportedProtocolsBitmap;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 using ContentAppCommandDelegate   = chip::AppPlatform::ContentAppCommandDelegate;
 
@@ -95,8 +95,7 @@ public:
                                   szApplicationVersion),
         mAccountLoginDelegate(commandDelegate, setupPIN),
         mContentLauncherDelegate(attributeDelegate, { "image/*", "video/*" },
-                                 to_underlying(SupportedStreamingProtocol::kDash) |
-                                     to_underlying(SupportedStreamingProtocol::kHls)),
+                                 to_underlying(SupportedProtocolsBitmap::kDash) | to_underlying(SupportedProtocolsBitmap::kHls)),
         mMediaPlaybackDelegate(attributeDelegate),
         mTargetNavigatorDelegate(attributeDelegate, { "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
