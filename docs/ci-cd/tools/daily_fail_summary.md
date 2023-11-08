@@ -23,6 +23,8 @@ determination of any fail with an error message.
 #### To Do
 
 -   Keep fail signature list updated to track causes of all common fails
+-   Include Darwin Test fail definitions in fail summary script - for starters,
+    Test Reliable Message Protocol
 
 #### Improvement Ideas
 
