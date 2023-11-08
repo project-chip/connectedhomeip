@@ -68,9 +68,9 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     g_variant_builder_init(&serviceDataBuilder, G_VARIANT_TYPE("a{sv}"));
     g_variant_builder_init(&serviceUUIDsBuilder, G_VARIANT_TYPE("as"));
 
-    g_variant_builder_add(&serviceDataBuilder, "{sv}", mpAdvertisingUUID,
+    g_variant_builder_add(&serviceDataBuilder, "{sv}", mpAdvUUID,
                           g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &mDeviceIdInfo, sizeof(mDeviceIdInfo), sizeof(uint8_t)));
-    g_variant_builder_add(&serviceUUIDsBuilder, "s", mpAdvertisingUUID);
+    g_variant_builder_add(&serviceUUIDsBuilder, "s", mpAdvUUID);
 
     if (mpAdapterName != nullptr)
         localName = GAutoPtr<char>(g_strdup_printf("%s", mpAdapterName));
@@ -83,7 +83,7 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     debugStr = GAutoPtr<char>(g_variant_print(serviceData, TRUE));
     ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(debugStr.get()));
 
-    bluez_leadvertisement1_set_type_(adv, (mType & BLUEZ_ADV_TYPE_CONNECTABLE) ? "peripheral" : "broadcast");
+    bluez_leadvertisement1_set_type_(adv, (mAdvType & BLUEZ_ADV_TYPE_CONNECTABLE) ? "peripheral" : "broadcast");
     // empty manufacturer data
     // empty solicit UUIDs
     bluez_leadvertisement1_set_service_data(adv, serviceData);
@@ -92,8 +92,8 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     // Setting "Discoverable" to False on the adapter and to True on the advertisement convinces
     // Bluez to set "BR/EDR Not Supported" flag. Bluez doesn't provide API to do that explicitly
     // and the flag is necessary to force using LE transport.
-    bluez_leadvertisement1_set_discoverable(adv, (mType & BLUEZ_ADV_TYPE_SCANNABLE) ? TRUE : FALSE);
-    if (mType & BLUEZ_ADV_TYPE_SCANNABLE)
+    bluez_leadvertisement1_set_discoverable(adv, (mAdvType & BLUEZ_ADV_TYPE_SCANNABLE) ? TRUE : FALSE);
+    if (mAdvType & BLUEZ_ADV_TYPE_SCANNABLE)
         bluez_leadvertisement1_set_discoverable_timeout(adv, UINT16_MAX);
 
     // advertising name corresponding to the PID and object path, for debug purposes
@@ -103,7 +103,7 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     // 0xffff means no appearance
     bluez_leadvertisement1_set_appearance(adv, 0xffff);
 
-    bluez_leadvertisement1_set_duration(adv, mDurationMs);
+    bluez_leadvertisement1_set_duration(adv, mAdvDurationMs);
     // empty duration, we don't have a clear notion what it would mean to timeslice between toble and anyone else
     bluez_leadvertisement1_set_timeout(adv, 0);
     // empty secondary channel for now
@@ -143,7 +143,8 @@ CHIP_ERROR BluezAdvertisement::InitImpl()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezAdvertisement::Init(BluezEndpoint * apEndpoint, const Configuration & aConfig)
+CHIP_ERROR BluezAdvertisement::Init(BluezEndpoint * apEndpoint, ChipAdvType aAdvType, const char * aAdvUUID,
+                                    uint32_t aAdvDurationMs)
 {
     GAutoPtr<char> rootPath;
     CHIP_ERROR err;
@@ -153,14 +154,22 @@ CHIP_ERROR BluezAdvertisement::Init(BluezEndpoint * apEndpoint, const Configurat
     VerifyOrExit(mpAdv == nullptr, err = CHIP_ERROR_INCORRECT_STATE;
                  ChipLogError(DeviceLayer, "FAIL: BLE advertisement already initialized in %s", __func__));
 
-    mpRoot    = g_object_ref(apEndpoint->mpRoot);
-    mpAdapter = g_object_ref(apEndpoint->mpAdapter);
+    mpRoot        = g_object_ref(apEndpoint->mpRoot);
+    mpAdapter     = g_object_ref(apEndpoint->mpAdapter);
+    mpAdapterName = g_strdup(apEndpoint->mpAdapterName);
 
     g_object_get(G_OBJECT(mpRoot), "object-path", &MakeUniquePointerReceiver(rootPath).Get(), nullptr);
-    mpAdvPath = g_strdup_printf("%s/advertising", rootPath.get());
+    mpAdvPath      = g_strdup_printf("%s/advertising", rootPath.get());
+    mAdvType       = aAdvType;
+    mpAdvUUID      = g_strdup(aAdvUUID);
+    mAdvDurationMs = aAdvDurationMs;
 
-    err = ConfigureBluezAdv(aConfig);
+    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
     ReturnErrorOnFailure(err);
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    mDeviceIdInfo.SetAdditionalDataFlag(true);
+#endif
 
     err = PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezAdvertisement * self) { return self->InitImpl(); }, this);
@@ -209,8 +218,8 @@ void BluezAdvertisement::Shutdown()
     mpAdvPath = nullptr;
     g_free(mpAdapterName);
     mpAdapterName = nullptr;
-    g_free(mpAdvertisingUUID);
-    mpAdvertisingUUID = nullptr;
+    g_free(mpAdvUUID);
+    mpAdvUUID = nullptr;
 
     mIsInitialized = false;
 }
@@ -337,34 +346,6 @@ CHIP_ERROR BluezAdvertisement::Stop()
         +[](BluezAdvertisement * self) { return self->StopImpl(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(Ble, "Failed to schedule BLE advertisement Stop() on CHIPoBluez thread"));
-    return err;
-}
-
-CHIP_ERROR BluezAdvertisement::ConfigureBluezAdv(const Configuration & aConfig)
-{
-    const char * msg = nullptr;
-    CHIP_ERROR err   = CHIP_NO_ERROR;
-    VerifyOrExit(aConfig.mpBleName != nullptr, msg = "FAIL: BLE name is NULL");
-    VerifyOrExit(aConfig.mpAdvertisingUUID != nullptr, msg = "FAIL: BLE mpAdvertisingUUID is NULL");
-
-    mpAdapterName     = g_strdup(aConfig.mpBleName);
-    mpAdvertisingUUID = g_strdup(aConfig.mpAdvertisingUUID);
-    mType             = aConfig.mType;
-    mDurationMs         = aConfig.mDurationMs;
-
-    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
-    SuccessOrExit(err);
-
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    mDeviceIdInfo.SetAdditionalDataFlag(true);
-#endif
-
-exit:
-    if (nullptr != msg)
-    {
-        ChipLogDetail(DeviceLayer, "%s in %s", msg, __func__);
-        err = CHIP_ERROR_INCORRECT_STATE;
-    }
     return err;
 }
 

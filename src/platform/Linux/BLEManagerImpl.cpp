@@ -186,23 +186,15 @@ uint16_t BLEManagerImpl::_NumConnections()
 
 CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
 {
-    CHIP_ERROR err                  = CHIP_NO_ERROR;
-    mBLEAdvConfig.mpBleName         = mDeviceName;
-    mBLEAdvConfig.mAdapterId        = aAdapterId;
-    mBLEAdvConfig.mMajor            = 1;
-    mBLEAdvConfig.mMinor            = 1;
-    mBLEAdvConfig.mVendorId         = 1;
-    mBLEAdvConfig.mProductId        = 1;
-    mBLEAdvConfig.mDeviceId         = 1;
-    mBLEAdvConfig.mDurationMs       = 2;
-    mBLEAdvConfig.mPairingStatus    = 0;
-    mBLEAdvConfig.mType             = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;
-    mBLEAdvConfig.mpAdvertisingUUID = "0xFFF6";
 
     mAdapterId = aAdapterId;
     mIsCentral = aIsCentral;
 
-    return err;
+    mBLEAdvType       = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;
+    mBLEAdvDurationMs = 2;
+    mpBLEAdvUUID      = "0xFFF6";
+
+    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
@@ -613,7 +605,7 @@ void BLEManagerImpl::DriveBLEState()
             // be called again, and execution will proceed to the code below.
             if (!mFlags.Has(Flags::kAdvertisingConfigured))
             {
-                err = mBLEAdvertisement.Init(mpEndpoint, mBLEAdvConfig);
+                err = mBLEAdvertisement.Init(mpEndpoint, mBLEAdvType, mpBLEAdvUUID, mBLEAdvDurationMs);
                 ExitNow();
             }
 

@@ -32,39 +32,21 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-struct BLEAdvConfig;
 struct BluezEndpoint;
 
 class BluezAdvertisement
 {
 public:
-    struct Configuration
-    {
-        char * mpBleName;
-        uint32_t mAdapterId;
-        uint8_t mMajor;
-        uint8_t mMinor;
-        uint16_t mVendorId;
-        uint16_t mProductId;
-        uint64_t mDeviceId;
-        uint8_t mPairingStatus;
-        ChipAdvType mType;
-        uint16_t mDurationMs;
-        const char * mpAdvertisingUUID;
-    };
-
     BluezAdvertisement() = default;
     ~BluezAdvertisement() { Shutdown(); }
 
-    CHIP_ERROR Init(BluezEndpoint * apEndpoint, const Configuration & aConfig);
+    CHIP_ERROR Init(BluezEndpoint * apEndpoint, ChipAdvType aAdvType, const char * aAdvUUID, uint32_t aAdvDurationMs);
     void Shutdown();
 
     CHIP_ERROR Start();
     CHIP_ERROR Stop();
 
 private:
-    CHIP_ERROR ConfigureBluezAdv(const Configuration & aConfig);
-
     BluezLEAdvertisement1 * CreateLEAdvertisement();
     gboolean BluezLEAdvertisement1Release(BluezLEAdvertisement1 * aAdv, GDBusMethodInvocation * aInv);
 
@@ -81,17 +63,15 @@ private:
     BluezAdapter1 * mpAdapter         = nullptr;
     BluezLEAdvertisement1 * mpAdv     = nullptr;
 
-    bool mIsInitialized      = false;
-    char * mpAdvPath         = nullptr;
-    char * mpAdapterName     = nullptr;
-    char * mpAdvertisingUUID = nullptr;
-    chip::Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
-    ChipAdvType mType;
-    uint16_t mDurationMs;
+    bool mIsInitialized = false;
     bool mIsAdvertising = false;
 
-    // Allow BluezConnection to access our private members
-    friend class BluezConnection;
+    Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
+    char * mpAdvPath     = nullptr;
+    char * mpAdapterName = nullptr;
+    char * mpAdvUUID     = nullptr;
+    ChipAdvType mAdvType;
+    uint16_t mAdvDurationMs = 0;
 };
 
 } // namespace Internal

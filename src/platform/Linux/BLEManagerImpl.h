@@ -190,7 +190,9 @@ private:
     BluezEndpoint * mpEndpoint = nullptr;
 
     BluezAdvertisement mBLEAdvertisement;
-    BluezAdvertisement::Configuration mBLEAdvConfig;
+    ChipAdvType mBLEAdvType    = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;
+    uint16_t mBLEAdvDurationMs = 20;
+    const char * mpBLEAdvUUID  = nullptr;
 
     ChipDeviceScanner mDeviceScanner;
     BLEScanConfig mBLEScanConfig;
