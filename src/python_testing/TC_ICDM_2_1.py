@@ -17,7 +17,10 @@
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
+import logging
 
+logger = logging.getLogger('PythonMatterControllerTEST')
+logger.setLevel(logging.INFO)
 
 class TC_ICDM_2_1(MatterBaseTest):
     async def read_icdm_attribute_expect_success(self, endpoint, attribute):
