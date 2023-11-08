@@ -15900,6 +15900,25 @@ typedef NS_OPTIONS(uint8_t, MTRFanControlWindSupportMask) {
     MTRFanControlWindSupportMaskNaturalWind MTR_DEPRECATED("Please use MTRFanControlWindBitmapNaturalWind", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0)) = 0x2,
 } MTR_DEPRECATED("Please use MTRFanControlWindBitmap", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0));
 
+typedef NS_ENUM(uint8_t, MTRThermostatUserInterfaceConfigurationKeypadLockout) {
+    MTRThermostatUserInterfaceConfigurationKeypadLockoutNoLockout MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRThermostatUserInterfaceConfigurationKeypadLockoutLockout1 MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRThermostatUserInterfaceConfigurationKeypadLockoutLockout2 MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRThermostatUserInterfaceConfigurationKeypadLockoutLockout3 MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRThermostatUserInterfaceConfigurationKeypadLockoutLockout4 MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRThermostatUserInterfaceConfigurationKeypadLockoutLockout5 MTR_PROVISIONALLY_AVAILABLE = 0x05,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRThermostatUserInterfaceConfigurationScheduleProgrammingVisibility) {
+    MTRThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityScheduleProgrammingPermitted MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityScheduleProgrammingDenied MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRThermostatUserInterfaceConfigurationTemperatureDisplayMode) {
+    MTRThermostatUserInterfaceConfigurationTemperatureDisplayModeCelsius MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRThermostatUserInterfaceConfigurationTemperatureDisplayModeFahrenheit MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRColorControlColorLoopAction) {
     MTRColorControlColorLoopActionDeactivate MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRColorControlColorLoopActionActivateFromColorLoopStartEnhancedHue MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,

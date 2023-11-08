@@ -2927,7 +2927,48 @@ enum class WindBitmap : uint8_t
 };
 } // namespace FanControl
 
-namespace ThermostatUserInterfaceConfiguration {} // namespace ThermostatUserInterfaceConfiguration
+namespace ThermostatUserInterfaceConfiguration {
+
+// Enum for KeypadLockoutEnum
+enum class KeypadLockoutEnum : uint8_t
+{
+    kNoLockout = 0x00,
+    kLockout1  = 0x01,
+    kLockout2  = 0x02,
+    kLockout3  = 0x03,
+    kLockout4  = 0x04,
+    kLockout5  = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 6,
+};
+
+// Enum for ScheduleProgrammingVisibilityEnum
+enum class ScheduleProgrammingVisibilityEnum : uint8_t
+{
+    kScheduleProgrammingPermitted = 0x00,
+    kScheduleProgrammingDenied    = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for TemperatureDisplayModeEnum
+enum class TemperatureDisplayModeEnum : uint8_t
+{
+    kCelsius    = 0x00,
+    kFahrenheit = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+} // namespace ThermostatUserInterfaceConfiguration
 
 namespace ColorControl {
 
