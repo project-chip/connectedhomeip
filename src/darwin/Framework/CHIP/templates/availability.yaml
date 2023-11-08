@@ -7832,6 +7832,32 @@
               # Targeting Spring 2024 Matter release
               - TimeSnapshot
               - TimeSnapshotResponse
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              - QueryIdentity
+              - QueryIdentityResponse
+      command fields:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              AddOrUpdateWiFiNetwork:
+                  - networkIdentity
+                  - clientIdentifier
+                  - possessionNonce
+              NetworkConfigResponse:
+                  - clientIdentity
+                  - possessionSignature
+              QueryIdentity:
+                  - keyIdentifier
+                  - possessionNonce
+              QueryIdentityResponse:
+                  - identity
+                  - possessionSignature
+      struct fields:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              NetworkInfoStruct:
+                  - networkIdentifier
+                  - clientIdentifier
       bitmaps:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -7841,6 +7867,12 @@
               Feature:
                   # Targeting Spring 2024 Matter release
                   - OffOnly
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              Feature:
+                  - PerDeviceCredentials
+              WiFiSecurityBitmap:
+                  - WPA3MatterPDC
   renames:
       event fields:
           WiFiNetworkDiagnostics:

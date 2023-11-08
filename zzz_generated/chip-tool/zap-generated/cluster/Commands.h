@@ -2734,6 +2734,7 @@ private:
 | * RemoveNetwork                                                     |   0x04 |
 | * ConnectNetwork                                                    |   0x06 |
 | * ReorderNetwork                                                    |   0x08 |
+| * QueryIdentity                                                     |   0x09 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MaxNetworks                                                       | 0x0000 |
@@ -2808,6 +2809,9 @@ public:
         AddArgument("Ssid", &mRequest.ssid);
         AddArgument("Credentials", &mRequest.credentials);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
+        AddArgument("NetworkIdentity", &mRequest.networkIdentity);
+        AddArgument("ClientIdentifier", &mRequest.clientIdentifier);
+        AddArgument("PossessionNonce", &mRequest.possessionNonce);
         ClusterCommand::AddArguments();
     }
 
@@ -2991,6 +2995,45 @@ public:
 
 private:
     chip::app::Clusters::NetworkCommissioning::Commands::ReorderNetwork::Type mRequest;
+};
+
+/*
+ * Command QueryIdentity
+ */
+class NetworkCommissioningQueryIdentity : public ClusterCommand
+{
+public:
+    NetworkCommissioningQueryIdentity(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("query-identity", credsIssuerConfig)
+    {
+        AddArgument("KeyIdentifier", &mRequest.keyIdentifier);
+        AddArgument("PossessionNonce", &mRequest.possessionNonce);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkCommissioning::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::NetworkCommissioning::Commands::QueryIdentity::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkCommissioning::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::NetworkCommissioning::Commands::QueryIdentity::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::NetworkCommissioning::Commands::QueryIdentity::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -13367,6 +13410,7 @@ void registerClusterNetworkCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<NetworkCommissioningRemoveNetwork>(credsIssuerConfig),            //
         make_unique<NetworkCommissioningConnectNetwork>(credsIssuerConfig),           //
         make_unique<NetworkCommissioningReorderNetwork>(credsIssuerConfig),           //
+        make_unique<NetworkCommissioningQueryIdentity>(credsIssuerConfig),            //
         //
         // Attributes
         //
