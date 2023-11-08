@@ -26,7 +26,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_ICDM_2_1(self):
-        
+
         if not self.check_pics("ICDM.S"):
             logger.info("Test skipped because PICS ICDM.S is not set")
             return
@@ -85,9 +85,9 @@ class TC_ICDM_2_1(MatterBaseTest):
             self.print_step(2, "Read ICDCounter Attribute")
 
             ICDCounter = await self.read_icdm_attribute_expect_success(endpoint=endpoint,
-                                                          attribute=attributes.ICDCounter)
+                                                                       attribute=attributes.ICDCounter)
             asserts.assert_true(0 <= ICDCounter <= 4294967295,
-                                "ICDCounter attribute does not fit in a uint32.")                                              
+                                "ICDCounter attribute does not fit in a uint32.")
 
         # ClientsSupportedPerFabric attribute test
         if (self.check_pics("ICDM.S.A0003")):
@@ -99,7 +99,6 @@ class TC_ICDM_2_1(MatterBaseTest):
                                 "ActiveModeThreshold ClientsSupportedPerFabric does not fit in a uint16.")
             asserts.assert_greater_equal(clientsSupportedPerFabric, 1,
                                          "ClientsSupportedPerFabric attribute is smaller than minimum value (1).")
-
 
 
 if __name__ == "__main__":
