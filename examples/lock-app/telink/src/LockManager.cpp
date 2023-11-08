@@ -108,7 +108,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                     LOG_INF("Lock Action: Lock action failed to initiate. No action performed");
                     mState = kState_NotFulyLocked;
                 }
-                if (mStateChangeCallback) 
+                if (mStateChangeCallback)
                     mStateChangeCallback(mState);
             }
             else
@@ -127,7 +127,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                     {
                         LOG_INF("Unlock Action: Step 1: Unbolt completed");
                         mState = kState_UnlatchInitiated;
-                        if (mStateChangeCallback) 
+                        if (mStateChangeCallback)
                             mStateChangeCallback(mState);
                         status = DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kUnlocked,
                             source, NullNullable, NullNullable, NullNullable, NullNullable);
@@ -135,7 +135,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                         {
                             LOG_INF("Unlock Action: Step 2: Unlock completed");
                             mState = kState_UnlockInitiated;
-                            if (mStateChangeCallback) 
+                            if (mStateChangeCallback)
                                 mStateChangeCallback(mState);
                             k_timer_start(&mActuatorTimer, K_MSEC(LOCK_MANAGER_ACTUATOR_MOVEMENT_TIME_MS), K_NO_WAIT);
                         }
@@ -150,10 +150,10 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                         LOG_INF("Unlock Action: Step 1: Unbolt failed. no action performed");
                         mState = kState_NotFulyLocked;
                     }
-                    if (mStateChangeCallback) 
+                    if (mStateChangeCallback)
                         mStateChangeCallback(mState);
                 }
-                else 
+                else
                 {
                     status = DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kUnlocked,
                         source, NullNullable, NullNullable, NullNullable, NullNullable);
@@ -168,7 +168,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                         LOG_INF("Unlock Action: Unlock failed. no action performed");
                         mState = kState_NotFulyLocked;
                     }
-                    if (mStateChangeCallback) 
+                    if (mStateChangeCallback)
                         mStateChangeCallback(mState);
                 }
             }
@@ -193,7 +193,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                     LOG_INF("Unbolt Action: Unbolt failed. no action performed");
                     mState = kState_NotFulyLocked;
                 }
-                if (mStateChangeCallback) 
+                if (mStateChangeCallback)
                     mStateChangeCallback(mState);
             }
             else
@@ -232,7 +232,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                     LOG_INF("Lock Action: Lock action failed to initiate. No action performed");
                     mState = kState_NotFulyLocked;
                 }
-                if (mStateChangeCallback) 
+                if (mStateChangeCallback)
                     mStateChangeCallback(mState);
             }
             else
@@ -250,14 +250,14 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                     {
                         LOG_INF("Unlock Action: Step 1: Unbolt completed");
                         mState = kState_UnlatchInitiated;
-                        if (mStateChangeCallback) 
+                        if (mStateChangeCallback)
                             mStateChangeCallback(mState);
                         status = setLockState(kExampleEndpointId, DlLockState::kUnlocked, source, err, fabricIdx, nodeId, pinCode);
                         if (status)
                         {
                             LOG_INF("Unlock Action: Step 2: Unlock completed");
                             mState = kState_UnlockInitiated;
-                            if (mStateChangeCallback) 
+                            if (mStateChangeCallback)
                                 mStateChangeCallback(mState);
                             k_timer_start(&mActuatorTimer, K_MSEC(LOCK_MANAGER_ACTUATOR_MOVEMENT_TIME_MS), K_NO_WAIT);
                         }
@@ -272,10 +272,10 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                         LOG_INF("Unlock Action: Step 1: Unbolt failed. no action performed");
                         mState = kState_NotFulyLocked;
                     }
-                    if (mStateChangeCallback) 
+                    if (mStateChangeCallback)
                         mStateChangeCallback(mState);
                 }
-                else 
+                else
                 {
                     status = setLockState(kExampleEndpointId, DlLockState::kUnlocked, source, err, fabricIdx, nodeId, pinCode);
                     if (status)
@@ -289,7 +289,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                         LOG_INF("Unlock Action: Unlock failed. no action performed");
                         mState = kState_NotFulyLocked;
                     }
-                    if (mStateChangeCallback) 
+                    if (mStateChangeCallback)
                         mStateChangeCallback(mState);
                 }
             }
@@ -313,7 +313,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                     LOG_INF("Unbolt Action: Unbolt failed. no action performed");
                     mState = kState_NotFulyLocked;
                 }
-                if (mStateChangeCallback) 
+                if (mStateChangeCallback)
                     mStateChangeCallback(mState);
             }
             else
@@ -356,19 +356,19 @@ void LockManager::ActuatorAppEventHandler(const AppEvent & event)
     case kState_LockInitiated:
         LOG_INF("Lock action completed");
         lock->mState = kState_LockCompleted;
-        if (lock->mStateChangeCallback) 
+        if (lock->mStateChangeCallback)
             lock->mStateChangeCallback(lock->mState);
         break;
     case kState_UnlockInitiated:
         LOG_INF("Unlock action completed");
         lock->mState = kState_UnlockCompleted;
-        if (lock->mStateChangeCallback) 
+        if (lock->mStateChangeCallback)
             lock->mStateChangeCallback(lock->mState);
         break;
     case kState_UnlatchInitiated:
         LOG_INF("Unbolt action completed");
         lock->mState = kState_UnlatchCompleted;
-        if (lock->mStateChangeCallback) 
+        if (lock->mStateChangeCallback)
             lock->mStateChangeCallback(lock->mState);
         break;
 
@@ -649,7 +649,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     err = ZephyrConfig::WriteConfigValueBin(LockSettingsStorage::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
                                       sizeof(mCredentialData));
     if (err != CHIP_NO_ERROR)
-    ChipLogError(Zcl, "Failed to write kConfigKey_CredentialData. User data will be resetted during reboot. Not enough storage space \n");                              
+    ChipLogError(Zcl, "Failed to write kConfigKey_CredentialData. User data will be resetted during reboot. Not enough storage space \n");
 #endif
 
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
@@ -836,8 +836,8 @@ const char * LockManager::lockStateToString(DlLockState lockState) const
     return "Unknown";
 }
 
-bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockState, OperationSource source, 
-                                OperationErrorEnum & err, const Nullable<chip::FabricIndex> & fabricIdx, 
+bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockState, OperationSource source,
+                                OperationErrorEnum & err, const Nullable<chip::FabricIndex> & fabricIdx,
                                 const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin)
 {
     // Assume pin is required until told otherwise
@@ -934,7 +934,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
                         LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin, credentialIndex } };
                         auto userCredentials = chip::app::DataModel::MakeNullable<List<const LockOpCredentials>>(userCredential);
 
-                        DoorLockServer::Instance().SetLockState(endpointId, lockState, source, 
+                        DoorLockServer::Instance().SetLockState(endpointId, lockState, source,
                         chip::app::DataModel::MakeNullable(static_cast<uint16_t>(userIndex)), userCredentials, fabricIdx, nodeId);
                         return true;
                     }

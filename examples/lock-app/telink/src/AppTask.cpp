@@ -142,7 +142,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
         case LockManager::kState_UnlockCompleted:
             LockMgr().LockAction(AppEvent::kEventType_Lock, LockManager::LOCK_ACTION, LockManager::OperationSource::kButton, kExampleEndpointId);
         break;
-        default: 
+        default:
             LOG_INF("Lock is in intermediate state, ignoring button");
         break;
     }
