@@ -39,10 +39,10 @@ constructor(
   val lockState: LiveData<LockState>
     get() = _lockState.asLiveData()
 
-  private val _batteryStatus: MutableStateFlow<Int> =
+  private val _batteryRemainingPercentage: MutableStateFlow<Int> =
     getBatPercentRemainingUseCase() as MutableStateFlow<Int>
-  val batteryStatus: LiveData<Int>
-    get() = _batteryStatus.asLiveData()
+  val batteryRemainingPercentage: LiveData<Int>
+    get() = _batteryRemainingPercentage.asLiveData()
 
   init {
     viewModelScope.launch { startMatterAppServiceUseCase(matterSettings) }
@@ -87,7 +87,7 @@ constructor(
   }
 
   fun updateBatterySeekbarProgress(progress: Int) {
-    _batteryStatus.value = progress
+    _batteryRemainingPercentage.value = progress
   }
 
   fun updateBatteryStatusToCluster(progress: Int) {
