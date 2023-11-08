@@ -508,7 +508,6 @@ static void EndpointCleanup(BluezEndpoint * apEndpoint)
         g_free(apEndpoint->mpAdapterName);
         g_free(apEndpoint->mpAdapterAddr);
         g_free(apEndpoint->mpRootPath);
-        g_free(apEndpoint->mpAdvPath);
         g_free(apEndpoint->mpServicePath);
         if (apEndpoint->mpObjMgr != nullptr)
             g_object_unref(apEndpoint->mpObjMgr);
@@ -526,11 +525,8 @@ static void EndpointCleanup(BluezEndpoint * apEndpoint)
             g_object_unref(apEndpoint->mpC2);
         if (apEndpoint->mpC3 != nullptr)
             g_object_unref(apEndpoint->mpC3);
-        if (apEndpoint->mpAdv != nullptr)
-            g_object_unref(apEndpoint->mpAdv);
         if (apEndpoint->mpConnMap != nullptr)
             g_hash_table_destroy(apEndpoint->mpConnMap);
-        g_free(apEndpoint->mpAdvertisingUUID);
         g_free(apEndpoint->mpPeerDevicePath);
         if (apEndpoint->mpConnectCancellable != nullptr)
             g_object_unref(apEndpoint->mpConnectCancellable);
@@ -696,31 +692,11 @@ CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint)
 
 static CHIP_ERROR ConfigureBluezAdv(const BluezAdvertisement::Configuration & aBleAdvConfig, BluezEndpoint * apEndpoint)
 {
-    const char * msg = nullptr;
-    CHIP_ERROR err   = CHIP_NO_ERROR;
-    VerifyOrExit(aBleAdvConfig.mpBleName != nullptr, msg = "FAIL: BLE name is NULL");
-    VerifyOrExit(aBleAdvConfig.mpAdvertisingUUID != nullptr, msg = "FAIL: BLE mpAdvertisingUUID is NULL");
-
-    apEndpoint->mpAdapterName     = g_strdup(aBleAdvConfig.mpBleName);
-    apEndpoint->mpAdvertisingUUID = g_strdup(aBleAdvConfig.mpAdvertisingUUID);
-    apEndpoint->mAdapterId        = aBleAdvConfig.mAdapterId;
-    apEndpoint->mType             = aBleAdvConfig.mType;
-    apEndpoint->mDurationMs         = aBleAdvConfig.mDurationMs;
-
-    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(apEndpoint->mDeviceIdInfo);
-    SuccessOrExit(err);
-
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    apEndpoint->mDeviceIdInfo.SetAdditionalDataFlag(true);
-#endif
-
-exit:
-    if (nullptr != msg)
-    {
-        ChipLogDetail(DeviceLayer, "%s in %s", msg, __func__);
-        err = CHIP_ERROR_INCORRECT_STATE;
-    }
-    return err;
+    VerifyOrReturnError(aBleAdvConfig.mpBleName != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogDetail(DeviceLayer, "FAIL: BLE name is NULL in %s", __func__));
+    apEndpoint->mpAdapterName = g_strdup(aBleAdvConfig.mpBleName);
+    apEndpoint->mAdapterId    = aBleAdvConfig.mAdapterId;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const BluezAdvertisement::Configuration & aBleAdvConfig,

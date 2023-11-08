@@ -71,7 +71,6 @@ struct BluezEndpoint
 
     // Paths for objects published by this service
     char * mpRootPath;
-    char * mpAdvPath;
     char * mpServicePath;
 
     // Objects (interfaces) subscribed to by this service
@@ -87,18 +86,10 @@ struct BluezEndpoint
     // additional data characteristics
     BluezGattCharacteristic1 * mpC3;
 
-    // Objects (interfaces) used by LE advertisement
-    BluezLEAdvertisement1 * mpAdv;
-
     // map device path to the connection
     GHashTable * mpConnMap;
     uint32_t mAdapterId;
     bool mIsCentral;
-    char * mpAdvertisingUUID;
-    chip::Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
-    ChipAdvType mType;
-    uint16_t mDurationMs;
-    bool mIsAdvertising;
     char * mpPeerDevicePath;
     GCancellable * mpConnectCancellable = nullptr;
 };
