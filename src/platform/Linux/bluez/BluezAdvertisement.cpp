@@ -107,8 +107,6 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     g_dbus_object_manager_server_export(mpRoot, G_DBUS_OBJECT_SKELETON(object));
     g_object_unref(object);
 
-    BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(true, nullptr);
-
     return adv;
 }
 

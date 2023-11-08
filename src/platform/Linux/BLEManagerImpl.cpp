@@ -275,12 +275,6 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX,
                                  PacketBufferHandle::Adopt(apEvent->Platform.BLEIndicationReceived.mData));
         break;
-    case DeviceEventType::kPlatformLinuxBLEPeripheralAdvConfiguredComplete:
-        VerifyOrExit(apEvent->Platform.BLEPeripheralAdvConfiguredComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
-        sInstance.mFlags.Set(Flags::kAdvertisingConfigured).Clear(Flags::kControlOpInProgress);
-        controlOpComplete = true;
-        ChipLogProgress(DeviceLayer, "CHIPoBLE advertising config complete");
-        break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvStartComplete:
         VerifyOrExit(apEvent->Platform.BLEPeripheralAdvStartComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
         sInstance.mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
@@ -600,20 +594,19 @@ void BLEManagerImpl::DriveBLEState()
         {
             mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
 
-            // Configure advertising data if it hasn't been done yet.  This is an asynchronous step which
-            // must complete before advertising can be started.  When that happens, this method will
-            // be called again, and execution will proceed to the code below.
+            // Configure advertising data if it hasn't been done yet.
             if (!mFlags.Has(Flags::kAdvertisingConfigured))
             {
                 err = mBLEAdvertisement.Init(mpEndpoint, mBLEAdvType, mpBLEAdvUUID, mBLEAdvDurationMs);
-                ExitNow();
+                SuccessOrExit(err);
+                mFlags.Set(Flags::kAdvertisingConfigured)
             }
 
-            // Start advertising.  This is also an asynchronous step.
+            // Start advertising. This is an asynchronous step. BLE manager will be notified of
+            // advertising start completion via a call to NotifyBLEPeripheralAdvStartComplete.
             err = mBLEAdvertisement.Start();
             SuccessOrExit(err);
-
-            mFlags.Set(Flags::kAdvertising);
+            mFlags.Set(Flags::kControlOpInProgress);
             ExitNow();
         }
     }
@@ -733,15 +726,6 @@ void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, voi
     event.Type                                                 = DeviceEventType::kPlatformLinuxBLEPeripheralRegisterAppComplete;
     event.Platform.BLEPeripheralRegisterAppComplete.mIsSuccess = aIsSuccess;
     event.Platform.BLEPeripheralRegisterAppComplete.mpAppstate = apAppstate;
-    PlatformMgr().PostEventOrDie(&event);
-}
-
-void BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, void * apAppstate)
-{
-    ChipDeviceEvent event;
-    event.Type = DeviceEventType::kPlatformLinuxBLEPeripheralAdvConfiguredComplete;
-    event.Platform.BLEPeripheralAdvConfiguredComplete.mIsSuccess = aIsSuccess;
-    event.Platform.BLEPeripheralAdvConfiguredComplete.mpAppstate = apAppstate;
     PlatformMgr().PostEventOrDie(&event);
 }
 
