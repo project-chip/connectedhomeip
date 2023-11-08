@@ -20,14 +20,12 @@ import logging
 import os
 import typing
 import xml.etree.ElementTree as ElementTree
-
-import chip.clusters as Clusters
-
 from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Callable
 
+import chip.clusters as Clusters
 from chip.tlv import uint
 from conformance_support import (DEPRECATE_CONFORM, DISALLOW_CONFORM, MANDATORY_CONFORM, OPTIONAL_CONFORM, OTHERWISE_CONFORM,
                                  PROVISIONAL_CONFORM, ConformanceDecision, ConformanceException, ConformanceParseParameters,
