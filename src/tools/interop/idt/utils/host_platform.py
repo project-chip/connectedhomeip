@@ -73,7 +73,6 @@ def verify_host_dependencies(deps: [str]) -> None:
     if missing_deps:
         for missing_dep in missing_deps:
             border_print(f"Missing dependency, please install {missing_dep}!", important=True)
-            logger.critical("Run idt_clean_child to close any dangling processes!")
         sys.exit(1)
 
 
@@ -86,4 +85,5 @@ def verify_py_version() -> None:
             and int(py_version_minor) >= int(config.py_minor_version)):
         logger.critical(
             f"IDT requires python >= {need} but you have {have}")
+        logger.critical("Please install the correct version, delete idt/venv, and re-run!")
         sys.exit(1)
