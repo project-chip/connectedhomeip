@@ -13,7 +13,7 @@ import timber.log.Timber
 @Singleton
 class DoorLockManagerStub @Inject constructor(private val deviceApp: DeviceApp) : DoorLockManager {
 
-  private val _lockState = MutableStateFlow(LockState.UNLOCKED)
+  private val _lockState = MutableStateFlow(LockState.LOCKED)
   val lockState: StateFlow<LockState>
     get() = _lockState
 
