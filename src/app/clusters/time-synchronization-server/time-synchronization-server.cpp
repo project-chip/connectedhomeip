@@ -771,6 +771,13 @@ CHIP_ERROR TimeSynchronizationServer::GetDefaultNtp(MutableCharSpan & dntp)
 Span<TimeSyncDataProvider::TimeZoneStore> & TimeSynchronizationServer::GetTimeZone()
 {
     mTimeZoneObj.timeZoneList = mTimeZoneObj.timeZoneList.SubSpan(0, mTimeZoneObj.validSize);
+
+    // Make sure the sizes of the entries is correct
+    for (auto & tzStore : mTimeZoneObj.timeZoneList)
+    {
+        tzStore.timeZone.name = MakeOptional(CharSpan(tzStore.name, strlen(tzStore.name)));
+    }
+
     return mTimeZoneObj.timeZoneList;
 }
 
