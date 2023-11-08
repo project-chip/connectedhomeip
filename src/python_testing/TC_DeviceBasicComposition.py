@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-import logging
+
 from dataclasses import dataclass
 from typing import Any, Callable
 
@@ -24,13 +24,10 @@ import chip.clusters.ClusterObjects
 import chip.tlv
 from basic_composition_support import BasicCompositionTests
 from chip.clusters.Attribute import ValueDecodeFailure
-from chip.tlv import uint
-from conformance_support import ConformanceDecision, conformance_allowed
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
                                     async_test_body, default_matter_test_main)
 from mobly import asserts
-from spec_parsing_support import CommandType, build_xml_clusters
 from taglist_and_topology_test_support import (create_device_type_list_for_root, create_device_type_lists, find_tag_list_problems,
                                                find_tree_roots, get_all_children, get_direct_children_of_root, parts_list_cycles,
                                                separate_endpoint_types)

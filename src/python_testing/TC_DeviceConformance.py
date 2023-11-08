@@ -15,25 +15,16 @@
 #    limitations under the License.
 #
 
-import logging
-from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Callable
 
 import chip.clusters as Clusters
-import chip.clusters.ClusterObjects
-import chip.tlv
 from basic_composition_support import BasicCompositionTests
-from chip.clusters.Attribute import ValueDecodeFailure
 from chip.tlv import uint
 from conformance_support import ConformanceDecision, conformance_allowed
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
                                     async_test_body, default_matter_test_main)
-from mobly import asserts
 from spec_parsing_support import CommandType, build_xml_clusters
-from taglist_and_topology_test_support import (create_device_type_list_for_root, create_device_type_lists, find_tag_list_problems,
-                                               find_tree_roots, get_all_children, get_direct_children_of_root, parts_list_cycles,
-                                               separate_endpoint_types)
 
 
 class TC_DeviceConformance(MatterBaseTest, BasicCompositionTests):
@@ -102,7 +93,7 @@ class TC_DeviceConformance(MatterBaseTest, BasicCompositionTests):
                         self.record_error(self.get_test_name(), location=location, problem=f'Unknown feature with mask 0x{f:02x}')
                         success = False
                         continue
-                    if cluster_id in ignore_features and feature_mask in ignore_features[cluster_id]:
+                    if cluster_id in ignore_features and f in ignore_features[cluster_id]:
                         continue
                     xml_feature = self.xml_clusters[cluster_id].features[f]
                     conformance_decision = xml_feature.conformance(feature_map, attribute_list, all_command_list)
