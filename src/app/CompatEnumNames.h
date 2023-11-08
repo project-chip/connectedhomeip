@@ -58,6 +58,11 @@ namespace ApplicationLauncher {
 using ApplicationLauncherStatusEnum = StatusEnum;
 } // namespace ApplicationLauncher
 
+namespace TargetNavigator {
+// https://github.com/project-chip/connectedhomeip/pull/30316 renamed this
+using KeypadInputStatusEnum = StatusEnum;
+} // namespace TargetNavigator
+
 namespace Channel {
 using ChannelStatusEnum = StatusEnum;
 } // namespace Channel
