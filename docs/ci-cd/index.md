@@ -6,7 +6,7 @@
 
 ## Tools
 
-### Daily Fail Summary
+-   [Daily Fail Summary](tools/daily_fail_summary.md)
 
 ## To Do
 
