@@ -3,7 +3,7 @@
 ```{toctree}
 :glob:
 
-*
+tools/*
 ```
 
 ## Known Issues
