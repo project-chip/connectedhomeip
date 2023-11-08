@@ -431,7 +431,7 @@ def test_tv_ctrl(device, controller):
                                 dict(target=current_target_id, data=None),
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == TargetNavigator.Enums.TargetNavigatorStatusEnum.kSuccess
+    assert res.status == TargetNavigator.Enums.StatusEnum.kSuccess
 
     err, res = read_zcl_attribute(devCtrl, "TargetNavigator", "CurrentTarget", nodeId, endpoint)
     assert err == 0
