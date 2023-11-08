@@ -94,16 +94,17 @@ protected:
     bool mIsInitialized                      = false;
 
 private:
-    void ResetPendingKey(bool keepOpaqueKey = false)
+    void ResetPendingKey(bool keepKeyPairInStorage = false)
     {
-        if (mPendingKeypair != nullptr)
+        if (mPendingKeypair != nullptr && !keepKeyPairInStorage)
         {
-            if (!keepOpaqueKey)
-            {
-                mPendingKeypair->Delete();
-            }
-            Platform::Delete(mPendingKeypair);
+            // This removes the PSA Keypair from storage and unloads it
+            // using the EFR32OpaqueKeypair context.
+            // We destroy it when the OperationKeyStore process failed.
+            mPendingKeypair->DestroyKey();
         }
+
+        Platform::Delete(mPendingKeypair);
         mPendingKeypair         = nullptr;
         mIsPendingKeypairActive = false;
         mPendingFabricIndex     = kUndefinedFabricIndex;
