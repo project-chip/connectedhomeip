@@ -92,7 +92,7 @@ CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
     }
 
     // LastConfiguredBy is optional, so we don't want to fail the command if it fails to update
-    VerifyOrReturnValue((EMBER_ZCL_STATUS_SUCCESS == status || EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status), CHIP_NO_ERROR);
+    VerifyOrReturnValue(!(EMBER_ZCL_STATUS_SUCCESS == status || EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status), CHIP_NO_ERROR);
     return AddResponseOnError(ctx, resp, status);
 }
 
