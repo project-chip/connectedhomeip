@@ -9,8 +9,8 @@ tools/*
 ## Known Issues
 
 -   Python build running out of space
-    - [Fail example](https://github.com/project-chip/connectedhomeip/actions/runs/6239660536/job/16938053552?pr=29333)
-    - May need intermediate cleanup steps  
+    -   [Fail example](https://github.com/project-chip/connectedhomeip/actions/runs/6239660536/job/16938053552?pr=29333)
+    -   May need intermediate cleanup steps
 
 ## Tools
 
