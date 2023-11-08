@@ -210,7 +210,7 @@ limitations under the License.
             <arg name="PossessionNonce" type="OCTET_STRING" length="32" optional="true"/>
             <access op="invoke" privilege="administer"/>
         </command>
-        <command source="server" code="0x0a" name="QueryIdentityResponse" optional="true" cli="chip network_commissioning queryidentityresponse">
+        <command source="server" code="0x0a" name="QueryIdentityResponse" optional="true">
             <description>Command that contains details about a network client identity and optionally a proof of possession.</description>
             <arg name="Identity" type="OCTET_STRING" length="140"/>
             <arg name="PossessionSignature" type="OCTET_STRING" length="64" optional="true"/>
