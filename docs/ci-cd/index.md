@@ -21,6 +21,6 @@ tools/*
 -   Cert image auto build
     -   [Initial code](https://github.com/woody-apple/connectedhomeip/tree/build-cert-bins)
     -   Need to change chip-build image builds to cut down time
-    -   Do multiplatform builds for ARM64
+    -   Do multi-platform builds for ARM64
 
 ## General Improvement Ideas
