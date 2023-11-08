@@ -194,11 +194,12 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
     mBLEAdvConfig.mVendorId         = 1;
     mBLEAdvConfig.mProductId        = 1;
     mBLEAdvConfig.mDeviceId         = 1;
-    mBLEAdvConfig.mDurationMs         = 2;
+    mBLEAdvConfig.mDurationMs       = 2;
     mBLEAdvConfig.mPairingStatus    = 0;
     mBLEAdvConfig.mType             = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;
     mBLEAdvConfig.mpAdvertisingUUID = "0xFFF6";
 
+    mAdapterId = aAdapterId;
     mIsCentral = aIsCentral;
 
     return err;
@@ -584,7 +585,7 @@ void BLEManagerImpl::DriveBLEState()
     // Initializes the Bluez BLE layer if needed.
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kBluezBLELayerInitialized))
     {
-        err = InitBluezBleLayer(mIsCentral, nullptr, mBLEAdvConfig, mpEndpoint);
+        err = InitBluezBleLayer(mAdapterId, mIsCentral, nullptr, mDeviceName, mpEndpoint);
         SuccessOrExit(err);
         mFlags.Set(Flags::kBluezBLELayerInitialized);
     }

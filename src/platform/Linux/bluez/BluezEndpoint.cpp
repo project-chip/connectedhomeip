@@ -690,16 +690,7 @@ CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint)
     return err;
 }
 
-static CHIP_ERROR ConfigureBluezAdv(const BluezAdvertisement::Configuration & aBleAdvConfig, BluezEndpoint * apEndpoint)
-{
-    VerifyOrReturnError(aBleAdvConfig.mpBleName != nullptr, CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogDetail(DeviceLayer, "FAIL: BLE name is NULL in %s", __func__));
-    apEndpoint->mpAdapterName = g_strdup(aBleAdvConfig.mpBleName);
-    apEndpoint->mAdapterId    = aBleAdvConfig.mAdapterId;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const BluezAdvertisement::Configuration & aBleAdvConfig,
+CHIP_ERROR InitBluezBleLayer(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr, const char * apBleName,
                              BluezEndpoint *& apEndpoint)
 {
     BluezEndpoint * endpoint = g_new0(BluezEndpoint, 1);
@@ -709,16 +700,15 @@ CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const Blue
         endpoint->mpAdapterAddr = g_strdup(apBleAddr);
 
     endpoint->mpConnMap  = g_hash_table_new(g_str_hash, g_str_equal);
+    endpoint->mAdapterId = aAdapterId;
     endpoint->mIsCentral = aIsCentral;
 
     if (!aIsCentral)
     {
-        err = ConfigureBluezAdv(aBleAdvConfig, endpoint);
-        SuccessOrExit(err);
+        endpoint->mpAdapterName = g_strdup(apBleName);
     }
     else
     {
-        endpoint->mAdapterId           = aBleAdvConfig.mAdapterId;
         endpoint->mpConnectCancellable = g_cancellable_new();
     }
 

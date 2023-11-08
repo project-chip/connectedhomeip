@@ -45,7 +45,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <gio/gio.h>
 #include <glib.h>
@@ -53,7 +53,6 @@
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
 
-#include "BluezAdvertisement.h"
 #include "BluezConnection.h"
 #include "Types.h"
 
@@ -94,7 +93,7 @@ struct BluezEndpoint
     GCancellable * mpConnectCancellable = nullptr;
 };
 
-CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const BluezAdvertisement::Configuration & aBleAdvConfig,
+CHIP_ERROR InitBluezBleLayer(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr, const char * apBleName,
                              BluezEndpoint *& apEndpoint);
 CHIP_ERROR ShutdownBluezBleLayer(BluezEndpoint * apEndpoint);
 CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint);

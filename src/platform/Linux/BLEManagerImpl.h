@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
 
 #include <ble/BleLayer.h>
@@ -182,6 +183,8 @@ private:
 
     CHIPoBLEServiceMode mServiceMode;
     BitFlags<Flags> mFlags;
+
+    uint32_t mAdapterId = 0;
     char mDeviceName[kMaxDeviceNameLength + 1];
     bool mIsCentral            = false;
     BluezEndpoint * mpEndpoint = nullptr;
