@@ -1,5 +1,11 @@
 # CI/CD Documentation
 
+```{toctree}
+:glob:
+
+*
+```
+
 ## Known Issues
 
 -   Python build running out of space
