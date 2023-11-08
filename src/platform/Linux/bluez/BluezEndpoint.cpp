@@ -694,7 +694,7 @@ CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint)
     return err;
 }
 
-static CHIP_ERROR ConfigureBluezAdv(const BLEAdvConfig & aBleAdvConfig, BluezEndpoint * apEndpoint)
+static CHIP_ERROR ConfigureBluezAdv(const BluezAdvertisement::Configuration & aBleAdvConfig, BluezEndpoint * apEndpoint)
 {
     const char * msg = nullptr;
     CHIP_ERROR err   = CHIP_NO_ERROR;
@@ -724,7 +724,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const BLEAdvConfig & aBleAdvConfig,
+CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const BluezAdvertisement::Configuration & aBleAdvConfig,
                              BluezEndpoint *& apEndpoint)
 {
     BluezEndpoint * endpoint = g_new0(BluezEndpoint, 1);

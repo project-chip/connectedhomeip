@@ -143,7 +143,7 @@ CHIP_ERROR BluezAdvertisement::InitImpl()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezAdvertisement::Init(BluezEndpoint * apEndpoint, const BLEAdvConfig & aBleAdvConfig)
+CHIP_ERROR BluezAdvertisement::Init(BluezEndpoint * apEndpoint, const Configuration & aConfig)
 {
     GAutoPtr<char> rootPath;
     CHIP_ERROR err;
@@ -159,7 +159,7 @@ CHIP_ERROR BluezAdvertisement::Init(BluezEndpoint * apEndpoint, const BLEAdvConf
     g_object_get(G_OBJECT(mpRoot), "object-path", &MakeUniquePointerReceiver(rootPath).Get(), nullptr);
     mpAdvPath = g_strdup_printf("%s/advertising", rootPath.get());
 
-    err = ConfigureBluezAdv(aBleAdvConfig);
+    err = ConfigureBluezAdv(aConfig);
     ReturnErrorOnFailure(err);
 
     err = PlatformMgrImpl().GLibMatterContextInvokeSync(
@@ -340,18 +340,18 @@ CHIP_ERROR BluezAdvertisement::Stop()
     return err;
 }
 
-CHIP_ERROR BluezAdvertisement::ConfigureBluezAdv(const BLEAdvConfig & aBleAdvConfig)
+CHIP_ERROR BluezAdvertisement::ConfigureBluezAdv(const Configuration & aConfig)
 {
     const char * msg = nullptr;
     CHIP_ERROR err   = CHIP_NO_ERROR;
-    VerifyOrExit(aBleAdvConfig.mpBleName != nullptr, msg = "FAIL: BLE name is NULL");
-    VerifyOrExit(aBleAdvConfig.mpAdvertisingUUID != nullptr, msg = "FAIL: BLE mpAdvertisingUUID is NULL");
+    VerifyOrExit(aConfig.mpBleName != nullptr, msg = "FAIL: BLE name is NULL");
+    VerifyOrExit(aConfig.mpAdvertisingUUID != nullptr, msg = "FAIL: BLE mpAdvertisingUUID is NULL");
 
-    mpAdapterName     = g_strdup(aBleAdvConfig.mpBleName);
-    mpAdvertisingUUID = g_strdup(aBleAdvConfig.mpAdvertisingUUID);
-    mType             = aBleAdvConfig.mType;
-    mDuration         = aBleAdvConfig.mDuration;
-    mDuration         = aBleAdvConfig.mDuration;
+    mpAdapterName     = g_strdup(aConfig.mpBleName);
+    mpAdvertisingUUID = g_strdup(aConfig.mpAdvertisingUUID);
+    mType             = aConfig.mType;
+    mDuration         = aConfig.mDuration;
+    mDuration         = aConfig.mDuration;
 
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
     SuccessOrExit(err);

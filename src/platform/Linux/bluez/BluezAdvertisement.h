@@ -38,17 +38,32 @@ struct BluezEndpoint;
 class BluezAdvertisement
 {
 public:
+    struct Configuration
+    {
+        char * mpBleName;
+        uint32_t mAdapterId;
+        uint8_t mMajor;
+        uint8_t mMinor;
+        uint16_t mVendorId;
+        uint16_t mProductId;
+        uint64_t mDeviceId;
+        uint8_t mPairingStatus;
+        ChipAdvType mType;
+        uint16_t mDuration;
+        const char * mpAdvertisingUUID;
+    };
+
     BluezAdvertisement() = default;
     ~BluezAdvertisement() { Shutdown(); }
 
-    CHIP_ERROR Init(BluezEndpoint * apEndpoint, const BLEAdvConfig & aBleAdvConfig);
+    CHIP_ERROR Init(BluezEndpoint * apEndpoint, const Configuration & aConfig);
     void Shutdown();
 
     CHIP_ERROR Start();
     CHIP_ERROR Stop();
 
 private:
-    CHIP_ERROR ConfigureBluezAdv(const BLEAdvConfig & aBleAdvConfig);
+    CHIP_ERROR ConfigureBluezAdv(const Configuration & aConfig);
 
     BluezLEAdvertisement1 * CreateLEAdvertisement();
     gboolean BluezLEAdvertisement1Release(BluezLEAdvertisement1 * aAdv, GDBusMethodInvocation * aInv);

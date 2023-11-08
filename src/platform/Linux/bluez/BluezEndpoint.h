@@ -53,14 +53,13 @@
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
 
+#include "BluezAdvertisement.h"
 #include "BluezConnection.h"
 #include "Types.h"
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-struct BLEAdvConfig;
 
 struct BluezEndpoint
 {
@@ -104,7 +103,7 @@ struct BluezEndpoint
     GCancellable * mpConnectCancellable = nullptr;
 };
 
-CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const BLEAdvConfig & aBleAdvConfig,
+CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const BluezAdvertisement::Configuration & aBleAdvConfig,
                              BluezEndpoint *& apEndpoint);
 CHIP_ERROR ShutdownBluezBleLayer(BluezEndpoint * apEndpoint);
 CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint);

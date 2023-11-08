@@ -39,21 +39,6 @@ namespace Internal {
 
 void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
 
-struct BLEAdvConfig
-{
-    char * mpBleName;
-    uint32_t mAdapterId;
-    uint8_t mMajor;
-    uint8_t mMinor;
-    uint16_t mVendorId;
-    uint16_t mProductId;
-    uint64_t mDeviceId;
-    uint8_t mPairingStatus;
-    ChipAdvType mType;
-    uint16_t mDuration;
-    const char * mpAdvertisingUUID;
-};
-
 enum class BleScanState : uint8_t
 {
     kNotScanning,
@@ -196,14 +181,16 @@ private:
     void CleanScanConfig();
 
     CHIPoBLEServiceMode mServiceMode;
-    BLEAdvConfig mBLEAdvConfig;
-    BLEScanConfig mBLEScanConfig;
     BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
     bool mIsCentral            = false;
     BluezEndpoint * mpEndpoint = nullptr;
+
     BluezAdvertisement mBLEAdvertisement;
+    BluezAdvertisement::Configuration mBLEAdvConfig;
+
     ChipDeviceScanner mDeviceScanner;
+    BLEScanConfig mBLEScanConfig;
 };
 
 /**
