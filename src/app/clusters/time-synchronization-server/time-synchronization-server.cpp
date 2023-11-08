@@ -775,7 +775,7 @@ Span<TimeSyncDataProvider::TimeZoneStore> & TimeSynchronizationServer::GetTimeZo
     // Make sure the sizes of the entries is correct
     for (auto & tzStore : mTimeZoneObj.timeZoneList)
     {
-        tzStore.timeZone.name = MakeOptional(CharSpan(tzStore.name, strlen(tzStore.name)));
+        tzStore.timeZone.name = MakeOptional(CharSpan(tzStore.name, strnlen(tzStore.name, sizeof(tzStore.name))));
     }
 
     return mTimeZoneObj.timeZoneList;
