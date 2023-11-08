@@ -44,10 +44,11 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     BluezObjectSkeleton * object;
     GVariant * serviceData;
     GVariant * serviceUUID;
-    GAutoPtr<char> localName;
     GVariantBuilder serviceDataBuilder;
     GVariantBuilder serviceUUIDsBuilder;
     GAutoPtr<char> debugStr;
+    const char * localNamePtr;
+    char localName[32];
 
     ChipLogDetail(DeviceLayer, "Create BLE adv object at %s", mpAdvPath);
     object = bluez_object_skeleton_new(mpAdvPath);
@@ -61,10 +62,12 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
                           g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &mDeviceIdInfo, sizeof(mDeviceIdInfo), sizeof(uint8_t)));
     g_variant_builder_add(&serviceUUIDsBuilder, "s", mpAdvUUID);
 
-    if (mpAdapterName != nullptr)
-        localName = GAutoPtr<char>(g_strdup_printf("%s", mpAdapterName));
-    else
-        localName = GAutoPtr<char>(g_strdup_printf("%s%04x", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, getpid() & 0xffff));
+    localNamePtr = mpAdapterName;
+    if (localNamePtr == nullptr)
+    {
+        g_snprintf(localName, sizeof(localName), "%s%04x", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, getpid() & 0xffff);
+        localNamePtr = localName;
+    }
 
     serviceData = g_variant_builder_end(&serviceDataBuilder);
     serviceUUID = g_variant_builder_end(&serviceUUIDsBuilder);
@@ -86,7 +89,7 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
         bluez_leadvertisement1_set_discoverable_timeout(adv, UINT16_MAX);
 
     // advertising name corresponding to the PID and object path, for debug purposes
-    bluez_leadvertisement1_set_local_name(adv, localName.get());
+    bluez_leadvertisement1_set_local_name(adv, localNamePtr);
     bluez_leadvertisement1_set_service_uuids(adv, serviceUUID);
 
     // 0xffff means no appearance

@@ -599,7 +599,7 @@ void BLEManagerImpl::DriveBLEState()
             {
                 err = mBLEAdvertisement.Init(mpEndpoint, mBLEAdvType, mpBLEAdvUUID, mBLEAdvDurationMs);
                 SuccessOrExit(err);
-                mFlags.Set(Flags::kAdvertisingConfigured)
+                mFlags.Set(Flags::kAdvertisingConfigured);
             }
 
             // Start advertising. This is an asynchronous step. BLE manager will be notified of

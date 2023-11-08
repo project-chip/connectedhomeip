@@ -44,7 +44,16 @@ public:
     CHIP_ERROR Init(BluezEndpoint * apEndpoint, ChipAdvType aAdvType, const char * aAdvUUID, uint32_t aAdvDurationMs);
     void Shutdown();
 
+    /// Start BLE advertising.
+    ///
+    /// BLE advertising is started asynchronously. Application will be notified of
+    /// completion via a call to BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete().
     CHIP_ERROR Start();
+
+    /// Stop BLE advertising.
+    ///
+    /// BLE advertising is stopped asynchronously. Application will be notified of
+    /// completion via a call to BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete().
     CHIP_ERROR Stop();
 
 private:
