@@ -113,7 +113,12 @@ public:
         mMaxPathsPerInvoke = maxPathsPerInvoke;
         return *reinterpret_cast<Derived *>(this);
     }
-    uint16_t GetMaxPathsPerInvoke() const { return mMaxPathsPerInvoke; }
+    Optional<uint16_t> GetMaxPathsPerInvoke() const {
+        if (mMaxPathsPerInvoke == 1) {
+            return NullOptional;
+        }
+        return MakeOptional(mMaxPathsPerInvoke);
+    }
 
 private:
     uint16_t mPort                   = CHIP_PORT;

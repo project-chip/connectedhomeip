@@ -208,14 +208,14 @@ Optional<System::Clock::Milliseconds16> GetRetryActiveThreshold(const ByteSpan &
 
 Optional<uint16_t> GetMaxPathsPerInvoke(const ByteSpan & value)
 {
-    const auto retryInterval = MakeU16FromAsciiDecimal(value);
+    const auto maxPathsPerInvoke = MakeU16FromAsciiDecimal(value);
 
-    if (retryInterval == 0)
+    if (maxPathsPerInvoke == 0)
     {
         return NullOptional;
     }
 
-    return MakeOptional(retryInterval);
+    return MakeOptional(maxPathsPerInvoke);
 }
 
 TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
