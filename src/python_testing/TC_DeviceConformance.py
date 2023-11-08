@@ -56,10 +56,16 @@ class TC_DeviceConformance(MatterBaseTest, BasicCompositionTests):
         is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         ignore_attributes: dict[int, list[int]] = {}
+        ignore_features: dict[int, list[int]] = {}
         if ignore_in_progress:
             # This is a manually curated list of attributes that are in-progress in the SDK, but have landed in the spec
-            in_progress_attributes = {Clusters.BasicInformation.id: [0x15, 0x016]}
+            in_progress_attributes = {Clusters.BasicInformation.id: [0x15, 0x016],
+                                      Clusters.PowerSource.id: [0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A]}
             ignore_attributes.update(in_progress_attributes)
+            # The spec currently has an error on the power source features
+            # This should be removed once https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/7823 lands
+            in_progress_features = {Clusters.PowerSource.id: [(1 << 2), (1 << 3), (1 << 4), (1 << 5)]}
+            ignore_features.update(in_progress_features)
 
         if is_ci:
             # The network commissioning clusters on the CI select the features on the fly and end up non-conformant
@@ -96,6 +102,8 @@ class TC_DeviceConformance(MatterBaseTest, BasicCompositionTests):
                         self.record_error(self.get_test_name(), location=location, problem=f'Unknown feature with mask 0x{f:02x}')
                         success = False
                         continue
+                    if cluster_id in ignore_features and feature_mask in ignore_features[cluster_id]:
+                        continue
                     xml_feature = self.xml_clusters[cluster_id].features[f]
                     conformance_decision = xml_feature.conformance(feature_map, attribute_list, all_command_list)
                     if not conformance_allowed(conformance_decision, allow_provisional):
@@ -103,6 +111,8 @@ class TC_DeviceConformance(MatterBaseTest, BasicCompositionTests):
                                           problem=f'Disallowed feature with mask 0x{f:02x}')
                         success = False
                 for feature_mask, xml_feature in self.xml_clusters[cluster_id].features.items():
+                    if cluster_id in ignore_features and feature_mask in ignore_features[cluster_id]:
+                        continue
                     conformance_decision = xml_feature.conformance(feature_map, attribute_list, all_command_list)
                     if conformance_decision == ConformanceDecision.MANDATORY and feature_mask not in feature_masks:
                         self.record_error(self.get_test_name(), location=location,
@@ -179,13 +189,19 @@ class TC_DeviceConformance(MatterBaseTest, BasicCompositionTests):
         # TODO: Add choice checkers
 
         if not success:
-            # TODO: Right now, we have failures in all-cluster, so we can't fail this test and keep it in CI. For now, just log.
-            # Issue tracking: #29812
-            # self.fail_current_test("Problems with conformance")
-            logging.error("Problems found with conformance, this should turn into a test failure once #29812 is resolved")
+            self.fail_current_test("Problems with conformance")
 
     def test_IDM_10_3(self):
         success = True
+
+        ignore_in_progress = self.user_params.get("ignore_in_progress", False)
+
+        ignore_revisions: list[int] = []
+        if ignore_in_progress:
+            # This is a manually curated list of cluster revisions that are in-progress in the SDK, but have landed in the spec
+            in_progress_revisions = [Clusters.BasicInformation.id, Clusters.PowerSource.id, Clusters.NetworkCommissioning.id]
+            ignore_revisions.extend(in_progress_revisions)
+
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
                 if cluster_id not in self.xml_clusters.keys():
@@ -197,6 +213,8 @@ class TC_DeviceConformance(MatterBaseTest, BasicCompositionTests):
                     self.record_warning(self.get_test_name(), location=location,
                                         problem='Standard cluster found on device, but is not present in spec data')
                     continue
+                if cluster_id in ignore_revisions:
+                    continue
                 if int(self.xml_clusters[cluster_id].revision) != cluster[GlobalAttributeIds.CLUSTER_REVISION_ID]:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
                                                      attribute_id=GlobalAttributeIds.CLUSTER_REVISION_ID)
@@ -204,10 +222,7 @@ class TC_DeviceConformance(MatterBaseTest, BasicCompositionTests):
                     ), location=location, problem=f'Revision found on cluster ({cluster[GlobalAttributeIds.CLUSTER_REVISION_ID]}) does not match revision listed in the spec ({self.xml_clusters[cluster_id].revision})')
                     success = False
         if not success:
-            # TODO: Right now, we have failures in all-cluster, so we can't fail this test and keep it in CI. For now, just log.
-            # Issue tracking: #30210
-            # self.fail_current_test("Problems with cluster revision on at least one cluster")
-            logging.error('Problems with cluster revision on at least one cluster')
+            self.fail_current_test("Problems with cluster revision on at least one cluster")
 
 
 if __name__ == "__main__":
