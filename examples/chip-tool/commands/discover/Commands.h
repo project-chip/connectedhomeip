@@ -55,7 +55,7 @@ public:
                         result.mrpRemoteConfig.mActiveRetransTimeout.count());
         ChipLogProgress(chipTool, "   Supports TCP: %s", result.supportsTcp ? "yes" : "no");
         ChipLogProgress(chipTool, "   ICD is operating as: %s", result.isICDOperatingAsLIT ? "LIT" : "SIT");
-        ChipLogProgress(chipTool, "   Max paths per invoke: %" PRIu16, result.maxPathsPerInvoke);
+        ChipLogProgress(chipTool, "   Max paths per invoke: %u", result.maxPathsPerInvoke);
         SetCommandExitStatus(CHIP_NO_ERROR);
     }
 
