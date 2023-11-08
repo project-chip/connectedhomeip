@@ -40,6 +40,6 @@ determination of any fail with an error message.
 
 -   Cert image auto build
 -   Include Darwin Test fail definitions in fail summary script - for starters,
-    TestReliableMessageProtocol
+    Test Reliable Message Protocol
 
 ## General Improvement Ideas
