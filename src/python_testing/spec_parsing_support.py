@@ -24,9 +24,10 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Callable
 
+import chip.clusters as Clusters
 from chip.tlv import uint
 from conformance_support import (DEPRECATE_CONFORM, DISALLOW_CONFORM, MANDATORY_CONFORM, OPTIONAL_CONFORM, OTHERWISE_CONFORM,
-                                 PROVISIONAL_CONFORM, ConformanceDecision, ConformanceException, ConformanceParseParameters,
+                                 PROVISIONAL_CONFORM, ConformanceDecision, ConformanceException, ConformanceParseParameters, feature,
                                  or_operation, parse_callable_from_xml)
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, EventPathLocation,
                                     FeaturePathLocation, ProblemNotice, ProblemSeverity)
@@ -345,5 +346,18 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
         new.derived = alias_base_name
         new.name = alias_name
         clusters[id] = new
+
+    # Workaround for temp control cluster - this is parsed incorrectly in the DM XML and is missing all its attributes
+    # Remove this workaround when https://github.com/csa-data-model/projects/issues/330 is fixed
+    temp_control_id = Clusters.TemperatureControl.id
+    if temp_control_id in clusters and not clusters[temp_control_id].attributes:
+        clusters[temp_control_id].attributes = {
+            0x00: XmlAttribute(name='TemperatureSetpoint', datatype='temperature', conformance=feature(0x01, 'TN')),
+            0x01: XmlAttribute(name='MinTemperature', datatype='temperature', conformance=feature(0x01, 'TN')),
+            0x02: XmlAttribute(name='MaxTemperature', datatype='temperature', conformance=feature(0x01, 'TN')),
+            0x03: XmlAttribute(name='Step', datatype='temperature', conformance=feature(0x04, 'STEP')),
+            0x04: XmlAttribute(name='SelectedTemperatureLevel', datatype='uint8', conformance=feature(0x02, 'TL')),
+            0x05: XmlAttribute(name='SupportedTemperatureLevels', datatype='list', conformance=feature(0x02, 'TL')),
+        }
 
     return clusters, problems
