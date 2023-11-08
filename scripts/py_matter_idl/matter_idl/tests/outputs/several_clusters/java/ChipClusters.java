@@ -17,68 +17,84 @@
 
 package chip.devicecontroller;
 
+import chip.devicecontroller.model.AttributeState;
+import chip.devicecontroller.model.AttributeWriteRequest;
+import chip.devicecontroller.model.ChipAttributePath;
+import chip.devicecontroller.model.ChipEventPath;
+import chip.devicecontroller.model.ClusterState;
+import chip.devicecontroller.model.EndpointState;
+import chip.devicecontroller.model.InvokeElement;
+import chip.devicecontroller.model.NodeState;
+
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import static chip.devicecontroller.ChipTLVType.*;
+
 public class ChipClusters {
 
-  public interface DefaultClusterCallback {
-    void onSuccess();
+  public interface BaseClusterCallback {
     void onError(Exception error);
   }
 
-  public interface CharStringAttributeCallback {
+  public interface DefaultClusterCallback extends BaseClusterCallback {
+    void onSuccess();
+  }
+
+  public interface BaseAttributeCallback {
+    void onError(Exception error);
+    default void onSubscriptionEstablished(long subscriptionId) {}
+  }
+
+  public interface CharStringAttributeCallback extends BaseAttributeCallback {
     /** Indicates a successful read for a CHAR_STRING attribute. */
     void onSuccess(String value);
-    void onError(Exception error);
-    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
-  public interface OctetStringAttributeCallback {
+  public interface OctetStringAttributeCallback extends BaseAttributeCallback {
     /** Indicates a successful read for an OCTET_STRING attribute. */
     void onSuccess(byte[] value);
-    void onError(Exception error);
-    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
-  public interface IntegerAttributeCallback {
+  public interface IntegerAttributeCallback extends BaseAttributeCallback {
     void onSuccess(int value);
-    void onError(Exception error);
-    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
-  public interface LongAttributeCallback {
+  public interface LongAttributeCallback extends BaseAttributeCallback {
     void onSuccess(long value);
-    void onError(Exception error);
-    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
-  public interface BooleanAttributeCallback {
+  public interface BooleanAttributeCallback extends BaseAttributeCallback {
     void onSuccess(boolean value);
-    void onError(Exception error);
-    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
-  public interface FloatAttributeCallback {
+  public interface FloatAttributeCallback extends BaseAttributeCallback {
     void onSuccess(float value);
-    void onError(Exception error);
-    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
-  public interface DoubleAttributeCallback {
+  public interface DoubleAttributeCallback extends BaseAttributeCallback {
     void onSuccess(double value);
-    void onError(Exception error);
-    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public static abstract class BaseChipCluster {
     protected long chipClusterPtr;
 
-    public BaseChipCluster(long devicePtr, int endpointId) {
-      chipClusterPtr = initWithDevice(devicePtr, endpointId);
+    protected long devicePtr;
+    protected int endpointId;
+    protected long clusterId;
+
+    private Optional<Long> timeoutMillis = Optional.empty();
+
+    public BaseChipCluster(long devicePtr, int endpointId, long clusterId) {
+      this.devicePtr = devicePtr;
+      this.endpointId = endpointId;
+      this.clusterId = clusterId;
     }
 
     /**
@@ -87,22 +103,64 @@ public class ChipClusters {
      * empty optional, the default timeout will be used.
      */
     public void setCommandTimeout(Optional<Long> timeoutMillis) {
-      setCommandTimeout(chipClusterPtr, timeoutMillis);
+      this.timeoutMillis = timeoutMillis;
     }
-
-    private native void setCommandTimeout(long clusterPtr, Optional<Long> timeoutMillis);
 
     /** Returns the current timeout (in milliseconds) for commands sent through this cluster. */
     public Optional<Long> getCommandTimeout() {
-      Optional<Long> timeout = getCommandTimeout(chipClusterPtr);
-      return timeout == null ? Optional.empty() : timeout;
+      return timeoutMillis == null ? Optional.empty() : timeoutMillis;
     }
 
-    private native Optional<Long> getCommandTimeout(long clusterPtr);
-
+    @Deprecated
     public abstract long initWithDevice(long devicePtr, int endpointId);
 
-    public native void deleteCluster(long chipClusterPtr);
+    protected void readAttribute(
+        ReportCallbackImpl callback,
+        long attributeId,
+        boolean isFabricFiltered) {
+      ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId);
+      ChipDeviceController.read(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(path), null, isFabricFiltered, timeoutMillis.orElse(0L).intValue(), null);
+    }
+
+    protected void writeAttribute(
+        WriteAttributesCallbackImpl callback,
+        long attributeId,
+        BaseTLVType value,
+        int timedRequestTimeoutMs) {
+      WriteAttributesCallbackJni jniCallback = new WriteAttributesCallbackJni(callback);
+      byte[] tlv = encodeToTlv(value);
+      AttributeWriteRequest writeRequest = AttributeWriteRequest.newInstance(endpointId, clusterId, attributeId, tlv);
+      ChipDeviceController.write(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(writeRequest), timedRequestTimeoutMs, timeoutMillis.orElse(0L).intValue());
+    }
+
+    protected void subscribeAttribute(
+        ReportCallbackImpl callback,
+        long attributeId,
+        int minInterval,
+        int maxInterval) {
+      ReportCallbackJni jniCallback = new ReportCallbackJni(callback, callback, null);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId);
+      ChipDeviceController.subscribe(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(path), null, minInterval, maxInterval, false, true, timeoutMillis.orElse(0L).intValue(), null);
+    }
+
+    protected void invoke(
+        InvokeCallbackImpl callback,
+        long commandId,
+        BaseTLVType value,
+        int timedRequestTimeoutMs) {
+      InvokeCallbackJni jniCallback = new InvokeCallbackJni(callback);
+      byte[] tlv = encodeToTlv(value);
+      InvokeElement element = InvokeElement.newInstance(endpointId, clusterId, commandId, tlv, null);
+      ChipDeviceController.invoke(0, jniCallback.getCallbackHandle(), devicePtr, element, timedRequestTimeoutMs, timeoutMillis.orElse(0L).intValue());
+    }
+
+    private static native byte[] encodeToTlv(BaseTLVType value);
+
+    static native BaseTLVType decodeFromTlv(byte[] tlv);
+
+    @Deprecated
+    public void deleteCluster(long chipClusterPtr) {}
     
     @SuppressWarnings("deprecation")
     protected void finalize() throws Throwable {
@@ -115,148 +173,323 @@ public class ChipClusters {
     }
   }
 
-  public static class FirstCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1L;
+  abstract static class ReportCallbackImpl implements ReportCallback, SubscriptionEstablishedCallback {
+    private BaseAttributeCallback callback;
+    private ChipAttributePath path;
 
-    public FirstCluster(long devicePtr, int endpointId) {
-      super(devicePtr, endpointId);
+    private static final long CHIP_ERROR_UNSUPPORTED_ATTRIBUTE = 0x86;
+
+    ReportCallbackImpl(BaseAttributeCallback callback, ChipAttributePath path) {
+      this.callback = callback;
+      this.path = path;
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    public void onError(
+        @Nullable ChipAttributePath attributePath,
+        @Nullable ChipEventPath eventPath,
+        @Nonnull Exception e) {
+      callback.onError(e);
+    }
+
+    @Override
+    public void onReport(NodeState nodeState) {
+      if (nodeState == null) {
+        callback.onError(new ChipClusterException());
+        return;
+      }
+
+      EndpointState endpointState = nodeState.getEndpointState((int)path.getEndpointId().getId());
+      if (endpointState == null) {
+        callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_ATTRIBUTE));
+        return;
+      }
+
+      ClusterState clusterState = endpointState.getClusterState(path.getClusterId().getId());
+      if (clusterState == null) {
+        callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_ATTRIBUTE));
+        return;
+      }
+
+      AttributeState attributeState = clusterState.getAttributeState(path.getAttributeId().getId());
+      if (attributeState == null) {
+        callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_ATTRIBUTE));
+        return;
+      }
+
+      byte[] tlv = attributeState.getTlv();
+      if (tlv == null) {
+          callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_ATTRIBUTE));
+          return;
+      }
+
+      onSuccess(tlv);
+    }
+
+    @Override
+    public void onSubscriptionEstablished(long subscriptionId) {
+      callback.onSubscriptionEstablished(subscriptionId);
+    }
+
+    public abstract void onSuccess(byte[] tlv);
+  }
+
+  static class WriteAttributesCallbackImpl implements WriteAttributesCallback {
+    private DefaultClusterCallback callback;
+
+    WriteAttributesCallbackImpl(DefaultClusterCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onResponse(ChipAttributePath attributePath) {
+      callback.onSuccess();
+    }
+
+    @Override
+    public void onError(@Nullable ChipAttributePath attributePath, Exception e) {
+      callback.onError(e);
+    }
+  }
+
+  abstract static class InvokeCallbackImpl implements InvokeCallback {
+    private BaseClusterCallback callback;
+
+    private static final long CHIP_ERROR_UNSUPPORTED_COMMAND = 0x81;
+
+    InvokeCallbackImpl(BaseClusterCallback callback) {
+      this.callback = callback;
+    }
+
+    public void onError(Exception e) {
+      callback.onError(e);
+    }
+
+    public void onResponse(InvokeElement invokeElement, long successCode) {
+      byte[] tlv = invokeElement.getTlvByteArray();
+      if (tlv == null) {
+        onResponse(null);
+        return;
+      }
+      BaseTLVType value = BaseChipCluster.decodeFromTlv(tlv);
+      if (value == null || value.type() != TLVType.Struct) {
+        callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_COMMAND));
+        return;
+      }
+      onResponse((StructType)value);
+    }
+
+    public abstract void onResponse(StructType value);
+  }
+
+  public static class FirstCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1L;
+
+    private static final long SOME_INTEGER_ATTRIBUTE_ID = 1L;
+
+    public FirstCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
+    }
+
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void readSomeIntegerAttribute(
         IntegerAttributeCallback callback) {
-        readSomeIntegerAttribute(chipClusterPtr, callback);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SOME_INTEGER_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SOME_INTEGER_ATTRIBUTE_ID, true);
     }
 
     public void writeSomeIntegerAttribute(DefaultClusterCallback callback, Integer value) {
-        writeSomeIntegerAttribute(chipClusterPtr, callback, value, null);
+      writeSomeIntegerAttribute(callback, value, 0);
     }
 
     public void writeSomeIntegerAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-        writeSomeIntegerAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), SOME_INTEGER_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeSomeIntegerAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-        subscribeSomeIntegerAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SOME_INTEGER_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+          }
+        }, SOME_INTEGER_ATTRIBUTE_ID, minInterval, maxInterval);
     }
-
-    private native void readSomeIntegerAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void writeSomeIntegerAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
-
-    private native void subscribeSomeIntegerAttribute(long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
   public static class SecondCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 2L;
 
+    private static final long FABRICS_ATTRIBUTE_ID = 0L;
+    private static final long SOME_BYTES_ATTRIBUTE_ID = 123L;
+
     public SecondCluster(long devicePtr, int endpointId) {
-      super(devicePtr, endpointId);
+      super(devicePtr, endpointId, CLUSTER_ID);
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
-    public interface FabricsAttributeCallback {
+    public interface FabricsAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.SecondClusterFabricDescriptorStruct> value);
-      void onError(Exception ex);
-      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readFabricsAttribute(
         FabricsAttributeCallback callback) {
-        readFabricsAttribute(chipClusterPtr, callback, true);
+      readFabricsAttributeWithFabricFilter(callback, true);
     }
 
     public void readFabricsAttributeWithFabricFilter(
         FabricsAttributeCallback callback, boolean isFabricFiltered) {
-        readFabricsAttribute(chipClusterPtr, callback, isFabricFiltered);
-    }
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FABRICS_ATTRIBUTE_ID);
 
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.SecondClusterFabricDescriptorStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FABRICS_ATTRIBUTE_ID, isFabricFiltered);
+    }
 
     public void subscribeFabricsAttribute(
         FabricsAttributeCallback callback, int minInterval, int maxInterval) {
-        subscribeFabricsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FABRICS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.SecondClusterFabricDescriptorStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+          }
+        }, FABRICS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readSomeBytesAttribute(
         OctetStringAttributeCallback callback) {
-        readSomeBytesAttribute(chipClusterPtr, callback);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SOME_BYTES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SOME_BYTES_ATTRIBUTE_ID, true);
     }
 
     public void subscribeSomeBytesAttribute(
         OctetStringAttributeCallback callback, int minInterval, int maxInterval) {
-        subscribeSomeBytesAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SOME_BYTES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+          }
+        }, SOME_BYTES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
-
-    private native void readFabricsAttribute(long chipClusterPtr, FabricsAttributeCallback callback, boolean isFabricFiltered);
-
-    private native void subscribeFabricsAttribute(long chipClusterPtr, FabricsAttributeCallback callback, int minInterval, int maxInterval);
-
-    private native void readSomeBytesAttribute(long chipClusterPtr, OctetStringAttributeCallback callback);
-
-    private native void subscribeSomeBytesAttribute(long chipClusterPtr, OctetStringAttributeCallback callback, int minInterval, int maxInterval);
   }
 
   public static class ThirdCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 3L;
 
+    private static final long SOME_ENUM_ATTRIBUTE_ID = 10L;
+    private static final long OPTIONS_ATTRIBUTE_ID = 20L;
+
     public ThirdCluster(long devicePtr, int endpointId) {
-      super(devicePtr, endpointId);
+      super(devicePtr, endpointId, CLUSTER_ID);
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void readSomeEnumAttribute(
         IntegerAttributeCallback callback) {
-        readSomeEnumAttribute(chipClusterPtr, callback);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SOME_ENUM_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SOME_ENUM_ATTRIBUTE_ID, true);
     }
 
     public void writeSomeEnumAttribute(DefaultClusterCallback callback, Integer value) {
-        writeSomeEnumAttribute(chipClusterPtr, callback, value, null);
+      writeSomeEnumAttribute(callback, value, 0);
     }
 
     public void writeSomeEnumAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-        writeSomeEnumAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), SOME_ENUM_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeSomeEnumAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-        subscribeSomeEnumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SOME_ENUM_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+          }
+        }, SOME_ENUM_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readOptionsAttribute(
         IntegerAttributeCallback callback) {
-        readOptionsAttribute(chipClusterPtr, callback);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OPTIONS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, OPTIONS_ATTRIBUTE_ID, true);
     }
 
     public void writeOptionsAttribute(DefaultClusterCallback callback, Integer value) {
-        writeOptionsAttribute(chipClusterPtr, callback, value, null);
+      writeOptionsAttribute(callback, value, 0);
     }
 
     public void writeOptionsAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-        writeOptionsAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), OPTIONS_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeOptionsAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-        subscribeOptionsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OPTIONS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+          }
+        }, OPTIONS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
-
-    private native void readSomeEnumAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void writeSomeEnumAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
-
-    private native void subscribeSomeEnumAttribute(long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
-
-    private native void readOptionsAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void writeOptionsAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
-
-    private native void subscribeOptionsAttribute(long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 }
