@@ -200,6 +200,11 @@ void BluezAdvertisement::Shutdown()
                 g_object_unref(self->mpAdapter);
                 self->mpAdapter = nullptr;
             }
+            if (self->mpAdv != nullptr)
+            {
+                g_object_unref(self->mpAdv);
+                self->mpAdv = nullptr;
+            }
             return CHIP_NO_ERROR;
         },
         this);
