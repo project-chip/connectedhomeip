@@ -17,11 +17,11 @@
  */
 
 #include "AppTask.h"
-#include <app/server/Server.h>
-#include <credentials/FabricTable.h>
+#include <LockManager.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/data-model/Nullable.h>
-#include <LockManager.h>
+#include <app/server/Server.h>
+#include <credentials/FabricTable.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -62,7 +62,8 @@ CHIP_ERROR AppTask::Init(void)
     {
         ChipLogError(Zcl,
                      "Unable to get number of credentials supported per user when initializing lock endpoint, defaulting to %d "
-                     "[endpointId=%d]", APP_DEFAULT_CREDENTIAL_COUNT, endpointId);
+                     "[endpointId=%d]",
+                     APP_DEFAULT_CREDENTIAL_COUNT, endpointId);
         numberOfCredentialsPerUser = APP_DEFAULT_CREDENTIAL_COUNT;
     }
 
@@ -116,7 +117,8 @@ CHIP_ERROR AppTask::Init(void)
                              .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
                              .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
                              .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
-                             .GetLockParam(), LockStateChanged);
+                             .GetLockParam(),
+                         LockStateChanged);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -135,15 +137,17 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
     switch (LockMgr().getLockState())
     {
-        case LockManager::kState_NotFulyLocked:
-        case LockManager::kState_LockCompleted:
-            LockMgr().LockAction(AppEvent::kEventType_Lock, LockManager::UNLOCK_ACTION, LockManager::OperationSource::kButton, kExampleEndpointId);
+    case LockManager::kState_NotFulyLocked:
+    case LockManager::kState_LockCompleted:
+        LockMgr().LockAction(AppEvent::kEventType_Lock, LockManager::UNLOCK_ACTION, LockManager::OperationSource::kButton,
+                             kExampleEndpointId);
         break;
-        case LockManager::kState_UnlockCompleted:
-            LockMgr().LockAction(AppEvent::kEventType_Lock, LockManager::LOCK_ACTION, LockManager::OperationSource::kButton, kExampleEndpointId);
+    case LockManager::kState_UnlockCompleted:
+        LockMgr().LockAction(AppEvent::kEventType_Lock, LockManager::LOCK_ACTION, LockManager::OperationSource::kButton,
+                             kExampleEndpointId);
         break;
-        default:
-            LOG_INF("Lock is in intermediate state, ignoring button");
+    default:
+        LOG_INF("Lock is in intermediate state, ignoring button");
         break;
     }
 }

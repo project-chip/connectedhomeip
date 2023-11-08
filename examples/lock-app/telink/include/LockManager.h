@@ -23,8 +23,8 @@
 #include <stdint.h>
 #include <zephyr/kernel.h>
 
-#include <AppEventCommon.h>
 #include <AppConfig.h>
+#include <AppEventCommon.h>
 
 #include <lib/core/CHIPError.h>
 
@@ -146,12 +146,11 @@ public:
 
     bool LockAction(int32_t appSource, Action_t aAction, OperationSource source, chip::EndpointId endpointId,
                     OperationErrorEnum & err, const Nullable<chip::FabricIndex> & fabricIdx = NullNullable,
-                    const Nullable<chip::NodeId> & nodeId = NullNullable,
-                    const Optional<chip::ByteSpan> & pinCode = NullNullable);
+                    const Nullable<chip::NodeId> & nodeId = NullNullable, const Optional<chip::ByteSpan> & pinCode = NullNullable);
 
     bool IsLocked() const { return mState == State_t::kState_LockCompleted; }
 
-    State_t getLockState() { return mState;}
+    State_t getLockState() { return mState; }
 
     bool GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user);
     bool SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
@@ -202,9 +201,9 @@ private:
     bool ReadConfigValues();
 #endif
 
-    bool setLockState(chip::EndpointId endpointId, DlLockState lockState, OperationSource source,
-                    OperationErrorEnum & err, const Nullable<chip::FabricIndex> & fabricIdx,
-                    const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin);
+    bool setLockState(chip::EndpointId endpointId, DlLockState lockState, OperationSource source, OperationErrorEnum & err,
+                      const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                      const Optional<chip::ByteSpan> & pin);
 
     static void ActuatorTimerEventHandler(k_timer * timer);
     static void ActuatorAppEventHandler(const AppEvent & event);
