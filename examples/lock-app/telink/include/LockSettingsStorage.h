@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <LockManagerConfig.h>
+#include <AppConfig.h>
 #include <../Zephyr/ZephyrConfig.h>
 
 #if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE

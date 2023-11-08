@@ -101,7 +101,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                 if (status)
                 {
                     LOG_INF("Lock Action: Lock action initiated successfully. Waiting for actuator");
-                    k_timer_start(&mActuatorTimer, K_MSEC(kActuatorMovementTimeMs), K_NO_WAIT);
+                    k_timer_start(&mActuatorTimer, K_MSEC(LOCK_MANAGER_ACTUATOR_MOVEMENT_TIME_MS), K_NO_WAIT);
                 }
                 else
                 {
@@ -137,7 +137,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                             mState = kState_UnlockInitiated;
                             if (mStateChangeCallback) 
                                 mStateChangeCallback(mState);
-                            k_timer_start(&mActuatorTimer, K_MSEC(kActuatorMovementTimeMs), K_NO_WAIT);
+                            k_timer_start(&mActuatorTimer, K_MSEC(LOCK_MANAGER_ACTUATOR_MOVEMENT_TIME_MS), K_NO_WAIT);
                         }
                         else
                         {
@@ -161,7 +161,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                     {
                         LOG_INF("Unlock Action: Unlock initiated");
                         mState = kState_UnlockInitiated;
-                        k_timer_start(&mActuatorTimer, K_MSEC(kActuatorMovementTimeMs), K_NO_WAIT);
+                        k_timer_start(&mActuatorTimer, K_MSEC(LOCK_MANAGER_ACTUATOR_MOVEMENT_TIME_MS), K_NO_WAIT);
                     }
                     else
                     {
@@ -186,7 +186,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                 {
                     LOG_INF("Unbolt Action: Unbolt initiated");
                     mState = kState_UnlatchInitiated;
-                    k_timer_start(&mActuatorTimer, K_MSEC(kActuatorMovementTimeMs), K_NO_WAIT);
+                    k_timer_start(&mActuatorTimer, K_MSEC(LOCK_MANAGER_ACTUATOR_MOVEMENT_TIME_MS), K_NO_WAIT);
                 }
                 else
                 {
@@ -225,7 +225,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                 if (status)
                 {
                     LOG_INF("Lock Action: Lock action initiated successfully. Waiting for actuator");
-                    k_timer_start(&mActuatorTimer, K_MSEC(kActuatorMovementTimeMs), K_NO_WAIT);
+                    k_timer_start(&mActuatorTimer, K_MSEC(LOCK_MANAGER_ACTUATOR_MOVEMENT_TIME_MS), K_NO_WAIT);
                 }
                 else
                 {
@@ -259,7 +259,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                             mState = kState_UnlockInitiated;
                             if (mStateChangeCallback) 
                                 mStateChangeCallback(mState);
-                            k_timer_start(&mActuatorTimer, K_MSEC(kActuatorMovementTimeMs), K_NO_WAIT);
+                            k_timer_start(&mActuatorTimer, K_MSEC(LOCK_MANAGER_ACTUATOR_MOVEMENT_TIME_MS), K_NO_WAIT);
                         }
                         else
                         {
@@ -282,7 +282,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                     {
                         LOG_INF("Unlock Action: Unlock initiated");
                         mState = kState_UnlockInitiated;
-                        k_timer_start(&mActuatorTimer, K_MSEC(kActuatorMovementTimeMs), K_NO_WAIT);
+                        k_timer_start(&mActuatorTimer, K_MSEC(LOCK_MANAGER_ACTUATOR_MOVEMENT_TIME_MS), K_NO_WAIT);
                     }
                     else
                     {
@@ -306,7 +306,7 @@ bool LockManager::LockAction(int32_t appSource, Action_t aAction, OperationSourc
                 {
                     LOG_INF("Unbolt Action: Unbolt initiated");
                     mState = kState_UnlatchInitiated;
-                    k_timer_start(&mActuatorTimer, K_MSEC(kActuatorMovementTimeMs), K_NO_WAIT);
+                    k_timer_start(&mActuatorTimer, K_MSEC(LOCK_MANAGER_ACTUATOR_MOVEMENT_TIME_MS), K_NO_WAIT);
                 }
                 else
                 {

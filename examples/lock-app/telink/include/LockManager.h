@@ -24,7 +24,7 @@
 #include <zephyr/kernel.h>
 
 #include <AppEventCommon.h>
-#include <LockManagerConfig.h>
+#include <AppConfig.h>
 
 #include <lib/core/CHIPError.h>
 
@@ -195,8 +195,6 @@ private:
     friend LockManager & LockMgr();
     State_t mState                           = kState_NotFulyLocked;
     StateChangeCallback mStateChangeCallback = nullptr;
-    static constexpr uint32_t kActuatorMovementTimeMs = 2000;
-
     OperationSource mActuatorOperationSource = OperationSource::kButton;
     k_timer mActuatorTimer                   = {};
 
