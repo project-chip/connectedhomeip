@@ -115,10 +115,11 @@ public:
      *
      * @param[in] addr   Address of the device to be set.
      * @param[in] config MRP parameters
+     * @param[in] supportsTcp indicates whether the remote peer supports TCP
      *
      * @return CHIP_NO_ERROR if the data has been updated, an error code otherwise.
      */
-    CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
+    CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config, bool supportsTcp = false);
 
     /**
      * @brief
