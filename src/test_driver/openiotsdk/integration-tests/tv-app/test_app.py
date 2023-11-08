@@ -408,13 +408,13 @@ def test_tv_ctrl(device, controller):
         err, res = send_zcl_command(devCtrl, "KeypadInput", "SendKey", nodeId, endpoint,
                                     dict(keyCode=keyCode), requestTimeoutMs=1000)
         assert err == 0
-        assert res.status == KeypadInput.Enums.KeypadInputStatusEnum.kSuccess
+        assert res.status == KeypadInput.Enums.StatusEnum.kSuccess
 
     err, res = send_zcl_command(devCtrl, "KeypadInput", "SendKey", nodeId, endpoint,
                                 dict(keyCode=TV_CTRL_TEST_KEY_PAD_UNSUPPORTED_KEY),
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == KeypadInput.Enums.KeypadInputStatusEnum.kUnsupportedKey
+    assert res.status == KeypadInput.Enums.StatusEnum.kUnsupportedKey
 
     # TargetNavigator
     err, res = read_zcl_attribute(devCtrl, "TargetNavigator", "TargetList", nodeId, endpoint)
