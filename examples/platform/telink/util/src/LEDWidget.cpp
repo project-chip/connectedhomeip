@@ -38,10 +38,17 @@ void LEDWidget::Init(gpio_dt_spec gpio)
     mGPIO           = gpio;
     mState          = false;
 
-    int ret = gpio_pin_configure_dt(&mGPIO, GPIO_OUTPUT_ACTIVE);
-    if (ret < 0)
+    if (!gpio_is_ready_dt(&mGPIO))
     {
-        LOG_ERR("GPIO pin %d configure - fail. Status%d\n", mGPIO.pin, ret);
+        LOG_ERR("GPIO device not ready");
+    }
+    else
+    {
+        int ret = gpio_pin_configure_dt(&mGPIO, GPIO_OUTPUT_ACTIVE);
+        if (ret < 0)
+        {
+            LOG_ERR("GPIO pin %d configure - fail. Status%d\n", mGPIO.pin, ret);
+        }
     }
 
     k_timer_init(&mLedTimer, &LEDWidget::LedStateTimerHandler, nullptr);
@@ -88,6 +95,10 @@ void LEDWidget::ScheduleStateChange()
 
 void LEDWidget::DoSet(bool state)
 {
+    if (!gpio_is_ready_dt(&mGPIO))
+    {
+        return;
+    }
     mState  = state;
     int ret = gpio_pin_set_dt(&mGPIO, state);
     if (ret < 0)

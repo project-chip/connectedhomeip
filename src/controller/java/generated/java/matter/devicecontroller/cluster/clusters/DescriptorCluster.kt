@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class DescriptorCluster(private val endpointId: UShort) {
+class DescriptorCluster(private val controller: MatterController, private val endpointId: UShort) {
   class DeviceTypeListAttribute(val value: List<DescriptorClusterDeviceTypeStruct>)
 
   class ServerListAttribute(val value: List<UInt>)

@@ -4449,6 +4449,9 @@ static BOOL AttributeIsSpecifiedInWakeOnLANCluster(AttributeId aAttributeId)
     case Attributes::MACAddress::Id: {
         return YES;
     }
+    case Attributes::LinkLocalAddress::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

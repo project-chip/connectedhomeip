@@ -545,6 +545,48 @@ exit:
     }
 }
 
+JNI_METHOD(void, startOTAProvider)(JNIEnv * env, jobject self, jlong handle, jobject otaProviderDelegate)
+{
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(Controller, "startOTAProvider() called");
+    err = wrapper->StartOTAProvider(otaProviderDelegate);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to start OTA Provider. : %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+#endif
+}
+
+JNI_METHOD(void, finishOTAProvider)(JNIEnv * env, jobject self, jlong handle)
+{
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(Controller, "finishOTAProvider() called");
+
+    err = wrapper->FinishOTAProvider();
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to finish OTA Provider. : %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+#endif
+}
+
 JNI_METHOD(void, commissionDevice)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jbyteArray csrNonce, jobject networkCredentials)
 {
@@ -2050,7 +2092,7 @@ exit:
 }
 
 JNI_METHOD(void, subscribe)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
  jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
 {
     chip::DeviceLayer::StackLock lock;
@@ -2159,7 +2201,7 @@ exit:
 }
 
 JNI_METHOD(void, read)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
  jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
 {
     chip::DeviceLayer::StackLock lock;
@@ -2253,7 +2295,7 @@ CHIP_ERROR PutPreencodedWriteAttribute(app::WriteClient & writeClient, app::Conc
 }
 
 JNI_METHOD(void, write)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs,
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs,
  jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
@@ -2419,7 +2461,7 @@ CHIP_ERROR PutPreencodedInvokeRequest(app::CommandSender & commandSender, app::C
 }
 
 JNI_METHOD(void, invoke)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs,
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs,
  jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;

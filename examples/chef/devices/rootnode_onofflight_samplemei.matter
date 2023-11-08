@@ -665,8 +665,8 @@ server cluster TimeFormatLocalization = 44 {
     kCalendarFormat = 0x1;
   }
 
-  attribute HourFormatEnum hourFormat = 0;
-  attribute CalendarTypeEnum activeCalendarType = 1;
+  attribute access(write: manage) HourFormatEnum hourFormat = 0;
+  attribute access(write: manage) CalendarTypeEnum activeCalendarType = 1;
   readonly attribute CalendarTypeEnum supportedCalendarTypes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;

@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class EthernetNetworkDiagnosticsCluster(private val endpointId: UShort) {
+class EthernetNetworkDiagnosticsCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class PHYRateAttribute(val value: UInt?)
 
   class FullDuplexAttribute(val value: Boolean?)
@@ -35,6 +39,8 @@ class EthernetNetworkDiagnosticsCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun resetCounts(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

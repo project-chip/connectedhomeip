@@ -80,24 +80,19 @@ shared_library("jni") {
     ]
   }
 
-  if (matter_enable_java_generated_api) {
-    sources += [
-      "CHIPDefaultCallbacks.cpp",
-      "CHIPDefaultCallbacks.h",
-      "zap-generated/CHIPClustersWrite-JNI.cpp",
-      "zap-generated/CHIPInvokeCallbacks.cpp",
-      "zap-generated/CHIPInvokeCallbacks.h",
-      "zap-generated/CHIPReadCallbacks.cpp",
-    ]
-
-    deps += [
-      "${chip_root}/src/controller/data_model",
-      "${chip_root}/src/controller/data_model:java-jni-sources",
-    ]
-  }
-
   if (chip_build_controller_dynamic_server) {
-    defines += [ "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER" ]
+    sources += [
+      "BdxOTASender.cpp",
+      "BdxOTASender.h",
+      "OTAProviderDelegateBridge.cpp",
+      "OTAProviderDelegateBridge.h",
+    ]
+
+    defines += [
+      "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
+      "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER",
+    ]
+
     deps += [ "${chip_root}/src/controller:nodatamodel" ]
   }
 
@@ -110,6 +105,8 @@ shared_library("jni") {
     ]
 
     include_dirs = java_matter_controller_dependent_paths
+    include_dirs += [ "${chip_root}/zzz_generated/controller-clusters" ]
+
     deps += [ "${chip_root}/third_party/inipp" ]
 
     if (current_os == "mac") {
@@ -449,6 +446,7 @@ android_library("java") {
     "src/chip/devicecontroller/KeypairDelegate.java",
     "src/chip/devicecontroller/NetworkCredentials.java",
     "src/chip/devicecontroller/NetworkLocation.java",
+    "src/chip/devicecontroller/OTAProviderDelegate.java",
     "src/chip/devicecontroller/OpenCommissioningCallback.java",
     "src/chip/devicecontroller/OperationalKeyConfig.java",
     "src/chip/devicecontroller/PaseVerifierParams.java",
@@ -491,6 +489,7 @@ android_library("java") {
       "src/chip/clusterinfo/CommandResponseInfo.java",
       "src/chip/clusterinfo/DelegatedClusterCallback.java",
       "src/chip/clusterinfo/InteractionInfo.java",
+      "src/chip/devicecontroller/ChipTLVType.java",
     ]
   }
 

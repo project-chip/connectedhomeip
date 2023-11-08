@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class BasicInformationCluster(private val endpointId: UShort) {
+class BasicInformationCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class CapabilityMinimaAttribute(val value: BasicInformationClusterCapabilityMinimaStruct)
 
   class ProductAppearanceAttribute(val value: BasicInformationClusterProductAppearanceStruct?)
@@ -33,6 +37,8 @@ class BasicInformationCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun mfgSpecificPing(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -84,12 +90,12 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNodeLabelAttribute(value: String) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeNodeLabelAttribute(value: String, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeNodeLabelAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeNodeLabelAttribute(minInterval: Int, maxInterval: Int): CharString {
@@ -100,12 +106,12 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLocationAttribute(value: String) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeLocationAttribute(value: String, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeLocationAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeLocationAttribute(minInterval: Int, maxInterval: Int): CharString {
@@ -194,12 +200,12 @@ class BasicInformationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLocalConfigDisabledAttribute(value: Boolean) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeLocalConfigDisabledAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeLocalConfigDisabledAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeLocalConfigDisabledAttribute(minInterval: Int, maxInterval: Int): Boolean {

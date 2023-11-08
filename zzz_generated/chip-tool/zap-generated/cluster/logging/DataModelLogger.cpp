@@ -11889,6 +11889,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MACAddress", 1, value);
         }
+        case WakeOnLan::Attributes::LinkLocalAddress::Id: {
+            chip::ByteSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LinkLocalAddress", 1, value);
+        }
         case WakeOnLan::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -12219,7 +12224,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AcceptHeader", 1, value);
         }
         case ContentLauncher::Attributes::SupportedStreamingProtocols::Id: {
-            uint32_t value;
+            chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedStreamingProtocols", 1, value);
         }

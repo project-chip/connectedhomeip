@@ -28111,9 +28111,22 @@ struct TypeInfo
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MACAddress::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 32; }
+    static constexpr size_t MaxLength() { return 12; }
 };
 } // namespace MACAddress
+namespace LinkLocalAddress {
+struct TypeInfo
+{
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LinkLocalAddress::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 16; }
+};
+} // namespace LinkLocalAddress
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -28160,6 +28173,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::MACAddress::TypeInfo::DecodableType MACAddress;
+        Attributes::LinkLocalAddress::TypeInfo::DecodableType linkLocalAddress;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -29087,7 +29101,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PlaybackResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    MediaPlaybackStatusEnum status = static_cast<MediaPlaybackStatusEnum>(0);
+    StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -29103,7 +29117,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PlaybackResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    MediaPlaybackStatusEnum status = static_cast<MediaPlaybackStatusEnum>(0);
+    StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -30080,7 +30094,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    ContentLaunchStatusEnum status = static_cast<ContentLaunchStatusEnum>(0);
+    StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -30096,7 +30110,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    ContentLaunchStatusEnum status = static_cast<ContentLaunchStatusEnum>(0);
+    StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -30120,9 +30134,9 @@ struct TypeInfo
 namespace SupportedStreamingProtocols {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedStreamingProtocols::Id; }
@@ -30175,7 +30189,8 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::AcceptHeader::TypeInfo::DecodableType acceptHeader;
-        Attributes::SupportedStreamingProtocols::TypeInfo::DecodableType supportedStreamingProtocols = static_cast<uint32_t>(0);
+        Attributes::SupportedStreamingProtocols::TypeInfo::DecodableType supportedStreamingProtocols =
+            static_cast<chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

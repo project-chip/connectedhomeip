@@ -1059,8 +1059,8 @@ provisional server cluster FanControl = 514 {
     kOffLowHigh = 1;
     kOffLowMedHighAuto = 2;
     kOffLowHighAuto = 3;
-    kOffOnAuto = 4;
-    kOffOn = 5;
+    kOffHighAuto = 4;
+    kOffHigh = 5;
   }
 
   enum StepDirectionEnum : enum8 {
@@ -1089,7 +1089,7 @@ provisional server cluster FanControl = 514 {
   }
 
   attribute FanModeEnum fanMode = 0;
-  attribute FanModeSequenceEnum fanModeSequence = 1;
+  readonly attribute FanModeSequenceEnum fanModeSequence = 1;
   attribute nullable percent percentSetting = 2;
   readonly attribute percent percentCurrent = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
