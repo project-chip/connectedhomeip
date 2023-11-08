@@ -144,10 +144,9 @@ config("siwx917-common-config") {
     defines += [ "QR_CODE_ENABLED" ]
   }
 
-  # TODO: Renable once ota is supported
-  # if (chip_enable_ota_requestor) {
-  #   defines += [ "SILABS_OTA_ENABLED" ]
-  # }
+  if (chip_enable_ota_requestor) {
+    defines += [ "SILABS_OTA_ENABLED" ]
+  }
 
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
@@ -229,7 +228,7 @@ source_set("siwx917-common") {
   }
 
   if (chip_enable_ota_requestor) {
-    # TODO: OTA For CCP Platform
+    sources += [ "${silabs_common_plat_dir}/OTAConfig.cpp" ]
   }
 
   if (!disable_lcd) {
