@@ -15,4 +15,36 @@
 #    limitations under the License.
 #
 
-async_timeout = 45.0
+"""
+The timeout time used by Orchestrator in capture/controller
+
+Used when calling:
+- Platform.connect() - if timeout, then halt
+- Ecosystem.start(), .stop(), .probe() - if timeout, then continue execution and log error
+
+This is an async timeout, so dependent on event loop being released to work.
+To illustrate, consider this example where no timeout is thrown despite the awaited task running for twice the timeout:
+----
+sleep_time = 2
+
+async def not_actually_async():
+    time.sleep(sleep_time * 2)  # Blocking the EL!
+
+async def try_timeout():
+    async with asyncio.timeout_at(asyncio.get_running_loop().time() + sleep_time):
+        await not_actually_async()
+    print("Timeout was NOT thrown!")
+
+asyncio.run(try_timeout())
+----
+Result: Timeout was NOT thrown!
+
+Update the example
+----
+async def not_actually_async():
+    await asyncio.sleep(sleep_time * 2)  # Change to something that isn't blocking the EL
+----
+Result: The timeout error will be raised.
+
+"""
+orchestrator_async_step_timeout = 45.0

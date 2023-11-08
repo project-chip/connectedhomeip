@@ -37,7 +37,7 @@ logger = log.get_logger(__file__)
 
 
 def get_timeout():
-    return asyncio.get_running_loop().time() + config.async_timeout
+    return asyncio.get_running_loop().time() + config.orchestrator_async_step_timeout
 
 
 class PlatformFactory:
@@ -58,7 +58,8 @@ class PlatformFactory:
         safe_mkdir(platform_artifact_dir)
         platform_inst = platform_class(platform_artifact_dir)
         _PLATFORM_MAP[platform] = platform_inst
-        await platform_inst.connect()
+        async with asyncio.timeout_at(get_timeout()):
+            await platform_inst.connect()
         return platform_inst
 
 
@@ -84,23 +85,17 @@ class EcosystemFactory:
 
     @staticmethod
     async def init_ecosystems(platform, ecosystem, artifact_dir):
-        async with asyncio.timeout_at(get_timeout()):
-            platform = await PlatformFactory.get_platform_impl(
-                platform, artifact_dir)
+        platform = await PlatformFactory.get_platform_impl(platform, artifact_dir)
         ecosystems_to_load = EcosystemFactory.list_available_ecosystems() \
             if ecosystem == 'ALL' \
             else [ecosystem]
         for ecosystem in ecosystems_to_load:
             try:
-                async with asyncio.timeout_at(get_timeout()):
-                    await EcosystemFactory.get_ecosystem_impl(
-                        ecosystem, platform, artifact_dir)
+                await EcosystemFactory.get_ecosystem_impl(
+                    ecosystem, platform, artifact_dir)
             except UnsupportedCapturePlatformException as e:
                 logger.error(f"Unsupported platform {ecosystem} {platform}")
                 track_error(ecosystem, "UNSUPPORTED_PLATFORM", str(e))
-            except TimeoutError as e:
-                logger.error(f"Timeout starting ecosystem {ecosystem} {platform}")
-                track_error(ecosystem, "TIMEOUT", str(e))
             except Exception as e:
                 logger.error(f"Unknown error instantiating ecosystem {ecosystem} {platform}")
                 track_error(ecosystem, "UNEXPECTED", str(e))
