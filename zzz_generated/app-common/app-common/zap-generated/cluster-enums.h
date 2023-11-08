@@ -3785,8 +3785,8 @@ enum class Feature : uint32_t
 
 namespace TargetNavigator {
 
-// Enum for TargetNavigatorStatusEnum
-enum class TargetNavigatorStatusEnum : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess        = 0x00,
     kTargetNotFound = 0x01,

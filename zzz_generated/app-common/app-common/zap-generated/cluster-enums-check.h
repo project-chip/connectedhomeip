@@ -2635,9 +2635,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::StatusEnum val
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(TargetNavigator::TargetNavigatorStatusEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TargetNavigator::StatusEnum val)
 {
-    using EnumType = TargetNavigator::TargetNavigatorStatusEnum;
+    using EnumType = TargetNavigator::StatusEnum;
     switch (val)
     {
     case EnumType::kSuccess:
