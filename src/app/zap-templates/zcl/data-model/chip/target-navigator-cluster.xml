@@ -35,12 +35,12 @@ limitations under the License.
 
     <command source="server" code="0x01" name="NavigateTargetResponse" optional="false">
       <description>This command SHALL be generated in response to NavigateTarget commands.</description>
-      <arg name="Status" type="TargetNavigatorStatusEnum"/>
+      <arg name="Status" type="StatusEnum"/>
       <arg name="Data"   type="char_string" optional="true"/>
     </command>
   </cluster>
 
-  <enum name="TargetNavigatorStatusEnum" type="enum8">
+  <enum name="StatusEnum" type="enum8">
     <cluster code="0x0505"/>
     <item name="Success"        value="0x00"/>
     <item name="TargetNotFound" value="0x01"/>
@@ -50,6 +50,6 @@ limitations under the License.
   <struct name="TargetInfoStruct">
     <cluster code="0x0505"/>
     <item name="Identifier" type="int8u"/>
-    <item name="Name"       type="char_string" length="32"/>
+    <item name="Name"       type="char_string"/>
   </struct>
 </configurator>
