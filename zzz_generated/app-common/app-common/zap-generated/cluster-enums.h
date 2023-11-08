@@ -922,6 +922,7 @@ enum class Feature : uint32_t
     kWiFiNetworkInterface     = 0x1,
     kThreadNetworkInterface   = 0x2,
     kEthernetNetworkInterface = 0x4,
+    kPerDeviceCredentials     = 0x8,
 };
 
 // Bitmap for ThreadCapabilitiesBitmap
@@ -937,11 +938,12 @@ enum class ThreadCapabilitiesBitmap : uint16_t
 // Bitmap for WiFiSecurityBitmap
 enum class WiFiSecurityBitmap : uint8_t
 {
-    kUnencrypted  = 0x1,
-    kWep          = 0x2,
-    kWpaPersonal  = 0x4,
-    kWpa2Personal = 0x8,
-    kWpa3Personal = 0x10,
+    kUnencrypted   = 0x1,
+    kWep           = 0x2,
+    kWpaPersonal   = 0x4,
+    kWpa2Personal  = 0x8,
+    kWpa3Personal  = 0x10,
+    kWpa3MatterPdc = 0x20,
 };
 } // namespace NetworkCommissioning
 
@@ -3970,8 +3972,8 @@ enum class CecKeyCode : uint8_t
     kUnknownEnumValue = 14,
 };
 
-// Enum for KeypadInputStatusEnum
-enum class KeypadInputStatusEnum : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess                  = 0x00,
     kUnsupportedKey           = 0x01,

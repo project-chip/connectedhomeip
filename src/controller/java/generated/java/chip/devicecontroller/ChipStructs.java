@@ -1304,21 +1304,31 @@ public static class GeneralCommissioningClusterBasicCommissioningInfo {
 public static class NetworkCommissioningClusterNetworkInfoStruct {
   public byte[] networkID;
   public Boolean connected;
+  public @Nullable Optional<byte[]> networkIdentifier;
+  public @Nullable Optional<byte[]> clientIdentifier;
   private static final long NETWORK_I_D_ID = 0L;
   private static final long CONNECTED_ID = 1L;
+  private static final long NETWORK_IDENTIFIER_ID = 2L;
+  private static final long CLIENT_IDENTIFIER_ID = 3L;
 
   public NetworkCommissioningClusterNetworkInfoStruct(
     byte[] networkID,
-    Boolean connected
+    Boolean connected,
+    @Nullable Optional<byte[]> networkIdentifier,
+    @Nullable Optional<byte[]> clientIdentifier
   ) {
     this.networkID = networkID;
     this.connected = connected;
+    this.networkIdentifier = networkIdentifier;
+    this.clientIdentifier = clientIdentifier;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(NETWORK_I_D_ID, new ByteArrayType(networkID)));
     values.add(new StructElement(CONNECTED_ID, new BooleanType(connected)));
+    values.add(new StructElement(NETWORK_IDENTIFIER_ID, networkIdentifier != null ? networkIdentifier.<BaseTLVType>map((nonOptionalnetworkIdentifier) -> new ByteArrayType(nonOptionalnetworkIdentifier)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(CLIENT_IDENTIFIER_ID, clientIdentifier != null ? clientIdentifier.<BaseTLVType>map((nonOptionalclientIdentifier) -> new ByteArrayType(nonOptionalclientIdentifier)).orElse(new EmptyType()) : new NullType()));
 
     return new StructType(values);
   }
@@ -1329,6 +1339,8 @@ public static class NetworkCommissioningClusterNetworkInfoStruct {
     }
     byte[] networkID = null;
     Boolean connected = null;
+    @Nullable Optional<byte[]> networkIdentifier = null;
+    @Nullable Optional<byte[]> clientIdentifier = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == NETWORK_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -1340,11 +1352,23 @@ public static class NetworkCommissioningClusterNetworkInfoStruct {
           BooleanType castingValue = element.value(BooleanType.class);
           connected = castingValue.value(Boolean.class);
         }
+      } else if (element.contextTagNum() == NETWORK_IDENTIFIER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          networkIdentifier = Optional.of(castingValue.value(byte[].class));
+        }
+      } else if (element.contextTagNum() == CLIENT_IDENTIFIER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          clientIdentifier = Optional.of(castingValue.value(byte[].class));
+        }
       }
     }
     return new NetworkCommissioningClusterNetworkInfoStruct(
       networkID,
-      connected
+      connected,
+      networkIdentifier,
+      clientIdentifier
     );
   }
 
@@ -1357,6 +1381,12 @@ public static class NetworkCommissioningClusterNetworkInfoStruct {
     output.append("\n");
     output.append("\tconnected: ");
     output.append(connected);
+    output.append("\n");
+    output.append("\tnetworkIdentifier: ");
+    output.append(networkIdentifier.isPresent() ? Arrays.toString(networkIdentifier.get()) : "");
+    output.append("\n");
+    output.append("\tclientIdentifier: ");
+    output.append(clientIdentifier.isPresent() ? Arrays.toString(clientIdentifier.get()) : "");
     output.append("\n");
     output.append("}\n");
     return output.toString();

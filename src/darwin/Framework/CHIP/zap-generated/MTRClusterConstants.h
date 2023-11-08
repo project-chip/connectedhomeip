@@ -5797,6 +5797,8 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterNetworkCommissioningCommandConnectNetworkID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000006,
     MTRCommandIDTypeClusterNetworkCommissioningCommandConnectNetworkResponseID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000007,
     MTRCommandIDTypeClusterNetworkCommissioningCommandReorderNetworkID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000008,
+    MTRCommandIDTypeClusterNetworkCommissioningCommandQueryIdentityID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
+    MTRCommandIDTypeClusterNetworkCommissioningCommandQueryIdentityResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
 
     // Cluster DiagnosticLogs deprecated command id names
     MTRClusterDiagnosticLogsCommandRetrieveLogsRequestID
