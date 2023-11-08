@@ -192,6 +192,10 @@ RPi users, as needed:
 
 ### Capture
 
+> **_IMPORTANT_**  
+> Ensure you've made it to the log line "Starting real time analysis, press enter to stop!" before 
+> launching the app under test.
+
 ```
 idt capture -h
 
@@ -265,7 +269,7 @@ provide artifacts.
 ## Troubleshooting
 
 -   Wireless `adb` may fail to connect indefinitely depending on network
-    configuration.
+    configuration. Use a wired connection if wireless fails repeatedly.
 -   Change log level from `INFO` to `DEBUG` in root `config.py` for additional
     logging.
 -   Compiling `tcpdump` for android may require additional dependencies.
