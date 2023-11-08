@@ -840,6 +840,93 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
     return true;
 }
 
+bool emberAfThermostatClusterGetRelayStatusLogCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+bool emberAfThermostatClusterSetActivePresetRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterStartSchedulesEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::StartSchedulesEditRequest::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterCancelSchedulesEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::CancelSchedulesEditRequest::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterCommitSchedulesEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::CommitSchedulesEditRequest::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterStartPresetsEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::StartPresetsEditRequest::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterCancelPresetsEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::CancelPresetsEditRequest::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterCommitPresetsEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::CommitPresetsEditRequest::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterCancelSetActivePresetRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::CancelSetActivePresetRequest::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterSetTemperatureSetpointHoldPolicyCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::SetTemperatureSetpointHoldPolicy::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
 void MatterThermostatPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gThermostatAttrAccess);
