@@ -113,8 +113,10 @@ public:
         mMaxPathsPerInvoke = maxPathsPerInvoke;
         return *reinterpret_cast<Derived *>(this);
     }
-    Optional<uint16_t> GetMaxPathsPerInvoke() const {
-        if (mMaxPathsPerInvoke == 1) {
+    Optional<uint16_t> GetMaxPathsPerInvoke() const
+    {
+        if (mMaxPathsPerInvoke == 1)
+        {
             return NullOptional;
         }
         return MakeOptional(mMaxPathsPerInvoke);

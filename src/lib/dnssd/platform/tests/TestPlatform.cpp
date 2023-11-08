@@ -38,13 +38,12 @@ const char host[]               = "0102030405060708";
 
 const PeerId kPeerId1 = PeerId().SetCompressedFabricId(0xBEEFBEEFF00DF00D).SetNodeId(0x1111222233334444);
 const PeerId kPeerId2 = PeerId().SetCompressedFabricId(0x5555666677778888).SetNodeId(0x1212343456567878);
-OperationalAdvertisingParameters operationalParams1 =
-    OperationalAdvertisingParameters()
-        .SetPeerId(kPeerId1)
-        .SetMac(ByteSpan(kMac))
-        .SetPort(CHIP_PORT)
-        .EnableIpV4(true)
-        .SetMaxPathsPerInvoke(1);
+OperationalAdvertisingParameters operationalParams1 = OperationalAdvertisingParameters()
+                                                          .SetPeerId(kPeerId1)
+                                                          .SetMac(ByteSpan(kMac))
+                                                          .SetPort(CHIP_PORT)
+                                                          .EnableIpV4(true)
+                                                          .SetMaxPathsPerInvoke(1);
 
 // Note `.SetMaxPathsPerInvoke(x)` is intended to be a no-op when x is 1. As a result there is nothing
 // to check for below.
