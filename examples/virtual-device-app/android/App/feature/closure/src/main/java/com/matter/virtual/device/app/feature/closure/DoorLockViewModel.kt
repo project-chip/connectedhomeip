@@ -12,6 +12,7 @@ import com.matter.virtual.device.app.core.domain.usecase.matter.cluster.doorlock
 import com.matter.virtual.device.app.core.domain.usecase.matter.cluster.doorlock.SetLockStateUseCase
 import com.matter.virtual.device.app.core.domain.usecase.matter.cluster.powersource.GetBatPercentRemainingUseCase
 import com.matter.virtual.device.app.core.domain.usecase.matter.cluster.powersource.SetBatPercentRemainingUseCase
+import com.matter.virtual.device.app.core.model.matter.LockState
 import com.matter.virtual.device.app.core.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -34,8 +35,8 @@ constructor(
   savedStateHandle: SavedStateHandle
 ) : BaseViewModel(savedStateHandle) {
 
-  private val _lockState: StateFlow<Boolean> = getLockStateFlowUseCase()
-  val lockState: LiveData<Boolean>
+  private val _lockState: StateFlow<LockState> = getLockStateFlowUseCase()
+  val lockState: LiveData<LockState>
     get() = _lockState.asLiveData()
 
   private val _batteryStatus: MutableStateFlow<Int> =
@@ -64,12 +65,12 @@ constructor(
     Timber.d("onClickButton()")
     viewModelScope.launch {
       Timber.d("current lockState value = ${_lockState.value}")
-      if (_lockState.value == LOCK_STATE_LOCKED) {
+      if (_lockState.value == LockState.LOCKED) {
         Timber.d("set value = unlocked")
-        setLockStateUseCase(LOCK_STATE_UNLOCKED)
+        setLockStateUseCase(LockState.UNLOCKED)
       } else {
         Timber.d("set value = locked")
-        setLockStateUseCase(LOCK_STATE_LOCKED)
+        setLockStateUseCase(LockState.LOCKED)
       }
     }
   }
@@ -77,10 +78,10 @@ constructor(
   fun onClickSendLockAlarmEventButton() {
     Timber.d("onClickSendLockAlarmEventButton()")
     viewModelScope.launch {
-      if (!_lockState.value) {
+      if (_lockState.value == LockState.LOCKED) {
         // if lockState == locked, send alarm event and change the lockState to unlocked
         sendLockAlarmEventUseCase()
-        setLockStateUseCase(LOCK_STATE_UNLOCKED)
+        setLockStateUseCase(LockState.UNLOCKED)
       }
     }
   }
@@ -95,10 +96,5 @@ constructor(
       updateBatterySeekbarProgress(progress)
       setBatPercentRemainingUseCase(progress)
     }
-  }
-
-  companion object {
-    const val LOCK_STATE_LOCKED = false
-    const val LOCK_STATE_UNLOCKED = true
   }
 }
