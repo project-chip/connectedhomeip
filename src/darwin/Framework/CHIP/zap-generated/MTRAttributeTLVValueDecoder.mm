@@ -2419,6 +2419,24 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
                 newElement_0 = [MTRNetworkCommissioningClusterNetworkInfoStruct new];
                 newElement_0.networkID = AsData(entry_0.networkID);
                 newElement_0.connected = [NSNumber numberWithBool:entry_0.connected];
+                if (entry_0.networkIdentifier.HasValue()) {
+                    if (entry_0.networkIdentifier.Value().IsNull()) {
+                        newElement_0.networkIdentifier = nil;
+                    } else {
+                        newElement_0.networkIdentifier = AsData(entry_0.networkIdentifier.Value().Value());
+                    }
+                } else {
+                    newElement_0.networkIdentifier = nil;
+                }
+                if (entry_0.clientIdentifier.HasValue()) {
+                    if (entry_0.clientIdentifier.Value().IsNull()) {
+                        newElement_0.clientIdentifier = nil;
+                    } else {
+                        newElement_0.clientIdentifier = AsData(entry_0.clientIdentifier.Value().Value());
+                    }
+                } else {
+                    newElement_0.clientIdentifier = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

@@ -3294,7 +3294,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer networkingStatus, Optional<String> debugText, Optional<Integer> networkIndex) {
+    public void onSuccess(Integer networkingStatus, Optional<String> debugText, Optional<Integer> networkIndex, Optional<byte[]> clientIdentity, Optional<byte[]> possessionSignature) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo networkingStatusResponseValue = new CommandResponseInfo("networkingStatus", "Integer");
@@ -3303,6 +3303,10 @@ public class ClusterInfoMapping {
       responseValues.put(debugTextResponseValue, debugText);
       CommandResponseInfo networkIndexResponseValue = new CommandResponseInfo("networkIndex", "Optional<Integer>");
       responseValues.put(networkIndexResponseValue, networkIndex);
+      CommandResponseInfo clientIdentityResponseValue = new CommandResponseInfo("clientIdentity", "Optional<byte[]>");
+      responseValues.put(clientIdentityResponseValue, clientIdentity);
+      CommandResponseInfo possessionSignatureResponseValue = new CommandResponseInfo("possessionSignature", "Optional<byte[]>");
+      responseValues.put(possessionSignatureResponseValue, possessionSignature);
       callback.onSuccess(responseValues);
     }
 
@@ -3329,6 +3333,30 @@ public class ClusterInfoMapping {
       responseValues.put(debugTextResponseValue, debugText);
       CommandResponseInfo errorValueResponseValue = new CommandResponseInfo("errorValue", "Long");
       responseValues.put(errorValueResponseValue, errorValue);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedNetworkCommissioningClusterQueryIdentityResponseCallback implements ChipClusters.NetworkCommissioningCluster.QueryIdentityResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(byte[] identity, Optional<byte[]> possessionSignature) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo identityResponseValue = new CommandResponseInfo("identity", "byte[]");
+      responseValues.put(identityResponseValue, identity);
+      CommandResponseInfo possessionSignatureResponseValue = new CommandResponseInfo("possessionSignature", "Optional<byte[]>");
+      responseValues.put(possessionSignatureResponseValue, possessionSignature);
       callback.onSuccess(responseValues);
     }
 
@@ -18974,6 +19002,15 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo networkCommissioningaddOrUpdateWiFiNetworkbreadcrumbCommandParameterInfo = new CommandParameterInfo("breadcrumb", Optional.class, Long.class);
     networkCommissioningaddOrUpdateWiFiNetworkCommandParams.put("breadcrumb",networkCommissioningaddOrUpdateWiFiNetworkbreadcrumbCommandParameterInfo);
+
+    CommandParameterInfo networkCommissioningaddOrUpdateWiFiNetworknetworkIdentityCommandParameterInfo = new CommandParameterInfo("networkIdentity", Optional.class, byte[].class);
+    networkCommissioningaddOrUpdateWiFiNetworkCommandParams.put("networkIdentity",networkCommissioningaddOrUpdateWiFiNetworknetworkIdentityCommandParameterInfo);
+
+    CommandParameterInfo networkCommissioningaddOrUpdateWiFiNetworkclientIdentifierCommandParameterInfo = new CommandParameterInfo("clientIdentifier", Optional.class, byte[].class);
+    networkCommissioningaddOrUpdateWiFiNetworkCommandParams.put("clientIdentifier",networkCommissioningaddOrUpdateWiFiNetworkclientIdentifierCommandParameterInfo);
+
+    CommandParameterInfo networkCommissioningaddOrUpdateWiFiNetworkpossessionNonceCommandParameterInfo = new CommandParameterInfo("possessionNonce", Optional.class, byte[].class);
+    networkCommissioningaddOrUpdateWiFiNetworkCommandParams.put("possessionNonce",networkCommissioningaddOrUpdateWiFiNetworkpossessionNonceCommandParameterInfo);
     InteractionInfo networkCommissioningaddOrUpdateWiFiNetworkInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.NetworkCommissioningCluster) cluster)
@@ -18986,6 +19023,15 @@ public class ClusterInfoMapping {
 
            , (Optional<Long>)
              commandArguments.get("breadcrumb")
+
+           , (Optional<byte[]>)
+             commandArguments.get("networkIdentity")
+
+           , (Optional<byte[]>)
+             commandArguments.get("clientIdentifier")
+
+           , (Optional<byte[]>)
+             commandArguments.get("possessionNonce")
 
             );
         },
@@ -19095,6 +19141,30 @@ public class ClusterInfoMapping {
         networkCommissioningreorderNetworkCommandParams
       );
     networkCommissioningClusterInteractionInfoMap.put("reorderNetwork", networkCommissioningreorderNetworkInteractionInfo);
+
+    Map<String, CommandParameterInfo> networkCommissioningqueryIdentityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo networkCommissioningqueryIdentitykeyIdentifierCommandParameterInfo = new CommandParameterInfo("keyIdentifier", byte[].class, byte[].class);
+    networkCommissioningqueryIdentityCommandParams.put("keyIdentifier",networkCommissioningqueryIdentitykeyIdentifierCommandParameterInfo);
+
+    CommandParameterInfo networkCommissioningqueryIdentitypossessionNonceCommandParameterInfo = new CommandParameterInfo("possessionNonce", Optional.class, byte[].class);
+    networkCommissioningqueryIdentityCommandParams.put("possessionNonce",networkCommissioningqueryIdentitypossessionNonceCommandParameterInfo);
+    InteractionInfo networkCommissioningqueryIdentityInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.NetworkCommissioningCluster) cluster)
+          .queryIdentity((ChipClusters.NetworkCommissioningCluster.QueryIdentityResponseCallback) callback
+           , (byte[])
+             commandArguments.get("keyIdentifier")
+
+           , (Optional<byte[]>)
+             commandArguments.get("possessionNonce")
+
+            );
+        },
+        () -> new DelegatedNetworkCommissioningClusterQueryIdentityResponseCallback(),
+        networkCommissioningqueryIdentityCommandParams
+      );
+    networkCommissioningClusterInteractionInfoMap.put("queryIdentity", networkCommissioningqueryIdentityInteractionInfo);
 
     commandMap.put("networkCommissioning", networkCommissioningClusterInteractionInfoMap);
 

@@ -903,6 +903,20 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.connected, value["connected"]));
     valueCopy.removeMember("connected");
 
+    if (value.isMember("networkIdentifier"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "networkIdentifier");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.networkIdentifier, value["networkIdentifier"]));
+    }
+    valueCopy.removeMember("networkIdentifier");
+
+    if (value.isMember("clientIdentifier"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "clientIdentifier");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.clientIdentifier, value["clientIdentifier"]));
+    }
+    valueCopy.removeMember("clientIdentifier");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -910,6 +924,8 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::NetworkCommissioning::
 {
     ComplexArgumentParser::Finalize(request.networkID);
     ComplexArgumentParser::Finalize(request.connected);
+    ComplexArgumentParser::Finalize(request.networkIdentifier);
+    ComplexArgumentParser::Finalize(request.clientIdentifier);
 }
 
 CHIP_ERROR
