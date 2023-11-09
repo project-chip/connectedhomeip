@@ -299,6 +299,11 @@ static void TestLiteral(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, literal.size() == 3);
     NL_TEST_ASSERT(inSuite, literal.data_equal(CharSpan::fromCharString("HI!")));
     NL_TEST_ASSERT(inSuite, ""_span.size() == 0);
+
+    // These should be compile errors -- if they were allowed they would produce
+    // a CharSpan that includes the trailing '\0' byte in the value.
+    // constexpr CharSpan disallowed1("abcd");
+    // constexpr CharSpan disallowed2{ "abcd" };
 }
 
 static void TestConversionConstructors(nlTestSuite * inSuite, void * inContext)
