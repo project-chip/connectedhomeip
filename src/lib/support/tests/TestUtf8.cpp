@@ -163,9 +163,7 @@ const nlTest sTests[] =
 
 int TestUtf8()
 {
-    nlTestSuite theSuite = { "CHIP Variant tests", &sTests[0], nullptr, nullptr };
-
-    // Run test suit againt one context.
+    nlTestSuite theSuite = { "CHIP UTF8 tests", &sTests[0], nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
