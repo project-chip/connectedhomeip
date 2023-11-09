@@ -102,21 +102,21 @@ static const SceneStorageId sceneId12(kScene6, kGroup4);
 CharSpan empty;
 
 // Scene data
-static const SceneData sceneData1(CharSpan("Scene #1"));
-static const SceneData sceneData2(CharSpan("Scene #2"), 2000);
-static const SceneData sceneData3(CharSpan("Scene #3"), 250);
-static const SceneData sceneData4(CharSpan("Scene num4"), 5000);
+static const SceneData sceneData1(CharSpan::fromCharString("Scene #1"));
+static const SceneData sceneData2(CharSpan::fromCharString("Scene #2"), 2000);
+static const SceneData sceneData3(CharSpan::fromCharString("Scene #3"), 250);
+static const SceneData sceneData4(CharSpan::fromCharString("Scene num4"), 5000);
 static const SceneData sceneData5(empty);
-static const SceneData sceneData6(CharSpan("Scene #6"), 3000);
-static const SceneData sceneData7(CharSpan("Scene #7"), 20000);
-static const SceneData sceneData8(CharSpan("NAME TOO LOOONNG!"), 15000);
-static const SceneData sceneData9(CharSpan("Scene #9"), 3000);
-static const SceneData sceneData10(CharSpan("Scene #10"), 1000);
-static const SceneData sceneData11(CharSpan("Scene #11"), 50);
-static const SceneData sceneData12(CharSpan("Scene #12"), 100);
-static const SceneData sceneData13(CharSpan("Scene #13"), 100);
-static const SceneData sceneData14(CharSpan("Scene #14"), 100);
-static const SceneData sceneData15(CharSpan("Scene #15"), 100);
+static const SceneData sceneData6(CharSpan::fromCharString("Scene #6"), 3000);
+static const SceneData sceneData7(CharSpan::fromCharString("Scene #7"), 20000);
+static const SceneData sceneData8(CharSpan::fromCharString("NAME TOO LOOONNG!"), 15000);
+static const SceneData sceneData9(CharSpan::fromCharString("Scene #9"), 3000);
+static const SceneData sceneData10(CharSpan::fromCharString("Scene #10"), 1000);
+static const SceneData sceneData11(CharSpan::fromCharString("Scene #11"), 50);
+static const SceneData sceneData12(CharSpan::fromCharString("Scene #12"), 100);
+static const SceneData sceneData13(CharSpan::fromCharString("Scene #13"), 100);
+static const SceneData sceneData14(CharSpan::fromCharString("Scene #14"), 100);
+static const SceneData sceneData15(CharSpan::fromCharString("Scene #15"), 100);
 
 // Scenes
 SceneTableEntry scene1(sceneId1, sceneData1);
