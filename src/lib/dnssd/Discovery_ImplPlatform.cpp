@@ -228,8 +228,11 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
         // A ICD operating as a LIT should not advertise its slow polling interval
         if (params.GetICDOperatingAsLIT().HasValue() && params.GetICDOperatingAsLIT().Value())
         {
-            return CHIP_NO_ERROR;
+            // returning WELL_UNINITIALIZED ensures that the SII string isn't added by the AddTxtRecord
+            // without erroring out the action.
+            return CHIP_ERROR_WELL_UNINITIALIZED;
         }
+        FALLTHROUGH;
 #endif
     case TxtFieldKey::kSessionActiveInterval:
     case TxtFieldKey::kSessionActiveThreshold:

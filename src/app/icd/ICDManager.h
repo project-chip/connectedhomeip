@@ -33,6 +33,14 @@ namespace app {
 // Used in unit tests
 class TestICDManager;
 
+// This structure is used for the creation an ObjectPool of ICDStateObserver pointers
+struct ObserverPointer
+{
+    ObserverPointer(ICDStateObserver * obs) : mObserver(obs) {}
+    ~ObserverPointer() { mObserver = nullptr; }
+    ICDStateObserver * mObserver;
+};
+
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
@@ -52,20 +60,32 @@ public:
     };
 
     ICDManager() {}
-    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver,
-              Crypto::SymmetricKeystore * symmetricKeyStore);
+    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore);
     void Shutdown();
     void UpdateICDMode();
     void UpdateOperationState(OperationalState state);
     void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
     bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
     bool SupportsFeature(Clusters::IcdManagement::Feature feature);
+
+    /**
+     * @brief Adds the referenced observer in parameters to the mStateObserverPool
+     * A maximum of CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE observers can be concurrently registered
+     *
+     * @return The pointer to the pool object, or null if it could not be added.
+     */
+    ObserverPointer * RegisterObserver(ICDStateObserver * observer);
+
+    /**
+     * @brief Remove the referenced observer in parameters from the mStateObserverPool
+     */
+    void ReleaseObserver(ICDStateObserver * observer);
     ICDMode GetICDMode() { return mICDMode; }
     OperationalState GetOperationalState() { return mOperationalState; }
 
     static System::Clock::Milliseconds32 GetSITPollingThreshold() { return kSITPollingThreshold; }
-    static System::Clock::Milliseconds32 GetSlowPollingInterval() { return kSlowPollingInterval; }
     static System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
+    static System::Clock::Milliseconds32 GetSlowPollingInterval();
 
 #ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
     void SetTestFeatureMapValue(uint32_t featureMap) { mFeatureMap = featureMap; };
@@ -110,9 +130,9 @@ private:
     ICDMode mICDMode                               = ICDMode::SIT;
     PersistentStorageDelegate * mStorage           = nullptr;
     FabricTable * mFabricTable                     = nullptr;
-    ICDStateObserver * mStateObserver              = nullptr;
     bool mTransitionToIdleCalled                   = false;
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
+    ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
 
 #ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // feature map that can be changed at runtime for testing purposes

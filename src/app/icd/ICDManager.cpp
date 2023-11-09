@@ -44,12 +44,10 @@ uint8_t ICDManager::OpenExchangeContextCount = 0;
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::OpenExchangeContextCount cannot hold count for the max exchange count");
 
-void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver,
-                      Crypto::SymmetricKeystore * symmetricKeystore)
+void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore)
 {
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
-    VerifyOrDie(stateObserver != nullptr);
     VerifyOrDie(symmetricKeystore != nullptr);
 
     bool supportLIT = SupportsFeature(Feature::kLongIdleTimeSupport);
@@ -62,9 +60,8 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     // VerifyOrDieWithMsg((supportLIT == false) && (GetSlowPollingInterval() <= GetSITPollingThreshold()) , AppServer,
     //                    "LIT support is required for slow polling intervals superior to 15 seconds");
 
-    mStorage       = storage;
-    mFabricTable   = fabricTable;
-    mStateObserver = stateObserver;
+    mStorage     = storage;
+    mFabricTable = fabricTable;
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
     mSymmetricKeystore = symmetricKeystore;
 
@@ -90,20 +87,20 @@ void ICDManager::Shutdown()
     mOperationalState = OperationalState::IdleMode;
     mStorage          = nullptr;
     mFabricTable      = nullptr;
+    mStateObserverPool.ReleaseAll();
 }
 
 bool ICDManager::SupportsFeature(Feature feature)
 {
     // Can't use attribute accessors/Attributes::FeatureMap::Get in unit tests
-#ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    bool success        = false;
+#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
     uint32_t featureMap = 0;
-    success             = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
-
+    bool success        = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 #else
+
     return ((mFeatureMap & to_underlying(feature)) != 0);
-#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#endif // !CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
 void ICDManager::UpdateICDMode()
@@ -133,10 +130,10 @@ void ICDManager::UpdateICDMode()
     if (mICDMode != tempMode)
     {
         mICDMode = tempMode;
-        // ICDMode changed, restart DNS-SD advertising, because SII and ICD key are affected by this change.
-        // StartServer will take care of setting the operational and commissionable advertissements
-        app::DnssdServer::Instance().StartServer();
-        // app::DnssdServer::Instance().AdvertiseOperational();
+        mStateObserverPool.ForEachActiveObject([](ObserverPointer * obs) {
+            obs->mObserver->OnICDModeChange();
+            return Loop::Continue;
+        });
     }
 
     // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
@@ -210,7 +207,10 @@ void ICDManager::UpdateOperationState(OperationalState state)
                 ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
             }
 
-            mStateObserver->OnEnterActiveMode();
+            mStateObserverPool.ForEachActiveObject([](ObserverPointer * obs) {
+                obs->mObserver->OnEnterActiveMode();
+                return Loop::Continue;
+            });
         }
         else
         {
@@ -272,7 +272,10 @@ void ICDManager::OnTransitionToIdle(System::Layer * aLayer, void * appState)
     // OnTransitionToIdle will trigger a report message if reporting is needed, which should extend the active mode until the
     // ack for the report is received.
     pICDManager->mTransitionToIdleCalled = true;
-    pICDManager->mStateObserver->OnTransitionToIdle();
+    pICDManager->mStateObserverPool.ForEachActiveObject([](ObserverPointer * obs) {
+        obs->mObserver->OnTransitionToIdle();
+        return Loop::Continue;
+    });
 }
 
 /* ICDListener functions. */
@@ -345,6 +348,37 @@ void ICDManager::OnICDManagementServerEvent(ICDManagementEvents event)
     default:
         break;
     }
+}
+
+System::Clock::Milliseconds32 ICDManager::GetSlowPollingInterval()
+{
+#if ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
+    // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
+    // This is important for ICD device configured for LIT operation but currently operating as a SIT
+    // due to a lack of client registration
+    if (mICDMode == ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
+    {
+        return GetSITPollingThreshold();
+    }
+#endif
+    return kSlowPollingInterval;
+}
+
+ObserverPointer * ICDManager::RegisterObserver(ICDStateObserver * observer)
+{
+    return mStateObserverPool.CreateObject(observer);
+}
+
+void ICDManager::ReleaseObserver(ICDStateObserver * observer)
+{
+    mStateObserverPool.ForEachActiveObject([this, observer](ObserverPointer * obs) {
+        if (obs->mObserver == observer)
+        {
+            mStateObserverPool.ReleaseObject(obs);
+            return Loop::Break;
+        }
+        return Loop::Continue;
+    });
 }
 
 } // namespace app
