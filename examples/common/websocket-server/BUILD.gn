@@ -16,8 +16,12 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 config("websocket_server_config_disable_warnings") {
-  # Unfortunately, some of the libwebsockets headers include -Wshadow failures.
-  cflags = [ "-Wno-shadow" ]
+  # Unfortunately, some of the libwebsockets headers include -Wshadow failures,
+  # and have tons of -Wdocumentation issues.
+  cflags = [
+    "-Wno-shadow",
+    "-Wno-documentation",
+  ]
 }
 
 static_library("websocket-server") {
