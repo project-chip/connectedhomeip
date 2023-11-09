@@ -188,7 +188,7 @@ static void TestMove(nlTestSuite * inSuite, void * inContext)
 
 static void TestConversion(nlTestSuite * inSuite, void * inContext)
 {
-
+    // FixedSpan is implicitly convertible from std::array
     using WidgetView    = FixedSpan<const bool, 10>;
     using WidgetStorage = std::array<bool, 10>;
 
@@ -208,6 +208,15 @@ static void TestConversion(nlTestSuite * inSuite, void * inContext)
     optView = constOptOtherStorage;
     NL_TEST_ASSERT(inSuite, optView.HasValue());
     NL_TEST_ASSERT(inSuite, &optView.Value()[0] == &optOtherStorage.Value()[0]);
+
+    struct ExplicitBool
+    {
+        explicit ExplicitBool(bool) {}
+    };
+    Optional<ExplicitBool> e(Optional<bool>(true)); // OK, explicitly constructing the optional
+
+    // The following should not compile
+    // e = Optional<bool>(false); // relies on implicit conversion
 }
 
 /**
