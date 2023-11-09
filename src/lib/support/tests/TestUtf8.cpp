@@ -28,7 +28,6 @@ namespace {
 
 using namespace chip;
 
-
 void TestValidStrings(nlTestSuite * inSuite, void * inContext)
 {
     NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan())); // empty span ok
