@@ -909,7 +909,7 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveEndpoint()
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    for (FabricIndex fabric_index = 1; fabric_index < kMaxFabrics; fabric_index++)
+    for (FabricIndex fabric_index = kMinValidFabricIndex; fabric_index < kMaxValidFabricIndex; fabric_index++)
     {
         FabricSceneData fabric(mEndpointId, fabric_index);
         CHIP_ERROR err = fabric.Load(mStorage);
