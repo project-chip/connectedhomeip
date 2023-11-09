@@ -86,7 +86,7 @@ void TestInvalidStrings(nlTestSuite * inSuite, void * inContext)
     TEST_INVALID_BYTES(0xed, 0b1011'0000, 0x80); // B
     TEST_INVALID_BYTES(0xf0, 0b1000'1111, 0x80); // C
 
-    // Ourside codepoint
+    // Outside codepoint
     TEST_INVALID_BYTES(0xf4, 0x90, 0x80, 0x80);  // D
 
     // Missing continuation
