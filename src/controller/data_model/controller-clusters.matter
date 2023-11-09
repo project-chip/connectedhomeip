@@ -2834,10 +2834,11 @@ client cluster OvenOperationalState = 72 {
   }
 
   enum OperationalStateEnum : enum8 {
-    kPreheating = 64;
-    kPreheated = 65;
-    kCoolingDown = 66;
-    kSelfCleaning = 67;
+    kRunning = 64;
+    kPreheating = 65;
+    kPreheated = 66;
+    kCoolingDown = 67;
+    kSelfCleaning = 68;
   }
 
   struct ErrorStateStruct {

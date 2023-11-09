@@ -1234,6 +1234,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OvenOperationalState::O
     using EnumType = OvenOperationalState::OperationalStateEnum;
     switch (val)
     {
+    case EnumType::kRunning:
     case EnumType::kPreheating:
     case EnumType::kPreheated:
     case EnumType::kCoolingDown:

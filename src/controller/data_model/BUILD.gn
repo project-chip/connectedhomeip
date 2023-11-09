@@ -181,7 +181,7 @@ if (current_os == "android" || matter_enable_java_compilation) {
       "jni/OperationalStateClient-InvokeSubscribeImpl.cpp",
       "jni/OperationalStateClient-ReadImpl.cpp",
       "jni/OvenOperationalStateClient-InvokeSubscribeImpl.cpp",
-      "jni/OvenOperationalStateClient-ReadImpl.cpp"
+      "jni/OvenOperationalStateClient-ReadImpl.cpp",
       "jni/OtaSoftwareUpdateProviderClient-InvokeSubscribeImpl.cpp",
       "jni/OtaSoftwareUpdateProviderClient-ReadImpl.cpp",
       "jni/OtaSoftwareUpdateRequestorClient-InvokeSubscribeImpl.cpp",

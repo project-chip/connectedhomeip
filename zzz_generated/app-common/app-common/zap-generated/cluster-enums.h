@@ -1543,10 +1543,11 @@ enum class ErrorStateEnum : uint8_t
 // Enum for OperationalStateEnum
 enum class OperationalStateEnum : uint8_t
 {
-    kPreheating   = 0x40,
-    kPreheated    = 0x41,
-    kCoolingDown  = 0x42,
-    kSelfCleaning = 0x43,
+    kRunning      = 0x40,
+    kPreheating   = 0x41,
+    kPreheated    = 0x42,
+    kCoolingDown  = 0x43,
+    kSelfCleaning = 0x44,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown

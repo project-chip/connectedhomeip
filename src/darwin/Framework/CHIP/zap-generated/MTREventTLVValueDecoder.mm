@@ -1648,7 +1648,6 @@ static id _Nullable DecodeEventPayloadForOvenOperationalStateCluster(EventId aEv
 {
     using namespace Clusters::OvenOperationalState;
     switch (aEventId) {
-#if MTR_ENABLE_PROVISIONAL
     case Events::OperationalError::Id: {
         Events::OperationalError::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1687,8 +1686,6 @@ static id _Nullable DecodeEventPayloadForOvenOperationalStateCluster(EventId aEv
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::OperationCompletion::Id: {
         Events::OperationCompletion::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1732,7 +1729,6 @@ static id _Nullable DecodeEventPayloadForOvenOperationalStateCluster(EventId aEv
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }

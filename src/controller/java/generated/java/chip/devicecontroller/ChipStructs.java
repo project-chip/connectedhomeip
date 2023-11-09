@@ -3682,6 +3682,10 @@ public static class OvenOperationalStateClusterErrorStateStruct {
   public Integer errorStateID;
   public Optional<String> errorStateLabel;
   public Optional<String> errorStateDetails;
+  private static final long ERROR_STATE_I_D_ID = 0L;
+  private static final long ERROR_STATE_LABEL_ID = 1L;
+  private static final long ERROR_STATE_DETAILS_ID = 2L;
+
   public OvenOperationalStateClusterErrorStateStruct(
     Integer errorStateID,
     Optional<String> errorStateLabel,
@@ -3690,6 +3694,47 @@ public static class OvenOperationalStateClusterErrorStateStruct {
     this.errorStateID = errorStateID;
     this.errorStateLabel = errorStateLabel;
     this.errorStateDetails = errorStateDetails;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ERROR_STATE_I_D_ID, new UIntType(errorStateID)));
+    values.add(new StructElement(ERROR_STATE_LABEL_ID, errorStateLabel.<BaseTLVType>map((nonOptionalerrorStateLabel) -> new StringType(nonOptionalerrorStateLabel)).orElse(new EmptyType())));
+    values.add(new StructElement(ERROR_STATE_DETAILS_ID, errorStateDetails.<BaseTLVType>map((nonOptionalerrorStateDetails) -> new StringType(nonOptionalerrorStateDetails)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static OvenOperationalStateClusterErrorStateStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer errorStateID = null;
+    Optional<String> errorStateLabel = Optional.empty();
+    Optional<String> errorStateDetails = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ERROR_STATE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          errorStateID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ERROR_STATE_LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          errorStateLabel = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == ERROR_STATE_DETAILS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          errorStateDetails = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new OvenOperationalStateClusterErrorStateStruct(
+      errorStateID,
+      errorStateLabel,
+      errorStateDetails
+    );
   }
 
   @Override
@@ -3712,12 +3757,48 @@ public static class OvenOperationalStateClusterErrorStateStruct {
 public static class OvenOperationalStateClusterOperationalStateStruct {
   public Integer operationalStateID;
   public Optional<String> operationalStateLabel;
+  private static final long OPERATIONAL_STATE_I_D_ID = 0L;
+  private static final long OPERATIONAL_STATE_LABEL_ID = 1L;
+
   public OvenOperationalStateClusterOperationalStateStruct(
     Integer operationalStateID,
     Optional<String> operationalStateLabel
   ) {
     this.operationalStateID = operationalStateID;
     this.operationalStateLabel = operationalStateLabel;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(OPERATIONAL_STATE_I_D_ID, new UIntType(operationalStateID)));
+    values.add(new StructElement(OPERATIONAL_STATE_LABEL_ID, operationalStateLabel.<BaseTLVType>map((nonOptionaloperationalStateLabel) -> new StringType(nonOptionaloperationalStateLabel)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static OvenOperationalStateClusterOperationalStateStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer operationalStateID = null;
+    Optional<String> operationalStateLabel = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == OPERATIONAL_STATE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          operationalStateID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == OPERATIONAL_STATE_LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          operationalStateLabel = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new OvenOperationalStateClusterOperationalStateStruct(
+      operationalStateID,
+      operationalStateLabel
+    );
   }
 
   @Override

@@ -5195,7 +5195,6 @@ static id _Nullable DecodeAttributeValueForOvenOperationalStateCluster(Attribute
 {
     using namespace Clusters::OvenOperationalState;
     switch (aAttributeId) {
-#if MTR_ENABLE_PROVISIONAL
     case Attributes::PhaseList::Id: {
         using TypeInfo = Attributes::PhaseList::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -5231,8 +5230,6 @@ static id _Nullable DecodeAttributeValueForOvenOperationalStateCluster(Attribute
         }
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Attributes::CurrentPhase::Id: {
         using TypeInfo = Attributes::CurrentPhase::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -5248,8 +5245,6 @@ static id _Nullable DecodeAttributeValueForOvenOperationalStateCluster(Attribute
         }
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Attributes::CountdownTime::Id: {
         using TypeInfo = Attributes::CountdownTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -5265,8 +5260,6 @@ static id _Nullable DecodeAttributeValueForOvenOperationalStateCluster(Attribute
         }
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Attributes::OperationalStateList::Id: {
         using TypeInfo = Attributes::OperationalStateList::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -5304,8 +5297,6 @@ static id _Nullable DecodeAttributeValueForOvenOperationalStateCluster(Attribute
         }
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Attributes::OperationalState::Id: {
         using TypeInfo = Attributes::OperationalState::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -5317,8 +5308,6 @@ static id _Nullable DecodeAttributeValueForOvenOperationalStateCluster(Attribute
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Attributes::OperationalError::Id: {
         using TypeInfo = Attributes::OperationalError::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -5351,7 +5340,6 @@ static id _Nullable DecodeAttributeValueForOvenOperationalStateCluster(Attribute
         }
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
