@@ -288,7 +288,6 @@ class MatterDnssdListener(ServiceListener):
 
     @staticmethod
     def log_addr(info: ServiceInfo) -> str:
-        # TODO: Check if link local etc.
         ret = "\n"
         for addr in info.parsed_scoped_addresses():
             ret += f"{get_addr_type(addr)}: {addr}\n"
