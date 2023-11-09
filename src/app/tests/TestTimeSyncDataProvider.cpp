@@ -119,8 +119,7 @@ void TestTimeZoneStoreLoad(nlTestSuite * inSuite, void * inContext)
     char tzShort[]                             = "LA";
     char tzLong[]                              = "MunichOnTheLongRiverOfIsarInNiceSummerWeatherWithAugustinerBeer";
     char tzBerlin[]                            = "Berlin";
-    TimeSyncDataProvider::TimeZoneStore tzS[3] = { makeTimeZone(1, 1, tzShort),
-                                                   makeTimeZone(2, 2, tzLong),
+    TimeSyncDataProvider::TimeZoneStore tzS[3] = { makeTimeZone(1, 1, tzShort), makeTimeZone(2, 2, tzLong),
                                                    makeTimeZone(3, 3, tzBerlin) };
     TimeZoneList tzL(tzS);
     NL_TEST_ASSERT(inSuite, tzL.size() == 3);
