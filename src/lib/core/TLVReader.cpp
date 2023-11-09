@@ -32,6 +32,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/utf8.h>
 
 namespace chip {
 namespace TLV {
