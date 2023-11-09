@@ -104,6 +104,18 @@ ScenesServer & ScenesServer::Instance()
 }
 void ReportAttributeOnAllEndpoints(AttributeId attribute) {}
 
+class ScenesClusterFabricDelegate : public chip::FabricTable::Delegate
+{
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        SceneTable * sceneTable = scenes::GetSceneTableImpl();
+        VerifyOrReturn(nullptr != sceneTable);
+        sceneTable->RemoveFabric(fabricIndex);
+    }
+};
+
+static ScenesClusterFabricDelegate gFabricDelegate;
+
 CHIP_ERROR ScenesServer::Init()
 {
     // Prevents re-initializing
@@ -115,6 +127,7 @@ CHIP_ERROR ScenesServer::Init()
 
     SceneTable * sceneTable = scenes::GetSceneTableImpl();
     ReturnErrorOnFailure(sceneTable->Init(&chip::Server::GetInstance().GetPersistentStorage()));
+    ReturnErrorOnFailure(chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate));
 
     mIsInitialized = true;
     return CHIP_NO_ERROR;
