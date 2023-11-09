@@ -19,8 +19,6 @@ from dataclasses import dataclass
 
 import websockets
 
-from websockets.protocol import State
-
 from .hooks import WebSocketRunnerHooks
 from .runner import TestRunner
 
@@ -53,7 +51,7 @@ class WebSocketRunner(TestRunner):
         if self._client is None:
             return False
 
-        return self._client.state == State.OPEN
+        return self._client.state == websockets.protocol.State.OPEN
 
     async def start(self):
         self._server = await self._start_server(self._server_startup_command)
