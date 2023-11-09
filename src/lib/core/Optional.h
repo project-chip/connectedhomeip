@@ -24,6 +24,7 @@
 #pragma once
 
 #include <new>
+#include <type_traits>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/InPlace.h>
@@ -70,6 +71,15 @@ public:
         if (mHasValue)
         {
             new (&mValue.mData) T(other.mValue.mData);
+        }
+    }
+
+    template <class U, typename = std::enable_if_t<!std::is_same_v<T, U> && std::is_constructible_v<T, const U &>>>
+    constexpr Optional(const Optional<U> & other) : mHasValue(other.HasValue())
+    {
+        if (mHasValue)
+        {
+            new (&mValue.mData) T(other.Value());
         }
     }
 
