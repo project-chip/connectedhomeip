@@ -2131,10 +2131,37 @@ public static class BooleanStateClusterStateChangeEvent {
 }
 public static class OvenOperationalStateClusterOperationalErrorEvent {
   public ChipStructs.OvenOperationalStateClusterErrorStateStruct errorState;
+  private static final long ERROR_STATE_ID = 0L;
+
   public OvenOperationalStateClusterOperationalErrorEvent(
     ChipStructs.OvenOperationalStateClusterErrorStateStruct errorState
   ) {
     this.errorState = errorState;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ERROR_STATE_ID, errorState.encodeTlv()));
+
+    return new StructType(values);
+  }
+
+  public static OvenOperationalStateClusterOperationalErrorEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ChipStructs.OvenOperationalStateClusterErrorStateStruct errorState = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ERROR_STATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          errorState = ChipStructs.OvenOperationalStateClusterErrorStateStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new OvenOperationalStateClusterOperationalErrorEvent(
+      errorState
+    );
   }
 
   @Override
@@ -2152,6 +2179,10 @@ public static class OvenOperationalStateClusterOperationCompletionEvent {
   public Integer completionErrorCode;
   public @Nullable Optional<Long> totalOperationalTime;
   public @Nullable Optional<Long> pausedTime;
+  private static final long COMPLETION_ERROR_CODE_ID = 0L;
+  private static final long TOTAL_OPERATIONAL_TIME_ID = 1L;
+  private static final long PAUSED_TIME_ID = 2L;
+
   public OvenOperationalStateClusterOperationCompletionEvent(
     Integer completionErrorCode,
     @Nullable Optional<Long> totalOperationalTime,
@@ -2160,6 +2191,47 @@ public static class OvenOperationalStateClusterOperationCompletionEvent {
     this.completionErrorCode = completionErrorCode;
     this.totalOperationalTime = totalOperationalTime;
     this.pausedTime = pausedTime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(COMPLETION_ERROR_CODE_ID, new UIntType(completionErrorCode)));
+    values.add(new StructElement(TOTAL_OPERATIONAL_TIME_ID, totalOperationalTime != null ? totalOperationalTime.<BaseTLVType>map((nonOptionaltotalOperationalTime) -> new UIntType(nonOptionaltotalOperationalTime)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(PAUSED_TIME_ID, pausedTime != null ? pausedTime.<BaseTLVType>map((nonOptionalpausedTime) -> new UIntType(nonOptionalpausedTime)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static OvenOperationalStateClusterOperationCompletionEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer completionErrorCode = null;
+    @Nullable Optional<Long> totalOperationalTime = null;
+    @Nullable Optional<Long> pausedTime = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == COMPLETION_ERROR_CODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          completionErrorCode = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TOTAL_OPERATIONAL_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          totalOperationalTime = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == PAUSED_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          pausedTime = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new OvenOperationalStateClusterOperationCompletionEvent(
+      completionErrorCode,
+      totalOperationalTime,
+      pausedTime
+    );
   }
 
   @Override
