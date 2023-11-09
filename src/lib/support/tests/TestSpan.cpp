@@ -27,6 +27,8 @@
 
 #include <nlunit-test.h>
 
+#include <array>
+
 using namespace chip;
 
 static void TestByteSpan(nlTestSuite * inSuite, void * inContext)
@@ -324,6 +326,22 @@ static void TestConversionConstructors(nlTestSuite * inSuite, void * inContext)
     Span<Foo> span6(testSpan2);
 
     FixedSpan<Foo, 2> span7(testSpan2);
+
+    std::array<Bar, 3> array;
+    const auto & constArray = array;
+    FixedSpan<Foo, 3> span9(array);
+    FixedSpan<const Foo, 3> span10(constArray);
+    Span<Foo> span11(array);
+    Span<const Foo> span12(constArray);
+
+    // Various places around the code base expect these conversions to be implicit
+    ([](FixedSpan<Foo, 3> f) {})(array);
+    ([](Span<Foo> f) {})(array);
+    ([](FixedSpan<const Foo, 3> f) {})(constArray);
+    ([](Span<const Foo> f) {})(constArray);
+
+    // The following should not compile
+    // Span<const Foo> error1 = std::array<Foo, 3>(); // Span would point into a temporary value
 }
 
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
