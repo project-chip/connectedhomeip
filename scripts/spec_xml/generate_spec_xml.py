@@ -24,6 +24,11 @@ DEFAULT_CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'
 DEFAULT_OUTPUT_DIR = os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'data_model'))
 
 
+def get_xml_path(filename, output_dir):
+    xml = os.path.basename(filename).replace('.adoc', '.xml')
+    return os.path.abspath(os.path.join(output_dir, xml))
+
+
 @click.command()
 @click.option(
     '--scraper',
@@ -45,8 +50,12 @@ DEFAULT_OUTPUT_DIR = os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'data_model
     is_flag=True,
     help='Flag for dry run')
 def main(scraper, spec_root, output_dir, dry_run):
-    # TODO: Add scrapers for device types
+    # Clusters need to be scraped first because the cluster directory is passed to the device type directory
+    scrape_clusters(scraper, spec_root, output_dir, dry_run)
+    scrape_device_types(scraper, spec_root, output_dir, dry_run)
 
+
+def scrape_clusters(scraper, spec_root, output_dir, dry_run):
     src_dir = os.path.abspath(os.path.join(spec_root, 'src'))
     sdm_clusters_dir = os.path.abspath(os.path.join(src_dir, 'service_device_management'))
     app_clusters_dir = os.path.abspath(os.path.join(src_dir, 'app_clusters'))
@@ -65,8 +74,7 @@ def main(scraper, spec_root, output_dir, dry_run):
         os.makedirs(clusters_output_dir)
 
     def scrape_cluster(filename: str) -> None:
-        xml = os.path.basename(filename).replace('.adoc', '.xml')
-        xml_path = os.path.abspath(os.path.join(clusters_output_dir, xml))
+        xml_path = get_xml_path(filename, clusters_output_dir)
         cmd = [scraper, 'cluster', filename, xml_path, '-nd']
         if dry_run:
             print(cmd)
@@ -92,6 +100,28 @@ def main(scraper, spec_root, output_dir, dry_run):
     sha = out.stdout
     with open(sha_file, 'wt', encoding='utf8') as output:
         output.write(sha)
+
+
+def scrape_device_types(scraper, spec_root, output_dir, dry_run):
+    device_type_dir = os.path.abspath(os.path.join(spec_root, 'src', 'device_types'))
+    device_types_output_dir = os.path.abspath(os.path.join(output_dir, 'device_types'))
+    clusters_output_dir = os.path.abspath(os.path.join(output_dir, 'clusters'))
+
+    if not os.path.exists(device_types_output_dir):
+        os.makedirs(device_types_output_dir)
+
+    def scrape_device_type(filename: str) -> None:
+        xml_path = get_xml_path(filename, device_types_output_dir)
+        print(xml_path)
+        cmd = [scraper, 'devicetype', '-c', clusters_output_dir, '-nd', filename, xml_path]
+        if dry_run:
+            print(cmd)
+        else:
+            print(' '.join(cmd))
+            subprocess.run(cmd)
+
+    for filename in glob.glob(f'{device_type_dir}/*.adoc'):
+        scrape_device_type(filename)
 
 
 if __name__ == '__main__':
