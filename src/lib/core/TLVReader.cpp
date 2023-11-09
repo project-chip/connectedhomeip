@@ -345,7 +345,7 @@ CHIP_ERROR TLVReader::Get(CharSpan & v) const
         return CHIP_ERROR_INVALID_UTF8;
     }
 
-    if ((len > 0) && (v[len - 1] == 0))
+    if (!v.empty() && (v.back() == 0))
     {
         return CHIP_ERROR_INVALID_TLV_CHAR_STRING;
     }
