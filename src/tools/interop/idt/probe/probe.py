@@ -16,7 +16,6 @@
 #
 
 import asyncio
-import ipaddress
 import os.path
 from abc import ABC, abstractmethod
 
@@ -27,6 +26,7 @@ from utils.log import get_logger
 from utils.shell import Bash
 
 from . import ProbeTarget, config
+from .ip_utils import is_ipv4, is_ipv6, is_ipv6_ll
 
 logger = get_logger(__file__)
 
@@ -48,29 +48,6 @@ class GenericMatterProber(ABC):
         bash = Bash(cmd, sync=True, capture_output=capture_output)
         bash.start_command()
         return bash
-
-    @staticmethod
-    def is_ipv4(ip: str) -> bool:
-        try:
-            ipaddress.IPv4Address(ip)
-            return True
-        except ipaddress.AddressValueError:
-            return False
-
-    @staticmethod
-    def is_ipv6_ll(ip: str) -> bool:
-        try:
-            return ipaddress.IPv6Address(ip).is_link_local
-        except ipaddress.AddressValueError:
-            return False
-
-    @staticmethod
-    def is_ipv6(ip: str) -> bool:
-        try:
-            ipaddress.IPv6Address(ip)
-            return True
-        except ipaddress.AddressValueError:
-            return False
 
     @abstractmethod
     def probe_v4(self, target: ProbeTarget) -> None:
@@ -101,13 +78,13 @@ class GenericMatterProber(ABC):
                 self.targets.append(ProbeTarget(name, addr, info.port))
 
     def probe_single_target(self, target: ProbeTarget) -> None:
-        if self.is_ipv4(target.ip):
+        if is_ipv4(target.ip):
             self.logger.debug(f"Probing v4 {target.ip}")
             self.probe_v4(target)
-        elif self.is_ipv6_ll(target.ip):
+        elif is_ipv6_ll(target.ip):
             self.logger.debug(f"Probing v6 ll {target.ip}")
             self.probe_v6_ll(target)
-        elif self.is_ipv6(target.ip):
+        elif is_ipv6(target.ip):
             self.logger.debug(f"Probing v6 {target.ip}")
             self.probe_v6(target)
 
