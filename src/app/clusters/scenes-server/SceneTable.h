@@ -209,7 +209,7 @@ public:
 
         void Clear()
         {
-            memset(mName, 0, sizeof(mName));
+            SetName(CharSpan());
             mSceneTransitionTimeMs = 0;
             mExtensionFieldSets.Clear();
         }
