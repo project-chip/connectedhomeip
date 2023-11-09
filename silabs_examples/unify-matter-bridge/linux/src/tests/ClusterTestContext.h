@@ -230,10 +230,51 @@ public:
         return SUCCESS;
     }
 
-    
     void  mqtt_subscribeCb(const std::string & topic, const std::string & json_payload)
     {
         mMqttHandler.subscribeCB(topic.c_str(), json_payload.c_str(), json_payload.length(), &mCommandHandler.value());
+    }
+    
+    template <typename DecodableEventType>
+    inline CHIP_ERROR event_test(nlTestSuite * sSuite, chip::EventNumber eventNumber, DecodableEventType & eventData)
+    {
+        auto sessionHandle      = GetSessionBobToAlice();
+        bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+        CHIP_ERROR err    = CHIP_NO_ERROR;
+
+        // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. 
+        // Otherwise, it's not safe to do so.
+        auto onSuccessCb = [&eventNumber, &eventData, &onSuccessCbInvoked](const chip::app::EventHeader & eventHeader,
+                                                                            const auto & eventResponse)
+        {
+            if (eventHeader.mEventNumber == eventNumber)
+            {
+                eventData = eventResponse;
+                onSuccessCbInvoked = true;
+            }
+        };
+
+        // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. 
+        // Otherwise, it's not safe to do so.
+        auto onFailureCb = [&eventNumber, &err, &onFailureCbInvoked](const chip::app::EventHeader * eventHeader, CHIP_ERROR aError)
+        {
+            if (eventHeader->mEventNumber == eventNumber)
+            {
+                err = aError;
+                onFailureCbInvoked = true;
+            }
+        };
+
+        err = chip::Controller::SubscribeEvent<DecodableEventType>(
+                    &GetExchangeManager(), sessionHandle, kEndpointId, onSuccessCb, onFailureCb, 0, 5);
+        NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
+        
+        DrainAndServiceIO();
+        NL_TEST_ASSERT(sSuite, !onFailureCbInvoked);
+        NL_TEST_ASSERT(sSuite, onSuccessCbInvoked);
+        NL_TEST_ASSERT(sSuite, GetExchangeManager().GetNumActiveExchanges() == 0);
+
+        return err;
     }
 
     template <typename T>

@@ -38,10 +38,8 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::DoorLock;
 using TestContext = unify::matter_bridge::Test::ClusterContext<DoorLockAttributeAccess,
                                 unify::matter_bridge::Test::MockClusterCommandHandler>;
-unify::matter_bridge::Test::MockInteractionModelApp delegate;
-
 chip::EndpointId kTestEndpointId   = 2;
-
+    
 static int Initialize(void * context)
 {
     if (TestContext::Initialize(context, true) != SUCCESS)
@@ -84,8 +82,8 @@ static void TestDoorLockAttributeLockState(nlTestSuite * sSuite, void * apContex
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = ctx.attribute_test<Clusters::DoorLock::Attributes::LockState::TypeInfo>(
-        sSuite, "ucl/by-unid/zw-0x0002/ep2/DoorLock/Attributes/LockState/Reported", R"({ "value": "Locked" })",
-        MakeNullable(DlLockState::kLocked));
+        sSuite, "ucl/by-unid/zw-0x0002/ep2/DoorLock/Attributes/LockState/Reported", R"({ "value": "Unlocked" })",
+        MakeNullable(DlLockState::kUnlocked));
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);   
 }
 
@@ -148,101 +146,55 @@ static void TestDoorLockEventErrorJammed(nlTestSuite * sSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
+    Clusters::DoorLock::Events::DoorLockAlarm::DecodableType eventdata;
         
     // Trigger Doorstate event.
     err = ctx.attribute_test<Clusters::DoorLock::Attributes::DoorState::TypeInfo>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/DoorLock/Attributes/DoorState/Reported", R"({ "value": "ErrorJammed" })",
         MakeNullable(DoorStateEnum::kDoorJammed));
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
-
-    chip::app::EventPathParams eventPathParams[1];
-    eventPathParams[0].mEndpointId = kTestEndpointId;
-    eventPathParams[0].mClusterId = Clusters::DoorLock::Id;
-    eventPathParams[0].mEventId = Clusters::DoorLock::Events::DoorLockAlarm::Id;
-
-    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
-    readPrepareParams.mpEventPathParamsList = eventPathParams;
-    readPrepareParams.mEventPathParamsListSize = 1;   
-    readPrepareParams.mEventNumber.SetValue(1);
-
-    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
-                                   chip::app::ReadClient::InteractionType::Read);
-
-    err = readClient.SendRequest(readPrepareParams);
+    
+    err = ctx.event_test<Clusters::DoorLock::Events::DoorLockAlarm::DecodableType>(sSuite, 1, eventdata);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(sSuite, eventdata.alarmCode == Clusters::DoorLock::AlarmCodeEnum::kLockJammed);
     ctx.DrainAndServiceIO();
-    NL_TEST_ASSERT(sSuite, delegate.mGotEventResponse);
-    delegate.Reset();
-    NL_TEST_ASSERT(sSuite, unify::matter_bridge::Test::engine->GetNumActiveReadClients() == 0);
-    NL_TEST_ASSERT(sSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 static void TestDoorLockEventLocked(nlTestSuite * sSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
+    Clusters::DoorLock::Events::LockOperation::DecodableType eventdata;
 
-    // Trigger LockOperation Locked 
+    // Trigger LockOperation Locked event
     err = ctx.attribute_test<Clusters::DoorLock::Attributes::LockState::TypeInfo>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/DoorLock/Attributes/LockState/Reported", R"({ "value": "Locked" })",
         MakeNullable(DlLockState::kLocked));
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR); 
 
-    chip::app::EventPathParams eventPathParams[1];
-    eventPathParams[0].mEndpointId = kTestEndpointId;
-    eventPathParams[0].mClusterId = Clusters::DoorLock::Id;
-    eventPathParams[0].mEventId = Clusters::DoorLock::Events::LockOperation::Id;
-
-    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
-    readPrepareParams.mpEventPathParamsList = eventPathParams;
-    readPrepareParams.mEventPathParamsListSize = 1;   
-    readPrepareParams.mEventNumber.SetValue(2);
-    
-    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
-                                   chip::app::ReadClient::InteractionType::Read);
-
-    err = readClient.SendRequest(readPrepareParams);
+    err = ctx.event_test<Clusters::DoorLock::Events::LockOperation::DecodableType>(sSuite, 2, eventdata);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(sSuite, eventdata.lockOperationType == Clusters::DoorLock::LockOperationTypeEnum::kLock);
     ctx.DrainAndServiceIO();
-    NL_TEST_ASSERT(sSuite, delegate.mGotEventResponse);
-    delegate.Reset();
-    NL_TEST_ASSERT(sSuite, unify::matter_bridge::Test::engine->GetNumActiveReadClients() == 0);
-    NL_TEST_ASSERT(sSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 static void TestDoorLockEventUnlocked(nlTestSuite * sSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
+    Clusters::DoorLock::Events::LockOperation::DecodableType eventdata;
 
-    // Trigger LockOperation Locked
+    // Trigger LockOperation Unlocked event
     err = ctx.attribute_test<Clusters::DoorLock::Attributes::LockState::TypeInfo>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/DoorLock/Attributes/LockState/Reported", R"({ "value": "Unlocked" })",
         MakeNullable(DlLockState::kUnlocked));
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR); 
     
-    chip::app::EventPathParams eventPathParams[1];
-    eventPathParams[0].mEndpointId = kTestEndpointId;
-    eventPathParams[0].mClusterId = Clusters::DoorLock::Id;
-    eventPathParams[0].mEventId = Clusters::DoorLock::Events::LockOperation::Id;
-
-    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
-    readPrepareParams.mpEventPathParamsList    = eventPathParams;
-    readPrepareParams.mEventPathParamsListSize = 1;   
-    readPrepareParams.mEventNumber.SetValue(3);
-
-    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
-                                   chip::app::ReadClient::InteractionType::Read);
-
-    err = readClient.SendRequest(readPrepareParams);
+    err = ctx.event_test<Clusters::DoorLock::Events::LockOperation::DecodableType>(sSuite, 3, eventdata);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(sSuite, eventdata.lockOperationType == Clusters::DoorLock::LockOperationTypeEnum::kUnlock);
     ctx.DrainAndServiceIO();
-    NL_TEST_ASSERT(sSuite, delegate.mGotEventResponse);
-    delegate.Reset();
-    NL_TEST_ASSERT(sSuite, unify::matter_bridge::Test::engine->GetNumActiveReadClients() == 0);
-    NL_TEST_ASSERT(sSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0); 
 }
-
 
 /**
  *   Test Suite. It lists all the test functions.
