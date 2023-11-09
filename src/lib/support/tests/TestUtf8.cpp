@@ -66,6 +66,26 @@ void TestValidStrings(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("�"));
     NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("􏿿"));
     NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("����"));
+
+
+    // NOTE: UTF8 allows embeded NULLs
+    //       even though strings like that are probably not ideal for handling
+    //       Test that we allow this, but consider later to disallow them
+    //       completely if the spec is updated as such
+    {
+        char zero[16] = { 0 };
+        NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(zero, 0)));
+        NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(zero, 1)));
+        NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(zero, 2)));
+        NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(zero, 3)));
+        NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(zero, 4)));
+        NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(zero, 16)));
+    }
+
+    {
+        char insideZero[] = "test\0zero";
+        NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(insideZero)));
+    }
 }
 
 #define TEST_INVALID_BYTES(...)                                                                                                    \
@@ -78,9 +98,6 @@ void TestValidStrings(nlTestSuite * inSuite, void * inContext)
 
 void TestInvalidStrings(nlTestSuite * inSuite, void * inContext)
 {
-    // cannot embed zeroes
-    TEST_INVALID_BYTES(0x00);
-
     // overly long representation
     TEST_INVALID_BYTES(0xe0, 0b1001'1111, 0x80); // A
     TEST_INVALID_BYTES(0xed, 0b1011'0000, 0x80); // B

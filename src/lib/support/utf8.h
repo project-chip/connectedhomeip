@@ -23,9 +23,7 @@ namespace chip {
 namespace Utf8 {
 
 /**
- * Validate that the given span looks like a valid UTF-8 string:
- *   - no embedded nulls (this is a Matter Spec requirement for encoding)
- *   - valid UTF8 encoding overall
+ * Validate that the given span looks like a valid UTF-8 string
  *
  * UTF-8 encoding described at
  * https://www.unicode.org/versions/Unicode12.0.0/UnicodeStandard-12.0.pdf
