@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="Energy"/>
+
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x0091"/>
+    <field name="ImportedEnergy" mask="0x1"/>
+    <field name="ExportedEnergy" mask="0x2"/>
+    <field name="CumulativeEnergy" mask="0x4"/>
+    <field name="PeriodicEnergy" mask="0x8"/>
+    <field name="EphemeralEnergy" mask="0x10"/>
+  </bitmap>
+
+  <cluster apiMaturity="provisional">
+    <name>Electrical Energy Measurement</name>
+    <domain>Energy</domain>
+    <description>This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server.</description>
+    <code>0x0091</code>
+    <define>ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
+
+    <attribute side="server" code="0x0000" define="MEASURED" type="boolean" writable="false" default="false" optional="false">Measured</attribute>
+    <attribute side="server" code="0x0001" define="CUMULATIVE_ENERGY_IMPORTED_TIME" type="epoch_s" writable="false" optional="true" isNullable="true">CumulativeEnergyImportedTime</attribute>
+    <attribute side="server" code="0x0002" define="CUMULATIVE_ENERGY_IMPORTED" type="int64u" writable="false" optional="true" isNullable="true">CumulativeEnergyImported</attribute>
+    <attribute side="server" code="0x0003" define="CUMULATIVE_ENERGY_EXPORTED_TIME" type="epoch_s" writable="false" optional="true" isNullable="true">CumulativeEnergyExportedTime</attribute>
+    <attribute side="server" code="0x0004" define="CUMULATIVE_ENERGY_EXPORTED" type="int64u" writable="false" optional="true" isNullable="true">CumulativeEnergyExported</attribute>
+    <attribute side="server" code="0x0005" define="PERIODIC_ENERGY_IMPORTED_START_TIME" type="epoch_s" writable="false" optional="true" isNullable="true">PeriodicEnergyImportedStartTime</attribute>
+    <attribute side="server" code="0x0006" define="PERIODIC_ENERGY_IMPORTED_END_TIME" type="epoch_s" writable="false" optional="true" isNullable="true">PeriodicEnergyImportedEndTime</attribute>
+    <attribute side="server" code="0x0007" define="PERIODIC_ENERGY_IMPORTED" type="int64u" writable="false" optional="true" isNullable="true">PeriodicEnergyImported</attribute>
+    <attribute side="server" code="0x0008" define="PERIODIC_ENERGY_EXPORTED_START_TIME" type="epoch_s" writable="false" optional="true" isNullable="true">PeriodicEnergyExportedStartTime</attribute>
+    <attribute side="server" code="0x0009" define="PERIODIC_ENERGY_EXPORTED_END_TIME" type="epoch_s" writable="false" optional="true" isNullable="true">PeriodicEnergyExportedEndTime</attribute>
+    <attribute side="server" code="0x000A" define="PERIODIC_ENERGY_EXPORTED" type="int64u" writable="false" optional="true" isNullable="true">PeriodicEnergyExported</attribute>
+    <attribute side="server" code="0x000B" define="EPHEMERAL_ENERGY_IMPORTED" type="int64u" writable="false" optional="true" isNullable="true">EphemeralEnergyImported</attribute>
+    <attribute side="server" code="0x000C" define="EPHEMERAL_ENERGY_EXPORTED" type="int64u" writable="false" optional="true" isNullable="true">EphemeralEnergyExported</attribute>
+
+    <event side="server" code="0x00" name="CumulativeEnergyImported" priority="info" optional="true">
+      <description>This event SHALL be generated when the server takes a snapshot of the cumulative energy imported by the server.</description>
+      <field id="0" name="ImportedTimestamp" type="epoch_s"/>
+      <field id="1" name="EnergyImported" type="int64u"/>
+    </event>
+    <event side="server" code="0x01" name="CumulativeEnergyExported" priority="info" optional="true">
+      <description>This event SHALL be generated when the server takes a snapshot of the cumulative energy exported by the server.</description>
+      <field id="0" name="ImportedTimestamp" type="epoch_s"/>
+      <field id="1" name="EnergyExported" type="int64u"/>
+    </event>
+    <event side="server" code="0x02" name="PeriodicEnergyImported" priority="info" optional="true">
+      <description>This event SHALL be generated when the server reaches the end of a reporting period for imported energy.</description>
+      <field id="0" name="PeriodStart" type="epoch_s"/>
+      <field id="1" name="PeriodEnd" type="epoch_s"/>
+      <field id="2" name="EnergyImported" type="int64u"/>
+    </event>
+    <event side="server" code="0x03" name="PeriodicEnergyExported" priority="info" optional="true">
+      <description>This event SHALL be generated when the server reaches the end of a reporting period for exported energy.</description>
+      <field id="0" name="PeriodStart" type="epoch_s"/>
+      <field id="1" name="PeriodEnd" type="epoch_s"/>
+      <field id="2" name="EnergyExported" type="int64u"/>
+    </event>
+    <event side="server" code="0x04" name="EphemeralEnergyImported" priority="info" optional="true">
+      <description>This event SHALL be generated when the server reaches the end of a reporting period for imported energy.</description>
+      <field id="0" name="PeriodStart" type="epoch_s"/>
+      <field id="1" name="PeriodEnd" type="epoch_s"/>
+      <field id="2" name="EnergyImported" type="int64u"/>
+    </event>
+    <event side="server" code="0x05" name="EphemeralEnergyExported" priority="info" optional="true">
+      <description>This event SHALL be generated when the server reaches the end of a reporting period for exported energy.</description>
+      <field id="0" name="PeriodStart" type="epoch_s"/>
+      <field id="1" name="PeriodEnd" type="epoch_s"/>
+      <field id="2" name="EnergyExported" type="int64u"/>
+    </event>
+
+  </cluster>
+</configurator>

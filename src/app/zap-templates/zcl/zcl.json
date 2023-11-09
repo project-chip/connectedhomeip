@@ -38,6 +38,7 @@
         "dishwasher-mode-cluster.xml",
         "microwave-oven-mode-cluster.xml",
         "door-lock-cluster.xml",
+        "electrical-energy-measurement-cluster.xml",
         "electrical-measurement-cluster.xml",
         "ethernet-network-diagnostics-cluster.xml",
         "fan-control-cluster.xml",
