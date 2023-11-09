@@ -302,6 +302,7 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
             }
 #endif
             result.address.SetIPAddress(nodeData.resolutionData.ipAddress[i]);
+            result.address.SetTransportType(result.supportsTcp ? Transport::Type::kTcp : Transport::Type::kUdp);
             current->LookupResult(result);
         }
 
