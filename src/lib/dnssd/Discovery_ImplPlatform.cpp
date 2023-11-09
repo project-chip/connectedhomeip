@@ -224,6 +224,13 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
     case TxtFieldKey::kTcpSupported:
         return CopyTextRecordValue(buffer, bufferLen, params.GetTcpSupported());
     case TxtFieldKey::kSessionIdleInterval:
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // A ICD operating as a LIT should not advertise its slow polling interval
+        if (params.GetICDOperatingAsLIT().HasValue() && params.GetICDOperatingAsLIT().Value())
+        {
+            return CHIP_NO_ERROR;
+        }
+#endif
     case TxtFieldKey::kSessionActiveInterval:
     case TxtFieldKey::kSessionActiveThreshold:
         return CopyTextRecordValue(buffer, bufferLen, params.GetLocalMRPConfig(), key);

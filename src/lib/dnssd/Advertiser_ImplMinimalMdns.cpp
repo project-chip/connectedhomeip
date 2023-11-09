@@ -230,6 +230,11 @@ private:
         if (optionalMrp.HasValue())
         {
             auto mrp = optionalMrp.Value();
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+            // A ICD operating as a LIT should not advertise its slow polling interval
+            if (!params.GetICDOperatingAsLIT().HasValue() || !params.GetICDOperatingAsLIT().Value())
+#endif
             {
                 if (mrp.mIdleRetransTimeout > kMaxRetryInterval)
                 {
