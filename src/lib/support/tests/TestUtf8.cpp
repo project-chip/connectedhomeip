@@ -81,6 +81,14 @@ void TestInvalidStrings(nlTestSuite * inSuite, void * inContext)
     // cannot embed zeroes
     TEST_INVALID_BYTES(0x00);
 
+    // overly long representation
+    TEST_INVALID_BYTES(0xe0, 0x09, 0x80);        // A
+    TEST_INVALID_BYTES(0xed, 0b1011'0000, 0x80); // B
+    TEST_INVALID_BYTES(0xf0, 0b1000'1111, 0x80); // C
+
+    // Ourside codepoint
+    TEST_INVALID_BYTES(0xf4, 0x90, 0x80, 0x80);  // D
+
     // Missing continuation
     TEST_INVALID_BYTES(0xC2);
     TEST_INVALID_BYTES(0xE0);
