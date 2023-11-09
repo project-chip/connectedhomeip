@@ -39,6 +39,10 @@ void TestValidStrings(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8(""));
     NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("abc"));
+
+    // Various tests from https://www.w3.org/2001/06/utf-8-wrong/UTF-8-test.html
+
+    // Generic UTF8
     NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("κόσμε"));
 
     // First possible sequence of a certain length
@@ -55,15 +59,65 @@ void TestValidStrings(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("����"));
     NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("�����"));
     NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("������"));
+
+    // Other boundary conditions
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("퟿"));
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8(""));
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("�"));
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("􏿿"));
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("����"));
 }
+
+#define TEST_INVALID_BYTES(...)                                                                                                    \
+    {                                                                                                                              \
+        uint8_t _buff[] = { __VA_ARGS__ };                                                                                         \
+        CharSpan _span(reinterpret_cast<const char *>(_buff), sizeof(_buff));                                                      \
+        NL_TEST_ASSERT(inSuite, !Utf8::IsValid(_span));                                                                            \
+    }                                                                                                                              \
+    (void) 0
 
 void TestInvalidStrings(nlTestSuite * inSuite, void * inContext)
 {
-    {
-        // cannot embed zeroes
-        char buff[] = { 0 };
-        NL_TEST_ASSERT(inSuite, !Utf8::IsValid(CharSpan(buff)));
-    }
+    // cannot embed zeroes
+    TEST_INVALID_BYTES(0x00);
+
+    // Missing continuation
+    TEST_INVALID_BYTES(0xC2);
+    TEST_INVALID_BYTES(0xE0);
+    TEST_INVALID_BYTES(0xE1);
+    TEST_INVALID_BYTES(0xE1, 0x9F);
+    TEST_INVALID_BYTES(0xED, 0x9F);
+    TEST_INVALID_BYTES(0xEE, 0x9F);
+    TEST_INVALID_BYTES(0xF0);
+    TEST_INVALID_BYTES(0xF0, 0x9F);
+    TEST_INVALID_BYTES(0xF0, 0x9F, 0x9F);
+    TEST_INVALID_BYTES(0xF1);
+    TEST_INVALID_BYTES(0xF1, 0x9F);
+    TEST_INVALID_BYTES(0xF1, 0x9F, 0x9F);
+    TEST_INVALID_BYTES(0xF4);
+    TEST_INVALID_BYTES(0xF4, 0x9F);
+    TEST_INVALID_BYTES(0xF4, 0x9F, 0x9F);
+
+    // More tests from  https://www.w3.org/2001/06/utf-8-wrong/UTF-8-test.html
+    TEST_INVALID_BYTES(0x80); // First continuation byte
+    TEST_INVALID_BYTES(0xBF); // Last continuation byte
+
+    // Impossible bytes
+    TEST_INVALID_BYTES(0xFE);
+    TEST_INVALID_BYTES(0xFF);
+    TEST_INVALID_BYTES(0xFE, 0xFE, 0xFF, 0xFF);
+
+    // Overlong sequences
+    TEST_INVALID_BYTES(0xc0, 0xaf);
+    TEST_INVALID_BYTES(0xe0, 0x80, 0xaf);
+    TEST_INVALID_BYTES(0xf0, 0x80, 0x80, 0xaf);
+    TEST_INVALID_BYTES(0xf8, 0x80, 0x80, 0x80, 0xaf);
+    TEST_INVALID_BYTES(0xfc, 0x80, 0x80, 0x80, 0x80, 0xaf);
+    TEST_INVALID_BYTES(0xc0, 0x80);
+    TEST_INVALID_BYTES(0xe0, 0x80, 0x80);
+    TEST_INVALID_BYTES(0xf0, 0x80, 0x80, 0x80);
+    TEST_INVALID_BYTES(0xf8, 0x80, 0x80, 0x80, 0x80);
+    TEST_INVALID_BYTES(0xfc, 0x80, 0x80, 0x80, 0x80, 0x80);
 }
 
 } // namespace
