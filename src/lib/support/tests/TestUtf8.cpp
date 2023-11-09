@@ -1,7 +1,7 @@
 
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -105,6 +105,8 @@ void TestInvalidStrings(nlTestSuite * inSuite, void * inContext)
 
     // Outside codepoint
     TEST_INVALID_BYTES(0xf4, 0x90, 0x80, 0x80); // D
+    TEST_INVALID_BYTES(0xf4, 0x91, 0x82, 0x83);
+    TEST_INVALID_BYTES(0xf5, 0x81, 0x82, 0x83);
 
     // Missing continuation
     TEST_INVALID_BYTES(0xC2);
