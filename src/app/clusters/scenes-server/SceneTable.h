@@ -214,12 +214,6 @@ public:
             mExtensionFieldSets.Clear();
         }
 
-        bool operator==(const SceneData & other)
-        {
-            return (mNameLength == other.mNameLength && !memcmp(mName, other.mName, mNameLength) &&
-                    (mSceneTransitionTimeMs == other.mSceneTransitionTimeMs) && (mExtensionFieldSets == other.mExtensionFieldSets));
-        }
-
         void operator=(const SceneData & other)
         {
             SetName(CharSpan(other.mName, other.mNameLength));
