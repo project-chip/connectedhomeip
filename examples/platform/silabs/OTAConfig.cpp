@@ -18,6 +18,8 @@
 
 #include "OTAConfig.h"
 
+#ifndef SIWX_917
+
 #include "application_properties.h"
 #include <app/server/Server.h>
 
@@ -66,6 +68,7 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
     .longTokenSectionAddress = NULL,
 };
 
+#endif
 // Global OTA objects
 chip::DefaultOTARequestor gRequestorCore;
 chip::DefaultOTARequestorStorage gRequestorStorage;
