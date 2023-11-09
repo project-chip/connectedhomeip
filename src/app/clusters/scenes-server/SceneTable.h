@@ -186,6 +186,14 @@ public:
         }
         ~SceneData(){};
 
+        bool operator==(const SceneData &other) const {
+            return (
+                    (CharSpan(mName, mNameLength) == CharSpan(other.mName, other.mNameLength)) &&
+                    (mSceneTransitionTimeMs == other.mSceneTransitionTimeMs) &&
+                    (mExtensionFieldSets == other.mExtensionFieldSets)
+                    );
+        }
+
         void SetName(const CharSpan & sceneName)
         {
             if (nullptr == sceneName.data())
@@ -203,8 +211,7 @@ public:
 
         void Clear()
         {
-            SetName(CharSpan());
-
+            memset(mName, 0, sizeof(mName));
             mSceneTransitionTimeMs = 0;
             mExtensionFieldSets.Clear();
         }

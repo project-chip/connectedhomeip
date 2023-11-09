@@ -134,7 +134,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                       "}\n");
 
     const char charBuf[] = "hello";
-    CharSpan charSpan(charBuf);
+    CharSpan charSpan = CharSpan::fromCharString(charBuf);
     EncodeAndValidate(charSpan,
                       "{\n"
                       "   \"value\" : \"hello\"\n"
