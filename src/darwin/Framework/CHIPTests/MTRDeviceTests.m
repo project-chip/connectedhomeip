@@ -2677,7 +2677,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
             size_t fileSize = [fileAttributes fileSize];
             XCTAssertTrue(fileSize > 0);
-            NSLog(@"test901_DownloadEndUserSupportLog_NoTimeout expectation fulfill");
             [expectation fulfill];
         }];
     });

@@ -1401,13 +1401,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     queue:(dispatch_queue_t)queue
                     error:(NSError * _Nullable)error
 {
-    if (self->_diagnosticLogsTransferHandler != nil) {
-        self->_diagnosticLogsTransferHandler->Reset();
-        delete (self->_diagnosticLogsTransferHandler);
-        self->_diagnosticLogsTransferHandler = nil;
-    }
     dispatch_async(queue, ^{
         completion(filepath, error);
+    });
+
+    dispatch_async(self.queue, ^{
+        if (self->_diagnosticLogsTransferHandler != nil) {
+            delete (self->_diagnosticLogsTransferHandler);
+            self->_diagnosticLogsTransferHandler = nil;
+        }
     });
 }
 
