@@ -1456,6 +1456,36 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ActivatedCarbonFilterMo
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(Messages::FutureMessagePreferenceEnum val)
+{
+    using EnumType = Messages::FutureMessagePreferenceEnum;
+    switch (val)
+    {
+    case EnumType::kAllowed:
+    case EnumType::kIncreased:
+    case EnumType::kReduced:
+    case EnumType::kDisallowed:
+    case EnumType::kBanned:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Messages::MessagePriorityEnum val)
+{
+    using EnumType = Messages::MessagePriorityEnum;
+    switch (val)
+    {
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
     using EnumType = DoorLock::AlarmCodeEnum;

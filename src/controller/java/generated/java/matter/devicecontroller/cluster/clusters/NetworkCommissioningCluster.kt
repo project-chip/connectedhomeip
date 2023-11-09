@@ -20,159 +20,147 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class NetworkCommissioningCluster(
-  private val controller: MatterController,
-  private val endpointId: UShort
-) {
+class NetworkCommissioningCluster(private val controller: MatterController, private val endpointId: UShort) {
   class ScanNetworksResponse(
-    val networkingStatus: UInt,
-    val debugText: String?,
-    val wiFiScanResults: List<NetworkCommissioningClusterWiFiInterfaceScanResultStruct>?,
+    val networkingStatus: UInt, 
+    val debugText: String?, 
+    val wiFiScanResults: List<NetworkCommissioningClusterWiFiInterfaceScanResultStruct>?, 
     val threadScanResults: List<NetworkCommissioningClusterThreadInterfaceScanResultStruct>?
   )
 
   class NetworkConfigResponse(
-    val networkingStatus: UInt,
-    val debugText: String?,
-    val networkIndex: UByte?,
-    val clientIdentity: ByteArray?,
+    val networkingStatus: UInt, 
+    val debugText: String?, 
+    val networkIndex: UByte?, 
+    val clientIdentity: ByteArray?, 
     val possessionSignature: ByteArray?
   )
 
   class ConnectNetworkResponse(
-    val networkingStatus: UInt,
-    val debugText: String?,
+    val networkingStatus: UInt, 
+    val debugText: String?, 
     val errorValue: Int?
   )
 
-  class QueryIdentityResponse(val identity: ByteArray, val possessionSignature: ByteArray?)
+  class QueryIdentityResponse(
+    val identity: ByteArray, 
+    val possessionSignature: ByteArray?
+  )
 
-  class NetworksAttribute(val value: List<NetworkCommissioningClusterNetworkInfoStruct>)
+  class NetworksAttribute(
+    val value: List<NetworkCommissioningClusterNetworkInfoStruct>
+  )
 
-  class LastNetworkingStatusAttribute(val value: UInt?)
+  class LastNetworkingStatusAttribute(
+    val value: UInt?
+  )
 
-  class LastNetworkIDAttribute(val value: ByteArray?)
+  class LastNetworkIDAttribute(
+    val value: ByteArray?
+  )
 
-  class LastConnectErrorValueAttribute(val value: Int?)
+  class LastConnectErrorValueAttribute(
+    val value: Int?
+  )
 
-  class SupportedWiFiBandsAttribute(val value: List<UInt>?)
+  class SupportedWiFiBandsAttribute(
+    val value: List<UInt>?
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
-  suspend fun scanNetworks(
-    ssid: ByteArray?,
-    breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int? = null
-  ): ScanNetworksResponse {
+  suspend fun scanNetworks(ssid: ByteArray?, breadcrumb: ULong?, timedInvokeTimeoutMs: Int? = null): ScanNetworksResponse {
     val commandId = 0L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
-  suspend fun addOrUpdateWiFiNetwork(
-    ssid: ByteArray,
-    credentials: ByteArray,
-    breadcrumb: ULong?,
-    networkIdentity: ByteArray?,
-    clientIdentifier: ByteArray?,
-    possessionNonce: ByteArray?,
-    timedInvokeTimeoutMs: Int? = null
-  ): NetworkConfigResponse {
+  suspend fun addOrUpdateWiFiNetwork(ssid: ByteArray, credentials: ByteArray, breadcrumb: ULong?, networkIdentity: ByteArray?, clientIdentifier: ByteArray?, possessionNonce: ByteArray?, timedInvokeTimeoutMs: Int? = null): NetworkConfigResponse {
     val commandId = 2L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
-  suspend fun addOrUpdateThreadNetwork(
-    operationalDataset: ByteArray,
-    breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int? = null
-  ): NetworkConfigResponse {
+  suspend fun addOrUpdateThreadNetwork(operationalDataset: ByteArray, breadcrumb: ULong?, timedInvokeTimeoutMs: Int? = null): NetworkConfigResponse {
     val commandId = 3L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
-  suspend fun removeNetwork(
-    networkID: ByteArray,
-    breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int? = null
-  ): NetworkConfigResponse {
+  suspend fun removeNetwork(networkID: ByteArray, breadcrumb: ULong?, timedInvokeTimeoutMs: Int? = null): NetworkConfigResponse {
     val commandId = 4L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
-  suspend fun connectNetwork(
-    networkID: ByteArray,
-    breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int? = null
-  ): ConnectNetworkResponse {
+  suspend fun connectNetwork(networkID: ByteArray, breadcrumb: ULong?, timedInvokeTimeoutMs: Int? = null): ConnectNetworkResponse {
     val commandId = 6L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
-  suspend fun reorderNetwork(
-    networkID: ByteArray,
-    networkIndex: UByte,
-    breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int? = null
-  ): NetworkConfigResponse {
+  suspend fun reorderNetwork(networkID: ByteArray, networkIndex: UByte, breadcrumb: ULong?, timedInvokeTimeoutMs: Int? = null): NetworkConfigResponse {
     val commandId = 8L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
-  suspend fun queryIdentity(
-    keyIdentifier: ByteArray,
-    possessionNonce: ByteArray?,
-    timedInvokeTimeoutMs: Int? = null
-  ): QueryIdentityResponse {
+  suspend fun queryIdentity(keyIdentifier: ByteArray, possessionNonce: ByteArray?, timedInvokeTimeoutMs: Int? = null): QueryIdentityResponse {
     val commandId = 9L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
   suspend fun readMaxNetworksAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxNetworksAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeMaxNetworksAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -180,7 +168,10 @@ class NetworkCommissioningCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNetworksAttribute(minInterval: Int, maxInterval: Int): NetworksAttribute {
+  suspend fun subscribeNetworksAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): NetworksAttribute {
     // Implementation needs to be added here
   }
 
@@ -188,7 +179,10 @@ class NetworkCommissioningCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeScanMaxTimeSecondsAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeScanMaxTimeSecondsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -196,7 +190,10 @@ class NetworkCommissioningCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeConnectMaxTimeSecondsAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeConnectMaxTimeSecondsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -204,15 +201,21 @@ class NetworkCommissioningCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeInterfaceEnabledAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInterfaceEnabledAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeInterfaceEnabledAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeInterfaceEnabledAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -275,7 +278,10 @@ class NetworkCommissioningCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeThreadVersionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeThreadVersionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -305,7 +311,10 @@ class NetworkCommissioningCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -324,7 +333,10 @@ class NetworkCommissioningCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -332,7 +344,10 @@ class NetworkCommissioningCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

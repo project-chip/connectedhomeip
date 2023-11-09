@@ -93,6 +93,7 @@
 | RvcOperationalState                                                 | 0x0061 |
 | HepaFilterMonitoring                                                | 0x0071 |
 | ActivatedCarbonFilterMonitoring                                     | 0x0072 |
+| Messages                                                            | 0x0097 |
 | DoorLock                                                            | 0x0101 |
 | WindowCovering                                                      | 0x0102 |
 | BarrierControl                                                      | 0x0103 |
@@ -5936,6 +5937,109 @@ public:
 
 private:
     chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster Messages                                                    | 0x0097 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * PresentMessagesRequest                                            |   0x00 |
+| * CancelMessagesRequest                                             |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Messages                                                          | 0x0000 |
+| * ActiveMessageIDs                                                  | 0x0001 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * MessageQueued                                                     | 0x0000 |
+| * MessagePresented                                                  | 0x0001 |
+| * MessageComplete                                                   | 0x0002 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command PresentMessagesRequest
+ */
+class MessagesPresentMessagesRequest : public ClusterCommand
+{
+public:
+    MessagesPresentMessagesRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("present-messages-request", credsIssuerConfig), mComplex_Messages(&mRequest.messages)
+    {
+        AddArgument("Messages", &mComplex_Messages);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Messages::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Messages::Commands::PresentMessagesRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Messages::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Messages::Commands::PresentMessagesRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::Messages::Commands::PresentMessagesRequest::Type mRequest;
+    TypedComplexArgument<
+        chip::app::DataModel::List<const chip::app::Clusters::Messages::Structs::PresentMessageRequestStruct::Type>>
+        mComplex_Messages;
+};
+
+/*
+ * Command CancelMessagesRequest
+ */
+class MessagesCancelMessagesRequest : public ClusterCommand
+{
+public:
+    MessagesCancelMessagesRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("cancel-messages-request", credsIssuerConfig), mComplex_Messages(&mRequest.messages)
+    {
+        AddArgument("Messages", &mComplex_Messages);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Messages::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Messages::Commands::CancelMessagesRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Messages::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Messages::Commands::CancelMessagesRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::Messages::Commands::CancelMessagesRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex_Messages;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -16620,6 +16724,74 @@ void registerClusterActivatedCarbonFilterMonitoring(Commands & commands, Credent
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterMessages(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::Messages;
+
+    const char * clusterName = "Messages";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),             //
+        make_unique<MessagesPresentMessagesRequest>(credsIssuerConfig), //
+        make_unique<MessagesCancelMessagesRequest>(credsIssuerConfig),  //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "messages", Attributes::Messages::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "active-message-ids", Attributes::ActiveMessageIDs::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<
+            WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::Messages::Structs::MessageStruct::Type>>>(
+            Id, "messages", Attributes::Messages::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::ByteSpan>>(Id, "active-message-ids", Attributes::ActiveMessageIDs::Id,
+                                                    WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "messages", Attributes::Messages::Id, credsIssuerConfig),                           //
+        make_unique<SubscribeAttribute>(Id, "active-message-ids", Attributes::ActiveMessageIDs::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                         //
+        make_unique<ReadEvent>(Id, "message-queued", Events::MessageQueued::Id, credsIssuerConfig),            //
+        make_unique<ReadEvent>(Id, "message-presented", Events::MessagePresented::Id, credsIssuerConfig),      //
+        make_unique<ReadEvent>(Id, "message-complete", Events::MessageComplete::Id, credsIssuerConfig),        //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                    //
+        make_unique<SubscribeEvent>(Id, "message-queued", Events::MessageQueued::Id, credsIssuerConfig),       //
+        make_unique<SubscribeEvent>(Id, "message-presented", Events::MessagePresented::Id, credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, "message-complete", Events::MessageComplete::Id, credsIssuerConfig),   //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::DoorLock;
@@ -21962,6 +22134,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterRvcOperationalState(commands, credsIssuerConfig);
     registerClusterHepaFilterMonitoring(commands, credsIssuerConfig);
     registerClusterActivatedCarbonFilterMonitoring(commands, credsIssuerConfig);
+    registerClusterMessages(commands, credsIssuerConfig);
     registerClusterDoorLock(commands, credsIssuerConfig);
     registerClusterWindowCovering(commands, credsIssuerConfig);
     registerClusterBarrierControl(commands, credsIssuerConfig);

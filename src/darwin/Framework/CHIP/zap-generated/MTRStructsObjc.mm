@@ -3975,6 +3975,222 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRMessagesClusterMessageResponseOptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageResponseID = @(0);
+
+        _label = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterMessageResponseOptionStruct alloc] init];
+
+    other.messageResponseID = self.messageResponseID;
+    other.label = self.label;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageResponseID:%@; label:%@; >", NSStringFromClass([self class]), _messageResponseID, _label];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMessagesClusterPresentMessageRequestStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageID = [NSData data];
+
+        _priority = @(0);
+
+        _messageControl = @(0);
+
+        _startTime = @(0);
+
+        _duration = @(0);
+
+        _messageText = @"";
+
+        _responses = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterPresentMessageRequestStruct alloc] init];
+
+    other.messageID = self.messageID;
+    other.priority = self.priority;
+    other.messageControl = self.messageControl;
+    other.startTime = self.startTime;
+    other.duration = self.duration;
+    other.messageText = self.messageText;
+    other.responses = self.responses;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; priority:%@; messageControl:%@; startTime:%@; duration:%@; messageText:%@; responses:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0], _priority, _messageControl, _startTime, _duration, _messageText, _responses];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMessagesClusterMessageStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageID = [NSData data];
+
+        _priority = @(0);
+
+        _messageControl = @(0);
+
+        _startTime = @(0);
+
+        _duration = @(0);
+
+        _messageText = @"";
+
+        _responses = [NSArray array];
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterMessageStruct alloc] init];
+
+    other.messageID = self.messageID;
+    other.priority = self.priority;
+    other.messageControl = self.messageControl;
+    other.startTime = self.startTime;
+    other.duration = self.duration;
+    other.messageText = self.messageText;
+    other.responses = self.responses;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; priority:%@; messageControl:%@; startTime:%@; duration:%@; messageText:%@; responses:%@; fabricIndex:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0], _priority, _messageControl, _startTime, _duration, _messageText, _responses, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMessagesClusterMessageQueuedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageID = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterMessageQueuedEvent alloc] init];
+
+    other.messageID = self.messageID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMessagesClusterMessagePresentedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageID = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterMessagePresentedEvent alloc] init];
+
+    other.messageID = self.messageID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMessagesClusterMessageCompleteEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageID = [NSData data];
+
+        _timestamp = @(0);
+
+        _responseID = nil;
+
+        _reply = nil;
+
+        _futureMessagesPref = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterMessageCompleteEvent alloc] init];
+
+    other.messageID = self.messageID;
+    other.timestamp = self.timestamp;
+    other.responseID = self.responseID;
+    other.reply = self.reply;
+    other.futureMessagesPref = self.futureMessagesPref;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; timestamp:%@; responseID:%@; reply:%@; futureMessagesPref:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0], _timestamp, _responseID, _reply, _futureMessagesPref];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDoorLockClusterCredentialStruct
 - (instancetype)init
 {

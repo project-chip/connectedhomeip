@@ -17,13 +17,18 @@
 package matter.devicecontroller.cluster.eventstructs
 
 import matter.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class WiFiNetworkDiagnosticsClusterDisconnectionEvent(val reasonCode: UShort) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class WiFiNetworkDiagnosticsClusterDisconnectionEvent (
+    val reasonCode: UShort) {
+  override fun toString(): String  = buildString {
     append("WiFiNetworkDiagnosticsClusterDisconnectionEvent {\n")
     append("\treasonCode : $reasonCode\n")
     append("}\n")
@@ -40,13 +45,10 @@ class WiFiNetworkDiagnosticsClusterDisconnectionEvent(val reasonCode: UShort) {
   companion object {
     private const val TAG_REASON_CODE = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): WiFiNetworkDiagnosticsClusterDisconnectionEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WiFiNetworkDiagnosticsClusterDisconnectionEvent {
       tlvReader.enterStructure(tlvTag)
       val reasonCode = tlvReader.getUShort(ContextSpecificTag(TAG_REASON_CODE))
-
+      
       tlvReader.exitContainer()
 
       return WiFiNetworkDiagnosticsClusterDisconnectionEvent(reasonCode)

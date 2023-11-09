@@ -8431,6 +8431,104 @@ using chip::System::Clock::Timeout;
 
 @end
 
+@implementation MTRClusterMessages
+
+- (void)presentMessagesRequestWithParams:(MTRMessagesClusterPresentMessagesRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRMessagesClusterPresentMessagesRequestParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Messages::Commands::PresentMessagesRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)cancelMessagesRequestWithParams:(MTRMessagesClusterCancelMessagesRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRMessagesClusterCancelMessagesRequestParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Messages::Commands::CancelMessagesRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMessagesWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeMessagesID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActiveMessageIDsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeActiveMessageIDsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeEventListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeClusterRevisionID) params:params];
+}
+
+@end
+
 @implementation MTRClusterDoorLock
 
 - (void)lockDoorWithParams:(MTRDoorLockClusterLockDoorParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion

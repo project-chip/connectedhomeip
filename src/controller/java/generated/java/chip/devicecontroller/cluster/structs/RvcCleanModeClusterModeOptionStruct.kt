@@ -20,15 +20,17 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class RvcCleanModeClusterModeOptionStruct(
-  val label: String,
-  val mode: UInt,
-  val modeTags: List<RvcCleanModeClusterModeTagStruct>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class RvcCleanModeClusterModeOptionStruct (
+    val label: String,
+    val mode: UInt,
+    val modeTags: List<RvcCleanModeClusterModeTagStruct>) {
+  override fun toString(): String  = buildString {
     append("RvcCleanModeClusterModeOptionStruct {\n")
     append("\tlabel : $label\n")
     append("\tmode : $mode\n")
@@ -55,19 +57,18 @@ class RvcCleanModeClusterModeOptionStruct(
     private const val TAG_MODE = 1
     private const val TAG_MODE_TAGS = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): RvcCleanModeClusterModeOptionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : RvcCleanModeClusterModeOptionStruct {
       tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val mode = tlvReader.getUInt(ContextSpecificTag(TAG_MODE))
-      val modeTags =
-        buildList<RvcCleanModeClusterModeTagStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(RvcCleanModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val modeTags = buildList<RvcCleanModeClusterModeTagStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(RvcCleanModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return RvcCleanModeClusterModeOptionStruct(label, mode, modeTags)

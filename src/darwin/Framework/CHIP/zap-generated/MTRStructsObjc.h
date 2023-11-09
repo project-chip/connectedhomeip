@@ -1004,6 +1004,54 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSString * _Nonnull productIdentifierValue MTR_PROVISIONALLY_AVAILABLE;
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRMessagesClusterMessageResponseOptionStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull messageResponseID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull label MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRMessagesClusterPresentMessageRequestStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nonnull messageID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull priority MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull messageControl MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull startTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull duration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull messageText MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull responses MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRMessagesClusterMessageStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nonnull messageID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull priority MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull messageControl MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull startTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull duration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull messageText MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull responses MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRMessagesClusterMessageQueuedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nonnull messageID MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRMessagesClusterMessagePresentedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nonnull messageID MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRMessagesClusterMessageCompleteEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nonnull messageID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull timestamp MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable responseID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable reply MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable futureMessagesPref MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDoorLockClusterCredentialStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull credentialType MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));

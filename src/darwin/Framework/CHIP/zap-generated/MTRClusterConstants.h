@@ -144,6 +144,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeRVCOperationalStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000061,
     MTRClusterIDTypeHEPAFilterMonitoringID MTR_PROVISIONALLY_AVAILABLE = 0x00000071,
     MTRClusterIDTypeActivatedCarbonFilterMonitoringID MTR_PROVISIONALLY_AVAILABLE = 0x00000072,
+    MTRClusterIDTypeMessagesID MTR_PROVISIONALLY_AVAILABLE = 0x00000097,
     MTRClusterIDTypeDoorLockID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000101,
     MTRClusterIDTypeWindowCoveringID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000102,
     MTRClusterIDTypeBarrierControlID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000103,
@@ -2514,6 +2515,16 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster Messages attributes
+    MTRAttributeIDTypeClusterMessagesAttributeMessagesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterMessagesAttributeActiveMessageIDsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterMessagesAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterMessagesAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterMessagesAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
+    MTRAttributeIDTypeClusterMessagesAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterMessagesAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterMessagesAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster DoorLock deprecated attribute names
     MTRClusterDoorLockAttributeLockStateID
@@ -6032,6 +6043,10 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster ActivatedCarbonFilterMonitoring commands
     MTRCommandIDTypeClusterActivatedCarbonFilterMonitoringCommandResetConditionID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
+    // Cluster Messages commands
+    MTRCommandIDTypeClusterMessagesCommandPresentMessagesRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterMessagesCommandCancelMessagesRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+
     // Cluster DoorLock deprecated command id names
     MTRClusterDoorLockCommandLockDoorID
         MTR_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandLockDoorID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -6867,6 +6882,11 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     // Cluster RVCOperationalState events
     MTREventIDTypeClusterRVCOperationalStateEventOperationalErrorID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTREventIDTypeClusterRVCOperationalStateEventOperationCompletionID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+
+    // Cluster Messages events
+    MTREventIDTypeClusterMessagesEventMessageQueuedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterMessagesEventMessagePresentedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTREventIDTypeClusterMessagesEventMessageCompleteID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
 
     // Cluster DoorLock deprecated event names
     MTRClusterDoorLockEventDoorLockAlarmID

@@ -667,6 +667,17 @@ typedef void (*ActivatedCarbonFilterMonitoringEventListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*ActivatedCarbonFilterMonitoringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*MessagesMessagesListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageStruct::DecodableType> & data);
+typedef void (*MessagesGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*MessagesAcceptedCommandListListAttributeCallback)(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*MessagesEventListListAttributeCallback)(void * context,
+                                                       const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*MessagesAttributeListListAttributeCallback)(void * context,
+                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*DoorLockGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DoorLockAcceptedCommandListListAttributeCallback)(void * context,

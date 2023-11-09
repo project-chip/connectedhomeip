@@ -2785,6 +2785,204 @@ public static class RvcOperationalStateClusterOperationCompletionEvent {
     return output.toString();
   }
 }
+public static class MessagesClusterMessageQueuedEvent {
+  public byte[] messageID;
+  private static final long MESSAGE_I_D_ID = 0L;
+
+  public MessagesClusterMessageQueuedEvent(
+    byte[] messageID
+  ) {
+    this.messageID = messageID;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MESSAGE_I_D_ID, new ByteArrayType(messageID)));
+
+    return new StructType(values);
+  }
+
+  public static MessagesClusterMessageQueuedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] messageID = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MESSAGE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          messageID = castingValue.value(byte[].class);
+        }
+      }
+    }
+    return new MessagesClusterMessageQueuedEvent(
+      messageID
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MessagesClusterMessageQueuedEvent {\n");
+    output.append("\tmessageID: ");
+    output.append(Arrays.toString(messageID));
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class MessagesClusterMessagePresentedEvent {
+  public byte[] messageID;
+  private static final long MESSAGE_I_D_ID = 0L;
+
+  public MessagesClusterMessagePresentedEvent(
+    byte[] messageID
+  ) {
+    this.messageID = messageID;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MESSAGE_I_D_ID, new ByteArrayType(messageID)));
+
+    return new StructType(values);
+  }
+
+  public static MessagesClusterMessagePresentedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] messageID = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MESSAGE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          messageID = castingValue.value(byte[].class);
+        }
+      }
+    }
+    return new MessagesClusterMessagePresentedEvent(
+      messageID
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MessagesClusterMessagePresentedEvent {\n");
+    output.append("\tmessageID: ");
+    output.append(Arrays.toString(messageID));
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class MessagesClusterMessageCompleteEvent {
+  public byte[] messageID;
+  public Long timestamp;
+  public @Nullable Long responseID;
+  public @Nullable String reply;
+  public @Nullable Integer futureMessagesPref;
+  private static final long MESSAGE_I_D_ID = 0L;
+  private static final long TIMESTAMP_ID = 2L;
+  private static final long RESPONSE_I_D_ID = 3L;
+  private static final long REPLY_ID = 4L;
+  private static final long FUTURE_MESSAGES_PREF_ID = 5L;
+
+  public MessagesClusterMessageCompleteEvent(
+    byte[] messageID,
+    Long timestamp,
+    @Nullable Long responseID,
+    @Nullable String reply,
+    @Nullable Integer futureMessagesPref
+  ) {
+    this.messageID = messageID;
+    this.timestamp = timestamp;
+    this.responseID = responseID;
+    this.reply = reply;
+    this.futureMessagesPref = futureMessagesPref;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MESSAGE_I_D_ID, new ByteArrayType(messageID)));
+    values.add(new StructElement(TIMESTAMP_ID, new UIntType(timestamp)));
+    values.add(new StructElement(RESPONSE_I_D_ID, responseID != null ? new UIntType(responseID) : new NullType()));
+    values.add(new StructElement(REPLY_ID, reply != null ? new StringType(reply) : new NullType()));
+    values.add(new StructElement(FUTURE_MESSAGES_PREF_ID, futureMessagesPref != null ? new UIntType(futureMessagesPref) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static MessagesClusterMessageCompleteEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] messageID = null;
+    Long timestamp = null;
+    @Nullable Long responseID = null;
+    @Nullable String reply = null;
+    @Nullable Integer futureMessagesPref = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MESSAGE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          messageID = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          timestamp = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == RESPONSE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          responseID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == REPLY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          reply = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == FUTURE_MESSAGES_PREF_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          futureMessagesPref = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new MessagesClusterMessageCompleteEvent(
+      messageID,
+      timestamp,
+      responseID,
+      reply,
+      futureMessagesPref
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MessagesClusterMessageCompleteEvent {\n");
+    output.append("\tmessageID: ");
+    output.append(Arrays.toString(messageID));
+    output.append("\n");
+    output.append("\ttimestamp: ");
+    output.append(timestamp);
+    output.append("\n");
+    output.append("\tresponseID: ");
+    output.append(responseID);
+    output.append("\n");
+    output.append("\treply: ");
+    output.append(reply);
+    output.append("\n");
+    output.append("\tfutureMessagesPref: ");
+    output.append(futureMessagesPref);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DoorLockClusterDoorLockAlarmEvent {
   public Integer alarmCode;
   private static final long ALARM_CODE_ID = 0L;

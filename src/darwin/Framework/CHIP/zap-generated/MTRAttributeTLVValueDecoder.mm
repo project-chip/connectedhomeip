@@ -6975,6 +6975,90 @@ static id _Nullable DecodeAttributeValueForActivatedCarbonFilterMonitoringCluste
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForMessagesCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::Messages;
+    switch (aAttributeId) {
+    case Attributes::Messages::Id: {
+        using TypeInfo = Attributes::Messages::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRMessagesClusterMessageStruct * newElement_0;
+                newElement_0 = [MTRMessagesClusterMessageStruct new];
+                newElement_0.messageID = AsData(entry_0.messageID);
+                newElement_0.priority = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.priority)];
+                newElement_0.messageControl = [NSNumber numberWithUnsignedShort:entry_0.messageControl.Raw()];
+                newElement_0.startTime = [NSNumber numberWithUnsignedInt:entry_0.startTime];
+                newElement_0.duration = [NSNumber numberWithUnsignedShort:entry_0.duration];
+                newElement_0.messageText = AsString(entry_0.messageText);
+                if (newElement_0.messageText == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.responses.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        MTRMessagesClusterMessageResponseOptionStruct * newElement_2;
+                        newElement_2 = [MTRMessagesClusterMessageResponseOptionStruct new];
+                        newElement_2.messageResponseID = [NSNumber numberWithUnsignedInt:entry_2.messageResponseID];
+                        newElement_2.label = AsString(entry_2.label);
+                        if (newElement_2.label == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    newElement_0.responses = array_2;
+                }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::ActiveMessageIDs::Id: {
+        using TypeInfo = Attributes::ActiveMessageIDs::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSData * _Nonnull value;
+        value = AsData(cppValue);
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::DoorLock;
@@ -15669,6 +15753,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return DecodeAttributeValueForActivatedCarbonFilterMonitoringCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::Messages::Id: {
+        return DecodeAttributeValueForMessagesCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeAttributeValueForDoorLockCluster(aPath.mAttributeId, aReader, aError);

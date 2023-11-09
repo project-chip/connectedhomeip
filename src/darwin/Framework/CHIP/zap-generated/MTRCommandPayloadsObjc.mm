@@ -14431,6 +14431,234 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation MTRMessagesClusterPresentMessagesRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messages = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRMessagesClusterPresentMessagesRequestParams alloc] init];
+
+    other.messages = self.messages;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messages:%@; >", NSStringFromClass([self class]), _messages];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMessagesClusterPresentMessagesRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Messages::Commands::PresentMessagesRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        {
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.messages)>;
+            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+            if (self.messages.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.messages.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i_0 = 0; i_0 < self.messages.count; ++i_0) {
+                    if (![self.messages[i_0] isKindOfClass:[MTRMessagesClusterPresentMessageRequestStruct class]]) {
+                        // Wrong kind of value.
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    auto element_0 = (MTRMessagesClusterPresentMessageRequestStruct *) self.messages[i_0];
+                    listHolder_0->mList[i_0].messageID = AsByteSpan(element_0.messageID);
+                    listHolder_0->mList[i_0].priority = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].priority)>>(element_0.priority.unsignedCharValue);
+                    listHolder_0->mList[i_0].messageControl = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].messageControl)>>(element_0.messageControl.unsignedShortValue);
+                    listHolder_0->mList[i_0].startTime = element_0.startTime.unsignedIntValue;
+                    listHolder_0->mList[i_0].duration = element_0.duration.unsignedShortValue;
+                    listHolder_0->mList[i_0].messageText = AsCharSpan(element_0.messageText);
+                    {
+                        using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].responses)>;
+                        using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                        if (element_0.responses.count != 0) {
+                            auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.responses.count);
+                            if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            listFreer.add(listHolder_2);
+                            for (size_t i_2 = 0; i_2 < element_0.responses.count; ++i_2) {
+                                if (![element_0.responses[i_2] isKindOfClass:[MTRMessagesClusterMessageResponseOptionStruct class]]) {
+                                    // Wrong kind of value.
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                auto element_2 = (MTRMessagesClusterMessageResponseOptionStruct *) element_0.responses[i_2];
+                                listHolder_2->mList[i_2].messageResponseID = element_2.messageResponseID.unsignedIntValue;
+                                listHolder_2->mList[i_2].label = AsCharSpan(element_2.label);
+                            }
+                            listHolder_0->mList[i_0].responses = ListType_2(listHolder_2->mList, element_0.responses.count);
+                        } else {
+                            listHolder_0->mList[i_0].responses = ListType_2();
+                        }
+                    }
+                }
+                encodableStruct.messages = ListType_0(listHolder_0->mList, self.messages.count);
+            } else {
+                encodableStruct.messages = ListType_0();
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRMessagesClusterCancelMessagesRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messages = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRMessagesClusterCancelMessagesRequestParams alloc] init];
+
+    other.messages = self.messages;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messages:%@; >", NSStringFromClass([self class]), _messages];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMessagesClusterCancelMessagesRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Messages::Commands::CancelMessagesRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        {
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.messages)>;
+            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+            if (self.messages.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.messages.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i_0 = 0; i_0 < self.messages.count; ++i_0) {
+                    if (![self.messages[i_0] isKindOfClass:[NSData class]]) {
+                        // Wrong kind of value.
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    auto element_0 = (NSData *) self.messages[i_0];
+                    listHolder_0->mList[i_0] = AsByteSpan(element_0);
+                }
+                encodableStruct.messages = ListType_0(listHolder_0->mList, self.messages.count);
+            } else {
+                encodableStruct.messages = ListType_0();
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRDoorLockClusterLockDoorParams
 - (instancetype)init
 {

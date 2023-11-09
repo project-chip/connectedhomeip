@@ -2237,6 +2237,106 @@ static id _Nullable DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForMessagesCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::Messages;
+    switch (aEventId) {
+    case Events::MessageQueued::Id: {
+        Events::MessageQueued::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRMessagesClusterMessageQueuedEvent new];
+
+        do {
+            NSData * _Nonnull memberValue;
+            memberValue = AsData(cppValue.messageID);
+            value.messageID = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::MessagePresented::Id: {
+        Events::MessagePresented::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRMessagesClusterMessagePresentedEvent new];
+
+        do {
+            NSData * _Nonnull memberValue;
+            memberValue = AsData(cppValue.messageID);
+            value.messageID = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::MessageComplete::Id: {
+        Events::MessageComplete::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRMessagesClusterMessageCompleteEvent new];
+
+        do {
+            NSData * _Nonnull memberValue;
+            memberValue = AsData(cppValue.messageID);
+            value.messageID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.timestamp];
+            value.timestamp = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.responseID.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = [NSNumber numberWithUnsignedInt:cppValue.responseID.Value()];
+            }
+            value.responseID = memberValue;
+        } while (0);
+        do {
+            NSString * _Nullable memberValue;
+            if (cppValue.reply.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = AsString(cppValue.reply.Value());
+                if (memberValue == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            }
+            value.reply = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.futureMessagesPref.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.futureMessagesPref.Value())];
+            }
+            value.futureMessagesPref = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForDoorLockCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::DoorLock;
@@ -3450,6 +3550,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::Messages::Id: {
+        return DecodeEventPayloadForMessagesCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);

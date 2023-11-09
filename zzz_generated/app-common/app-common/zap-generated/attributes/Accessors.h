@@ -1720,6 +1720,27 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace ActivatedCarbonFilterMonitoring
 
+namespace Messages {
+namespace Attributes {
+
+namespace ActiveMessageIDs {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
+} // namespace ActiveMessageIDs
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace Messages
+
 namespace DoorLock {
 namespace Attributes {
 

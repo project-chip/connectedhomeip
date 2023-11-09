@@ -3447,6 +3447,161 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::Messages::Id: {
+        using namespace app::Clusters::Messages;
+        switch (aPath.mEventId)
+        {
+        case Events::MessageQueued::Id: {
+            Events::MessageQueued::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_messageID;
+            jbyteArray value_messageIDByteArray = env->NewByteArray(static_cast<jsize>(cppValue.messageID.size()));
+            env->SetByteArrayRegion(value_messageIDByteArray, 0, static_cast<jsize>(cppValue.messageID.size()),
+                                    reinterpret_cast<const jbyte *>(cppValue.messageID.data()));
+            value_messageID = value_messageIDByteArray;
+
+            jclass messageQueuedStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$MessagesClusterMessageQueuedEvent", messageQueuedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$MessagesClusterMessageQueuedEvent");
+                return nullptr;
+            }
+            jmethodID messageQueuedStructCtor = env->GetMethodID(messageQueuedStructClass, "<init>", "([B)V");
+            if (messageQueuedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$MessagesClusterMessageQueuedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(messageQueuedStructClass, messageQueuedStructCtor, value_messageID);
+
+            return value;
+        }
+        case Events::MessagePresented::Id: {
+            Events::MessagePresented::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_messageID;
+            jbyteArray value_messageIDByteArray = env->NewByteArray(static_cast<jsize>(cppValue.messageID.size()));
+            env->SetByteArrayRegion(value_messageIDByteArray, 0, static_cast<jsize>(cppValue.messageID.size()),
+                                    reinterpret_cast<const jbyte *>(cppValue.messageID.data()));
+            value_messageID = value_messageIDByteArray;
+
+            jclass messagePresentedStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$MessagesClusterMessagePresentedEvent", messagePresentedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$MessagesClusterMessagePresentedEvent");
+                return nullptr;
+            }
+            jmethodID messagePresentedStructCtor = env->GetMethodID(messagePresentedStructClass, "<init>", "([B)V");
+            if (messagePresentedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$MessagesClusterMessagePresentedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(messagePresentedStructClass, messagePresentedStructCtor, value_messageID);
+
+            return value;
+        }
+        case Events::MessageComplete::Id: {
+            Events::MessageComplete::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_messageID;
+            jbyteArray value_messageIDByteArray = env->NewByteArray(static_cast<jsize>(cppValue.messageID.size()));
+            env->SetByteArrayRegion(value_messageIDByteArray, 0, static_cast<jsize>(cppValue.messageID.size()),
+                                    reinterpret_cast<const jbyte *>(cppValue.messageID.data()));
+            value_messageID = value_messageIDByteArray;
+
+            jobject value_timestamp;
+            std::string value_timestampClassName     = "java/lang/Long";
+            std::string value_timestampCtorSignature = "(J)V";
+            jlong jnivalue_timestamp                 = static_cast<jlong>(cppValue.timestamp);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_timestampClassName.c_str(), value_timestampCtorSignature.c_str(), jnivalue_timestamp, value_timestamp);
+
+            jobject value_responseID;
+            if (cppValue.responseID.IsNull())
+            {
+                value_responseID = nullptr;
+            }
+            else
+            {
+                std::string value_responseIDClassName     = "java/lang/Long";
+                std::string value_responseIDCtorSignature = "(J)V";
+                jlong jnivalue_responseID                 = static_cast<jlong>(cppValue.responseID.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_responseIDClassName.c_str(),
+                                                                            value_responseIDCtorSignature.c_str(),
+                                                                            jnivalue_responseID, value_responseID);
+            }
+
+            jobject value_reply;
+            if (cppValue.reply.IsNull())
+            {
+                value_reply = nullptr;
+            }
+            else
+            {
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.reply.Value(), value_reply));
+            }
+
+            jobject value_futureMessagesPref;
+            if (cppValue.futureMessagesPref.IsNull())
+            {
+                value_futureMessagesPref = nullptr;
+            }
+            else
+            {
+                std::string value_futureMessagesPrefClassName     = "java/lang/Integer";
+                std::string value_futureMessagesPrefCtorSignature = "(I)V";
+                jint jnivalue_futureMessagesPref                  = static_cast<jint>(cppValue.futureMessagesPref.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_futureMessagesPrefClassName.c_str(),
+                                                                           value_futureMessagesPrefCtorSignature.c_str(),
+                                                                           jnivalue_futureMessagesPref, value_futureMessagesPref);
+            }
+
+            jclass messageCompleteStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$MessagesClusterMessageCompleteEvent", messageCompleteStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$MessagesClusterMessageCompleteEvent");
+                return nullptr;
+            }
+            jmethodID messageCompleteStructCtor = env->GetMethodID(
+                messageCompleteStructClass, "<init>", "([BLjava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Integer;)V");
+            if (messageCompleteStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$MessagesClusterMessageCompleteEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(messageCompleteStructClass, messageCompleteStructCtor, value_messageID, value_timestamp,
+                                           value_responseID, value_reply, value_futureMessagesPref);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::DoorLock::Id: {
         using namespace app::Clusters::DoorLock;
         switch (aPath.mEventId)

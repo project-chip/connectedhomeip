@@ -847,6 +847,20 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace ActivatedCarbonFilterMonitoring
 
+namespace Messages {
+namespace Commands {
+
+namespace PresentMessagesRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace PresentMessagesRequest
+
+namespace CancelMessagesRequest {
+static constexpr CommandId Id = 0x00000001;
+} // namespace CancelMessagesRequest
+
+} // namespace Commands
+} // namespace Messages
+
 namespace DoorLock {
 namespace Commands {
 

@@ -8787,6 +8787,105 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 } // namespace Attributes
 } // namespace ActivatedCarbonFilterMonitoring
 
+namespace Messages {
+namespace Attributes {
+
+namespace ActiveMessageIDs {
+
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
+{
+    uint8_t zclString[16 + 1];
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Messages::Id, Id, zclString, sizeof(zclString));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    size_t length = emberAfStringLength(zclString);
+    if (length == NumericAttributeTraits<uint8_t>::kNullValue)
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+
+    VerifyOrReturnError(value.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    memcpy(value.data(), &zclString[1], 16);
+    value.reduce_size(length);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
+{
+    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    uint8_t zclString[16 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::Messages::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
+}
+
+} // namespace ActiveMessageIDs
+
+namespace FeatureMap {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Messages::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Messages::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+}
+
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Messages::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Messages::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace Messages
+
 namespace DoorLock {
 namespace Attributes {
 

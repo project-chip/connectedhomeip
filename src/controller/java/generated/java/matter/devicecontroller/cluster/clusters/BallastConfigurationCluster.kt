@@ -20,33 +20,51 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class BallastConfigurationCluster(
-  private val controller: MatterController,
-  private val endpointId: UShort
-) {
-  class IntrinsicBallastFactorAttribute(val value: UByte?)
+class BallastConfigurationCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class IntrinsicBallastFactorAttribute(
+    val value: UByte?
+  )
 
-  class BallastFactorAdjustmentAttribute(val value: UByte?)
+  class BallastFactorAdjustmentAttribute(
+    val value: UByte?
+  )
 
-  class LampRatedHoursAttribute(val value: UInt?)
+  class LampRatedHoursAttribute(
+    val value: UInt?
+  )
 
-  class LampBurnHoursAttribute(val value: UInt?)
+  class LampBurnHoursAttribute(
+    val value: UInt?
+  )
 
-  class LampBurnHoursTripPointAttribute(val value: UInt?)
+  class LampBurnHoursTripPointAttribute(
+    val value: UInt?
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
   suspend fun readPhysicalMinLevelAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePhysicalMinLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribePhysicalMinLevelAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -54,7 +72,10 @@ class BallastConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePhysicalMaxLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribePhysicalMaxLevelAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -62,7 +83,10 @@ class BallastConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBallastStatusAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeBallastStatusAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -70,15 +94,21 @@ class BallastConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeMinLevelAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeMinLevelAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeMinLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeMinLevelAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -86,15 +116,21 @@ class BallastConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeMaxLevelAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeMaxLevelAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeMaxLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeMaxLevelAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -102,12 +138,15 @@ class BallastConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeIntrinsicBallastFactorAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeIntrinsicBallastFactorAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribeIntrinsicBallastFactorAttribute(
@@ -123,13 +162,13 @@ class BallastConfigurationCluster(
 
   suspend fun writeBallastFactorAdjustmentAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeoutMs: Int? = null    
   ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribeBallastFactorAdjustmentAttribute(
@@ -143,7 +182,10 @@ class BallastConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLampQuantityAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeLampQuantityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -151,15 +193,21 @@ class BallastConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampTypeAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLampTypeAttribute(
+    value: String,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeLampTypeAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeLampTypeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -167,15 +215,21 @@ class BallastConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampManufacturerAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLampManufacturerAttribute(
+    value: String,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeLampManufacturerAttribute(minInterval: Int, maxInterval: Int): CharString {
+  suspend fun subscribeLampManufacturerAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
     // Implementation needs to be added here
   }
 
@@ -183,12 +237,15 @@ class BallastConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampRatedHoursAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLampRatedHoursAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribeLampRatedHoursAttribute(
@@ -202,12 +259,15 @@ class BallastConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampBurnHoursAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLampBurnHoursAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribeLampBurnHoursAttribute(
@@ -221,15 +281,21 @@ class BallastConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampAlarmModeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLampAlarmModeAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeLampAlarmModeAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeLampAlarmModeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -237,12 +303,15 @@ class BallastConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeLampBurnHoursTripPointAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLampBurnHoursTripPointAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribeLampBurnHoursTripPointAttribute(
@@ -278,7 +347,10 @@ class BallastConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -297,7 +369,10 @@ class BallastConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -305,7 +380,10 @@ class BallastConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

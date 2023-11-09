@@ -20,31 +20,42 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ThermostatUserInterfaceConfigurationCluster(
-  private val controller: MatterController,
-  private val endpointId: UShort
-) {
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+class ThermostatUserInterfaceConfigurationCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
   suspend fun readTemperatureDisplayModeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun writeTemperatureDisplayModeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeTemperatureDisplayModeAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeTemperatureDisplayModeAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeTemperatureDisplayModeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -52,15 +63,21 @@ class ThermostatUserInterfaceConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeKeypadLockoutAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeKeypadLockoutAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeKeypadLockoutAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeKeypadLockoutAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -70,13 +87,13 @@ class ThermostatUserInterfaceConfigurationCluster(
 
   suspend fun writeScheduleProgrammingVisibilityAttribute(
     value: UInt,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeoutMs: Int? = null    
   ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribeScheduleProgrammingVisibilityAttribute(
@@ -112,7 +129,10 @@ class ThermostatUserInterfaceConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -131,7 +151,10 @@ class ThermostatUserInterfaceConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -139,7 +162,10 @@ class ThermostatUserInterfaceConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

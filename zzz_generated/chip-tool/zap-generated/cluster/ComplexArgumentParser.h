@@ -271,6 +271,21 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Messages::Structs::PresentMessageRequestStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Messages::Structs::PresentMessageRequestStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Messages::Structs::MessageStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Messages::Structs::MessageStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
                         Json::Value & value);
 

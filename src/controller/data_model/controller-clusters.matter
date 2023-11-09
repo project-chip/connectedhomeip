@@ -3670,6 +3670,103 @@ client cluster ActivatedCarbonFilterMonitoring = 114 {
   command ResetCondition(): DefaultSuccess = 0;
 }
 
+/** An interface for passing messages to be presented by a device. */
+provisional client cluster Messages = 151 {
+  enum FutureMessagePreferenceEnum : enum8 {
+    kAllowed = 0;
+    kIncreased = 1;
+    kReduced = 2;
+    kDisallowed = 3;
+    kBanned = 4;
+  }
+
+  enum MessagePriorityEnum : enum8 {
+    kLow = 0;
+    kMedium = 1;
+    kHigh = 2;
+    kCritical = 3;
+  }
+
+  bitmap Feature : bitmap32 {
+    kConfirmation = 0x1;
+    kConfirmationResponse = 0x2;
+    kConfirmationReply = 0x4;
+    kProtectedMessages = 0x8;
+  }
+
+  bitmap MessageControl : bitmap16 {
+    kConfirmationRequired = 0x1;
+    kResponseRequired = 0x2;
+    kReplyMessage = 0x4;
+    kMessageConfirmed = 0x8;
+    kMessageProtected = 0x10;
+  }
+
+  struct MessageResponseOptionStruct {
+    int32u messageResponseID = 0;
+    char_string<32> label = 1;
+  }
+
+  struct PresentMessageRequestStruct {
+    octet_string<16> messageID = 0;
+    MessagePriorityEnum priority = 1;
+    MessageControl messageControl = 2;
+    epoch_s startTime = 3;
+    int16u duration = 4;
+    long_char_string<512> messageText = 5;
+    MessageResponseOptionStruct responses[] = 6;
+  }
+
+  fabric_scoped struct MessageStruct {
+    octet_string<16> messageID = 0;
+    MessagePriorityEnum priority = 1;
+    MessageControl messageControl = 2;
+    epoch_s startTime = 3;
+    int16u duration = 4;
+    long_char_string<512> messageText = 5;
+    MessageResponseOptionStruct responses[] = 6;
+    fabric_idx fabricIndex = 254;
+  }
+
+  info event MessageQueued = 0 {
+    octet_string messageID = 0;
+  }
+
+  info event MessagePresented = 1 {
+    octet_string messageID = 0;
+  }
+
+  info event MessageComplete = 2 {
+    octet_string messageID = 0;
+    epoch_s timestamp = 2;
+    nullable int32u responseID = 3;
+    nullable long_char_string reply = 4;
+    nullable FutureMessagePreferenceEnum futureMessagesPref = 5;
+  }
+
+  readonly attribute MessageStruct messages[] = 0;
+  readonly attribute octet_string<16> activeMessageIDs = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct PresentMessagesRequestRequest {
+    PresentMessageRequestStruct messages[] = 0;
+  }
+
+  request struct CancelMessagesRequestRequest {
+    octet_string messages[] = 0;
+  }
+
+  /** Command for requesting messages be presented */
+  command PresentMessagesRequest(PresentMessagesRequestRequest): DefaultSuccess = 0;
+  /** Command for cancelling message present requests */
+  command CancelMessagesRequest(CancelMessagesRequestRequest): DefaultSuccess = 1;
+}
+
 /** An interface to a generic way to secure a door */
 client cluster DoorLock = 257 {
   enum AlarmCodeEnum : enum8 {
