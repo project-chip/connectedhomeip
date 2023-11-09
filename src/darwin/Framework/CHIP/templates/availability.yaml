@@ -7751,12 +7751,27 @@
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   - associationFailureCause
+      enums:
+          ContentLauncher:
+              - StatusEnum
+      enum values:
+          ContentLauncher:
+              StatusEnum:
+                  - Success
+                  - URLNotAvailable
+                  - AuthFailed
+          FanControl:
+              FanModeSequenceEnum:
+                  - OffHighAuto
+                  - OffHigh
       bitmaps:
           Scenes:
               - CopyModeBitmap
               - NameSupportBitmap
           AdministratorCommissioning:
               - Feature
+          ContentLauncher:
+              - SupportedProtocolsBitmap
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7772,14 +7787,28 @@
           AdministratorCommissioning:
               Feature:
                   - Basic
+          ContentLauncher:
+              SupportedProtocolsBitmap:
+                  - DASH
+                  - HLS
   deprecated:
       event fields:
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   - associationFailure
+      enums:
+          ContentLauncher:
+              - ContentLaunchStatusEnum
+      enum values:
+          FanControl:
+              FanModeSequenceEnum:
+                  - OffOnAuto
+                  - OffOn
       bitmaps:
           Scenes:
               - ScenesCopyMode
+          ContentLauncher:
+              - SupportedStreamingProtocol
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7803,6 +7832,32 @@
               # Targeting Spring 2024 Matter release
               - TimeSnapshot
               - TimeSnapshotResponse
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              - QueryIdentity
+              - QueryIdentityResponse
+      command fields:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              AddOrUpdateWiFiNetwork:
+                  - networkIdentity
+                  - clientIdentifier
+                  - possessionNonce
+              NetworkConfigResponse:
+                  - clientIdentity
+                  - possessionSignature
+              QueryIdentity:
+                  - keyIdentifier
+                  - possessionNonce
+              QueryIdentityResponse:
+                  - identity
+                  - possessionSignature
+      struct fields:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              NetworkInfoStruct:
+                  - networkIdentifier
+                  - clientIdentifier
       bitmaps:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -7812,14 +7867,43 @@
               Feature:
                   # Targeting Spring 2024 Matter release
                   - OffOnly
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              Feature:
+                  - PerDeviceCredentials
+              WiFiSecurityBitmap:
+                  - WPA3MatterPDC
   renames:
       event fields:
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   associationFailureCause: associationFailure
+      enums:
+          ContentLauncher:
+              StatusEnum: ContentLaunchStatusEnum
+      enum values:
+          ContentLauncher:
+              # The URLNotAvailable value got renamed at the same time
+              # as the enum.  Record the rename here so that the old
+              # value name is generated for the old enum name.
+              ContentLaunchStatusEnum:
+                  URLNotAvailable: UrlNotAvailable
+          FanControl:
+              FanModeSequenceEnum:
+                  OffHighAuto: OffOnAuto
+                  OffHigh: OffOn
+              # FanModeSequenceType is the old name of
+              # FanModeSequenceEnum; we need this rename annotation
+              # here so we don't lose the old values under that old
+              # name.
+              FanModeSequenceType:
+                  OffHighAuto: OffOnAuto
+                  OffHigh: OffOn
       bitmaps:
           Scenes:
               CopyModeBitmap: ScenesCopyMode
+          ContentLauncher:
+              SupportedProtocolsBitmap: SupportedStreamingProtocol
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7827,3 +7911,10 @@
           SoftwareDiagnostics:
               Feature:
                   Watermarks: WaterMarks
+  removed:
+      enum values:
+          ContentLauncher:
+              # The URLNotAvailable value got renamed at the same time
+              # as the enum.  The old enum name never had the new value name.
+              ContentLaunchStatusEnum:
+                  - URLNotAvailable

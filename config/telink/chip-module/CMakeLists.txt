@@ -143,10 +143,11 @@ set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
 # Define 'chip-ota-image' target for building CHIP OTA image
 # ==============================================================================
 
+string(REPLACE "_retention" "" BASE_BOARD ${BOARD})
 
 if(${TLNK_USB_DONGLE} MATCHES y)
-  if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}_usb_boot.overlay")
-    set(USB_BOOT_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}_usb_boot.overlay")
+  if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_usb_boot.overlay")
+    set(USB_BOOT_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_usb_boot.overlay")
   else()
     unset(USB_BOOT_DTC_OVERLAY_FILE)
   endif()
@@ -154,8 +155,8 @@ else()
   unset(USB_BOOT_DTC_OVERLAY_FILE)
 endif()
 
-if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
-    set(GLOBAL_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
+if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}.overlay")
+    set(GLOBAL_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}.overlay")
 else()
     unset(GLOBAL_DTC_OVERLAY_FILE)
 endif()
@@ -184,7 +185,7 @@ math(EXPR boot_blocks "${mcuboot_size} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
 if (CONFIG_BOOTLOADER_MCUBOOT)
     add_custom_target(build_mcuboot ALL
         COMMAND
-        west build -b ${BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
+        west build -b ${BASE_BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
             -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE="${GLOBAL_DTC_OVERLAY_FILE};${FLASH_DTC_OVERLAY_FILE};${USB_BOOT_DTC_OVERLAY_FILE}"
         COMMAND
         cp ${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin ${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin

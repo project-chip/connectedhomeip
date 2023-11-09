@@ -5558,6 +5558,10 @@ namespace MACAddress {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace MACAddress
 
+namespace LinkLocalAddress {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace LinkLocalAddress
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
