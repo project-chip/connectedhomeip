@@ -186,12 +186,10 @@ public:
         }
         ~SceneData(){};
 
-        bool operator==(const SceneData &other) const {
-            return (
-                    (CharSpan(mName, mNameLength) == CharSpan(other.mName, other.mNameLength)) &&
-                    (mSceneTransitionTimeMs == other.mSceneTransitionTimeMs) &&
-                    (mExtensionFieldSets == other.mExtensionFieldSets)
-                    );
+        bool operator==(const SceneData & other) const
+        {
+            return ((CharSpan(mName, mNameLength) == CharSpan(other.mName, other.mNameLength)) &&
+                    (mSceneTransitionTimeMs == other.mSceneTransitionTimeMs) && (mExtensionFieldSets == other.mExtensionFieldSets));
         }
 
         void SetName(const CharSpan & sceneName)

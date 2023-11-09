@@ -1985,7 +1985,7 @@ Status DoorLockServer::clearUser(chip::EndpointId endpointId, chip::FabricIndex 
     }
 
     // Remove the user entry
-    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, chip::CharSpan(""), 0,
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, chip::CharSpan(), 0,
                                       UserStatusEnum::kAvailable, UserTypeEnum::kUnrestrictedUser, CredentialRuleEnum::kSingle,
                                       nullptr, 0))
     {

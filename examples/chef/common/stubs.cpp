@@ -186,8 +186,8 @@ private:
         endpoints[0].id = 1;
         uint8_t pin[6]  = { 0x31, 0x32, 0x33, 0x34, 0x35, 0x36 };
         endpoints[0].credentials[0].set(DlCredentialStatus::kOccupied, CredentialTypeEnum::kPin, chip::ByteSpan(pin));
-        endpoints[0].users[0].set(chip::CharSpan("default"), 1, UserStatusEnum::kOccupiedEnabled, UserTypeEnum::kUnrestrictedUser,
-                                  CredentialRuleEnum::kSingle);
+        endpoints[0].users[0].set(chip::CharSpan::fromCharString("default"), 1, UserStatusEnum::kOccupiedEnabled,
+                                  UserTypeEnum::kUnrestrictedUser, CredentialRuleEnum::kSingle);
         endpoints[0].users[0].addCredential(CredentialTypeEnum::kPin, 1);
     }
 
