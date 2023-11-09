@@ -58,6 +58,10 @@ ParserState NextState(ParserState state, uint8_t value)
     if (value == 0)
     {
         // Refuse to have embedded 0s
+        //
+        // NOTE: this is NOT a UTF-8 requirement but a chip encoding
+        //       requirement for TLV. We have this here to adhere to the
+        //       exposed (non-anon-namespace) API.
         return ParserState::kInvalid;
     }
 
