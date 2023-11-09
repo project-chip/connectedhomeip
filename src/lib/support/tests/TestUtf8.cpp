@@ -67,7 +67,6 @@ void TestValidStrings(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("􏿿"));
     NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("����"));
 
-
     // NOTE: UTF8 allows embeded NULLs
     //       even though strings like that are probably not ideal for handling
     //       Test that we allow this, but consider later to disallow them
