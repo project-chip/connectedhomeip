@@ -37,6 +37,14 @@ class WakeOnLanCluster(private val controller: MatterController, private val end
     // Implementation needs to be added here
   }
 
+  suspend fun readLinkLocalAddressAttribute(): OctetString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLinkLocalAddressAttribute(minInterval: Int, maxInterval: Int): OctetString {
+    // Implementation needs to be added here
+  }
+
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
