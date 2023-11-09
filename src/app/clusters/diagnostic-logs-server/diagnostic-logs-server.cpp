@@ -137,7 +137,7 @@ void DiagnosticLogsServer::HandleBDXResponse(CHIP_ERROR error)
     }
     else
     {
-        SendErrorResponseAndReset(commandHandle, mRequestPath, StatusEnum::kNoLogs);
+        SendErrorResponse(commandHandle, mRequestPath, StatusEnum::kNoLogs);
     }
 }
 
@@ -147,8 +147,8 @@ void DiagnosticLogsServer::SetAsyncCommandHandleAndPath(CommandHandler * command
     mRequestPath        = commandPath;
 }
 
-void DiagnosticLogsServer::SendErrorResponseAndReset(chip::app::CommandHandler * commandHandler,
-                                                     chip::app::ConcreteCommandPath path, StatusEnum status)
+void DiagnosticLogsServer::SendErrorResponse(chip::app::CommandHandler * commandHandler, chip::app::ConcreteCommandPath path,
+                                             StatusEnum status)
 {
     Commands::RetrieveLogsResponse::Type response;
     if (commandHandler != nullptr)
@@ -156,8 +156,6 @@ void DiagnosticLogsServer::SendErrorResponseAndReset(chip::app::CommandHandler *
         response.status = status;
         commandHandler->AddResponse(path, response);
     }
-    // mDiagnosticLogsBDXTransferHandler->Reset();
-    // delete(mDiagnosticLogsBDXTransferHandler);
 }
 
 #endif

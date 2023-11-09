@@ -82,6 +82,4 @@ private:
 
     NSFileHandle * _Nullable mFileHandle;
     std::function<void(bool)> mCallback;
-
-    bool mInitialized = false;
 };
