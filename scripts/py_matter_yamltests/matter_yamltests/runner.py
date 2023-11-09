@@ -71,7 +71,7 @@ class TestRunnerConfig:
            running. It may may allow the callers to gain insights about the
            current running state.
 
-    auto_start_stop: Indicates wheter the run method should start and stop
+    auto_start_stop: Indicates whether the run method should start and stop
             the runner of if that will be handled outside of that method.
     """
     adapter: TestAdapter = None
