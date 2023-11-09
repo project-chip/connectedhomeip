@@ -365,6 +365,36 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace RvcOperationalState
 
+namespace ElectricalEnergyMeasurement {
+namespace Events {
+
+namespace CumulativeEnergyImported {
+static constexpr EventId Id = 0x00000000;
+} // namespace CumulativeEnergyImported
+
+namespace CumulativeEnergyExported {
+static constexpr EventId Id = 0x00000001;
+} // namespace CumulativeEnergyExported
+
+namespace PeriodicEnergyImported {
+static constexpr EventId Id = 0x00000002;
+} // namespace PeriodicEnergyImported
+
+namespace PeriodicEnergyExported {
+static constexpr EventId Id = 0x00000003;
+} // namespace PeriodicEnergyExported
+
+namespace EphemeralEnergyImported {
+static constexpr EventId Id = 0x00000004;
+} // namespace EphemeralEnergyImported
+
+namespace EphemeralEnergyExported {
+static constexpr EventId Id = 0x00000005;
+} // namespace EphemeralEnergyExported
+
+} // namespace Events
+} // namespace ElectricalEnergyMeasurement
+
 namespace DoorLock {
 namespace Events {
 

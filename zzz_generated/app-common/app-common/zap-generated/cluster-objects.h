@@ -18471,6 +18471,464 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ActivatedCarbonFilterMonitoring
+namespace ElectricalEnergyMeasurement {
+
+namespace Attributes {
+
+namespace Measured {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Measured::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Measured
+namespace CumulativeEnergyImportedTime {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CumulativeEnergyImportedTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CumulativeEnergyImportedTime
+namespace CumulativeEnergyImported {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CumulativeEnergyImported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CumulativeEnergyImported
+namespace CumulativeEnergyExportedTime {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CumulativeEnergyExportedTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CumulativeEnergyExportedTime
+namespace CumulativeEnergyExported {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CumulativeEnergyExported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CumulativeEnergyExported
+namespace PeriodicEnergyImportedStartTime {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeriodicEnergyImportedStartTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeriodicEnergyImportedStartTime
+namespace PeriodicEnergyImportedEndTime {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeriodicEnergyImportedEndTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeriodicEnergyImportedEndTime
+namespace PeriodicEnergyImported {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeriodicEnergyImported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeriodicEnergyImported
+namespace PeriodicEnergyExportedStartTime {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeriodicEnergyExportedStartTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeriodicEnergyExportedStartTime
+namespace PeriodicEnergyExportedEndTime {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeriodicEnergyExportedEndTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeriodicEnergyExportedEndTime
+namespace PeriodicEnergyExported {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeriodicEnergyExported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeriodicEnergyExported
+namespace EphemeralEnergyImported {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EphemeralEnergyImported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace EphemeralEnergyImported
+namespace EphemeralEnergyExported {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EphemeralEnergyExported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace EphemeralEnergyExported
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Measured::TypeInfo::DecodableType measured = static_cast<bool>(0);
+        Attributes::CumulativeEnergyImportedTime::TypeInfo::DecodableType cumulativeEnergyImportedTime;
+        Attributes::CumulativeEnergyImported::TypeInfo::DecodableType cumulativeEnergyImported;
+        Attributes::CumulativeEnergyExportedTime::TypeInfo::DecodableType cumulativeEnergyExportedTime;
+        Attributes::CumulativeEnergyExported::TypeInfo::DecodableType cumulativeEnergyExported;
+        Attributes::PeriodicEnergyImportedStartTime::TypeInfo::DecodableType periodicEnergyImportedStartTime;
+        Attributes::PeriodicEnergyImportedEndTime::TypeInfo::DecodableType periodicEnergyImportedEndTime;
+        Attributes::PeriodicEnergyImported::TypeInfo::DecodableType periodicEnergyImported;
+        Attributes::PeriodicEnergyExportedStartTime::TypeInfo::DecodableType periodicEnergyExportedStartTime;
+        Attributes::PeriodicEnergyExportedEndTime::TypeInfo::DecodableType periodicEnergyExportedEndTime;
+        Attributes::PeriodicEnergyExported::TypeInfo::DecodableType periodicEnergyExported;
+        Attributes::EphemeralEnergyImported::TypeInfo::DecodableType ephemeralEnergyImported;
+        Attributes::EphemeralEnergyExported::TypeInfo::DecodableType ephemeralEnergyExported;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+namespace Events {
+namespace CumulativeEnergyImported {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kImportedTimestamp = 0,
+    kEnergyImported    = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::CumulativeEnergyImported::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint32_t importedTimestamp = static_cast<uint32_t>(0);
+    uint64_t energyImported    = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::CumulativeEnergyImported::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+
+    uint32_t importedTimestamp = static_cast<uint32_t>(0);
+    uint64_t energyImported    = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace CumulativeEnergyImported
+namespace CumulativeEnergyExported {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kImportedTimestamp = 0,
+    kEnergyExported    = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::CumulativeEnergyExported::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint32_t importedTimestamp = static_cast<uint32_t>(0);
+    uint64_t energyExported    = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::CumulativeEnergyExported::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+
+    uint32_t importedTimestamp = static_cast<uint32_t>(0);
+    uint64_t energyExported    = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace CumulativeEnergyExported
+namespace PeriodicEnergyImported {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kPeriodStart    = 0,
+    kPeriodEnd      = 1,
+    kEnergyImported = 2,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::PeriodicEnergyImported::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint32_t periodStart    = static_cast<uint32_t>(0);
+    uint32_t periodEnd      = static_cast<uint32_t>(0);
+    uint64_t energyImported = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::PeriodicEnergyImported::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+
+    uint32_t periodStart    = static_cast<uint32_t>(0);
+    uint32_t periodEnd      = static_cast<uint32_t>(0);
+    uint64_t energyImported = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace PeriodicEnergyImported
+namespace PeriodicEnergyExported {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kPeriodStart    = 0,
+    kPeriodEnd      = 1,
+    kEnergyExported = 2,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::PeriodicEnergyExported::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint32_t periodStart    = static_cast<uint32_t>(0);
+    uint32_t periodEnd      = static_cast<uint32_t>(0);
+    uint64_t energyExported = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::PeriodicEnergyExported::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+
+    uint32_t periodStart    = static_cast<uint32_t>(0);
+    uint32_t periodEnd      = static_cast<uint32_t>(0);
+    uint64_t energyExported = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace PeriodicEnergyExported
+namespace EphemeralEnergyImported {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kPeriodStart    = 0,
+    kPeriodEnd      = 1,
+    kEnergyImported = 2,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::EphemeralEnergyImported::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint32_t periodStart    = static_cast<uint32_t>(0);
+    uint32_t periodEnd      = static_cast<uint32_t>(0);
+    uint64_t energyImported = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::EphemeralEnergyImported::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+
+    uint32_t periodStart    = static_cast<uint32_t>(0);
+    uint32_t periodEnd      = static_cast<uint32_t>(0);
+    uint64_t energyImported = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace EphemeralEnergyImported
+namespace EphemeralEnergyExported {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kPeriodStart    = 0,
+    kPeriodEnd      = 1,
+    kEnergyExported = 2,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::EphemeralEnergyExported::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint32_t periodStart    = static_cast<uint32_t>(0);
+    uint32_t periodEnd      = static_cast<uint32_t>(0);
+    uint64_t energyExported = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::EphemeralEnergyExported::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+
+    uint32_t periodStart    = static_cast<uint32_t>(0);
+    uint32_t periodEnd      = static_cast<uint32_t>(0);
+    uint64_t energyExported = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace EphemeralEnergyExported
+} // namespace Events
+} // namespace ElectricalEnergyMeasurement
 namespace DoorLock {
 namespace Structs {
 namespace CredentialStruct {

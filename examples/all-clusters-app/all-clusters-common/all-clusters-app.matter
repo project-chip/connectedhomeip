@@ -3230,6 +3230,71 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
   command ResetCondition(): DefaultSuccess = 0;
 }
 
+/** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
+provisional server cluster ElectricalEnergyMeasurement = 145 {
+  bitmap Feature : bitmap32 {
+    kImportedEnergy = 0x1;
+    kExportedEnergy = 0x2;
+    kCumulativeEnergy = 0x4;
+    kPeriodicEnergy = 0x8;
+    kEphemeralEnergy = 0x10;
+  }
+
+  info event CumulativeEnergyImported = 0 {
+    epoch_s importedTimestamp = 0;
+    int64u energyImported = 1;
+  }
+
+  info event CumulativeEnergyExported = 1 {
+    epoch_s importedTimestamp = 0;
+    int64u energyExported = 1;
+  }
+
+  info event PeriodicEnergyImported = 2 {
+    epoch_s periodStart = 0;
+    epoch_s periodEnd = 1;
+    int64u energyImported = 2;
+  }
+
+  info event PeriodicEnergyExported = 3 {
+    epoch_s periodStart = 0;
+    epoch_s periodEnd = 1;
+    int64u energyExported = 2;
+  }
+
+  info event EphemeralEnergyImported = 4 {
+    epoch_s periodStart = 0;
+    epoch_s periodEnd = 1;
+    int64u energyImported = 2;
+  }
+
+  info event EphemeralEnergyExported = 5 {
+    epoch_s periodStart = 0;
+    epoch_s periodEnd = 1;
+    int64u energyExported = 2;
+  }
+
+  readonly attribute boolean measured = 0;
+  readonly attribute nullable epoch_s cumulativeEnergyImportedTime = 1;
+  readonly attribute nullable int64u cumulativeEnergyImported = 2;
+  readonly attribute nullable epoch_s cumulativeEnergyExportedTime = 3;
+  readonly attribute nullable int64u cumulativeEnergyExported = 4;
+  readonly attribute nullable epoch_s periodicEnergyImportedStartTime = 5;
+  readonly attribute nullable epoch_s periodicEnergyImportedEndTime = 6;
+  readonly attribute nullable int64u periodicEnergyImported = 7;
+  readonly attribute nullable epoch_s periodicEnergyExportedStartTime = 8;
+  readonly attribute nullable epoch_s periodicEnergyExportedEndTime = 9;
+  readonly attribute nullable int64u periodicEnergyExported = 10;
+  readonly attribute nullable int64u ephemeralEnergyImported = 11;
+  readonly attribute nullable int64u ephemeralEnergyExported = 12;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** Provides an interface for controlling and adjusting automatic window coverings. */
 server cluster WindowCovering = 258 {
   enum EndProductType : enum8 {
@@ -6075,6 +6140,34 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command ResetCondition;
+  }
+
+  server cluster ElectricalEnergyMeasurement {
+    emits event CumulativeEnergyImported;
+    emits event CumulativeEnergyExported;
+    emits event PeriodicEnergyImported;
+    emits event PeriodicEnergyExported;
+    emits event EphemeralEnergyImported;
+    emits event EphemeralEnergyExported;
+    ram      attribute measured default = false;
+    ram      attribute cumulativeEnergyImportedTime;
+    ram      attribute cumulativeEnergyImported;
+    ram      attribute cumulativeEnergyExportedTime;
+    ram      attribute cumulativeEnergyExported;
+    ram      attribute periodicEnergyImportedStartTime;
+    ram      attribute periodicEnergyImportedEndTime;
+    ram      attribute periodicEnergyImported;
+    ram      attribute periodicEnergyExportedStartTime;
+    ram      attribute periodicEnergyExportedEndTime;
+    ram      attribute periodicEnergyExported;
+    ram      attribute ephemeralEnergyImported;
+    ram      attribute ephemeralEnergyExported;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x001F;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster WindowCovering {

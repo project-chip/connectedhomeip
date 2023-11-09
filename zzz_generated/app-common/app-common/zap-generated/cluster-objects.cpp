@@ -12979,6 +12979,323 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace ActivatedCarbonFilterMonitoring
+namespace ElectricalEnergyMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::Measured::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, measured);
+    case Attributes::CumulativeEnergyImportedTime::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, cumulativeEnergyImportedTime);
+    case Attributes::CumulativeEnergyImported::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, cumulativeEnergyImported);
+    case Attributes::CumulativeEnergyExportedTime::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, cumulativeEnergyExportedTime);
+    case Attributes::CumulativeEnergyExported::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, cumulativeEnergyExported);
+    case Attributes::PeriodicEnergyImportedStartTime::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, periodicEnergyImportedStartTime);
+    case Attributes::PeriodicEnergyImportedEndTime::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, periodicEnergyImportedEndTime);
+    case Attributes::PeriodicEnergyImported::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, periodicEnergyImported);
+    case Attributes::PeriodicEnergyExportedStartTime::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, periodicEnergyExportedStartTime);
+    case Attributes::PeriodicEnergyExportedEndTime::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, periodicEnergyExportedEndTime);
+    case Attributes::PeriodicEnergyExported::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, periodicEnergyExported);
+    case Attributes::EphemeralEnergyImported::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, ephemeralEnergyImported);
+    case Attributes::EphemeralEnergyExported::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, ephemeralEnergyExported);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {
+namespace CumulativeEnergyImported {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kImportedTimestamp), importedTimestamp));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEnergyImported), energyImported));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kImportedTimestamp))
+        {
+            err = DataModel::Decode(reader, importedTimestamp);
+        }
+        else if (__context_tag == to_underlying(Fields::kEnergyImported))
+        {
+            err = DataModel::Decode(reader, energyImported);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace CumulativeEnergyImported.
+namespace CumulativeEnergyExported {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kImportedTimestamp), importedTimestamp));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEnergyExported), energyExported));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kImportedTimestamp))
+        {
+            err = DataModel::Decode(reader, importedTimestamp);
+        }
+        else if (__context_tag == to_underlying(Fields::kEnergyExported))
+        {
+            err = DataModel::Decode(reader, energyExported);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace CumulativeEnergyExported.
+namespace PeriodicEnergyImported {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kPeriodStart), periodStart));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kPeriodEnd), periodEnd));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEnergyImported), energyImported));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kPeriodStart))
+        {
+            err = DataModel::Decode(reader, periodStart);
+        }
+        else if (__context_tag == to_underlying(Fields::kPeriodEnd))
+        {
+            err = DataModel::Decode(reader, periodEnd);
+        }
+        else if (__context_tag == to_underlying(Fields::kEnergyImported))
+        {
+            err = DataModel::Decode(reader, energyImported);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace PeriodicEnergyImported.
+namespace PeriodicEnergyExported {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kPeriodStart), periodStart));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kPeriodEnd), periodEnd));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEnergyExported), energyExported));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kPeriodStart))
+        {
+            err = DataModel::Decode(reader, periodStart);
+        }
+        else if (__context_tag == to_underlying(Fields::kPeriodEnd))
+        {
+            err = DataModel::Decode(reader, periodEnd);
+        }
+        else if (__context_tag == to_underlying(Fields::kEnergyExported))
+        {
+            err = DataModel::Decode(reader, energyExported);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace PeriodicEnergyExported.
+namespace EphemeralEnergyImported {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kPeriodStart), periodStart));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kPeriodEnd), periodEnd));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEnergyImported), energyImported));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kPeriodStart))
+        {
+            err = DataModel::Decode(reader, periodStart);
+        }
+        else if (__context_tag == to_underlying(Fields::kPeriodEnd))
+        {
+            err = DataModel::Decode(reader, periodEnd);
+        }
+        else if (__context_tag == to_underlying(Fields::kEnergyImported))
+        {
+            err = DataModel::Decode(reader, energyImported);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace EphemeralEnergyImported.
+namespace EphemeralEnergyExported {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kPeriodStart), periodStart));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kPeriodEnd), periodEnd));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEnergyExported), energyExported));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kPeriodStart))
+        {
+            err = DataModel::Decode(reader, periodStart);
+        }
+        else if (__context_tag == to_underlying(Fields::kPeriodEnd))
+        {
+            err = DataModel::Decode(reader, periodEnd);
+        }
+        else if (__context_tag == to_underlying(Fields::kEnergyExported))
+        {
+            err = DataModel::Decode(reader, energyExported);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace EphemeralEnergyExported.
+} // namespace Events
+
+} // namespace ElectricalEnergyMeasurement
 namespace DoorLock {
 namespace Structs {
 

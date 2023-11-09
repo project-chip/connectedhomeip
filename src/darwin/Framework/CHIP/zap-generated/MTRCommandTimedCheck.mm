@@ -536,6 +536,15 @@ static BOOL CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(Attr
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInElectricalEnergyMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalEnergyMeasurement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInDoorLockCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DoorLock;
@@ -1106,6 +1115,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(commandID);
+    }
+    case Clusters::ElectricalEnergyMeasurement::Id: {
+        return CommandNeedsTimedInvokeInElectricalEnergyMeasurementCluster(commandID);
     }
     case Clusters::DoorLock::Id: {
         return CommandNeedsTimedInvokeInDoorLockCluster(commandID);

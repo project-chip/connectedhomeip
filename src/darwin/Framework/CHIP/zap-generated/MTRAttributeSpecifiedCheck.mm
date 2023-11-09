@@ -2660,6 +2660,72 @@ static BOOL AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(Attribu
     }
     }
 }
+static BOOL AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalEnergyMeasurement;
+    switch (aAttributeId) {
+    case Attributes::Measured::Id: {
+        return YES;
+    }
+    case Attributes::CumulativeEnergyImportedTime::Id: {
+        return YES;
+    }
+    case Attributes::CumulativeEnergyImported::Id: {
+        return YES;
+    }
+    case Attributes::CumulativeEnergyExportedTime::Id: {
+        return YES;
+    }
+    case Attributes::CumulativeEnergyExported::Id: {
+        return YES;
+    }
+    case Attributes::PeriodicEnergyImportedStartTime::Id: {
+        return YES;
+    }
+    case Attributes::PeriodicEnergyImportedEndTime::Id: {
+        return YES;
+    }
+    case Attributes::PeriodicEnergyImported::Id: {
+        return YES;
+    }
+    case Attributes::PeriodicEnergyExportedStartTime::Id: {
+        return YES;
+    }
+    case Attributes::PeriodicEnergyExportedEndTime::Id: {
+        return YES;
+    }
+    case Attributes::PeriodicEnergyExported::Id: {
+        return YES;
+    }
+    case Attributes::EphemeralEnergyImported::Id: {
+        return YES;
+    }
+    case Attributes::EphemeralEnergyExported::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInDoorLockCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DoorLock;
@@ -5741,6 +5807,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(aAttributeId);
+    }
+    case Clusters::ElectricalEnergyMeasurement::Id: {
+        return AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(aAttributeId);
     }
     case Clusters::DoorLock::Id: {
         return AttributeIsSpecifiedInDoorLockCluster(aAttributeId);

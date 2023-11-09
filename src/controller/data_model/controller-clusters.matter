@@ -3670,6 +3670,71 @@ client cluster ActivatedCarbonFilterMonitoring = 114 {
   command ResetCondition(): DefaultSuccess = 0;
 }
 
+/** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
+provisional client cluster ElectricalEnergyMeasurement = 145 {
+  bitmap Feature : bitmap32 {
+    kImportedEnergy = 0x1;
+    kExportedEnergy = 0x2;
+    kCumulativeEnergy = 0x4;
+    kPeriodicEnergy = 0x8;
+    kEphemeralEnergy = 0x10;
+  }
+
+  info event CumulativeEnergyImported = 0 {
+    epoch_s importedTimestamp = 0;
+    int64u energyImported = 1;
+  }
+
+  info event CumulativeEnergyExported = 1 {
+    epoch_s importedTimestamp = 0;
+    int64u energyExported = 1;
+  }
+
+  info event PeriodicEnergyImported = 2 {
+    epoch_s periodStart = 0;
+    epoch_s periodEnd = 1;
+    int64u energyImported = 2;
+  }
+
+  info event PeriodicEnergyExported = 3 {
+    epoch_s periodStart = 0;
+    epoch_s periodEnd = 1;
+    int64u energyExported = 2;
+  }
+
+  info event EphemeralEnergyImported = 4 {
+    epoch_s periodStart = 0;
+    epoch_s periodEnd = 1;
+    int64u energyImported = 2;
+  }
+
+  info event EphemeralEnergyExported = 5 {
+    epoch_s periodStart = 0;
+    epoch_s periodEnd = 1;
+    int64u energyExported = 2;
+  }
+
+  readonly attribute boolean measured = 0;
+  readonly attribute optional nullable epoch_s cumulativeEnergyImportedTime = 1;
+  readonly attribute optional nullable int64u cumulativeEnergyImported = 2;
+  readonly attribute optional nullable epoch_s cumulativeEnergyExportedTime = 3;
+  readonly attribute optional nullable int64u cumulativeEnergyExported = 4;
+  readonly attribute optional nullable epoch_s periodicEnergyImportedStartTime = 5;
+  readonly attribute optional nullable epoch_s periodicEnergyImportedEndTime = 6;
+  readonly attribute optional nullable int64u periodicEnergyImported = 7;
+  readonly attribute optional nullable epoch_s periodicEnergyExportedStartTime = 8;
+  readonly attribute optional nullable epoch_s periodicEnergyExportedEndTime = 9;
+  readonly attribute optional nullable int64u periodicEnergyExported = 10;
+  readonly attribute optional nullable int64u ephemeralEnergyImported = 11;
+  readonly attribute optional nullable int64u ephemeralEnergyExported = 12;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** An interface to a generic way to secure a door */
 client cluster DoorLock = 257 {
   enum AlarmCodeEnum : enum8 {

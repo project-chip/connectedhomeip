@@ -17,16 +17,19 @@
 package matter.devicecontroller.cluster.structs
 
 import matter.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class AccessControlClusterAccessControlExtensionStruct(
-  val data: ByteArray,
-  val fabricIndex: UByte
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class AccessControlClusterAccessControlExtensionStruct (
+    val data: ByteArray,
+    val fabricIndex: UByte) {
+  override fun toString(): String  = buildString {
     append("AccessControlClusterAccessControlExtensionStruct {\n")
     append("\tdata : $data\n")
     append("\tfabricIndex : $fabricIndex\n")
@@ -46,14 +49,11 @@ class AccessControlClusterAccessControlExtensionStruct(
     private const val TAG_DATA = 1
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): AccessControlClusterAccessControlExtensionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AccessControlClusterAccessControlExtensionStruct {
       tlvReader.enterStructure(tlvTag)
       val data = tlvReader.getByteArray(ContextSpecificTag(TAG_DATA))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
       return AccessControlClusterAccessControlExtensionStruct(data, fabricIndex)

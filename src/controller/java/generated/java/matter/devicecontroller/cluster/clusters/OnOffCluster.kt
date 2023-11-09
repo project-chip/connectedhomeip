@@ -21,15 +21,25 @@ import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
 class OnOffCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class StartUpOnOffAttribute(val value: UInt?)
+  class StartUpOnOffAttribute(
+    val value: UInt?
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
   suspend fun off(timedInvokeTimeoutMs: Int? = null) {
     val commandId = 0L
@@ -38,7 +48,7 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
   suspend fun on(timedInvokeTimeoutMs: Int? = null) {
@@ -48,7 +58,7 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
   suspend fun toggle(timedInvokeTimeoutMs: Int? = null) {
@@ -58,21 +68,17 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
-  suspend fun offWithEffect(
-    effectIdentifier: UInt,
-    effectVariant: UInt,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun offWithEffect(effectIdentifier: UInt, effectVariant: UInt, timedInvokeTimeoutMs: Int? = null) {
     val commandId = 64L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
   suspend fun onWithRecallGlobalScene(timedInvokeTimeoutMs: Int? = null) {
@@ -82,29 +88,27 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
-  suspend fun onWithTimedOff(
-    onOffControl: UInt,
-    onTime: UShort,
-    offWaitTime: UShort,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun onWithTimedOff(onOffControl: UInt, onTime: UShort, offWaitTime: UShort, timedInvokeTimeoutMs: Int? = null) {
     val commandId = 66L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
   suspend fun readOnOffAttribute(): Boolean {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOnOffAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeOnOffAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -112,7 +116,10 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeGlobalSceneControlAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeGlobalSceneControlAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -120,15 +127,21 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
     // Implementation needs to be added here
   }
 
-  suspend fun writeOnTimeAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeOnTimeAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeOnTimeAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeOnTimeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -136,15 +149,21 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
     // Implementation needs to be added here
   }
 
-  suspend fun writeOffWaitTimeAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeOffWaitTimeAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeOffWaitTimeAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeOffWaitTimeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -152,12 +171,15 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
     // Implementation needs to be added here
   }
 
-  suspend fun writeStartUpOnOffAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeStartUpOnOffAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribeStartUpOnOffAttribute(
@@ -193,7 +215,10 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -212,7 +237,10 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -220,7 +248,10 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

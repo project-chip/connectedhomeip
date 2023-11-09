@@ -2047,6 +2047,19 @@ enum class Feature : uint32_t
 };
 } // namespace ActivatedCarbonFilterMonitoring
 
+namespace ElectricalEnergyMeasurement {
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kImportedEnergy   = 0x1,
+    kExportedEnergy   = 0x2,
+    kCumulativeEnergy = 0x4,
+    kPeriodicEnergy   = 0x8,
+    kEphemeralEnergy  = 0x10,
+};
+} // namespace ElectricalEnergyMeasurement
+
 namespace DoorLock {
 
 // Enum for AlarmCodeEnum

@@ -20,19 +20,26 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class MicrowaveOvenModeCluster(
-  private val controller: MatterController,
-  private val endpointId: UShort
-) {
-  class SupportedModesAttribute(val value: List<MicrowaveOvenModeClusterModeOptionStruct>)
+class MicrowaveOvenModeCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class SupportedModesAttribute(
+    val value: List<MicrowaveOvenModeClusterModeOptionStruct>
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
   suspend fun readSupportedModesAttribute(): SupportedModesAttribute {
     // Implementation needs to be added here
@@ -49,7 +56,10 @@ class MicrowaveOvenModeCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentModeAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeCurrentModeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -79,7 +89,10 @@ class MicrowaveOvenModeCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -98,7 +111,10 @@ class MicrowaveOvenModeCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -106,7 +122,10 @@ class MicrowaveOvenModeCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

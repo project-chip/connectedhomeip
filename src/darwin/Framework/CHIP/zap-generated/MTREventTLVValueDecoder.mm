@@ -2237,6 +2237,170 @@ static id _Nullable DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ElectricalEnergyMeasurement;
+    switch (aEventId) {
+    case Events::CumulativeEnergyImported::Id: {
+        Events::CumulativeEnergyImported::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRElectricalEnergyMeasurementClusterCumulativeEnergyImportedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.importedTimestamp];
+            value.importedTimestamp = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.energyImported];
+            value.energyImported = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::CumulativeEnergyExported::Id: {
+        Events::CumulativeEnergyExported::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.importedTimestamp];
+            value.importedTimestamp = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.energyExported];
+            value.energyExported = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::PeriodicEnergyImported::Id: {
+        Events::PeriodicEnergyImported::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRElectricalEnergyMeasurementClusterPeriodicEnergyImportedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.periodStart];
+            value.periodStart = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.periodEnd];
+            value.periodEnd = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.energyImported];
+            value.energyImported = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::PeriodicEnergyExported::Id: {
+        Events::PeriodicEnergyExported::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.periodStart];
+            value.periodStart = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.periodEnd];
+            value.periodEnd = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.energyExported];
+            value.energyExported = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::EphemeralEnergyImported::Id: {
+        Events::EphemeralEnergyImported::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRElectricalEnergyMeasurementClusterEphemeralEnergyImportedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.periodStart];
+            value.periodStart = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.periodEnd];
+            value.periodEnd = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.energyImported];
+            value.energyImported = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::EphemeralEnergyExported::Id: {
+        Events::EphemeralEnergyExported::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRElectricalEnergyMeasurementClusterEphemeralEnergyExportedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.periodStart];
+            value.periodStart = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.periodEnd];
+            value.periodEnd = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.energyExported];
+            value.energyExported = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForDoorLockCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::DoorLock;
@@ -3450,6 +3614,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ElectricalEnergyMeasurement::Id: {
+        return DecodeEventPayloadForElectricalEnergyMeasurementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);

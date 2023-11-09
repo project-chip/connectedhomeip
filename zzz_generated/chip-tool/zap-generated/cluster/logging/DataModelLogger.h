@@ -353,6 +353,24 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::RvcOperationalState::Events::OperationalError::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::RvcOperationalState::Events::OperationCompletion::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyImported::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyExported::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyImported::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyExported::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::ElectricalEnergyMeasurement::Events::EphemeralEnergyImported::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::ElectricalEnergyMeasurement::Events::EphemeralEnergyExported::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
