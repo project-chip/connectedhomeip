@@ -17,6 +17,7 @@
 
 #include <app/clusters/time-synchronization-server/TimeSyncDataProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 
@@ -104,23 +105,23 @@ void TestTimeZoneStoreLoad(nlTestSuite * inSuite, void * inContext)
     TimeSyncDataProvider timeSyncDataProv;
     timeSyncDataProv.Init(persistentStorage);
 
-    const auto makeTimeZone = [](int32_t offset = 0, uint64_t validAt = 0, char * name = nullptr, uint8_t len = 0) {
+    const auto makeTimeZone = [](int32_t offset = 0, uint64_t validAt = 0, char * name = nullptr) {
         TimeSyncDataProvider::TimeZoneStore tzS;
         tzS.timeZone.offset  = offset;
         tzS.timeZone.validAt = validAt;
-        if (name != nullptr && len)
+        if (name != nullptr)
         {
-            memcpy(tzS.name, name, len);
-            tzS.timeZone.name.SetValue(chip::CharSpan(tzS.name, len));
+            Platform::CopyString(tzS.name, name);
+            tzS.timeZone.name.SetValue(chip::CharSpan::fromCharString(tzS.name));
         }
         return tzS;
     };
     char tzShort[]                             = "LA";
     char tzLong[]                              = "MunichOnTheLongRiverOfIsarInNiceSummerWeatherWithAugustinerBeer";
     char tzBerlin[]                            = "Berlin";
-    TimeSyncDataProvider::TimeZoneStore tzS[3] = { makeTimeZone(1, 1, tzShort, sizeof(tzShort)-1),
-                                                   makeTimeZone(2, 2, tzLong, sizeof(tzLong)-1),
-                                                   makeTimeZone(3, 3, tzBerlin, sizeof(tzBerlin)-1) };
+    TimeSyncDataProvider::TimeZoneStore tzS[3] = { makeTimeZone(1, 1, tzShort),
+                                                   makeTimeZone(2, 2, tzLong),
+                                                   makeTimeZone(3, 3, tzBerlin) };
     TimeZoneList tzL(tzS);
     NL_TEST_ASSERT(inSuite, tzL.size() == 3);
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.StoreTimeZone(tzL));

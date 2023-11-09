@@ -188,7 +188,7 @@ public:
 
         bool operator==(const SceneData & other) const
         {
-            return ((CharSpan(mName, mNameLength) == CharSpan(other.mName, other.mNameLength)) &&
+            return ((CharSpan(mName, mNameLength).data_equal(CharSpan(other.mName, other.mNameLength))) &&
                     (mSceneTransitionTimeMs == other.mSceneTransitionTimeMs) && (mExtensionFieldSets == other.mExtensionFieldSets));
         }
 
