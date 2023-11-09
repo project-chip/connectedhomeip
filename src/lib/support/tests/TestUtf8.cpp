@@ -28,44 +28,40 @@ namespace {
 
 using namespace chip;
 
-bool IsValidCStringAsUtf8(const char * s)
-{
-    return Utf8::IsValid(CharSpan(s, strlen(s)));
-}
 
 void TestValidStrings(nlTestSuite * inSuite, void * inContext)
 {
     NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan())); // empty span ok
 
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8(""));
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("abc"));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("")));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("abc")));
 
     // Various tests from https://www.w3.org/2001/06/utf-8-wrong/UTF-8-test.html
 
     // Generic UTF8
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("κόσμε"));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("κόσμε")));
 
     // First possible sequence of a certain length
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8(""));
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("ࠀ"));
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("𐀀"));
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("�����"));
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("������"));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("")));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("ࠀ")));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("𐀀")));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("�����")));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("������")));
 
     // Last possible sequence of a certain length
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8(""));
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("߿"));
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("￿"));
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("����"));
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("�����"));
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("������"));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("")));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("߿")));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("￿")));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("����")));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("�����")));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("������")));
 
     // Other boundary conditions
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("퟿"));
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8(""));
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("�"));
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("􏿿"));
-    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("����"));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("퟿")));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("")));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("�")));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("􏿿")));
+    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("����")));
 
     // NOTE: UTF8 allows embeded NULLs
     //       even though strings like that are probably not ideal for handling
