@@ -34,9 +34,9 @@ namespace Server {
 
 bool NotifyCumulativeEnergyImported(chip::EndpointId endpointId, uint32_t aImportedTimeStampS, uint64_t aEnergyImported)
 {
-	Events::CumulativeEnergyImported::Type event;
-	event.importedTimestamp = aImportedTimeStampS;
-	event.energyImported = aEnergyImported;
+    Events::CumulativeEnergyImported::Type event;
+    event.importedTimestamp = aImportedTimeStampS;
+    event.energyImported = aEnergyImported;
 
     EventNumber eventNumber;
     CHIP_ERROR error = app::LogEvent(event, endpointId, eventNumber);
@@ -53,9 +53,9 @@ bool NotifyCumulativeEnergyImported(chip::EndpointId endpointId, uint32_t aImpor
 
 bool NotifyCumulativeEnergyExported(chip::EndpointId endpointId, uint32_t aImportedTimeStampS, uint64_t aEnergyExported)
 {
-	Events::CumulativeEnergyExported::Type event;
-	event.importedTimestamp = aImportedTimeStampS;
-	event.energyExported = aEnergyExported;
+    Events::CumulativeEnergyExported::Type event;
+    event.importedTimestamp = aImportedTimeStampS;
+    event.energyExported = aEnergyExported;
 
     EventNumber eventNumber;
     CHIP_ERROR error = app::LogEvent(event, endpointId, eventNumber);
@@ -72,10 +72,10 @@ bool NotifyCumulativeEnergyExported(chip::EndpointId endpointId, uint32_t aImpor
 
 bool NotifyPeriodicEnergyImported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyImported)
 {
-	Events::PeriodicEnergyImported::Type event;
-	event.periodStart = aPeriodStartS;
-	event.periodEnd = aPeriodEndS;
-	event.energyImported = aEnergyImported;
+    Events::PeriodicEnergyImported::Type event;
+    event.periodStart = aPeriodStartS;
+    event.periodEnd = aPeriodEndS;
+    event.energyImported = aEnergyImported;
 
     EventNumber eventNumber;
     CHIP_ERROR error = app::LogEvent(event, endpointId, eventNumber);
@@ -92,10 +92,10 @@ bool NotifyPeriodicEnergyImported(chip::EndpointId endpointId, uint32_t aPeriodS
 
 bool NotifyPeriodicEnergyExported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyExported)
 {
-	Events::PeriodicEnergyExported::Type event;
-	event.periodStart = aPeriodStartS;
-	event.periodEnd = aPeriodEndS;
-	event.energyExported = aEnergyExported;
+    Events::PeriodicEnergyExported::Type event;
+    event.periodStart = aPeriodStartS;
+    event.periodEnd = aPeriodEndS;
+    event.energyExported = aEnergyExported;
 
     EventNumber eventNumber;
     CHIP_ERROR error = app::LogEvent(event, endpointId, eventNumber);
@@ -112,10 +112,10 @@ bool NotifyPeriodicEnergyExported(chip::EndpointId endpointId, uint32_t aPeriodS
 
 bool NotifyEphemeralEnergyImported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyImported)
 {
-	Events::EphemeralEnergyImported::Type event;
-	event.periodStart = aPeriodStartS;
-	event.periodEnd = aPeriodEndS;
-	event.energyImported = aEnergyImported;
+    Events::EphemeralEnergyImported::Type event;
+    event.periodStart = aPeriodStartS;
+    event.periodEnd = aPeriodEndS;
+    event.energyImported = aEnergyImported;
 
     EventNumber eventNumber;
     CHIP_ERROR error = app::LogEvent(event, endpointId, eventNumber);
@@ -132,10 +132,10 @@ bool NotifyEphemeralEnergyImported(chip::EndpointId endpointId, uint32_t aPeriod
 
 bool NotifyEphemeralEnergyExported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyExported)
 {
-	Events::EphemeralEnergyExported::Type event;
-	event.periodStart = aPeriodStartS;
-	event.periodEnd = aPeriodEndS;
-	event.energyExported = aEnergyExported;
+    Events::EphemeralEnergyExported::Type event;
+    event.periodStart = aPeriodStartS;
+    event.periodEnd = aPeriodEndS;
+    event.energyExported = aEnergyExported;
 
     EventNumber eventNumber;
     CHIP_ERROR error = app::LogEvent(event, endpointId, eventNumber);
