@@ -80,17 +80,20 @@ template <typename ResponseType>
 CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
 {
     Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
+    EmberAfStatus status                 = EMBER_ZCL_STATUS_SUCCESS;
+
     if (AuthMode::kCase == descriptor.authMode)
     {
-        ReturnErrorOnFailure(
-            AddResponseOnError(ctx, resp, Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject)));
+        status = Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
     }
     else
     {
-        ReturnErrorOnFailure(AddResponseOnError(ctx, resp, Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId)));
+        status = Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
     }
 
-    return CHIP_NO_ERROR;
+    // LastConfiguredBy is optional, so we don't want to fail the command if it fails to update
+    VerifyOrReturnValue(!(EMBER_ZCL_STATUS_SUCCESS == status || EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status), CHIP_NO_ERROR);
+    return AddResponseOnError(ctx, resp, status);
 }
 
 ScenesServer ScenesServer::mInstance;

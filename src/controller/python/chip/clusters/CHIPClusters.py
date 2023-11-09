@@ -2190,6 +2190,9 @@ class ChipClusters:
                     "ssid": "bytes",
                     "credentials": "bytes",
                     "breadcrumb": "int",
+                    "networkIdentity": "bytes",
+                    "clientIdentifier": "bytes",
+                    "possessionNonce": "bytes",
                 },
             },
             0x00000003: {
@@ -2223,6 +2226,14 @@ class ChipClusters:
                     "networkID": "bytes",
                     "networkIndex": "int",
                     "breadcrumb": "int",
+                },
+            },
+            0x00000009: {
+                "commandId": 0x00000009,
+                "commandName": "QueryIdentity",
+                "args": {
+                    "keyIdentifier": "bytes",
+                    "possessionNonce": "bytes",
                 },
             },
         },
@@ -7284,7 +7295,6 @@ class ChipClusters:
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000002: {
                 "attributeName": "PercentSetting",
@@ -9779,6 +9789,12 @@ class ChipClusters:
                 "type": "str",
                 "reportable": True,
             },
+            0x00000001: {
+                "attributeName": "LinkLocalAddress",
+                "attributeId": 0x00000001,
+                "type": "bytes",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -10339,7 +10355,6 @@ class ChipClusters:
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",

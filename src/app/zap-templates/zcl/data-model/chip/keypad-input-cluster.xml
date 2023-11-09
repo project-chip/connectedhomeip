@@ -32,12 +32,12 @@ limitations under the License.
 
     <command source="server" code="0x01" name="SendKeyResponse" optional="false">
       <description>This command SHALL be generated in response to a SendKey Request command.</description>
-      <arg name="Status" type="KeypadInputStatusEnum"/>
+      <arg name="Status" type="StatusEnum"/>
     </command>
 
   </cluster>
 
-  <enum name="KeypadInputStatusEnum" type="enum8">
+  <enum name="StatusEnum" type="enum8">
     <cluster code="0x0509"/>
     <item name="Success" value="0x00"/>
     <item name="UnsupportedKey" value="0x01"/>

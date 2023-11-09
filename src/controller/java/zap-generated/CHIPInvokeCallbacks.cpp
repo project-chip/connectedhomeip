@@ -1975,8 +1975,9 @@ void CHIPNetworkCommissioningClusterNetworkConfigResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess",
-                                                  "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V", &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(
+        env, javaCallbackRef, "onSuccess",
+        "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject NetworkingStatus;
@@ -2013,8 +2014,41 @@ void CHIPNetworkCommissioningClusterNetworkConfigResponseCallback::CallbackFn(
                                                                    jniNetworkIndexInsideOptional, NetworkIndexInsideOptional);
         chip::JniReferences::GetInstance().CreateOptional(NetworkIndexInsideOptional, NetworkIndex);
     }
+    jobject ClientIdentity;
+    if (!dataResponse.clientIdentity.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, ClientIdentity);
+    }
+    else
+    {
+        jobject ClientIdentityInsideOptional;
+        jbyteArray ClientIdentityInsideOptionalByteArray =
+            env->NewByteArray(static_cast<jsize>(dataResponse.clientIdentity.Value().size()));
+        env->SetByteArrayRegion(ClientIdentityInsideOptionalByteArray, 0,
+                                static_cast<jsize>(dataResponse.clientIdentity.Value().size()),
+                                reinterpret_cast<const jbyte *>(dataResponse.clientIdentity.Value().data()));
+        ClientIdentityInsideOptional = ClientIdentityInsideOptionalByteArray;
+        chip::JniReferences::GetInstance().CreateOptional(ClientIdentityInsideOptional, ClientIdentity);
+    }
+    jobject PossessionSignature;
+    if (!dataResponse.possessionSignature.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, PossessionSignature);
+    }
+    else
+    {
+        jobject PossessionSignatureInsideOptional;
+        jbyteArray PossessionSignatureInsideOptionalByteArray =
+            env->NewByteArray(static_cast<jsize>(dataResponse.possessionSignature.Value().size()));
+        env->SetByteArrayRegion(PossessionSignatureInsideOptionalByteArray, 0,
+                                static_cast<jsize>(dataResponse.possessionSignature.Value().size()),
+                                reinterpret_cast<const jbyte *>(dataResponse.possessionSignature.Value().data()));
+        PossessionSignatureInsideOptional = PossessionSignatureInsideOptionalByteArray;
+        chip::JniReferences::GetInstance().CreateOptional(PossessionSignatureInsideOptional, PossessionSignature);
+    }
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, NetworkingStatus, DebugText, NetworkIndex);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, NetworkingStatus, DebugText, NetworkIndex, ClientIdentity,
+                        PossessionSignature);
 }
 CHIPNetworkCommissioningClusterConnectNetworkResponseCallback::CHIPNetworkCommissioningClusterConnectNetworkResponseCallback(
     jobject javaCallback) : Callback::Callback<CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType>(CallbackFn, this)
@@ -2102,6 +2136,82 @@ void CHIPNetworkCommissioningClusterConnectNetworkResponseCallback::CallbackFn(
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, NetworkingStatus, DebugText, ErrorValue);
+}
+CHIPNetworkCommissioningClusterQueryIdentityResponseCallback::CHIPNetworkCommissioningClusterQueryIdentityResponseCallback(
+    jobject javaCallback) : Callback::Callback<CHIPNetworkCommissioningClusterQueryIdentityResponseCallbackType>(CallbackFn, this)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPNetworkCommissioningClusterQueryIdentityResponseCallback::~CHIPNetworkCommissioningClusterQueryIdentityResponseCallback()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+};
+
+void CHIPNetworkCommissioningClusterQueryIdentityResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::QueryIdentityResponse::DecodableType & dataResponse)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+    jmethodID javaMethod;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+
+    std::unique_ptr<CHIPNetworkCommissioningClusterQueryIdentityResponseCallback,
+                    void (*)(CHIPNetworkCommissioningClusterQueryIdentityResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPNetworkCommissioningClusterQueryIdentityResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPNetworkCommissioningClusterQueryIdentityResponseCallback>);
+    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
+
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    // Java callback is allowed to be null, exit early if this is the case.
+    VerifyOrReturn(javaCallbackRef != nullptr);
+
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([BLjava/util/Optional;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+
+    jobject Identity;
+    jbyteArray IdentityByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.identity.size()));
+    env->SetByteArrayRegion(IdentityByteArray, 0, static_cast<jsize>(dataResponse.identity.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.identity.data()));
+    Identity = IdentityByteArray;
+    jobject PossessionSignature;
+    if (!dataResponse.possessionSignature.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, PossessionSignature);
+    }
+    else
+    {
+        jobject PossessionSignatureInsideOptional;
+        jbyteArray PossessionSignatureInsideOptionalByteArray =
+            env->NewByteArray(static_cast<jsize>(dataResponse.possessionSignature.Value().size()));
+        env->SetByteArrayRegion(PossessionSignatureInsideOptionalByteArray, 0,
+                                static_cast<jsize>(dataResponse.possessionSignature.Value().size()),
+                                reinterpret_cast<const jbyte *>(dataResponse.possessionSignature.Value().data()));
+        PossessionSignatureInsideOptional = PossessionSignatureInsideOptionalByteArray;
+        chip::JniReferences::GetInstance().CreateOptional(PossessionSignatureInsideOptional, PossessionSignature);
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, Identity, PossessionSignature);
 }
 CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback::CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType>(CallbackFn, this)
