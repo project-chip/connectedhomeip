@@ -40,6 +40,30 @@ void TestValidStrings(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8(""));
     NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("abc"));
     NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("κόσμε"));
+
+    // First possible sequence of a certain length
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8(""));
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("ࠀ"));
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("𐀀"));
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("�����"));
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("������"));
+
+    // Last possible sequence of a certain length
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8(""));
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("߿"));
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("￿"));
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("����"));
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("�����"));
+    NL_TEST_ASSERT(inSuite, IsValidCStringAsUtf8("������"));
+}
+
+void TestInvalidStrings(nlTestSuite * inSuite, void * inContext)
+{
+    {
+        // cannot embed zeroes
+        char buff[] = { 0 };
+        NL_TEST_ASSERT(inSuite, !Utf8::IsValid(CharSpan(buff)));
+    }
 }
 
 } // namespace
@@ -48,6 +72,7 @@ void TestValidStrings(nlTestSuite * inSuite, void * inContext)
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestValidStrings", TestValidStrings),
+    NL_TEST_DEF("TestInvalidStrings", TestInvalidStrings),
     NL_TEST_SENTINEL()
 };
 // clang-format on
