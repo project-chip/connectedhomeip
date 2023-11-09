@@ -38,19 +38,19 @@ class MdnsTypeInfo:
 
 commissioner = MdnsTypeInfo(
     "COMMISSIONER",
-    "This is a record for a Matter commissioner aka. controller"
+    "This is a service for a Matter commissioner aka. controller"
 )
 commissionable = MdnsTypeInfo(
     "COMMISSIONABLE / EXTENDED DISCOVERY",
-    "This is a record to be used in the commissioning process and provides more info about the device."
+    "This is a service to be used in the commissioning process and provides more info about the device."
 )
 operational = MdnsTypeInfo(
     "OPERATIONAL",
-    "This is a record for a commissioned Matter device. It exposes limited info about the device."
+    "This is a service for a commissioned Matter device. It exposes limited info about the device."
 )
 border_router = MdnsTypeInfo(
     "THREAD BORDER ROUTER",
-    "This device is a thread border router; may be used for thread+Matter devices."
+    "This is a service for a thread border router; may be used for thread+Matter devices."
 )
 
 _MDNS_TYPES = {
@@ -127,7 +127,7 @@ class MatterTxtRecordParser:
         self.parsed_records += parser.explanation + "\n\n"
         try:
             self.parsed_records += "PARSED VALUE: " + parser.parse(value) + "\n"
-        except Exception as e:
+        except Exception:
             logger.error("Exception parsing TXT record, appending raw value")
             logger.error(traceback.format_exc())
             self.parsed_records += f"RAW VALUE: {value}\n"
@@ -176,11 +176,11 @@ class MatterTxtRecordParser:
     @staticmethod
     def parse_cm(txt_value: str) -> str:
         cm = int(txt_value)
-        mode_descriptions = {
-            0: "Not in commissioning mode",
-            1: "In passcode commissioning mode (standard mode)",
-            2: "In dynamic passcode commissioning mode",
-        }
+        mode_descriptions = [
+            "Not in commissioning mode",
+            "In passcode commissioning mode (standard mode)",
+            "In dynamic passcode commissioning mode",
+        ]
         return mode_descriptions[cm]
 
     @staticmethod
@@ -306,6 +306,8 @@ class MatterDnssdListener(ServiceListener):
         to_log += ("*" * (len(update_str) - 2)) + update_str
         to_log += _MDNS_TYPES[type_].type + "\n"
         to_log += _MDNS_TYPES[type_].description
+        to_log += f"\nA/SRV TTL: {str(info.host_ttl)}\n"
+        to_log += f"PTR/TXT TTL: {str(info.other_ttl)}\n"
         txt_parser = MatterTxtRecordParser()
         to_log += txt_parser.parse_records(info)
         to_log += add_border("This device has the following IP addresses\n")

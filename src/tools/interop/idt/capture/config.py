@@ -41,8 +41,8 @@ Result: Timeout was NOT thrown!
 
 Update the example
 ----
-async def not_actually_async():
-    await asyncio.sleep(sleep_time * 2)  # Change to something that isn't blocking the EL
+async def not_actually_async():  # Now it is_actually_async because we
+    await asyncio.sleep(sleep_time * 2)  # change to something that isn't blocking the EL
 ----
 Result: The timeout error will be raised.
 
