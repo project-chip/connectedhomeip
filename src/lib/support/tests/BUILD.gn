@@ -55,6 +55,7 @@ chip_test_suite_using_nltest("tests") {
     "TestTimeUtils.cpp",
     "TestTlvJson.cpp",
     "TestTlvToJson.cpp",
+    "TestUtf8.cpp",
     "TestVariant.cpp",
     "TestZclString.cpp",
   ]
