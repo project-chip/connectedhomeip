@@ -3733,5 +3733,6 @@
       "endpointId": 3,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }
