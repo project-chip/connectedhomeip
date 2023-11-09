@@ -20,8 +20,8 @@ import os
 from typing import List, Optional, Set
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.generators.types import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
-                                         ParseDataType, TypeLookupContext)
+from matter_idl.generators.type_definitions import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
+                                                    ParseDataType, TypeLookupContext)
 from matter_idl.matter_idl_types import (Attribute, Cluster, ClusterSide, Command, DataType, Field, FieldQuality, Idl, Struct,
                                          StructQuality, StructTag)
 from stringcase import capitalcase
@@ -508,6 +508,37 @@ class EncodableValue:
                 return "Integer"
         else:
             return "Object"
+
+    @property
+    def java_tlv_type(self):
+        t = ParseDataType(self.data_type, self.context)
+
+        if isinstance(t, FundamentalType):
+            if t == FundamentalType.BOOL:
+                return "Boolean"
+            elif t == FundamentalType.FLOAT:
+                return "Float"
+            elif t == FundamentalType.DOUBLE:
+                return "Double"
+            else:
+                raise Exception("Unknown fundamental type")
+        elif isinstance(t, BasicInteger):
+            # the >= 3 will include int24_t to be considered "long"
+            if t.is_signed:
+                return "Int"
+            else:
+                return "UInt"
+        elif isinstance(t, BasicString):
+            if t.is_binary:
+                return "ByteArray"
+            else:
+                return "String"
+        elif isinstance(t, IdlEnumType):
+            return "UInt"
+        elif isinstance(t, IdlBitmapType):
+            return "UInt"
+        else:
+            return "Any"
 
     @property
     def kotlin_type(self):

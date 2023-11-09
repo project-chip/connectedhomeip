@@ -120,6 +120,20 @@ public class ChipDeviceController {
     setAttestationTrustStoreDelegate(deviceControllerPtr, attestationTrustStoreDelegate);
   }
 
+  /**
+   * Set the delegate of OTA Provider for firmware Update
+   *
+   * @param aOTAProviderDelegate Delegate for OTA Provider
+   */
+  public void startOTAProvider(OTAProviderDelegate aOTAProviderDelegate) {
+    startOTAProvider(deviceControllerPtr, aOTAProviderDelegate);
+  }
+
+  /** Disable OTA Provider server cluster */
+  public void finishOTAProvider() {
+    finishOTAProvider(deviceControllerPtr);
+  }
+
   public void pairDevice(
       BluetoothGatt bleServer,
       int connId,
@@ -1105,7 +1119,7 @@ public class ChipDeviceController {
   private native PaseVerifierParams computePaseVerifier(
       long deviceControllerPtr, long devicePtr, long setupPincode, long iterations, byte[] salt);
 
-  private native void subscribe(
+  static native void subscribe(
       long deviceControllerPtr,
       long callbackHandle,
       long devicePtr,
@@ -1118,7 +1132,7 @@ public class ChipDeviceController {
       int imTimeoutMs,
       @Nullable Long eventMin);
 
-  private native void read(
+  static native void read(
       long deviceControllerPtr,
       long callbackHandle,
       long devicePtr,
@@ -1128,7 +1142,7 @@ public class ChipDeviceController {
       int imTimeoutMs,
       @Nullable Long eventMin);
 
-  private native void write(
+  static native void write(
       long deviceControllerPtr,
       long callbackHandle,
       long devicePtr,
@@ -1136,7 +1150,7 @@ public class ChipDeviceController {
       int timedRequestTimeoutMs,
       int imTimeoutMs);
 
-  private native void invoke(
+  static native void invoke(
       long deviceControllerPtr,
       long callbackHandle,
       long devicePtr,
@@ -1151,6 +1165,10 @@ public class ChipDeviceController {
 
   private native void setAttestationTrustStoreDelegate(
       long deviceControllerPtr, AttestationTrustStoreDelegate delegate);
+
+  private native void startOTAProvider(long deviceControllerPtr, OTAProviderDelegate delegate);
+
+  private native void finishOTAProvider(long deviceControllerPtr);
 
   private native void pairDevice(
       long deviceControllerPtr,

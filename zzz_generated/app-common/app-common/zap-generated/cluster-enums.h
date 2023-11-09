@@ -922,6 +922,7 @@ enum class Feature : uint32_t
     kWiFiNetworkInterface     = 0x1,
     kThreadNetworkInterface   = 0x2,
     kEthernetNetworkInterface = 0x4,
+    kPerDeviceCredentials     = 0x8,
 };
 
 // Bitmap for ThreadCapabilitiesBitmap
@@ -937,11 +938,12 @@ enum class ThreadCapabilitiesBitmap : uint16_t
 // Bitmap for WiFiSecurityBitmap
 enum class WiFiSecurityBitmap : uint8_t
 {
-    kUnencrypted  = 0x1,
-    kWep          = 0x2,
-    kWpaPersonal  = 0x4,
-    kWpa2Personal = 0x8,
-    kWpa3Personal = 0x10,
+    kUnencrypted   = 0x1,
+    kWep           = 0x2,
+    kWpaPersonal   = 0x4,
+    kWpa2Personal  = 0x8,
+    kWpa3Personal  = 0x10,
+    kWpa3MatterPdc = 0x20,
 };
 } // namespace NetworkCommissioning
 
@@ -2879,8 +2881,8 @@ enum class FanModeSequenceEnum : uint8_t
     kOffLowHigh        = 0x01,
     kOffLowMedHighAuto = 0x02,
     kOffLowHighAuto    = 0x03,
-    kOffOnAuto         = 0x04,
-    kOffOn             = 0x05,
+    kOffHighAuto       = 0x04,
+    kOffHigh           = 0x05,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -3970,8 +3972,8 @@ enum class CecKeyCode : uint8_t
     kUnknownEnumValue = 14,
 };
 
-// Enum for KeypadInputStatusEnum
-enum class KeypadInputStatusEnum : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess                  = 0x00,
     kUnsupportedKey           = 0x01,
@@ -3993,19 +3995,6 @@ enum class Feature : uint32_t
 } // namespace KeypadInput
 
 namespace ContentLauncher {
-
-// Enum for ContentLaunchStatusEnum
-enum class ContentLaunchStatusEnum : uint8_t
-{
-    kSuccess         = 0x00,
-    kUrlNotAvailable = 0x01,
-    kAuthFailed      = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
 
 // Enum for MetricTypeEnum
 enum class MetricTypeEnum : uint8_t
@@ -4043,6 +4032,19 @@ enum class ParameterEnum : uint8_t
     kUnknownEnumValue = 14,
 };
 
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
+{
+    kSuccess         = 0x00,
+    kURLNotAvailable = 0x01,
+    kAuthFailed      = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
@@ -4050,8 +4052,8 @@ enum class Feature : uint32_t
     kURLPlayback   = 0x2,
 };
 
-// Bitmap for SupportedStreamingProtocol
-enum class SupportedStreamingProtocol : uint32_t
+// Bitmap for SupportedProtocolsBitmap
+enum class SupportedProtocolsBitmap : uint32_t
 {
     kDash = 0x1,
     kHls  = 0x2,

@@ -14002,6 +14002,17 @@ public class ClusterReadMapping {
           readWakeOnLanMACAddressCommandParams
         );
         result.put("readMACAddressAttribute", readWakeOnLanMACAddressAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWakeOnLanLinkLocalAddressCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWakeOnLanLinkLocalAddressAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WakeOnLanCluster) cluster).readLinkLocalAddressAttribute(
+              (ChipClusters.OctetStringAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
+          readWakeOnLanLinkLocalAddressCommandParams
+        );
+        result.put("readLinkLocalAddressAttribute", readWakeOnLanLinkLocalAddressAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readWakeOnLanGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWakeOnLanGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

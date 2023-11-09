@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-asr:24
+            image: ghcr.io/project-chip/chip-build-asr:25
             options: --user root
 
         steps:

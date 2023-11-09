@@ -5821,6 +5821,54 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(newElement_0_connectedClassName.c_str(),
                                                                                newElement_0_connectedCtorSignature.c_str(),
                                                                                jninewElement_0_connected, newElement_0_connected);
+                jobject newElement_0_networkIdentifier;
+                if (!entry_0.networkIdentifier.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_networkIdentifier);
+                }
+                else
+                {
+                    jobject newElement_0_networkIdentifierInsideOptional;
+                    if (entry_0.networkIdentifier.Value().IsNull())
+                    {
+                        newElement_0_networkIdentifierInsideOptional = nullptr;
+                    }
+                    else
+                    {
+                        jbyteArray newElement_0_networkIdentifierInsideOptionalByteArray =
+                            env->NewByteArray(static_cast<jsize>(entry_0.networkIdentifier.Value().Value().size()));
+                        env->SetByteArrayRegion(newElement_0_networkIdentifierInsideOptionalByteArray, 0,
+                                                static_cast<jsize>(entry_0.networkIdentifier.Value().Value().size()),
+                                                reinterpret_cast<const jbyte *>(entry_0.networkIdentifier.Value().Value().data()));
+                        newElement_0_networkIdentifierInsideOptional = newElement_0_networkIdentifierInsideOptionalByteArray;
+                    }
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_networkIdentifierInsideOptional,
+                                                                      newElement_0_networkIdentifier);
+                }
+                jobject newElement_0_clientIdentifier;
+                if (!entry_0.clientIdentifier.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_clientIdentifier);
+                }
+                else
+                {
+                    jobject newElement_0_clientIdentifierInsideOptional;
+                    if (entry_0.clientIdentifier.Value().IsNull())
+                    {
+                        newElement_0_clientIdentifierInsideOptional = nullptr;
+                    }
+                    else
+                    {
+                        jbyteArray newElement_0_clientIdentifierInsideOptionalByteArray =
+                            env->NewByteArray(static_cast<jsize>(entry_0.clientIdentifier.Value().Value().size()));
+                        env->SetByteArrayRegion(newElement_0_clientIdentifierInsideOptionalByteArray, 0,
+                                                static_cast<jsize>(entry_0.clientIdentifier.Value().Value().size()),
+                                                reinterpret_cast<const jbyte *>(entry_0.clientIdentifier.Value().Value().data()));
+                        newElement_0_clientIdentifierInsideOptional = newElement_0_clientIdentifierInsideOptionalByteArray;
+                    }
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_clientIdentifierInsideOptional,
+                                                                      newElement_0_clientIdentifier);
+                }
 
                 jclass networkInfoStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -5831,16 +5879,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterNetworkInfoStruct");
                     return nullptr;
                 }
-                jmethodID networkInfoStructStructCtor_1 =
-                    env->GetMethodID(networkInfoStructStructClass_1, "<init>", "([BLjava/lang/Boolean;)V");
+                jmethodID networkInfoStructStructCtor_1 = env->GetMethodID(
+                    networkInfoStructStructClass_1, "<init>", "([BLjava/lang/Boolean;Ljava/util/Optional;Ljava/util/Optional;)V");
                 if (networkInfoStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$NetworkCommissioningClusterNetworkInfoStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(networkInfoStructStructClass_1, networkInfoStructStructCtor_1, newElement_0_networkID,
-                                              newElement_0_connected);
+                newElement_0 =
+                    env->NewObject(networkInfoStructStructClass_1, networkInfoStructStructCtor_1, newElement_0_networkID,
+                                   newElement_0_connected, newElement_0_networkIdentifier, newElement_0_clientIdentifier);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -27928,6 +27977,21 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
             return value;
         }
+        case Attributes::LinkLocalAddress::Id: {
+            using TypeInfo = Attributes::LinkLocalAddress::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            jbyteArray valueByteArray = env->NewByteArray(static_cast<jsize>(cppValue.size()));
+            env->SetByteArrayRegion(valueByteArray, 0, static_cast<jsize>(cppValue.size()),
+                                    reinterpret_cast<const jbyte *>(cppValue.data()));
+            value = valueByteArray;
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -29527,7 +29591,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             jobject value;
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
-            jlong jnivalue                 = static_cast<jlong>(cppValue);
+            jlong jnivalue                 = static_cast<jlong>(cppValue.Raw());
             chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(valueClassName.c_str(), valueCtorSignature.c_str(),
                                                                         jnivalue, value);
             return value;

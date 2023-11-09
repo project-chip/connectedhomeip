@@ -46,10 +46,22 @@ using OTAChangeReasonEnum   = ChangeReasonEnum;
 using OTAUpdateStateEnum    = UpdateStateEnum;
 } // namespace OtaSoftwareUpdateRequestor
 
+namespace ContentLauncher {
+// https://github.com/project-chip/connectedhomeip/pull/30176 renamed these
+// enums to follow the spec names.
+using SupportedStreamingProtocol = SupportedProtocolsBitmap;
+using ContentLaunchStatusEnum    = StatusEnum;
+} // namespace ContentLauncher
+
 namespace ApplicationLauncher {
 // https://github.com/project-chip/connectedhomeip/pull/30134 renamed this
 using ApplicationLauncherStatusEnum = StatusEnum;
 } // namespace ApplicationLauncher
+
+namespace KeypadInput {
+// https://github.com/project-chip/connectedhomeip/pull/30316 renamed this
+using KeypadInputStatusEnum = StatusEnum;
+} // namespace KeypadInput
 
 namespace Channel {
 using ChannelStatusEnum = StatusEnum;
