@@ -17,9 +17,9 @@
  */
 #include "ChipMainLoopWork.h"
 
-#include <platform/CHIPDeviceLayer.h>
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 namespace MainLoopWork {
@@ -34,12 +34,14 @@ struct WorkData
 
     WorkData() {}
     ~WorkData() {}
-    void Post() {
+    void Post()
+    {
         std::unique_lock lock(mux);
         done = true;
         cond.notify_all();
     }
-    void Wait() {
+    void Wait()
+    {
         std::unique_lock lock(mux);
         cond.wait(lock, [&] { return done; });
     }
