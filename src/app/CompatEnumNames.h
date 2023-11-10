@@ -73,6 +73,7 @@ using TargetNavigatorStatusEnum = StatusEnum;
 } // namespace TargetNavigator
 
 namespace LevelControl {
+// https://github.com/project-chip/connectedhomeip/pull/30417 renamed/updated these
 using MoveMode            = MoveModeEnum;
 using StepMode            = MoveModeEnum;
 using LevelControlOptions = OptionsBitmap;
