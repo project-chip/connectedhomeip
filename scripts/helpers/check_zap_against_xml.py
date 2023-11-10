@@ -14,14 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import click
+import coloredlogs
 import json
+import logging
 import os
 import sys
 import xml.etree.ElementTree as ET
 
-import click
-
 DATA_MODEL_PATH = 'data_model/clusters'
+
+# Supported log levels, mapping string values required for argument
+# parsing into logging constants
+__LOG_LEVELS__ = {
+    "debug": logging.DEBUG,
+    "info": logging.INFO,
+    "warn": logging.WARN,
+    "fatal": logging.FATAL,
+}
 
 
 @click.command()
@@ -33,62 +43,73 @@ DATA_MODEL_PATH = 'data_model/clusters'
 @click.option(
     '--matter-root',
     required=True,
+    default=os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')),
     type=str,
     help='Path to the matter root')
-def main(zap, matter_root):
+@click.option(
+    "--log-level",
+    default="INFO",
+    type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
+    help="Determines the verbosity of script output",
+)
+def main(zap, matter_root, log_level):
+
+    coloredlogs.install(
+        level=__LOG_LEVELS__[log_level], fmt="%(asctime)s %(levelname)-7s %(message)s"
+    )
 
     all_checks_successful = True
 
     CLUSTER_REVISIONS_BY_CLUSTER_ID = {}
 
-    print('Getting latest cluster revisions from XML data model')
+    logging.info('Getting latest cluster revisions from XML data model')
     for file in os.listdir(os.path.join(matter_root, DATA_MODEL_PATH)):
         if file.endswith(".xml"):
             with open(os.path.join(matter_root, DATA_MODEL_PATH, file), "r") as cluster_xml_file:
-                print(f'Processing {file}')
+                logging.info(f'Processing {file}')
                 xml_et = ET.parse(cluster_xml_file)
                 root = xml_et.getroot()
 
                 try:
                     CLUSTER_REVISIONS_BY_CLUSTER_ID[int(root.attrib['id'], 16)] = root.attrib['revision']
                 except ValueError:
-                    print(' ⚠️ Failed to parse Cluster ID')
+                    logging.warning(f' ⚠️ Failed to parse Cluster ID in {file}')
 
-    # print(CLUSTER_REVISIONS_BY_CLUSTER_ID)
-    print()
+    logging.debug(CLUSTER_REVISIONS_BY_CLUSTER_ID)
 
     with open(zap, "r") as zap_file:
         zap_data = json.load(zap_file)
 
         for endpoint in zap_data["endpointTypes"]:
-            print(f'Checking endpoint {endpoint["name"]}')
+            logging.info(f'Checking endpoint {endpoint["name"]}')
 
             for cluster in endpoint["clusters"]:
-                print(f' Checking {cluster["side"]} cluster {cluster["name"]}')
+                logging.info(f' Checking {cluster["side"]} cluster {cluster["name"]}')
 
                 if "attributes" in cluster:
                     for attribute in cluster["attributes"]:
 
                         if attribute["name"] == "ClusterRevision":
-                            print('  Checking value of attribute ClusterRevision')
+                            logging.info('  Checking value of attribute ClusterRevision')
 
                             try:
                                 value_in_zap = attribute["defaultValue"]
                                 value_in_xml = CLUSTER_REVISIONS_BY_CLUSTER_ID[cluster["code"]]
 
                                 if value_in_xml == value_in_zap:
-                                    print(f'   ✅ ClusterRevision: XML:{value_in_xml} == ZAP:{value_in_zap}')
+                                    logging.info(f'   ✅ ClusterRevision: XML:{value_in_xml} == ZAP:{value_in_zap}')
                                 else:
-                                    print(f'   ❌ ClusterRevision: XML:{value_in_xml} != ZAP:{value_in_zap}')
+                                    logging.fatal(f'   ❌ ClusterRevision: XML:{value_in_xml} != ZAP:{value_in_zap}')
                                     all_checks_successful = False
                             except KeyError:
-                                print(f'   ⚠️ No ClusterRevision found for cluster >{cluster["name"]}< {cluster["code"]}')
+                                logging.warning(f'   ⚠️ No ClusterRevision found for cluster >{cluster["name"]}< {cluster["code"]}')
                 else:
-                    print('  No attributes in this cluster')
+                    logging.info('  No attributes in this cluster')
 
     if all_checks_successful:
         sys.exit(0)
     else:
+        logging.error('Found zap lint errors')
         sys.exit(-1)
 
 
