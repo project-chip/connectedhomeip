@@ -67,7 +67,7 @@ buildconfig_header("app_buildconfig") {
 source_set("revision_info") {
   sources = [
     "DataModelRevision.h",
-    "InteractionModelRevision.h"
+    "InteractionModelRevision.h",
   ]
 }
 
