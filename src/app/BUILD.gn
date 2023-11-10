@@ -64,6 +64,13 @@ buildconfig_header("app_buildconfig") {
   ]
 }
 
+source_set("revision_info") {
+  sources = [
+    "InteractionModelRevision.h",
+    "DataModelRevision.h"
+  ]
+}
+
 source_set("app_config") {
   sources = [ "AppConfig.h" ]
 
@@ -101,7 +108,6 @@ static_library("app") {
     "FailSafeContext.h",
     "GlobalAttributes.h",
     "InteractionModelEngine.cpp",
-    "InteractionModelRevision.h",
     "InteractionModelTimeout.h",
     "MessageDef/ArrayBuilder.cpp",
     "MessageDef/ArrayParser.cpp",
@@ -237,6 +243,7 @@ static_library("app") {
 
   public_deps = [
     ":app_config",
+    ":revision_info",
     "${chip_root}/src/access",
     "${chip_root}/src/app/icd:notifier",
     "${chip_root}/src/app/icd:observer",

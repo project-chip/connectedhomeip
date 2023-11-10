@@ -271,11 +271,11 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
 
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
-    const size_t max_msg_len = TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize, // initiatorRandom,
-                                                           sizeof(uint16_t),            // initiatorSessionId
-                                                           sizeof(PasscodeId),          // passcodeId,
-                                                           sizeof(uint8_t),             // hasPBKDFParameters
-                                                           kSessionParamSize            // Session Parameters
+    const size_t max_msg_len = TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize,         // initiatorRandom,
+                                                           sizeof(uint16_t),                    // initiatorSessionId
+                                                           sizeof(PasscodeId),                  // passcodeId,
+                                                           sizeof(uint8_t),                     // hasPBKDFParameters
+                                                           SessionParameters::kEstimatedTLVSize // Session Parameters
     );
 
     System::PacketBufferHandle req = System::PacketBufferHandle::New(max_msg_len);
@@ -386,7 +386,7 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
                                     kPBKDFParamRandomNumberSize,                                // responderRandom
                                     sizeof(uint16_t),                                           // responderSessionId
                                     TLV::EstimateStructOverhead(sizeof(uint32_t), mSaltLength), // pbkdf_parameters
-                                    kSessionParamSize                                           // Session Parameters
+                                    SessionParameters::kEstimatedTLVSize                        // Session Parameters
         );
 
     System::PacketBufferHandle resp = System::PacketBufferHandle::New(max_msg_len);

@@ -641,11 +641,11 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
 CHIP_ERROR CASESession::SendSigma1()
 {
     MATTER_TRACE_SCOPE("SendSigma1", "CASESession");
-    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, // initiatorRandom
-                                                  sizeof(uint16_t),            // initiatorSessionId,
-                                                  kSHA256_Hash_Length,         // destinationId
-                                                  kP256_PublicKey_Length,      // InitiatorEphPubKey,
-                                                  kSessionParamSize,           // initiatorSessionParams
+    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize,          // initiatorRandom
+                                                  sizeof(uint16_t),                     // initiatorSessionId,
+                                                  kSHA256_Hash_Length,                  // destinationId
+                                                  kP256_PublicKey_Length,               // InitiatorEphPubKey,
+                                                  SessionParameters::kEstimatedTLVSize, // initiatorSessionParams
                                                   SessionResumptionStorage::kResumptionIdSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     System::PacketBufferTLVWriter tlvWriter;
@@ -912,8 +912,9 @@ exit:
 CHIP_ERROR CASESession::SendSigma2Resume()
 {
     MATTER_TRACE_SCOPE("SendSigma2Resume", "CASESession");
-    size_t max_sigma2_resume_data_len = TLV::EstimateStructOverhead(
-        SessionResumptionStorage::kResumptionIdSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, sizeof(uint16_t), kSessionParamSize);
+    size_t max_sigma2_resume_data_len =
+        TLV::EstimateStructOverhead(SessionResumptionStorage::kResumptionIdSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
+                                    sizeof(uint16_t), SessionParameters::kEstimatedTLVSize);
 
     System::PacketBufferTLVWriter tlvWriter;
     System::PacketBufferHandle msg_R2_resume;
@@ -1058,8 +1059,9 @@ CHIP_ERROR CASESession::SendSigma2()
                                          msg_R2_Encrypted.Get() + msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
     // Construct Sigma2 Msg
-    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, sizeof(uint16_t), kP256_PublicKey_Length,
-                                                  msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, kSessionParamSize);
+    size_t data_len =
+        TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, sizeof(uint16_t), kP256_PublicKey_Length, msg_r2_signed_enc_len,
+                                    CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, SessionParameters::kEstimatedTLVSize);
 
     System::PacketBufferHandle msg_R2 = System::PacketBufferHandle::New(data_len);
     VerifyOrReturnError(!msg_R2.IsNull(), CHIP_ERROR_NO_MEMORY);

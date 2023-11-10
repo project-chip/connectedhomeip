@@ -18,9 +18,7 @@
 
 /**
  *    @file
- *      TODO need to give this a proper description.
- *      This file defines a common interface to access various types of secure
- *      pairing sessions (e.g. PASE, CASE)
+ *      This file defines a Session Parameters that are passed during session estalishment.
  *
  */
 
@@ -32,13 +30,21 @@
 namespace chip {
 
 // TODO We should get part of this from constexpr that is in ReliableMessageProtocolConfig.h
-inline constexpr size_t kSessionParamSize = TLV::EstimateStructOverhead(
-    sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint32_t), sizeof(uint16_t));
 
 class SessionParameters
 {
 public:
     SessionParameters(ReliableMessageProtocolConfig mrpConfig = GetDefaultMRPConfig()) : mMRPConfig(mrpConfig) {}
+
+    // This estimated TLV size calc is here instead of messaging/ReliableMessageProtocolConfig.h
+    // because we would need to add `include <lib/core/TLV.h>`. While we could make it all work
+    // from a build standpoint, if any new MRP config gets added accessors will still need to be
+    // added here so having this calc done here isn't problematic.
+    static constexpr size_t kMrpConfigEstimatedTLVSize =
+        TLV::EstimateStructOverhead(sizeof(uint32_t), sizeof(uint32_t), sizeof(uint16_t));
+
+    static constexpr size_t kEstimatedTLVSize = kMrpConfigEstimatedTLVSize +
+        TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint32_t), sizeof(uint16_t));
 
     const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
@@ -77,7 +83,7 @@ private:
     Optional<uint16_t> mInteractionModelRev = NullOptional;
     // For legacy reason if we do not get Specification Version it means that version is less than
     // 0x01030000. But there isn't a way to know for certain.
-    Optional<uint32_t> mSpecificationVersion = MakeOptional(0x01030000u);
+    Optional<uint32_t> mSpecificationVersion = NullOptional;
     // When maxPathPerInvoke is not provide legacy is always 1
     uint16_t mMaxPathPerInvoke = 1;
 };

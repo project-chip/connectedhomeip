@@ -18,6 +18,8 @@
 
 #include <protocols/secure_channel/PairingSession.h>
 
+#include <app/DataModelRevision.h>
+#include <app/InteractionModelRevision.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVTypes.h>
 #include <lib/support/SafeInt.h>
@@ -114,16 +116,10 @@ CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const Optional<
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), mrpLocalConfig.mActiveRetransTimeout.count()));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), mrpLocalConfig.mActiveThresholdTime.count()));
 
-    // TODO not sure where to grab CHIP_DEVICE_DATA_MODEL_REVISION, include "app/DataModelRevision.h"
-    // creates depenency loop, should I isolate those header to their own target to remove loop
-    // or provide these in a different way
-    uint16_t dataModel = 17;
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(4), dataModel)); // CHIP_DEVICE_INTERACTION_MODEL_REVISION
+    uint16_t dataModel = CHIP_DEVICE_DATA_MODEL_REVISION;
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(4), dataModel));
 
-    // TODO not sure where to grab CHIP_DEVICE_DATA_MODEL_REVISION, include "app/InteractionModelRevision.h"
-    // creates depenency loop, should I isolate those header to their own target to remove loop
-    // or provide these in a different way
-    uint16_t interactionModel = 11;
+    uint16_t interactionModel = CHIP_DEVICE_INTERACTION_MODEL_REVISION;
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(5), interactionModel));
 
     // TODO where do I get SPECIFICATION_VERSION from? For now I have just hardcoded 1.3.
