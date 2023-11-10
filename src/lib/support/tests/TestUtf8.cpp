@@ -28,6 +28,22 @@ namespace {
 
 using namespace chip;
 
+#define TEST_VALID_BYTES(...)                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        uint8_t _buff[] = { __VA_ARGS__ };                                                                                         \
+        CharSpan _span(reinterpret_cast<const char *>(_buff), sizeof(_buff));                                                      \
+        NL_TEST_ASSERT(inSuite, Utf8::IsValid(_span));                                                                             \
+    } while (0)
+
+#define TEST_INVALID_BYTES(...)                                                                                                    \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        uint8_t _buff[] = { __VA_ARGS__ };                                                                                         \
+        CharSpan _span(reinterpret_cast<const char *>(_buff), sizeof(_buff));                                                      \
+        NL_TEST_ASSERT(inSuite, !Utf8::IsValid(_span));                                                                            \
+    } while (0)
+
 void TestValidStrings(nlTestSuite * inSuite, void * inContext)
 {
     NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan())); // empty span ok
@@ -80,22 +96,25 @@ void TestValidStrings(nlTestSuite * inSuite, void * inContext)
         char insideZero[] = "test\0zero";
         NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(insideZero)));
     }
-}
 
-#define TEST_INVALID_BYTES(...)                                                                                                    \
-    {                                                                                                                              \
-        uint8_t _buff[] = { __VA_ARGS__ };                                                                                         \
-        CharSpan _span(reinterpret_cast<const char *>(_buff), sizeof(_buff));                                                      \
-        NL_TEST_ASSERT(inSuite, !Utf8::IsValid(_span));                                                                            \
-    }                                                                                                                              \
-    (void) 0
+    // Test around forbidden 0xD800..0xDFFF UTF-16 surrogate pairs.
+    TEST_VALID_BYTES(0b1110'1101, 0b10'011111, 0b10'111111);
+    TEST_VALID_BYTES(0b1110'1110, 0b10'000000, 0b10'000000);
+}
 
 void TestInvalidStrings(nlTestSuite * inSuite, void * inContext)
 {
-    // overly long representation
+    // Overly long sequences
+    TEST_INVALID_BYTES(0xc0, 0b10'111111);
+    TEST_INVALID_BYTES(0xc1, 0b10'111111);
+
     TEST_INVALID_BYTES(0xe0, 0b1001'1111, 0x80); // A
     TEST_INVALID_BYTES(0xed, 0b1011'0000, 0x80); // B
     TEST_INVALID_BYTES(0xf0, 0b1000'1111, 0x80); // C
+
+    // Invalid 0xD800 .. 0xDFFF UTF-16 surrogates that should not appear in UTF-8.
+    TEST_INVALID_BYTES(0b1110'1101, 0b10'100000, 0b10'000000);
+    TEST_INVALID_BYTES(0b1110'1101, 0b10'111111, 0b10'111111);
 
     // Outside codepoint
     TEST_INVALID_BYTES(0xf4, 0x90, 0x80, 0x80); // D
@@ -162,7 +181,8 @@ const nlTest sTests[] =
 
 int TestUtf8()
 {
-    nlTestSuite theSuite = { "CHIP UTF8 tests", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "UTF8 validator tests", &sTests[0], nullptr, nullptr };
+
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
