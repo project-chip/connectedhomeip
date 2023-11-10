@@ -14,13 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
-import coloredlogs
 import json
 import logging
 import os
 import sys
 import xml.etree.ElementTree as ET
+
+import click
+import coloredlogs
 
 DATA_MODEL_PATH = 'data_model/clusters'
 
