@@ -581,7 +581,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_WRONG_ENCRYPTION_TYPE                       CHIP_CORE_ERROR(0x11)
 
-// AVAILABLE: 0x12
+/**
+ *  @def CHIP_ERROR_INVALID_UTF8
+ *
+ *  @brief
+ *    Invalid UTF8 string (contains some characters that are invalid)
+ *
+ */
+#define CHIP_ERROR_INVALID_UTF8                       CHIP_CORE_ERROR(0x12)
 
 /**
  *  @def CHIP_ERROR_INTEGRITY_CHECK_FAILED
@@ -602,7 +609,15 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_SIGNATURE                           CHIP_CORE_ERROR(0x14)
 
-// AVAILABLE: 0x15
+/**
+ *  @def CHIP_ERROR_INVALID_TLV_CHAR_STRING
+ *
+ *  @brief
+ *    Invalid TLV character string (e.g. null terminator)
+ *
+ */
+#define CHIP_ERROR_INVALID_TLV_CHAR_STRING                     CHIP_CORE_ERROR(0x15)
+
 // AVAILABLE: 0x16
 
 /**
