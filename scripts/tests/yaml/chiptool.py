@@ -19,8 +19,8 @@ import relative_importer  # isort: split # noqa: F401
 import sys
 from typing import List
 
-import click
 import chiptest
+import click
 from paths_finder import PathsFinder
 from runner import CONTEXT_SETTINGS, chiptool
 from tests_finder import TestsFinder
