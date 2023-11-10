@@ -111,16 +111,13 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
                         chip::Optional<BitMask<OptionsBitmap>> optionsOverride);
 static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, MoveModeEnum stepMode,
                         uint8_t stepSize, app::DataModel::Nullable<uint16_t> transitionTimeDs,
-                        chip::Optional<BitMask<OptionsBitmap>> optionsMask,
-                        chip::Optional<BitMask<OptionsBitmap>> optionsOverride);
+                        chip::Optional<BitMask<OptionsBitmap>> optionsMask, chip::Optional<BitMask<OptionsBitmap>> optionsOverride);
 static void stopHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                        chip::Optional<BitMask<OptionsBitmap>> optionsMask,
-                        chip::Optional<BitMask<OptionsBitmap>> optionsOverride);
+                        chip::Optional<BitMask<OptionsBitmap>> optionsMask, chip::Optional<BitMask<OptionsBitmap>> optionsOverride);
 
 static void setOnOffValue(EndpointId endpoint, bool onOff);
 static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs);
-static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId,
-                               chip::Optional<chip::BitMask<OptionsBitmap>> optionsMask,
+static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::Optional<chip::BitMask<OptionsBitmap>> optionsMask,
                                chip::Optional<chip::BitMask<OptionsBitmap>> optionsOverride);
 
 #ifdef EMBER_AF_PLUGIN_SCENES
@@ -494,8 +491,7 @@ static void setOnOffValue(EndpointId endpoint, bool onOff)
 #endif // EMBER_AF_PLUGIN_ON_OFF
 }
 
-static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId,
-                               chip::Optional<chip::BitMask<OptionsBitmap>> optionsMask,
+static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::Optional<chip::BitMask<OptionsBitmap>> optionsMask,
                                chip::Optional<chip::BitMask<OptionsBitmap>> optionsOverride)
 {
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS
@@ -608,8 +604,7 @@ Status MoveToLevel(EndpointId endpointId, const Commands::MoveToLevel::Decodable
     }
 
     return moveToLevelHandler(endpointId, Commands::MoveToLevel::Id, level, transitionTime,
-                              Optional<BitMask<OptionsBitmap>>(optionsMask),
-                              Optional<BitMask<OptionsBitmap>>(optionsOverride),
+                              Optional<BitMask<OptionsBitmap>>(optionsMask), Optional<BitMask<OptionsBitmap>>(optionsOverride),
                               INVALID_STORED_LEVEL); // Don't revert to the stored level
 }
 
@@ -644,10 +639,10 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(app::CommandHandler 
                         optionsMask.Raw(), optionsOverride.Raw());
     }
 
-    Status status = moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevelWithOnOff::Id, level, transitionTime,
-                                       Optional<BitMask<OptionsBitmap>>(optionsMask),
-                                       Optional<BitMask<OptionsBitmap>>(optionsOverride),
-                                       INVALID_STORED_LEVEL); // Don't revert to the stored level
+    Status status =
+        moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevelWithOnOff::Id, level, transitionTime,
+                           Optional<BitMask<OptionsBitmap>>(optionsMask), Optional<BitMask<OptionsBitmap>>(optionsOverride),
+                           INVALID_STORED_LEVEL); // Don't revert to the stored level
 
     commandObj->AddStatus(commandPath, status);
 
@@ -664,7 +659,8 @@ bool emberAfLevelControlClusterMoveCallback(app::CommandHandler * commandObj, co
 
     if (rate.IsNull())
     {
-        ChipLogProgress(Zcl, "%s MOVE %x null %x %x", "RX level-control:", to_underlying(moveMode), optionsMask.Raw(), optionsOverride.Raw());
+        ChipLogProgress(Zcl, "%s MOVE %x null %x %x", "RX level-control:", to_underlying(moveMode), optionsMask.Raw(),
+                        optionsOverride.Raw());
     }
     else
     {
@@ -692,8 +688,8 @@ bool emberAfLevelControlClusterMoveWithOnOffCallback(app::CommandHandler * comma
     }
     else
     {
-        ChipLogProgress(Zcl, "%s MOVE_WITH_ON_OFF %u %2x %x %x", "RX level-control:", to_underlying(moveMode), rate.Value(), optionsMask.Raw(),
-                        optionsOverride.Raw());
+        ChipLogProgress(Zcl, "%s MOVE_WITH_ON_OFF %u %2x %x %x", "RX level-control:", to_underlying(moveMode), rate.Value(),
+                        optionsMask.Raw(), optionsOverride.Raw());
     }
 
     moveHandler(commandObj, commandPath, moveMode, rate, Optional<BitMask<OptionsBitmap>>(optionsMask),
@@ -717,8 +713,8 @@ bool emberAfLevelControlClusterStepCallback(app::CommandHandler * commandObj, co
     }
     else
     {
-        ChipLogProgress(Zcl, "%s STEP %x %x %2x %x %x", "RX level-control:", to_underlying(stepMode), stepSize, transitionTime.Value(),
-                        optionsMask.Raw(), optionsOverride.Raw());
+        ChipLogProgress(Zcl, "%s STEP %x %x %2x %x %x", "RX level-control:", to_underlying(stepMode), stepSize,
+                        transitionTime.Value(), optionsMask.Raw(), optionsOverride.Raw());
     }
 
     stepHandler(commandObj, commandPath, stepMode, stepSize, transitionTime, Optional<BitMask<OptionsBitmap>>(optionsMask),
@@ -737,13 +733,13 @@ bool emberAfLevelControlClusterStepWithOnOffCallback(app::CommandHandler * comma
 
     if (transitionTime.IsNull())
     {
-        ChipLogProgress(Zcl, "%s STEP_WITH_ON_OFF %x %x null %x %x", "RX level-control:", to_underlying(stepMode), stepSize, optionsMask.Raw(),
-                        optionsOverride.Raw());
+        ChipLogProgress(Zcl, "%s STEP_WITH_ON_OFF %x %x null %x %x", "RX level-control:", to_underlying(stepMode), stepSize,
+                        optionsMask.Raw(), optionsOverride.Raw());
     }
     else
     {
-        ChipLogProgress(Zcl, "%s STEP_WITH_ON_OFF %x %x %2x %x %x", "RX level-control:", to_underlying(stepMode), stepSize, transitionTime.Value(),
-                        optionsMask.Raw(), optionsOverride.Raw());
+        ChipLogProgress(Zcl, "%s STEP_WITH_ON_OFF %x %x %2x %x %x", "RX level-control:", to_underlying(stepMode), stepSize,
+                        transitionTime.Value(), optionsMask.Raw(), optionsOverride.Raw());
     }
 
     stepHandler(commandObj, commandPath, stepMode, stepSize, transitionTime, Optional<BitMask<OptionsBitmap>>(optionsMask),
@@ -1065,8 +1061,7 @@ send_default_response:
 
 static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, MoveModeEnum stepMode,
                         uint8_t stepSize, app::DataModel::Nullable<uint16_t> transitionTimeDs,
-                        chip::Optional<BitMask<OptionsBitmap>> optionsMask,
-                        chip::Optional<BitMask<OptionsBitmap>> optionsOverride)
+                        chip::Optional<BitMask<OptionsBitmap>> optionsMask, chip::Optional<BitMask<OptionsBitmap>> optionsOverride)
 {
     EndpointId endpoint = commandPath.mEndpointId;
     CommandId commandId = commandPath.mCommandId;
@@ -1204,8 +1199,7 @@ send_default_response:
 }
 
 static void stopHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                        chip::Optional<BitMask<OptionsBitmap>> optionsMask,
-                        chip::Optional<BitMask<OptionsBitmap>> optionsOverride)
+                        chip::Optional<BitMask<OptionsBitmap>> optionsMask, chip::Optional<BitMask<OptionsBitmap>> optionsOverride)
 {
     EndpointId endpoint = commandPath.mEndpointId;
     CommandId commandId = commandPath.mCommandId;

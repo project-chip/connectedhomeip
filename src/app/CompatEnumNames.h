@@ -73,10 +73,10 @@ using TargetNavigatorStatusEnum = StatusEnum;
 } // namespace TargetNavigator
 
 namespace LevelControl {
-using MoveMode = MoveModeEnum;
-using StepMode = MoveModeEnum;
+using MoveMode            = MoveModeEnum;
+using StepMode            = MoveModeEnum;
 using LevelControlOptions = OptionsBitmap;
-}
+} // namespace LevelControl
 
 } // namespace Clusters
 } // namespace app
