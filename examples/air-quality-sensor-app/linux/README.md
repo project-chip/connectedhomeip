@@ -11,7 +11,7 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 
 <hr>
 
--   [Matter Linux Air Quality Example](#chip-linux-air-quality-example)
+-   [Matter Linux Air Quality Example](#matter-linux-air-quality-example)
     -   [Building](#building)
     -   [Commandline Arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
