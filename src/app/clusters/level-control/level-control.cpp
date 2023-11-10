@@ -106,10 +106,10 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
                                  app::DataModel::Nullable<uint16_t> transitionTimeDs,
                                  chip::Optional<BitMask<LevelControlOptions>> optionsMask,
                                  chip::Optional<BitMask<LevelControlOptions>> optionsOverride, uint16_t storedLevel);
-static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, uint8_t moveMode,
+static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, MoveModeEnum moveMode,
                         app::DataModel::Nullable<uint8_t> rate, chip::Optional<BitMask<LevelControlOptions>> optionsMask,
                         chip::Optional<BitMask<LevelControlOptions>> optionsOverride);
-static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, uint8_t stepMode,
+static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, MoveModeEnum stepMode,
                         uint8_t stepSize, app::DataModel::Nullable<uint16_t> transitionTimeDs,
                         chip::Optional<BitMask<LevelControlOptions>> optionsMask,
                         chip::Optional<BitMask<LevelControlOptions>> optionsOverride);
@@ -664,11 +664,11 @@ bool emberAfLevelControlClusterMoveCallback(app::CommandHandler * commandObj, co
 
     if (rate.IsNull())
     {
-        ChipLogProgress(Zcl, "%s MOVE %x null %x %x", "RX level-control:", moveMode, optionsMask.Raw(), optionsOverride.Raw());
+        ChipLogProgress(Zcl, "%s MOVE %x null %x %x", "RX level-control:", to_underlying(moveMode), optionsMask.Raw(), optionsOverride.Raw());
     }
     else
     {
-        ChipLogProgress(Zcl, "%s MOVE %x %u %x %x", "RX level-control:", moveMode, rate.Value(), optionsMask.Raw(),
+        ChipLogProgress(Zcl, "%s MOVE %x %u %x %x", "RX level-control:", to_underlying(moveMode), rate.Value(), optionsMask.Raw(),
                         optionsOverride.Raw());
     }
 
@@ -687,12 +687,12 @@ bool emberAfLevelControlClusterMoveWithOnOffCallback(app::CommandHandler * comma
 
     if (rate.IsNull())
     {
-        ChipLogProgress(Zcl, "%s MOVE_WITH_ON_OFF %x null %x %x", "RX level-control:", moveMode, optionsMask.Raw(),
+        ChipLogProgress(Zcl, "%s MOVE_WITH_ON_OFF %x null %x %x", "RX level-control:", to_underlying(moveMode), optionsMask.Raw(),
                         optionsOverride.Raw());
     }
     else
     {
-        ChipLogProgress(Zcl, "%s MOVE_WITH_ON_OFF %u %2x %x %x", "RX level-control:", moveMode, rate.Value(), optionsMask.Raw(),
+        ChipLogProgress(Zcl, "%s MOVE_WITH_ON_OFF %u %2x %x %x", "RX level-control:", to_underlying(moveMode), rate.Value(), optionsMask.Raw(),
                         optionsOverride.Raw());
     }
 
@@ -712,12 +712,12 @@ bool emberAfLevelControlClusterStepCallback(app::CommandHandler * commandObj, co
 
     if (transitionTime.IsNull())
     {
-        ChipLogProgress(Zcl, "%s STEP %x %x null %x %x", "RX level-control:", stepMode, stepSize, optionsMask.Raw(),
+        ChipLogProgress(Zcl, "%s STEP %x %x null %x %x", "RX level-control:", to_underlying(stepMode), stepSize, optionsMask.Raw(),
                         optionsOverride.Raw());
     }
     else
     {
-        ChipLogProgress(Zcl, "%s STEP %x %x %2x %x %x", "RX level-control:", stepMode, stepSize, transitionTime.Value(),
+        ChipLogProgress(Zcl, "%s STEP %x %x %2x %x %x", "RX level-control:", to_underlying(stepMode), stepSize, transitionTime.Value(),
                         optionsMask.Raw(), optionsOverride.Raw());
     }
 
@@ -737,12 +737,12 @@ bool emberAfLevelControlClusterStepWithOnOffCallback(app::CommandHandler * comma
 
     if (transitionTime.IsNull())
     {
-        ChipLogProgress(Zcl, "%s STEP_WITH_ON_OFF %x %x null %x %x", "RX level-control:", stepMode, stepSize, optionsMask.Raw(),
+        ChipLogProgress(Zcl, "%s STEP_WITH_ON_OFF %x %x null %x %x", "RX level-control:", to_underlying(stepMode), stepSize, optionsMask.Raw(),
                         optionsOverride.Raw());
     }
     else
     {
-        ChipLogProgress(Zcl, "%s STEP_WITH_ON_OFF %x %x %2x %x %x", "RX level-control:", stepMode, stepSize, transitionTime.Value(),
+        ChipLogProgress(Zcl, "%s STEP_WITH_ON_OFF %x %x %2x %x %x", "RX level-control:", to_underlying(stepMode), stepSize, transitionTime.Value(),
                         optionsMask.Raw(), optionsOverride.Raw());
     }
 
@@ -933,7 +933,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     return Status::Success;
 }
 
-static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, uint8_t moveMode,
+static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, MoveModeEnum moveMode,
                         app::DataModel::Nullable<uint8_t> rate, chip::Optional<BitMask<LevelControlOptions>> optionsMask,
                         chip::Optional<BitMask<LevelControlOptions>> optionsOverride)
 {
@@ -981,12 +981,12 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     // the maximum or minimum level at the specified rate.
     switch (moveMode)
     {
-    case EMBER_ZCL_MOVE_MODE_UP:
+    case MoveModeEnum::kUp:
         state->increasing  = true;
         state->moveToLevel = state->maxLevel;
         difference         = static_cast<uint8_t>(state->maxLevel - currentLevel.Value());
         break;
-    case EMBER_ZCL_MOVE_MODE_DOWN:
+    case MoveModeEnum::kDown:
         state->increasing  = false;
         state->moveToLevel = state->minLevel;
         difference         = static_cast<uint8_t>(currentLevel.Value() - state->minLevel);
@@ -1063,7 +1063,7 @@ send_default_response:
     commandObj->AddStatus(commandPath, status);
 }
 
-static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, uint8_t stepMode,
+static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, MoveModeEnum stepMode,
                         uint8_t stepSize, app::DataModel::Nullable<uint16_t> transitionTimeDs,
                         chip::Optional<BitMask<LevelControlOptions>> optionsMask,
                         chip::Optional<BitMask<LevelControlOptions>> optionsOverride)
@@ -1112,7 +1112,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     // level over the specified transition time.
     switch (stepMode)
     {
-    case EMBER_ZCL_STEP_MODE_UP:
+    case MoveModeEnum::kUp:
         state->increasing = true;
         if (state->maxLevel - currentLevel.Value() < stepSize)
         {
@@ -1124,7 +1124,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
             state->moveToLevel = static_cast<uint8_t>(currentLevel.Value() + stepSize);
         }
         break;
-    case EMBER_ZCL_STEP_MODE_DOWN:
+    case MoveModeEnum::kDown:
         state->increasing = false;
         if (currentLevel.Value() - state->minLevel < stepSize)
         {
