@@ -16,7 +16,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
-using namespace chip::app; 
+using namespace chip::app;
 using namespace chip::app::Clusters::Messages;
 using chip::Protocols::InteractionModel::Status;
 
@@ -34,10 +34,10 @@ bool emberAfMessagesClusterCancelMessagesRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Messages::Commands::CancelMessagesRequest::DecodableType & commandData)
 {
-    return true;	
+    return true;
 }
 
-void MatterMessagesPluginServerInitCallback() 
+void MatterMessagesPluginServerInitCallback()
 {
 
 }
