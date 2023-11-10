@@ -148,7 +148,7 @@ public:
     /**
      * @brief Level Control cluster
      */
-    CHIP_ERROR LevelControl_Step(TargetEndpointInfo * endpoint, chip::app::Clusters::LevelControl::StepMode stepMode,
+    CHIP_ERROR LevelControl_Step(TargetEndpointInfo * endpoint, chip::app::Clusters::LevelControl::MoveModeEnum stepMode,
                                  uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
                                  std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR LevelControl_MoveToLevel(TargetEndpointInfo * endpoint, uint8_t level, uint16_t transitionTime, uint8_t optionMask,
