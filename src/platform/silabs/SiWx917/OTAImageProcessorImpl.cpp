@@ -39,10 +39,10 @@ extern "C" {
 #define SL_BOOTLOADER_OK 0L
 #define SL_STATUS_FW_UPDATE_DONE ((sl_status_t)0x10003)
 uint8_t flag = RPS_HEADER;
-uint8_t last = 0;
-uint8_t length = 0;
-uint32_t total_size = 0;
-uint32_t count = 0;
+//uint8_t last = 0;
+//uint8_t length = 0;
+//uint32_t total_size = 0;
+//uint32_t count = 0;
 namespace chip {
 
 // Define static memebers
@@ -163,40 +163,28 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     {
         return;
     }
-    if(last == 1)
-    {
-        ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully in HandleFinalize");
-        return;
-    }
-    // Pad the remainder of the write buffer with zeros and write it to bootloader storage
     if (writeBufOffset != 0)
     {
         // Account for last bytes of the image not yet written to storage
         imageProcessor->mParams.downloadedBytes += writeBufOffset;
-        // Send RPS header which is received as first chunk
-        count = count + writeBufOffset;
-        if(count >= total_size) {
-            writeBufOffset = writeBufOffset - (count - total_size);
-            last=1;
-        }
 	    status = sl_si91x_fwup_load(writeBuffer, writeBufOffset);
 	    ChipLogProgress(SoftwareUpdate, "status: 0x%lX", status);
 
-        if (status != 0) {
+        if (status != 0)
+        {
             if (status == SL_STATUS_FW_UPDATE_DONE) {
                 ChipLogProgress(SoftwareUpdate,"M4 Firmware update complete");
-                osDelay(5000);
                 // send system reset request to reset the MCU and upgrade the m4 image
                 ChipLogProgress(SoftwareUpdate,"SoC Soft Reset initiated!");
                 sl_si91x_soc_soft_reset();
-            } else {
-            ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize for last chunk rsi_fwup() error %ld", status);
-            imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-            return;
+            }
+            else {
+                ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize for last chunk rsi_fwup() error %ld", status);
+                imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+                return;
             }
         }
     }
-
     imageProcessor->ReleaseBlock();
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully in HandleFinalize");
 }
@@ -269,39 +257,12 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
                 // Send RPS header which is received as first chunk
                 status = sl_si91x_fwup_start(writeBuffer);
                 status = sl_si91x_fwup_load(writeBuffer, kAlignmentBytes);
-                total_size = imageProcessor->mParams.totalFileBytes;
-                count = count + kAlignmentBytes;
                 flag = RPS_DATA;
             }
             else if(flag == RPS_DATA)
             {
                 // Send RPS content
-                count = count + kAlignmentBytes;
-                if(count >= total_size)
-                {
-                    length = kAlignmentBytes - (count - total_size);
-                    last = 1;
-                }
-                else
-                {
-	                length = kAlignmentBytes;
-                }
-                status = sl_si91x_fwup_load(writeBuffer, length);
-	            if (status != 0) {
-					ChipLogProgress(SoftwareUpdate, "status: 0x%lX", status);
-                    if (status == SL_STATUS_FW_UPDATE_DONE) {
-                        ChipLogProgress(SoftwareUpdate, "M4 Firmware update complete");
-                        // send system reset request to reset the MCU and upgrade the m4 image
-                        osDelay(5000);
-                        sl_si91x_soc_soft_reset();
-                    }
-                    else
-                    {
-                         ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock for middle chunk sl_si91x_fwup_load() error %ld", status);
-                         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-                         return;
-                    }
-                }
+                status = sl_si91x_fwup_load(writeBuffer, kAlignmentBytes);
             }
            imageProcessor->mParams.downloadedBytes += kAlignmentBytes;
          }

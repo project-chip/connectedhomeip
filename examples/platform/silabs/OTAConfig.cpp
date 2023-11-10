@@ -17,11 +17,10 @@
  */
 
 #include "OTAConfig.h"
+#include <app/server/Server.h>
 
 #ifndef SIWX_917
-
 #include "application_properties.h"
-#include <app/server/Server.h>
 
 // Header used for building the image GBL file
 #define APP_PROPERTIES_VERSION 1
