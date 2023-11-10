@@ -37,7 +37,4 @@ bool emberAfMessagesClusterCancelMessagesRequestCallback(
     return true;
 }
 
-void MatterMessagesPluginServerInitCallback()
-{
-
-}
+void MatterMessagesPluginServerInitCallback() {}
