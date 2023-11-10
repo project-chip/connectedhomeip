@@ -104,24 +104,24 @@ static EmberAfLevelControlState * getState(EndpointId endpoint);
 
 static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level,
                                  app::DataModel::Nullable<uint16_t> transitionTimeDs,
-                                 chip::Optional<BitMask<LevelControlOptions>> optionsMask,
-                                 chip::Optional<BitMask<LevelControlOptions>> optionsOverride, uint16_t storedLevel);
+                                 chip::Optional<BitMask<OptionsBitmap>> optionsMask,
+                                 chip::Optional<BitMask<OptionsBitmap>> optionsOverride, uint16_t storedLevel);
 static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, MoveModeEnum moveMode,
-                        app::DataModel::Nullable<uint8_t> rate, chip::Optional<BitMask<LevelControlOptions>> optionsMask,
-                        chip::Optional<BitMask<LevelControlOptions>> optionsOverride);
+                        app::DataModel::Nullable<uint8_t> rate, chip::Optional<BitMask<OptionsBitmap>> optionsMask,
+                        chip::Optional<BitMask<OptionsBitmap>> optionsOverride);
 static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, MoveModeEnum stepMode,
                         uint8_t stepSize, app::DataModel::Nullable<uint16_t> transitionTimeDs,
-                        chip::Optional<BitMask<LevelControlOptions>> optionsMask,
-                        chip::Optional<BitMask<LevelControlOptions>> optionsOverride);
+                        chip::Optional<BitMask<OptionsBitmap>> optionsMask,
+                        chip::Optional<BitMask<OptionsBitmap>> optionsOverride);
 static void stopHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                        chip::Optional<BitMask<LevelControlOptions>> optionsMask,
-                        chip::Optional<BitMask<LevelControlOptions>> optionsOverride);
+                        chip::Optional<BitMask<OptionsBitmap>> optionsMask,
+                        chip::Optional<BitMask<OptionsBitmap>> optionsOverride);
 
 static void setOnOffValue(EndpointId endpoint, bool onOff);
 static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs);
 static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId,
-                               chip::Optional<chip::BitMask<LevelControlOptions>> optionsMask,
-                               chip::Optional<chip::BitMask<LevelControlOptions>> optionsOverride);
+                               chip::Optional<chip::BitMask<OptionsBitmap>> optionsMask,
+                               chip::Optional<chip::BitMask<OptionsBitmap>> optionsOverride);
 
 #ifdef EMBER_AF_PLUGIN_SCENES
 class DefaultLevelControlSceneHandler : public scenes::DefaultSceneHandlerImpl
@@ -246,7 +246,7 @@ public:
                                                                                             : Commands::MoveToLevel::Id;
 
         status = moveToLevelHandler(endpoint, command, level, app::DataModel::MakeNullable(static_cast<uint16_t>(timeMs / 100)),
-                                    chip::Optional<BitMask<LevelControlOptions>>(), chip::Optional<BitMask<LevelControlOptions>>(),
+                                    chip::Optional<BitMask<OptionsBitmap>>(), chip::Optional<BitMask<OptionsBitmap>>(),
                                     INVALID_STORED_LEVEL);
 
         if (status != Status::Success)
@@ -351,7 +351,7 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
 
     if (emberAfContainsAttribute(endpoint, ColorControl::Id, ColorControl::Attributes::ColorTemperatureMireds::Id))
     {
-        if (options.Has(LevelControlOptions::kCoupleColorTempToLevel))
+        if (options.Has(OptionsBitmap::kCoupleColorTempToLevel))
         {
             emberAfPluginLevelControlCoupledColorTempChangeCallback(endpoint);
         }
@@ -495,8 +495,8 @@ static void setOnOffValue(EndpointId endpoint, bool onOff)
 }
 
 static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId,
-                               chip::Optional<chip::BitMask<LevelControlOptions>> optionsMask,
-                               chip::Optional<chip::BitMask<LevelControlOptions>> optionsOverride)
+                               chip::Optional<chip::BitMask<OptionsBitmap>> optionsMask,
+                               chip::Optional<chip::BitMask<OptionsBitmap>> optionsOverride)
 {
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS
     if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::Options::Id))
@@ -561,18 +561,18 @@ static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId,
         {
             // in case optionMask or optionOverride is not set, use of option
             // attribute to decide execution of the command
-            return options.Has(LevelControlOptions::kExecuteIfOff);
+            return options.Has(OptionsBitmap::kExecuteIfOff);
         }
         // ---------- The above is to distinguish if the payload is present or not
 
-        if (optionsMask.Value().Has(LevelControlOptions::kExecuteIfOff))
+        if (optionsMask.Value().Has(OptionsBitmap::kExecuteIfOff))
         {
             // Mask is present and set in the command payload, this indicates
             // use the over ride as temporary option
-            return optionsOverride.Value().Has(LevelControlOptions::kExecuteIfOff);
+            return optionsOverride.Value().Has(OptionsBitmap::kExecuteIfOff);
         }
         // if we are here - use the option bits
-        return options.Has(LevelControlOptions::kExecuteIfOff);
+        return options.Has(OptionsBitmap::kExecuteIfOff);
     }
 
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS
@@ -608,8 +608,8 @@ Status MoveToLevel(EndpointId endpointId, const Commands::MoveToLevel::Decodable
     }
 
     return moveToLevelHandler(endpointId, Commands::MoveToLevel::Id, level, transitionTime,
-                              Optional<BitMask<LevelControlOptions>>(optionsMask),
-                              Optional<BitMask<LevelControlOptions>>(optionsOverride),
+                              Optional<BitMask<OptionsBitmap>>(optionsMask),
+                              Optional<BitMask<OptionsBitmap>>(optionsOverride),
                               INVALID_STORED_LEVEL); // Don't revert to the stored level
 }
 
@@ -645,8 +645,8 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(app::CommandHandler 
     }
 
     Status status = moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevelWithOnOff::Id, level, transitionTime,
-                                       Optional<BitMask<LevelControlOptions>>(optionsMask),
-                                       Optional<BitMask<LevelControlOptions>>(optionsOverride),
+                                       Optional<BitMask<OptionsBitmap>>(optionsMask),
+                                       Optional<BitMask<OptionsBitmap>>(optionsOverride),
                                        INVALID_STORED_LEVEL); // Don't revert to the stored level
 
     commandObj->AddStatus(commandPath, status);
@@ -672,8 +672,8 @@ bool emberAfLevelControlClusterMoveCallback(app::CommandHandler * commandObj, co
                         optionsOverride.Raw());
     }
 
-    moveHandler(commandObj, commandPath, moveMode, rate, Optional<BitMask<LevelControlOptions>>(optionsMask),
-                Optional<BitMask<LevelControlOptions>>(optionsOverride));
+    moveHandler(commandObj, commandPath, moveMode, rate, Optional<BitMask<OptionsBitmap>>(optionsMask),
+                Optional<BitMask<OptionsBitmap>>(optionsOverride));
     return true;
 }
 
@@ -696,8 +696,8 @@ bool emberAfLevelControlClusterMoveWithOnOffCallback(app::CommandHandler * comma
                         optionsOverride.Raw());
     }
 
-    moveHandler(commandObj, commandPath, moveMode, rate, Optional<BitMask<LevelControlOptions>>(optionsMask),
-                Optional<BitMask<LevelControlOptions>>(optionsOverride));
+    moveHandler(commandObj, commandPath, moveMode, rate, Optional<BitMask<OptionsBitmap>>(optionsMask),
+                Optional<BitMask<OptionsBitmap>>(optionsOverride));
     return true;
 }
 
@@ -721,8 +721,8 @@ bool emberAfLevelControlClusterStepCallback(app::CommandHandler * commandObj, co
                         optionsMask.Raw(), optionsOverride.Raw());
     }
 
-    stepHandler(commandObj, commandPath, stepMode, stepSize, transitionTime, Optional<BitMask<LevelControlOptions>>(optionsMask),
-                Optional<BitMask<LevelControlOptions>>(optionsOverride));
+    stepHandler(commandObj, commandPath, stepMode, stepSize, transitionTime, Optional<BitMask<OptionsBitmap>>(optionsMask),
+                Optional<BitMask<OptionsBitmap>>(optionsOverride));
     return true;
 }
 
@@ -746,8 +746,8 @@ bool emberAfLevelControlClusterStepWithOnOffCallback(app::CommandHandler * comma
                         optionsMask.Raw(), optionsOverride.Raw());
     }
 
-    stepHandler(commandObj, commandPath, stepMode, stepSize, transitionTime, Optional<BitMask<LevelControlOptions>>(optionsMask),
-                Optional<BitMask<LevelControlOptions>>(optionsOverride));
+    stepHandler(commandObj, commandPath, stepMode, stepSize, transitionTime, Optional<BitMask<OptionsBitmap>>(optionsMask),
+                Optional<BitMask<OptionsBitmap>>(optionsOverride));
     return true;
 }
 
@@ -758,8 +758,8 @@ bool emberAfLevelControlClusterStopCallback(app::CommandHandler * commandObj, co
     auto & optionsOverride = commandData.optionsOverride;
 
     ChipLogProgress(Zcl, "%s STOP", "RX level-control:");
-    stopHandler(commandObj, commandPath, Optional<BitMask<LevelControlOptions>>(optionsMask),
-                Optional<BitMask<LevelControlOptions>>(optionsOverride));
+    stopHandler(commandObj, commandPath, Optional<BitMask<OptionsBitmap>>(optionsMask),
+                Optional<BitMask<OptionsBitmap>>(optionsOverride));
     return true;
 }
 
@@ -769,15 +769,15 @@ bool emberAfLevelControlClusterStopWithOnOffCallback(app::CommandHandler * comma
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
     ChipLogProgress(Zcl, "%s STOP_WITH_ON_OFF", "RX level-control:");
-    stopHandler(commandObj, commandPath, Optional<BitMask<LevelControlOptions>>(optionsMask),
-                Optional<BitMask<LevelControlOptions>>(optionsOverride));
+    stopHandler(commandObj, commandPath, Optional<BitMask<OptionsBitmap>>(optionsMask),
+                Optional<BitMask<OptionsBitmap>>(optionsOverride));
     return true;
 }
 
 static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level,
                                  app::DataModel::Nullable<uint16_t> transitionTimeDs,
-                                 chip::Optional<BitMask<LevelControlOptions>> optionsMask,
-                                 chip::Optional<BitMask<LevelControlOptions>> optionsOverride, uint16_t storedLevel)
+                                 chip::Optional<BitMask<OptionsBitmap>> optionsMask,
+                                 chip::Optional<BitMask<OptionsBitmap>> optionsOverride, uint16_t storedLevel)
 {
     EmberAfLevelControlState * state = getState(endpoint);
     app::DataModel::Nullable<uint8_t> currentLevel;
@@ -934,8 +934,8 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
 }
 
 static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, MoveModeEnum moveMode,
-                        app::DataModel::Nullable<uint8_t> rate, chip::Optional<BitMask<LevelControlOptions>> optionsMask,
-                        chip::Optional<BitMask<LevelControlOptions>> optionsOverride)
+                        app::DataModel::Nullable<uint8_t> rate, chip::Optional<BitMask<OptionsBitmap>> optionsMask,
+                        chip::Optional<BitMask<OptionsBitmap>> optionsOverride)
 {
     EndpointId endpoint = commandPath.mEndpointId;
     CommandId commandId = commandPath.mCommandId;
@@ -1065,8 +1065,8 @@ send_default_response:
 
 static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, MoveModeEnum stepMode,
                         uint8_t stepSize, app::DataModel::Nullable<uint16_t> transitionTimeDs,
-                        chip::Optional<BitMask<LevelControlOptions>> optionsMask,
-                        chip::Optional<BitMask<LevelControlOptions>> optionsOverride)
+                        chip::Optional<BitMask<OptionsBitmap>> optionsMask,
+                        chip::Optional<BitMask<OptionsBitmap>> optionsOverride)
 {
     EndpointId endpoint = commandPath.mEndpointId;
     CommandId commandId = commandPath.mCommandId;
@@ -1204,8 +1204,8 @@ send_default_response:
 }
 
 static void stopHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                        chip::Optional<BitMask<LevelControlOptions>> optionsMask,
-                        chip::Optional<BitMask<LevelControlOptions>> optionsOverride)
+                        chip::Optional<BitMask<OptionsBitmap>> optionsMask,
+                        chip::Optional<BitMask<OptionsBitmap>> optionsOverride)
 {
     EndpointId endpoint = commandPath.mEndpointId;
     CommandId commandId = commandPath.mCommandId;
