@@ -31,6 +31,7 @@
         "DISHWASHER_MODE_CLUSTER": [],
         "MICROWAVE_OVEN_MODE_CLUSTER": [],
         "DOOR_LOCK_CLUSTER": [],
+        "DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER": [],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "FAN_CONTROL_CLUSTER": [],
@@ -156,6 +157,7 @@
         "DISHWASHER_MODE_CLUSTER": ["mode-base-server"],
         "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
+        "DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER": ["drlc-server"],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [
             "ethernet-network-diagnostics-server"
