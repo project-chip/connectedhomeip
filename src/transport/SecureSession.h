@@ -177,7 +177,6 @@ public:
 
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
-    void SetSupportsTcp(bool supportsTcp) { mSupportsTcp = supportsTcp; }
 
     Type GetSecureSessionType() const { return mSecureSessionType; }
     bool IsCASESession() const { return GetSecureSessionType() == Type::kCASE; }
@@ -306,9 +305,6 @@ private:
     uint16_t mPeerSessionId = 0;
 
     PeerAddress mPeerAddress;
-
-    /// Indicates whether the remote peer supports TCP transport
-    bool mSupportsTcp = false;
 
     /// Timestamp of last tx or rx. @see SessionTimestamp in the spec
     System::Clock::Timestamp mLastActivityTime = System::SystemClock().GetMonotonicTimestamp();
