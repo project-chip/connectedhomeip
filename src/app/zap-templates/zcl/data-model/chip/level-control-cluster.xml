@@ -30,12 +30,6 @@ limitations under the License.
     <item name="Down" value="0x1"/>
   </enum>
 
-  <enum name="StepMode" type="enum8">
-    <cluster code="0x0008"/>
-    <item name="Up" value="0x0"/>
-    <item name="Down" value="0x1"/>
-  </enum>
-
   <bitmap name="OptionsBitmap" type="bitmap8">
     <cluster code="0x0008"/>
     <field name="ExecuteIfOff" mask="0x1"/>
@@ -98,7 +92,7 @@ limitations under the License.
       <description>
         Command description for Step
       </description>
-      <arg name="StepMode" type="StepMode"/>
+      <arg name="StepMode" type="MoveModeEnum"/>
       <arg name="StepSize" type="int8u"/>
       <arg name="TransitionTime" type="int16u" isNullable="true"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
@@ -137,7 +131,7 @@ limitations under the License.
       <description>
         Command description for StepWithOnOff
       </description>
-      <arg name="StepMode" type="StepMode"/>
+      <arg name="StepMode" type="MoveModeEnum"/>
       <arg name="StepSize" type="int8u"/>
       <arg name="TransitionTime" type="int16u" isNullable="true"/>
       <arg name="OptionsMask" type="OptionsBitmap"/>
