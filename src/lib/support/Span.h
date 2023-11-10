@@ -62,8 +62,17 @@ public:
     constexpr explicit Span(U (&databuf)[N]) : mDataBuf(databuf), mDataLen(N)
     {}
 
+    // Creates a (potentially mutable) Span view of an std::array
     template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr Span(std::array<U, N> & arr) : mDataBuf(arr.data()), mDataLen(N)
+    {}
+
+    template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
+    constexpr Span(std::array<U, N> && arr) = delete; // would be a view of an rvalue
+
+    // Creates a Span view of an std::array
+    template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<const U *, T *>::value>>
+    constexpr Span(const std::array<U, N> & arr) : mDataBuf(arr.data()), mDataLen(N)
     {}
 
     template <size_t N>
@@ -265,8 +274,17 @@ public:
         static_assert(M >= N, "Passed-in buffer too small for FixedSpan");
     }
 
+    // Creates a (potentially mutable) FixedSpan view of an std::array
     template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr FixedSpan(std::array<U, N> & arr) : mDataBuf(arr.data())
+    {}
+
+    template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
+    constexpr FixedSpan(std::array<U, N> && arr) = delete; // would be a view of an rvalue
+
+    // Creates a FixedSpan view of an std::array
+    template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<const U *, T *>::value>>
+    constexpr FixedSpan(const std::array<U, N> & arr) : mDataBuf(arr.data())
     {}
 
     // Allow implicit construction from a FixedSpan of sufficient size over a
