@@ -79,7 +79,7 @@ static constexpr size_t kMaxTcpAppMessageLen = kMaxApplicationTcpPayloadAndMICSi
 
 static constexpr uint16_t kMsgUnicastSessionIdUnsecured = 0x0000;
 
-#if CHIP_CONFIG_TCP_SUPPORT
+#if CHIP_CONFIG_TCP_SUPPORT_SERVER || CHIP_CONFIG_TCP_SUPPORT_CLIENT
 static constexpr size_t kMaxAppMessageLen = detail::kMaxTcpAppMessageLen;
 #else
 static constexpr size_t kMaxAppMessageLen = detail::kMaxUdpAppMessageLen;
