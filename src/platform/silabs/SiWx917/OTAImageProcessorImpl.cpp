@@ -39,10 +39,7 @@ extern "C" {
 #define SL_BOOTLOADER_OK 0L
 #define SL_STATUS_FW_UPDATE_DONE ((sl_status_t)0x10003)
 uint8_t flag = RPS_HEADER;
-//uint8_t last = 0;
-//uint8_t length = 0;
-//uint32_t total_size = 0;
-//uint32_t count = 0;
+
 namespace chip {
 
 // Define static memebers
