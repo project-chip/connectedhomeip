@@ -60,8 +60,7 @@ void PairingSessionEncodeDecodeMRPParams(nlTestSuite * inSuite, void * inContext
 {
     TestPairingSession session;
 
-    Optional<ReliableMessageProtocolConfig> config =
-        MakeOptional(ReliableMessageProtocolConfig(Milliseconds32(100), Milliseconds32(200), Milliseconds16(4000)));
+    ReliableMessageProtocolConfig config(Milliseconds32(100), Milliseconds32(200), Milliseconds16(4000));
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(64, 0);
     System::PacketBufferTLVWriter writer;
@@ -71,7 +70,8 @@ void PairingSessionEncodeDecodeMRPParams(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite,
                    writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, PairingSession::EncodeSessionParameters(TLV::ContextTag(1), config, writer) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   PairingSession::EncodeSessionParameters(TLV::ContextTag(1), MakeOptional(config), writer) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, writer.EndContainer(outerContainerType) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, writer.Finalize(&buf) == CHIP_NO_ERROR);
