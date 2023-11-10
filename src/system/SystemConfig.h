@@ -359,6 +359,16 @@
 #endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE */
 
 /**
+ *  @def CHIP_CONFIG_TCP_SUPPORT
+ *
+ *  @brief
+ *      Indicates whether the current node supports TCP
+ */
+#ifndef CHIP_CONFIG_TCP_SUPPORT
+#define CHIP_CONFIG_TCP_SUPPORT 0
+#endif /* CHIP_CONFIG_TCP_SUPPORT */
+
+/**
  *  @def CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
  *
  *  @brief
