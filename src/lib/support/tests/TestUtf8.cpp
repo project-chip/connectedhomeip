@@ -97,7 +97,7 @@ void TestValidStrings(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(insideZero)));
     }
 
-    // Test around forbidden 0xD800..0xDFF UTF-16 surrogate pairs.
+    // Test around forbidden 0xD800..0xDFFF UTF-16 surrogate pairs.
     TEST_VALID_BYTES(0b1110'1101, 0b10'011111, 0b10'111111);
     TEST_VALID_BYTES(0b1110'1110, 0b10'000000, 0b10'000000);
 }
