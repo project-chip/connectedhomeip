@@ -206,9 +206,7 @@
             "UserActiveModeTriggerHint",
             "UserActiveModeTriggerInstruction"
         ],
-        "Messages": [
-            "Messages"
-        ],
+        "Messages": ["Messages"],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
