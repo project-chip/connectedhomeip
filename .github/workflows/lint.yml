@@ -190,3 +190,10 @@ jobs:
               if: always()
               run: |
                   git grep -n 'SuccessOrExit([^=)]*(' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            - name: Check for errors in zapfiles
+              if: always()
+              run: |
+                  for zap_file in $(find . -name '*.zap'); do
+                      ./scripts/run_in_build_env.sh "./scripts/helpers/check_zap_against_xml.py $zap_file" --matter-root . || exit 1
+                  done
