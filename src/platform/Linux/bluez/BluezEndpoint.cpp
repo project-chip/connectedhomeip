@@ -81,217 +81,6 @@ constexpr uint16_t kMaxConnectRetries = 4;
 
 static BluezConnection * GetBluezConnectionViaDevice(BluezEndpoint * apEndpoint);
 
-static gboolean BluezAdvertisingRelease(BluezLEAdvertisement1 * aAdv, GDBusMethodInvocation * aInvocation, gpointer apClosure)
-{
-    bool isSuccess           = false;
-    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
-    VerifyOrExit(aAdv != nullptr, ChipLogError(DeviceLayer, "BluezLEAdvertisement1 is NULL in %s", __func__));
-    ChipLogDetail(DeviceLayer, "Release adv object in %s", __func__);
-
-    g_dbus_object_manager_server_unexport(endpoint->mpRoot, endpoint->mpAdvPath);
-    g_object_unref(endpoint->mpAdv);
-    endpoint->mpAdv          = nullptr;
-    endpoint->mIsAdvertising = false;
-    isSuccess                = true;
-exit:
-
-    return isSuccess ? TRUE : FALSE;
-}
-
-static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint)
-{
-    BluezLEAdvertisement1 * adv = nullptr;
-    BluezObjectSkeleton * object;
-    GVariant * serviceData;
-    GVariant * serviceUUID;
-    GAutoPtr<char> localName;
-    GVariantBuilder serviceDataBuilder;
-    GVariantBuilder serviceUUIDsBuilder;
-    GAutoPtr<char> debugStr;
-
-    VerifyOrExit(apEndpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
-    if (apEndpoint->mpAdvPath == nullptr)
-        apEndpoint->mpAdvPath = g_strdup_printf("%s/advertising", apEndpoint->mpRootPath);
-
-    ChipLogDetail(DeviceLayer, "Create adv object at %s", apEndpoint->mpAdvPath);
-    object = bluez_object_skeleton_new(apEndpoint->mpAdvPath);
-
-    adv = bluez_leadvertisement1_skeleton_new();
-
-    g_variant_builder_init(&serviceDataBuilder, G_VARIANT_TYPE("a{sv}"));
-    g_variant_builder_init(&serviceUUIDsBuilder, G_VARIANT_TYPE("as"));
-
-    g_variant_builder_add(&serviceDataBuilder, "{sv}", apEndpoint->mpAdvertisingUUID,
-                          g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &apEndpoint->mDeviceIdInfo,
-                                                    sizeof(apEndpoint->mDeviceIdInfo), sizeof(uint8_t)));
-    g_variant_builder_add(&serviceUUIDsBuilder, "s", apEndpoint->mpAdvertisingUUID);
-
-    if (apEndpoint->mpAdapterName != nullptr)
-        localName = GAutoPtr<char>(g_strdup_printf("%s", apEndpoint->mpAdapterName));
-    else
-        localName = GAutoPtr<char>(g_strdup_printf("%s%04x", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, getpid() & 0xffff));
-
-    serviceData = g_variant_builder_end(&serviceDataBuilder);
-    serviceUUID = g_variant_builder_end(&serviceUUIDsBuilder);
-
-    debugStr = GAutoPtr<char>(g_variant_print(serviceData, TRUE));
-    ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(debugStr.get()));
-
-    bluez_leadvertisement1_set_type_(adv, (apEndpoint->mType & BLUEZ_ADV_TYPE_CONNECTABLE) ? "peripheral" : "broadcast");
-    // empty manufacturer data
-    // empty solicit UUIDs
-    bluez_leadvertisement1_set_service_data(adv, serviceData);
-    // empty data
-
-    // Setting "Discoverable" to False on the adapter and to True on the advertisement convinces
-    // Bluez to set "BR/EDR Not Supported" flag. Bluez doesn't provide API to do that explicitly
-    // and the flag is necessary to force using LE transport.
-    bluez_leadvertisement1_set_discoverable(adv, (apEndpoint->mType & BLUEZ_ADV_TYPE_SCANNABLE) ? TRUE : FALSE);
-    if (apEndpoint->mType & BLUEZ_ADV_TYPE_SCANNABLE)
-        bluez_leadvertisement1_set_discoverable_timeout(adv, UINT16_MAX);
-
-    // advertising name corresponding to the PID and object path, for debug purposes
-    bluez_leadvertisement1_set_local_name(adv, localName.get());
-    bluez_leadvertisement1_set_service_uuids(adv, serviceUUID);
-
-    // 0xffff means no appearance
-    bluez_leadvertisement1_set_appearance(adv, 0xffff);
-
-    bluez_leadvertisement1_set_duration(adv, apEndpoint->mDuration);
-    // empty duration, we don't have a clear notion what it would mean to timeslice between toble and anyone else
-    bluez_leadvertisement1_set_timeout(adv, 0);
-    // empty secondary channel for now
-
-    bluez_object_skeleton_set_leadvertisement1(object, adv);
-    g_signal_connect(adv, "handle-release", G_CALLBACK(BluezAdvertisingRelease), apEndpoint);
-
-    g_dbus_object_manager_server_export(apEndpoint->mpRoot, G_DBUS_OBJECT_SKELETON(object));
-    g_object_unref(object);
-
-    BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(true, nullptr);
-
-exit:
-    return adv;
-}
-
-static void BluezAdvStartDone(GObject * aObject, GAsyncResult * aResult, gpointer apClosure)
-{
-    BluezLEAdvertisingManager1 * advMgr = BLUEZ_LEADVERTISING_MANAGER1(aObject);
-    GAutoPtr<GError> error;
-    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
-    gboolean success         = FALSE;
-
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
-
-    success =
-        bluez_leadvertising_manager1_call_register_advertisement_finish(advMgr, aResult, &MakeUniquePointerReceiver(error).Get());
-    if (success == FALSE)
-    {
-        g_dbus_object_manager_server_unexport(endpoint->mpRoot, endpoint->mpAdvPath);
-    }
-    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: RegisterAdvertisement : %s", error->message));
-
-    endpoint->mIsAdvertising = true;
-
-    ChipLogDetail(DeviceLayer, "RegisterAdvertisement complete");
-
-exit:
-    BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(success == TRUE, nullptr);
-}
-
-static void BluezAdvStopDone(GObject * aObject, GAsyncResult * aResult, gpointer apClosure)
-{
-    BluezLEAdvertisingManager1 * advMgr = BLUEZ_LEADVERTISING_MANAGER1(aObject);
-    BluezEndpoint * endpoint            = static_cast<BluezEndpoint *>(apClosure);
-    GAutoPtr<GError> error;
-    gboolean success = FALSE;
-
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
-
-    success =
-        bluez_leadvertising_manager1_call_unregister_advertisement_finish(advMgr, aResult, &MakeUniquePointerReceiver(error).Get());
-
-    if (success == FALSE)
-    {
-        g_dbus_object_manager_server_unexport(endpoint->mpRoot, endpoint->mpAdvPath);
-    }
-    else
-    {
-        endpoint->mIsAdvertising = false;
-    }
-
-    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: UnregisterAdvertisement : %s", error->message));
-
-    ChipLogDetail(DeviceLayer, "UnregisterAdvertisement complete");
-
-exit:
-    BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(success == TRUE, nullptr);
-}
-
-static CHIP_ERROR BluezAdvSetup(BluezEndpoint * endpoint)
-{
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
-    VerifyOrExit(endpoint->mIsAdvertising == FALSE, ChipLogError(DeviceLayer, "FAIL: Advertising already enabled in %s", __func__));
-    VerifyOrExit(endpoint->mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL endpoint->mpAdapter in %s", __func__));
-
-    endpoint->mpAdv = BluezAdvertisingCreate(endpoint);
-    VerifyOrExit(endpoint->mpAdv != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adv in %s", __func__));
-
-exit:
-    return CHIP_NO_ERROR;
-}
-
-static CHIP_ERROR BluezAdvStart(BluezEndpoint * endpoint)
-{
-    GDBusObject * adapter;
-    BluezLEAdvertisingManager1 * advMgr = nullptr;
-    GVariantBuilder optionsBuilder;
-    GVariant * options;
-
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
-    VerifyOrExit(!endpoint->mIsAdvertising,
-                 ChipLogError(DeviceLayer, "FAIL: Advertising has already been enabled in %s", __func__));
-    VerifyOrExit(endpoint->mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL endpoint->mpAdapter in %s", __func__));
-
-    adapter = g_dbus_interface_get_object(G_DBUS_INTERFACE(endpoint->mpAdapter));
-    VerifyOrExit(adapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapter in %s", __func__));
-
-    advMgr = bluez_object_get_leadvertising_manager1(BLUEZ_OBJECT(adapter));
-    VerifyOrExit(advMgr != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
-
-    g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
-    options = g_variant_builder_end(&optionsBuilder);
-
-    bluez_leadvertising_manager1_call_register_advertisement(advMgr, endpoint->mpAdvPath, options, nullptr, BluezAdvStartDone,
-                                                             endpoint);
-
-exit:
-    return CHIP_NO_ERROR;
-}
-
-static CHIP_ERROR BluezAdvStop(BluezEndpoint * endpoint)
-{
-    GDBusObject * adapter;
-    BluezLEAdvertisingManager1 * advMgr = nullptr;
-
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
-    VerifyOrExit(endpoint->mIsAdvertising,
-                 ChipLogError(DeviceLayer, "FAIL: Advertising has already been disabled in %s", __func__));
-    VerifyOrExit(endpoint->mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL endpoint->mpAdapter in %s", __func__));
-
-    adapter = g_dbus_interface_get_object(G_DBUS_INTERFACE(endpoint->mpAdapter));
-    VerifyOrExit(adapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapter in %s", __func__));
-
-    advMgr = bluez_object_get_leadvertising_manager1(BLUEZ_OBJECT(adapter));
-    VerifyOrExit(advMgr != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
-
-    bluez_leadvertising_manager1_call_unregister_advertisement(advMgr, endpoint->mpAdvPath, nullptr, BluezAdvStopDone, endpoint);
-
-exit:
-    return CHIP_NO_ERROR;
-}
-
 static gboolean BluezCharacteristicReadValue(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
                                              GVariant * aOptions)
 {
@@ -719,7 +508,6 @@ static void EndpointCleanup(BluezEndpoint * apEndpoint)
         g_free(apEndpoint->mpAdapterName);
         g_free(apEndpoint->mpAdapterAddr);
         g_free(apEndpoint->mpRootPath);
-        g_free(apEndpoint->mpAdvPath);
         g_free(apEndpoint->mpServicePath);
         if (apEndpoint->mpObjMgr != nullptr)
             g_object_unref(apEndpoint->mpObjMgr);
@@ -737,11 +525,8 @@ static void EndpointCleanup(BluezEndpoint * apEndpoint)
             g_object_unref(apEndpoint->mpC2);
         if (apEndpoint->mpC3 != nullptr)
             g_object_unref(apEndpoint->mpC3);
-        if (apEndpoint->mpAdv != nullptr)
-            g_object_unref(apEndpoint->mpAdv);
         if (apEndpoint->mpConnMap != nullptr)
             g_hash_table_destroy(apEndpoint->mpConnMap);
-        g_free(apEndpoint->mpAdvertisingUUID);
         g_free(apEndpoint->mpPeerDevicePath);
         if (apEndpoint->mpConnectCancellable != nullptr)
             g_object_unref(apEndpoint->mpConnectCancellable);
@@ -897,30 +682,6 @@ static CHIP_ERROR StartupEndpointBindings(BluezEndpoint * endpoint)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR StartBluezAdv(BluezEndpoint * apEndpoint)
-{
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(BluezAdvStart, apEndpoint);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(Ble, "Failed to schedule BluezAdvStart() on CHIPoBluez thread"));
-    return err;
-}
-
-CHIP_ERROR StopBluezAdv(BluezEndpoint * apEndpoint)
-{
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(BluezAdvStop, apEndpoint);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(Ble, "Failed to schedule BluezAdvStop() on CHIPoBluez thread"));
-    return err;
-}
-
-CHIP_ERROR BluezAdvertisementSetup(BluezEndpoint * apEndpoint)
-{
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(BluezAdvSetup, apEndpoint);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(Ble, "Failed to schedule BluezAdvSetup() on CHIPoBluez thread"));
-    return err;
-}
-
 CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint)
 {
     CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(BluezPeripheralRegisterApp, apEndpoint);
@@ -929,37 +690,7 @@ CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint)
     return err;
 }
 
-static CHIP_ERROR ConfigureBluezAdv(const BLEAdvConfig & aBleAdvConfig, BluezEndpoint * apEndpoint)
-{
-    const char * msg = nullptr;
-    CHIP_ERROR err   = CHIP_NO_ERROR;
-    VerifyOrExit(aBleAdvConfig.mpBleName != nullptr, msg = "FAIL: BLE name is NULL");
-    VerifyOrExit(aBleAdvConfig.mpAdvertisingUUID != nullptr, msg = "FAIL: BLE mpAdvertisingUUID is NULL");
-
-    apEndpoint->mpAdapterName     = g_strdup(aBleAdvConfig.mpBleName);
-    apEndpoint->mpAdvertisingUUID = g_strdup(aBleAdvConfig.mpAdvertisingUUID);
-    apEndpoint->mAdapterId        = aBleAdvConfig.mAdapterId;
-    apEndpoint->mType             = aBleAdvConfig.mType;
-    apEndpoint->mDuration         = aBleAdvConfig.mDuration;
-    apEndpoint->mDuration         = aBleAdvConfig.mDuration;
-
-    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(apEndpoint->mDeviceIdInfo);
-    SuccessOrExit(err);
-
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    apEndpoint->mDeviceIdInfo.SetAdditionalDataFlag(true);
-#endif
-
-exit:
-    if (nullptr != msg)
-    {
-        ChipLogDetail(DeviceLayer, "%s in %s", msg, __func__);
-        err = CHIP_ERROR_INCORRECT_STATE;
-    }
-    return err;
-}
-
-CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const BLEAdvConfig & aBleAdvConfig,
+CHIP_ERROR InitBluezBleLayer(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr, const char * apBleName,
                              BluezEndpoint *& apEndpoint)
 {
     BluezEndpoint * endpoint = g_new0(BluezEndpoint, 1);
@@ -969,16 +700,15 @@ CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const BLEA
         endpoint->mpAdapterAddr = g_strdup(apBleAddr);
 
     endpoint->mpConnMap  = g_hash_table_new(g_str_hash, g_str_equal);
+    endpoint->mAdapterId = aAdapterId;
     endpoint->mIsCentral = aIsCentral;
 
     if (!aIsCentral)
     {
-        err = ConfigureBluezAdv(aBleAdvConfig, endpoint);
-        SuccessOrExit(err);
+        endpoint->mpAdapterName = g_strdup(apBleName);
     }
     else
     {
-        endpoint->mAdapterId           = aBleAdvConfig.mAdapterId;
         endpoint->mpConnectCancellable = g_cancellable_new();
     }
 
