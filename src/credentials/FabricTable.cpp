@@ -782,7 +782,7 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::
     FabricInfo::InitParams newFabricInfo;
     FabricInfo * fabricEntry    = nullptr;
     FabricId fabricIdToValidate = kUndefinedFabricId;
-    CharSpan fabricLabel("");
+    CharSpan fabricLabel;
 
     if (isAddition)
     {
