@@ -72,6 +72,12 @@ namespace TargetNavigator {
 using TargetNavigatorStatusEnum = StatusEnum;
 } // namespace TargetNavigator
 
+namespace LevelControl {
+using MoveMode = MoveModeEnum;
+using StepMode = MoveModeEnum;
+using LevelControlOptions = OptionsBitmap;
+}
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip
