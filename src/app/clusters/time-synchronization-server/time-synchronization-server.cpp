@@ -551,7 +551,7 @@ void TimeSynchronizationServer::InitTimeZone()
     for (auto & tzStore : mTimeZoneObj.timeZoneList)
     {
         memset(tzStore.name, 0, sizeof(tzStore.name));
-        tzStore.timeZone = { .offset = 0, .validAt = 0, .name = MakeOptional(CharSpan(tzStore.name, sizeof(tzStore.name))) };
+        tzStore.timeZone = { .offset = 0, .validAt = 0, .name = MakeOptional(CharSpan(tzStore.name, 0)) };
     }
 }
 

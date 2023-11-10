@@ -27,8 +27,9 @@ using namespace chip::app::Clusters::TemperatureControl;
 using chip::Protocols::InteractionModel::Status;
 
 // TODO: Configure your options for each endpoint
-CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { CharSpan("Hot", 3), CharSpan("Warm", 4),
-                                                                              CharSpan("Cold", 4) };
+CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { CharSpan::fromCharString("Hot"),
+                                                                              CharSpan::fromCharString("Warm"),
+                                                                              CharSpan::fromCharString("Cold") };
 
 const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
     [EMBER_AF_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
