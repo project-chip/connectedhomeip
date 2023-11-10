@@ -588,7 +588,7 @@ using CHIP_ERROR = ::chip::ChipError;
  *    Invalid UTF8 string (contains some characters that are invalid)
  *
  */
-#define CHIP_ERROR_INVALID_UTF8                       CHIP_CORE_ERROR(0x12)
+#define CHIP_ERROR_INVALID_UTF8                                CHIP_CORE_ERROR(0x12)
 
 /**
  *  @def CHIP_ERROR_INTEGRITY_CHECK_FAILED
