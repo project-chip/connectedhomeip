@@ -100,11 +100,6 @@ uint8_t MakeU8FromAsciiDecimal(const ByteSpan & val)
     return CanCastTo<uint8_t>(num) ? static_cast<uint8_t>(num) : 0;
 }
 
-bool MakeBoolFromAsciiDecimal(const ByteSpan & val)
-{
-    return val.size() == 1 && static_cast<char>(*val.data()) == '1';
-}
-
 Optional<bool> MakeOptionalBoolFromAsciiDecimal(const ByteSpan & val)
 {
     char character = static_cast<char>(*val.data());
@@ -268,9 +263,12 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonRes
     case TxtFieldKey::kSessionActiveThreshold:
         nodeData.mrpRetryActiveThreshold = Internal::GetRetryActiveThreshold(value);
         break;
-    case TxtFieldKey::kTcpSupported:
-        nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
+    case TxtFieldKey::kTcpSupported: {
+        uint8_t support = Internal::MakeU8FromAsciiDecimal(value);
+        nodeData.supportsTcpClient = (support >> 1 & 0x01) == 0x01;
+        nodeData.supportsTcpServer = (support >> 2 & 0x01) == 0x01;
         break;
+    }
     case TxtFieldKey::kLongIdleTimeICD:
         nodeData.isICDOperatingAsLIT = Internal::MakeOptionalBoolFromAsciiDecimal(value);
         break;

@@ -54,7 +54,8 @@ public:
         result.address.ToString(addr_string);
 
         streamer_printf(streamer_get(), "Resolve completed: %s\r\n", addr_string);
-        streamer_printf(streamer_get(), "   Supports TCP:                  %s\r\n", result.supportsTcp ? "YES" : "NO");
+        streamer_printf(streamer_get(), "   Supports Client TCP:  %s\r\n", result.supportsTcpClient ? "YES" : "NO");
+        streamer_printf(streamer_get(), "   Supports Server TCP:  %s\r\n", result.supportsTcpServer ? "YES" : "NO");
         streamer_printf(streamer_get(), "   MRP IDLE retransmit timeout:   %u ms\r\n",
                         result.mrpRemoteConfig.mIdleRetransTimeout.count());
         streamer_printf(streamer_get(), "   MRP ACTIVE retransmit timeout: %u ms\r\n",
@@ -123,7 +124,8 @@ public:
             streamer_printf(streamer_get(), "   MRP retry active threshold time: %" PRIu32 "ms\r\n",
                             nodeData.resolutionData.GetMrpRetryActiveThreshold().Value());
         }
-        streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.resolutionData.supportsTcp ? "yes" : "no");
+        streamer_printf(streamer_get(), "   Supports Client TCP: %s\r\n", nodeData.resolutionData.supportsTcpClient ? "yes" : "no");
+        streamer_printf(streamer_get(), "   Supports Server TCP: %s\r\n", nodeData.resolutionData.supportsTcpServer ? "yes" : "no");
 
         if (nodeData.resolutionData.isICDOperatingAsLIT.HasValue())
         {

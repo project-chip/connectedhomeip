@@ -132,7 +132,8 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
         {
             jsonVal["mrpRetryActiveThreshold"] = dnsSdInfo->resolutionData.GetMrpRetryActiveThreshold().Value().count();
         }
-        jsonVal["supportsTcp"] = dnsSdInfo->resolutionData.supportsTcp;
+        jsonVal["supportsTcpClient"] = dnsSdInfo->resolutionData.supportsTcpClient;
+        jsonVal["supportsTcpServer"] = dnsSdInfo->resolutionData.supportsTcpServer;
         {
             Json::Value addresses;
             for (unsigned j = 0; j < dnsSdInfo->resolutionData.numIPs; ++j)
@@ -203,7 +204,8 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
         {
             ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
         }
-        ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->resolutionData.supportsTcp);
+        ChipLogProgress(Discovery, "\tSupports Cilent TCP\t\t%d", dnsSdInfo->resolutionData.supportsTcpClient);
+        ChipLogProgress(Discovery, "\tSupports Server TCP\t\t%d", dnsSdInfo->resolutionData.supportsTcpServer);
         if (dnsSdInfo->resolutionData.isICDOperatingAsLIT.HasValue())
         {
             ChipLogProgress(Discovery, "\tICD is operating as a\t%s",

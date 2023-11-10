@@ -47,7 +47,8 @@ struct CommonResolutionData
 
     uint16_t port                         = 0;
     char hostName[kHostNameMaxLength + 1] = {};
-    bool supportsTcp                      = false;
+    bool supportsTcpClient                = false;
+    bool supportsTcpServer                = false;
     Optional<bool> isICDOperatingAsLIT;
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
@@ -88,7 +89,8 @@ struct CommonResolutionData
         isICDOperatingAsLIT     = NullOptional;
         numIPs                  = 0;
         port                    = 0;
-        supportsTcp             = false;
+        supportsTcpClient       = false;
+        supportsTcpServer       = false;
         interfaceId             = Inet::InterfaceId::Null();
         for (auto & addr : ipAddress)
         {
@@ -138,7 +140,8 @@ struct CommonResolutionData
         {
             ChipLogDetail(Discovery, "\tMrp Active Threshold: not present");
         }
-        ChipLogDetail(Discovery, "\tTCP Supported: %d", supportsTcp);
+        ChipLogDetail(Discovery, "\tTCP Client Supported: %d", supportsTcpClient);
+        ChipLogDetail(Discovery, "\tTCP Server Supported: %d", supportsTcpServer);
         if (isICDOperatingAsLIT.HasValue())
         {
             ChipLogDetail(Discovery, "\tThe ICD operates in %s", isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
