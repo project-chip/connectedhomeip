@@ -15010,11 +15010,11 @@ typedef NS_ENUM(uint8_t, MTROvenOperationalStateErrorState) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROvenOperationalStateOperationalState) {
-    MTROvenOperationalStateOperationalStateRunning MTR_PROVISIONALLY_AVAILABLE = 0x40,
-    MTROvenOperationalStateOperationalStatePreheating MTR_PROVISIONALLY_AVAILABLE = 0x41,
-    MTROvenOperationalStateOperationalStatePreheated MTR_PROVISIONALLY_AVAILABLE = 0x42,
-    MTROvenOperationalStateOperationalStateCoolingDown MTR_PROVISIONALLY_AVAILABLE = 0x43,
-    MTROvenOperationalStateOperationalStateSelfCleaning MTR_PROVISIONALLY_AVAILABLE = 0x44,
+    MTROvenOperationalStateOperationalStateRunning MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTROvenOperationalStateOperationalStatePreheating MTR_PROVISIONALLY_AVAILABLE = 0x40,
+    MTROvenOperationalStateOperationalStatePreheated MTR_PROVISIONALLY_AVAILABLE = 0x41,
+    MTROvenOperationalStateOperationalStateCoolingDown MTR_PROVISIONALLY_AVAILABLE = 0x42,
+    MTROvenOperationalStateOperationalStateSelfCleaning MTR_PROVISIONALLY_AVAILABLE = 0x43,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRModeSelectFeature) {
