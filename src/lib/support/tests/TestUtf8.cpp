@@ -28,19 +28,21 @@ namespace {
 
 using namespace chip;
 
-#define TEST_VALID_BYTES(...)                                                 \
-    do {                                                                      \
-        uint8_t _buff[] = { __VA_ARGS__ };                                    \
-        CharSpan _span(reinterpret_cast<const char *>(_buff), sizeof(_buff)); \
-        NL_TEST_ASSERT(inSuite, Utf8::IsValid(_span));                        \
-    } while(0)                                                                \
+#define TEST_VALID_BYTES(...)                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        uint8_t _buff[] = { __VA_ARGS__ };                                                                                         \
+        CharSpan _span(reinterpret_cast<const char *>(_buff), sizeof(_buff));                                                      \
+        NL_TEST_ASSERT(inSuite, Utf8::IsValid(_span));                                                                             \
+    } while (0)
 
-#define TEST_INVALID_BYTES(...)                                               \
-    do {                                                                      \
-        uint8_t _buff[] = { __VA_ARGS__ };                                    \
-        CharSpan _span(reinterpret_cast<const char *>(_buff), sizeof(_buff)); \
-        NL_TEST_ASSERT(inSuite, !Utf8::IsValid(_span));                       \
-    } while(0)
+#define TEST_INVALID_BYTES(...)                                                                                                    \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        uint8_t _buff[] = { __VA_ARGS__ };                                                                                         \
+        CharSpan _span(reinterpret_cast<const char *>(_buff), sizeof(_buff));                                                      \
+        NL_TEST_ASSERT(inSuite, !Utf8::IsValid(_span));                                                                            \
+    } while (0)
 
 void TestValidStrings(nlTestSuite * inSuite, void * inContext)
 {
@@ -99,7 +101,6 @@ void TestValidStrings(nlTestSuite * inSuite, void * inContext)
     TEST_VALID_BYTES(0b1110'1101, 0b10'011111, 0b10'111111);
     TEST_VALID_BYTES(0b1110'1110, 0b10'000000, 0b10'000000);
 }
-
 
 void TestInvalidStrings(nlTestSuite * inSuite, void * inContext)
 {
