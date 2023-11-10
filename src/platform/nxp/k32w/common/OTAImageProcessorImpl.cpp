@@ -148,6 +148,16 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessPayload(ByteSpan & block)
             mAccumulator.Init(sizeof(OTATlvHeader));
 
             mCurrentProcessor = nullptr;
+
+            // If the block size is 0, it means that the processed data was a multiple of
+            // received BDX block size (e.g. 8 blocks of 1024 bytes were transferred).
+            // After state for selecting next processor is reset, a request for fetching next
+            // data must be sent.
+            if (block.size() == 0)
+            {
+                status = CHIP_NO_ERROR;
+                break;
+            }
         }
         else
         {

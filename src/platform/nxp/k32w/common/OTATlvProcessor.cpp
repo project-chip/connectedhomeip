@@ -45,7 +45,7 @@ CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
         if (mProcessedLength == mLength)
         {
             status = ExitAction();
-            if (!IsError(status) && (block.size() > 0))
+            if (!IsError(status))
             {
                 // If current block was processed fully and the block still contains data, it
                 // means that the block contains another TLV's data and the current processor
