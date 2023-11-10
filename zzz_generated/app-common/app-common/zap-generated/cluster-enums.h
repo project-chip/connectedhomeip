@@ -182,11 +182,8 @@ namespace OnOffSwitchConfiguration {} // namespace OnOffSwitchConfiguration
 
 namespace LevelControl {
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for MoveMode
-enum class MoveMode : uint8_t
+// Enum for MoveModeEnum
+enum class MoveModeEnum : uint8_t
 {
     kUp   = 0x00,
     kDown = 0x01,
@@ -196,10 +193,6 @@ enum class MoveMode : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MoveMode                                                     = EmberAfMoveMode;
-static MoveMode __attribute__((unused)) kMoveModekUnknownEnumValue = static_cast<MoveMode>(2);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -228,8 +221,8 @@ enum class Feature : uint32_t
     kFrequency = 0x4,
 };
 
-// Bitmap for LevelControlOptions
-enum class LevelControlOptions : uint8_t
+// Bitmap for OptionsBitmap
+enum class OptionsBitmap : uint8_t
 {
     kExecuteIfOff           = 0x1,
     kCoupleColorTempToLevel = 0x2,

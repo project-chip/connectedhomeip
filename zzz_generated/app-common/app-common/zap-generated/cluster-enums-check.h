@@ -118,20 +118,13 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::StartUpOnOffEnum
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::MoveMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::MoveModeEnum val)
 {
-    using EnumType = LevelControl::MoveMode;
+    using EnumType = LevelControl::MoveModeEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUp:
     case EnumType::kDown:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_MOVE_MODE_UP:
-    case EMBER_ZCL_MOVE_MODE_DOWN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(2);

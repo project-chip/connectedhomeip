@@ -63,13 +63,6 @@ enum EmberAfEnhancedColorMode : uint8_t
     EMBER_ZCL_ENHANCED_COLOR_MODE_ENHANCED_CURRENT_HUE_AND_CURRENT_SATURATION = 3,
 };
 
-// Enum for MoveMode
-enum EmberAfMoveMode : uint8_t
-{
-    EMBER_ZCL_MOVE_MODE_UP   = 0,
-    EMBER_ZCL_MOVE_MODE_DOWN = 1,
-};
-
 // Enum for PHYRateEnum
 enum EmberAfPHYRateEnum : uint8_t
 {

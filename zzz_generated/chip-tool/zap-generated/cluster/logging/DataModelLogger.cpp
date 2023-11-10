@@ -5431,7 +5431,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("MaxFrequency", 1, value);
         }
         case LevelControl::Attributes::Options::Id: {
-            chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> value;
+            chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Options", 1, value);
         }

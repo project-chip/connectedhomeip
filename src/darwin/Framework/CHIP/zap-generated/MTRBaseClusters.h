@@ -13910,9 +13910,9 @@ typedef NS_OPTIONS(uint8_t, MTROnOffControl) {
 } MTR_DEPRECATED("Please use MTROnOffControlBitmap", ios(16.1, 17.2), macos(13.0, 14.2), watchos(9.1, 10.2), tvos(16.1, 17.2));
 
 typedef NS_ENUM(uint8_t, MTRLevelControlMoveMode) {
-    MTRLevelControlMoveModeUp MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRLevelControlMoveModeDown MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRLevelControlMoveModeUp MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRLevelControlMoveModeDown MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRLevelControlStepMode) {
     MTRLevelControlStepModeUp MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
@@ -13925,10 +13925,10 @@ typedef NS_OPTIONS(uint32_t, MTRLevelControlFeature) {
     MTRLevelControlFeatureFrequency MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-typedef NS_OPTIONS(uint8_t, MTRLevelControlOptions) {
-    MTRLevelControlOptionsExecuteIfOff MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x1,
-    MTRLevelControlOptionsCoupleColorTempToLevel MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x2,
-} MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+typedef NS_OPTIONS(uint8_t, MTRLevelControlOptionsBitmap) {
+    MTRLevelControlOptionsBitmapExecuteIfOff MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRLevelControlOptionsBitmapCoupleColorTempToLevel MTR_PROVISIONALLY_AVAILABLE = 0x2,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRDescriptorFeature) {
     MTRDescriptorFeatureTagList MTR_PROVISIONALLY_AVAILABLE = 0x1,

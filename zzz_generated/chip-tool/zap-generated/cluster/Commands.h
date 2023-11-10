@@ -12097,7 +12097,7 @@ void registerClusterLevelControl(Commands & commands, CredentialIssuerCommands *
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "max-frequency", 0, UINT16_MAX, Attributes::MaxFrequency::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap>>>(
             Id, "options", 0, UINT8_MAX, Attributes::Options::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "on-off-transition-time", 0, UINT16_MAX, Attributes::OnOffTransitionTime::Id,
                                               WriteCommandType::kWrite, credsIssuerConfig), //
