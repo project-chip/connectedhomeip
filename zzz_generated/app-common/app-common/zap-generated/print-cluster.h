@@ -402,6 +402,13 @@
 #define CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER
 #endif
 
+#if defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                     \
+    { chip::app::Clusters::DemandReponseLoadControl::Id, "Demand Reponse Load Control" },
+#else
+#define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER
+#endif
+
 #if defined(ZCL_USING_DOOR_LOCK_CLUSTER_SERVER) || defined(ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER { chip::app::Clusters::DoorLock::Id, "Door Lock" },
 #else
@@ -738,6 +745,7 @@
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER                                                                   \
+    CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                         \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER                                                                                      \

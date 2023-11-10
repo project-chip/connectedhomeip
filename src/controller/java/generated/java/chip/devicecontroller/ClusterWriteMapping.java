@@ -1090,6 +1090,8 @@ public class ClusterWriteMapping {
     );
     writeActivatedCarbonFilterMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeActivatedCarbonFilterMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("activatedCarbonFilterMonitoring", writeActivatedCarbonFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeDemandReponseLoadControlInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("demandReponseLoadControl", writeDemandReponseLoadControlInteractionInfo);
     Map<String, InteractionInfo> writeDoorLockInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDoorLockDoorOpenEventsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockdoorOpenEventsCommandParameterInfo =

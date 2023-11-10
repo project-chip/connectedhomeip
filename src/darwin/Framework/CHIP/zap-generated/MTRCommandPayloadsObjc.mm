@@ -14431,6 +14431,512 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation MTRDemandReponseLoadControlClusterRegisterLoadControlProgramRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _loadControlProgram = [MTRDemandReponseLoadControlClusterLoadControlProgramStruct new];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDemandReponseLoadControlClusterRegisterLoadControlProgramRequestParams alloc] init];
+
+    other.loadControlProgram = self.loadControlProgram;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: loadControlProgram:%@; >", NSStringFromClass([self class]), _loadControlProgram];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDemandReponseLoadControlClusterRegisterLoadControlProgramRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::DemandReponseLoadControl::Commands::RegisterLoadControlProgramRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.loadControlProgram.programID = AsByteSpan(self.loadControlProgram.programID);
+        encodableStruct.loadControlProgram.name = AsCharSpan(self.loadControlProgram.name);
+        if (self.loadControlProgram.enrollmentGroup == nil) {
+            encodableStruct.loadControlProgram.enrollmentGroup.SetNull();
+        } else {
+            auto & nonNullValue_1 = encodableStruct.loadControlProgram.enrollmentGroup.SetNonNull();
+            nonNullValue_1 = self.loadControlProgram.enrollmentGroup.unsignedCharValue;
+        }
+        if (self.loadControlProgram.randomStartMinutes == nil) {
+            encodableStruct.loadControlProgram.randomStartMinutes.SetNull();
+        } else {
+            auto & nonNullValue_1 = encodableStruct.loadControlProgram.randomStartMinutes.SetNonNull();
+            nonNullValue_1 = self.loadControlProgram.randomStartMinutes.unsignedCharValue;
+        }
+        if (self.loadControlProgram.randomDurationMinutes == nil) {
+            encodableStruct.loadControlProgram.randomDurationMinutes.SetNull();
+        } else {
+            auto & nonNullValue_1 = encodableStruct.loadControlProgram.randomDurationMinutes.SetNonNull();
+            nonNullValue_1 = self.loadControlProgram.randomDurationMinutes.unsignedCharValue;
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRDemandReponseLoadControlClusterUnregisterLoadControlProgramRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _loadControlProgramID = [NSData data];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDemandReponseLoadControlClusterUnregisterLoadControlProgramRequestParams alloc] init];
+
+    other.loadControlProgramID = self.loadControlProgramID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: loadControlProgramID:%@; >", NSStringFromClass([self class]), [_loadControlProgramID base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDemandReponseLoadControlClusterUnregisterLoadControlProgramRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::DemandReponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.loadControlProgramID = AsByteSpan(self.loadControlProgramID);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRDemandReponseLoadControlClusterAddLoadControlEventRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _event = [MTRDemandReponseLoadControlClusterLoadControlEventStruct new];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDemandReponseLoadControlClusterAddLoadControlEventRequestParams alloc] init];
+
+    other.event = self.event;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: event:%@; >", NSStringFromClass([self class]), _event];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDemandReponseLoadControlClusterAddLoadControlEventRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::DemandReponseLoadControl::Commands::AddLoadControlEventRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.event.eventID = AsByteSpan(self.event.eventID);
+        encodableStruct.event.programControl = AsByteSpan(self.event.programControl);
+        encodableStruct.event.control = static_cast<std::remove_reference_t<decltype(encodableStruct.event.control)>>(self.event.control.unsignedShortValue);
+        encodableStruct.event.deviceClass = static_cast<std::remove_reference_t<decltype(encodableStruct.event.deviceClass)>>(self.event.deviceClass.unsignedIntValue);
+        if (self.event.enrollmentGroup == nil) {
+            encodableStruct.event.enrollmentGroup.SetNull();
+        } else {
+            auto & nonNullValue_1 = encodableStruct.event.enrollmentGroup.SetNonNull();
+            nonNullValue_1 = self.event.enrollmentGroup.unsignedCharValue;
+        }
+        encodableStruct.event.criticality = static_cast<std::remove_reference_t<decltype(encodableStruct.event.criticality)>>(self.event.criticality.unsignedCharValue);
+        if (self.event.startTime == nil) {
+            encodableStruct.event.startTime.SetNull();
+        } else {
+            auto & nonNullValue_1 = encodableStruct.event.startTime.SetNonNull();
+            nonNullValue_1 = self.event.startTime.unsignedIntValue;
+        }
+        {
+            using ListType_1 = std::remove_reference_t<decltype(encodableStruct.event.transitions)>;
+            using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+            if (self.event.transitions.count != 0) {
+                auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.event.transitions.count);
+                if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_1);
+                for (size_t i_1 = 0; i_1 < self.event.transitions.count; ++i_1) {
+                    if (![self.event.transitions[i_1] isKindOfClass:[MTRDemandReponseLoadControlClusterLoadControlEventTransitionStruct class]]) {
+                        // Wrong kind of value.
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    auto element_1 = (MTRDemandReponseLoadControlClusterLoadControlEventTransitionStruct *) self.event.transitions[i_1];
+                    listHolder_1->mList[i_1].duration = element_1.duration.unsignedShortValue;
+                    listHolder_1->mList[i_1].control = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].control)>>(element_1.control.unsignedShortValue);
+                    if (element_1.temperatureControl == nil) {
+                        listHolder_1->mList[i_1].temperatureControl.SetNull();
+                    } else {
+                        auto & nonNullValue_3 = listHolder_1->mList[i_1].temperatureControl.SetNonNull();
+                        if (element_1.temperatureControl.coolingTempOffset == nil) {
+                            nonNullValue_3.coolingTempOffset.SetNull();
+                        } else {
+                            auto & nonNullValue_5 = nonNullValue_3.coolingTempOffset.SetNonNull();
+                            nonNullValue_5 = element_1.temperatureControl.coolingTempOffset.unsignedShortValue;
+                        }
+                        if (element_1.temperatureControl.heatTempOffset == nil) {
+                            nonNullValue_3.heatTempOffset.SetNull();
+                        } else {
+                            auto & nonNullValue_5 = nonNullValue_3.heatTempOffset.SetNonNull();
+                            nonNullValue_5 = element_1.temperatureControl.heatTempOffset.unsignedShortValue;
+                        }
+                        if (element_1.temperatureControl.coolingTempSetpoint == nil) {
+                            nonNullValue_3.coolingTempSetpoint.SetNull();
+                        } else {
+                            auto & nonNullValue_5 = nonNullValue_3.coolingTempSetpoint.SetNonNull();
+                            nonNullValue_5 = element_1.temperatureControl.coolingTempSetpoint.unsignedShortValue;
+                        }
+                        if (element_1.temperatureControl.heatingTempSetpoint == nil) {
+                            nonNullValue_3.heatingTempSetpoint.SetNull();
+                        } else {
+                            auto & nonNullValue_5 = nonNullValue_3.heatingTempSetpoint.SetNonNull();
+                            nonNullValue_5 = element_1.temperatureControl.heatingTempSetpoint.unsignedShortValue;
+                        }
+                    }
+                    if (element_1.averageLoadControl == nil) {
+                        listHolder_1->mList[i_1].averageLoadControl.SetNull();
+                    } else {
+                        auto & nonNullValue_3 = listHolder_1->mList[i_1].averageLoadControl.SetNonNull();
+                        nonNullValue_3.loadAdjustment = element_1.averageLoadControl.loadAdjustment.charValue;
+                    }
+                    if (element_1.dutyCycleControl == nil) {
+                        listHolder_1->mList[i_1].dutyCycleControl.SetNull();
+                    } else {
+                        auto & nonNullValue_3 = listHolder_1->mList[i_1].dutyCycleControl.SetNonNull();
+                        nonNullValue_3.dutyCycle = element_1.dutyCycleControl.dutyCycle.unsignedCharValue;
+                    }
+                    if (element_1.powerSavingsControl == nil) {
+                        listHolder_1->mList[i_1].powerSavingsControl.SetNull();
+                    } else {
+                        auto & nonNullValue_3 = listHolder_1->mList[i_1].powerSavingsControl.SetNonNull();
+                        nonNullValue_3.powerSavings = static_cast<std::remove_reference_t<decltype(nonNullValue_3.powerSavings)>>(element_1.powerSavingsControl.powerSavings.unsignedCharValue);
+                    }
+                    if (element_1.heatingSourceControl == nil) {
+                        listHolder_1->mList[i_1].heatingSourceControl.SetNull();
+                    } else {
+                        auto & nonNullValue_3 = listHolder_1->mList[i_1].heatingSourceControl.SetNonNull();
+                        nonNullValue_3.heatingSource = static_cast<std::remove_reference_t<decltype(nonNullValue_3.heatingSource)>>(element_1.heatingSourceControl.heatingSource.unsignedCharValue);
+                    }
+                }
+                encodableStruct.event.transitions = ListType_1(listHolder_1->mList, self.event.transitions.count);
+            } else {
+                encodableStruct.event.transitions = ListType_1();
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRDemandReponseLoadControlClusterRemoveLoadControlEventRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _eventID = [NSData data];
+
+        _cancelControl = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDemandReponseLoadControlClusterRemoveLoadControlEventRequestParams alloc] init];
+
+    other.eventID = self.eventID;
+    other.cancelControl = self.cancelControl;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: eventID:%@; cancelControl:%@; >", NSStringFromClass([self class]), [_eventID base64EncodedStringWithOptions:0], _cancelControl];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDemandReponseLoadControlClusterRemoveLoadControlEventRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::DemandReponseLoadControl::Commands::RemoveLoadControlEventRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.eventID = AsByteSpan(self.eventID);
+    }
+    {
+        encodableStruct.cancelControl = static_cast<std::remove_reference_t<decltype(encodableStruct.cancelControl)>>(self.cancelControl.unsignedShortValue);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRDemandReponseLoadControlClusterClearLoadControlEventsRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDemandReponseLoadControlClusterClearLoadControlEventsRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDemandReponseLoadControlClusterClearLoadControlEventsRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::DemandReponseLoadControl::Commands::ClearLoadControlEventsRequest::Type encodableStruct;
+    ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRDoorLockClusterLockDoorParams
 - (instancetype)init
 {

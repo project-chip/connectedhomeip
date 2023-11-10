@@ -20,48 +20,41 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class FaultInjectionCluster(
-  private val controller: MatterController,
-  private val endpointId: UShort
-) {
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+class FaultInjectionCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
-  suspend fun failAtFault(
-    type: UInt,
-    id: UInt,
-    numCallsToSkip: UInt,
-    numCallsToFail: UInt,
-    takeMutex: Boolean,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun failAtFault(type: UInt, id: UInt, numCallsToSkip: UInt, numCallsToFail: UInt, takeMutex: Boolean, timedInvokeTimeoutMs: Int? = null) {
     val commandId = 0L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
-  suspend fun failRandomlyAtFault(
-    type: UInt,
-    id: UInt,
-    percentage: UByte,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun failRandomlyAtFault(type: UInt, id: UInt, percentage: UByte, timedInvokeTimeoutMs: Int? = null) {
     val commandId = 1L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
@@ -90,7 +83,10 @@ class FaultInjectionCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -109,7 +105,10 @@ class FaultInjectionCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -117,7 +116,10 @@ class FaultInjectionCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

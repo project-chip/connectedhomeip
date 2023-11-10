@@ -202,6 +202,9 @@ static constexpr ClusterId Id = 0x00000071;
 namespace ActivatedCarbonFilterMonitoring {
 static constexpr ClusterId Id = 0x00000072;
 } // namespace ActivatedCarbonFilterMonitoring
+namespace DemandReponseLoadControl {
+static constexpr ClusterId Id = 0x00000096;
+} // namespace DemandReponseLoadControl
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock

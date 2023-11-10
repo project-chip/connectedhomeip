@@ -2237,6 +2237,113 @@ static id _Nullable DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForDemandReponseLoadControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::DemandReponseLoadControl;
+    switch (aEventId) {
+    case Events::LoadControlEventStatusChange::Id: {
+        Events::LoadControlEventStatusChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDemandReponseLoadControlClusterLoadControlEventStatusChangeEvent new];
+
+        do {
+            NSData * _Nonnull memberValue;
+            memberValue = AsData(cppValue.eventID);
+            value.eventID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.transitionIndex.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.transitionIndex.Value()];
+            }
+            value.transitionIndex = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.status)];
+            value.status = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.criticality)];
+            value.criticality = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.control.Raw()];
+            value.control = memberValue;
+        } while (0);
+        do {
+            MTRDemandReponseLoadControlClusterTemperatureControlStruct * _Nonnull memberValue;
+            memberValue = [MTRDemandReponseLoadControlClusterTemperatureControlStruct new];
+            if (cppValue.temperatureControl.coolingTempOffset.IsNull()) {
+                memberValue.coolingTempOffset = nil;
+            } else {
+                memberValue.coolingTempOffset = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.coolingTempOffset.Value()];
+            }
+            if (cppValue.temperatureControl.heatTempOffset.IsNull()) {
+                memberValue.heatTempOffset = nil;
+            } else {
+                memberValue.heatTempOffset = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.heatTempOffset.Value()];
+            }
+            if (cppValue.temperatureControl.coolingTempSetpoint.IsNull()) {
+                memberValue.coolingTempSetpoint = nil;
+            } else {
+                memberValue.coolingTempSetpoint = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.coolingTempSetpoint.Value()];
+            }
+            if (cppValue.temperatureControl.heatingTempSetpoint.IsNull()) {
+                memberValue.heatingTempSetpoint = nil;
+            } else {
+                memberValue.heatingTempSetpoint = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.heatingTempSetpoint.Value()];
+            }
+            value.temperatureControl = memberValue;
+        } while (0);
+        do {
+            MTRDemandReponseLoadControlClusterAverageLoadControlStruct * _Nonnull memberValue;
+            memberValue = [MTRDemandReponseLoadControlClusterAverageLoadControlStruct new];
+            memberValue.loadAdjustment = [NSNumber numberWithChar:cppValue.averageLoadControl.loadAdjustment];
+            value.averageLoadControl = memberValue;
+        } while (0);
+        do {
+            MTRDemandReponseLoadControlClusterDutyCycleControlStruct * _Nonnull memberValue;
+            memberValue = [MTRDemandReponseLoadControlClusterDutyCycleControlStruct new];
+            memberValue.dutyCycle = [NSNumber numberWithUnsignedChar:cppValue.dutyCycleControl.dutyCycle];
+            value.dutyCycleControl = memberValue;
+        } while (0);
+        do {
+            MTRDemandReponseLoadControlClusterPowerSavingsControlStruct * _Nonnull memberValue;
+            memberValue = [MTRDemandReponseLoadControlClusterPowerSavingsControlStruct new];
+            memberValue.powerSavings = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.powerSavingsControl.powerSavings)];
+            value.powerSavingsControl = memberValue;
+        } while (0);
+        do {
+            MTRDemandReponseLoadControlClusterHeatingSourceControlStruct * _Nonnull memberValue;
+            memberValue = [MTRDemandReponseLoadControlClusterHeatingSourceControlStruct new];
+            memberValue.heatingSource = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.heatingSourceControl.heatingSource)];
+            value.heatingSourceControl = memberValue;
+        } while (0);
+        do {
+            NSData * _Nonnull memberValue;
+            memberValue = AsData(cppValue.signature);
+            value.signature = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForDoorLockCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::DoorLock;
@@ -3450,6 +3557,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::DemandReponseLoadControl::Id: {
+        return DecodeEventPayloadForDemandReponseLoadControlCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);

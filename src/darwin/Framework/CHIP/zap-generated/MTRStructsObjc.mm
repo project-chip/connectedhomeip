@@ -3975,6 +3975,432 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDemandReponseLoadControlClusterHeatingSourceControlStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _heatingSource = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDemandReponseLoadControlClusterHeatingSourceControlStruct alloc] init];
+
+    other.heatingSource = self.heatingSource;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: heatingSource:%@; >", NSStringFromClass([self class]), _heatingSource];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDemandReponseLoadControlClusterPowerSavingsControlStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerSavings = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDemandReponseLoadControlClusterPowerSavingsControlStruct alloc] init];
+
+    other.powerSavings = self.powerSavings;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: powerSavings:%@; >", NSStringFromClass([self class]), _powerSavings];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDemandReponseLoadControlClusterDutyCycleControlStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _dutyCycle = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDemandReponseLoadControlClusterDutyCycleControlStruct alloc] init];
+
+    other.dutyCycle = self.dutyCycle;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dutyCycle:%@; >", NSStringFromClass([self class]), _dutyCycle];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDemandReponseLoadControlClusterAverageLoadControlStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _loadAdjustment = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDemandReponseLoadControlClusterAverageLoadControlStruct alloc] init];
+
+    other.loadAdjustment = self.loadAdjustment;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: loadAdjustment:%@; >", NSStringFromClass([self class]), _loadAdjustment];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDemandReponseLoadControlClusterTemperatureControlStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _coolingTempOffset = nil;
+
+        _heatTempOffset = nil;
+
+        _coolingTempSetpoint = nil;
+
+        _heatingTempSetpoint = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDemandReponseLoadControlClusterTemperatureControlStruct alloc] init];
+
+    other.coolingTempOffset = self.coolingTempOffset;
+    other.heatTempOffset = self.heatTempOffset;
+    other.coolingTempSetpoint = self.coolingTempSetpoint;
+    other.heatingTempSetpoint = self.heatingTempSetpoint;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: coolingTempOffset:%@; heatTempOffset:%@; coolingTempSetpoint:%@; heatingTempSetpoint:%@; >", NSStringFromClass([self class]), _coolingTempOffset, _heatTempOffset, _coolingTempSetpoint, _heatingTempSetpoint];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDemandReponseLoadControlClusterLoadControlEventTransitionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _duration = @(0);
+
+        _control = @(0);
+
+        _temperatureControl = nil;
+
+        _averageLoadControl = nil;
+
+        _dutyCycleControl = nil;
+
+        _powerSavingsControl = nil;
+
+        _heatingSourceControl = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDemandReponseLoadControlClusterLoadControlEventTransitionStruct alloc] init];
+
+    other.duration = self.duration;
+    other.control = self.control;
+    other.temperatureControl = self.temperatureControl;
+    other.averageLoadControl = self.averageLoadControl;
+    other.dutyCycleControl = self.dutyCycleControl;
+    other.powerSavingsControl = self.powerSavingsControl;
+    other.heatingSourceControl = self.heatingSourceControl;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: duration:%@; control:%@; temperatureControl:%@; averageLoadControl:%@; dutyCycleControl:%@; powerSavingsControl:%@; heatingSourceControl:%@; >", NSStringFromClass([self class]), _duration, _control, _temperatureControl, _averageLoadControl, _dutyCycleControl, _powerSavingsControl, _heatingSourceControl];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDemandReponseLoadControlClusterScopedLoadControlEventStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _eventID = [NSData data];
+
+        _programControl = [NSData data];
+
+        _control = @(0);
+
+        _deviceClass = @(0);
+
+        _enrollmentGroup = nil;
+
+        _criticality = @(0);
+
+        _startTime = nil;
+
+        _transitions = [NSArray array];
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDemandReponseLoadControlClusterScopedLoadControlEventStruct alloc] init];
+
+    other.eventID = self.eventID;
+    other.programControl = self.programControl;
+    other.control = self.control;
+    other.deviceClass = self.deviceClass;
+    other.enrollmentGroup = self.enrollmentGroup;
+    other.criticality = self.criticality;
+    other.startTime = self.startTime;
+    other.transitions = self.transitions;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: eventID:%@; programControl:%@; control:%@; deviceClass:%@; enrollmentGroup:%@; criticality:%@; startTime:%@; transitions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), [_eventID base64EncodedStringWithOptions:0], [_programControl base64EncodedStringWithOptions:0], _control, _deviceClass, _enrollmentGroup, _criticality, _startTime, _transitions, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDemandReponseLoadControlClusterLoadControlEventStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _eventID = [NSData data];
+
+        _programControl = [NSData data];
+
+        _control = @(0);
+
+        _deviceClass = @(0);
+
+        _enrollmentGroup = nil;
+
+        _criticality = @(0);
+
+        _startTime = nil;
+
+        _transitions = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDemandReponseLoadControlClusterLoadControlEventStruct alloc] init];
+
+    other.eventID = self.eventID;
+    other.programControl = self.programControl;
+    other.control = self.control;
+    other.deviceClass = self.deviceClass;
+    other.enrollmentGroup = self.enrollmentGroup;
+    other.criticality = self.criticality;
+    other.startTime = self.startTime;
+    other.transitions = self.transitions;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: eventID:%@; programControl:%@; control:%@; deviceClass:%@; enrollmentGroup:%@; criticality:%@; startTime:%@; transitions:%@; >", NSStringFromClass([self class]), [_eventID base64EncodedStringWithOptions:0], [_programControl base64EncodedStringWithOptions:0], _control, _deviceClass, _enrollmentGroup, _criticality, _startTime, _transitions];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDemandReponseLoadControlClusterLoadControlProgramStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _programID = [NSData data];
+
+        _name = @"";
+
+        _enrollmentGroup = nil;
+
+        _randomStartMinutes = nil;
+
+        _randomDurationMinutes = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDemandReponseLoadControlClusterLoadControlProgramStruct alloc] init];
+
+    other.programID = self.programID;
+    other.name = self.name;
+    other.enrollmentGroup = self.enrollmentGroup;
+    other.randomStartMinutes = self.randomStartMinutes;
+    other.randomDurationMinutes = self.randomDurationMinutes;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: programID:%@; name:%@; enrollmentGroup:%@; randomStartMinutes:%@; randomDurationMinutes:%@; >", NSStringFromClass([self class]), [_programID base64EncodedStringWithOptions:0], _name, _enrollmentGroup, _randomStartMinutes, _randomDurationMinutes];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDemandReponseLoadControlClusterScopedLoadControlProgramStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _programID = [NSData data];
+
+        _name = @"";
+
+        _enrollmentGroup = nil;
+
+        _randomStartMinutes = nil;
+
+        _randomDurationMinutes = nil;
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDemandReponseLoadControlClusterScopedLoadControlProgramStruct alloc] init];
+
+    other.programID = self.programID;
+    other.name = self.name;
+    other.enrollmentGroup = self.enrollmentGroup;
+    other.randomStartMinutes = self.randomStartMinutes;
+    other.randomDurationMinutes = self.randomDurationMinutes;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: programID:%@; name:%@; enrollmentGroup:%@; randomStartMinutes:%@; randomDurationMinutes:%@; fabricIndex:%@; >", NSStringFromClass([self class]), [_programID base64EncodedStringWithOptions:0], _name, _enrollmentGroup, _randomStartMinutes, _randomDurationMinutes, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDemandReponseLoadControlClusterLoadControlEventStatusChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _eventID = [NSData data];
+
+        _transitionIndex = nil;
+
+        _status = @(0);
+
+        _criticality = @(0);
+
+        _control = @(0);
+
+        _temperatureControl = [MTRDemandReponseLoadControlClusterTemperatureControlStruct new];
+
+        _averageLoadControl = [MTRDemandReponseLoadControlClusterAverageLoadControlStruct new];
+
+        _dutyCycleControl = [MTRDemandReponseLoadControlClusterDutyCycleControlStruct new];
+
+        _powerSavingsControl = [MTRDemandReponseLoadControlClusterPowerSavingsControlStruct new];
+
+        _heatingSourceControl = [MTRDemandReponseLoadControlClusterHeatingSourceControlStruct new];
+
+        _signature = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDemandReponseLoadControlClusterLoadControlEventStatusChangeEvent alloc] init];
+
+    other.eventID = self.eventID;
+    other.transitionIndex = self.transitionIndex;
+    other.status = self.status;
+    other.criticality = self.criticality;
+    other.control = self.control;
+    other.temperatureControl = self.temperatureControl;
+    other.averageLoadControl = self.averageLoadControl;
+    other.dutyCycleControl = self.dutyCycleControl;
+    other.powerSavingsControl = self.powerSavingsControl;
+    other.heatingSourceControl = self.heatingSourceControl;
+    other.signature = self.signature;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: eventID:%@; transitionIndex:%@; status:%@; criticality:%@; control:%@; temperatureControl:%@; averageLoadControl:%@; dutyCycleControl:%@; powerSavingsControl:%@; heatingSourceControl:%@; signature:%@; >", NSStringFromClass([self class]), [_eventID base64EncodedStringWithOptions:0], _transitionIndex, _status, _criticality, _control, _temperatureControl, _averageLoadControl, _dutyCycleControl, _powerSavingsControl, _heatingSourceControl, [_signature base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDoorLockClusterCredentialStruct
 - (instancetype)init
 {

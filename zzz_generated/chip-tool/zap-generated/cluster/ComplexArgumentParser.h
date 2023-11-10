@@ -271,6 +271,66 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DemandReponseLoadControl::Structs::HeatingSourceControlStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DemandReponseLoadControl::Structs::HeatingSourceControlStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DemandReponseLoadControl::Structs::PowerSavingsControlStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DemandReponseLoadControl::Structs::PowerSavingsControlStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DemandReponseLoadControl::Structs::DutyCycleControlStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DemandReponseLoadControl::Structs::DutyCycleControlStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DemandReponseLoadControl::Structs::AverageLoadControlStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DemandReponseLoadControl::Structs::AverageLoadControlStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DemandReponseLoadControl::Structs::TemperatureControlStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DemandReponseLoadControl::Structs::TemperatureControlStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DemandReponseLoadControl::Structs::LoadControlEventTransitionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DemandReponseLoadControl::Structs::LoadControlEventTransitionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DemandReponseLoadControl::Structs::ScopedLoadControlEventStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DemandReponseLoadControl::Structs::ScopedLoadControlEventStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DemandReponseLoadControl::Structs::LoadControlEventStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DemandReponseLoadControl::Structs::LoadControlEventStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DemandReponseLoadControl::Structs::LoadControlProgramStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DemandReponseLoadControl::Structs::LoadControlProgramStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DemandReponseLoadControl::Structs::ScopedLoadControlProgramStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DemandReponseLoadControl::Structs::ScopedLoadControlProgramStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
                         Json::Value & value);
 

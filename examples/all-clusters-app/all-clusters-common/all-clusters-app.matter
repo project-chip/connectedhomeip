@@ -3230,6 +3230,223 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
   command ResetCondition(): DefaultSuccess = 0;
 }
 
+/** This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control. */
+server cluster DemandReponseLoadControl = 150 {
+  enum CriticalityLevelEnum : enum8 {
+    kInvalid = 0;
+    kGreen = 1;
+    kLevel1 = 2;
+    kLevel2 = 3;
+    kLevel3 = 4;
+    kLevel4 = 5;
+    kLevel5 = 6;
+    kEmergency = 7;
+    kPlannedOutage = 8;
+    kServiceDisconnect = 9;
+  }
+
+  enum HeatingSourceEnum : enum8 {
+    kAny = 0;
+    kElectric = 1;
+    kNaturalGas = 2;
+  }
+
+  enum LoadControlEventChangeSourceEnum : enum8 {
+    kAutomatic = 0;
+    kUserAction = 1;
+  }
+
+  enum LoadControlEventStatusEnum : enum8 {
+    kInvalid = 0;
+    kReceived = 1;
+    kInProgress = 2;
+    kCompleted = 3;
+    kOptedOut = 4;
+    kOptedIn = 5;
+    kCanceled = 6;
+    kSuperseded = 7;
+    kPartialOptedOut = 8;
+    kPartialOptedIn = 9;
+    kNoParticipation = 10;
+    kUnavailable = 11;
+    kFailed = 12;
+  }
+
+  enum PowerSavingsEnum : enum8 {
+    kLow = 0;
+    kMedium = 1;
+    kHigh = 2;
+  }
+
+  bitmap CancelControlBitmap : bitmap16 {
+    kRandomEnd = 0x1;
+  }
+
+  bitmap DeviceClassBitmap : bitmap32 {
+    kHVACCompressorOrFurnace = 0x1;
+    kStripHeatBaseboardHeat = 0x2;
+    kWaterHeater = 0x4;
+    kPoolPumpSpaJacuzzi = 0x8;
+    kSmartAppliances = 0x10;
+    kIrrigationPump = 0x20;
+    kManagedCAndILoads = 0x40;
+    kSimpleMiscLoads = 0x80;
+    kExteriorLighting = 0x100;
+    kInteriorLighting = 0x200;
+    kElectricVehicle = 0x400;
+    kGenerationSystems = 0x800;
+    kSmartInverter = 0x1000;
+    kEVSE = 0x2000;
+    kRESU = 0x4000;
+    kEnergyManagementSytem = 0x8000;
+    kSmartEnergyModule = 0x10000;
+  }
+
+  bitmap EventControlBitmap : bitmap16 {
+    kRandomStart = 0x1;
+  }
+
+  bitmap EventTransitionControlBitmap : bitmap16 {
+    kRandomDuration = 0x1;
+    kIgnoreOptOut = 0x2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kEnrollmentGroups = 0x1;
+    kTemperatureOffset = 0x2;
+    kTemperatureSetpoint = 0x4;
+    kLoadAdjustment = 0x8;
+    kDutyCycle = 0x10;
+    kPowerSavings = 0x20;
+    kHeatingSource = 0x40;
+  }
+
+  struct HeatingSourceControlStruct {
+    HeatingSourceEnum heatingSource = 0;
+  }
+
+  struct PowerSavingsControlStruct {
+    PowerSavingsEnum powerSavings = 0;
+  }
+
+  struct DutyCycleControlStruct {
+    int8u dutyCycle = 0;
+  }
+
+  struct AverageLoadControlStruct {
+    int8s loadAdjustment = 0;
+  }
+
+  struct TemperatureControlStruct {
+    nullable int16u coolingTempOffset = 0;
+    nullable int16u heatTempOffset = 1;
+    nullable int16u coolingTempSetpoint = 2;
+    nullable int16u heatingTempSetpoint = 3;
+  }
+
+  struct LoadControlEventTransitionStruct {
+    int16u duration = 0;
+    EventTransitionControlBitmap control = 1;
+    nullable TemperatureControlStruct temperatureControl = 2;
+    nullable AverageLoadControlStruct averageLoadControl = 3;
+    nullable DutyCycleControlStruct dutyCycleControl = 4;
+    nullable PowerSavingsControlStruct powerSavingsControl = 5;
+    nullable HeatingSourceControlStruct heatingSourceControl = 6;
+  }
+
+  fabric_scoped struct ScopedLoadControlEventStruct {
+    octet_string<16> eventID = 0;
+    octet_string<16> programControl = 1;
+    EventControlBitmap control = 2;
+    DeviceClassBitmap deviceClass = 3;
+    nullable int8u enrollmentGroup = 4;
+    CriticalityLevelEnum criticality = 5;
+    nullable epoch_s startTime = 6;
+    LoadControlEventTransitionStruct transitions[] = 7;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct LoadControlEventStruct {
+    octet_string<16> eventID = 0;
+    octet_string<16> programControl = 1;
+    EventControlBitmap control = 2;
+    DeviceClassBitmap deviceClass = 3;
+    nullable int8u enrollmentGroup = 4;
+    CriticalityLevelEnum criticality = 5;
+    nullable epoch_s startTime = 6;
+    LoadControlEventTransitionStruct transitions[] = 7;
+  }
+
+  struct LoadControlProgramStruct {
+    octet_string<16> programID = 0;
+    long_char_string<32> name = 1;
+    nullable int8u enrollmentGroup = 2;
+    nullable int8u randomStartMinutes = 3;
+    nullable int8u randomDurationMinutes = 4;
+  }
+
+  fabric_scoped struct ScopedLoadControlProgramStruct {
+    octet_string<16> programID = 0;
+    long_char_string<32> name = 1;
+    nullable int8u enrollmentGroup = 2;
+    nullable int8u randomStartMinutes = 3;
+    nullable int8u randomDurationMinutes = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  info event LoadControlEventStatusChange = 0 {
+    octet_string eventID = 0;
+    nullable int8u transitionIndex = 1;
+    LoadControlEventStatusEnum status = 2;
+    CriticalityLevelEnum criticality = 3;
+    EventControlBitmap control = 4;
+    TemperatureControlStruct temperatureControl = 5;
+    AverageLoadControlStruct averageLoadControl = 6;
+    DutyCycleControlStruct dutyCycleControl = 7;
+    PowerSavingsControlStruct powerSavingsControl = 8;
+    HeatingSourceControlStruct heatingSourceControl = 9;
+    octet_string signature = 255;
+  }
+
+  readonly attribute DeviceClassBitmap deviceClass = 0;
+  readonly attribute ScopedLoadControlProgramStruct loadControlPrograms[] = 1;
+  readonly attribute int8u numberOfLoadControlPrograms = 2;
+  readonly attribute ScopedLoadControlEventStruct events[] = 3;
+  readonly attribute int8u numberOfEventsPerProgram = 4;
+  readonly attribute int8u numberOfTransistions = 5;
+  readonly attribute int8u defaultRandomStart = 6;
+  readonly attribute int8u defaultRandomDuration = 7;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct RegisterLoadControlProgramRequestRequest {
+    LoadControlProgramStruct loadControlProgram = 0;
+  }
+
+  request struct UnregisterLoadControlProgramRequestRequest {
+    octet_string<16> loadControlProgramID = 0;
+  }
+
+  request struct AddLoadControlEventRequestRequest {
+    LoadControlEventStruct event = 0;
+  }
+
+  request struct RemoveLoadControlEventRequestRequest {
+    octet_string<16> eventID = 0;
+    CancelControlBitmap cancelControl = 1;
+  }
+
+  command RegisterLoadControlProgramRequest(RegisterLoadControlProgramRequestRequest): DefaultSuccess = 0;
+  command UnregisterLoadControlProgramRequest(UnregisterLoadControlProgramRequestRequest): DefaultSuccess = 1;
+  command AddLoadControlEventRequest(AddLoadControlEventRequestRequest): DefaultSuccess = 2;
+  command RemoveLoadControlEventRequest(RemoveLoadControlEventRequestRequest): DefaultSuccess = 3;
+  command ClearLoadControlEventsRequest(): DefaultSuccess = 4;
+}
+
 /** Provides an interface for controlling and adjusting automatic window coverings. */
 server cluster WindowCovering = 258 {
   enum EndProductType : enum8 {
@@ -6075,6 +6292,30 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command ResetCondition;
+  }
+
+  server cluster DemandReponseLoadControl {
+    emits event LoadControlEventStatusChange;
+    ram      attribute deviceClass default = 0;
+    callback attribute loadControlPrograms;
+    ram      attribute numberOfLoadControlPrograms default = 5;
+    callback attribute events;
+    ram      attribute numberOfEventsPerProgram default = 10;
+    ram      attribute numberOfTransistions default = 3;
+    ram      attribute defaultRandomStart default = 0x1E;
+    ram      attribute defaultRandomDuration default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x7F;
+    ram      attribute clusterRevision default = 4;
+
+    handle command RegisterLoadControlProgramRequest;
+    handle command UnregisterLoadControlProgramRequest;
+    handle command AddLoadControlEventRequest;
+    handle command RemoveLoadControlEventRequest;
+    handle command ClearLoadControlEventsRequest;
   }
 
   server cluster WindowCovering {

@@ -505,6 +505,14 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Demand Reponse Load Control Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDemandReponseLoadControlClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Door Lock Cluster Init
  *
  * Cluster Init
@@ -5389,6 +5397,82 @@ void emberAfActivatedCarbonFilterMonitoringClusterServerTickCallback(chip::Endpo
 void emberAfActivatedCarbonFilterMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
+// Demand Reponse Load Control Cluster
+//
+
+/** @brief Demand Reponse Load Control Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDemandReponseLoadControlClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Demand Reponse Load Control Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterDemandReponseLoadControlClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Demand Reponse Load Control Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDemandReponseLoadControlClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Demand Reponse Load Control Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterDemandReponseLoadControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Demand Reponse Load Control Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterDemandReponseLoadControlClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Demand Reponse Load Control Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterDemandReponseLoadControlClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Demand Reponse Load Control Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDemandReponseLoadControlClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Demand Reponse Load Control Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDemandReponseLoadControlClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
 // Door Lock Cluster
 //
 
@@ -9039,6 +9123,37 @@ bool emberAfMicrowaveOvenControlClusterSetCookingParametersCallback(
 bool emberAfMicrowaveOvenControlClusterAddMoreTimeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::MicrowaveOvenControl::Commands::AddMoreTime::DecodableType & commandData);
+/**
+ * @brief Demand Reponse Load Control Cluster RegisterLoadControlProgramRequest Command callback (from client)
+ */
+bool emberAfDemandReponseLoadControlClusterRegisterLoadControlProgramRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DemandReponseLoadControl::Commands::RegisterLoadControlProgramRequest::DecodableType & commandData);
+/**
+ * @brief Demand Reponse Load Control Cluster UnregisterLoadControlProgramRequest Command callback (from client)
+ */
+bool emberAfDemandReponseLoadControlClusterUnregisterLoadControlProgramRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DemandReponseLoadControl::Commands::UnregisterLoadControlProgramRequest::DecodableType &
+        commandData);
+/**
+ * @brief Demand Reponse Load Control Cluster AddLoadControlEventRequest Command callback (from client)
+ */
+bool emberAfDemandReponseLoadControlClusterAddLoadControlEventRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DemandReponseLoadControl::Commands::AddLoadControlEventRequest::DecodableType & commandData);
+/**
+ * @brief Demand Reponse Load Control Cluster RemoveLoadControlEventRequest Command callback (from client)
+ */
+bool emberAfDemandReponseLoadControlClusterRemoveLoadControlEventRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DemandReponseLoadControl::Commands::RemoveLoadControlEventRequest::DecodableType & commandData);
+/**
+ * @brief Demand Reponse Load Control Cluster ClearLoadControlEventsRequest Command callback (from client)
+ */
+bool emberAfDemandReponseLoadControlClusterClearLoadControlEventsRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DemandReponseLoadControl::Commands::ClearLoadControlEventsRequest::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */

@@ -20,14 +20,16 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ScenesClusterExtensionFieldSet(
-  val clusterID: ULong,
-  val attributeValueList: List<ScenesClusterAttributeValuePair>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ScenesClusterExtensionFieldSet (
+    val clusterID: ULong,
+    val attributeValueList: List<ScenesClusterAttributeValuePair>) {
+  override fun toString(): String  = buildString {
     append("ScenesClusterExtensionFieldSet {\n")
     append("\tclusterID : $clusterID\n")
     append("\tattributeValueList : $attributeValueList\n")
@@ -51,18 +53,17 @@ class ScenesClusterExtensionFieldSet(
     private const val TAG_CLUSTER_I_D = 0
     private const val TAG_ATTRIBUTE_VALUE_LIST = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesClusterExtensionFieldSet {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ScenesClusterExtensionFieldSet {
       tlvReader.enterStructure(tlvTag)
       val clusterID = tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER_I_D))
-      val attributeValueList =
-        buildList<ScenesClusterAttributeValuePair> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
-          while (!tlvReader.isEndOfContainer()) {
-            add(ScenesClusterAttributeValuePair.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val attributeValueList = buildList<ScenesClusterAttributeValuePair> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
+      while(!tlvReader.isEndOfContainer()) {
+        add(ScenesClusterAttributeValuePair.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return ScenesClusterExtensionFieldSet(clusterID, attributeValueList)

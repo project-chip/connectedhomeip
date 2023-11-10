@@ -1004,6 +1004,104 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSString * _Nonnull productIdentifierValue MTR_PROVISIONALLY_AVAILABLE;
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDemandReponseLoadControlClusterHeatingSourceControlStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull heatingSource MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDemandReponseLoadControlClusterPowerSavingsControlStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull powerSavings MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDemandReponseLoadControlClusterDutyCycleControlStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull dutyCycle MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDemandReponseLoadControlClusterAverageLoadControlStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull loadAdjustment MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDemandReponseLoadControlClusterTemperatureControlStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nullable coolingTempOffset MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable heatTempOffset MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable coolingTempSetpoint MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable heatingTempSetpoint MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDemandReponseLoadControlClusterLoadControlEventTransitionStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull duration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull control MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDemandReponseLoadControlClusterTemperatureControlStruct * _Nullable temperatureControl MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDemandReponseLoadControlClusterAverageLoadControlStruct * _Nullable averageLoadControl MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDemandReponseLoadControlClusterDutyCycleControlStruct * _Nullable dutyCycleControl MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDemandReponseLoadControlClusterPowerSavingsControlStruct * _Nullable powerSavingsControl MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDemandReponseLoadControlClusterHeatingSourceControlStruct * _Nullable heatingSourceControl MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDemandReponseLoadControlClusterScopedLoadControlEventStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nonnull eventID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull programControl MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull control MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull deviceClass MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable enrollmentGroup MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull criticality MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable startTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull transitions MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDemandReponseLoadControlClusterLoadControlEventStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nonnull eventID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull programControl MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull control MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull deviceClass MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable enrollmentGroup MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull criticality MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable startTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull transitions MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDemandReponseLoadControlClusterLoadControlProgramStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nonnull programID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull name MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable enrollmentGroup MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable randomStartMinutes MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable randomDurationMinutes MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDemandReponseLoadControlClusterScopedLoadControlProgramStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nonnull programID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull name MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable enrollmentGroup MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable randomStartMinutes MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable randomDurationMinutes MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDemandReponseLoadControlClusterLoadControlEventStatusChangeEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nonnull eventID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable transitionIndex MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull criticality MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull control MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDemandReponseLoadControlClusterTemperatureControlStruct * _Nonnull temperatureControl MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDemandReponseLoadControlClusterAverageLoadControlStruct * _Nonnull averageLoadControl MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDemandReponseLoadControlClusterDutyCycleControlStruct * _Nonnull dutyCycleControl MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDemandReponseLoadControlClusterPowerSavingsControlStruct * _Nonnull powerSavingsControl MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDemandReponseLoadControlClusterHeatingSourceControlStruct * _Nonnull heatingSourceControl MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull signature MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDoorLockClusterCredentialStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull credentialType MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
