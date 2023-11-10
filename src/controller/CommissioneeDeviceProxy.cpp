@@ -67,8 +67,7 @@ void CommissioneeDeviceProxy::CloseSession()
 }
 
 CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr,
-                                                     const ReliableMessageProtocolConfig & config,
-                                                     bool supportsTcp)
+                                                     const ReliableMessageProtocolConfig & config)
 {
     mDeviceAddress = addr;
 
@@ -87,7 +86,6 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
 
     Transport::SecureSession * secureSession = mSecureSession.Get().Value()->AsSecureSession();
     secureSession->SetPeerAddress(addr);
-    secureSession->SetSupportsTcp(supportsTcp);
 
     return CHIP_NO_ERROR;
 }

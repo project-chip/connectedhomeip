@@ -178,7 +178,7 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
     }
 }
 
-void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config, bool supportsTcp)
+void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config)
 {
     if (mState == State::Uninitialized)
     {
@@ -531,7 +531,7 @@ void OperationalSessionSetup::PerformAddressUpdate()
 
 void OperationalSessionSetup::OnNodeAddressResolved(const PeerId & peerId, const ResolveResult & result)
 {
-    UpdateDeviceData(result.address, result.mrpRemoteConfig, result.supportsTcp);
+    UpdateDeviceData(result.address, result.mrpRemoteConfig);
 }
 
 void OperationalSessionSetup::OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason)
