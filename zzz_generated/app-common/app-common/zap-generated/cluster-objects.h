@@ -2552,8 +2552,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    StepMode stepMode = static_cast<StepMode>(0);
-    uint8_t stepSize  = static_cast<uint8_t>(0);
+    MoveModeEnum stepMode = static_cast<MoveModeEnum>(0);
+    uint8_t stepSize      = static_cast<uint8_t>(0);
     DataModel::Nullable<uint16_t> transitionTime;
     chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
     chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
@@ -2571,8 +2571,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    StepMode stepMode = static_cast<StepMode>(0);
-    uint8_t stepSize  = static_cast<uint8_t>(0);
+    MoveModeEnum stepMode = static_cast<MoveModeEnum>(0);
+    uint8_t stepSize      = static_cast<uint8_t>(0);
     DataModel::Nullable<uint16_t> transitionTime;
     chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
     chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
@@ -2713,8 +2713,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    StepMode stepMode = static_cast<StepMode>(0);
-    uint8_t stepSize  = static_cast<uint8_t>(0);
+    MoveModeEnum stepMode = static_cast<MoveModeEnum>(0);
+    uint8_t stepSize      = static_cast<uint8_t>(0);
     DataModel::Nullable<uint16_t> transitionTime;
     chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
     chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
@@ -2732,8 +2732,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    StepMode stepMode = static_cast<StepMode>(0);
-    uint8_t stepSize  = static_cast<uint8_t>(0);
+    MoveModeEnum stepMode = static_cast<MoveModeEnum>(0);
+    uint8_t stepSize      = static_cast<uint8_t>(0);
     DataModel::Nullable<uint16_t> transitionTime;
     chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
     chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);

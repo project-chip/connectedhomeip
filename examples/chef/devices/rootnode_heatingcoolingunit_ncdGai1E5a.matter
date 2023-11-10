@@ -163,11 +163,6 @@ server cluster LevelControl = 8 {
     kDown = 1;
   }
 
-  enum StepMode : enum8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
   bitmap Feature : bitmap32 {
     kOnOff = 0x1;
     kLighting = 0x2;
@@ -206,7 +201,7 @@ server cluster LevelControl = 8 {
   }
 
   request struct StepRequest {
-    StepMode stepMode = 0;
+    MoveModeEnum stepMode = 0;
     int8u stepSize = 1;
     nullable int16u transitionTime = 2;
     OptionsBitmap optionsMask = 3;
@@ -233,7 +228,7 @@ server cluster LevelControl = 8 {
   }
 
   request struct StepWithOnOffRequest {
-    StepMode stepMode = 0;
+    MoveModeEnum stepMode = 0;
     int8u stepSize = 1;
     nullable int16u transitionTime = 2;
     OptionsBitmap optionsMask = 3;

@@ -194,25 +194,6 @@ enum class MoveModeEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for StepMode
-enum class StepMode : uint8_t
-{
-    kUp   = 0x00,
-    kDown = 0x01,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
-};
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using StepMode                                                     = EmberAfStepMode;
-static StepMode __attribute__((unused)) kStepModekUnknownEnumValue = static_cast<StepMode>(2);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-
 // Bitmap for Feature
 enum class Feature : uint32_t
 {

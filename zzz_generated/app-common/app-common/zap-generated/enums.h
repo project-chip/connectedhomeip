@@ -77,10 +77,3 @@ enum EmberAfPHYRateEnum : uint8_t
     EMBER_ZCL_PHY_RATE_ENUM_RATE200_G = 8,
     EMBER_ZCL_PHY_RATE_ENUM_RATE400_G = 9,
 };
-
-// Enum for StepMode
-enum EmberAfStepMode : uint8_t
-{
-    EMBER_ZCL_STEP_MODE_UP   = 0,
-    EMBER_ZCL_STEP_MODE_DOWN = 1,
-};
