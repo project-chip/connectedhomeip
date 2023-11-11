@@ -193,8 +193,8 @@ RPi users, as needed:
 ### Capture
 
 > **_IMPORTANT_**  
-> Ensure you've made it to the log line "Starting real time analysis, press enter to stop!" before 
-> launching the app under test.
+> Ensure you've made it to the log line "Starting real time analysis, press
+> enter to stop!" before launching the app under test.
 
 ```
 idt capture -h
