@@ -19,10 +19,11 @@ import os
 import platform as host_platform
 import sys
 
-import config
 from utils import log
 from utils.log import border_print
 from utils.shell import Bash
+
+import config
 
 logger = log.get_logger(__file__)
 

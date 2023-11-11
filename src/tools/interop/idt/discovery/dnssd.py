@@ -19,12 +19,12 @@ import asyncio
 import os
 import traceback
 from dataclasses import dataclass
-from typing import Callable
 from textwrap import dedent
+from typing import Callable
 
 from probe.ip_utils import get_addr_type
 from utils.artifact import create_standard_log_name, log
-from utils.log import border_print, add_border
+from utils.log import add_border, border_print
 from zeroconf import ServiceBrowser, ServiceInfo, ServiceListener, Zeroconf
 
 logger = log.get_logger(__file__)

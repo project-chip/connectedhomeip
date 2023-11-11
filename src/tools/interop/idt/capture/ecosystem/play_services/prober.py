@@ -18,6 +18,7 @@
 import os
 
 from utils.shell import Bash, log
+
 from . import config
 
 logger = log.get_logger(__file__)
