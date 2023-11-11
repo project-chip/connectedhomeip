@@ -69,13 +69,13 @@ class AndroidPcap(AndroidStream):
             return
         if not os.path.exists(os.path.join(self.build_dir, "tcpdump")):
             self.logger.warning("tcpdump bin not found, attempting to build, please wait a few moments!")
-            if is_mac():
-                # TODO: script is not using BUILD dir yet, but need to call mac_build_tcpdump_64.sh here
-                self.logger.critical("Build Android tcpdump on macOS not supported!")
-                return
             safe_mkdir(self.build_dir)
-            build_script = os.path.join(os.path.dirname(__file__), "linux_build_tcpdump_64.sh")
-            Bash(f"{build_script} 2>&1 >> BUILD_LOG.txt", sync=True, cwd=self.build_dir).start_command()
+            if is_mac():
+                build_script = os.path.join(os.path.dirname(__file__), "mac_build_tcpdump_64.sh")
+                Bash(f"{build_script} 2>&1 >> BUILD_LOG.txt", sync=True, cwd=self.build_dir).start_command()
+            else:
+                build_script = os.path.join(os.path.dirname(__file__), "linux_build_tcpdump_64.sh")
+                Bash(f"{build_script} 2>&1 >> BUILD_LOG.txt", sync=True, cwd=self.build_dir).start_command()
         else:
             self.logger.warning("Reusing existing tcpdump build")
         if not self.platform.run_adb_command(f"shell ls {self.target_dir}/tcpdump").finished_success():

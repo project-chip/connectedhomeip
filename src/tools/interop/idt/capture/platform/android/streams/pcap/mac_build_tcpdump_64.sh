@@ -56,5 +56,5 @@ cleanup "$TCPDUMP_ARCHIVE" "$TCPDUMP_DIR"
 
 # Prepare the artifact
 strip "$OUT_DIR/bin/tcpdump"
-mkdir -p ./build/ && mv "$OUT_DIR/bin/tcpdump" ./build/
+mv "$OUT_DIR/bin/tcpdump" .
 rm -rf "$TMP_DIR"
