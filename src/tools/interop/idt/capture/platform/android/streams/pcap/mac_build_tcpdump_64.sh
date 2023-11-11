@@ -16,9 +16,9 @@ OUT_DIR=$TMP_DIR/out
 
 # Function to download and extract archives
 download_and_extract() {
-  local url=$1
-  local filepath=$2
-  local tar_dir=$3
+  local url="$1"
+  local filepath="$2"
+  local tar_dir="$3"
 
   wget -O "$filepath" "$url"
   tar -C "$tar_dir" -zxvf "$filepath"
@@ -26,8 +26,8 @@ download_and_extract() {
 
 # Function to clean up downloaded and extracted files
 cleanup() {
-  local filepath=$1
-  local dirpath=$2
+  local filepath="$1"
+  local dirpath="$2"
 
   rm -rf "$filepath" "$dirpath"
 }
@@ -39,7 +39,7 @@ LIBPCAP_ARCHIVE=$TMP_DIR/libpcap-$LIBPCAP_VERSION.tar.gz
 
 download_and_extract "https://www.tcpdump.org/release/libpcap-$LIBPCAP_VERSION.tar.gz" "$LIBPCAP_ARCHIVE" "$TMP_DIR"
 ( cd "$LIBPCAP_DIR" && ./configure --prefix="$OUT_DIR" --host="$TARGET_ARCH" --with-pcap=linux )
-make -C "$LIBPCAP_DIR" -j$(nproc)
+make -C "$LIBPCAP_DIR" -j"$(nproc)"
 make -C "$LIBPCAP_DIR" install
 cleanup "$LIBPCAP_ARCHIVE" "$LIBPCAP_DIR"
 
