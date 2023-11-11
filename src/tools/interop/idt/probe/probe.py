@@ -66,7 +66,7 @@ class GenericMatterProber(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def check_routes(self) -> None:
+    def get_general_details(self) -> None:
         raise NotImplementedError
 
     def discover_targets_by_browsing(self) -> None:
@@ -97,4 +97,4 @@ class GenericMatterProber(ABC):
         self.discover_targets_by_browsing()
         self.discover_targets_by_neighbor()
         self.probe_targets()
-        self.check_routes()
+        self.get_general_details()

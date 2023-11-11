@@ -86,7 +86,7 @@ class MatterTxtRecordParser:
                                "Whether the device is in commissioning mode or not.",
                                MatterTxtRecordParser.parse_cm),  # Decode
             "DT": RecordParser("Device type",
-                               "Type for this end device.",
+                               "Application type for this end device.",
                                MatterTxtRecordParser.parse_dt),  # Decode
             "DN": RecordParser("Device name",
                                "Manufacturer provided device name. MAY match NodeLabel in Basic info cluster.",
@@ -100,7 +100,9 @@ class MatterTxtRecordParser:
                                commissionable."),
                                MatterTxtRecordParser.parse_ph),  # Decode
             "PI": RecordParser("Pairing instructions",
-                               "Used in combination with the pairing hint.",
+                               dedent("\
+                               Used in combination with the Pairing hint. If the Pairing hint mentions N, this is the \
+                               value of N."),
                                MatterTxtRecordParser.parse_pass_through),  # None
             # General records
             "SII": RecordParser("Session idle interval",
@@ -243,7 +245,7 @@ class MatterTxtRecordParser:
             "Read the manual",
             "Press the reset button",
             "Press Reset Button with application of power",
-            "Press Reset Button for N seconds, N set in PI TXT value",
+            "Press Reset Button for N seconds",
             "Press Reset Button until light blinks",
             "Press Reset Button for N seconds with application of power",
             "Press Reset Button until light blinks with application of power",
@@ -288,7 +290,7 @@ class MatterDnssdListener(ServiceListener):
 
     @staticmethod
     def log_addr(info: ServiceInfo) -> str:
-        ret = "\n"
+        ret = add_border("This device has the following IP addresses\n")
         for addr in info.parsed_scoped_addresses():
             ret += f"{get_addr_type(addr)}: {addr}\n"
         return ret
@@ -305,12 +307,11 @@ class MatterDnssdListener(ServiceListener):
         update_str = f"\nSERVICE {delta_type}\n"
         to_log += ("*" * (len(update_str) - 2)) + update_str
         to_log += _MDNS_TYPES[type_].type + "\n"
-        to_log += _MDNS_TYPES[type_].description
-        to_log += f"\nA/SRV TTL: {str(info.host_ttl)}\n"
+        to_log += _MDNS_TYPES[type_].description + "\n"
+        to_log += f"A/SRV TTL: {str(info.host_ttl)}\n"
         to_log += f"PTR/TXT TTL: {str(info.other_ttl)}\n"
         txt_parser = MatterTxtRecordParser()
         to_log += txt_parser.parse_records(info)
-        to_log += add_border("This device has the following IP addresses\n")
         to_log += self.log_addr(info)
         self.logger.info(to_log)
         self.write_log(to_log, name)

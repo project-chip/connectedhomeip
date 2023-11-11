@@ -16,3 +16,4 @@
 #
 
 enable_foyer_probers = True
+foyer_prober_traceroute_limit = 32

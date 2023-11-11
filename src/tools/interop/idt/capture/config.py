@@ -47,4 +47,4 @@ async def not_actually_async():  # Now it is_actually_async because we
 Result: The timeout error will be raised.
 
 """
-orchestrator_async_step_timeout = 45.0
+orchestrator_async_step_timeout = 120.0

@@ -28,7 +28,7 @@ green = "\x1b[32;1m"
 grey = "\x1b[38;20m"
 magenta = "\x1b[35;1m"
 yellow = "\x1b[33;20m"
-red_black_background = "\x1b[31;40;20m"
+bold_red = "\x1b[1;31m"
 bold_red_yellow_background = "\x1b[31;43;1m"
 
 reset = "\x1b[0m"
@@ -42,7 +42,7 @@ FORMATS = {
     logging.DEBUG: format_pre + blue + format_post,
     logging.INFO: format_pre + green + format_post,
     logging.WARNING: format_pre + yellow + format_post,
-    logging.ERROR: format_pre + red_black_background + format_post,
+    logging.ERROR: format_pre + bold_red + format_post,
     logging.CRITICAL: format_pre + bold_red_yellow_background + format_post
 }
 

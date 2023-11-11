@@ -30,6 +30,10 @@ class ProberLinuxHost(p.GenericMatterProber):
         # TODO: Parity with macOS
         super().__init__(artifact_dir, dnssd_artifact_dir)
         self.logger = logger
+        self.ll_int = get_ll_interface()
+
+    def discover_targets_by_neighbor(self) -> None:
+        pass
 
     def probe_v4(self, ipv4: str, port: str) -> None:
         self.run_command(f"ping -c {config.ping_count} {ipv4}")
@@ -38,11 +42,7 @@ class ProberLinuxHost(p.GenericMatterProber):
         self.run_command(f"ping -c {config.ping_count} -6 {ipv6}")
 
     def probe_v6_ll(self, ipv6_ll: str, port: str) -> None:
-        interface = get_ll_interface()
-        self.run_command(f"ping -c {config.ping_count} -6 {ipv6_ll}%{interface}")
+        self.run_command(f"ping -c {config.ping_count} -6 {ipv6_ll}%{self.ll_int}")
 
-    def discover_targets_by_neighbor(self) -> None:
+    def get_general_details(self) -> None:
         pass
-
-    def check_routes(self) -> None:
-        self.run_command("route -6 -n")

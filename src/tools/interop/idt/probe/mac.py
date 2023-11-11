@@ -30,26 +30,27 @@ class ProberMacHost(p.GenericMatterProber):
         # TODO: Build out additional probes
         super().__init__(artifact_dir, dnssd_artifact_dir)
         self.logger = logger
+        self.ll_int = get_ll_interface()
 
     def discover_targets_by_neighbor(self) -> None:
-        self.logger.info("Arp")
-        self.run_command("arp -a")
-        self.logger.info("Neigh")
-        self.run_command("ndp -an")
-
-    def check_routes(self) -> None:
-        self.logger.info("v6")
-        self.run_command("netstat -r -f inet6 -n")
+        pass
 
     def probe_v4(self, target: ProbeTarget) -> None:
-        self.logger.info("Ping")
+        self.logger.info("Ping IPv4")
         self.run_command(f"ping -c {config.ping_count} {target.ip}")
 
     def probe_v6(self, target: ProbeTarget) -> None:
-        self.logger.info("Ping")
+        self.logger.info("Ping IPv6")
         self.run_command(f"ping6 -c {config.ping_count} {target.ip}")
 
     def probe_v6_ll(self, target: ProbeTarget) -> None:
-        interface = get_ll_interface()
-        self.logger.info("Ping")
-        self.run_command(f"ping6 -c {config.ping_count} -I {interface} {target.ip}")
+        self.logger.info("Ping IPv6 Link Local")
+        self.run_command(f"ping6 -c {config.ping_count} -I {self.ll_int} {target.ip}")
+
+    def get_general_details(self) -> None:
+        self.logger.info("Host interfaces")
+        self.run_command("ifconfig")
+        self.logger.info("v4 routes from host")
+        self.run_command("netstat -r -f inet -n")
+        self.logger.info("v6 routes from host")
+        self.run_command("netstat -r -f inet6 -n")
