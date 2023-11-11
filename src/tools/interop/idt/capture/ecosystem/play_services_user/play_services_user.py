@@ -48,7 +48,6 @@ class PlayServicesUser(EcosystemCapture):
         self.output = ""
         self.logcat_stream: LogcatStreamer = self.platform.streams["LogcatStreamer"]
 
-
     async def start_capture(self) -> None:
         pass
 
