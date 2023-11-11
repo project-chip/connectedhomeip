@@ -53,7 +53,6 @@ chip_test_suite_using_nltest("tests") {
     "TestTestPersistentStorageDelegate.cpp",
     "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
-    "TestTlvJson.cpp",
     "TestTlvToJson.cpp",
     "TestUtf8.cpp",
     "TestVariant.cpp",
