@@ -39,18 +39,6 @@ FactoryDataProviderImpl::FactoryDataProviderImpl()
 CHIP_ERROR FactoryDataProviderImpl::Init()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    uint32_t sum     = 0;
-
-    for (uint8_t i = 1; i < FactoryDataProvider::FactoryDataId::kMaxId; i++)
-    {
-        sum += maxLengths[i];
-    }
-
-    if (sum > kFactoryDataSize)
-    {
-        ChipLogError(DeviceLayer, "Max size of factory data: %lu is bigger than reserved factory data size: %lu", sum,
-                     kFactoryDataSize);
-    }
 
 #if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
     error = ValidateWithRestore();
