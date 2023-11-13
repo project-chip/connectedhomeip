@@ -147,7 +147,7 @@ const Map<uint32_t, WiFiManager::NetEventHandler, 5>
 
 void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
 {
-    if (0 == strcmp(iface->if_dev->dev->name, "wlan0"))
+    if (iface == Instance().mNetIf)
     {
         Platform::UniquePtr<uint8_t> eventData(new uint8_t[cb->info_length]);
         VerifyOrReturn(eventData);
@@ -158,6 +158,9 @@ void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mg
 
 CHIP_ERROR WiFiManager::Init()
 {
+    mNetIf = InetUtils::GetWiFiInterface();
+    VerifyOrReturnError(mNetIf != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+
     // TODO: consider moving these to ConnectivityManagerImpl to be prepared for handling multiple interfaces on a single device.
     Inet::UDPEndPointImplSockets::SetJoinMulticastGroupHandler([](Inet::InterfaceId interfaceId, const Inet::IPAddress & address) {
         const in6_addr addr = InetUtils::ToZephyrAddr(address);
@@ -197,9 +200,6 @@ CHIP_ERROR WiFiManager::Init()
 CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCallback, ScanDoneCallback doneCallback,
                              bool internalScan)
 {
-    net_if * iface = InetUtils::GetInterface();
-    VerifyOrReturnError(nullptr != iface, CHIP_ERROR_INTERNAL);
-
     mInternalScan       = internalScan;
     mScanResultCallback = resultCallback;
     mScanDoneCallback   = doneCallback;
@@ -207,7 +207,7 @@ CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCal
     mWiFiState          = WIFI_STATE_SCANNING;
     mSsidFound          = false;
 
-    if (0 != net_mgmt(NET_REQUEST_WIFI_SCAN, iface, NULL, 0))
+    if (0 != net_mgmt(NET_REQUEST_WIFI_SCAN, mNetIf, NULL, 0))
     {
         ChipLogError(DeviceLayer, "Scan request failed");
         return CHIP_ERROR_INTERNAL;
@@ -248,11 +248,8 @@ CHIP_ERROR WiFiManager::Connect(const ByteSpan & ssid, const ByteSpan & credenti
 
 CHIP_ERROR WiFiManager::Disconnect()
 {
-    net_if * iface = InetUtils::GetInterface();
-    VerifyOrReturnError(nullptr != iface, CHIP_ERROR_INTERNAL);
-
     mApplicationDisconnectRequested = true;
-    int status                      = net_mgmt(NET_REQUEST_WIFI_DISCONNECT, iface, NULL, 0);
+    int status                      = net_mgmt(NET_REQUEST_WIFI_DISCONNECT, mNetIf, NULL, 0);
 
     if (status)
     {
@@ -277,11 +274,9 @@ CHIP_ERROR WiFiManager::Disconnect()
 
 CHIP_ERROR WiFiManager::GetWiFiInfo(WiFiInfo & info) const
 {
-    net_if * iface = InetUtils::GetInterface();
-    VerifyOrReturnError(nullptr != iface, CHIP_ERROR_INTERNAL);
-    struct wifi_iface_status status = { 0 };
+    wifi_iface_status status = { 0 };
 
-    if (net_mgmt(NET_REQUEST_WIFI_IFACE_STATUS, iface, &status, sizeof(struct wifi_iface_status)))
+    if (net_mgmt(NET_REQUEST_WIFI_IFACE_STATUS, mNetIf, &status, sizeof(wifi_iface_status)))
     {
         ChipLogError(DeviceLayer, "Status request failed");
         return CHIP_ERROR_INTERNAL;
@@ -306,7 +301,7 @@ CHIP_ERROR WiFiManager::GetWiFiInfo(WiFiInfo & info) const
 CHIP_ERROR WiFiManager::GetNetworkStatistics(NetworkStatistics & stats) const
 {
     net_stats_wifi data{};
-    net_mgmt(NET_REQUEST_STATS_GET_WIFI, InetUtils::GetInterface(), &data, sizeof(data));
+    net_mgmt(NET_REQUEST_STATS_GET_WIFI, mNetIf, &data, sizeof(data));
 
     stats.mPacketMulticastRxCount = data.multicast.rx;
     stats.mPacketMulticastTxCount = data.multicast.tx;
@@ -321,7 +316,7 @@ CHIP_ERROR WiFiManager::GetNetworkStatistics(NetworkStatistics & stats) const
 void WiFiManager::ScanResultHandler(Platform::UniquePtr<uint8_t> data)
 {
     // Contrary to other handlers, offload accumulating of the scan results from the CHIP thread to the caller's thread
-    const struct wifi_scan_result * scanResult = reinterpret_cast<const struct wifi_scan_result *>(data.get());
+    const wifi_scan_result * scanResult = reinterpret_cast<const wifi_scan_result *>(data.get());
 
     if (Instance().mInternalScan &&
         Instance().mWantedNetwork.GetSsidSpan().data_equal(ByteSpan(scanResult->ssid, scanResult->ssid_length)))
@@ -402,10 +397,9 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data)
             }
 
             Instance().mWiFiState = WIFI_STATE_ASSOCIATING;
-            net_if * iface        = InetUtils::GetInterface();
-            VerifyOrReturn(nullptr != iface, CHIP_ERROR_INTERNAL);
 
-            if (net_mgmt(NET_REQUEST_WIFI_CONNECT, iface, &(Instance().mWiFiParams.mParams), sizeof(wifi_connect_req_params)))
+            if (net_mgmt(NET_REQUEST_WIFI_CONNECT, Instance().mNetIf, &(Instance().mWiFiParams.mParams),
+                         sizeof(wifi_connect_req_params)))
             {
                 ChipLogError(DeviceLayer, "Connection request failed");
                 if (Instance().mHandling.mOnConnectionFailed)
@@ -430,20 +424,16 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data)
 
 void WiFiManager::SendRouterSolicitation(System::Layer * layer, void * param)
 {
-    net_if * iface = InetUtils::GetInterface();
-    if (iface && iface->if_dev->link_addr.type == NET_LINK_ETHERNET)
+    net_if_start_rs(Instance().mNetIf);
+    Instance().mRouterSolicitationCounter++;
+    if (Instance().mRouterSolicitationCounter < kRouterSolicitationMaxCount)
     {
-        net_if_start_rs(iface);
-        Instance().mRouterSolicitationCounter++;
-        if (Instance().mRouterSolicitationCounter < kRouterSolicitationMaxCount)
-        {
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kRouterSolicitationIntervalMs),
-                                                  SendRouterSolicitation, nullptr);
-        }
-        else
-        {
-            Instance().mRouterSolicitationCounter = 0;
-        }
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kRouterSolicitationIntervalMs), SendRouterSolicitation,
+                                              nullptr);
+    }
+    else
+    {
+        Instance().mRouterSolicitationCounter = 0;
     }
 }
 
@@ -572,11 +562,10 @@ System::Clock::Milliseconds32 WiFiManager::CalculateNextRecoveryTime()
 
 CHIP_ERROR WiFiManager::SetLowPowerMode(bool onoff)
 {
-    net_if * iface = InetUtils::GetInterface();
-    VerifyOrReturnError(nullptr != iface, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(nullptr != mNetIf, CHIP_ERROR_INTERNAL);
 
     wifi_ps_config currentConfig{};
-    if (net_mgmt(NET_REQUEST_WIFI_PS_CONFIG, iface, &currentConfig, sizeof(currentConfig)))
+    if (net_mgmt(NET_REQUEST_WIFI_PS_CONFIG, mNetIf, &currentConfig, sizeof(currentConfig)))
     {
         ChipLogError(DeviceLayer, "Get current low power mode config request failed");
         return CHIP_ERROR_INTERNAL;
@@ -586,7 +575,7 @@ CHIP_ERROR WiFiManager::SetLowPowerMode(bool onoff)
         (currentConfig.ps_params.enabled == WIFI_PS_DISABLED && onoff == true))
     {
         wifi_ps_params params{ .enabled = onoff ? WIFI_PS_ENABLED : WIFI_PS_DISABLED };
-        if (net_mgmt(NET_REQUEST_WIFI_PS, iface, &params, sizeof(params)))
+        if (net_mgmt(NET_REQUEST_WIFI_PS, mNetIf, &params, sizeof(params)))
         {
             ChipLogError(DeviceLayer, "Set low power mode request failed");
             return CHIP_ERROR_INTERNAL;
