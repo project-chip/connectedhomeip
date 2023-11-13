@@ -46,6 +46,8 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
+#include <unordered_map>
 
 #include <gio/gio.h>
 #include <glib.h>
@@ -64,8 +66,8 @@ namespace Internal {
 class BluezEndpoint
 {
 public:
-    BluezEndpoint();
-    ~BluezEndpoint();
+    BluezEndpoint()  = default;
+    ~BluezEndpoint() = default;
 
     CHIP_ERROR Init(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr, const char * apBleName);
     void Shutdown();
@@ -101,6 +103,7 @@ private:
 
     void HandleNewDevice(BluezDevice1 * aDevice);
     void UpdateConnectionTable(BluezDevice1 * aDevice);
+    BluezConnection * GetBluezConnection(const char * aPath);
     BluezConnection * GetBluezConnectionViaDevice();
 
     gboolean BluezCharacteristicReadValue(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOptions);
@@ -120,10 +123,13 @@ private:
     static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams);
     static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams);
 
+    bool mIsCentral = false;
+
     // Bus owning name
     char * mpOwningName = nullptr;
 
     // Adapter properties
+    uint32_t mAdapterId  = 0;
     char * mpAdapterName = nullptr;
     char * mpAdapterAddr = nullptr;
 
@@ -144,12 +150,9 @@ private:
     // additional data characteristics
     BluezGattCharacteristic1 * mpC3 = nullptr;
 
-    // map device path to the connection
-    GHashTable * mpConnMap              = nullptr;
-    uint32_t mAdapterId                 = 0;
-    bool mIsCentral                     = false;
-    char * mpPeerDevicePath             = nullptr;
+    std::unordered_map<std::string, BluezConnection *> mConnMap;
     GCancellable * mpConnectCancellable = nullptr;
+    char * mpPeerDevicePath             = nullptr;
 
     // Allow BluezAdvertisement and BluezConnection to access our private members
     // TODO: Fix this tight coupling

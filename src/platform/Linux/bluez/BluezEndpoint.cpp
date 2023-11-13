@@ -308,16 +308,16 @@ exit:
 void BluezEndpoint::UpdateConnectionTable(BluezDevice1 * apDevice)
 {
     const char * objectPath      = g_dbus_proxy_get_object_path(G_DBUS_PROXY(apDevice));
-    BluezConnection * connection = static_cast<BluezConnection *>(g_hash_table_lookup(mpConnMap, objectPath));
+    BluezConnection * connection = GetBluezConnection(objectPath);
 
     if (connection != nullptr && !bluez_device1_get_connected(apDevice))
     {
         ChipLogDetail(DeviceLayer, "Bluez disconnected");
         BLEManagerImpl::CHIPoBluez_ConnectionClosed(connection);
+        mConnMap.erase(objectPath);
         // TODO: the connection object should be released after BLEManagerImpl finishes cleaning up its resources
         // after the disconnection. Releasing it here doesn't cause any issues, but it's error-prone.
         chip::Platform::Delete(connection);
-        g_hash_table_remove(mpConnMap, objectPath);
         return;
     }
 
@@ -329,9 +329,9 @@ void BluezEndpoint::UpdateConnectionTable(BluezDevice1 * apDevice)
     if (connection == nullptr && bluez_device1_get_connected(apDevice) &&
         (!mIsCentral || bluez_device1_get_services_resolved(apDevice)))
     {
-        connection       = chip::Platform::New<BluezConnection>(*this, apDevice);
-        mpPeerDevicePath = g_strdup(objectPath);
-        g_hash_table_insert(mpConnMap, mpPeerDevicePath, connection);
+        connection                 = chip::Platform::New<BluezConnection>(*this, apDevice);
+        mpPeerDevicePath           = g_strdup(objectPath);
+        mConnMap[mpPeerDevicePath] = connection;
 
         ChipLogDetail(DeviceLayer, "New BLE connection: conn %p, device %s, path %s", connection, connection->GetPeerAddress(),
                       mpPeerDevicePath);
@@ -364,14 +364,14 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 * device)
     BluezConnection * conn;
     VerifyOrExit(bluez_device1_get_connected(device), ChipLogError(DeviceLayer, "FAIL: device is not connected"));
 
-    conn = static_cast<BluezConnection *>(g_hash_table_lookup(mpConnMap, g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))));
+    conn = GetBluezConnection(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
     VerifyOrExit(conn == nullptr,
                  ChipLogError(DeviceLayer, "FAIL: connection already tracked: conn: %p new device: %s", conn,
                               g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))));
 
-    conn             = chip::Platform::New<BluezConnection>(*this, device);
-    mpPeerDevicePath = g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
-    g_hash_table_insert(mpConnMap, mpPeerDevicePath, conn);
+    conn                       = chip::Platform::New<BluezConnection>(*this, device);
+    mpPeerDevicePath           = g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
+    mConnMap[mpPeerDevicePath] = conn;
 
     ChipLogDetail(DeviceLayer, "BLE device connected: conn %p, device %s, path %s", conn, conn->GetPeerAddress(), mpPeerDevicePath);
 
@@ -469,9 +469,15 @@ exit:
     g_list_free_full(objects, g_object_unref);
 }
 
+BluezConnection * BluezEndpoint::GetBluezConnection(const char * aPath)
+{
+    auto it = mConnMap.find(aPath);
+    return (it != mConnMap.end()) ? it->second : nullptr;
+}
+
 BluezConnection * BluezEndpoint::GetBluezConnectionViaDevice()
 {
-    return static_cast<BluezConnection *>(g_hash_table_lookup(mpConnMap, mpPeerDevicePath));
+    return GetBluezConnection(mpPeerDevicePath);
 }
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -645,16 +651,6 @@ CHIP_ERROR BluezEndpoint::StartupEndpointBindings()
     SetupAdapter();
 
     return CHIP_NO_ERROR;
-}
-
-BluezEndpoint::BluezEndpoint()
-{
-    mpConnMap = g_hash_table_new(g_str_hash, g_str_equal);
-}
-
-BluezEndpoint::~BluezEndpoint()
-{
-    g_hash_table_destroy(mpConnMap);
 }
 
 CHIP_ERROR BluezEndpoint::RegisterGattApplication()
