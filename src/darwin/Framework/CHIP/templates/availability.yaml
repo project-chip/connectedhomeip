@@ -3074,8 +3074,12 @@
               - EffectIdentifierEnum
               - StartUpOnOffEnum
           LevelControl:
-              - MoveMode
-              - StepMode
+              # MoveModeEnum and StepModeEnum were originally named MoveMode and
+              # StepMode, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - MoveModeEnum
+              - StepModeEnum
           AccessControl:
               - AuthMode
               - ChangeTypeEnum
@@ -3320,10 +3324,14 @@
                   - On
                   - TogglePreviousOnOff
           LevelControl:
-              MoveMode:
+              # MoveModeEnum and StepModeEnum were originally named MoveMode and
+              # StepMode, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              MoveModeEnum:
                   - Up
                   - Down
-              StepMode:
+              StepModeEnum:
                   - Up
                   - Down
           AccessControl:
@@ -7772,6 +7780,8 @@
               - Feature
           ContentLauncher:
               - SupportedProtocolsBitmap
+          LevelControl:
+              - OptionsBitmap
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7791,6 +7801,10 @@
               SupportedProtocolsBitmap:
                   - DASH
                   - HLS
+          LevelControl:
+              OptionsBitmap:
+                  - ExecuteIfOff
+                  - CoupleColorTempToLevel
   deprecated:
       event fields:
           WiFiNetworkDiagnostics:
@@ -7809,6 +7823,8 @@
               - ScenesCopyMode
           ContentLauncher:
               - SupportedStreamingProtocol
+          LevelControl:
+              - LevelControlOptions
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7904,6 +7920,8 @@
               CopyModeBitmap: ScenesCopyMode
           ContentLauncher:
               SupportedProtocolsBitmap: SupportedStreamingProtocol
+          LevelControl:
+              OptionsBitmap: LevelControlOptions
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
