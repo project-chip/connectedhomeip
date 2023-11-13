@@ -641,9 +641,12 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
 CHIP_ERROR ReadClient::ProcessAttributePath(AttributePathIB::Parser & aAttributePathParser,
                                             ConcreteDataAttributePath & aAttributePath)
 {
+    // The ReportData must contain a concrete attribute path.  Don't validate ID
+    // ranges here, so we can tell apart "malformed data" and "out of range
+    // IDs".
     CHIP_ERROR err = CHIP_NO_ERROR;
     // The ReportData must contain a concrete attribute path
-    err = aAttributePathParser.GetConcreteAttributePath(aAttributePath);
+    err = aAttributePathParser.GetConcreteAttributePath(aAttributePath, AttributePathIB::ValidateIdRanges::kNo);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
     return CHIP_NO_ERROR;
 }
@@ -679,6 +682,17 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             StatusIB::Parser errorStatus;
             ReturnErrorOnFailure(status.GetPath(&path));
             ReturnErrorOnFailure(ProcessAttributePath(path, attributePath));
+            if (!attributePath.IsValid())
+            {
+                // Don't fail the entire read or subscription when there is an
+                // out-of-range ID.  Just skip that one AttributeReportIB.
+                ChipLogError(DataManagement,
+                             "Skipping AttributeStatusIB with out-of-range IDs: (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") ",
+                             attributePath.mEndpointId, ChipLogValueMEI(attributePath.mClusterId),
+                             ChipLogValueMEI(attributePath.mAttributeId));
+                continue;
+            }
+
             ReturnErrorOnFailure(status.GetErrorStatus(&errorStatus));
             ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
             NoteReportingData();
@@ -689,6 +703,17 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             ReturnErrorOnFailure(report.GetAttributeData(&data));
             ReturnErrorOnFailure(data.GetPath(&path));
             ReturnErrorOnFailure(ProcessAttributePath(path, attributePath));
+            if (!attributePath.IsValid())
+            {
+                // Don't fail the entire read or subscription when there is an
+                // out-of-range ID.  Just skip that one AttributeReportIB.
+                ChipLogError(DataManagement,
+                             "Skipping AttributeDataIB  with out-of-range IDs: (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") ",
+                             attributePath.mEndpointId, ChipLogValueMEI(attributePath.mClusterId),
+                             ChipLogValueMEI(attributePath.mAttributeId));
+                continue;
+            }
+
             DataVersion version = 0;
             ReturnErrorOnFailure(data.GetDataVersion(&version));
             attributePath.mDataVersion.SetValue(version);
