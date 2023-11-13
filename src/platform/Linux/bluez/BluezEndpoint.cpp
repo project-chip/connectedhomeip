@@ -654,7 +654,6 @@ BluezEndpoint::BluezEndpoint()
 
 BluezEndpoint::~BluezEndpoint()
 {
-    Shutdown();
     g_hash_table_destroy(mpConnMap);
 }
 
