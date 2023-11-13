@@ -112,7 +112,6 @@ CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const Optional<
     ReliableMessageProtocolConfig mrpLocalConfig = GetDefaultMRPConfig();
     if (providedMrpConfig.HasValue())
     {
-        
         mrpLocalConfig = providedMrpConfig.Value();
     }
     TLV::TLVType mrpParamsContainer;
