@@ -30,17 +30,16 @@ namespace Clusters {
 
 namespace MicrowaveOvenMode {
 
-const uint8_t ModeNormal = 0;
-const uint8_t ModeDefrost  = 1;
+const uint8_t ModeNormal  = 0;
+const uint8_t ModeDefrost = 1;
 
 /// This is an application level delegate to handle MicrowaveOvenMode commands according to the specific business logic.
 class MicrowaveOvenModeDelegate : public ModeBase::Delegate
 {
 private:
-    using ModeTagStructType             = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsNormal[1]   = { { .value = to_underlying(ModeTag::kNormal) } };
-    ModeTagStructType modeTagsDefrost[1]  = { { .value = to_underlying(ModeTag::kDefrost) } };
-
+    using ModeTagStructType              = detail::Structs::ModeTagStruct::Type;
+    ModeTagStructType modeTagsNormal[1]  = { { .value = to_underlying(ModeTag::kNormal) } };
+    ModeTagStructType modeTagsDefrost[1] = { { .value = to_underlying(ModeTag::kDefrost) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[2] = {
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),

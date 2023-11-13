@@ -26,7 +26,7 @@ using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
 static MicrowaveOvenModeDelegate * gMicrowaveOvenModeDelegate = nullptr;
-static ModeBase::Instance * gMicrowaveOvenModeInstance     = nullptr;
+static ModeBase::Instance * gMicrowaveOvenModeInstance        = nullptr;
 
 CHIP_ERROR MicrowaveOvenModeDelegate::Init()
 {
