@@ -16,7 +16,9 @@
  */
 package matter.devicecontroller.cluster.eventstructs
 
+import java.util.Optional
 import matter.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -82,51 +84,39 @@ class DoorLockClusterLockUserChangeEvent(
     private const val TAG_SOURCE_NODE = 5
     private const val TAG_DATA_INDEX = 6
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DoorLockClusterLockUserChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DoorLockClusterLockUserChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val lockDataType = tlvReader.getUInt(ContextSpecificTag(TAG_LOCK_DATA_TYPE))
       val dataOperationType = tlvReader.getUInt(ContextSpecificTag(TAG_DATA_OPERATION_TYPE))
       val operationSource = tlvReader.getUInt(ContextSpecificTag(TAG_OPERATION_SOURCE))
-      val userIndex =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_USER_INDEX))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_USER_INDEX))
-          null
-        }
-      val fabricIndex =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_FABRIC_INDEX))
-          null
-        }
-      val sourceNode =
-        if (!tlvReader.isNull()) {
-          tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_NODE))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_SOURCE_NODE))
-          null
-        }
-      val dataIndex =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_DATA_INDEX))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_DATA_INDEX))
-          null
-        }
-
+      val userIndex = if (!tlvReader.isNull()) {
+        tlvReader.getUShort(ContextSpecificTag(TAG_USER_INDEX))
+      } else {
+        tlvReader.getNull(ContextSpecificTag(TAG_USER_INDEX))
+        null
+      }
+      val fabricIndex = if (!tlvReader.isNull()) {
+        tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
+      } else {
+        tlvReader.getNull(ContextSpecificTag(TAG_FABRIC_INDEX))
+        null
+      }
+      val sourceNode = if (!tlvReader.isNull()) {
+        tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_NODE))
+      } else {
+        tlvReader.getNull(ContextSpecificTag(TAG_SOURCE_NODE))
+        null
+      }
+      val dataIndex = if (!tlvReader.isNull()) {
+        tlvReader.getUShort(ContextSpecificTag(TAG_DATA_INDEX))
+      } else {
+        tlvReader.getNull(ContextSpecificTag(TAG_DATA_INDEX))
+        null
+      }
+      
       tlvReader.exitContainer()
 
-      return DoorLockClusterLockUserChangeEvent(
-        lockDataType,
-        dataOperationType,
-        operationSource,
-        userIndex,
-        fabricIndex,
-        sourceNode,
-        dataIndex
-      )
+      return DoorLockClusterLockUserChangeEvent(lockDataType, dataOperationType, operationSource, userIndex, fabricIndex, sourceNode, dataIndex)
     }
   }
 }

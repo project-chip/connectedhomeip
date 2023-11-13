@@ -2194,6 +2194,292 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::DoorLock::Structs::Cre
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Thermostat::Structs::ScheduleTransitionStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ScheduleTransitionStruct.dayOfWeek", "dayOfWeek", value.isMember("dayOfWeek")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleTransitionStruct.transitionTime", "transitionTime",
+                                                                  value.isMember("transitionTime")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleTransitionStruct.presetHandle", "presetHandle",
+                                                                  value.isMember("presetHandle")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleTransitionStruct.systemMode", "systemMode",
+                                                                  value.isMember("systemMode")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleTransitionStruct.coolingSetpoint", "coolingSetpoint",
+                                                                  value.isMember("coolingSetpoint")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleTransitionStruct.heatingSetpoint", "heatingSetpoint",
+                                                                  value.isMember("heatingSetpoint")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dayOfWeek");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.dayOfWeek, value["dayOfWeek"]));
+    valueCopy.removeMember("dayOfWeek");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transitionTime");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transitionTime, value["transitionTime"]));
+    valueCopy.removeMember("transitionTime");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presetHandle");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presetHandle, value["presetHandle"]));
+    valueCopy.removeMember("presetHandle");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "systemMode");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.systemMode, value["systemMode"]));
+    valueCopy.removeMember("systemMode");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "coolingSetpoint");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.coolingSetpoint, value["coolingSetpoint"]));
+    valueCopy.removeMember("coolingSetpoint");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatingSetpoint");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.heatingSetpoint, value["heatingSetpoint"]));
+    valueCopy.removeMember("heatingSetpoint");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::ScheduleTransitionStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.dayOfWeek);
+    ComplexArgumentParser::Finalize(request.transitionTime);
+    ComplexArgumentParser::Finalize(request.presetHandle);
+    ComplexArgumentParser::Finalize(request.systemMode);
+    ComplexArgumentParser::Finalize(request.coolingSetpoint);
+    ComplexArgumentParser::Finalize(request.heatingSetpoint);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.sceduleHandle", "sceduleHandle", value.isMember("sceduleHandle")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.systemMode", "systemMode", value.isMember("systemMode")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.name", "name", value.isMember("name")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.presetHandle", "presetHandle", value.isMember("presetHandle")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.transitions", "transitions", value.isMember("transitions")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.builtIn", "builtIn", value.isMember("builtIn")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "sceduleHandle");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.sceduleHandle, value["sceduleHandle"]));
+    valueCopy.removeMember("sceduleHandle");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "systemMode");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.systemMode, value["systemMode"]));
+    valueCopy.removeMember("systemMode");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    valueCopy.removeMember("name");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presetHandle");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presetHandle, value["presetHandle"]));
+    valueCopy.removeMember("presetHandle");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transitions");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transitions, value["transitions"]));
+    valueCopy.removeMember("transitions");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "builtIn");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.builtIn, value["builtIn"]));
+    valueCopy.removeMember("builtIn");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.sceduleHandle);
+    ComplexArgumentParser::Finalize(request.systemMode);
+    ComplexArgumentParser::Finalize(request.name);
+    ComplexArgumentParser::Finalize(request.presetHandle);
+    ComplexArgumentParser::Finalize(request.transitions);
+    ComplexArgumentParser::Finalize(request.builtIn);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Thermostat::Structs::PresetStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("PresetStruct.presetHandle", "presetHandle", value.isMember("presetHandle")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PresetStruct.presetScenario", "presetScenario",
+                                                                  value.isMember("presetScenario")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PresetStruct.name", "name", value.isMember("name")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PresetStruct.coolingSetpoint", "coolingSetpoint",
+                                                                  value.isMember("coolingSetpoint")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PresetStruct.heatingSetpoint", "heatingSetpoint",
+                                                                  value.isMember("heatingSetpoint")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PresetStruct.builtIn", "builtIn", value.isMember("builtIn")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presetHandle");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presetHandle, value["presetHandle"]));
+    valueCopy.removeMember("presetHandle");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presetScenario");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presetScenario, value["presetScenario"]));
+    valueCopy.removeMember("presetScenario");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    valueCopy.removeMember("name");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "coolingSetpoint");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.coolingSetpoint, value["coolingSetpoint"]));
+    valueCopy.removeMember("coolingSetpoint");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatingSetpoint");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.heatingSetpoint, value["heatingSetpoint"]));
+    valueCopy.removeMember("heatingSetpoint");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "builtIn");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.builtIn, value["builtIn"]));
+    valueCopy.removeMember("builtIn");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::PresetStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.presetHandle);
+    ComplexArgumentParser::Finalize(request.presetScenario);
+    ComplexArgumentParser::Finalize(request.name);
+    ComplexArgumentParser::Finalize(request.coolingSetpoint);
+    ComplexArgumentParser::Finalize(request.heatingSetpoint);
+    ComplexArgumentParser::Finalize(request.builtIn);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PresetTypeStruct.presetScenario", "presetScenario",
+                                                                  value.isMember("presetScenario")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PresetTypeStruct.numberOfPresets", "numberOfPresets",
+                                                                  value.isMember("numberOfPresets")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PresetTypeStruct.presetTypeFeatures", "presetTypeFeatures",
+                                                                  value.isMember("presetTypeFeatures")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presetScenario");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presetScenario, value["presetScenario"]));
+    valueCopy.removeMember("presetScenario");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "numberOfPresets");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.numberOfPresets, value["numberOfPresets"]));
+    valueCopy.removeMember("numberOfPresets");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presetTypeFeatures");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presetTypeFeatures, value["presetTypeFeatures"]));
+    valueCopy.removeMember("presetTypeFeatures");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.presetScenario);
+    ComplexArgumentParser::Finalize(request.numberOfPresets);
+    ComplexArgumentParser::Finalize(request.presetTypeFeatures);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("QueuedPresetStruct.presetHandle", "presetHandle",
+                                                                  value.isMember("presetHandle")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("QueuedPresetStruct.transitionTimestamp", "transitionTimestamp",
+                                                                  value.isMember("transitionTimestamp")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presetHandle");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presetHandle, value["presetHandle"]));
+    valueCopy.removeMember("presetHandle");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transitionTimestamp");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transitionTimestamp, value["transitionTimestamp"]));
+    valueCopy.removeMember("transitionTimestamp");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.presetHandle);
+    ComplexArgumentParser::Finalize(request.transitionTimestamp);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ScheduleTypeStruct.systemMode", "systemMode", value.isMember("systemMode")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleTypeStruct.numberOfSchedules", "numberOfSchedules",
+                                                                  value.isMember("numberOfSchedules")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleTypeStruct.scheduleTypeFeatures", "scheduleTypeFeatures",
+                                                                  value.isMember("scheduleTypeFeatures")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "systemMode");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.systemMode, value["systemMode"]));
+    valueCopy.removeMember("systemMode");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "numberOfSchedules");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.numberOfSchedules, value["numberOfSchedules"]));
+    valueCopy.removeMember("numberOfSchedules");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "scheduleTypeFeatures");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.scheduleTypeFeatures, value["scheduleTypeFeatures"]));
+    valueCopy.removeMember("scheduleTypeFeatures");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.systemMode);
+    ComplexArgumentParser::Finalize(request.numberOfSchedules);
+    ComplexArgumentParser::Finalize(request.scheduleTypeFeatures);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransition::Type & request,
                                         Json::Value & value)
 {

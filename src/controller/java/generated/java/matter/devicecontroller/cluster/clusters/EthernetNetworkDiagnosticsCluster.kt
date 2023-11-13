@@ -20,23 +20,34 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class EthernetNetworkDiagnosticsCluster(
-  private val controller: MatterController,
-  private val endpointId: UShort
-) {
-  class PHYRateAttribute(val value: UInt?)
+class EthernetNetworkDiagnosticsCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class PHYRateAttribute(
+    val value: UInt?
+  )
 
-  class FullDuplexAttribute(val value: Boolean?)
+  class FullDuplexAttribute(
+    val value: Boolean?
+  )
 
-  class CarrierDetectAttribute(val value: Boolean?)
+  class CarrierDetectAttribute(
+    val value: Boolean?
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
   suspend fun resetCounts(timedInvokeTimeoutMs: Int? = null) {
     val commandId = 0L
@@ -45,14 +56,17 @@ class EthernetNetworkDiagnosticsCluster(
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
   suspend fun readPHYRateAttribute(): PHYRateAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePHYRateAttribute(minInterval: Int, maxInterval: Int): PHYRateAttribute {
+  suspend fun subscribePHYRateAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): PHYRateAttribute {
     // Implementation needs to be added here
   }
 
@@ -71,7 +85,10 @@ class EthernetNetworkDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePacketRxCountAttribute(minInterval: Int, maxInterval: Int): ULong {
+  suspend fun subscribePacketRxCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ULong {
     // Implementation needs to be added here
   }
 
@@ -79,7 +96,10 @@ class EthernetNetworkDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePacketTxCountAttribute(minInterval: Int, maxInterval: Int): ULong {
+  suspend fun subscribePacketTxCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ULong {
     // Implementation needs to be added here
   }
 
@@ -87,7 +107,10 @@ class EthernetNetworkDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxErrCountAttribute(minInterval: Int, maxInterval: Int): ULong {
+  suspend fun subscribeTxErrCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ULong {
     // Implementation needs to be added here
   }
 
@@ -95,7 +118,10 @@ class EthernetNetworkDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCollisionCountAttribute(minInterval: Int, maxInterval: Int): ULong {
+  suspend fun subscribeCollisionCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ULong {
     // Implementation needs to be added here
   }
 
@@ -103,7 +129,10 @@ class EthernetNetworkDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOverrunCountAttribute(minInterval: Int, maxInterval: Int): ULong {
+  suspend fun subscribeOverrunCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ULong {
     // Implementation needs to be added here
   }
 
@@ -122,7 +151,10 @@ class EthernetNetworkDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTimeSinceResetAttribute(minInterval: Int, maxInterval: Int): ULong {
+  suspend fun subscribeTimeSinceResetAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ULong {
     // Implementation needs to be added here
   }
 
@@ -152,7 +184,10 @@ class EthernetNetworkDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -171,7 +206,10 @@ class EthernetNetworkDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -179,7 +217,10 @@ class EthernetNetworkDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

@@ -4008,6 +4008,66 @@ namespace ACCapacityformat {
 static constexpr AttributeId Id = 0x00000047;
 } // namespace ACCapacityformat
 
+namespace PresetTypes {
+static constexpr AttributeId Id = 0x00000048;
+} // namespace PresetTypes
+
+namespace ScheduleTypes {
+static constexpr AttributeId Id = 0x00000049;
+} // namespace ScheduleTypes
+
+namespace NumberOfPresets {
+static constexpr AttributeId Id = 0x0000004A;
+} // namespace NumberOfPresets
+
+namespace NumberOfSchedules {
+static constexpr AttributeId Id = 0x0000004B;
+} // namespace NumberOfSchedules
+
+namespace NumberOfScheduleTransitions {
+static constexpr AttributeId Id = 0x0000004C;
+} // namespace NumberOfScheduleTransitions
+
+namespace NumberOfScheduleTransitionsPerDay {
+static constexpr AttributeId Id = 0x0000004D;
+} // namespace NumberOfScheduleTransitionsPerDay
+
+namespace Presets {
+static constexpr AttributeId Id = 0x0000004E;
+} // namespace Presets
+
+namespace PresetsEditable {
+static constexpr AttributeId Id = 0x0000004F;
+} // namespace PresetsEditable
+
+namespace ActivePresetHandle {
+static constexpr AttributeId Id = 0x00000050;
+} // namespace ActivePresetHandle
+
+namespace Schedules {
+static constexpr AttributeId Id = 0x00000051;
+} // namespace Schedules
+
+namespace SchedulesEditable {
+static constexpr AttributeId Id = 0x00000052;
+} // namespace SchedulesEditable
+
+namespace ActiveScheduleHandle {
+static constexpr AttributeId Id = 0x00000053;
+} // namespace ActiveScheduleHandle
+
+namespace TemperatureSetpointHoldPolicy {
+static constexpr AttributeId Id = 0x00000054;
+} // namespace TemperatureSetpointHoldPolicy
+
+namespace SetpointHoldPolicyExpiryTimestamp {
+static constexpr AttributeId Id = 0x00000055;
+} // namespace SetpointHoldPolicyExpiryTimestamp
+
+namespace QueuedPreset {
+static constexpr AttributeId Id = 0x00000056;
+} // namespace QueuedPreset
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

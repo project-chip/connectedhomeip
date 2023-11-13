@@ -5094,6 +5094,582 @@ public static class DoorLockClusterCredentialStruct {
     return output.toString();
   }
 }
+public static class ThermostatClusterScheduleTransitionStruct {
+  public Integer dayOfWeek;
+  public Integer transitionTime;
+  public byte[] presetHandle;
+  public Integer systemMode;
+  public Integer coolingSetpoint;
+  public Integer heatingSetpoint;
+  private static final long DAY_OF_WEEK_ID = 0L;
+  private static final long TRANSITION_TIME_ID = 1L;
+  private static final long PRESET_HANDLE_ID = 2L;
+  private static final long SYSTEM_MODE_ID = 3L;
+  private static final long COOLING_SETPOINT_ID = 4L;
+  private static final long HEATING_SETPOINT_ID = 5L;
+
+  public ThermostatClusterScheduleTransitionStruct(
+    Integer dayOfWeek,
+    Integer transitionTime,
+    byte[] presetHandle,
+    Integer systemMode,
+    Integer coolingSetpoint,
+    Integer heatingSetpoint
+  ) {
+    this.dayOfWeek = dayOfWeek;
+    this.transitionTime = transitionTime;
+    this.presetHandle = presetHandle;
+    this.systemMode = systemMode;
+    this.coolingSetpoint = coolingSetpoint;
+    this.heatingSetpoint = heatingSetpoint;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(DAY_OF_WEEK_ID, new UIntType(dayOfWeek)));
+    values.add(new StructElement(TRANSITION_TIME_ID, new UIntType(transitionTime)));
+    values.add(new StructElement(PRESET_HANDLE_ID, new ByteArrayType(presetHandle)));
+    values.add(new StructElement(SYSTEM_MODE_ID, new UIntType(systemMode)));
+    values.add(new StructElement(COOLING_SETPOINT_ID, new IntType(coolingSetpoint)));
+    values.add(new StructElement(HEATING_SETPOINT_ID, new IntType(heatingSetpoint)));
+
+    return new StructType(values);
+  }
+
+  public static ThermostatClusterScheduleTransitionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer dayOfWeek = null;
+    Integer transitionTime = null;
+    byte[] presetHandle = null;
+    Integer systemMode = null;
+    Integer coolingSetpoint = null;
+    Integer heatingSetpoint = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == DAY_OF_WEEK_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          dayOfWeek = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TRANSITION_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          transitionTime = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PRESET_HANDLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          presetHandle = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == SYSTEM_MODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          systemMode = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == COOLING_SETPOINT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          coolingSetpoint = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == HEATING_SETPOINT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          heatingSetpoint = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ThermostatClusterScheduleTransitionStruct(
+      dayOfWeek,
+      transitionTime,
+      presetHandle,
+      systemMode,
+      coolingSetpoint,
+      heatingSetpoint
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThermostatClusterScheduleTransitionStruct {\n");
+    output.append("\tdayOfWeek: ");
+    output.append(dayOfWeek);
+    output.append("\n");
+    output.append("\ttransitionTime: ");
+    output.append(transitionTime);
+    output.append("\n");
+    output.append("\tpresetHandle: ");
+    output.append(Arrays.toString(presetHandle));
+    output.append("\n");
+    output.append("\tsystemMode: ");
+    output.append(systemMode);
+    output.append("\n");
+    output.append("\tcoolingSetpoint: ");
+    output.append(coolingSetpoint);
+    output.append("\n");
+    output.append("\theatingSetpoint: ");
+    output.append(heatingSetpoint);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ThermostatClusterScheduleStruct {
+  public byte[] sceduleHandle;
+  public Integer systemMode;
+  public @Nullable String name;
+  public byte[] presetHandle;
+  public ArrayList<ChipStructs.ThermostatClusterScheduleTransitionStruct> transitions;
+  public Boolean builtIn;
+  private static final long SCEDULE_HANDLE_ID = 0L;
+  private static final long SYSTEM_MODE_ID = 1L;
+  private static final long NAME_ID = 2L;
+  private static final long PRESET_HANDLE_ID = 3L;
+  private static final long TRANSITIONS_ID = 4L;
+  private static final long BUILT_IN_ID = 5L;
+
+  public ThermostatClusterScheduleStruct(
+    byte[] sceduleHandle,
+    Integer systemMode,
+    @Nullable String name,
+    byte[] presetHandle,
+    ArrayList<ChipStructs.ThermostatClusterScheduleTransitionStruct> transitions,
+    Boolean builtIn
+  ) {
+    this.sceduleHandle = sceduleHandle;
+    this.systemMode = systemMode;
+    this.name = name;
+    this.presetHandle = presetHandle;
+    this.transitions = transitions;
+    this.builtIn = builtIn;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SCEDULE_HANDLE_ID, new ByteArrayType(sceduleHandle)));
+    values.add(new StructElement(SYSTEM_MODE_ID, new UIntType(systemMode)));
+    values.add(new StructElement(NAME_ID, name != null ? new StringType(name) : new NullType()));
+    values.add(new StructElement(PRESET_HANDLE_ID, new ByteArrayType(presetHandle)));
+    values.add(new StructElement(TRANSITIONS_ID, ArrayType.generateArrayType(transitions, (elementtransitions) -> elementtransitions.encodeTlv())));
+    values.add(new StructElement(BUILT_IN_ID, new BooleanType(builtIn)));
+
+    return new StructType(values);
+  }
+
+  public static ThermostatClusterScheduleStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] sceduleHandle = null;
+    Integer systemMode = null;
+    @Nullable String name = null;
+    byte[] presetHandle = null;
+    ArrayList<ChipStructs.ThermostatClusterScheduleTransitionStruct> transitions = null;
+    Boolean builtIn = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SCEDULE_HANDLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          sceduleHandle = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == SYSTEM_MODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          systemMode = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          name = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == PRESET_HANDLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          presetHandle = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == TRANSITIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          transitions = castingValue.map((elementcastingValue) -> ChipStructs.ThermostatClusterScheduleTransitionStruct.decodeTlv(elementcastingValue));
+        }
+      } else if (element.contextTagNum() == BUILT_IN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          builtIn = castingValue.value(Boolean.class);
+        }
+      }
+    }
+    return new ThermostatClusterScheduleStruct(
+      sceduleHandle,
+      systemMode,
+      name,
+      presetHandle,
+      transitions,
+      builtIn
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThermostatClusterScheduleStruct {\n");
+    output.append("\tsceduleHandle: ");
+    output.append(Arrays.toString(sceduleHandle));
+    output.append("\n");
+    output.append("\tsystemMode: ");
+    output.append(systemMode);
+    output.append("\n");
+    output.append("\tname: ");
+    output.append(name);
+    output.append("\n");
+    output.append("\tpresetHandle: ");
+    output.append(Arrays.toString(presetHandle));
+    output.append("\n");
+    output.append("\ttransitions: ");
+    output.append(transitions);
+    output.append("\n");
+    output.append("\tbuiltIn: ");
+    output.append(builtIn);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ThermostatClusterPresetStruct {
+  public byte[] presetHandle;
+  public Integer presetScenario;
+  public @Nullable String name;
+  public Integer coolingSetpoint;
+  public Integer heatingSetpoint;
+  public Boolean builtIn;
+  private static final long PRESET_HANDLE_ID = 0L;
+  private static final long PRESET_SCENARIO_ID = 1L;
+  private static final long NAME_ID = 2L;
+  private static final long COOLING_SETPOINT_ID = 3L;
+  private static final long HEATING_SETPOINT_ID = 4L;
+  private static final long BUILT_IN_ID = 5L;
+
+  public ThermostatClusterPresetStruct(
+    byte[] presetHandle,
+    Integer presetScenario,
+    @Nullable String name,
+    Integer coolingSetpoint,
+    Integer heatingSetpoint,
+    Boolean builtIn
+  ) {
+    this.presetHandle = presetHandle;
+    this.presetScenario = presetScenario;
+    this.name = name;
+    this.coolingSetpoint = coolingSetpoint;
+    this.heatingSetpoint = heatingSetpoint;
+    this.builtIn = builtIn;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PRESET_HANDLE_ID, new ByteArrayType(presetHandle)));
+    values.add(new StructElement(PRESET_SCENARIO_ID, new UIntType(presetScenario)));
+    values.add(new StructElement(NAME_ID, name != null ? new StringType(name) : new NullType()));
+    values.add(new StructElement(COOLING_SETPOINT_ID, new IntType(coolingSetpoint)));
+    values.add(new StructElement(HEATING_SETPOINT_ID, new IntType(heatingSetpoint)));
+    values.add(new StructElement(BUILT_IN_ID, new BooleanType(builtIn)));
+
+    return new StructType(values);
+  }
+
+  public static ThermostatClusterPresetStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] presetHandle = null;
+    Integer presetScenario = null;
+    @Nullable String name = null;
+    Integer coolingSetpoint = null;
+    Integer heatingSetpoint = null;
+    Boolean builtIn = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PRESET_HANDLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          presetHandle = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == PRESET_SCENARIO_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          presetScenario = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          name = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == COOLING_SETPOINT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          coolingSetpoint = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == HEATING_SETPOINT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          heatingSetpoint = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == BUILT_IN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          builtIn = castingValue.value(Boolean.class);
+        }
+      }
+    }
+    return new ThermostatClusterPresetStruct(
+      presetHandle,
+      presetScenario,
+      name,
+      coolingSetpoint,
+      heatingSetpoint,
+      builtIn
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThermostatClusterPresetStruct {\n");
+    output.append("\tpresetHandle: ");
+    output.append(Arrays.toString(presetHandle));
+    output.append("\n");
+    output.append("\tpresetScenario: ");
+    output.append(presetScenario);
+    output.append("\n");
+    output.append("\tname: ");
+    output.append(name);
+    output.append("\n");
+    output.append("\tcoolingSetpoint: ");
+    output.append(coolingSetpoint);
+    output.append("\n");
+    output.append("\theatingSetpoint: ");
+    output.append(heatingSetpoint);
+    output.append("\n");
+    output.append("\tbuiltIn: ");
+    output.append(builtIn);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ThermostatClusterPresetTypeStruct {
+  public Integer presetScenario;
+  public Integer numberOfPresets;
+  public Integer presetTypeFeatures;
+  private static final long PRESET_SCENARIO_ID = 0L;
+  private static final long NUMBER_OF_PRESETS_ID = 1L;
+  private static final long PRESET_TYPE_FEATURES_ID = 2L;
+
+  public ThermostatClusterPresetTypeStruct(
+    Integer presetScenario,
+    Integer numberOfPresets,
+    Integer presetTypeFeatures
+  ) {
+    this.presetScenario = presetScenario;
+    this.numberOfPresets = numberOfPresets;
+    this.presetTypeFeatures = presetTypeFeatures;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PRESET_SCENARIO_ID, new UIntType(presetScenario)));
+    values.add(new StructElement(NUMBER_OF_PRESETS_ID, new UIntType(numberOfPresets)));
+    values.add(new StructElement(PRESET_TYPE_FEATURES_ID, new UIntType(presetTypeFeatures)));
+
+    return new StructType(values);
+  }
+
+  public static ThermostatClusterPresetTypeStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer presetScenario = null;
+    Integer numberOfPresets = null;
+    Integer presetTypeFeatures = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PRESET_SCENARIO_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          presetScenario = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == NUMBER_OF_PRESETS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          numberOfPresets = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PRESET_TYPE_FEATURES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          presetTypeFeatures = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ThermostatClusterPresetTypeStruct(
+      presetScenario,
+      numberOfPresets,
+      presetTypeFeatures
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThermostatClusterPresetTypeStruct {\n");
+    output.append("\tpresetScenario: ");
+    output.append(presetScenario);
+    output.append("\n");
+    output.append("\tnumberOfPresets: ");
+    output.append(numberOfPresets);
+    output.append("\n");
+    output.append("\tpresetTypeFeatures: ");
+    output.append(presetTypeFeatures);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ThermostatClusterQueuedPresetStruct {
+  public byte[] presetHandle;
+  public Long transitionTimestamp;
+  private static final long PRESET_HANDLE_ID = 0L;
+  private static final long TRANSITION_TIMESTAMP_ID = 1L;
+
+  public ThermostatClusterQueuedPresetStruct(
+    byte[] presetHandle,
+    Long transitionTimestamp
+  ) {
+    this.presetHandle = presetHandle;
+    this.transitionTimestamp = transitionTimestamp;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PRESET_HANDLE_ID, new ByteArrayType(presetHandle)));
+    values.add(new StructElement(TRANSITION_TIMESTAMP_ID, new UIntType(transitionTimestamp)));
+
+    return new StructType(values);
+  }
+
+  public static ThermostatClusterQueuedPresetStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] presetHandle = null;
+    Long transitionTimestamp = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PRESET_HANDLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          presetHandle = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == TRANSITION_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          transitionTimestamp = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new ThermostatClusterQueuedPresetStruct(
+      presetHandle,
+      transitionTimestamp
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThermostatClusterQueuedPresetStruct {\n");
+    output.append("\tpresetHandle: ");
+    output.append(Arrays.toString(presetHandle));
+    output.append("\n");
+    output.append("\ttransitionTimestamp: ");
+    output.append(transitionTimestamp);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ThermostatClusterScheduleTypeStruct {
+  public Integer systemMode;
+  public Integer numberOfSchedules;
+  public Integer scheduleTypeFeatures;
+  private static final long SYSTEM_MODE_ID = 0L;
+  private static final long NUMBER_OF_SCHEDULES_ID = 1L;
+  private static final long SCHEDULE_TYPE_FEATURES_ID = 2L;
+
+  public ThermostatClusterScheduleTypeStruct(
+    Integer systemMode,
+    Integer numberOfSchedules,
+    Integer scheduleTypeFeatures
+  ) {
+    this.systemMode = systemMode;
+    this.numberOfSchedules = numberOfSchedules;
+    this.scheduleTypeFeatures = scheduleTypeFeatures;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SYSTEM_MODE_ID, new UIntType(systemMode)));
+    values.add(new StructElement(NUMBER_OF_SCHEDULES_ID, new UIntType(numberOfSchedules)));
+    values.add(new StructElement(SCHEDULE_TYPE_FEATURES_ID, new UIntType(scheduleTypeFeatures)));
+
+    return new StructType(values);
+  }
+
+  public static ThermostatClusterScheduleTypeStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer systemMode = null;
+    Integer numberOfSchedules = null;
+    Integer scheduleTypeFeatures = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SYSTEM_MODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          systemMode = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == NUMBER_OF_SCHEDULES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          numberOfSchedules = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SCHEDULE_TYPE_FEATURES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          scheduleTypeFeatures = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ThermostatClusterScheduleTypeStruct(
+      systemMode,
+      numberOfSchedules,
+      scheduleTypeFeatures
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThermostatClusterScheduleTypeStruct {\n");
+    output.append("\tsystemMode: ");
+    output.append(systemMode);
+    output.append("\n");
+    output.append("\tnumberOfSchedules: ");
+    output.append(numberOfSchedules);
+    output.append("\n");
+    output.append("\tscheduleTypeFeatures: ");
+    output.append(scheduleTypeFeatures);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ThermostatClusterThermostatScheduleTransition {
   public Integer transitionTime;
   public @Nullable Integer heatSetpoint;

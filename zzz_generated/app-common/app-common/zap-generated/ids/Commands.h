@@ -1024,6 +1024,50 @@ namespace ClearWeeklySchedule {
 static constexpr CommandId Id = 0x00000003;
 } // namespace ClearWeeklySchedule
 
+namespace GetRelayStatusLog {
+static constexpr CommandId Id = 0x00000004;
+} // namespace GetRelayStatusLog
+
+namespace SetActiveScheduleRequest {
+static constexpr CommandId Id = 0x00000005;
+} // namespace SetActiveScheduleRequest
+
+namespace SetActivePresetRequest {
+static constexpr CommandId Id = 0x00000006;
+} // namespace SetActivePresetRequest
+
+namespace StartSchedulesEditRequest {
+static constexpr CommandId Id = 0x00000007;
+} // namespace StartSchedulesEditRequest
+
+namespace CancelSchedulesEditRequest {
+static constexpr CommandId Id = 0x00000008;
+} // namespace CancelSchedulesEditRequest
+
+namespace CommitSchedulesEditRequest {
+static constexpr CommandId Id = 0x00000009;
+} // namespace CommitSchedulesEditRequest
+
+namespace StartPresetsEditRequest {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace StartPresetsEditRequest
+
+namespace CancelPresetsEditRequest {
+static constexpr CommandId Id = 0x0000000B;
+} // namespace CancelPresetsEditRequest
+
+namespace CommitPresetsEditRequest {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace CommitPresetsEditRequest
+
+namespace CancelSetActivePresetRequest {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace CancelSetActivePresetRequest
+
+namespace SetTemperatureSetpointHoldPolicy {
+static constexpr CommandId Id = 0x0000000F;
+} // namespace SetTemperatureSetpointHoldPolicy
+
 } // namespace Commands
 } // namespace Thermostat
 

@@ -4587,6 +4587,228 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRThermostatClusterScheduleTransitionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _dayOfWeek = @(0);
+
+        _transitionTime = @(0);
+
+        _presetHandle = [NSData data];
+
+        _systemMode = @(0);
+
+        _coolingSetpoint = @(0);
+
+        _heatingSetpoint = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterScheduleTransitionStruct alloc] init];
+
+    other.dayOfWeek = self.dayOfWeek;
+    other.transitionTime = self.transitionTime;
+    other.presetHandle = self.presetHandle;
+    other.systemMode = self.systemMode;
+    other.coolingSetpoint = self.coolingSetpoint;
+    other.heatingSetpoint = self.heatingSetpoint;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeek:%@; transitionTime:%@; presetHandle:%@; systemMode:%@; coolingSetpoint:%@; heatingSetpoint:%@; >", NSStringFromClass([self class]), _dayOfWeek, _transitionTime, [_presetHandle base64EncodedStringWithOptions:0], _systemMode, _coolingSetpoint, _heatingSetpoint];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterScheduleStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sceduleHandle = [NSData data];
+
+        _systemMode = @(0);
+
+        _name = nil;
+
+        _presetHandle = [NSData data];
+
+        _transitions = [NSArray array];
+
+        _builtIn = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterScheduleStruct alloc] init];
+
+    other.sceduleHandle = self.sceduleHandle;
+    other.systemMode = self.systemMode;
+    other.name = self.name;
+    other.presetHandle = self.presetHandle;
+    other.transitions = self.transitions;
+    other.builtIn = self.builtIn;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sceduleHandle:%@; systemMode:%@; name:%@; presetHandle:%@; transitions:%@; builtIn:%@; >", NSStringFromClass([self class]), [_sceduleHandle base64EncodedStringWithOptions:0], _systemMode, _name, [_presetHandle base64EncodedStringWithOptions:0], _transitions, _builtIn];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterPresetStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _presetHandle = [NSData data];
+
+        _presetScenario = @(0);
+
+        _name = nil;
+
+        _coolingSetpoint = @(0);
+
+        _heatingSetpoint = @(0);
+
+        _builtIn = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterPresetStruct alloc] init];
+
+    other.presetHandle = self.presetHandle;
+    other.presetScenario = self.presetScenario;
+    other.name = self.name;
+    other.coolingSetpoint = self.coolingSetpoint;
+    other.heatingSetpoint = self.heatingSetpoint;
+    other.builtIn = self.builtIn;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetHandle:%@; presetScenario:%@; name:%@; coolingSetpoint:%@; heatingSetpoint:%@; builtIn:%@; >", NSStringFromClass([self class]), [_presetHandle base64EncodedStringWithOptions:0], _presetScenario, _name, _coolingSetpoint, _heatingSetpoint, _builtIn];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterPresetTypeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _presetScenario = @(0);
+
+        _numberOfPresets = @(0);
+
+        _presetTypeFeatures = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterPresetTypeStruct alloc] init];
+
+    other.presetScenario = self.presetScenario;
+    other.numberOfPresets = self.numberOfPresets;
+    other.presetTypeFeatures = self.presetTypeFeatures;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetScenario:%@; numberOfPresets:%@; presetTypeFeatures:%@; >", NSStringFromClass([self class]), _presetScenario, _numberOfPresets, _presetTypeFeatures];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterQueuedPresetStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _presetHandle = [NSData data];
+
+        _transitionTimestamp = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterQueuedPresetStruct alloc] init];
+
+    other.presetHandle = self.presetHandle;
+    other.transitionTimestamp = self.transitionTimestamp;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetHandle:%@; transitionTimestamp:%@; >", NSStringFromClass([self class]), [_presetHandle base64EncodedStringWithOptions:0], _transitionTimestamp];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterScheduleTypeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _systemMode = @(0);
+
+        _numberOfSchedules = @(0);
+
+        _scheduleTypeFeatures = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterScheduleTypeStruct alloc] init];
+
+    other.systemMode = self.systemMode;
+    other.numberOfSchedules = self.numberOfSchedules;
+    other.scheduleTypeFeatures = self.scheduleTypeFeatures;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: systemMode:%@; numberOfSchedules:%@; scheduleTypeFeatures:%@; >", NSStringFromClass([self class]), _systemMode, _numberOfSchedules, _scheduleTypeFeatures];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRThermostatClusterThermostatScheduleTransition
 - (instancetype)init
 {

@@ -20,17 +20,22 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class SmokeCoAlarmCluster(
-  private val controller: MatterController,
-  private val endpointId: UShort
-) {
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+class SmokeCoAlarmCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
   suspend fun selfTestRequest(timedInvokeTimeoutMs: Int? = null) {
     val commandId = 0L
@@ -39,14 +44,17 @@ class SmokeCoAlarmCluster(
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
   suspend fun readExpressedStateAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeExpressedStateAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeExpressedStateAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -54,7 +62,10 @@ class SmokeCoAlarmCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSmokeStateAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeSmokeStateAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -62,7 +73,10 @@ class SmokeCoAlarmCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCOStateAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeCOStateAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -70,7 +84,10 @@ class SmokeCoAlarmCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBatteryAlertAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeBatteryAlertAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -78,7 +95,10 @@ class SmokeCoAlarmCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDeviceMutedAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeDeviceMutedAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -86,7 +106,10 @@ class SmokeCoAlarmCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTestInProgressAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeTestInProgressAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -94,7 +117,10 @@ class SmokeCoAlarmCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeHardwareFaultAlertAttribute(minInterval: Int, maxInterval: Int): Boolean {
+  suspend fun subscribeHardwareFaultAlertAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
     // Implementation needs to be added here
   }
 
@@ -102,7 +128,10 @@ class SmokeCoAlarmCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEndOfServiceAlertAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeEndOfServiceAlertAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -110,7 +139,10 @@ class SmokeCoAlarmCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInterconnectSmokeAlarmAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeInterconnectSmokeAlarmAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -118,7 +150,10 @@ class SmokeCoAlarmCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInterconnectCOAlarmAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeInterconnectCOAlarmAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -126,7 +161,10 @@ class SmokeCoAlarmCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeContaminationStateAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeContaminationStateAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -134,15 +172,21 @@ class SmokeCoAlarmCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeSmokeSensitivityLevelAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeSmokeSensitivityLevelAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeSmokeSensitivityLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeSmokeSensitivityLevelAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -150,7 +194,10 @@ class SmokeCoAlarmCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeExpiryDateAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeExpiryDateAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -180,7 +227,10 @@ class SmokeCoAlarmCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -199,7 +249,10 @@ class SmokeCoAlarmCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -207,7 +260,10 @@ class SmokeCoAlarmCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

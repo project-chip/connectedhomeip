@@ -20722,6 +20722,596 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                        value);
             return value;
         }
+        case Attributes::PresetTypes::Id: {
+            using TypeInfo = Attributes::PresetTypes::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_presetScenario;
+                std::string newElement_0_presetScenarioClassName     = "java/lang/Integer";
+                std::string newElement_0_presetScenarioCtorSignature = "(I)V";
+                jint jninewElement_0_presetScenario                  = static_cast<jint>(entry_0.presetScenario);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_presetScenarioClassName.c_str(), newElement_0_presetScenarioCtorSignature.c_str(),
+                    jninewElement_0_presetScenario, newElement_0_presetScenario);
+                jobject newElement_0_numberOfPresets;
+                std::string newElement_0_numberOfPresetsClassName     = "java/lang/Integer";
+                std::string newElement_0_numberOfPresetsCtorSignature = "(I)V";
+                jint jninewElement_0_numberOfPresets                  = static_cast<jint>(entry_0.numberOfPresets);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_numberOfPresetsClassName.c_str(), newElement_0_numberOfPresetsCtorSignature.c_str(),
+                    jninewElement_0_numberOfPresets, newElement_0_numberOfPresets);
+                jobject newElement_0_presetTypeFeatures;
+                std::string newElement_0_presetTypeFeaturesClassName     = "java/lang/Integer";
+                std::string newElement_0_presetTypeFeaturesCtorSignature = "(I)V";
+                jint jninewElement_0_presetTypeFeatures                  = static_cast<jint>(entry_0.presetTypeFeatures.Raw());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_presetTypeFeaturesClassName.c_str(), newElement_0_presetTypeFeaturesCtorSignature.c_str(),
+                    jninewElement_0_presetTypeFeatures, newElement_0_presetTypeFeatures);
+
+                jclass presetTypeStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ThermostatClusterPresetTypeStruct", presetTypeStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterPresetTypeStruct");
+                    return nullptr;
+                }
+                jmethodID presetTypeStructStructCtor_1 = env->GetMethodID(
+                    presetTypeStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                if (presetTypeStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterPresetTypeStruct constructor");
+                    return nullptr;
+                }
+
+                newElement_0 =
+                    env->NewObject(presetTypeStructStructClass_1, presetTypeStructStructCtor_1, newElement_0_presetScenario,
+                                   newElement_0_numberOfPresets, newElement_0_presetTypeFeatures);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::ScheduleTypes::Id: {
+            using TypeInfo = Attributes::ScheduleTypes::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_systemMode;
+                std::string newElement_0_systemModeClassName     = "java/lang/Integer";
+                std::string newElement_0_systemModeCtorSignature = "(I)V";
+                jint jninewElement_0_systemMode                  = static_cast<jint>(entry_0.systemMode);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_systemModeClassName.c_str(),
+                                                                           newElement_0_systemModeCtorSignature.c_str(),
+                                                                           jninewElement_0_systemMode, newElement_0_systemMode);
+                jobject newElement_0_numberOfSchedules;
+                std::string newElement_0_numberOfSchedulesClassName     = "java/lang/Integer";
+                std::string newElement_0_numberOfSchedulesCtorSignature = "(I)V";
+                jint jninewElement_0_numberOfSchedules                  = static_cast<jint>(entry_0.numberOfSchedules);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_numberOfSchedulesClassName.c_str(), newElement_0_numberOfSchedulesCtorSignature.c_str(),
+                    jninewElement_0_numberOfSchedules, newElement_0_numberOfSchedules);
+                jobject newElement_0_scheduleTypeFeatures;
+                std::string newElement_0_scheduleTypeFeaturesClassName     = "java/lang/Integer";
+                std::string newElement_0_scheduleTypeFeaturesCtorSignature = "(I)V";
+                jint jninewElement_0_scheduleTypeFeatures                  = static_cast<jint>(entry_0.scheduleTypeFeatures.Raw());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_scheduleTypeFeaturesClassName.c_str(), newElement_0_scheduleTypeFeaturesCtorSignature.c_str(),
+                    jninewElement_0_scheduleTypeFeatures, newElement_0_scheduleTypeFeatures);
+
+                jclass scheduleTypeStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ThermostatClusterScheduleTypeStruct", scheduleTypeStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterScheduleTypeStruct");
+                    return nullptr;
+                }
+                jmethodID scheduleTypeStructStructCtor_1 = env->GetMethodID(
+                    scheduleTypeStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                if (scheduleTypeStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterScheduleTypeStruct constructor");
+                    return nullptr;
+                }
+
+                newElement_0 =
+                    env->NewObject(scheduleTypeStructStructClass_1, scheduleTypeStructStructCtor_1, newElement_0_systemMode,
+                                   newElement_0_numberOfSchedules, newElement_0_scheduleTypeFeatures);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::NumberOfPresets::Id: {
+            using TypeInfo = Attributes::NumberOfPresets::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            jint jnivalue                  = static_cast<jint>(cppValue);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue,
+                                                                       value);
+            return value;
+        }
+        case Attributes::NumberOfSchedules::Id: {
+            using TypeInfo = Attributes::NumberOfSchedules::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            jint jnivalue                  = static_cast<jint>(cppValue);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue,
+                                                                       value);
+            return value;
+        }
+        case Attributes::NumberOfScheduleTransitions::Id: {
+            using TypeInfo = Attributes::NumberOfScheduleTransitions::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            jint jnivalue                  = static_cast<jint>(cppValue);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue,
+                                                                       value);
+            return value;
+        }
+        case Attributes::NumberOfScheduleTransitionsPerDay::Id: {
+            using TypeInfo = Attributes::NumberOfScheduleTransitionsPerDay::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                jint jnivalue                  = static_cast<jint>(cppValue.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                           jnivalue, value);
+            }
+            return value;
+        }
+        case Attributes::Presets::Id: {
+            using TypeInfo = Attributes::Presets::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_presetHandle;
+                jbyteArray newElement_0_presetHandleByteArray = env->NewByteArray(static_cast<jsize>(entry_0.presetHandle.size()));
+                env->SetByteArrayRegion(newElement_0_presetHandleByteArray, 0, static_cast<jsize>(entry_0.presetHandle.size()),
+                                        reinterpret_cast<const jbyte *>(entry_0.presetHandle.data()));
+                newElement_0_presetHandle = newElement_0_presetHandleByteArray;
+                jobject newElement_0_presetScenario;
+                std::string newElement_0_presetScenarioClassName     = "java/lang/Integer";
+                std::string newElement_0_presetScenarioCtorSignature = "(I)V";
+                jint jninewElement_0_presetScenario                  = static_cast<jint>(entry_0.presetScenario);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_presetScenarioClassName.c_str(), newElement_0_presetScenarioCtorSignature.c_str(),
+                    jninewElement_0_presetScenario, newElement_0_presetScenario);
+                jobject newElement_0_name;
+                if (entry_0.name.IsNull())
+                {
+                    newElement_0_name = nullptr;
+                }
+                else
+                {
+                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.name.Value(), newElement_0_name));
+                }
+                jobject newElement_0_coolingSetpoint;
+                std::string newElement_0_coolingSetpointClassName     = "java/lang/Integer";
+                std::string newElement_0_coolingSetpointCtorSignature = "(I)V";
+                jint jninewElement_0_coolingSetpoint                  = static_cast<jint>(entry_0.coolingSetpoint);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_coolingSetpointClassName.c_str(), newElement_0_coolingSetpointCtorSignature.c_str(),
+                    jninewElement_0_coolingSetpoint, newElement_0_coolingSetpoint);
+                jobject newElement_0_heatingSetpoint;
+                std::string newElement_0_heatingSetpointClassName     = "java/lang/Integer";
+                std::string newElement_0_heatingSetpointCtorSignature = "(I)V";
+                jint jninewElement_0_heatingSetpoint                  = static_cast<jint>(entry_0.heatingSetpoint);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_heatingSetpointClassName.c_str(), newElement_0_heatingSetpointCtorSignature.c_str(),
+                    jninewElement_0_heatingSetpoint, newElement_0_heatingSetpoint);
+                jobject newElement_0_builtIn;
+                std::string newElement_0_builtInClassName     = "java/lang/Boolean";
+                std::string newElement_0_builtInCtorSignature = "(Z)V";
+                jboolean jninewElement_0_builtIn              = static_cast<jboolean>(entry_0.builtIn);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(newElement_0_builtInClassName.c_str(),
+                                                                               newElement_0_builtInCtorSignature.c_str(),
+                                                                               jninewElement_0_builtIn, newElement_0_builtIn);
+
+                jclass presetStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ThermostatClusterPresetStruct", presetStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterPresetStruct");
+                    return nullptr;
+                }
+                jmethodID presetStructStructCtor_1 = env->GetMethodID(
+                    presetStructStructClass_1, "<init>",
+                    "([BLjava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;)V");
+                if (presetStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterPresetStruct constructor");
+                    return nullptr;
+                }
+
+                newElement_0 = env->NewObject(presetStructStructClass_1, presetStructStructCtor_1, newElement_0_presetHandle,
+                                              newElement_0_presetScenario, newElement_0_name, newElement_0_coolingSetpoint,
+                                              newElement_0_heatingSetpoint, newElement_0_builtIn);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::PresetsEditable::Id: {
+            using TypeInfo = Attributes::PresetsEditable::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Boolean";
+            std::string valueCtorSignature = "(Z)V";
+            jboolean jnivalue              = static_cast<jboolean>(cppValue);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                           jnivalue, value);
+            return value;
+        }
+        case Attributes::ActivePresetHandle::Id: {
+            using TypeInfo = Attributes::ActivePresetHandle::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                jbyteArray valueByteArray = env->NewByteArray(static_cast<jsize>(cppValue.Value().size()));
+                env->SetByteArrayRegion(valueByteArray, 0, static_cast<jsize>(cppValue.Value().size()),
+                                        reinterpret_cast<const jbyte *>(cppValue.Value().data()));
+                value = valueByteArray;
+            }
+            return value;
+        }
+        case Attributes::Schedules::Id: {
+            using TypeInfo = Attributes::Schedules::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_sceduleHandle;
+                jbyteArray newElement_0_sceduleHandleByteArray =
+                    env->NewByteArray(static_cast<jsize>(entry_0.sceduleHandle.size()));
+                env->SetByteArrayRegion(newElement_0_sceduleHandleByteArray, 0, static_cast<jsize>(entry_0.sceduleHandle.size()),
+                                        reinterpret_cast<const jbyte *>(entry_0.sceduleHandle.data()));
+                newElement_0_sceduleHandle = newElement_0_sceduleHandleByteArray;
+                jobject newElement_0_systemMode;
+                std::string newElement_0_systemModeClassName     = "java/lang/Integer";
+                std::string newElement_0_systemModeCtorSignature = "(I)V";
+                jint jninewElement_0_systemMode                  = static_cast<jint>(entry_0.systemMode);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_systemModeClassName.c_str(),
+                                                                           newElement_0_systemModeCtorSignature.c_str(),
+                                                                           jninewElement_0_systemMode, newElement_0_systemMode);
+                jobject newElement_0_name;
+                if (entry_0.name.IsNull())
+                {
+                    newElement_0_name = nullptr;
+                }
+                else
+                {
+                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.name.Value(), newElement_0_name));
+                }
+                jobject newElement_0_presetHandle;
+                jbyteArray newElement_0_presetHandleByteArray = env->NewByteArray(static_cast<jsize>(entry_0.presetHandle.size()));
+                env->SetByteArrayRegion(newElement_0_presetHandleByteArray, 0, static_cast<jsize>(entry_0.presetHandle.size()),
+                                        reinterpret_cast<const jbyte *>(entry_0.presetHandle.data()));
+                newElement_0_presetHandle = newElement_0_presetHandleByteArray;
+                jobject newElement_0_transitions;
+                chip::JniReferences::GetInstance().CreateArrayList(newElement_0_transitions);
+
+                auto iter_newElement_0_transitions_2 = entry_0.transitions.begin();
+                while (iter_newElement_0_transitions_2.Next())
+                {
+                    auto & entry_2 = iter_newElement_0_transitions_2.GetValue();
+                    jobject newElement_2;
+                    jobject newElement_2_dayOfWeek;
+                    std::string newElement_2_dayOfWeekClassName     = "java/lang/Integer";
+                    std::string newElement_2_dayOfWeekCtorSignature = "(I)V";
+                    jint jninewElement_2_dayOfWeek                  = static_cast<jint>(entry_2.dayOfWeek.Raw());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_2_dayOfWeekClassName.c_str(),
+                                                                               newElement_2_dayOfWeekCtorSignature.c_str(),
+                                                                               jninewElement_2_dayOfWeek, newElement_2_dayOfWeek);
+                    jobject newElement_2_transitionTime;
+                    std::string newElement_2_transitionTimeClassName     = "java/lang/Integer";
+                    std::string newElement_2_transitionTimeCtorSignature = "(I)V";
+                    jint jninewElement_2_transitionTime                  = static_cast<jint>(entry_2.transitionTime);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_2_transitionTimeClassName.c_str(), newElement_2_transitionTimeCtorSignature.c_str(),
+                        jninewElement_2_transitionTime, newElement_2_transitionTime);
+                    jobject newElement_2_presetHandle;
+                    jbyteArray newElement_2_presetHandleByteArray =
+                        env->NewByteArray(static_cast<jsize>(entry_2.presetHandle.size()));
+                    env->SetByteArrayRegion(newElement_2_presetHandleByteArray, 0, static_cast<jsize>(entry_2.presetHandle.size()),
+                                            reinterpret_cast<const jbyte *>(entry_2.presetHandle.data()));
+                    newElement_2_presetHandle = newElement_2_presetHandleByteArray;
+                    jobject newElement_2_systemMode;
+                    std::string newElement_2_systemModeClassName     = "java/lang/Integer";
+                    std::string newElement_2_systemModeCtorSignature = "(I)V";
+                    jint jninewElement_2_systemMode                  = static_cast<jint>(entry_2.systemMode);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_2_systemModeClassName.c_str(),
+                                                                               newElement_2_systemModeCtorSignature.c_str(),
+                                                                               jninewElement_2_systemMode, newElement_2_systemMode);
+                    jobject newElement_2_coolingSetpoint;
+                    std::string newElement_2_coolingSetpointClassName     = "java/lang/Integer";
+                    std::string newElement_2_coolingSetpointCtorSignature = "(I)V";
+                    jint jninewElement_2_coolingSetpoint                  = static_cast<jint>(entry_2.coolingSetpoint);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_2_coolingSetpointClassName.c_str(), newElement_2_coolingSetpointCtorSignature.c_str(),
+                        jninewElement_2_coolingSetpoint, newElement_2_coolingSetpoint);
+                    jobject newElement_2_heatingSetpoint;
+                    std::string newElement_2_heatingSetpointClassName     = "java/lang/Integer";
+                    std::string newElement_2_heatingSetpointCtorSignature = "(I)V";
+                    jint jninewElement_2_heatingSetpoint                  = static_cast<jint>(entry_2.heatingSetpoint);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_2_heatingSetpointClassName.c_str(), newElement_2_heatingSetpointCtorSignature.c_str(),
+                        jninewElement_2_heatingSetpoint, newElement_2_heatingSetpoint);
+
+                    jclass scheduleTransitionStructStructClass_3;
+                    err = chip::JniReferences::GetInstance().GetClassRef(
+                        env, "chip/devicecontroller/ChipStructs$ThermostatClusterScheduleTransitionStruct",
+                        scheduleTransitionStructStructClass_3);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterScheduleTransitionStruct");
+                        return nullptr;
+                    }
+                    jmethodID scheduleTransitionStructStructCtor_3 = env->GetMethodID(
+                        scheduleTransitionStructStructClass_3, "<init>",
+                        "(Ljava/lang/Integer;Ljava/lang/Integer;[BLjava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                    if (scheduleTransitionStructStructCtor_3 == nullptr)
+                    {
+                        ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterScheduleTransitionStruct constructor");
+                        return nullptr;
+                    }
+
+                    newElement_2 =
+                        env->NewObject(scheduleTransitionStructStructClass_3, scheduleTransitionStructStructCtor_3,
+                                       newElement_2_dayOfWeek, newElement_2_transitionTime, newElement_2_presetHandle,
+                                       newElement_2_systemMode, newElement_2_coolingSetpoint, newElement_2_heatingSetpoint);
+                    chip::JniReferences::GetInstance().AddToList(newElement_0_transitions, newElement_2);
+                }
+                jobject newElement_0_builtIn;
+                std::string newElement_0_builtInClassName     = "java/lang/Boolean";
+                std::string newElement_0_builtInCtorSignature = "(Z)V";
+                jboolean jninewElement_0_builtIn              = static_cast<jboolean>(entry_0.builtIn);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(newElement_0_builtInClassName.c_str(),
+                                                                               newElement_0_builtInCtorSignature.c_str(),
+                                                                               jninewElement_0_builtIn, newElement_0_builtIn);
+
+                jclass scheduleStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ThermostatClusterScheduleStruct", scheduleStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterScheduleStruct");
+                    return nullptr;
+                }
+                jmethodID scheduleStructStructCtor_1 =
+                    env->GetMethodID(scheduleStructStructClass_1, "<init>",
+                                     "([BLjava/lang/Integer;Ljava/lang/String;[BLjava/util/ArrayList;Ljava/lang/Boolean;)V");
+                if (scheduleStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterScheduleStruct constructor");
+                    return nullptr;
+                }
+
+                newElement_0 = env->NewObject(scheduleStructStructClass_1, scheduleStructStructCtor_1, newElement_0_sceduleHandle,
+                                              newElement_0_systemMode, newElement_0_name, newElement_0_presetHandle,
+                                              newElement_0_transitions, newElement_0_builtIn);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::SchedulesEditable::Id: {
+            using TypeInfo = Attributes::SchedulesEditable::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Boolean";
+            std::string valueCtorSignature = "(Z)V";
+            jboolean jnivalue              = static_cast<jboolean>(cppValue);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                           jnivalue, value);
+            return value;
+        }
+        case Attributes::ActiveScheduleHandle::Id: {
+            using TypeInfo = Attributes::ActiveScheduleHandle::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                jbyteArray valueByteArray = env->NewByteArray(static_cast<jsize>(cppValue.Value().size()));
+                env->SetByteArrayRegion(valueByteArray, 0, static_cast<jsize>(cppValue.Value().size()),
+                                        reinterpret_cast<const jbyte *>(cppValue.Value().data()));
+                value = valueByteArray;
+            }
+            return value;
+        }
+        case Attributes::TemperatureSetpointHoldPolicy::Id: {
+            using TypeInfo = Attributes::TemperatureSetpointHoldPolicy::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            jint jnivalue                  = static_cast<jint>(cppValue.Raw());
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue,
+                                                                       value);
+            return value;
+        }
+        case Attributes::SetpointHoldPolicyExpiryTimestamp::Id: {
+            using TypeInfo = Attributes::SetpointHoldPolicyExpiryTimestamp::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Long";
+                std::string valueCtorSignature = "(J)V";
+                jlong jnivalue                 = static_cast<jlong>(cppValue.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                            jnivalue, value);
+            }
+            return value;
+        }
+        case Attributes::QueuedPreset::Id: {
+            using TypeInfo = Attributes::QueuedPreset::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                jobject value_presetHandle;
+                jbyteArray value_presetHandleByteArray =
+                    env->NewByteArray(static_cast<jsize>(cppValue.Value().presetHandle.size()));
+                env->SetByteArrayRegion(value_presetHandleByteArray, 0, static_cast<jsize>(cppValue.Value().presetHandle.size()),
+                                        reinterpret_cast<const jbyte *>(cppValue.Value().presetHandle.data()));
+                value_presetHandle = value_presetHandleByteArray;
+                jobject value_transitionTimestamp;
+                std::string value_transitionTimestampClassName     = "java/lang/Long";
+                std::string value_transitionTimestampCtorSignature = "(J)V";
+                jlong jnivalue_transitionTimestamp                 = static_cast<jlong>(cppValue.Value().transitionTimestamp);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_transitionTimestampClassName.c_str(), value_transitionTimestampCtorSignature.c_str(),
+                    jnivalue_transitionTimestamp, value_transitionTimestamp);
+
+                jclass queuedPresetStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ThermostatClusterQueuedPresetStruct", queuedPresetStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterQueuedPresetStruct");
+                    return nullptr;
+                }
+                jmethodID queuedPresetStructStructCtor_1 =
+                    env->GetMethodID(queuedPresetStructStructClass_1, "<init>", "([BLjava/lang/Long;)V");
+                if (queuedPresetStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterQueuedPresetStruct constructor");
+                    return nullptr;
+                }
+
+                value = env->NewObject(queuedPresetStructStructClass_1, queuedPresetStructStructCtor_1, value_presetHandle,
+                                       value_transitionTimestamp);
+            }
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;

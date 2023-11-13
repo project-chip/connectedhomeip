@@ -9232,6 +9232,72 @@ bool emberAfThermostatClusterClearWeeklyScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::DecodableType & commandData);
 /**
+ * @brief Thermostat Cluster GetRelayStatusLog Command callback (from client)
+ */
+bool emberAfThermostatClusterGetRelayStatusLogCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::DecodableType & commandData);
+/**
+ * @brief Thermostat Cluster SetActiveScheduleRequest Command callback (from client)
+ */
+bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData);
+/**
+ * @brief Thermostat Cluster SetActivePresetRequest Command callback (from client)
+ */
+bool emberAfThermostatClusterSetActivePresetRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData);
+/**
+ * @brief Thermostat Cluster StartSchedulesEditRequest Command callback (from client)
+ */
+bool emberAfThermostatClusterStartSchedulesEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::StartSchedulesEditRequest::DecodableType & commandData);
+/**
+ * @brief Thermostat Cluster CancelSchedulesEditRequest Command callback (from client)
+ */
+bool emberAfThermostatClusterCancelSchedulesEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::CancelSchedulesEditRequest::DecodableType & commandData);
+/**
+ * @brief Thermostat Cluster CommitSchedulesEditRequest Command callback (from client)
+ */
+bool emberAfThermostatClusterCommitSchedulesEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::CommitSchedulesEditRequest::DecodableType & commandData);
+/**
+ * @brief Thermostat Cluster StartPresetsEditRequest Command callback (from client)
+ */
+bool emberAfThermostatClusterStartPresetsEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::StartPresetsEditRequest::DecodableType & commandData);
+/**
+ * @brief Thermostat Cluster CancelPresetsEditRequest Command callback (from client)
+ */
+bool emberAfThermostatClusterCancelPresetsEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::CancelPresetsEditRequest::DecodableType & commandData);
+/**
+ * @brief Thermostat Cluster CommitPresetsEditRequest Command callback (from client)
+ */
+bool emberAfThermostatClusterCommitPresetsEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::CommitPresetsEditRequest::DecodableType & commandData);
+/**
+ * @brief Thermostat Cluster CancelSetActivePresetRequest Command callback (from client)
+ */
+bool emberAfThermostatClusterCancelSetActivePresetRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::CancelSetActivePresetRequest::DecodableType & commandData);
+/**
+ * @brief Thermostat Cluster SetTemperatureSetpointHoldPolicy Command callback (from client)
+ */
+bool emberAfThermostatClusterSetTemperatureSetpointHoldPolicyCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::SetTemperatureSetpointHoldPolicy::DecodableType & commandData);
+/**
  * @brief Fan Control Cluster Step Command callback (from client)
  */
 bool emberAfFanControlClusterStepCallback(chip::app::CommandHandler * commandObj,

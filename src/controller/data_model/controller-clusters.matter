@@ -4605,6 +4605,16 @@ client cluster PumpConfigurationAndControl = 512 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 client cluster Thermostat = 513 {
+  enum PresetScenarioEnum : enum8 {
+    kUnspecified = 0;
+    kOccupied = 1;
+    kUnoccupied = 2;
+    kSleep = 3;
+    kWake = 4;
+    kVacation = 5;
+    kUserDefined = 6;
+  }
+
   enum SetpointAdjustMode : enum8 {
     kHeat = 0;
     kCool = 1;
@@ -4657,11 +4667,76 @@ client cluster Thermostat = 513 {
     kSetback = 0x10;
     kAutoMode = 0x20;
     kLocalTemperatureNotExposed = 0x40;
+    kMatterScheduleConfiguration = 0x80;
+    kPresets = 0x100;
+    kSetpoints = 0x200;
+    kQueuedPresetsSupported = 0x400;
   }
 
   bitmap ModeForSequence : bitmap8 {
     kHeatSetpointPresent = 0x1;
     kCoolSetpointPresent = 0x2;
+  }
+
+  bitmap PresetTypeFeaturesBitmap : bitmap8 {
+    kAutomatic = 0x1;
+    kSupportsNames = 0x2;
+  }
+
+  bitmap ScheduleTypeFeaturesBitmap : bitmap8 {
+    kSupportsPresets = 0x1;
+    kSupportsSetpoints = 0x2;
+    kSupportsNames = 0x3;
+    kSupportsOff = 0x4;
+  }
+
+  bitmap TemperatureSetpointHoldPolicy : bitmap8 {
+    kHoldDurationElapsed = 0x1;
+    kHoldDurationElapsedOrPresetChanged = 0x2;
+  }
+
+  struct ScheduleTransitionStruct {
+    DayOfWeek dayOfWeek = 0;
+    int16u transitionTime = 1;
+    octet_string<16> presetHandle = 2;
+    ThermostatSystemMode systemMode = 3;
+    int16s coolingSetpoint = 4;
+    int16s heatingSetpoint = 5;
+  }
+
+  struct ScheduleStruct {
+    octet_string<16> sceduleHandle = 0;
+    ThermostatSystemMode systemMode = 1;
+    nullable char_string<64> name = 2;
+    octet_string<16> presetHandle = 3;
+    ScheduleTransitionStruct transitions[] = 4;
+    boolean builtIn = 5;
+  }
+
+  struct PresetStruct {
+    octet_string<16> presetHandle = 0;
+    PresetScenarioEnum presetScenario = 1;
+    nullable char_string<64> name = 2;
+    int16s coolingSetpoint = 3;
+    int16s heatingSetpoint = 4;
+    boolean builtIn = 5;
+  }
+
+  struct PresetTypeStruct {
+    PresetScenarioEnum presetScenario = 0;
+    int8u numberOfPresets = 1;
+    PresetTypeFeaturesBitmap presetTypeFeatures = 2;
+  }
+
+  struct QueuedPresetStruct {
+    octet_string<16> presetHandle = 0;
+    epoch_s transitionTimestamp = 1;
+  }
+
+  struct ScheduleTypeStruct {
+    ThermostatSystemMode systemMode = 0;
+    int8u numberOfSchedules = 1;
+    ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
   }
 
   struct ThermostatScheduleTransition {
@@ -4719,6 +4794,21 @@ client cluster Thermostat = 513 {
   attribute access(write: manage) optional enum8 ACLouverPosition = 69;
   readonly attribute optional nullable int16s ACCoilTemperature = 70;
   attribute access(write: manage) optional enum8 ACCapacityformat = 71;
+  readonly attribute optional PresetTypeStruct presetTypes[] = 72;
+  readonly attribute optional ScheduleTypeStruct scheduleTypes[] = 73;
+  readonly attribute optional int8u numberOfPresets = 74;
+  readonly attribute optional int8u numberOfSchedules = 75;
+  readonly attribute optional int8u numberOfScheduleTransitions = 76;
+  readonly attribute optional nullable int8u numberOfScheduleTransitionsPerDay = 77;
+  readonly attribute access(write: manage) optional PresetStruct presets[] = 78;
+  readonly attribute optional boolean presetsEditable = 79;
+  readonly attribute optional nullable octet_string<16> activePresetHandle = 80;
+  readonly attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
+  readonly attribute optional boolean schedulesEditable = 82;
+  readonly attribute optional nullable octet_string<16> activeScheduleHandle = 83;
+  readonly attribute optional TemperatureSetpointHoldPolicy temperatureSetpointHoldPolicy = 84;
+  readonly attribute optional nullable epoch_s setpointHoldPolicyExpiryTimestamp = 85;
+  readonly attribute optional nullable QueuedPresetStruct queuedPreset = 86;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4750,6 +4840,27 @@ client cluster Thermostat = 513 {
     ModeForSequence modeToReturn = 1;
   }
 
+  request struct SetActiveScheduleRequestRequest {
+    octet_string<16> scheduleHandle = 0;
+  }
+
+  request struct SetActivePresetRequestRequest {
+    octet_string<16> presetHandle = 0;
+    int16u delayMinutes = 1;
+  }
+
+  request struct StartSchedulesEditRequestRequest {
+    int16u timeoutSeconds = 0;
+  }
+
+  request struct StartPresetsEditRequestRequest {
+    int16u timeoutSeconds = 0;
+  }
+
+  request struct SetTemperatureSetpointHoldPolicyRequest {
+    TemperatureSetpointHoldPolicy temperatureSetpointHoldPolicy = 0;
+  }
+
   /** Command description for SetpointRaiseLower */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
   /** Command description for SetWeeklySchedule */
@@ -4758,6 +4869,28 @@ client cluster Thermostat = 513 {
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
   /** The Clear Weekly Schedule command is used to clear the weekly schedule. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
+  /** Request the Relay Status Log */
+  command GetRelayStatusLog(): DefaultSuccess = 4;
+  /** Set the active schedule */
+  command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
+  /** Set the active preset */
+  command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  /** Start Editing Schedules */
+  command access(invoke: manage) StartSchedulesEditRequest(StartSchedulesEditRequestRequest): DefaultSuccess = 7;
+  /** Cancel Editing Schedules */
+  command access(invoke: manage) CancelSchedulesEditRequest(): DefaultSuccess = 8;
+  /** Commit Edited Schedules */
+  command access(invoke: manage) CommitSchedulesEditRequest(): DefaultSuccess = 9;
+  /** Start Editing Presets */
+  command access(invoke: manage) StartPresetsEditRequest(StartPresetsEditRequestRequest): DefaultSuccess = 10;
+  /** Cancel Editing Presets */
+  command access(invoke: manage) CancelPresetsEditRequest(): DefaultSuccess = 11;
+  /** Commit Edited Presets */
+  command access(invoke: manage) CommitPresetsEditRequest(): DefaultSuccess = 12;
+  /** Cancel a delayed preset request */
+  command access(invoke: manage) CancelSetActivePresetRequest(): DefaultSuccess = 14;
+  /** Set the set point hold policy */
+  command access(invoke: manage) SetTemperatureSetpointHoldPolicy(SetTemperatureSetpointHoldPolicyRequest): DefaultSuccess = 15;
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */

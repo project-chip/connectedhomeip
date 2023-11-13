@@ -24144,6 +24144,21 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="ACLouverPosition", Tag=0x00000045, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="ACCoilTemperature", Tag=0x00000046, Type=typing.Union[None, Nullable, int]),
                 ClusterObjectFieldDescriptor(Label="ACCapacityformat", Tag=0x00000047, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="presetTypes", Tag=0x00000048, Type=typing.Optional[typing.List[Thermostat.Structs.PresetTypeStruct]]),
+                ClusterObjectFieldDescriptor(Label="scheduleTypes", Tag=0x00000049, Type=typing.Optional[typing.List[Thermostat.Structs.ScheduleTypeStruct]]),
+                ClusterObjectFieldDescriptor(Label="numberOfPresets", Tag=0x0000004A, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="numberOfSchedules", Tag=0x0000004B, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="numberOfScheduleTransitions", Tag=0x0000004C, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="numberOfScheduleTransitionsPerDay", Tag=0x0000004D, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="presets", Tag=0x0000004E, Type=typing.Optional[typing.List[Thermostat.Structs.PresetStruct]]),
+                ClusterObjectFieldDescriptor(Label="presetsEditable", Tag=0x0000004F, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="activePresetHandle", Tag=0x00000050, Type=typing.Union[None, Nullable, bytes]),
+                ClusterObjectFieldDescriptor(Label="schedules", Tag=0x00000051, Type=typing.Optional[typing.List[Thermostat.Structs.ScheduleStruct]]),
+                ClusterObjectFieldDescriptor(Label="schedulesEditable", Tag=0x00000052, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="activeScheduleHandle", Tag=0x00000053, Type=typing.Union[None, Nullable, bytes]),
+                ClusterObjectFieldDescriptor(Label="temperatureSetpointHoldPolicy", Tag=0x00000054, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="setpointHoldPolicyExpiryTimestamp", Tag=0x00000055, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="queuedPreset", Tag=0x00000056, Type=typing.Union[None, Nullable, Thermostat.Structs.QueuedPresetStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -24201,6 +24216,21 @@ class Thermostat(Cluster):
     ACLouverPosition: 'typing.Optional[uint]' = None
     ACCoilTemperature: 'typing.Union[None, Nullable, int]' = None
     ACCapacityformat: 'typing.Optional[uint]' = None
+    presetTypes: 'typing.Optional[typing.List[Thermostat.Structs.PresetTypeStruct]]' = None
+    scheduleTypes: 'typing.Optional[typing.List[Thermostat.Structs.ScheduleTypeStruct]]' = None
+    numberOfPresets: 'typing.Optional[uint]' = None
+    numberOfSchedules: 'typing.Optional[uint]' = None
+    numberOfScheduleTransitions: 'typing.Optional[uint]' = None
+    numberOfScheduleTransitionsPerDay: 'typing.Union[None, Nullable, uint]' = None
+    presets: 'typing.Optional[typing.List[Thermostat.Structs.PresetStruct]]' = None
+    presetsEditable: 'typing.Optional[bool]' = None
+    activePresetHandle: 'typing.Union[None, Nullable, bytes]' = None
+    schedules: 'typing.Optional[typing.List[Thermostat.Structs.ScheduleStruct]]' = None
+    schedulesEditable: 'typing.Optional[bool]' = None
+    activeScheduleHandle: 'typing.Union[None, Nullable, bytes]' = None
+    temperatureSetpointHoldPolicy: 'typing.Optional[uint]' = None
+    setpointHoldPolicyExpiryTimestamp: 'typing.Union[None, Nullable, uint]' = None
+    queuedPreset: 'typing.Union[None, Nullable, Thermostat.Structs.QueuedPresetStruct]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -24209,6 +24239,20 @@ class Thermostat(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
+        class PresetScenarioEnum(MatterIntEnum):
+            kUnspecified = 0x00
+            kOccupied = 0x01
+            kUnoccupied = 0x02
+            kSleep = 0x03
+            kWake = 0x04
+            kVacation = 0x05
+            kUserDefined = 0x06
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 7,
+
         class SetpointAdjustMode(MatterIntEnum):
             kHeat = 0x00
             kCool = 0x01
@@ -24277,12 +24321,136 @@ class Thermostat(Cluster):
             kSetback = 0x10
             kAutoMode = 0x20
             kLocalTemperatureNotExposed = 0x40
+            kMatterScheduleConfiguration = 0x80
+            kPresets = 0x100
+            kSetpoints = 0x200
+            kQueuedPresetsSupported = 0x400
 
         class ModeForSequence(IntFlag):
             kHeatSetpointPresent = 0x1
             kCoolSetpointPresent = 0x2
 
+        class PresetTypeFeaturesBitmap(IntFlag):
+            kAutomatic = 0x1
+            kSupportsNames = 0x2
+
+        class ScheduleTypeFeaturesBitmap(IntFlag):
+            kSupportsPresets = 0x1
+            kSupportsSetpoints = 0x2
+            kSupportsNames = 0x3
+            kSupportsOff = 0x4
+
+        class TemperatureSetpointHoldPolicy(IntFlag):
+            kHoldDurationElapsed = 0x1
+            kHoldDurationElapsedOrPresetChanged = 0x2
+
     class Structs:
+        @dataclass
+        class ScheduleTransitionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="dayOfWeek", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=2, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="systemMode", Tag=3, Type=Thermostat.Enums.ThermostatSystemMode),
+                        ClusterObjectFieldDescriptor(Label="coolingSetpoint", Tag=4, Type=int),
+                        ClusterObjectFieldDescriptor(Label="heatingSetpoint", Tag=5, Type=int),
+                    ])
+
+            dayOfWeek: 'uint' = 0
+            transitionTime: 'uint' = 0
+            presetHandle: 'bytes' = b""
+            systemMode: 'Thermostat.Enums.ThermostatSystemMode' = 0
+            coolingSetpoint: 'int' = 0
+            heatingSetpoint: 'int' = 0
+
+        @dataclass
+        class ScheduleStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sceduleHandle", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="systemMode", Tag=1, Type=Thermostat.Enums.ThermostatSystemMode),
+                        ClusterObjectFieldDescriptor(Label="name", Tag=2, Type=typing.Union[Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=3, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="transitions", Tag=4, Type=typing.List[Thermostat.Structs.ScheduleTransitionStruct]),
+                        ClusterObjectFieldDescriptor(Label="builtIn", Tag=5, Type=bool),
+                    ])
+
+            sceduleHandle: 'bytes' = b""
+            systemMode: 'Thermostat.Enums.ThermostatSystemMode' = 0
+            name: 'typing.Union[Nullable, str]' = NullValue
+            presetHandle: 'bytes' = b""
+            transitions: 'typing.List[Thermostat.Structs.ScheduleTransitionStruct]' = field(default_factory=lambda: [])
+            builtIn: 'bool' = False
+
+        @dataclass
+        class PresetStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="presetScenario", Tag=1, Type=Thermostat.Enums.PresetScenarioEnum),
+                        ClusterObjectFieldDescriptor(Label="name", Tag=2, Type=typing.Union[Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="coolingSetpoint", Tag=3, Type=int),
+                        ClusterObjectFieldDescriptor(Label="heatingSetpoint", Tag=4, Type=int),
+                        ClusterObjectFieldDescriptor(Label="builtIn", Tag=5, Type=bool),
+                    ])
+
+            presetHandle: 'bytes' = b""
+            presetScenario: 'Thermostat.Enums.PresetScenarioEnum' = 0
+            name: 'typing.Union[Nullable, str]' = NullValue
+            coolingSetpoint: 'int' = 0
+            heatingSetpoint: 'int' = 0
+            builtIn: 'bool' = False
+
+        @dataclass
+        class PresetTypeStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="presetScenario", Tag=0, Type=Thermostat.Enums.PresetScenarioEnum),
+                        ClusterObjectFieldDescriptor(Label="numberOfPresets", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="presetTypeFeatures", Tag=2, Type=uint),
+                    ])
+
+            presetScenario: 'Thermostat.Enums.PresetScenarioEnum' = 0
+            numberOfPresets: 'uint' = 0
+            presetTypeFeatures: 'uint' = 0
+
+        @dataclass
+        class QueuedPresetStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="transitionTimestamp", Tag=1, Type=uint),
+                    ])
+
+            presetHandle: 'bytes' = b""
+            transitionTimestamp: 'uint' = 0
+
+        @dataclass
+        class ScheduleTypeStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="systemMode", Tag=0, Type=Thermostat.Enums.ThermostatSystemMode),
+                        ClusterObjectFieldDescriptor(Label="numberOfSchedules", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="scheduleTypeFeatures", Tag=2, Type=uint),
+                    ])
+
+            systemMode: 'Thermostat.Enums.ThermostatSystemMode' = 0
+            numberOfSchedules: 'uint' = 0
+            scheduleTypeFeatures: 'uint' = 0
+
         @dataclass
         class ThermostatScheduleTransition(ClusterObject):
             @ChipUtility.classproperty
@@ -24391,6 +24559,166 @@ class Thermostat(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                     ])
+
+        @dataclass
+        class GetRelayStatusLog(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+        @dataclass
+        class SetActiveScheduleRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="scheduleHandle", Tag=0, Type=bytes),
+                    ])
+
+            scheduleHandle: 'bytes' = b""
+
+        @dataclass
+        class SetActivePresetRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x00000006
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="delayMinutes", Tag=1, Type=uint),
+                    ])
+
+            presetHandle: 'bytes' = b""
+            delayMinutes: 'uint' = 0
+
+        @dataclass
+        class StartSchedulesEditRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x00000007
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="timeoutSeconds", Tag=0, Type=uint),
+                    ])
+
+            timeoutSeconds: 'uint' = 0
+
+        @dataclass
+        class CancelSchedulesEditRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x00000008
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+        @dataclass
+        class CommitSchedulesEditRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x00000009
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+        @dataclass
+        class StartPresetsEditRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x0000000A
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="timeoutSeconds", Tag=0, Type=uint),
+                    ])
+
+            timeoutSeconds: 'uint' = 0
+
+        @dataclass
+        class CancelPresetsEditRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x0000000B
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+        @dataclass
+        class CommitPresetsEditRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x0000000C
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+        @dataclass
+        class CancelSetActivePresetRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x0000000E
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+        @dataclass
+        class SetTemperatureSetpointHoldPolicy(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x0000000F
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="temperatureSetpointHoldPolicy", Tag=0, Type=uint),
+                    ])
+
+            temperatureSetpointHoldPolicy: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -25176,6 +25504,246 @@ class Thermostat(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
             value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class PresetTypes(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000048
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Thermostat.Structs.PresetTypeStruct]])
+
+            value: 'typing.Optional[typing.List[Thermostat.Structs.PresetTypeStruct]]' = None
+
+        @dataclass
+        class ScheduleTypes(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000049
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Thermostat.Structs.ScheduleTypeStruct]])
+
+            value: 'typing.Optional[typing.List[Thermostat.Structs.ScheduleTypeStruct]]' = None
+
+        @dataclass
+        class NumberOfPresets(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000004A
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class NumberOfSchedules(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000004B
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class NumberOfScheduleTransitions(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000004C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class NumberOfScheduleTransitionsPerDay(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000004D
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class Presets(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000004E
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Thermostat.Structs.PresetStruct]])
+
+            value: 'typing.Optional[typing.List[Thermostat.Structs.PresetStruct]]' = None
+
+        @dataclass
+        class PresetsEditable(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000004F
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class ActivePresetHandle(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000050
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, bytes])
+
+            value: 'typing.Union[None, Nullable, bytes]' = None
+
+        @dataclass
+        class Schedules(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000051
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Thermostat.Structs.ScheduleStruct]])
+
+            value: 'typing.Optional[typing.List[Thermostat.Structs.ScheduleStruct]]' = None
+
+        @dataclass
+        class SchedulesEditable(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000052
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class ActiveScheduleHandle(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000053
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, bytes])
+
+            value: 'typing.Union[None, Nullable, bytes]' = None
+
+        @dataclass
+        class TemperatureSetpointHoldPolicy(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000054
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class SetpointHoldPolicyExpiryTimestamp(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000055
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class QueuedPreset(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000056
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, Thermostat.Structs.QueuedPresetStruct])
+
+            value: 'typing.Union[None, Nullable, Thermostat.Structs.QueuedPresetStruct]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

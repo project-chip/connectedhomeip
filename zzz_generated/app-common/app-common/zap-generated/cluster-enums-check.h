@@ -1879,6 +1879,23 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PumpConfigurationAndCon
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::PresetScenarioEnum val)
+{
+    using EnumType = Thermostat::PresetScenarioEnum;
+    switch (val)
+    {
+    case EnumType::kUnspecified:
+    case EnumType::kOccupied:
+    case EnumType::kUnoccupied:
+    case EnumType::kSleep:
+    case EnumType::kWake:
+    case EnumType::kVacation:
+    case EnumType::kUserDefined:
+        return val;
+    default:
+        return static_cast<EnumType>(7);
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::SetpointAdjustMode val)
 {
     using EnumType = Thermostat::SetpointAdjustMode;

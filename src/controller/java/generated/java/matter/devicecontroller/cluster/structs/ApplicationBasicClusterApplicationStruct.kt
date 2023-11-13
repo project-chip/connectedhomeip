@@ -16,7 +16,9 @@
  */
 package matter.devicecontroller.cluster.structs
 
+import java.util.Optional
 import matter.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -50,7 +52,7 @@ class ApplicationBasicClusterApplicationStruct(
       tlvReader.enterStructure(tlvTag)
       val catalogVendorID = tlvReader.getUShort(ContextSpecificTag(TAG_CATALOG_VENDOR_I_D))
       val applicationID = tlvReader.getString(ContextSpecificTag(TAG_APPLICATION_I_D))
-
+      
       tlvReader.exitContainer()
 
       return ApplicationBasicClusterApplicationStruct(catalogVendorID, applicationID)
