@@ -1680,6 +1680,28 @@ public class ClusterReadMapping {
           readBasicInformationUniqueIDCommandParams
         );
         result.put("readUniqueIDAttribute", readBasicInformationUniqueIDAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBasicInformationSpecificationVersionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBasicInformationSpecificationVersionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.BasicInformationCluster) cluster).readSpecificationVersionAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readBasicInformationSpecificationVersionCommandParams
+        );
+        result.put("readSpecificationVersionAttribute", readBasicInformationSpecificationVersionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBasicInformationMaxPathsPerInvokeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBasicInformationMaxPathsPerInvokeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.BasicInformationCluster) cluster).readMaxPathsPerInvokeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readBasicInformationMaxPathsPerInvokeCommandParams
+        );
+        result.put("readMaxPathsPerInvokeAttribute", readBasicInformationMaxPathsPerInvokeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readBasicInformationGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readBasicInformationGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

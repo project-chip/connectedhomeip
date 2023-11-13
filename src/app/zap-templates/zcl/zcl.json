@@ -160,7 +160,9 @@
             "SerialNumber",
             "UniqueID",
             "CapabilityMinima",
-            "ProductAppearance"
+            "ProductAppearance",
+            "SpecificationVersion",
+            "MaxPathsPerInvoke"
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Descriptor": ["ClusterRevision"],

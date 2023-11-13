@@ -2347,6 +2347,8 @@ public class ClusterIDMapping {
             UniqueID(18L),
             CapabilityMinima(19L),
             ProductAppearance(20L),
+            SpecificationVersion(21L),
+            MaxPathsPerInvoke(22L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
