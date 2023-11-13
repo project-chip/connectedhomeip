@@ -25,17 +25,6 @@
 #include <lib/core/TLVTypes.h>
 #include <lib/support/SafeInt.h>
 
-#define NEXT_ELEMENT_OR_EXIT_CONTAINER_AND_RETURN(tlvReader)                                                                       \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        CHIP_ERROR err = tlvReader.Next();                                                                                         \
-        if (err == CHIP_END_OF_TLV)                                                                                                \
-        {                                                                                                                          \
-            return tlvReader.ExitContainer(containerType);                                                                         \
-        }                                                                                                                          \
-        ReturnErrorOnFailure(err);                                                                                                 \
-    } while (0)
-
 namespace chip {
 
 CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager, const ScopedNodeId & sessionEvictionHint)
@@ -139,6 +128,8 @@ CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const Optional<
 
 CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     // The MRP parameters are optional.
     if (tlvReader.GetTag() != expectedTag)
     {
@@ -161,7 +152,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
         mRemoteSessionParams.SetMRPIdleRetransTimeout(System::Clock::Milliseconds32(idleRetransTimeout));
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
-        NEXT_ELEMENT_OR_EXIT_CONTAINER_AND_RETURN(tlvReader);
+        SuccessOrExit(err = tlvReader.Next());
     }
 
     if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kSessionActiveInterval)
@@ -171,7 +162,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
         mRemoteSessionParams.SetMRPActiveRetransTimeout(System::Clock::Milliseconds32(activeRetransTimeout));
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
-        NEXT_ELEMENT_OR_EXIT_CONTAINER_AND_RETURN(tlvReader);
+        SuccessOrExit(err = tlvReader.Next());
     }
 
     if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kSessionActiveThreshold)
@@ -181,7 +172,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
         mRemoteSessionParams.SetMRPActiveThresholdTime(System::Clock::Milliseconds16(activeThresholdTime));
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
-        NEXT_ELEMENT_OR_EXIT_CONTAINER_AND_RETURN(tlvReader);
+        SuccessOrExit(err = tlvReader.Next());
     }
 
     if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kDataModelRevision)
@@ -191,7 +182,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
         mRemoteSessionParams.SetDataModelRevision(SetDataModelRevision);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
-        NEXT_ELEMENT_OR_EXIT_CONTAINER_AND_RETURN(tlvReader);
+        SuccessOrExit(err = tlvReader.Next());
     }
 
     if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kInteractionModelRevision)
@@ -201,7 +192,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
         mRemoteSessionParams.SetInteractionModelRevision(interactionModelRev);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
-        NEXT_ELEMENT_OR_EXIT_CONTAINER_AND_RETURN(tlvReader);
+        SuccessOrExit(err = tlvReader.Next());
     }
 
     if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kSpecificationVersion)
@@ -211,7 +202,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
         mRemoteSessionParams.SetSpecificationVersion(specificationVersion);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
-        NEXT_ELEMENT_OR_EXIT_CONTAINER_AND_RETURN(tlvReader);
+        SuccessOrExit(err = tlvReader.Next());
     }
 
     if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kMaxPathsPerInvoke)
@@ -221,12 +212,16 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
         mRemoteSessionParams.SetMaxPathsPerInvoke(maxPathsPerInvoke);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
-        NEXT_ELEMENT_OR_EXIT_CONTAINER_AND_RETURN(tlvReader);
+        SuccessOrExit(err = tlvReader.Next());
     }
 
     // Future proofing - Don't error out if there are other tags
-
-    return tlvReader.ExitContainer(containerType);
+exit:
+    if (err == CHIP_END_OF_TLV)
+    {
+        return tlvReader.ExitContainer(containerType);
+    }
+    return err;
 }
 
 bool PairingSession::IsSessionEstablishmentInProgress()
