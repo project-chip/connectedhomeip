@@ -251,6 +251,7 @@ class ChipDeviceControllerBase():
         self.devCtrl = devCtrl
         self.name = name
         self.fabricCheckNodeId = -1
+        self._isActive = False
 
         self._Cluster = ChipClusters(builtins.chipStack)
         self._Cluster.InitLib(self._dmLib)
@@ -375,16 +376,18 @@ class ChipDeviceControllerBase():
         ''' Shuts down this controller and reclaims any used resources, including the bound
             C++ constructor instance in the SDK.
         '''
-        if (self._isActive):
-            if self.devCtrl is not None:
-                self._ChipStack.Call(
-                    lambda: self._dmLib.pychip_DeviceController_DeleteDeviceController(
-                        self.devCtrl)
-                ).raise_on_error()
-                self.devCtrl = None
+        if not self._isActive:
+            return
 
-            ChipDeviceController.activeList.remove(self)
-            self._isActive = False
+        if self.devCtrl is not None:
+            self._ChipStack.Call(
+                lambda: self._dmLib.pychip_DeviceController_DeleteDeviceController(
+                    self.devCtrl)
+            ).raise_on_error()
+            self.devCtrl = None
+
+        ChipDeviceController.activeList.remove(self)
+        self._isActive = False
 
     def ShutdownAll():
         ''' Shut down all active controllers and reclaim any used resources.
