@@ -32,8 +32,6 @@ struct WorkData
     std::condition_variable cond;
     bool done = false;
 
-    WorkData() {}
-    ~WorkData() {}
     void Post()
     {
         std::unique_lock lock(mux);
