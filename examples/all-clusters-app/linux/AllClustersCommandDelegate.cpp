@@ -31,6 +31,7 @@
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
 #include <rvc-modes.h>
+#include <oven-modes.h>
 
 using namespace chip;
 using namespace chip::app;

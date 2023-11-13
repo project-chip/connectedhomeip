@@ -226,6 +226,8 @@ if (current_os == "android" || matter_enable_java_compilation) {
       "jni/RelativeHumidityMeasurementClient-ReadImpl.cpp",
       "jni/RvcOperationalStateClient-InvokeSubscribeImpl.cpp",
       "jni/RvcOperationalStateClient-ReadImpl.cpp",
+      "jni/OvenOperationalStateClient-InvokeSubscribeImpl.cpp",
+      "jni/OvenOperationalStateClient-ReadImpl.cpp",
       "jni/RvcCleanModeClient-InvokeSubscribeImpl.cpp",
       "jni/RvcCleanModeClient-ReadImpl.cpp",
       "jni/RvcRunModeClient-InvokeSubscribeImpl.cpp",

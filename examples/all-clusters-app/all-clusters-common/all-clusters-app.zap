@@ -8409,15 +8409,15 @@
           ]
         },
         {
-          "name": "Laundry Dryer Controls",
-          "code": 74,
+          "name": "Oven Operational State",
+          "code": 72,
           "mfgCode": null,
-          "define": "LAUNDRY_DRYER_CONTROLS_CLUSTER",
+          "define": "OPERATIONAL_STATE_OVEN_CLUSTER",
           "side": "server",
           "enabled": 1,
           "attributes": [
             {
-              "name": "SupportedDrynessLevels",
+              "name": "PhaseList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8433,13 +8433,61 @@
               "reportableChange": 0
             },
             {
-              "name": "SelectedDrynessLevel",
+              "name": "CurrentPhase",
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "DrynessLevelEnum",
+              "type": "int8u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "OperationalStateList",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "OperationalState",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "type": "enum8",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "OperationalError",
+              "code": 5,
+              "mfgCode": null,
+              "side": "server",
+              "type": "ErrorStateStruct",
+              "included": 1,
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11875,72 +11923,6 @@
           "side": "server",
           "enabled": 1,
           "apiMaturity": "provisional",
-          "commands": [
-            {
-              "name": "GetTargetsResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "Disable",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "EnableCharging",
-              "code": 2,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "EnableDischarging",
-              "code": 3,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "StartDiagnostics",
-              "code": 4,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "SetTargets",
-              "code": 5,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "GetTargets",
-              "code": 6,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "ClearTargets",
-              "code": 7,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            }
-          ],
           "attributes": [
             {
               "name": "State",
@@ -12352,7 +12334,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": null,
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -12368,7 +12350,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": null,
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -12384,7 +12366,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": null,
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -12400,7 +12382,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": null,
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -22661,4 +22643,3 @@
   ],
   "log": []
 }
-
