@@ -130,6 +130,18 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::MoveModeE
         return static_cast<EnumType>(2);
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::StepModeEnum val)
+{
+    using EnumType = LevelControl::StepModeEnum;
+    switch (val)
+    {
+    case EnumType::kUp:
+    case EnumType::kDown:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
 
 static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessControlEntryAuthModeEnum val)
 {
