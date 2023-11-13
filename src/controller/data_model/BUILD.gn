@@ -164,6 +164,8 @@ if (current_os == "android" || matter_enable_java_compilation) {
       "jni/MediaInputClient-ReadImpl.cpp",
       "jni/MediaPlaybackClient-InvokeSubscribeImpl.cpp",
       "jni/MediaPlaybackClient-ReadImpl.cpp",
+      "jni/MessagesClient-InvokeSubscribeImpl.cpp",
+      "jni/MessagesClient-ReadImpl.cpp",
       "jni/ModeSelectClient-InvokeSubscribeImpl.cpp",
       "jni/ModeSelectClient-ReadImpl.cpp",
       "jni/NetworkCommissioningClient-InvokeSubscribeImpl.cpp",
