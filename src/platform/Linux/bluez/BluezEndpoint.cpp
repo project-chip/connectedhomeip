@@ -329,7 +329,7 @@ void BluezEndpoint::UpdateConnectionTable(BluezDevice1 * apDevice)
     if (connection == nullptr && bluez_device1_get_connected(apDevice) &&
         (!mIsCentral || bluez_device1_get_services_resolved(apDevice)))
     {
-        connection       = chip::Platform::New<BluezConnection>(this, apDevice);
+        connection       = chip::Platform::New<BluezConnection>(*this, apDevice);
         mpPeerDevicePath = g_strdup(objectPath);
         g_hash_table_insert(mpConnMap, mpPeerDevicePath, connection);
 
@@ -369,7 +369,7 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 * device)
                  ChipLogError(DeviceLayer, "FAIL: connection already tracked: conn: %p new device: %s", conn,
                               g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))));
 
-    conn             = chip::Platform::New<BluezConnection>(this, device);
+    conn             = chip::Platform::New<BluezConnection>(*this, device);
     mpPeerDevicePath = g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
     g_hash_table_insert(mpConnMap, mpPeerDevicePath, conn);
 

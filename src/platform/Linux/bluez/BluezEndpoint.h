@@ -54,7 +54,6 @@
 #include <lib/core/CHIPError.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
-#include "BluezAdvertisement.h"
 #include "BluezConnection.h"
 #include "Types.h"
 
@@ -72,6 +71,7 @@ public:
     void Shutdown();
 
     BluezAdapter1 * GetAdapter() const { return mpAdapter; }
+    const char * GetAdapterName() const { return mpAdapterName; }
 
     CHIP_ERROR RegisterGattApplication();
 

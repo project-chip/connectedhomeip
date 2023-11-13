@@ -133,20 +133,18 @@ CHIP_ERROR BluezAdvertisement::InitImpl()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezAdvertisement::Init(BluezEndpoint * apEndpoint, ChipAdvType aAdvType, const char * aAdvUUID,
+CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, ChipAdvType aAdvType, const char * aAdvUUID,
                                     uint32_t aAdvDurationMs)
 {
     GAutoPtr<char> rootPath;
     CHIP_ERROR err;
 
-    VerifyOrExit(apEndpoint != nullptr, err = CHIP_ERROR_INCORRECT_STATE;
-                 ChipLogError(DeviceLayer, "FAIL: NULL endpoint in %s", __func__));
     VerifyOrExit(mpAdv == nullptr, err = CHIP_ERROR_INCORRECT_STATE;
                  ChipLogError(DeviceLayer, "FAIL: BLE advertisement already initialized in %s", __func__));
 
-    mpRoot        = reinterpret_cast<GDBusObjectManagerServer *>(g_object_ref(apEndpoint->mpRoot));
-    mpAdapter     = reinterpret_cast<BluezAdapter1 *>(g_object_ref(apEndpoint->mpAdapter));
-    mpAdapterName = g_strdup(apEndpoint->mpAdapterName);
+    mpRoot        = reinterpret_cast<GDBusObjectManagerServer *>(g_object_ref(aEndpoint.mpRoot));
+    mpAdapter     = reinterpret_cast<BluezAdapter1 *>(g_object_ref(aEndpoint.GetAdapter()));
+    mpAdapterName = g_strdup(aEndpoint.GetAdapterName());
 
     g_object_get(G_OBJECT(mpRoot), "object-path", &MakeUniquePointerReceiver(rootPath).Get(), nullptr);
     mpAdvPath      = g_strdup_printf("%s/advertising", rootPath.get());

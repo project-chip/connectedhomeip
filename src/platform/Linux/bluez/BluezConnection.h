@@ -37,7 +37,7 @@ class BluezEndpoint;
 class BluezConnection
 {
 public:
-    BluezConnection(BluezEndpoint * apEndpoint, BluezDevice1 * apDevice);
+    BluezConnection(const BluezEndpoint & aEndpoint, BluezDevice1 * apDevice);
     ~BluezConnection();
 
     const char * GetPeerAddress() const;
@@ -95,7 +95,7 @@ private:
         GAutoPtr<GVariant> mData;
     };
 
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(const BluezEndpoint & aEndpoint);
 
     static CHIP_ERROR BluezDisconnect(BluezConnection * apConn);
 
@@ -115,7 +115,6 @@ private:
     static void UnsubscribeCharacteristicDone(GObject * aObject, GAsyncResult * aResult, gpointer apConn);
     static CHIP_ERROR UnsubscribeCharacteristicImpl(BluezConnection * apConn);
 
-    BluezEndpoint * mpEndpoint;
     BluezDevice1 * mpDevice;
 
     bool mNotifyAcquired = false;
