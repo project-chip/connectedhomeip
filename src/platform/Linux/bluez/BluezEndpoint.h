@@ -124,7 +124,8 @@ private:
     static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams);
     static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams);
 
-    bool mIsCentral = false;
+    bool mIsCentral     = false;
+    bool mIsInitialized = false;
 
     // Bus owning name
     char * mpOwningName = nullptr;

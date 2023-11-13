@@ -685,12 +685,16 @@ CHIP_ERROR BluezEndpoint::Init(uint32_t aAdapterId, bool aIsCentral, const char 
         +[](BluezEndpoint * self) { return self->StartupEndpointBindings(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization"));
 
-    ChipLogDetail(DeviceLayer, "PlatformBlueZInit init success");
+    ChipLogDetail(DeviceLayer, "BlueZ integration init success");
+    mIsInitialized = true;
+
     return CHIP_NO_ERROR;
 }
 
 void BluezEndpoint::Shutdown()
 {
+    VerifyOrReturn(mIsInitialized);
+
     // Run endpoint cleanup on the CHIPoBluez thread. This is necessary because the
     // cleanup function releases the D-Bus manager client object, which handles D-Bus
     // signals. Otherwise, we will face race condition when the D-Bus signal is in
@@ -725,6 +729,8 @@ void BluezEndpoint::Shutdown()
     g_free(mpRootPath);
     g_free(mpServicePath);
     g_free(mpPeerDevicePath);
+
+    mIsInitialized = false;
 }
 
 // ConnectDevice callbacks
