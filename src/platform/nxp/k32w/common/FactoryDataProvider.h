@@ -88,6 +88,8 @@ public:
         kPartNumber,
         kProductURL,
         kProductLabel,
+        kProductFinish,
+        kProductPrimaryColor,
         kMaxId
     };
 
@@ -137,6 +139,8 @@ public:
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override;
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
+    CHIP_ERROR GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish) override;
+    CHIP_ERROR GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor) override;
 
 protected:
     uint16_t maxLengths[FactoryDataId::kMaxId];

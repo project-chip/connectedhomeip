@@ -67,6 +67,8 @@ FactoryDataProvider::FactoryDataProvider()
     maxLengths[FactoryDataId::kPartNumber]           = ConfigurationManager::kMaxPartNumberLength;
     maxLengths[FactoryDataId::kProductURL]           = ConfigurationManager::kMaxProductURLLength;
     maxLengths[FactoryDataId::kProductLabel]         = ConfigurationManager::kMaxProductLabelLength;
+    maxLengths[FactoryDataId::kProductFinish]        = sizeof(uint8_t);
+    maxLengths[FactoryDataId::kProductPrimaryColor]  = sizeof(uint8_t);
 }
 
 FactoryDataProvider::~FactoryDataProvider() {}
@@ -359,6 +361,30 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
 #endif
 
     return err;
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish)
+{
+    uint8_t productFinish;
+    uint16_t length = 0;
+    auto err = SearchForId(FactoryDataId::kProductFinish, &productFinish, sizeof(productFinish), length);
+    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
+
+    *finish = static_cast<app::Clusters::BasicInformation::ProductFinishEnum>(productFinish);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor)
+{
+    uint8_t color;
+    uint16_t length = 0;
+    auto err = SearchForId(FactoryDataId::kProductPrimaryColor, &color, sizeof(color), length);
+    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
+
+    *primaryColor = static_cast<app::Clusters::BasicInformation::ColorEnum>(color);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer
