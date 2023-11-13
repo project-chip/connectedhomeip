@@ -142,7 +142,7 @@ CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, ChipAdvType
     VerifyOrExit(mpAdv == nullptr, err = CHIP_ERROR_INCORRECT_STATE;
                  ChipLogError(DeviceLayer, "FAIL: BLE advertisement already initialized in %s", __func__));
 
-    mpRoot        = reinterpret_cast<GDBusObjectManagerServer *>(g_object_ref(aEndpoint.mpRoot));
+    mpRoot        = reinterpret_cast<GDBusObjectManagerServer *>(g_object_ref(aEndpoint.GetGattApplicationObjectManager()));
     mpAdapter     = reinterpret_cast<BluezAdapter1 *>(g_object_ref(aEndpoint.GetAdapter()));
     mpAdapterName = g_strdup(aEndpoint.GetAdapterName());
 

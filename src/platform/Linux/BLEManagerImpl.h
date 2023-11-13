@@ -27,7 +27,6 @@
 #include <string>
 
 #include <ble/BleLayer.h>
-#include <lib/support/CHIPMem.h>
 #include <platform/internal/BLEManager.h>
 
 #include "bluez/BluezAdvertisement.h"

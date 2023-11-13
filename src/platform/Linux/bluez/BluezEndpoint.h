@@ -76,6 +76,7 @@ public:
     const char * GetAdapterName() const { return mpAdapterName; }
 
     CHIP_ERROR RegisterGattApplication();
+    GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mpRoot; }
 
     CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
     void CancelConnect();
@@ -154,9 +155,7 @@ private:
     GCancellable * mpConnectCancellable = nullptr;
     char * mpPeerDevicePath             = nullptr;
 
-    // Allow BluezAdvertisement and BluezConnection to access our private members
-    // TODO: Fix this tight coupling
-    friend class BluezAdvertisement;
+    // Allow BluezConnection to access our private members
     friend class BluezConnection;
 };
 
