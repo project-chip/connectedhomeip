@@ -894,7 +894,7 @@ class ChipDeviceControllerBase():
             to the XYZ attribute on the test cluster to endpoint 1
 
         Returns:
-            - PyChipError
+            - [PyChipError] (list - one for each pth)
         '''
         self.CheckIsActive()
 
