@@ -5618,6 +5618,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kNetworkID), networkID);
     encoder.Encode(to_underlying(Fields::kConnected), connected);
+    encoder.Encode(to_underlying(Fields::kNetworkIdentifier), networkIdentifier);
+    encoder.Encode(to_underlying(Fields::kClientIdentifier), clientIdentifier);
     return encoder.Finalize();
 }
 
@@ -5642,6 +5644,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kConnected))
         {
             err = DataModel::Decode(reader, connected);
+        }
+        else if (__context_tag == to_underlying(Fields::kNetworkIdentifier))
+        {
+            err = DataModel::Decode(reader, networkIdentifier);
+        }
+        else if (__context_tag == to_underlying(Fields::kClientIdentifier))
+        {
+            err = DataModel::Decode(reader, clientIdentifier);
         }
         else
         {
@@ -5882,6 +5892,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kSsid), ssid);
     encoder.Encode(to_underlying(Fields::kCredentials), credentials);
     encoder.Encode(to_underlying(Fields::kBreadcrumb), breadcrumb);
+    encoder.Encode(to_underlying(Fields::kNetworkIdentity), networkIdentity);
+    encoder.Encode(to_underlying(Fields::kClientIdentifier), clientIdentifier);
+    encoder.Encode(to_underlying(Fields::kPossessionNonce), possessionNonce);
     return encoder.Finalize();
 }
 
@@ -5910,6 +5923,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kBreadcrumb))
         {
             err = DataModel::Decode(reader, breadcrumb);
+        }
+        else if (__context_tag == to_underlying(Fields::kNetworkIdentity))
+        {
+            err = DataModel::Decode(reader, networkIdentity);
+        }
+        else if (__context_tag == to_underlying(Fields::kClientIdentifier))
+        {
+            err = DataModel::Decode(reader, clientIdentifier);
+        }
+        else if (__context_tag == to_underlying(Fields::kPossessionNonce))
+        {
+            err = DataModel::Decode(reader, possessionNonce);
         }
         else
         {
@@ -6004,6 +6029,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kNetworkingStatus), networkingStatus);
     encoder.Encode(to_underlying(Fields::kDebugText), debugText);
     encoder.Encode(to_underlying(Fields::kNetworkIndex), networkIndex);
+    encoder.Encode(to_underlying(Fields::kClientIdentity), clientIdentity);
+    encoder.Encode(to_underlying(Fields::kPossessionSignature), possessionSignature);
     return encoder.Finalize();
 }
 
@@ -6032,6 +6059,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kNetworkIndex))
         {
             err = DataModel::Decode(reader, networkIndex);
+        }
+        else if (__context_tag == to_underlying(Fields::kClientIdentity))
+        {
+            err = DataModel::Decode(reader, clientIdentity);
+        }
+        else if (__context_tag == to_underlying(Fields::kPossessionSignature))
+        {
+            err = DataModel::Decode(reader, possessionSignature);
         }
         else
         {
@@ -6168,6 +6203,84 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace ReorderNetwork.
+namespace QueryIdentity {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kKeyIdentifier), keyIdentifier);
+    encoder.Encode(to_underlying(Fields::kPossessionNonce), possessionNonce);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kKeyIdentifier))
+        {
+            err = DataModel::Decode(reader, keyIdentifier);
+        }
+        else if (__context_tag == to_underlying(Fields::kPossessionNonce))
+        {
+            err = DataModel::Decode(reader, possessionNonce);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace QueryIdentity.
+namespace QueryIdentityResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kIdentity), identity);
+    encoder.Encode(to_underlying(Fields::kPossessionSignature), possessionSignature);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kIdentity))
+        {
+            err = DataModel::Decode(reader, identity);
+        }
+        else if (__context_tag == to_underlying(Fields::kPossessionSignature))
+        {
+            err = DataModel::Decode(reader, possessionSignature);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace QueryIdentityResponse.
 } // namespace Commands
 
 namespace Attributes {
@@ -17717,6 +17830,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::MACAddress::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, MACAddress);
+    case Attributes::LinkLocalAddress::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, linkLocalAddress);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

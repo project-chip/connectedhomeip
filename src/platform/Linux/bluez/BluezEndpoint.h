@@ -45,7 +45,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <gio/gio.h>
 #include <glib.h>
@@ -60,8 +60,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-struct BLEAdvConfig;
-
 struct BluezEndpoint
 {
     char * mpOwningName; // Bus owning name
@@ -72,7 +70,6 @@ struct BluezEndpoint
 
     // Paths for objects published by this service
     char * mpRootPath;
-    char * mpAdvPath;
     char * mpServicePath;
 
     // Objects (interfaces) subscribed to by this service
@@ -88,29 +85,18 @@ struct BluezEndpoint
     // additional data characteristics
     BluezGattCharacteristic1 * mpC3;
 
-    // Objects (interfaces) used by LE advertisement
-    BluezLEAdvertisement1 * mpAdv;
-
     // map device path to the connection
     GHashTable * mpConnMap;
     uint32_t mAdapterId;
     bool mIsCentral;
-    char * mpAdvertisingUUID;
-    chip::Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
-    ChipAdvType mType;  ///< Advertisement type.
-    uint16_t mDuration; ///< Advertisement interval (in ms).
-    bool mIsAdvertising;
     char * mpPeerDevicePath;
     GCancellable * mpConnectCancellable = nullptr;
 };
 
-CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const BLEAdvConfig & aBleAdvConfig,
+CHIP_ERROR InitBluezBleLayer(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr, const char * apBleName,
                              BluezEndpoint *& apEndpoint);
 CHIP_ERROR ShutdownBluezBleLayer(BluezEndpoint * apEndpoint);
-CHIP_ERROR StartBluezAdv(BluezEndpoint * apEndpoint);
-CHIP_ERROR StopBluezAdv(BluezEndpoint * apEndpoint);
 CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint);
-CHIP_ERROR BluezAdvertisementSetup(BluezEndpoint * apEndpoint);
 
 CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice, BluezEndpoint * apEndpoint);
 void CancelConnect(BluezEndpoint * apEndpoint);

@@ -3289,28 +3289,6 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeKeypadInputInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("keypadInput", writeKeypadInputInteractionInfo);
     Map<String, InteractionInfo> writeContentLauncherInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeContentLauncherSupportedStreamingProtocolsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo contentLaunchersupportedStreamingProtocolsCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Long.class, 
-            Long.class 
-        );
-    writeContentLauncherSupportedStreamingProtocolsCommandParams.put(
-        "value",
-        contentLaunchersupportedStreamingProtocolsCommandParameterInfo
-    );
-    InteractionInfo writeContentLauncherSupportedStreamingProtocolsAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ContentLauncherCluster) cluster).writeSupportedStreamingProtocolsAttribute(
-          (DefaultClusterCallback) callback,
-          (Long) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeContentLauncherSupportedStreamingProtocolsCommandParams
-    );
-    writeContentLauncherInteractionInfo.put("writeSupportedStreamingProtocolsAttribute", writeContentLauncherSupportedStreamingProtocolsAttributeInteractionInfo);
     writeAttributeMap.put("contentLauncher", writeContentLauncherInteractionInfo);
     Map<String, InteractionInfo> writeAudioOutputInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("audioOutput", writeAudioOutputInteractionInfo);
