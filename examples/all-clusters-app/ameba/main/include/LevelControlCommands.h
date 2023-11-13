@@ -29,8 +29,8 @@
 
 using namespace chip;
 using namespace chip::app;
-using chip::app::Clusters::LevelControl::OptionsBitmap;
 using chip::app::Clusters::LevelControl::MoveModeEnum;
+using chip::app::Clusters::LevelControl::OptionsBitmap;
 using chip::app::Clusters::LevelControl::StepModeEnum;
 
 #if CONFIG_ENABLE_CHIP_SHELL
@@ -46,9 +46,10 @@ Engine sShellSwitchGroupsLevelControlSubCommands;
 
 namespace {
 
-template<class T>
-T from_underlying(std::underlying_type_t<T> value) {
-  return static_cast<T>(value);
+template <class T>
+T from_underlying(std::underlying_type_t<T> value)
+{
+    return static_cast<T>(value);
 }
 
 } // namespace
