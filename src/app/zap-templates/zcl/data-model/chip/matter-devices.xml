@@ -641,6 +641,8 @@ limitations under the License.
             </include>
         </clusters>
     </deviceType>
+
+
     <deviceType>
         <name>MA-dimmablepluginunit</name>
         <domain>CHIP</domain>
