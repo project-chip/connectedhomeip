@@ -44,34 +44,7 @@ uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t) __MATTER_FAC
 uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t) __MATTER_FACTORY_DATA_SIZE;
 uint32_t FactoryDataProvider::kFactoryDataPayloadStart = kFactoryDataStart + sizeof(FactoryDataProvider::Header);
 
-FactoryDataProvider::FactoryDataProvider()
-{
-    maxLengths[FactoryDataId::kVerifierId]           = kSpake2pSerializedVerifier_MaxBase64Len;
-    maxLengths[FactoryDataId::kSaltId]               = kSpake2pSalt_MaxBase64Len;
-    maxLengths[FactoryDataId::kIcId]                 = sizeof(uint32_t);
-    maxLengths[FactoryDataId::kDacPrivateKeyId]      = Crypto::kP256_PrivateKey_Length;
-    maxLengths[FactoryDataId::kDacCertificateId]     = Credentials::kMaxDERCertLength;
-    maxLengths[FactoryDataId::kPaiCertificateId]     = Credentials::kMaxDERCertLength;
-    maxLengths[FactoryDataId::kDiscriminatorId]      = sizeof(uint32_t);
-    maxLengths[FactoryDataId::kSetupPasscodeId]      = sizeof(uint32_t);
-    maxLengths[FactoryDataId::kVidId]                = sizeof(uint16_t);
-    maxLengths[FactoryDataId::kPidId]                = sizeof(uint16_t);
-    maxLengths[FactoryDataId::kCertDeclarationId]    = Credentials::kMaxCMSSignedCDMessage;
-    maxLengths[FactoryDataId::kVendorNameId]         = ConfigurationManager::kMaxVendorNameLength;
-    maxLengths[FactoryDataId::kProductNameId]        = ConfigurationManager::kMaxProductNameLength;
-    maxLengths[FactoryDataId::kSerialNumberId]       = ConfigurationManager::kMaxSerialNumberLength;
-    maxLengths[FactoryDataId::kManufacturingDateId]  = ConfigurationManager::kMaxManufacturingDateLength;
-    maxLengths[FactoryDataId::kHardwareVersionId]    = sizeof(uint16_t);
-    maxLengths[FactoryDataId::kHardwareVersionStrId] = ConfigurationManager::kMaxHardwareVersionStringLength;
-    maxLengths[FactoryDataId::kUniqueId]             = ConfigurationManager::kMaxUniqueIDLength;
-    maxLengths[FactoryDataId::kPartNumber]           = ConfigurationManager::kMaxPartNumberLength;
-    maxLengths[FactoryDataId::kProductURL]           = ConfigurationManager::kMaxProductURLLength;
-    maxLengths[FactoryDataId::kProductLabel]         = ConfigurationManager::kMaxProductLabelLength;
-    maxLengths[FactoryDataId::kProductFinish]        = sizeof(uint8_t);
-    maxLengths[FactoryDataId::kProductPrimaryColor]  = sizeof(uint8_t);
-}
-
-FactoryDataProvider::~FactoryDataProvider() {}
+FactoryDataProvider::~FactoryDataProvider() { }
 
 CHIP_ERROR FactoryDataProvider::Validate()
 {

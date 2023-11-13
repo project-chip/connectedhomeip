@@ -101,7 +101,6 @@ public:
     static constexpr uint32_t kHashLen      = 4;
     static constexpr size_t kHashId         = 0xCE47BA5E;
 
-    FactoryDataProvider();
     virtual ~FactoryDataProvider();
 
     virtual CHIP_ERROR Init()                                                                          = 0;
@@ -143,7 +142,6 @@ public:
     CHIP_ERROR GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor) override;
 
 protected:
-    uint16_t maxLengths[FactoryDataId::kMaxId];
     Header mHeader;
 };
 
