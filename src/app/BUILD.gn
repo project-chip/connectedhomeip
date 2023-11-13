@@ -68,6 +68,7 @@ source_set("revision_info") {
   sources = [
     "DataModelRevision.h",
     "InteractionModelRevision.h",
+    "SpecificationVersion.h",
   ]
 }
 

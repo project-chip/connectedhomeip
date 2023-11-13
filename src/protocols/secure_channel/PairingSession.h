@@ -97,8 +97,8 @@ public:
      */
     virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session) const = 0;
 
-    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteSessionParam.GetMRPConfig(); }
-    void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteSessionParam.SetMRPConfig(config); }
+    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteSessionParams.GetMRPConfig(); }
+    void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteSessionParams.SetMRPConfig(config); }
 
     /**
      * Encode the Session Parameters using the provided TLV tag.
@@ -201,7 +201,7 @@ protected:
 
     /**
      * Try to decode the current element (pointed by the TLV reader) as MRP parameters.
-     * If the MRP parameters are found, mRemoteSessionParam is updated with the devoded values.
+     * If the MRP parameters are found, mRemoteSessionParams is updated with the devoded values.
      *
      * MRP parameters are optional. So, if the TLV reader is not pointing to the MRP parameters,
      * the function is a noop.
@@ -232,9 +232,9 @@ protected:
     SessionEstablishmentDelegate * mDelegate   = nullptr;
 
     // mLocalMRPConfig is our config which is sent to the other end and used by the peer session.
-    // mRemoteSessionParam is received from other end and set to our session.
+    // mRemoteSessionParams is received from other end and set to our session.
     Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
-    SessionParameters mRemoteSessionParam;
+    SessionParameters mRemoteSessionParams;
 
 private:
     Optional<uint16_t> mPeerSessionId;

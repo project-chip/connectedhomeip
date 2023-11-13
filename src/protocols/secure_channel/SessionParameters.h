@@ -16,12 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines a Session Parameters that are passed during session estalishment.
- *
- */
-
 #pragma once
 
 #include <lib/core/TLV.h>
@@ -40,11 +34,29 @@ public:
     // because we would need to add `include <lib/core/TLV.h>`. While we could make it all work
     // from a build standpoint, if any new MRP config gets added accessors will still need to be
     // added here so having this calc done here isn't problematic.
-    static constexpr size_t kMrpConfigEstimatedTLVSize =
-        TLV::EstimateStructOverhead(sizeof(uint32_t), sizeof(uint32_t), sizeof(uint16_t));
+    static constexpr size_t kSizeOfSessionIdleInterval      = sizeof(uint32_t);
+    static constexpr size_t kSizeOfSessionActiveInterval    = sizeof(uint32_t);
+    static constexpr size_t kSizeOfSessionActiveThreshold   = sizeof(uint16_t);
+    static constexpr size_t kSizeOfDataModelRevision        = sizeof(uint16_t);
+    static constexpr size_t kSizeOfInteractionModelRevision = sizeof(uint16_t);
+    static constexpr size_t kSizeOfSpecificationVersion     = sizeof(uint32_t);
+    static constexpr size_t kSizeOfMaxPathsPerInvoke        = sizeof(uint16_t);
 
-    static constexpr size_t kEstimatedTLVSize = kMrpConfigEstimatedTLVSize +
-        TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint32_t), sizeof(uint16_t));
+    static constexpr size_t kEstimatedTLVSize = TLV::EstimateStructOverhead(
+        kSizeOfSessionIdleInterval, kSizeOfSessionActiveInterval, kSizeOfSessionActiveThreshold, kSizeOfDataModelRevision,
+        kSizeOfInteractionModelRevision, kSizeOfSpecificationVersion, kSizeOfMaxPathsPerInvoke);
+
+    // From Section 4.12.8 "Parameters and Constants" in chapter "Secure Channel".
+    enum Tag : uint32_t
+    {
+        kSessionIdleInterval      = 1,
+        kSessionActiveInterval    = 2,
+        kSessionActiveThreshold   = 3,
+        kDataModelRevision        = 4,
+        kInteractionModelRevision = 5,
+        kSpecificationVersion     = 6,
+        kMaxPathsPerInvoke        = 7,
+    };
 
     const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
@@ -61,30 +73,33 @@ public:
         mMRPConfig.mActiveThresholdTime = activeThresholdTime;
     }
 
-    const Optional<uint16_t> & GetDataModelRev() const { return mDataModelRev; }
-    void SetDataModelRev(const uint16_t dataModelRev) { mDataModelRev = MakeOptional(dataModelRev); }
+    const Optional<uint16_t> & GetDataModelRevision() const { return mDataModelRevision; }
+    void SetDataModelRevision(const uint16_t dataModelRev) { mDataModelRevision = MakeOptional(dataModelRev); }
 
-    const Optional<uint16_t> & GetInteractionModelRev() const { return mInteractionModelRev; }
-    void SetInteractionModelRev(const uint16_t interactionModelRev) { mInteractionModelRev = MakeOptional(interactionModelRev); }
+    const Optional<uint16_t> & GetInteractionModelRevision() const { return mInteractionModelRevision; }
+    void SetInteractionModelRevision(const uint16_t interactionModelRev)
+    {
+        mInteractionModelRevision = MakeOptional(interactionModelRev);
+    }
 
     const Optional<uint32_t> & GetSpecificationVersion() const { return mSpecificationVersion; }
     void SetSpecificationVersion(const uint32_t specVersion) { mSpecificationVersion = MakeOptional(specVersion); }
 
-    uint16_t GetMaxPathPerInvoke() const { return mMaxPathPerInvoke; }
-    void SetMaxPathPerInvoke(const uint16_t maxPathPerInvoke) { mMaxPathPerInvoke = maxPathPerInvoke; }
+    uint16_t GetMaxPathsPerInvoke() const { return mMaxPathPerInvoke; }
+    void SetMaxPathsPerInvoke(const uint16_t maxPathsPerInvoke) { mMaxPathPerInvoke = maxPathsPerInvoke; }
 
 private:
     ReliableMessageProtocolConfig mMRPConfig;
-    // For legacy reason if we do not get DataModelRev it means that either 16 or 17. But there isn't
+    // For legacy reasons if we do not get DataModelRevision it means either 16 or 17. But there isn't
     // a way to know for certain.
-    Optional<uint16_t> mDataModelRev = NullOptional;
-    // For legacy reason if we do not get InterationModelRev it means that either 10 or 11. But there
+    Optional<uint16_t> mDataModelRevision;
+    // For legacy reasons if we do not get InteractionModelRevision it means either 10 or 11. But there
     // isn't a way to know for certain.
-    Optional<uint16_t> mInteractionModelRev = NullOptional;
-    // For legacy reason if we do not get Specification Version it means that version is less than
+    Optional<uint16_t> mInteractionModelRevision;
+    // For legacy reasons if we do not get SpecificationVersion it means that version is less than
     // 0x01030000. But there isn't a way to know for certain.
-    Optional<uint32_t> mSpecificationVersion = NullOptional;
-    // When maxPathPerInvoke is not provide legacy is always 1
+    Optional<uint32_t> mSpecificationVersion;
+    // When maxPathsPerInvoke is not provided legacy is always 1
     uint16_t mMaxPathPerInvoke = 1;
 };
 

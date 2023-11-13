@@ -698,7 +698,6 @@ CHIP_ERROR CASESession::SendSigma1()
     ReturnErrorOnFailure(
         tlvWriter.PutBytes(TLV::ContextTag(4), mEphemeralKey->Pubkey(), static_cast<uint32_t>(mEphemeralKey->Pubkey().Length())));
 
-    ChipLogDetail(SecureChannel, "Including MRP parameters");
     ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig, tlvWriter));
 
     // Try to find persistent session, and resume it.
@@ -943,7 +942,6 @@ CHIP_ERROR CASESession::SendSigma2Resume()
 
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalSessionId().Value()));
 
-    ChipLogDetail(SecureChannel, "Including MRP parameters");
     ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(4), mLocalMRPConfig, tlvWriter));
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
@@ -1078,7 +1076,6 @@ CHIP_ERROR CASESession::SendSigma2()
     ReturnErrorOnFailure(tlvWriterMsg2.PutBytes(TLV::ContextTag(4), msg_R2_Encrypted.Get(),
                                                 static_cast<uint32_t>(msg_r2_signed_enc_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES)));
 
-    ChipLogDetail(SecureChannel, "Including MRP parameters");
     ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig, tlvWriterMsg2));
 
     ReturnErrorOnFailure(tlvWriterMsg2.EndContainer(outerContainerType));
