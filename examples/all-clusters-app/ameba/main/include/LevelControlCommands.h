@@ -20,6 +20,8 @@
 #include "controller/ReadInteraction.h"
 #include <app/clusters/bindings/bindings.h>
 
+#include <type_traits>
+
 #if CONFIG_ENABLE_CHIP_SHELL
 #include "lib/shell/Engine.h"
 #include "lib/shell/commands/Help.h"
@@ -28,6 +30,8 @@
 using namespace chip;
 using namespace chip::app;
 using chip::app::Clusters::LevelControl::OptionsBitmap;
+using chip::app::Clusters::LevelControl::MoveModeEnum;
+using chip::app::Clusters::LevelControl::StepModeEnum;
 
 #if CONFIG_ENABLE_CHIP_SHELL
 using Shell::Engine;
@@ -39,6 +43,15 @@ Engine sShellSwitchLevelControlSubCommands;
 Engine sShellSwitchLevelControlReadSubCommands;
 Engine sShellSwitchGroupsLevelControlSubCommands;
 #endif // defined(ENABLE_CHIP_SHELL)
+
+namespace {
+
+template<class T>
+T from_underlying(std::underlying_type_t<T> value) {
+  return static_cast<T>(value);
+}
+
+} // namespace
 
 void ProcessLevelControlUnicastBindingRead(BindingCommandData * data, const EmberBindingTableEntry & binding,
                                            OperationalDeviceProxy * peer_device)
@@ -166,7 +179,7 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
         break;
 
     case Clusters::LevelControl::Commands::Move::Id:
-        moveCommand.moveMode        = static_cast<EmberAfMoveMode>(data->args[0]);
+        moveCommand.moveMode        = from_underlying<MoveModeEnum>(data->args[0]);
         moveCommand.rate            = static_cast<DataModel::Nullable<uint8_t>>(data->args[1]);
         moveCommand.optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(data->args[2]);
         moveCommand.optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(data->args[3]);
@@ -175,7 +188,7 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
         break;
 
     case Clusters::LevelControl::Commands::Step::Id:
-        stepCommand.stepMode        = static_cast<EmberAfStepMode>(data->args[0]);
+        stepCommand.stepMode        = from_underlying<StepModeEnum>(data->args[0]);
         stepCommand.stepSize        = static_cast<uint8_t>(data->args[1]);
         stepCommand.transitionTime  = static_cast<DataModel::Nullable<uint16_t>>(data->args[2]);
         stepCommand.optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(data->args[3]);
@@ -201,7 +214,7 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
         break;
 
     case Clusters::LevelControl::Commands::MoveWithOnOff::Id:
-        moveWithOnOffCommand.moveMode        = static_cast<EmberAfMoveMode>(data->args[0]);
+        moveWithOnOffCommand.moveMode        = from_underlying<MoveModeEnum>(data->args[0]);
         moveWithOnOffCommand.rate            = static_cast<DataModel::Nullable<uint8_t>>(data->args[1]);
         moveWithOnOffCommand.optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(data->args[2]);
         moveWithOnOffCommand.optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(data->args[3]);
@@ -210,7 +223,7 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
         break;
 
     case Clusters::LevelControl::Commands::StepWithOnOff::Id:
-        stepWithOnOffCommand.stepMode        = static_cast<EmberAfStepMode>(data->args[0]);
+        stepWithOnOffCommand.stepMode        = from_underlying<StepModeEnum>(data->args[0]);
         stepWithOnOffCommand.stepSize        = static_cast<uint8_t>(data->args[1]);
         stepWithOnOffCommand.transitionTime  = static_cast<DataModel::Nullable<uint16_t>>(data->args[2]);
         stepWithOnOffCommand.optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(data->args[3]);
@@ -252,7 +265,7 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
         break;
 
     case Clusters::LevelControl::Commands::Move::Id:
-        moveCommand.moveMode        = static_cast<EmberAfMoveMode>(data->args[0]);
+        moveCommand.moveMode        = from_underlying<MoveModeEnum>(data->args[0]);
         moveCommand.rate            = static_cast<DataModel::Nullable<uint8_t>>(data->args[1]);
         moveCommand.optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(data->args[2]);
         moveCommand.optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(data->args[3]);
@@ -260,7 +273,7 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
         break;
 
     case Clusters::LevelControl::Commands::Step::Id:
-        stepCommand.stepMode        = static_cast<EmberAfStepMode>(data->args[0]);
+        stepCommand.stepMode        = from_underlying<StepModeEnum>(data->args[0]);
         stepCommand.stepSize        = static_cast<uint8_t>(data->args[1]);
         stepCommand.transitionTime  = static_cast<DataModel::Nullable<uint16_t>>(data->args[2]);
         stepCommand.optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(data->args[3]);
@@ -283,7 +296,7 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
         break;
 
     case Clusters::LevelControl::Commands::MoveWithOnOff::Id:
-        moveWithOnOffCommand.moveMode        = static_cast<EmberAfMoveMode>(data->args[0]);
+        moveWithOnOffCommand.moveMode        = from_underlying<MoveModeEnum>(data->args[0]);
         moveWithOnOffCommand.rate            = static_cast<DataModel::Nullable<uint8_t>>(data->args[1]);
         moveWithOnOffCommand.optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(data->args[2]);
         moveWithOnOffCommand.optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(data->args[3]);
@@ -291,7 +304,7 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
         break;
 
     case Clusters::LevelControl::Commands::StepWithOnOff::Id:
-        stepWithOnOffCommand.stepMode        = static_cast<EmberAfStepMode>(data->args[0]);
+        stepWithOnOffCommand.stepMode        = from_underlying<StepModeEnum>(data->args[0]);
         stepWithOnOffCommand.stepSize        = static_cast<uint8_t>(data->args[1]);
         stepWithOnOffCommand.transitionTime  = static_cast<DataModel::Nullable<uint16_t>>(data->args[2]);
         stepWithOnOffCommand.optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(data->args[3]);
