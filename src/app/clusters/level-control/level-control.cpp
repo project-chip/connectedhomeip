@@ -109,7 +109,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
 static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, MoveModeEnum moveMode,
                         app::DataModel::Nullable<uint8_t> rate, chip::Optional<BitMask<OptionsBitmap>> optionsMask,
                         chip::Optional<BitMask<OptionsBitmap>> optionsOverride);
-static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, MoveModeEnum stepMode,
+static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, StepModeEnum stepMode,
                         uint8_t stepSize, app::DataModel::Nullable<uint16_t> transitionTimeDs,
                         chip::Optional<BitMask<OptionsBitmap>> optionsMask, chip::Optional<BitMask<OptionsBitmap>> optionsOverride);
 static void stopHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
@@ -1059,7 +1059,7 @@ send_default_response:
     commandObj->AddStatus(commandPath, status);
 }
 
-static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, MoveModeEnum stepMode,
+static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, StepModeEnum stepMode,
                         uint8_t stepSize, app::DataModel::Nullable<uint16_t> transitionTimeDs,
                         chip::Optional<BitMask<OptionsBitmap>> optionsMask, chip::Optional<BitMask<OptionsBitmap>> optionsOverride)
 {
@@ -1107,7 +1107,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     // level over the specified transition time.
     switch (stepMode)
     {
-    case MoveModeEnum::kUp:
+    case StepModeEnum::kUp:
         state->increasing = true;
         if (state->maxLevel - currentLevel.Value() < stepSize)
         {
@@ -1119,7 +1119,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
             state->moveToLevel = static_cast<uint8_t>(currentLevel.Value() + stepSize);
         }
         break;
-    case MoveModeEnum::kDown:
+    case StepModeEnum::kDown:
         state->increasing = false;
         if (currentLevel.Value() - state->minLevel < stepSize)
         {
