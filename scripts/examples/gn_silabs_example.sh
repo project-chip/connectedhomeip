@@ -31,6 +31,7 @@ fi
 set -x
 env
 USE_WIFI=false
+USE_RPS_EXTENSION=false
 USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
 USE_SLC=false
@@ -281,9 +282,10 @@ else
     fi
 
     # 917 exception. TODO find a more generic way
-    if [ "$SILABS_BOARD" == "BRD4325B" ] || [ "$SILABS_BOARD" == "BRD4325C" ] || [ "$SILABS_BOARD" == "BRD4338A" ]; then
+    if [ "$SILABS_BOARD" == "BRD4325B" ] || [ "$SILABS_BOARD" == "BRD4325C" ] || [ "$SILABS_BOARD" == "BRD4338A" ] || [ "$SILABS_BOARD" == "BRD4325G" ]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
+        USE_RPS_EXTENSION=true
         optArgs+="chip_device_platform =\"SiWx917\" "
     fi
 
@@ -335,6 +337,10 @@ else
     ninja -C "$BUILD_DIR"/
     #print stats
     arm-none-eabi-size -A "$BUILD_DIR"/*.out
+
+    # Generate RPS file from .s37 for 917 SoC builds
+    # if ["USE_RPS_EXTENSION" == true]; then
+    # fi
 
     # add bootloader to generated image
     if [ "$USE_BOOTLOADER" == true ]; then

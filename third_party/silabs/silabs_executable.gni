@@ -14,13 +14,19 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-
 import("${build_root}/toolchain/flashable_executable.gni")
+import("silabs_board.gni")
 
 template("silabs_executable") {
   output_base_name = get_path_info(invoker.output_name, "name")
 
-  objcopy_image_name = output_base_name + ".s37"
+  if (use_rps_extension) {
+    extension = ".rps"
+  } else {
+    extension = ".s37"
+  }
+
+  objcopy_image_name = output_base_name + extension
   objcopy_image_format = "srec"
   objcopy = "arm-none-eabi-objcopy"
 
@@ -31,7 +37,7 @@ template("silabs_executable") {
 
   flashing_runtime_target = target_name + ".flashing_runtime"
   flashing_script_inputs = [
-    "${chip_root}/scripts/flashing/efr32_firmware_utils.py",
+    "${chip_root}/scripts/flashing/silabs_firmware_utils.py",
     "${chip_root}/scripts/flashing/firmware_utils.py",
   ]
   copy(flashing_runtime_target) {

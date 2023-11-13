@@ -19,7 +19,7 @@ through an `Flasher` instance, or operations according to a command line.
 For `Flasher`, see the class documentation. For the parse_command()
 interface or standalone execution:
 
-usage: efr32_firmware_utils.py [-h] [--verbose] [--erase] [--application FILE]
+usage: silabs_firmware_utils.py [-h] [--verbose] [--erase] [--application FILE]
                                [--verify_application] [--reset] [--skip_reset]
                                [--commander FILE] [--device DEVICE]
                                [--serialno SERIAL] [--ip ADDRESS]
@@ -49,6 +49,7 @@ operations:
                         Do not reset device after flashing
 """
 
+import os
 import sys
 
 import firmware_utils
@@ -133,9 +134,18 @@ class Flasher(firmware_utils.Flasher):
 
     def flash(self, image):
         """Flash image."""
+        ext = os.path.splitext(image)[-1].lower()
+
+        if ext == ".rps":
+            # rps load command for .rps files
+            arguments = ['rps', 'load']
+        else:
+            # flash command for .s37 files
+            arguments = ['flash']
+
         return self.run_tool(
             'commander',
-            ['flash', self.DEVICE_ARGUMENTS, image],
+            [arguments, self.DEVICE_ARGUMENTS, image],
             name='Flash')
 
     def reset(self):
