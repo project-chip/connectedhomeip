@@ -312,10 +312,8 @@ void PtrSrvTxtMultipleRespondersToInstance(nlTestSuite * inSuite, void * inConte
 
 void PtrSrvTxtMultipleRespondersToServiceListing(nlTestSuite * inSuite, void * inContext)
 {
-    // CommonTestElements common1(inSuite, "test1");
-    // CommonTestElements common2(inSuite, "test2");
-    auto common1 = new CommonTestElements(inSuite, "test1");
-    auto common2 = new CommonTestElements(inSuite, "test2");
+    auto common1 = std::make_unique<CommonTestElements>(inSuite, "test1");
+    auto common2 = std::make_unique<CommonTestElements>(inSuite, "test2");
     // Just use the server from common1.
     ResponseSender responseSender(&common1->server);
 
@@ -342,10 +340,8 @@ void PtrSrvTxtMultipleRespondersToServiceListing(nlTestSuite * inSuite, void * i
     responseSender.Respond(1, queryData, &common1->packetInfo, ResponseConfiguration());
 
     NL_TEST_ASSERT(inSuite, common1->server.GetSendCalled());
-    NL_TEST_ASSERT(inSuite, common1->server.GetHeaderFound());
 
-    delete common1;
-    delete common2;
+    NL_TEST_ASSERT(inSuite, common1->server.GetHeaderFound());
 }
 
 const nlTest sTests[] = {
