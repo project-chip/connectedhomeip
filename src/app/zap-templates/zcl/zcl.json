@@ -363,7 +363,7 @@
             "CurrentPhase",
             "CountdownTime"
         ],
-        "Oven Operational State": [
+        "Oven Cavity Operational State": [
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
