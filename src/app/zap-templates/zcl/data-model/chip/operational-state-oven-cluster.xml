@@ -28,7 +28,7 @@ limitations under the License.
 
   <cluster>
     <domain>Appliances</domain>
-    <name>Oven Operational State</name>
+    <name>Oven Cavity Operational State</name>
     <code>0x0048</code>
     <define>OPERATIONAL_STATE_OVEN_CLUSTER</define>
     <client init="false" tick="false">true</client>
