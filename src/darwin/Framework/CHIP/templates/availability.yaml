@@ -3245,7 +3245,10 @@
               - StatusEnum
               - LineupInfoTypeEnum
           TargetNavigator:
-              - TargetNavigatorStatusEnum
+              # StatusEnum was originally named TargetNavigatorStatusEnum, but
+              # we generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
           MediaPlayback:
               # StatusEnum was originally named MediaPlaybackStatusEnum, but we
               # generate the same API for the names with/without the cluster
@@ -3256,7 +3259,10 @@
               - InputTypeEnum
           KeypadInput:
               - CecKeyCode
-              - KeypadInputStatusEnum
+              # StatusEnum was originally named KeypadInputStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
           ContentLauncher:
               - ContentLaunchStatusEnum
               - MetricTypeEnum
@@ -3995,7 +4001,10 @@
               LineupInfoTypeEnum:
                   - Mso
           TargetNavigator:
-              TargetNavigatorStatusEnum:
+              # StatusEnum was originally named TargetNavigatorStatusEnum, but
+              # we generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - TargetNotFound
                   - NotAllowed
@@ -4117,7 +4126,10 @@
                   - F4Yellow
                   - F5
                   - Data
-              KeypadInputStatusEnum:
+              # StatusEnum was originally named KeypadInputStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - UnsupportedKey
                   - InvalidKeyInCurrentState
@@ -7827,6 +7839,9 @@
               - SupportedWiFiBands
               - SupportedThreadFeatures
               - ThreadVersion
+          WakeOnLAN:
+              # Targeting Spring 2024 Matter release
+              - LinkLocalAddress
       commands:
           GeneralDiagnostics:
               # Targeting Spring 2024 Matter release
