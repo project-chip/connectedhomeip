@@ -47,7 +47,7 @@ public:
         ~ObserverPointer() { mObserver = nullptr; }
         ICDStateObserver * mObserver;
     };
-    
+
     enum class OperationalState : uint8_t
     {
         IdleMode,
