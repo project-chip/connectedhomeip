@@ -432,8 +432,8 @@ server cluster TimeFormatLocalization = 44 {
     kCalendarFormat = 0x1;
   }
 
-  attribute HourFormatEnum hourFormat = 0;
-  attribute CalendarTypeEnum activeCalendarType = 1;
+  attribute access(write: manage) HourFormatEnum hourFormat = 0;
+  attribute access(write: manage) CalendarTypeEnum activeCalendarType = 1;
   readonly attribute CalendarTypeEnum supportedCalendarTypes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -538,6 +538,7 @@ server cluster NetworkCommissioning = 49 {
     kWiFiNetworkInterface = 0x1;
     kThreadNetworkInterface = 0x2;
     kEthernetNetworkInterface = 0x4;
+    kPerDeviceCredentials = 0x8;
   }
 
   bitmap ThreadCapabilitiesBitmap : bitmap16 {
@@ -554,11 +555,14 @@ server cluster NetworkCommissioning = 49 {
     kWPAPersonal = 0x4;
     kWPA2Personal = 0x8;
     kWPA3Personal = 0x10;
+    kWPA3MatterPDC = 0x20;
   }
 
   struct NetworkInfoStruct {
     octet_string<32> networkID = 0;
     boolean connected = 1;
+    optional nullable octet_string<20> networkIdentifier = 2;
+    optional nullable octet_string<20> clientIdentifier = 3;
   }
 
   struct ThreadInterfaceScanResultStruct {
@@ -605,6 +609,9 @@ server cluster NetworkCommissioning = 49 {
     octet_string<32> ssid = 0;
     octet_string<64> credentials = 1;
     optional int64u breadcrumb = 2;
+    optional octet_string<140> networkIdentity = 3;
+    optional octet_string<20> clientIdentifier = 4;
+    optional octet_string<32> possessionNonce = 5;
   }
 
   request struct AddOrUpdateThreadNetworkRequest {
@@ -639,6 +646,8 @@ server cluster NetworkCommissioning = 49 {
     NetworkCommissioningStatusEnum networkingStatus = 0;
     optional char_string<512> debugText = 1;
     optional int8u networkIndex = 2;
+    optional octet_string<140> clientIdentity = 3;
+    optional octet_string<64> possessionSignature = 4;
   }
 
   response struct ConnectNetworkResponse = 7 {
@@ -1099,14 +1108,14 @@ server cluster WakeOnLan = 1283 {
 
 /** This cluster provides an interface for controlling the current Channel on a device. */
 server cluster Channel = 1284 {
-  enum ChannelStatusEnum : enum8 {
+  enum LineupInfoTypeEnum : enum8 {
+    kMSO = 0;
+  }
+
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kMultipleMatches = 1;
     kNoMatches = 2;
-  }
-
-  enum LineupInfoTypeEnum : enum8 {
-    kMSO = 0;
   }
 
   bitmap Feature : bitmap32 {
@@ -1153,7 +1162,7 @@ server cluster Channel = 1284 {
   }
 
   response struct ChangeChannelResponse = 1 {
-    ChannelStatusEnum status = 0;
+    StatusEnum status = 0;
     optional char_string data = 1;
   }
 
@@ -1164,7 +1173,7 @@ server cluster Channel = 1284 {
 
 /** This cluster provides an interface for UX navigation within a set of targets on a device or endpoint. */
 server cluster TargetNavigator = 1285 {
-  enum TargetNavigatorStatusEnum : enum8 {
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kTargetNotFound = 1;
     kNotAllowed = 2;
@@ -1172,7 +1181,7 @@ server cluster TargetNavigator = 1285 {
 
   struct TargetInfoStruct {
     int8u identifier = 0;
-    char_string<32> name = 1;
+    char_string name = 1;
   }
 
   readonly attribute TargetInfoStruct targetList[] = 0;
@@ -1189,7 +1198,7 @@ server cluster TargetNavigator = 1285 {
   }
 
   response struct NavigateTargetResponse = 1 {
-    TargetNavigatorStatusEnum status = 0;
+    StatusEnum status = 0;
     optional char_string data = 1;
   }
 
@@ -1198,20 +1207,20 @@ server cluster TargetNavigator = 1285 {
 
 /** This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker. */
 server cluster MediaPlayback = 1286 {
-  enum MediaPlaybackStatusEnum : enum8 {
+  enum PlaybackStateEnum : enum8 {
+    kPlaying = 0;
+    kPaused = 1;
+    kNotPlaying = 2;
+    kBuffering = 3;
+  }
+
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kInvalidStateForCommand = 1;
     kNotAllowed = 2;
     kNotActive = 3;
     kSpeedOutOfRange = 4;
     kSeekOutOfRange = 5;
-  }
-
-  enum PlaybackStateEnum : enum8 {
-    kPlaying = 0;
-    kPaused = 1;
-    kNotPlaying = 2;
-    kBuffering = 3;
   }
 
   bitmap Feature : bitmap32 {
@@ -1233,7 +1242,7 @@ server cluster MediaPlayback = 1286 {
   readonly attribute int16u clusterRevision = 65533;
 
   response struct PlaybackResponse = 10 {
-    MediaPlaybackStatusEnum status = 0;
+    StatusEnum status = 0;
     optional char_string data = 1;
   }
 
@@ -1391,7 +1400,7 @@ server cluster KeypadInput = 1289 {
     kData = 118;
   }
 
-  enum KeypadInputStatusEnum : enum8 {
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kUnsupportedKey = 1;
     kInvalidKeyInCurrentState = 2;
@@ -1415,7 +1424,7 @@ server cluster KeypadInput = 1289 {
   }
 
   response struct SendKeyResponse = 1 {
-    KeypadInputStatusEnum status = 0;
+    StatusEnum status = 0;
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;

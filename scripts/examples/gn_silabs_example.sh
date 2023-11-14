@@ -227,6 +227,8 @@ else
                 ;;
             --docker)
                 optArgs+="efr32_sdk_root=\"$GSDK_ROOT\" "
+                optArgs+="wiseconnect_sdk_root=\"$WISECONNECT_SDK_ROOT\" "
+                optArgs+="wifi_sdk_root=\"$WIFI_SDK_ROOT\" "
                 USE_DOCKER=true
                 shift
                 ;;
@@ -289,7 +291,7 @@ else
         {
             ShortCommitSha=$(git describe --always --dirty --exclude '*')
             branchName=$(git rev-parse --abbrev-ref HEAD)
-            optArgs+="sl_matter_version_str=\"v1.1-$branchName-$ShortCommitSha\" "
+            optArgs+="sl_matter_version_str=\"v1.2-$branchName-$ShortCommitSha\" "
         } &>/dev/null
     fi
 

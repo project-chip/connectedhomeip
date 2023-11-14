@@ -1245,7 +1245,6 @@ static id _Nullable DecodeEventPayloadForTimeSynchronizationCluster(EventId aEve
 {
     using namespace Clusters::TimeSynchronization;
     switch (aEventId) {
-#if MTR_ENABLE_PROVISIONAL
     case Events::DSTTableEmpty::Id: {
         Events::DSTTableEmpty::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1257,8 +1256,6 @@ static id _Nullable DecodeEventPayloadForTimeSynchronizationCluster(EventId aEve
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::DSTStatus::Id: {
         Events::DSTStatus::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1276,8 +1273,6 @@ static id _Nullable DecodeEventPayloadForTimeSynchronizationCluster(EventId aEve
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::TimeZoneStatus::Id: {
         Events::TimeZoneStatus::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1309,8 +1304,6 @@ static id _Nullable DecodeEventPayloadForTimeSynchronizationCluster(EventId aEve
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::TimeFailure::Id: {
         Events::TimeFailure::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1322,8 +1315,6 @@ static id _Nullable DecodeEventPayloadForTimeSynchronizationCluster(EventId aEve
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::MissingTrustedTimeSource::Id: {
         Events::MissingTrustedTimeSource::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1335,7 +1326,6 @@ static id _Nullable DecodeEventPayloadForTimeSynchronizationCluster(EventId aEve
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -1754,7 +1744,6 @@ static id _Nullable DecodeEventPayloadForRefrigeratorAlarmCluster(EventId aEvent
 {
     using namespace Clusters::RefrigeratorAlarm;
     switch (aEventId) {
-#if MTR_ENABLE_PROVISIONAL
     case Events::Notify::Id: {
         Events::Notify::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1787,7 +1776,6 @@ static id _Nullable DecodeEventPayloadForRefrigeratorAlarmCluster(EventId aEvent
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -1824,7 +1812,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 {
     using namespace Clusters::SmokeCoAlarm;
     switch (aEventId) {
-#if MTR_ENABLE_PROVISIONAL
     case Events::SmokeAlarm::Id: {
         Events::SmokeAlarm::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1842,8 +1829,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::COAlarm::Id: {
         Events::COAlarm::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1861,8 +1846,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::LowBattery::Id: {
         Events::LowBattery::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1880,8 +1863,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::HardwareFault::Id: {
         Events::HardwareFault::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1893,8 +1874,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::EndOfService::Id: {
         Events::EndOfService::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1906,8 +1885,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::SelfTestComplete::Id: {
         Events::SelfTestComplete::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1919,8 +1896,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::AlarmMuted::Id: {
         Events::AlarmMuted::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1932,8 +1907,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::MuteEnded::Id: {
         Events::MuteEnded::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1945,8 +1918,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::InterconnectSmokeAlarm::Id: {
         Events::InterconnectSmokeAlarm::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1964,8 +1935,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::InterconnectCOAlarm::Id: {
         Events::InterconnectCOAlarm::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1983,8 +1952,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::AllClear::Id: {
         Events::AllClear::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1996,7 +1963,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -2009,7 +1975,6 @@ static id _Nullable DecodeEventPayloadForDishwasherAlarmCluster(EventId aEventId
 {
     using namespace Clusters::DishwasherAlarm;
     switch (aEventId) {
-#if MTR_ENABLE_PROVISIONAL
     case Events::Notify::Id: {
         Events::Notify::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -2042,7 +2007,6 @@ static id _Nullable DecodeEventPayloadForDishwasherAlarmCluster(EventId aEventId
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -2079,7 +2043,6 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
 {
     using namespace Clusters::OperationalState;
     switch (aEventId) {
-#if MTR_ENABLE_PROVISIONAL
     case Events::OperationalError::Id: {
         Events::OperationalError::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -2118,8 +2081,6 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::OperationCompletion::Id: {
         Events::OperationCompletion::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -2163,7 +2124,6 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -2176,7 +2136,6 @@ static id _Nullable DecodeEventPayloadForRVCOperationalStateCluster(EventId aEve
 {
     using namespace Clusters::RvcOperationalState;
     switch (aEventId) {
-#if MTR_ENABLE_PROVISIONAL
     case Events::OperationalError::Id: {
         Events::OperationalError::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -2215,8 +2174,6 @@ static id _Nullable DecodeEventPayloadForRVCOperationalStateCluster(EventId aEve
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::OperationCompletion::Id: {
         Events::OperationCompletion::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -2260,7 +2217,6 @@ static id _Nullable DecodeEventPayloadForRVCOperationalStateCluster(EventId aEve
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }

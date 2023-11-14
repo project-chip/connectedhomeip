@@ -206,11 +206,13 @@ extern const ByteSpan sTestCert_Node02_08_SubjectKeyId;
 extern const ByteSpan sTestCert_Node02_08_AuthorityKeyId;
 
 extern const ByteSpan sTestCert_PDCID01_Chip;
+extern const ByteSpan sTestCert_PDCID01_ChipCompact;
 extern const ByteSpan sTestCert_PDCID01_DER;
 extern const ByteSpan sTestCert_PDCID01_PublicKey;
 extern const ByteSpan sTestCert_PDCID01_PrivateKey;
-extern const ByteSpan sTestCert_PDCID01_SubjectKeyId;
-extern const ByteSpan sTestCert_PDCID01_AuthorityKeyId;
+extern const ByteSpan sTestCert_PDCID01_SubjectKeyId;   // empty
+extern const ByteSpan sTestCert_PDCID01_AuthorityKeyId; // empty
+extern const ByteSpan sTestCert_PDCID01_KeyId;
 
 } // namespace TestCerts
 } // namespace chip

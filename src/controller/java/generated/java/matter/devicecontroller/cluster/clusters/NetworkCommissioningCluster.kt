@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class NetworkCommissioningCluster(private val endpointId: UShort) {
+class NetworkCommissioningCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class ScanNetworksResponse(
     val networkingStatus: UInt,
     val debugText: String?,
@@ -30,7 +34,9 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
   class NetworkConfigResponse(
     val networkingStatus: UInt,
     val debugText: String?,
-    val networkIndex: UByte?
+    val networkIndex: UByte?,
+    val clientIdentity: ByteArray?,
+    val possessionSignature: ByteArray?
   )
 
   class ConnectNetworkResponse(
@@ -38,6 +44,8 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     val debugText: String?,
     val errorValue: Int?
   )
+
+  class QueryIdentityResponse(val identity: ByteArray, val possessionSignature: ByteArray?)
 
   class NetworksAttribute(val value: List<NetworkCommissioningClusterNetworkInfoStruct>)
 
@@ -62,6 +70,8 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     breadcrumb: ULong?,
     timedInvokeTimeoutMs: Int? = null
   ): ScanNetworksResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -73,8 +83,13 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     ssid: ByteArray,
     credentials: ByteArray,
     breadcrumb: ULong?,
+    networkIdentity: ByteArray?,
+    clientIdentifier: ByteArray?,
+    possessionNonce: ByteArray?,
     timedInvokeTimeoutMs: Int? = null
   ): NetworkConfigResponse {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -87,6 +102,8 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     breadcrumb: ULong?,
     timedInvokeTimeoutMs: Int? = null
   ): NetworkConfigResponse {
+    val commandId = 3L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -99,6 +116,8 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     breadcrumb: ULong?,
     timedInvokeTimeoutMs: Int? = null
   ): NetworkConfigResponse {
+    val commandId = 4L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -111,6 +130,8 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     breadcrumb: ULong?,
     timedInvokeTimeoutMs: Int? = null
   ): ConnectNetworkResponse {
+    val commandId = 6L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -124,6 +145,22 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     breadcrumb: ULong?,
     timedInvokeTimeoutMs: Int? = null
   ): NetworkConfigResponse {
+    val commandId = 8L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun queryIdentity(
+    keyIdentifier: ByteArray,
+    possessionNonce: ByteArray?,
+    timedInvokeTimeoutMs: Int? = null
+  ): QueryIdentityResponse {
+    val commandId = 9L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -167,12 +204,12 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeInterfaceEnabledAttribute(value: Boolean) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeInterfaceEnabledAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeInterfaceEnabledAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeInterfaceEnabledAttribute(minInterval: Int, maxInterval: Int): Boolean {

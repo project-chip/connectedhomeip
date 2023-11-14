@@ -3474,7 +3474,8 @@ public class ClusterIDMapping {
             AddOrUpdateThreadNetwork(3L),
             RemoveNetwork(4L),
             ConnectNetwork(6L),
-            ReorderNetwork(8L),;
+            ReorderNetwork(8L),
+            QueryIdentity(9L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -3509,7 +3510,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum AddOrUpdateWiFiNetworkCommandField {Ssid(0),Credentials(1),Breadcrumb(2),;
+                }public enum AddOrUpdateWiFiNetworkCommandField {Ssid(0),Credentials(1),Breadcrumb(2),NetworkIdentity(3),ClientIdentifier(4),PossessionNonce(5),;
                     private final int id;
                     AddOrUpdateWiFiNetworkCommandField(int id) {
                         this.id = id;
@@ -3588,6 +3589,23 @@ public class ClusterIDMapping {
                     }
                     public static ReorderNetworkCommandField value(int id) throws NoSuchFieldError {
                         for (ReorderNetworkCommandField field : ReorderNetworkCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum QueryIdentityCommandField {KeyIdentifier(0),PossessionNonce(1),;
+                    private final int id;
+                    QueryIdentityCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static QueryIdentityCommandField value(int id) throws NoSuchFieldError {
+                        for (QueryIdentityCommandField field : QueryIdentityCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -12129,6 +12147,7 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             MACAddress(0L),
+            LinkLocalAddress(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

@@ -2,6 +2,8 @@ DarwinForceWritable:
     # Work-around for not allowing changes from writable to read-only
     # happened in https://github.com/project-chip/connectedhomeip/pull/30134
     - ApplicationLauncher::CurrentApp
+    - ContentLauncher::SupportedStreamingProtocols
+    - FanControl::FanModeSequence
 
 WeakEnums:
     # Allow-list of enums that we generate as enums, not enum classes.

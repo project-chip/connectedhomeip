@@ -1208,7 +1208,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "6",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2961,7 +2961,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "type": "temperature",
+              "type": "int16u",
               "included": 1,
               "storageOption": "NVM",
               "singleton": 0,
@@ -6078,5 +6078,6 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }

@@ -1994,8 +1994,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeSequ
     case EnumType::kOffLowHigh:
     case EnumType::kOffLowMedHighAuto:
     case EnumType::kOffLowHighAuto:
-    case EnumType::kOffOnAuto:
-    case EnumType::kOffOn:
+    case EnumType::kOffHighAuto:
+    case EnumType::kOffHigh:
         return val;
     default:
         return static_cast<EnumType>(6);
@@ -2625,19 +2625,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RadonConcentrationMeasu
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::ChannelStatusEnum val)
-{
-    using EnumType = Channel::ChannelStatusEnum;
-    switch (val)
-    {
-    case EnumType::kSuccess:
-    case EnumType::kMultipleMatches:
-    case EnumType::kNoMatches:
-        return val;
-    default:
-        return static_cast<EnumType>(3);
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::LineupInfoTypeEnum val)
 {
     using EnumType = Channel::LineupInfoTypeEnum;
@@ -2649,10 +2636,23 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::LineupInfoType
         return static_cast<EnumType>(1);
     }
 }
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(TargetNavigator::TargetNavigatorStatusEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::StatusEnum val)
 {
-    using EnumType = TargetNavigator::TargetNavigatorStatusEnum;
+    using EnumType = Channel::StatusEnum;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kMultipleMatches:
+    case EnumType::kNoMatches:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(TargetNavigator::StatusEnum val)
+{
+    using EnumType = TargetNavigator::StatusEnum;
     switch (val)
     {
     case EnumType::kSuccess:
@@ -2664,22 +2664,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TargetNavigator::Target
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::MediaPlaybackStatusEnum val)
-{
-    using EnumType = MediaPlayback::MediaPlaybackStatusEnum;
-    switch (val)
-    {
-    case EnumType::kSuccess:
-    case EnumType::kInvalidStateForCommand:
-    case EnumType::kNotAllowed:
-    case EnumType::kNotActive:
-    case EnumType::kSpeedOutOfRange:
-    case EnumType::kSeekOutOfRange:
-        return val;
-    default:
-        return static_cast<EnumType>(6);
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::PlaybackStateEnum val)
 {
     using EnumType = MediaPlayback::PlaybackStateEnum;
@@ -2692,6 +2676,22 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::Playback
         return val;
     default:
         return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::StatusEnum val)
+{
+    using EnumType = MediaPlayback::StatusEnum;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kInvalidStateForCommand:
+    case EnumType::kNotAllowed:
+    case EnumType::kNotActive:
+    case EnumType::kSpeedOutOfRange:
+    case EnumType::kSeekOutOfRange:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
     }
 }
 
@@ -2814,9 +2814,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CecKeyCode
         return static_cast<EnumType>(14);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::KeypadInputStatusEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::StatusEnum val)
 {
-    using EnumType = KeypadInput::KeypadInputStatusEnum;
+    using EnumType = KeypadInput::StatusEnum;
     switch (val)
     {
     case EnumType::kSuccess:
@@ -2828,19 +2828,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::KeypadInpu
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::ContentLaunchStatusEnum val)
-{
-    using EnumType = ContentLauncher::ContentLaunchStatusEnum;
-    switch (val)
-    {
-    case EnumType::kSuccess:
-    case EnumType::kUrlNotAvailable:
-    case EnumType::kAuthFailed:
-        return val;
-    default:
-        return static_cast<EnumType>(3);
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::MetricTypeEnum val)
 {
     using EnumType = ContentLauncher::MetricTypeEnum;
@@ -2875,6 +2862,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::Parame
         return val;
     default:
         return static_cast<EnumType>(14);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::StatusEnum val)
+{
+    using EnumType = ContentLauncher::StatusEnum;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kURLNotAvailable:
+    case EnumType::kAuthFailed:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
     }
 }
 

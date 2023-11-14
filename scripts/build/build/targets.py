@@ -136,6 +136,7 @@ def BuildHostTarget():
         TargetPart('refrigerator', app=HostApp.REFRIGERATOR),
         TargetPart('rvc', app=HostApp.RVC),
         TargetPart('air-purifier', app=HostApp.AIR_PURIFIER),
+        TargetPart('lit-icd', app=HostApp.LIT_ICD)
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -702,6 +703,7 @@ def BuildTelinkTarget():
     target.AppendFixedTargets([
         TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D),
         TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
+        TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),
     ])
 
     target.AppendFixedTargets([

@@ -254,4 +254,9 @@
     <string name="group_setting_unbind_btn_text">Unbind</string>
     <string name="group_setting_send_btn_text">Send</string>
     <string name="group_setting_write_btn_text">Write</string>
+
+    <string name="ota_provider_btn_text">OTA Provider</string>
+    <string name="ota_provider_vendorId_text">Vendor ID</string>
+    <string name="ota_provider_select_firmware_file_text">Select Firmware</string>
+    <string name="ota_provider_start_firmware_update_text">Start Firmware Update</string>
 </resources>

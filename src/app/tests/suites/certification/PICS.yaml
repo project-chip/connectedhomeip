@@ -7311,7 +7311,7 @@ PICS:
           "Reset the following attributes to 0; BeaconLostCount, BeaconRxCount,
           PacketMulticastRxCount, PacketMulticastTxCount, PacketUnicastRxCount,
           PacketUnicastTxCount"
-      id: DGWIFI.S.C00.Tx
+      id: DGWIFI.C.C00.Tx
 
     # Window Covering Cluster Test Plan
     - label:

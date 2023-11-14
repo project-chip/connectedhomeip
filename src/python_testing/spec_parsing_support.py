@@ -78,22 +78,6 @@ class CommandType(Enum):
     GENERATED = auto()
 
 
-def has_zigbee_conformance(conformance: ElementTree.Element) -> bool:
-    # For clusters, things with zigbee conformance can share IDs with the matter elements, so we don't want them
-
-    # TODO: it's actually possible for a thing to have a zigbee conformance AND to have other conformances, and we should check
-    # for that, but for now, this is fine because that hasn't happened in the cluster conformances YET.
-    # It does happen for device types, so we need to be careful there.
-    condition = conformance.iter('condition')
-    for c in condition:
-        try:
-            c.attrib['name'].lower() == "zigbee"
-            return True
-        except KeyError:
-            continue
-    return False
-
-
 class ClusterParser:
     def __init__(self, cluster, cluster_id, name):
         self._problems: list[ProblemNotice] = []
@@ -150,8 +134,6 @@ class ClusterParser:
                     # This is a conformance tag, which uses the same name
                     continue
                 conformance = self.get_conformance(element)
-                if has_zigbee_conformance(conformance):
-                    continue
                 ret.append((element, conformance))
         return ret
 
@@ -264,7 +246,11 @@ class ClusterParser:
         return events
 
     def create_cluster(self) -> XmlCluster:
-        return XmlCluster(revision=self._cluster.attrib['revision'], derived=self._derived,
+        try:
+            revision = int(self._cluster.attrib['revision'], 0)
+        except ValueError:
+            revision = 0
+        return XmlCluster(revision=revision, derived=self._derived,
                           name=self._name, feature_map=self.params.feature_map,
                           attribute_map=self.params.attribute_map, command_map=self.params.command_map,
                           features=self.parse_features(),
@@ -340,4 +326,24 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
                              features=features, attributes=attributes, accepted_commands=accepted_commands,
                              generated_commands=generated_commands, events=events)
             clusters[id] = new
+
+    # workaround for aliased clusters not appearing in the xml. Remove this once https://github.com/csa-data-model/projects/issues/373 is addressed
+    aliased_clusters = {0x040C: 'Carbon Monoxide Concentration Measurement',
+                        0x040D: 'Carbon Dioxide Concentration Measurement',
+                        0x0413: 'Nitrogen Dioxide Concentration Measurement',
+                        0x0415: 'Ozone Concentration Measurement',
+                        0x042A: 'PM2.5 Concentration Measurement',
+                        0x042B: 'Formaldehyde Concentration Measurement',
+                        0x042C: 'PM1 Concentration Measurement',
+                        0x042D: 'PM10 Concentration Measurement',
+                        0x042E: 'Total Volatile Organic Compounds Concentration Measurement',
+                        0x042F: 'Radon Concentration Measurement'}
+    alias_base_name = 'Concentration Measurement Clusters'
+    for id, alias_name in aliased_clusters.items():
+        base = derived_clusters[alias_base_name]
+        new = deepcopy(base)
+        new.derived = alias_base_name
+        new.name = alias_name
+        clusters[id] = new
+
     return clusters, problems

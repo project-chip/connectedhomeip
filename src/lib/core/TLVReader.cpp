@@ -32,6 +32,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/utf8.h>
 
 namespace chip {
 namespace TLV {
@@ -330,6 +331,25 @@ CHIP_ERROR TLVReader::Get(CharSpan & v) const
     }
 
     v = CharSpan(Uint8::to_const_char(bytes), len);
+#if CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ
+    // Spec requirement: A.11.2. UTF-8 and Octet Strings
+    //
+    // For UTF-8 strings, the value octets SHALL encode a valid
+    // UTF-8 character (code points) sequence.
+    //
+    // Senders SHALL NOT include a terminating null character to
+    // mark the end of a string.
+
+    if (!Utf8::IsValid(v))
+    {
+        return CHIP_ERROR_INVALID_UTF8;
+    }
+
+    if (!v.empty() && (v.back() == 0))
+    {
+        return CHIP_ERROR_INVALID_TLV_CHAR_STRING;
+    }
+#endif // CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ
     return CHIP_NO_ERROR;
 }
 
@@ -585,7 +605,8 @@ CHIP_ERROR TLVReader::Next()
 
 CHIP_ERROR TLVReader::Expect(Tag expectedTag)
 {
-    VerifyOrReturnError(mElemTag == expectedTag, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    VerifyOrReturnError(GetType() != kTLVType_NotSpecified, CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrReturnError(GetTag() == expectedTag, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
     return CHIP_NO_ERROR;
 }
 
@@ -598,8 +619,8 @@ CHIP_ERROR TLVReader::Next(Tag expectedTag)
 
 CHIP_ERROR TLVReader::Expect(TLVType expectedType, Tag expectedTag)
 {
-    ReturnErrorOnFailure(Expect(expectedTag));
     VerifyOrReturnError(GetType() == expectedType, CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrReturnError(GetTag() == expectedTag, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
     return CHIP_NO_ERROR;
 }
 

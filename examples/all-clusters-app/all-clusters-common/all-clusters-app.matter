@@ -1046,8 +1046,8 @@ server cluster TimeFormatLocalization = 44 {
     kCalendarFormat = 0x1;
   }
 
-  attribute HourFormatEnum hourFormat = 0;
-  attribute CalendarTypeEnum activeCalendarType = 1;
+  attribute access(write: manage) HourFormatEnum hourFormat = 0;
+  attribute access(write: manage) CalendarTypeEnum activeCalendarType = 1;
   readonly attribute CalendarTypeEnum supportedCalendarTypes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1419,6 +1419,7 @@ server cluster NetworkCommissioning = 49 {
     kWiFiNetworkInterface = 0x1;
     kThreadNetworkInterface = 0x2;
     kEthernetNetworkInterface = 0x4;
+    kPerDeviceCredentials = 0x8;
   }
 
   bitmap ThreadCapabilitiesBitmap : bitmap16 {
@@ -1435,11 +1436,14 @@ server cluster NetworkCommissioning = 49 {
     kWPAPersonal = 0x4;
     kWPA2Personal = 0x8;
     kWPA3Personal = 0x10;
+    kWPA3MatterPDC = 0x20;
   }
 
   struct NetworkInfoStruct {
     octet_string<32> networkID = 0;
     boolean connected = 1;
+    optional nullable octet_string<20> networkIdentifier = 2;
+    optional nullable octet_string<20> clientIdentifier = 3;
   }
 
   struct ThreadInterfaceScanResultStruct {
@@ -1486,6 +1490,9 @@ server cluster NetworkCommissioning = 49 {
     octet_string<32> ssid = 0;
     octet_string<64> credentials = 1;
     optional int64u breadcrumb = 2;
+    optional octet_string<140> networkIdentity = 3;
+    optional octet_string<20> clientIdentifier = 4;
+    optional octet_string<32> possessionNonce = 5;
   }
 
   request struct AddOrUpdateThreadNetworkRequest {
@@ -1520,6 +1527,8 @@ server cluster NetworkCommissioning = 49 {
     NetworkCommissioningStatusEnum networkingStatus = 0;
     optional char_string<512> debugText = 1;
     optional int8u networkIndex = 2;
+    optional octet_string<140> clientIdentity = 3;
+    optional octet_string<64> possessionSignature = 4;
   }
 
   response struct ConnectNetworkResponse = 7 {
@@ -2465,74 +2474,6 @@ server cluster BooleanState = 69 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Allows servers to ensure that listed clients are notified when a server is available for communication. */
-server cluster IcdManagement = 70 {
-  bitmap Feature : bitmap32 {
-    kCheckInProtocolSupport = 0x1;
-    kUserActiveModeTrigger = 0x2;
-    kLongIdleTimeSupport = 0x4;
-  }
-
-  bitmap UserActiveModeTriggerBitmap : bitmap32 {
-    kPowerCycle = 0x1;
-    kSettingsMenu = 0x2;
-    kCustomInstruction = 0x4;
-    kDeviceManual = 0x8;
-    kActuateSensor = 0x10;
-    kActuateSensorSeconds = 0x20;
-    kActuateSensorTimes = 0x40;
-    kActuateSensorLightsBlink = 0x80;
-    kResetButton = 0x100;
-    kResetButtonLightsBlink = 0x200;
-    kResetButtonSeconds = 0x400;
-    kResetButtonTimes = 0x800;
-    kSetupButton = 0x1000;
-    kSetupButtonSeconds = 0x2000;
-    kSetupButtonLightsBlink = 0x4000;
-    kSetupButtonTimes = 0x8000;
-    kAppDefinedButton = 0x10000;
-  }
-
-  fabric_scoped struct MonitoringRegistrationStruct {
-    fabric_sensitive node_id checkInNodeID = 1;
-    fabric_sensitive int64u monitoredSubject = 2;
-    fabric_idx fabricIndex = 254;
-  }
-
-  readonly attribute int32u idleModeDuration = 0;
-  readonly attribute int32u activeModeDuration = 1;
-  readonly attribute int16u activeModeThreshold = 2;
-  readonly attribute access(read: administer) MonitoringRegistrationStruct registeredClients[] = 3;
-  readonly attribute access(read: administer) int32u ICDCounter = 4;
-  readonly attribute int16u clientsSupportedPerFabric = 5;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct RegisterClientRequest {
-    node_id checkInNodeID = 0;
-    int64u monitoredSubject = 1;
-    octet_string<16> key = 2;
-    optional octet_string<16> verificationKey = 3;
-  }
-
-  request struct UnregisterClientRequest {
-    node_id checkInNodeID = 0;
-    optional octet_string<16> verificationKey = 1;
-  }
-
-  response struct RegisterClientResponse = 1 {
-    int32u ICDCounter = 0;
-  }
-
-  fabric command access(invoke: manage) RegisterClient(RegisterClientRequest): RegisterClientResponse = 0;
-  fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
-  command access(invoke: manage) StayActiveRequest(): DefaultSuccess = 3;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
@@ -3705,8 +3646,8 @@ provisional server cluster FanControl = 514 {
     kOffLowHigh = 1;
     kOffLowMedHighAuto = 2;
     kOffLowHighAuto = 3;
-    kOffOnAuto = 4;
-    kOffOn = 5;
+    kOffHighAuto = 4;
+    kOffHigh = 5;
   }
 
   enum StepDirectionEnum : enum8 {
@@ -3735,7 +3676,7 @@ provisional server cluster FanControl = 514 {
   }
 
   attribute FanModeEnum fanMode = 0;
-  attribute FanModeSequenceEnum fanModeSequence = 1;
+  readonly attribute FanModeSequenceEnum fanModeSequence = 1;
   attribute nullable percent percentSetting = 2;
   readonly attribute percent percentCurrent = 3;
   readonly attribute int8u speedMax = 4;
@@ -4768,7 +4709,7 @@ server cluster RadonConcentrationMeasurement = 1071 {
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 server cluster WakeOnLan = 1283 {
-  readonly attribute char_string<32> MACAddress = 0;
+  readonly attribute char_string<12> MACAddress = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5645,25 +5586,6 @@ endpoint 0 {
     callback attribute labelList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster IcdManagement {
-    callback attribute idleModeDuration default = 500;
-    callback attribute activeModeDuration default = 300;
-    callback attribute activeModeThreshold default = 300;
-    callback attribute registeredClients;
-    callback attribute ICDCounter default = 0;
-    callback attribute clientsSupportedPerFabric default = 2;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 2;
-
-    handle command RegisterClient;
-    handle command RegisterClientResponse;
-    handle command UnregisterClient;
-    handle command StayActiveRequest;
   }
 
   server cluster RelativeHumidityMeasurement {

@@ -3105,7 +3105,7 @@ server cluster WakeOnLan = 1283 {
 }
 
 server cluster Channel = 1284 {
-  enum ChannelStatusEnum : ENUM8 {
+  enum StatusEnum : ENUM8 {
     kSuccess = 0;
     kMultipleMatches = 1;
     kNoMatches = 2;
@@ -3398,7 +3398,7 @@ server cluster ContentLauncher = 1290 {
     kURLPlayback = 0x2;
   }
 
-  bitmap SupportedStreamingProtocol : BITMAP32 {
+  bitmap SupportedProtocolsBitmap : BITMAP32 {
     kDash = 0x1;
     kHls = 0x2;
   }

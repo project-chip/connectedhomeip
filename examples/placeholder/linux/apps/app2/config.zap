@@ -3210,7 +3210,7 @@
               "code": 10,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "int16u",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -3226,7 +3226,7 @@
               "code": 11,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "int16u",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -3242,7 +3242,7 @@
               "code": 12,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "int16u",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -4038,7 +4038,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveNetworkFaults",
+              "name": "ActiveNetworkFaultsList",
               "code": 62,
               "mfgCode": null,
               "side": "server",
@@ -9168,7 +9168,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "type": "temperature",
+              "type": "int16u",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -10770,7 +10770,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap32",
+              "type": "SupportedProtocolsBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -12060,7 +12060,7 @@
               "code": 4,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "NameSupportBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -14997,5 +14997,6 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }

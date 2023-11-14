@@ -453,6 +453,12 @@ config CHIP_MALLOC_SYS_HEAP_SIZE
 	  the heap used by the memory allocation functions based on sys_heap from
 	  Zephyr RTOS.
 
+config CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT
+	bool "Enable support for heap watermarks based on Zephyr sys_heap"
+	help
+	  Enables support for getting current heap high watermark and resetting 
+	  watermarks. 
+
 endif
 
 module = MATTER

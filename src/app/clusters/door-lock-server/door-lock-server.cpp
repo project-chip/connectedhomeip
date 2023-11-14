@@ -211,7 +211,7 @@ void DoorLockServer::HandleLocalLockOperationError(chip::EndpointId endpointId, 
 
     HandleWrongCodeEntry(endpointId);
 
-    ChipLogProgress(Zcl, "Handling a local Lock Operation Error: [endpoint=%d, user=%d]", endpointId, userId.Value());
+    ChipLogProgress(Zcl, "Handling a local Lock Operation Error: [endpoint=%d]", endpointId);
 }
 
 bool DoorLockServer::HandleWrongCodeEntry(chip::EndpointId endpointId)
@@ -1985,7 +1985,7 @@ Status DoorLockServer::clearUser(chip::EndpointId endpointId, chip::FabricIndex 
     }
 
     // Remove the user entry
-    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, chip::CharSpan(""), 0,
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, ""_span, 0,
                                       UserStatusEnum::kAvailable, UserTypeEnum::kUnrestrictedUser, CredentialRuleEnum::kSingle,
                                       nullptr, 0))
     {

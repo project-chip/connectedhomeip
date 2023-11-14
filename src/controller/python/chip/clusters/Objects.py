@@ -7472,6 +7472,7 @@ class NetworkCommissioning(Cluster):
             kWiFiNetworkInterface = 0x1
             kThreadNetworkInterface = 0x2
             kEthernetNetworkInterface = 0x4
+            kPerDeviceCredentials = 0x8
 
         class ThreadCapabilitiesBitmap(IntFlag):
             kIsBorderRouterCapable = 0x1
@@ -7486,6 +7487,7 @@ class NetworkCommissioning(Cluster):
             kWpaPersonal = 0x4
             kWpa2Personal = 0x8
             kWpa3Personal = 0x10
+            kWpa3MatterPdc = 0x20
 
     class Structs:
         @dataclass
@@ -7496,10 +7498,14 @@ class NetworkCommissioning(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="networkID", Tag=0, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="connected", Tag=1, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="networkIdentifier", Tag=2, Type=typing.Union[None, Nullable, bytes]),
+                        ClusterObjectFieldDescriptor(Label="clientIdentifier", Tag=3, Type=typing.Union[None, Nullable, bytes]),
                     ])
 
             networkID: 'bytes' = b""
             connected: 'bool' = False
+            networkIdentifier: 'typing.Union[None, Nullable, bytes]' = None
+            clientIdentifier: 'typing.Union[None, Nullable, bytes]' = None
 
         @dataclass
         class ThreadInterfaceScanResultStruct(ClusterObject):
@@ -7602,11 +7608,17 @@ class NetworkCommissioning(Cluster):
                         ClusterObjectFieldDescriptor(Label="ssid", Tag=0, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="credentials", Tag=1, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="networkIdentity", Tag=3, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="clientIdentifier", Tag=4, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="possessionNonce", Tag=5, Type=typing.Optional[bytes]),
                     ])
 
             ssid: 'bytes' = b""
             credentials: 'bytes' = b""
             breadcrumb: 'typing.Optional[uint]' = None
+            networkIdentity: 'typing.Optional[bytes]' = None
+            clientIdentifier: 'typing.Optional[bytes]' = None
+            possessionNonce: 'typing.Optional[bytes]' = None
 
         @dataclass
         class AddOrUpdateThreadNetwork(ClusterCommand):
@@ -7658,11 +7670,15 @@ class NetworkCommissioning(Cluster):
                         ClusterObjectFieldDescriptor(Label="networkingStatus", Tag=0, Type=NetworkCommissioning.Enums.NetworkCommissioningStatusEnum),
                         ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="networkIndex", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="clientIdentity", Tag=3, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="possessionSignature", Tag=4, Type=typing.Optional[bytes]),
                     ])
 
             networkingStatus: 'NetworkCommissioning.Enums.NetworkCommissioningStatusEnum' = 0
             debugText: 'typing.Optional[str]' = None
             networkIndex: 'typing.Optional[uint]' = None
+            clientIdentity: 'typing.Optional[bytes]' = None
+            possessionSignature: 'typing.Optional[bytes]' = None
 
         @dataclass
         class ConnectNetwork(ClusterCommand):
@@ -7721,6 +7737,42 @@ class NetworkCommissioning(Cluster):
             networkID: 'bytes' = b""
             networkIndex: 'uint' = 0
             breadcrumb: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class QueryIdentity(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000031
+            command_id: typing.ClassVar[int] = 0x00000009
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'QueryIdentityResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="keyIdentifier", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="possessionNonce", Tag=1, Type=typing.Optional[bytes]),
+                    ])
+
+            keyIdentifier: 'bytes' = b""
+            possessionNonce: 'typing.Optional[bytes]' = None
+
+        @dataclass
+        class QueryIdentityResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000031
+            command_id: typing.ClassVar[int] = 0x0000000A
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="identity", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="possessionSignature", Tag=1, Type=typing.Optional[bytes]),
+                    ])
+
+            identity: 'bytes' = b""
+            possessionSignature: 'typing.Optional[bytes]' = None
 
     class Attributes:
         @dataclass
@@ -25551,8 +25603,8 @@ class FanControl(Cluster):
             kOffLowHigh = 0x01
             kOffLowMedHighAuto = 0x02
             kOffLowHighAuto = 0x03
-            kOffOnAuto = 0x04
-            kOffOn = 0x05
+            kOffHighAuto = 0x04
+            kOffHigh = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
@@ -33173,6 +33225,7 @@ class WakeOnLan(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="MACAddress", Tag=0x00000000, Type=typing.Optional[str]),
+                ClusterObjectFieldDescriptor(Label="linkLocalAddress", Tag=0x00000001, Type=typing.Optional[bytes]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -33182,6 +33235,7 @@ class WakeOnLan(Cluster):
             ])
 
     MACAddress: 'typing.Optional[str]' = None
+    linkLocalAddress: 'typing.Optional[bytes]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -33205,6 +33259,22 @@ class WakeOnLan(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[str])
 
             value: 'typing.Optional[str]' = None
+
+        @dataclass
+        class LinkLocalAddress(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000503
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bytes])
+
+            value: 'typing.Optional[bytes]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -33333,7 +33403,15 @@ class Channel(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class ChannelStatusEnum(MatterIntEnum):
+        class LineupInfoTypeEnum(MatterIntEnum):
+            kMso = 0x00
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 1,
+
+        class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
             kMultipleMatches = 0x01
             kNoMatches = 0x02
@@ -33342,14 +33420,6 @@ class Channel(Cluster):
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 3,
-
-        class LineupInfoTypeEnum(MatterIntEnum):
-            kMso = 0x00
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 1,
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -33421,11 +33491,11 @@ class Channel(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=Channel.Enums.ChannelStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=Channel.Enums.StatusEnum),
                         ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            status: 'Channel.Enums.ChannelStatusEnum' = 0
+            status: 'Channel.Enums.StatusEnum' = 0
             data: 'typing.Optional[str]' = None
 
         @dataclass
@@ -33636,7 +33706,7 @@ class TargetNavigator(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class TargetNavigatorStatusEnum(MatterIntEnum):
+        class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
             kTargetNotFound = 0x01
             kNotAllowed = 0x02
@@ -33690,11 +33760,11 @@ class TargetNavigator(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=TargetNavigator.Enums.TargetNavigatorStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=TargetNavigator.Enums.StatusEnum),
                         ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            status: 'TargetNavigator.Enums.TargetNavigatorStatusEnum' = 0
+            status: 'TargetNavigator.Enums.StatusEnum' = 0
             data: 'typing.Optional[str]' = None
 
     class Attributes:
@@ -33865,7 +33935,18 @@ class MediaPlayback(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class MediaPlaybackStatusEnum(MatterIntEnum):
+        class PlaybackStateEnum(MatterIntEnum):
+            kPlaying = 0x00
+            kPaused = 0x01
+            kNotPlaying = 0x02
+            kBuffering = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 4,
+
+        class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
             kInvalidStateForCommand = 0x01
             kNotAllowed = 0x02
@@ -33877,17 +33958,6 @@ class MediaPlayback(Cluster):
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 6,
-
-        class PlaybackStateEnum(MatterIntEnum):
-            kPlaying = 0x00
-            kPaused = 0x01
-            kNotPlaying = 0x02
-            kBuffering = 0x03
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 4,
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -34056,11 +34126,11 @@ class MediaPlayback(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=MediaPlayback.Enums.StatusEnum),
                         ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            status: 'MediaPlayback.Enums.MediaPlaybackStatusEnum' = 0
+            status: 'MediaPlayback.Enums.StatusEnum' = 0
             data: 'typing.Optional[str]' = None
 
         @dataclass
@@ -34801,7 +34871,7 @@ class KeypadInput(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 14,
 
-        class KeypadInputStatusEnum(MatterIntEnum):
+        class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
             kUnsupportedKey = 0x01
             kInvalidKeyInCurrentState = 0x02
@@ -34845,10 +34915,10 @@ class KeypadInput(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=KeypadInput.Enums.KeypadInputStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=KeypadInput.Enums.StatusEnum),
                     ])
 
-            status: 'KeypadInput.Enums.KeypadInputStatusEnum' = 0
+            status: 'KeypadInput.Enums.StatusEnum' = 0
 
     class Attributes:
         @dataclass
@@ -34976,16 +35046,6 @@ class ContentLauncher(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class ContentLaunchStatusEnum(MatterIntEnum):
-            kSuccess = 0x00
-            kUrlNotAvailable = 0x01
-            kAuthFailed = 0x02
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 3,
-
         class MetricTypeEnum(MatterIntEnum):
             kPixels = 0x00
             kPercentage = 0x01
@@ -35016,12 +35076,22 @@ class ContentLauncher(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 14,
 
+        class StatusEnum(MatterIntEnum):
+            kSuccess = 0x00
+            kURLNotAvailable = 0x01
+            kAuthFailed = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 3,
+
     class Bitmaps:
         class Feature(IntFlag):
             kContentSearch = 0x1
             kURLPlayback = 0x2
 
-        class SupportedStreamingProtocol(IntFlag):
+        class SupportedProtocolsBitmap(IntFlag):
             kDash = 0x1
             kHls = 0x2
 
@@ -35168,11 +35238,11 @@ class ContentLauncher(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ContentLauncher.Enums.ContentLaunchStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ContentLauncher.Enums.StatusEnum),
                         ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            status: 'ContentLauncher.Enums.ContentLaunchStatusEnum' = 0
+            status: 'ContentLauncher.Enums.StatusEnum' = 0
             data: 'typing.Optional[str]' = None
 
     class Attributes:
