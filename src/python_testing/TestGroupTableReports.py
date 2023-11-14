@@ -16,11 +16,11 @@
 #
 import logging
 import queue
+from typing import List
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
-from chip.exceptions import ChipStackError
+from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
 from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -56,11 +56,6 @@ class TestGroupTableReports(MatterBaseTest):
     @async_test_body
     async def test_group_table_reports(self):
         self.print_step(1, "Commissioning, already done")
-
-        # TODO : Verify if they are needed
-        fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
-        TH1_nodeid = self.matter_test_config.controller_node_id
-        # end TODO
 
         self.TH1 = self.default_controller
 
