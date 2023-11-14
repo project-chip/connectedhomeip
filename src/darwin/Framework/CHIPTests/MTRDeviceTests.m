@@ -38,7 +38,7 @@
 #import <XCTest/XCTest.h>
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
-static const uint16_t kDownloadLogTimeoutInSeconds = 50;
+static const uint16_t kDownloadLogTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
@@ -2631,20 +2631,33 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 }
 
 - (NSError *)generateLogFile:(NSString *)outFile
+                        size:(unsigned long long)size
 {
-    NSTask * appTask = [self createTaskForPath:@"out/debug/chip-all-clusters-app"];
-
     // Remove the file if one exists
     [[NSFileManager defaultManager] removeItemAtPath:outFile error:nil];
 
     // Create the file
     [[NSFileManager defaultManager] createFileAtPath:outFile contents:nil attributes:nil];
 
-    NSFileHandle * handle = [NSFileHandle fileHandleForUpdatingAtPath:outFile];
-    appTask.standardOutput = handle;
-    NSError * error = nil;
+    NSString * content = @"The quick brown fox jumps over the lazy dog";
+    NSFileHandle * handle = [NSFileHandle fileHandleForWritingAtPath:outFile];
+    if (handle == nil)
+    {
+        NSLog(@"Failed to generate the log file %@", outFile);
+    }
 
-    [appTask launchAndReturnError:&error];
+    NSError * error = nil;
+    unsigned long long offset = 0;
+
+    while (offset < size - content.length && error == nil)
+    {
+        if ([handle getOffset:&offset error:nil])
+        {
+            [handle writeData:[content dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+        }
+    }
+
+    [handle closeFile];
     return error;
 }
 
@@ -2661,7 +2674,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertNotNil(device);
 
         NSString * outFile = [NSString stringWithFormat:@"/tmp/endusersupportlog.txt"];
-        NSError * error = [self generateLogFile:outFile];
+        NSError * error = [self generateLogFile:outFile size:(10 * 1024)];
 
         if (error != nil) {
             NSLog(@"Failed to generate log file");
@@ -2696,7 +2709,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertNotNil(device);
 
         NSString * outFile = [NSString stringWithFormat:@"/tmp/networkdiagnosticslog.txt"];
-        NSError * error = [self generateLogFile:outFile];
+        NSError * error = [self generateLogFile:outFile size:(4 * 1024)];
 
         if (error != nil) {
             NSLog(@"Failed to generate log file");
@@ -2731,7 +2744,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertNotNil(device);
 
         NSString * outFile = [NSString stringWithFormat:@"/tmp/crashlog.txt"];
-        NSError * error = [self generateLogFile:outFile];
+        NSError * error = [self generateLogFile:outFile size:(3 * 1024)];
 
         if (error != nil) {
             NSLog(@"Failed to generate log file");
