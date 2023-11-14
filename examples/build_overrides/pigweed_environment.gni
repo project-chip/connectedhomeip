@@ -37,54 +37,24 @@ import("${_bootstrap_root}/build_overrides/pigweed_environment.gni")
 # TODO: need a better expansion here. This replacement logic seems very brittle and
 #       it is unclear how we know exactly 3 levels of indirections are correct
 #
+
+# Rebase paths to our root.
 if (defined(pw_env_setup_CIPD_ARM)) {
-  _split_arm = string_split(pw_env_setup_CIPD_ARM, "//../")
-  if (_split_arm[0] == "") {
-    pw_env_setup_CIPD_ARM = get_path_info(
-            string_replace(pw_env_setup_CIPD_ARM, "//../", "//../../../"),
-            "abspath")
-  } else {
-    pw_env_setup_CIPD_ARM =
-        get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_ARM}", "abspath")
-  }
+  pw_env_setup_CIPD_ARM =
+      get_path_info(rebase_path(pw_env_setup_CIPD_ARM, "", _bootstrap_root), "abspath")
 }
+
 if (defined(pw_env_setup_CIPD_PIGWEED)) {
-  _split_pigweed = string_split(pw_env_setup_CIPD_PIGWEED, "//../")
-  if (_split_pigweed[0] == "") {
-    pw_env_setup_CIPD_PIGWEED =
-        get_path_info(
-            string_replace(pw_env_setup_CIPD_PIGWEED, "//../", "//../../../"),
-            "abspath")
-  } else {
-    pw_env_setup_CIPD_PIGWEED =
-        get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_PIGWEED}",
-                      "abspath")
-  }
+  pw_env_setup_CIPD_PIGWEED =
+      get_path_info(rebase_path(pw_env_setup_CIPD_PIGWEED, "", _bootstrap_root), "abspath")
 }
 
 if (defined(pw_env_setup_CIPD_PYTHON)) {
-  _split_python = string_split(pw_env_setup_CIPD_PYTHON, "//../")
-  if (_split_python[0] == "") {
-    pw_env_setup_CIPD_PYTHON =
-        get_path_info(
-            string_replace(pw_env_setup_CIPD_PYTHON, "//../", "//../../../"),
-            "abspath")
-  } else {
-    pw_env_setup_CIPD_PYTHON =
-        get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_PYTHON}",
-                      "abspath")
-  }
+  pw_env_setup_CIPD_PYTHON =
+      get_path_info(rebase_path(pw_env_setup_CIPD_PYTHON, "", _bootstrap_root), "abspath")
 }
+
 if (defined(pw_env_setup_VIRTUAL_ENV)) {
-  _split_env = string_split(pw_env_setup_VIRTUAL_ENV, "//../")
-  if (_split_env[0] == "") {
-    pw_env_setup_VIRTUAL_ENV =
-        get_path_info(
-            string_replace(pw_env_setup_VIRTUAL_ENV, "//../", "//../../../"),
-            "abspath")
-  } else {
-    pw_env_setup_VIRTUAL_ENV =
-        get_path_info("${_bootstrap_root}/${pw_env_setup_VIRTUAL_ENV}",
-                      "abspath")
-  }
+  pw_env_setup_VIRTUAL_ENV =
+      get_path_info(rebase_path(pw_env_setup_VIRTUAL_ENV, "", _bootstrap_root), "abspath")
 }
