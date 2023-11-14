@@ -2959,7 +2959,7 @@ client cluster LaundryDryerControls = 74 {
 }
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven. */
-client cluster OvenOperationalState = 72 {
+client cluster OvenCavityOperationalState = 72 {
   enum ErrorStateEnum : enum8 {
     kNoError = 0;
     kUnableToStartOrResume = 1;

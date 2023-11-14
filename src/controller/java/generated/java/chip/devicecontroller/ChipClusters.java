@@ -20463,7 +20463,7 @@ public class ChipClusters {
     }
   }
 
-  public static class OvenOperationalStateCluster extends BaseChipCluster {
+  public static class OvenCavityOperationalStateCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 72L;
 
     private static final long PHASE_LIST_ATTRIBUTE_ID = 0L;
@@ -20479,7 +20479,7 @@ public class ChipClusters {
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
 
-    public OvenOperationalStateCluster(long devicePtr, int endpointId) {
+    public OvenCavityOperationalStateCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId, CLUSTER_ID);
     }
 
@@ -20502,12 +20502,12 @@ public class ChipClusters {
           @Override
           public void onResponse(StructType invokeStructValue) {
           final long commandResponseStateFieldID = 0L;
-          ChipStructs.OvenOperationalStateClusterErrorStateStruct commandResponseState = null;
+          ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct commandResponseState = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == commandResponseStateFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
                 StructType castingValue = element.value(StructType.class);
-                commandResponseState = ChipStructs.OvenOperationalStateClusterErrorStateStruct.decodeTlv(castingValue);
+                commandResponseState = ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct.decodeTlv(castingValue);
               }
             }
           }
@@ -20528,12 +20528,12 @@ public class ChipClusters {
           @Override
           public void onResponse(StructType invokeStructValue) {
           final long commandResponseStateFieldID = 0L;
-          ChipStructs.OvenOperationalStateClusterErrorStateStruct commandResponseState = null;
+          ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct commandResponseState = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == commandResponseStateFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
                 StructType castingValue = element.value(StructType.class);
-                commandResponseState = ChipStructs.OvenOperationalStateClusterErrorStateStruct.decodeTlv(castingValue);
+                commandResponseState = ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct.decodeTlv(castingValue);
               }
             }
           }
@@ -20554,12 +20554,12 @@ public class ChipClusters {
           @Override
           public void onResponse(StructType invokeStructValue) {
           final long commandResponseStateFieldID = 0L;
-          ChipStructs.OvenOperationalStateClusterErrorStateStruct commandResponseState = null;
+          ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct commandResponseState = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == commandResponseStateFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
                 StructType castingValue = element.value(StructType.class);
-                commandResponseState = ChipStructs.OvenOperationalStateClusterErrorStateStruct.decodeTlv(castingValue);
+                commandResponseState = ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct.decodeTlv(castingValue);
               }
             }
           }
@@ -20580,12 +20580,12 @@ public class ChipClusters {
           @Override
           public void onResponse(StructType invokeStructValue) {
           final long commandResponseStateFieldID = 0L;
-          ChipStructs.OvenOperationalStateClusterErrorStateStruct commandResponseState = null;
+          ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct commandResponseState = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == commandResponseStateFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
                 StructType castingValue = element.value(StructType.class);
-                commandResponseState = ChipStructs.OvenOperationalStateClusterErrorStateStruct.decodeTlv(castingValue);
+                commandResponseState = ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct.decodeTlv(castingValue);
               }
             }
           }
@@ -20594,7 +20594,7 @@ public class ChipClusters {
     }
 
     public interface OperationalCommandResponseCallback extends BaseClusterCallback {
-      void onSuccess(ChipStructs.OvenOperationalStateClusterErrorStateStruct commandResponseState);
+      void onSuccess(ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct commandResponseState);
     }
 
     public interface PhaseListAttributeCallback extends BaseAttributeCallback {
@@ -20610,11 +20610,11 @@ public class ChipClusters {
     }
 
     public interface OperationalStateListAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<ChipStructs.OvenOperationalStateClusterOperationalStateStruct> value);
+      void onSuccess(List<ChipStructs.OvenCavityOperationalStateClusterOperationalStateStruct> value);
     }
 
     public interface OperationalErrorAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(ChipStructs.OvenOperationalStateClusterErrorStateStruct value);
+      void onSuccess(ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -20715,7 +20715,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.OvenOperationalStateClusterOperationalStateStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.OvenCavityOperationalStateClusterOperationalStateStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, OPERATIONAL_STATE_LIST_ATTRIBUTE_ID, true);
@@ -20728,7 +20728,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.OvenOperationalStateClusterOperationalStateStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.OvenCavityOperationalStateClusterOperationalStateStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, OPERATIONAL_STATE_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
@@ -20765,7 +20765,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            ChipStructs.OvenOperationalStateClusterErrorStateStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, OPERATIONAL_ERROR_ATTRIBUTE_ID, true);
@@ -20778,7 +20778,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            ChipStructs.OvenOperationalStateClusterErrorStateStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, OPERATIONAL_ERROR_ATTRIBUTE_ID, minInterval, maxInterval);
     }
