@@ -1,0 +1,62 @@
+/ {
+	leds {
+		led_red: led_3 {
+			gpios = <&gpiob 6 GPIO_ACTIVE_HIGH>;
+			label = "LED Red";
+		};
+	};
+
+	keys {
+		/delete-node/ button_1;
+		/delete-node/ button_3;
+		compatible = "gpio-keys";
+		key_1: button_1 {
+			gpios = <&gpiod 2 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		};
+		key_2: button_2 {
+			gpios = <&gpiod 1 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		};
+		key_3: button_3 {
+			gpios = <&gpioc 1 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		};
+		key_4: button_4 {
+			gpios = <&gpiod 3 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		};
+	};
+};
+
+&gpioc {
+	interrupts = <38 1>;
+};
+
+&gpiod {
+	interrupts = <37 1>;
+	status = "okay";
+};
+
+&pinctrl {
+	/* Define I2C pins: SCL(PE0), SDA(PC2) */
+	i2c_scl_pe0_default: i2c_scl_pe0_default {
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_E, B9x_PIN_0, B91_FUNC_A)>;
+	};
+	i2c_sda_pc2_default: i2c_sda_pc2_default {
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_C, B9x_PIN_2, B91_FUNC_A)>;
+	};
+
+	pwm_ch4_pe4_default: pwm_ch4_pe4_default {
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_E, B9x_PIN_4, B91_FUNC_C)>;
+	};
+};
+
+&i2c {
+	pinctrl-0 = <&i2c_scl_pe0_default &i2c_sda_pc2_default>;
+
+	sht3xd@44 {
+		compatible = "sensirion,sht3xd";
+		reg = <0x44>;
+	};
+};
+
+&pwm0 {
+	pinctrl-0 = <&pwm_ch0_pb4_default &pwm_ch1_pb5_default &pwm_ch2_pe2_default &pwm_ch4_pe4_default>;
+};

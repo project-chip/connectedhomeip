@@ -18,27 +18,27 @@
 
 #pragma once
 
-#include "AppTaskCommon.h"
+#include <stdbool.h>
+#include <stdint.h>
 
-class AppTask : public AppTaskCommon
+#include "AppEventCommon.h"
+
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <lib/core/CHIPError.h>
+
+class SensorManager
 {
 public:
-    void UpdateClusterState(void);
+    CHIP_ERROR Init();
+    CHIP_ERROR GetTempAndHumMeasurValue(int16_t *pTempMeasured, uint16_t *pHumMeasured);
 
 private:
-    friend AppTask & GetAppTask(void);
-    friend class AppTaskCommon;
+    friend SensorManager & SensorMgr();
 
-    CHIP_ERROR Init(void);
-
-    static void AirQualitySensorMeasurTimerTimeoutCallback(k_timer * timer);
-    static void AirQualitySensorBanForNextMeasurTimerTimeoutCallback(k_timer * timer);
-    static void AirQualitySensorMeasurActionEventHandler(AppEvent * aEvent);
-
-    static AppTask sAppTask;
+    static SensorManager sSensorManager;
 };
 
-inline AppTask & GetAppTask(void)
+inline SensorManager & SensorMgr()
 {
-    return AppTask::sAppTask;
+    return SensorManager::sSensorManager;
 }
