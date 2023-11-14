@@ -81,20 +81,19 @@ runtime. These options are also available for many Linux samples. Do not
 conflate these with chef options available at build time.
 
 Ex.:
-  --discriminator <discriminator>
-       A 12-bit unsigned integer match the value which a device advertises during commissioning.
-  --passcode <passcode>
-       A 27-bit unsigned integer, which serves as proof of possession during commissioning.
-       If not provided to compute a verifier, the --spake2p-verifier-base64 must be provided.
-  --secured-device-port <port>
-       A 16-bit unsigned integer specifying the listen port to use for secure device messages (default is 5540).
-  --KVS <filepath>
-       A file to store Key Value Store items.
+
+-   --discriminator <discriminator>: A 12-bit unsigned integer match the value
+    which a device advertises during commissioning.
+-   --passcode <passcode>: A 27-bit unsigned integer, which serves as proof of
+    possession during commissioning. If not provided to compute a verifier, the
+    --spake2p-verifier-base64 must be provided.
+-   --secured-device-port <port>: A 16-bit unsigned integer specifying the
+    listen port to use for secure device messages (default is 5540).
+-   --KVS <filepath>: A file to store Key Value Store items.
 
 For a full list, call the generated linux binary with
 
-  -h, --help
-       Print this output and then exit.
+-   -h, --help: Print this output and then exit.
 
 ## CI
 
@@ -123,7 +122,7 @@ relevant platform image. You can simulate the workflow locally by mounting your
 CHIP repo into a container and executing the CI command:
 
 ```shell
-docker run -it --mount source=$(pwd),target=/workspace,type=bind ghcr.io/project-chip/chip-build-$PLATFORM:$VERSION
+docker run -it --mount source=$(pwd),target=/workspace,type=bind ghcr.io/project-chip/chip-build-$PLATFORM:1$VERSION
 ```
 
 In the container:
@@ -150,7 +149,7 @@ chef_$PLATFORM:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-        image: ghcr.io/project-chip/chip-build-$PLATFORM:$VERSION
+        image: ghcr.io/project-chip/chip-build-$PLATFORM:1$VERSION
         options: --user root
 
     steps:
@@ -205,7 +204,7 @@ command for these targets.
 To test your configuration locally, you may employ a similar strategy as in CI:
 
 ```shell
-docker run -it --mount source=$(pwd),target=/workspace,type=bind ghcr.io/project-chip/chip-build-vscode:$VERSION
+docker run -it --mount source=$(pwd),target=/workspace,type=bind ghcr.io/project-chip/chip-build-vscode:1$VERSION
 ```
 
 In the container:
