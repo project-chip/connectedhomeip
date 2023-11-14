@@ -338,27 +338,33 @@ else
     #print stats
     arm-none-eabi-size -A "$BUILD_DIR"/*.out
 
-    # Generate RPS file from .s37 for 917 SoC builds
-    # if ["USE_RPS_EXTENSION" == true]; then
-    # fi
+    # Get .s37 path and name
+    binName="$(find "$BUILD_DIR" -type f -name "*.s37")"
+
+    # set commander path
+    if [ -z "$COMMANDER_PATH" ]; then
+        commanderPath="commander"
+    else
+        commanderPath="$COMMANDER_PATH"
+    fi
+
+    # # Generate RPS file from .s37 for 917 SoC builds
+    if [ "$USE_RPS_EXTENSION" == true ]; then
+
+        # Create .rps
+        rpsName=$(sed 's/[^\.]*$/rps/' <<< "$binName")
+        "$commanderPath" rps create "$rpsName" --app "$binName"
+    fi
 
     # add bootloader to generated image
     if [ "$USE_BOOTLOADER" == true ]; then
 
-        binName=""
         InternalBootloaderBoards=("BRD4337A" "BRD2704A" "BRD2703A" "BRD4319A")
         bootloaderPath=""
-        commanderPath=""
+
         # find the matter root folder
         if [ -z "$MATTER_ROOT" ]; then
             MATTER_ROOT="$CHIP_ROOT"
-        fi
-
-        # set commander path
-        if [ -z "$COMMANDER_PATH" ]; then
-            commanderPath="commander"
-        else
-            commanderPath="$COMMANDER_PATH"
         fi
 
         # search bootloader directory for the respective bootloaders for the input board
@@ -378,7 +384,6 @@ else
             bootloaderPath="${bootloaderFiles[0]}"
         fi
         echo "$bootloaderPath"
-        binName="$(find "$BUILD_DIR" -type f -name "*.s37")"
         echo "$binName"
         "$commanderPath" convert "$binName" "$bootloaderPath" -o "$binName"
     fi
