@@ -16384,10 +16384,10 @@ typedef NS_OPTIONS(uint32_t, MTRChannelFeature) {
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRTargetNavigatorStatus) {
-    MTRTargetNavigatorStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRTargetNavigatorStatusTargetNotFound MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRTargetNavigatorStatusNotAllowed MTR_PROVISIONALLY_AVAILABLE = 0x02,
-} MTR_PROVISIONALLY_AVAILABLE;
+    MTRTargetNavigatorStatusSuccess MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
+    MTRTargetNavigatorStatusTargetNotFound MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
+    MTRTargetNavigatorStatusNotAllowed MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
+} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRMediaPlaybackPlaybackState) {
     MTRMediaPlaybackPlaybackStatePlaying MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
@@ -16522,10 +16522,10 @@ typedef NS_ENUM(uint8_t, MTRKeypadInputCecKeyCode) {
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRKeypadInputStatus) {
-    MTRKeypadInputStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRKeypadInputStatusUnsupportedKey MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRKeypadInputStatusInvalidKeyInCurrentState MTR_PROVISIONALLY_AVAILABLE = 0x02,
-} MTR_PROVISIONALLY_AVAILABLE;
+    MTRKeypadInputStatusSuccess MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
+    MTRKeypadInputStatusUnsupportedKey MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
+    MTRKeypadInputStatusInvalidKeyInCurrentState MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
+} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRKeypadInputFeature) {
     MTRKeypadInputFeatureNavigationKeyCodes MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,

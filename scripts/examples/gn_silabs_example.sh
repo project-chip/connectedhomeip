@@ -291,7 +291,7 @@ else
         {
             ShortCommitSha=$(git describe --always --dirty --exclude '*')
             branchName=$(git rev-parse --abbrev-ref HEAD)
-            optArgs+="sl_matter_version_str=\"v1.1-$branchName-$ShortCommitSha\" "
+            optArgs+="sl_matter_version_str=\"v1.2-$branchName-$ShortCommitSha\" "
         } &>/dev/null
     fi
 
