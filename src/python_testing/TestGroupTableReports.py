@@ -25,6 +25,7 @@ from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class AttributeChangeCallback:
     def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor, output: queue.Queue):
         self._output = output
@@ -49,18 +50,19 @@ def WaitForAttributeReport(q: queue.Queue, expected_attribute: ClusterObjects.Cl
     except KeyError:
         asserts.fail("Attribute not found in returned report")
 
+
 class TestGroupTableReports(MatterBaseTest):
 
     @async_test_body
     async def test_group_table_reports(self):
         self.print_step(1, "Commissioning, already done")
 
-        #TODO : Verify if they are needed
+        # TODO : Verify if they are needed
         fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
         TH1_nodeid = self.matter_test_config.controller_node_id
-        #end TODO
+        # end TODO
 
-        self.TH1= self.default_controller
+        self.TH1 = self.default_controller
 
         self.kGroupKeyset1 = 0x01a1
 
@@ -77,7 +79,6 @@ class TestGroupTableReports(MatterBaseTest):
 
         await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(self.groupKey))
 
-        
         self.kGroup1 = 0x0101
         self.kGroup2 = 0x0102
         self.kGroup3 = 0x0103
@@ -86,20 +87,19 @@ class TestGroupTableReports(MatterBaseTest):
         mapping_structs: List[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
 
         mapping_structs.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-                    groupId=self.kGroup1,
-                    groupKeySetID=self.kGroupKeyset1,
-                    fabricIndex=1))
-        
-        mapping_structs.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-                    groupId=self.kGroup2,
-                    groupKeySetID=self.kGroupKeyset1,
-                    fabricIndex=1))
+            groupId=self.kGroup1,
+            groupKeySetID=self.kGroupKeyset1,
+            fabricIndex=1))
 
         mapping_structs.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
-                    groupId=self.kGroup3,
-                    groupKeySetID=self.kGroupKeyset1,
-                    fabricIndex=1))
+            groupId=self.kGroup2,
+            groupKeySetID=self.kGroupKeyset1,
+            fabricIndex=1))
 
+        mapping_structs.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
+            groupId=self.kGroup3,
+            groupKeySetID=self.kGroupKeyset1,
+            fabricIndex=1))
 
         result = await self.TH1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping_structs))])
         asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
