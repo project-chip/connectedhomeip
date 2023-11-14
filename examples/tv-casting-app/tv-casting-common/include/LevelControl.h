@@ -31,7 +31,7 @@ class StepCommand
 public:
     StepCommand() : MediaCommandBase(chip::app::Clusters::LevelControl::Id) {}
 
-    CHIP_ERROR Invoke(chip::app::Clusters::LevelControl::MoveModeEnum stepMode, uint8_t stepSize,
+    CHIP_ERROR Invoke(chip::app::Clusters::LevelControl::StepModeEnum stepMode, uint8_t stepSize,
                       chip::app::DataModel::Nullable<uint16_t> transitionTime,
                       chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> optionMask,
                       chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> optionOverride,

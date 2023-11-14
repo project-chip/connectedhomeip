@@ -1121,7 +1121,7 @@
                                      [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
                                      return castingServer->LevelControl_Step(&endpoint,
-                                         static_cast<chip::app::Clusters::LevelControl::MoveModeEnum>(stepMode), stepSize,
+                                         static_cast<chip::app::Clusters::LevelControl::StepModeEnum>(stepMode), stepSize,
                                          transitionTime, optionMask, optionOverride, responseFunction);
                                  }];
 }
