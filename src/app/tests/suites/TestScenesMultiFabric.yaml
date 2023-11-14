@@ -827,7 +827,8 @@ tests:
                   },
               ]
 
-    - label: "TH1 confirms its FabricSceneInfo's field SceneValid remains unchanged"
+    - label:
+          "TH1 confirms its FabricSceneInfo's field SceneValid remains unchanged"
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:
@@ -886,7 +887,9 @@ tests:
                   },
               ]
 
-    - label: "TH1 confirms its FabricSceneInfo's field SceneCount and RemainingCapacity were updated"
+    - label:
+          "TH1 confirms its FabricSceneInfo's field SceneCount and
+          RemainingCapacity were updated"
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:
