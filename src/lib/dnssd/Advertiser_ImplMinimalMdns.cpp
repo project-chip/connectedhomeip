@@ -233,8 +233,11 @@ private:
             auto mrp = optionalMrp.Value();
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-            // A ICD operating as a LIT should not advertise its slow polling interval
-            if (!params.GetICDOperatingAsLIT().HasValue() || !params.GetICDOperatingAsLIT().Value())
+            // An ICD operating as a LIT should not advertise its slow polling interval.
+            // When the ICD doesn't support the LIT feature, it doesn't set nor advertise the GetICDOperatingAsLIT entry.
+            // Therefore when GetICDOperatingAsLIT has no value or a value of 0, we advertise the slow polling interval
+            // otherwise we don't include the SII key in the advertisement.
+            if (!params.GetICDOperatingAsLIT().ValueOr(false))
 #endif
             {
                 if (mrp.mIdleRetransTimeout > kMaxRetryInterval)

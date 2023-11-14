@@ -130,10 +130,7 @@ void ICDManager::UpdateICDMode()
     if (mICDMode != tempMode)
     {
         mICDMode = tempMode;
-        mStateObserverPool.ForEachActiveObject([](ObserverPointer * obs) {
-            obs->mObserver->OnICDModeChange();
-            return Loop::Continue;
-        });
+        postObserverEvent(ObserverEventType::ICDModeChange);
     }
 
     // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
@@ -207,10 +204,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
                 ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
             }
 
-            mStateObserverPool.ForEachActiveObject([](ObserverPointer * obs) {
-                obs->mObserver->OnEnterActiveMode();
-                return Loop::Continue;
-            });
+            postObserverEvent(ObserverEventType::EnterActiveMode);
         }
         else
         {
@@ -272,10 +266,7 @@ void ICDManager::OnTransitionToIdle(System::Layer * aLayer, void * appState)
     // OnTransitionToIdle will trigger a report message if reporting is needed, which should extend the active mode until the
     // ack for the report is received.
     pICDManager->mTransitionToIdleCalled = true;
-    pICDManager->mStateObserverPool.ForEachActiveObject([](ObserverPointer * obs) {
-        obs->mObserver->OnTransitionToIdle();
-        return Loop::Continue;
-    });
+    pICDManager->postObserverEvent(ObserverEventType::TransitionToIdle);
 }
 
 /* ICDListener functions. */
@@ -381,5 +372,33 @@ void ICDManager::ReleaseObserver(ICDStateObserver * observer)
     });
 }
 
+void ICDManager::postObserverEvent(ObserverEventType event)
+{
+    mStateObserverPool.ForEachActiveObject([event](ObserverPointer * obs) {
+        switch (event)
+        {
+            case ObserverEventType::EnterActiveMode:
+            {
+                obs->mObserver->OnEnterActiveMode();
+                return Loop::Continue;
+            }
+            case ObserverEventType::TransitionToIdle:
+            {
+                obs->mObserver->OnTransitionToIdle();
+                return Loop::Continue;
+            }
+            case ObserverEventType::ICDModeChange:
+            {
+                obs->mObserver->OnICDModeChange();
+                return Loop::Continue;
+            }
+            default:
+            {
+                ChipLogError(DeviceLayer, "Invalid ICD Observer event type");
+                return Loop::Break;
+            }
+        }
+    });
+}
 } // namespace app
 } // namespace chip

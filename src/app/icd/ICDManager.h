@@ -59,6 +59,15 @@ public:
         LIT, // Long Interval Time ICD
     };
 
+    // This enum class represents to all ICDStateObserver callbacks available from the
+    // mStateObserverPool for the ICDManager.
+    enum class ObserverEventType : uint8_t
+    {
+        EnterActiveMode,
+        TransitionToIdle,
+        ICDModeChange,
+    };
+
     ICDManager() {}
     void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore);
     void Shutdown();
@@ -80,6 +89,12 @@ public:
      * @brief Remove the referenced observer in parameters from the mStateObserverPool
      */
     void ReleaseObserver(ICDStateObserver * observer);
+
+    /**
+     * @brief Associates the ObserverEventType parameters to the correct
+     *  ICDStateObservers function and calls it for all observers in the mStateObserverPool
+     */
+    void postObserverEvent(ObserverEventType event);
     ICDMode GetICDMode() { return mICDMode; }
     OperationalState GetOperationalState() { return mOperationalState; }
 
