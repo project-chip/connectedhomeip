@@ -110,6 +110,7 @@ class ScenesClusterFabricDelegate : public chip::FabricTable::Delegate
     {
         SceneTable * sceneTable = scenes::GetSceneTableImpl();
         VerifyOrReturn(nullptr != sceneTable);
+        // The implementation of SceneTable::RemoveFabric() must not call back into the FabricTable
         sceneTable->RemoveFabric(fabricIndex);
     }
 };
