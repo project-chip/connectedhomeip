@@ -19544,9 +19544,10 @@ void CHIPIcdManagementAttributeListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPOvenOperationalStatePhaseListAttributeCallback::CHIPOvenOperationalStatePhaseListAttributeCallback(jobject javaCallback,
-                                                                                                       bool keepAlive) :
-    chip::Callback::Callback<CHIPOvenOperationalStateClusterPhaseListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPOvenCavityOperationalStatePhaseListAttributeCallback::CHIPOvenCavityOperationalStatePhaseListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPOvenCavityOperationalStateClusterPhaseListAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -19562,7 +19563,7 @@ CHIPOvenOperationalStatePhaseListAttributeCallback::CHIPOvenOperationalStatePhas
     }
 }
 
-CHIPOvenOperationalStatePhaseListAttributeCallback::~CHIPOvenOperationalStatePhaseListAttributeCallback()
+CHIPOvenCavityOperationalStatePhaseListAttributeCallback::~CHIPOvenCavityOperationalStatePhaseListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -19573,7 +19574,7 @@ CHIPOvenOperationalStatePhaseListAttributeCallback::~CHIPOvenOperationalStatePha
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPOvenOperationalStatePhaseListAttributeCallback::CallbackFn(
+void CHIPOvenCavityOperationalStatePhaseListAttributeCallback::CallbackFn(
     void * context, const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -19583,8 +19584,8 @@ void CHIPOvenOperationalStatePhaseListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPOvenOperationalStatePhaseListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPOvenOperationalStatePhaseListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPOvenCavityOperationalStatePhaseListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPOvenCavityOperationalStatePhaseListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -19618,9 +19619,9 @@ void CHIPOvenOperationalStatePhaseListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPOvenOperationalStateCurrentPhaseAttributeCallback::CHIPOvenOperationalStateCurrentPhaseAttributeCallback(jobject javaCallback,
-                                                                                                             bool keepAlive) :
-    chip::Callback::Callback<CHIPOvenOperationalStateClusterCurrentPhaseAttributeCallbackType>(CallbackFn, this),
+CHIPOvenCavityOperationalStateCurrentPhaseAttributeCallback::CHIPOvenCavityOperationalStateCurrentPhaseAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPOvenCavityOperationalStateClusterCurrentPhaseAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -19637,7 +19638,7 @@ CHIPOvenOperationalStateCurrentPhaseAttributeCallback::CHIPOvenOperationalStateC
     }
 }
 
-CHIPOvenOperationalStateCurrentPhaseAttributeCallback::~CHIPOvenOperationalStateCurrentPhaseAttributeCallback()
+CHIPOvenCavityOperationalStateCurrentPhaseAttributeCallback::~CHIPOvenCavityOperationalStateCurrentPhaseAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -19648,8 +19649,8 @@ CHIPOvenOperationalStateCurrentPhaseAttributeCallback::~CHIPOvenOperationalState
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPOvenOperationalStateCurrentPhaseAttributeCallback::CallbackFn(void * context,
-                                                                       const chip::app::DataModel::Nullable<uint8_t> & value)
+void CHIPOvenCavityOperationalStateCurrentPhaseAttributeCallback::CallbackFn(void * context,
+                                                                             const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19657,8 +19658,8 @@ void CHIPOvenOperationalStateCurrentPhaseAttributeCallback::CallbackFn(void * co
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPOvenOperationalStateCurrentPhaseAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPOvenOperationalStateCurrentPhaseAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPOvenCavityOperationalStateCurrentPhaseAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPOvenCavityOperationalStateCurrentPhaseAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -19686,9 +19687,9 @@ void CHIPOvenOperationalStateCurrentPhaseAttributeCallback::CallbackFn(void * co
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPOvenOperationalStateCountdownTimeAttributeCallback::CHIPOvenOperationalStateCountdownTimeAttributeCallback(jobject javaCallback,
-                                                                                                               bool keepAlive) :
-    chip::Callback::Callback<CHIPOvenOperationalStateClusterCountdownTimeAttributeCallbackType>(CallbackFn, this),
+CHIPOvenCavityOperationalStateCountdownTimeAttributeCallback::CHIPOvenCavityOperationalStateCountdownTimeAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPOvenCavityOperationalStateClusterCountdownTimeAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -19705,7 +19706,7 @@ CHIPOvenOperationalStateCountdownTimeAttributeCallback::CHIPOvenOperationalState
     }
 }
 
-CHIPOvenOperationalStateCountdownTimeAttributeCallback::~CHIPOvenOperationalStateCountdownTimeAttributeCallback()
+CHIPOvenCavityOperationalStateCountdownTimeAttributeCallback::~CHIPOvenCavityOperationalStateCountdownTimeAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -19716,8 +19717,8 @@ CHIPOvenOperationalStateCountdownTimeAttributeCallback::~CHIPOvenOperationalStat
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPOvenOperationalStateCountdownTimeAttributeCallback::CallbackFn(void * context,
-                                                                        const chip::app::DataModel::Nullable<uint32_t> & value)
+void CHIPOvenCavityOperationalStateCountdownTimeAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19725,8 +19726,8 @@ void CHIPOvenOperationalStateCountdownTimeAttributeCallback::CallbackFn(void * c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPOvenOperationalStateCountdownTimeAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPOvenOperationalStateCountdownTimeAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPOvenCavityOperationalStateCountdownTimeAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPOvenCavityOperationalStateCountdownTimeAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -19754,9 +19755,9 @@ void CHIPOvenOperationalStateCountdownTimeAttributeCallback::CallbackFn(void * c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPOvenOperationalStateOperationalStateListAttributeCallback::CHIPOvenOperationalStateOperationalStateListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPOvenOperationalStateClusterOperationalStateListAttributeCallbackType>(CallbackFn, this),
+CHIPOvenCavityOperationalStateOperationalStateListAttributeCallback::
+CHIPOvenCavityOperationalStateOperationalStateListAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPOvenCavityOperationalStateClusterOperationalStateListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -19773,7 +19774,8 @@ CHIPOvenOperationalStateOperationalStateListAttributeCallback::CHIPOvenOperation
     }
 }
 
-CHIPOvenOperationalStateOperationalStateListAttributeCallback::~CHIPOvenOperationalStateOperationalStateListAttributeCallback()
+CHIPOvenCavityOperationalStateOperationalStateListAttributeCallback::~
+CHIPOvenCavityOperationalStateOperationalStateListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -19784,10 +19786,10 @@ CHIPOvenOperationalStateOperationalStateListAttributeCallback::~CHIPOvenOperatio
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPOvenOperationalStateOperationalStateListAttributeCallback::CallbackFn(
+void CHIPOvenCavityOperationalStateOperationalStateListAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OvenOperationalState::Structs::OperationalStateStruct::DecodableType> & list)
+        chip::app::Clusters::OvenCavityOperationalState::Structs::OperationalStateStruct::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19796,8 +19798,8 @@ void CHIPOvenOperationalStateOperationalStateListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPOvenOperationalStateOperationalStateListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPOvenOperationalStateOperationalStateListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPOvenCavityOperationalStateOperationalStateListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPOvenCavityOperationalStateOperationalStateListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -19839,18 +19841,18 @@ void CHIPOvenOperationalStateOperationalStateListAttributeCallback::CallbackFn(
 
         jclass operationalStateStructStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$OvenOperationalStateClusterOperationalStateStruct",
+            env, "chip/devicecontroller/ChipStructs$OvenCavityOperationalStateClusterOperationalStateStruct",
             operationalStateStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$OvenOperationalStateClusterOperationalStateStruct");
+            ChipLogError(Zcl, "Could not find class ChipStructs$OvenCavityOperationalStateClusterOperationalStateStruct");
             return;
         }
         jmethodID operationalStateStructStructCtor_1 =
             env->GetMethodID(operationalStateStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
         if (operationalStateStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$OvenOperationalStateClusterOperationalStateStruct constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$OvenCavityOperationalStateClusterOperationalStateStruct constructor");
             return;
         }
 
@@ -19863,9 +19865,9 @@ void CHIPOvenOperationalStateOperationalStateListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPOvenOperationalStateGeneratedCommandListAttributeCallback::CHIPOvenOperationalStateGeneratedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPOvenOperationalStateClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
+CHIPOvenCavityOperationalStateGeneratedCommandListAttributeCallback::
+CHIPOvenCavityOperationalStateGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPOvenCavityOperationalStateClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -19882,7 +19884,8 @@ CHIPOvenOperationalStateGeneratedCommandListAttributeCallback::CHIPOvenOperation
     }
 }
 
-CHIPOvenOperationalStateGeneratedCommandListAttributeCallback::~CHIPOvenOperationalStateGeneratedCommandListAttributeCallback()
+CHIPOvenCavityOperationalStateGeneratedCommandListAttributeCallback::~
+CHIPOvenCavityOperationalStateGeneratedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -19893,7 +19896,7 @@ CHIPOvenOperationalStateGeneratedCommandListAttributeCallback::~CHIPOvenOperatio
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPOvenOperationalStateGeneratedCommandListAttributeCallback::CallbackFn(
+void CHIPOvenCavityOperationalStateGeneratedCommandListAttributeCallback::CallbackFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -19903,8 +19906,8 @@ void CHIPOvenOperationalStateGeneratedCommandListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPOvenOperationalStateGeneratedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPOvenOperationalStateGeneratedCommandListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPOvenCavityOperationalStateGeneratedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPOvenCavityOperationalStateGeneratedCommandListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -19935,9 +19938,9 @@ void CHIPOvenOperationalStateGeneratedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPOvenOperationalStateAcceptedCommandListAttributeCallback::CHIPOvenOperationalStateAcceptedCommandListAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPOvenOperationalStateClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
+CHIPOvenCavityOperationalStateAcceptedCommandListAttributeCallback::
+CHIPOvenCavityOperationalStateAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPOvenCavityOperationalStateClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -19954,7 +19957,8 @@ CHIPOvenOperationalStateAcceptedCommandListAttributeCallback::CHIPOvenOperationa
     }
 }
 
-CHIPOvenOperationalStateAcceptedCommandListAttributeCallback::~CHIPOvenOperationalStateAcceptedCommandListAttributeCallback()
+CHIPOvenCavityOperationalStateAcceptedCommandListAttributeCallback::~
+CHIPOvenCavityOperationalStateAcceptedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -19965,7 +19969,7 @@ CHIPOvenOperationalStateAcceptedCommandListAttributeCallback::~CHIPOvenOperation
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPOvenOperationalStateAcceptedCommandListAttributeCallback::CallbackFn(
+void CHIPOvenCavityOperationalStateAcceptedCommandListAttributeCallback::CallbackFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -19975,8 +19979,8 @@ void CHIPOvenOperationalStateAcceptedCommandListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPOvenOperationalStateAcceptedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPOvenOperationalStateAcceptedCommandListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPOvenCavityOperationalStateAcceptedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPOvenCavityOperationalStateAcceptedCommandListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -20007,80 +20011,9 @@ void CHIPOvenOperationalStateAcceptedCommandListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPOvenOperationalStateEventListAttributeCallback::CHIPOvenOperationalStateEventListAttributeCallback(jobject javaCallback,
-                                                                                                       bool keepAlive) :
-    chip::Callback::Callback<CHIPOvenOperationalStateClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPOvenOperationalStateEventListAttributeCallback::~CHIPOvenOperationalStateEventListAttributeCallback()
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-}
-
-void CHIPOvenOperationalStateEventListAttributeCallback::CallbackFn(void * context,
-                                                                    const chip::app::DataModel::DecodableList<chip::EventId> & list)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-
-    std::unique_ptr<CHIPOvenOperationalStateEventListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPOvenOperationalStateEventListAttributeCallback *>(context), maybeDestroy);
-
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
-    VerifyOrReturn(javaCallbackRef != nullptr,
-                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
-
-    jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
-
-    jobject arrayListObj;
-    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
-
-    auto iter_arrayListObj_0 = list.begin();
-    while (iter_arrayListObj_0.Next())
-    {
-        auto & entry_0 = iter_arrayListObj_0.GetValue();
-        jobject newElement_0;
-        std::string newElement_0ClassName     = "java/lang/Long";
-        std::string newElement_0CtorSignature = "(J)V";
-        jlong jninewElement_0                 = static_cast<jlong>(entry_0);
-        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-            newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
-        chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
-    }
-
-    env->ExceptionClear();
-    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
-}
-
-CHIPOvenOperationalStateAttributeListAttributeCallback::CHIPOvenOperationalStateAttributeListAttributeCallback(jobject javaCallback,
-                                                                                                               bool keepAlive) :
-    chip::Callback::Callback<CHIPOvenOperationalStateClusterAttributeListAttributeCallbackType>(CallbackFn, this),
+CHIPOvenCavityOperationalStateEventListAttributeCallback::CHIPOvenCavityOperationalStateEventListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPOvenCavityOperationalStateClusterEventListAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -20097,7 +20030,7 @@ CHIPOvenOperationalStateAttributeListAttributeCallback::CHIPOvenOperationalState
     }
 }
 
-CHIPOvenOperationalStateAttributeListAttributeCallback::~CHIPOvenOperationalStateAttributeListAttributeCallback()
+CHIPOvenCavityOperationalStateEventListAttributeCallback::~CHIPOvenCavityOperationalStateEventListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -20108,7 +20041,79 @@ CHIPOvenOperationalStateAttributeListAttributeCallback::~CHIPOvenOperationalStat
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPOvenOperationalStateAttributeListAttributeCallback::CallbackFn(
+void CHIPOvenCavityOperationalStateEventListAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIPOvenCavityOperationalStateEventListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPOvenCavityOperationalStateEventListAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
+    {
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Long";
+        std::string newElement_0CtorSignature = "(J)V";
+        jlong jninewElement_0                 = static_cast<jlong>(entry_0);
+        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+            newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+        chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
+    }
+
+    env->ExceptionClear();
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+
+CHIPOvenCavityOperationalStateAttributeListAttributeCallback::CHIPOvenCavityOperationalStateAttributeListAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPOvenCavityOperationalStateClusterAttributeListAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPOvenCavityOperationalStateAttributeListAttributeCallback::~CHIPOvenCavityOperationalStateAttributeListAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPOvenCavityOperationalStateAttributeListAttributeCallback::CallbackFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -20118,8 +20123,8 @@ void CHIPOvenOperationalStateAttributeListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPOvenOperationalStateAttributeListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPOvenOperationalStateAttributeListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPOvenCavityOperationalStateAttributeListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPOvenCavityOperationalStateAttributeListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;

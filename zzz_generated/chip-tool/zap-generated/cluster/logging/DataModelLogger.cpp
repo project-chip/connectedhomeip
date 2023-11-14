@@ -3690,7 +3690,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OvenOperationalState::Events::OperationalError::DecodableType & value)
+                                     const OvenCavityOperationalState::Events::OperationalError::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3706,7 +3706,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OvenOperationalState::Events::OperationCompletion::DecodableType & value)
+                                     const OvenCavityOperationalState::Events::OperationCompletion::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -4778,7 +4778,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OvenOperationalState::Commands::OperationalCommandResponse::DecodableType & value)
+                                     const OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("commandResponseState", indent + 1, value.commandResponseState));
@@ -8128,67 +8128,67 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case OvenOperationalState::Id: {
+    case OvenCavityOperationalState::Id: {
         switch (path.mAttributeId)
         {
-        case OvenOperationalState::Attributes::PhaseList::Id: {
+        case OvenCavityOperationalState::Attributes::PhaseList::Id: {
             chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PhaseList", 1, value);
         }
-        case OvenOperationalState::Attributes::CurrentPhase::Id: {
+        case OvenCavityOperationalState::Attributes::CurrentPhase::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentPhase", 1, value);
         }
-        case OvenOperationalState::Attributes::CountdownTime::Id: {
+        case OvenCavityOperationalState::Attributes::CountdownTime::Id: {
             chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CountdownTime", 1, value);
         }
-        case OvenOperationalState::Attributes::OperationalStateList::Id: {
+        case OvenCavityOperationalState::Attributes::OperationalStateList::Id: {
             chip::app::DataModel::DecodableList<
-                chip::app::Clusters::OvenOperationalState::Structs::OperationalStateStruct::DecodableType>
+                chip::app::Clusters::OvenCavityOperationalState::Structs::OperationalStateStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalStateList", 1, value);
         }
-        case OvenOperationalState::Attributes::OperationalState::Id: {
+        case OvenCavityOperationalState::Attributes::OperationalState::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalState", 1, value);
         }
-        case OvenOperationalState::Attributes::OperationalError::Id: {
-            chip::app::Clusters::OvenOperationalState::Structs::ErrorStateStruct::DecodableType value;
+        case OvenCavityOperationalState::Attributes::OperationalError::Id: {
+            chip::app::Clusters::OvenCavityOperationalState::Structs::ErrorStateStruct::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalError", 1, value);
         }
-        case OvenOperationalState::Attributes::GeneratedCommandList::Id: {
+        case OvenCavityOperationalState::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-        case OvenOperationalState::Attributes::AcceptedCommandList::Id: {
+        case OvenCavityOperationalState::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-        case OvenOperationalState::Attributes::EventList::Id: {
+        case OvenCavityOperationalState::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EventList", 1, value);
         }
-        case OvenOperationalState::Attributes::AttributeList::Id: {
+        case OvenCavityOperationalState::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-        case OvenOperationalState::Attributes::FeatureMap::Id: {
+        case OvenCavityOperationalState::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case OvenOperationalState::Attributes::ClusterRevision::Id: {
+        case OvenCavityOperationalState::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -14059,11 +14059,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
-    case OvenOperationalState::Id: {
+    case OvenCavityOperationalState::Id: {
         switch (path.mCommandId)
         {
-        case OvenOperationalState::Commands::OperationalCommandResponse::Id: {
-            OvenOperationalState::Commands::OperationalCommandResponse::DecodableType value;
+        case OvenCavityOperationalState::Commands::OperationalCommandResponse::Id: {
+            OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalCommandResponse", 1, value);
         }
@@ -14682,16 +14682,16 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         }
         break;
     }
-    case OvenOperationalState::Id: {
+    case OvenCavityOperationalState::Id: {
         switch (header.mPath.mEventId)
         {
-        case OvenOperationalState::Events::OperationalError::Id: {
-            chip::app::Clusters::OvenOperationalState::Events::OperationalError::DecodableType value;
+        case OvenCavityOperationalState::Events::OperationalError::Id: {
+            chip::app::Clusters::OvenCavityOperationalState::Events::OperationalError::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalError", 1, value);
         }
-        case OvenOperationalState::Events::OperationCompletion::Id: {
-            chip::app::Clusters::OvenOperationalState::Events::OperationCompletion::DecodableType value;
+        case OvenCavityOperationalState::Events::OperationCompletion::Id: {
+            chip::app::Clusters::OvenCavityOperationalState::Events::OperationCompletion::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationCompletion", 1, value);
         }

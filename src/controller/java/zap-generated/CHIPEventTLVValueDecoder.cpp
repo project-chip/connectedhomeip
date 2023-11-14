@@ -2479,8 +2479,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::OvenOperationalState::Id: {
-        using namespace app::Clusters::OvenOperationalState;
+    case app::Clusters::OvenCavityOperationalState::Id: {
+        using namespace app::Clusters::OvenCavityOperationalState;
         switch (aPath.mEventId)
         {
         case Events::OperationalError::Id: {
@@ -2527,18 +2527,18 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jclass errorStateStructStructClass_0;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$OvenOperationalStateClusterErrorStateStruct",
+                env, "chip/devicecontroller/ChipStructs$OvenCavityOperationalStateClusterErrorStateStruct",
                 errorStateStructStructClass_0);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$OvenOperationalStateClusterErrorStateStruct");
+                ChipLogError(Zcl, "Could not find class ChipStructs$OvenCavityOperationalStateClusterErrorStateStruct");
                 return nullptr;
             }
             jmethodID errorStateStructStructCtor_0 = env->GetMethodID(
                 errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V");
             if (errorStateStructStructCtor_0 == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipStructs$OvenOperationalStateClusterErrorStateStruct constructor");
+                ChipLogError(Zcl, "Could not find ChipStructs$OvenCavityOperationalStateClusterErrorStateStruct constructor");
                 return nullptr;
             }
 
@@ -2548,19 +2548,20 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jclass operationalErrorStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$OvenOperationalStateClusterOperationalErrorEvent",
+                env, "chip/devicecontroller/ChipEventStructs$OvenCavityOperationalStateClusterOperationalErrorEvent",
                 operationalErrorStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$OvenOperationalStateClusterOperationalErrorEvent");
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$OvenCavityOperationalStateClusterOperationalErrorEvent");
                 return nullptr;
             }
             jmethodID operationalErrorStructCtor =
                 env->GetMethodID(operationalErrorStructClass, "<init>",
-                                 "(Lchip/devicecontroller/ChipStructs$OvenOperationalStateClusterErrorStateStruct;)V");
+                                 "(Lchip/devicecontroller/ChipStructs$OvenCavityOperationalStateClusterErrorStateStruct;)V");
             if (operationalErrorStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$OvenOperationalStateClusterOperationalErrorEvent constructor");
+                ChipLogError(Zcl,
+                             "Could not find ChipEventStructs$OvenCavityOperationalStateClusterOperationalErrorEvent constructor");
                 return nullptr;
             }
 
@@ -2636,19 +2637,20 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jclass operationCompletionStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$OvenOperationalStateClusterOperationCompletionEvent",
+                env, "chip/devicecontroller/ChipEventStructs$OvenCavityOperationalStateClusterOperationCompletionEvent",
                 operationCompletionStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$OvenOperationalStateClusterOperationCompletionEvent");
+                ChipLogError(Zcl,
+                             "Could not find class ChipEventStructs$OvenCavityOperationalStateClusterOperationCompletionEvent");
                 return nullptr;
             }
             jmethodID operationCompletionStructCtor = env->GetMethodID(
                 operationCompletionStructClass, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V");
             if (operationCompletionStructCtor == nullptr)
             {
-                ChipLogError(Zcl,
-                             "Could not find ChipEventStructs$OvenOperationalStateClusterOperationCompletionEvent constructor");
+                ChipLogError(
+                    Zcl, "Could not find ChipEventStructs$OvenCavityOperationalStateClusterOperationCompletionEvent constructor");
                 return nullptr;
             }
 

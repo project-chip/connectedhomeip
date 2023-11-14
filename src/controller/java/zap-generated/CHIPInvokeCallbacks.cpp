@@ -3043,9 +3043,9 @@ void CHIPIcdManagementClusterRegisterClientResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, ICDCounter);
 }
-CHIPOvenOperationalStateClusterOperationalCommandResponseCallback::
-CHIPOvenOperationalStateClusterOperationalCommandResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPOvenOperationalStateClusterOperationalCommandResponseCallbackType>(CallbackFn, this)
+CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback::
+CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback(jobject javaCallback) :
+    Callback::Callback<CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3061,8 +3061,8 @@ CHIPOvenOperationalStateClusterOperationalCommandResponseCallback(jobject javaCa
     }
 }
 
-CHIPOvenOperationalStateClusterOperationalCommandResponseCallback::~
-CHIPOvenOperationalStateClusterOperationalCommandResponseCallback()
+CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback::~
+CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3073,9 +3073,9 @@ CHIPOvenOperationalStateClusterOperationalCommandResponseCallback()
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPOvenOperationalStateClusterOperationalCommandResponseCallback::CallbackFn(
+void CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback::CallbackFn(
     void * context,
-    const chip::app::Clusters::OvenOperationalState::Commands::OperationalCommandResponse::DecodableType & dataResponse)
+    const chip::app::Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3085,10 +3085,10 @@ void CHIPOvenOperationalStateClusterOperationalCommandResponseCallback::Callback
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPOvenOperationalStateClusterOperationalCommandResponseCallback,
-                    void (*)(CHIPOvenOperationalStateClusterOperationalCommandResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPOvenOperationalStateClusterOperationalCommandResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPOvenOperationalStateClusterOperationalCommandResponseCallback>);
+    std::unique_ptr<CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback,
+                    void (*)(CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
@@ -3096,8 +3096,8 @@ void CHIPOvenOperationalStateClusterOperationalCommandResponseCallback::Callback
     VerifyOrReturn(javaCallbackRef != nullptr);
 
     err = JniReferences::GetInstance().FindMethod(
-        env, javaCallbackRef, "onSuccess", "(Lchip/devicecontroller/ChipStructs$OvenOperationalStateClusterErrorStateStruct;)V",
-        &javaMethod);
+        env, javaCallbackRef, "onSuccess",
+        "(Lchip/devicecontroller/ChipStructs$OvenCavityOperationalStateClusterErrorStateStruct;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject CommandResponseState;
@@ -3137,17 +3137,17 @@ void CHIPOvenOperationalStateClusterOperationalCommandResponseCallback::Callback
 
     jclass errorStateStructStructClass_0;
     err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipStructs$OvenOperationalStateClusterErrorStateStruct", errorStateStructStructClass_0);
+        env, "chip/devicecontroller/ChipStructs$OvenCavityOperationalStateClusterErrorStateStruct", errorStateStructStructClass_0);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Could not find class ChipStructs$OvenOperationalStateClusterErrorStateStruct");
+        ChipLogError(Zcl, "Could not find class ChipStructs$OvenCavityOperationalStateClusterErrorStateStruct");
         return;
     }
     jmethodID errorStateStructStructCtor_0 =
         env->GetMethodID(errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V");
     if (errorStateStructStructCtor_0 == nullptr)
     {
-        ChipLogError(Zcl, "Could not find ChipStructs$OvenOperationalStateClusterErrorStateStruct constructor");
+        ChipLogError(Zcl, "Could not find ChipStructs$OvenCavityOperationalStateClusterErrorStateStruct constructor");
         return;
     }
 

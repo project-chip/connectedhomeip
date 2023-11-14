@@ -1916,9 +1916,9 @@ static BOOL AttributeIsSpecifiedInICDManagementCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL AttributeIsSpecifiedInOvenOperationalStateCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInOvenCavityOperationalStateCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::OvenOperationalState;
+    using namespace Clusters::OvenCavityOperationalState;
     switch (aAttributeId) {
     case Attributes::PhaseList::Id: {
         return YES;
@@ -5733,8 +5733,8 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::IcdManagement::Id: {
         return AttributeIsSpecifiedInICDManagementCluster(aAttributeId);
     }
-    case Clusters::OvenOperationalState::Id: {
-        return AttributeIsSpecifiedInOvenOperationalStateCluster(aAttributeId);
+    case Clusters::OvenCavityOperationalState::Id: {
+        return AttributeIsSpecifiedInOvenCavityOperationalStateCluster(aAttributeId);
     }
     case Clusters::ModeSelect::Id: {
         return AttributeIsSpecifiedInModeSelectCluster(aAttributeId);

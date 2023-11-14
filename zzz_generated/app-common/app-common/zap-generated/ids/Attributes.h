@@ -2441,7 +2441,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace IcdManagement
 
-namespace OvenOperationalState {
+namespace OvenCavityOperationalState {
 namespace Attributes {
 
 namespace PhaseList {
@@ -2493,7 +2493,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace OvenOperationalState
+} // namespace OvenCavityOperationalState
 
 namespace ModeSelect {
 namespace Attributes {

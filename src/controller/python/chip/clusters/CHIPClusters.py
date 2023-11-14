@@ -4327,8 +4327,8 @@ class ChipClusters:
             },
         },
     }
-    _OVEN_OPERATIONAL_STATE_CLUSTER_INFO = {
-        "clusterName": "OvenOperationalState",
+    _OVEN_CAVITY_OPERATIONAL_STATE_CLUSTER_INFO = {
+        "clusterName": "OvenCavityOperationalState",
         "clusterId": 0x00000048,
         "commands": {
             0x00000000: {
@@ -12494,7 +12494,7 @@ class ChipClusters:
         0x00000044: _PROXY_VALID_CLUSTER_INFO,
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
         0x00000046: _ICD_MANAGEMENT_CLUSTER_INFO,
-        0x00000048: _OVEN_OPERATIONAL_STATE_CLUSTER_INFO,
+        0x00000048: _OVEN_CAVITY_OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000050: _MODE_SELECT_CLUSTER_INFO,
         0x00000051: _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
         0x00000052: _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
@@ -12598,7 +12598,7 @@ class ChipClusters:
         "ProxyValid": _PROXY_VALID_CLUSTER_INFO,
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "IcdManagement": _ICD_MANAGEMENT_CLUSTER_INFO,
-        "OvenOperationalState": _OVEN_OPERATIONAL_STATE_CLUSTER_INFO,
+        "OvenCavityOperationalState": _OVEN_CAVITY_OPERATIONAL_STATE_CLUSTER_INFO,
         "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
         "LaundryWasherMode": _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
         "RefrigeratorAndTemperatureControlledCabinetMode": _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,

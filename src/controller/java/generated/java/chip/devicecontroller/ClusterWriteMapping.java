@@ -724,8 +724,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("booleanState", writeBooleanStateInteractionInfo);
     Map<String, InteractionInfo> writeIcdManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("icdManagement", writeIcdManagementInteractionInfo);
-    Map<String, InteractionInfo> writeOvenOperationalStateInteractionInfo = new LinkedHashMap<>();
-    writeAttributeMap.put("ovenOperationalState", writeOvenOperationalStateInteractionInfo);
+    Map<String, InteractionInfo> writeOvenCavityOperationalStateInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("ovenCavityOperationalState", writeOvenCavityOperationalStateInteractionInfo);
     Map<String, InteractionInfo> writeModeSelectInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeModeSelectStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo modeSelectstartUpModeCommandParameterInfo =

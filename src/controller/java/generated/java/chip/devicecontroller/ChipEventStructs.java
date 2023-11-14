@@ -2129,12 +2129,12 @@ public static class BooleanStateClusterStateChangeEvent {
     return output.toString();
   }
 }
-public static class OvenOperationalStateClusterOperationalErrorEvent {
-  public ChipStructs.OvenOperationalStateClusterErrorStateStruct errorState;
+public static class OvenCavityOperationalStateClusterOperationalErrorEvent {
+  public ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct errorState;
   private static final long ERROR_STATE_ID = 0L;
 
-  public OvenOperationalStateClusterOperationalErrorEvent(
-    ChipStructs.OvenOperationalStateClusterErrorStateStruct errorState
+  public OvenCavityOperationalStateClusterOperationalErrorEvent(
+    ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct errorState
   ) {
     this.errorState = errorState;
   }
@@ -2146,20 +2146,20 @@ public static class OvenOperationalStateClusterOperationalErrorEvent {
     return new StructType(values);
   }
 
-  public static OvenOperationalStateClusterOperationalErrorEvent decodeTlv(BaseTLVType tlvValue) {
+  public static OvenCavityOperationalStateClusterOperationalErrorEvent decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    ChipStructs.OvenOperationalStateClusterErrorStateStruct errorState = null;
+    ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct errorState = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ERROR_STATE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
-          errorState = ChipStructs.OvenOperationalStateClusterErrorStateStruct.decodeTlv(castingValue);
+          errorState = ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct.decodeTlv(castingValue);
         }
       }
     }
-    return new OvenOperationalStateClusterOperationalErrorEvent(
+    return new OvenCavityOperationalStateClusterOperationalErrorEvent(
       errorState
     );
   }
@@ -2167,7 +2167,7 @@ public static class OvenOperationalStateClusterOperationalErrorEvent {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("OvenOperationalStateClusterOperationalErrorEvent {\n");
+    output.append("OvenCavityOperationalStateClusterOperationalErrorEvent {\n");
     output.append("\terrorState: ");
     output.append(errorState);
     output.append("\n");
@@ -2175,7 +2175,7 @@ public static class OvenOperationalStateClusterOperationalErrorEvent {
     return output.toString();
   }
 }
-public static class OvenOperationalStateClusterOperationCompletionEvent {
+public static class OvenCavityOperationalStateClusterOperationCompletionEvent {
   public Integer completionErrorCode;
   public @Nullable Optional<Long> totalOperationalTime;
   public @Nullable Optional<Long> pausedTime;
@@ -2183,7 +2183,7 @@ public static class OvenOperationalStateClusterOperationCompletionEvent {
   private static final long TOTAL_OPERATIONAL_TIME_ID = 1L;
   private static final long PAUSED_TIME_ID = 2L;
 
-  public OvenOperationalStateClusterOperationCompletionEvent(
+  public OvenCavityOperationalStateClusterOperationCompletionEvent(
     Integer completionErrorCode,
     @Nullable Optional<Long> totalOperationalTime,
     @Nullable Optional<Long> pausedTime
@@ -2202,7 +2202,7 @@ public static class OvenOperationalStateClusterOperationCompletionEvent {
     return new StructType(values);
   }
 
-  public static OvenOperationalStateClusterOperationCompletionEvent decodeTlv(BaseTLVType tlvValue) {
+  public static OvenCavityOperationalStateClusterOperationCompletionEvent decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -2227,7 +2227,7 @@ public static class OvenOperationalStateClusterOperationCompletionEvent {
         }
       }
     }
-    return new OvenOperationalStateClusterOperationCompletionEvent(
+    return new OvenCavityOperationalStateClusterOperationCompletionEvent(
       completionErrorCode,
       totalOperationalTime,
       pausedTime
@@ -2237,7 +2237,7 @@ public static class OvenOperationalStateClusterOperationCompletionEvent {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("OvenOperationalStateClusterOperationCompletionEvent {\n");
+    output.append("OvenCavityOperationalStateClusterOperationCompletionEvent {\n");
     output.append("\tcompletionErrorCode: ");
     output.append(completionErrorCode);
     output.append("\n");

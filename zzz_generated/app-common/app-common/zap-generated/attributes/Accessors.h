@@ -1282,7 +1282,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace IcdManagement
 
-namespace OvenOperationalState {
+namespace OvenCavityOperationalState {
 namespace Attributes {
 
 namespace FeatureMap {
@@ -1296,7 +1296,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace OvenOperationalState
+} // namespace OvenCavityOperationalState
 
 namespace ModeSelect {
 namespace Attributes {

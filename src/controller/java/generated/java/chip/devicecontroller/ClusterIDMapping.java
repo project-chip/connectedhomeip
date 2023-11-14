@@ -151,8 +151,8 @@ public class ClusterIDMapping {
         if (clusterId == IcdManagement.ID) {
             return new IcdManagement();
         }
-        if (clusterId == OvenOperationalState.ID) {
-            return new OvenOperationalState();
+        if (clusterId == OvenCavityOperationalState.ID) {
+            return new OvenCavityOperationalState();
         }
         if (clusterId == ModeSelect.ID) {
             return new ModeSelect();
@@ -6127,7 +6127,7 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
-    public static class OvenOperationalState implements BaseCluster {
+    public static class OvenCavityOperationalState implements BaseCluster {
         public static final long ID = 72L;
         public long getID() {
             return ID;

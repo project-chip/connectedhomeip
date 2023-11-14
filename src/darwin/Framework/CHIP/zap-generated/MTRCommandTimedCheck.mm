@@ -374,9 +374,9 @@ static BOOL CommandNeedsTimedInvokeInICDManagementCluster(AttributeId aAttribute
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInOvenOperationalStateCluster(AttributeId aAttributeId)
+static BOOL CommandNeedsTimedInvokeInOvenCavityOperationalStateCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::OvenOperationalState;
+    using namespace Clusters::OvenCavityOperationalState;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1062,8 +1062,8 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::IcdManagement::Id: {
         return CommandNeedsTimedInvokeInICDManagementCluster(commandID);
     }
-    case Clusters::OvenOperationalState::Id: {
-        return CommandNeedsTimedInvokeInOvenOperationalStateCluster(commandID);
+    case Clusters::OvenCavityOperationalState::Id: {
+        return CommandNeedsTimedInvokeInOvenCavityOperationalStateCluster(commandID);
     }
     case Clusters::ModeSelect::Id: {
         return CommandNeedsTimedInvokeInModeSelectCluster(commandID);

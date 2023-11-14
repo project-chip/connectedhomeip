@@ -1524,7 +1524,7 @@ enum class UserActiveModeTriggerBitmap : uint32_t
 };
 } // namespace IcdManagement
 
-namespace OvenOperationalState {
+namespace OvenCavityOperationalState {
 
 // Enum for ErrorStateEnum
 enum class ErrorStateEnum : uint8_t
@@ -1554,7 +1554,7 @@ enum class OperationalStateEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
 };
-} // namespace OvenOperationalState
+} // namespace OvenCavityOperationalState
 
 namespace ModeSelect {
 

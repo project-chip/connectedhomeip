@@ -5191,9 +5191,9 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForOvenOperationalStateCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForOvenCavityOperationalStateCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::OvenOperationalState;
+    using namespace Clusters::OvenCavityOperationalState;
     switch (aAttributeId) {
     case Attributes::PhaseList::Id: {
         using TypeInfo = Attributes::PhaseList::TypeInfo;
@@ -5273,8 +5273,8 @@ static id _Nullable DecodeAttributeValueForOvenOperationalStateCluster(Attribute
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTROvenOperationalStateClusterOperationalStateStruct * newElement_0;
-                newElement_0 = [MTROvenOperationalStateClusterOperationalStateStruct new];
+                MTROvenCavityOperationalStateClusterOperationalStateStruct * newElement_0;
+                newElement_0 = [MTROvenCavityOperationalStateClusterOperationalStateStruct new];
                 newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:entry_0.operationalStateID];
                 if (entry_0.operationalStateLabel.HasValue()) {
                     newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel.Value());
@@ -5315,8 +5315,8 @@ static id _Nullable DecodeAttributeValueForOvenOperationalStateCluster(Attribute
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        MTROvenOperationalStateClusterErrorStateStruct * _Nonnull value;
-        value = [MTROvenOperationalStateClusterErrorStateStruct new];
+        MTROvenCavityOperationalStateClusterErrorStateStruct * _Nonnull value;
+        value = [MTROvenCavityOperationalStateClusterErrorStateStruct new];
         value.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorStateID];
         if (cppValue.errorStateLabel.HasValue()) {
             value.errorStateLabel = AsString(cppValue.errorStateLabel.Value());
@@ -15773,8 +15773,8 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     case Clusters::IcdManagement::Id: {
         return DecodeAttributeValueForICDManagementCluster(aPath.mAttributeId, aReader, aError);
     }
-    case Clusters::OvenOperationalState::Id: {
-        return DecodeAttributeValueForOvenOperationalStateCluster(aPath.mAttributeId, aReader, aError);
+    case Clusters::OvenCavityOperationalState::Id: {
+        return DecodeAttributeValueForOvenCavityOperationalStateCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::ModeSelect::Id: {
         return DecodeAttributeValueForModeSelectCluster(aPath.mAttributeId, aReader, aError);

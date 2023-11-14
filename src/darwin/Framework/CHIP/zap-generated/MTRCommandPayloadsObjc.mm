@@ -12065,7 +12065,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTROvenOperationalStateClusterPauseParams
+@implementation MTROvenCavityOperationalStateClusterPauseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -12077,7 +12077,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROvenOperationalStateClusterPauseParams alloc] init];
+    auto other = [[MTROvenCavityOperationalStateClusterPauseParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -12093,11 +12093,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROvenOperationalStateClusterPauseParams (InternalMethods)
+@implementation MTROvenCavityOperationalStateClusterPauseParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::OvenOperationalState::Commands::Pause::Type encodableStruct;
+    chip::app::Clusters::OvenCavityOperationalState::Commands::Pause::Type encodableStruct;
     ListFreer listFreer;
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -12138,7 +12138,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTROvenOperationalStateClusterStopParams
+@implementation MTROvenCavityOperationalStateClusterStopParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -12150,7 +12150,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROvenOperationalStateClusterStopParams alloc] init];
+    auto other = [[MTROvenCavityOperationalStateClusterStopParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -12166,11 +12166,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROvenOperationalStateClusterStopParams (InternalMethods)
+@implementation MTROvenCavityOperationalStateClusterStopParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::OvenOperationalState::Commands::Stop::Type encodableStruct;
+    chip::app::Clusters::OvenCavityOperationalState::Commands::Stop::Type encodableStruct;
     ListFreer listFreer;
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -12211,7 +12211,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTROvenOperationalStateClusterStartParams
+@implementation MTROvenCavityOperationalStateClusterStartParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -12223,7 +12223,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROvenOperationalStateClusterStartParams alloc] init];
+    auto other = [[MTROvenCavityOperationalStateClusterStartParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -12239,11 +12239,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROvenOperationalStateClusterStartParams (InternalMethods)
+@implementation MTROvenCavityOperationalStateClusterStartParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::OvenOperationalState::Commands::Start::Type encodableStruct;
+    chip::app::Clusters::OvenCavityOperationalState::Commands::Start::Type encodableStruct;
     ListFreer listFreer;
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -12284,7 +12284,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTROvenOperationalStateClusterResumeParams
+@implementation MTROvenCavityOperationalStateClusterResumeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -12296,7 +12296,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROvenOperationalStateClusterResumeParams alloc] init];
+    auto other = [[MTROvenCavityOperationalStateClusterResumeParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -12312,11 +12312,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROvenOperationalStateClusterResumeParams (InternalMethods)
+@implementation MTROvenCavityOperationalStateClusterResumeParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::OvenOperationalState::Commands::Resume::Type encodableStruct;
+    chip::app::Clusters::OvenCavityOperationalState::Commands::Resume::Type encodableStruct;
     ListFreer listFreer;
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -12357,19 +12357,19 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTROvenOperationalStateClusterOperationalCommandResponseParams
+@implementation MTROvenCavityOperationalStateClusterOperationalCommandResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _commandResponseState = [MTROvenOperationalStateClusterErrorStateStruct new];
+        _commandResponseState = [MTROvenCavityOperationalStateClusterErrorStateStruct new];
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROvenOperationalStateClusterOperationalCommandResponseParams alloc] init];
+    auto other = [[MTROvenCavityOperationalStateClusterOperationalCommandResponseParams alloc] init];
 
     other.commandResponseState = self.commandResponseState;
 
@@ -12389,7 +12389,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::OvenOperationalState::Commands::OperationalCommandResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -12424,12 +12424,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROvenOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
+@implementation MTROvenCavityOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OvenOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
 {
     {
-        self.commandResponseState = [MTROvenOperationalStateClusterErrorStateStruct new];
+        self.commandResponseState = [MTROvenCavityOperationalStateClusterErrorStateStruct new];
         self.commandResponseState.errorStateID = [NSNumber numberWithUnsignedChar:decodableStruct.commandResponseState.errorStateID];
         if (decodableStruct.commandResponseState.errorStateLabel.HasValue()) {
             self.commandResponseState.errorStateLabel = AsString(decodableStruct.commandResponseState.errorStateLabel.Value());

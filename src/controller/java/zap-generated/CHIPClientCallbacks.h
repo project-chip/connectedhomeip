@@ -471,19 +471,19 @@ typedef void (*IcdManagementEventListListAttributeCallback)(void * context,
                                                             const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*IcdManagementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OvenOperationalStatePhaseListListAttributeCallback)(
+typedef void (*OvenCavityOperationalStatePhaseListListAttributeCallback)(
     void * context, const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> & data);
-typedef void (*OvenOperationalStateOperationalStateListListAttributeCallback)(
+typedef void (*OvenCavityOperationalStateOperationalStateListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OvenOperationalState::Structs::OperationalStateStruct::DecodableType> & data);
-typedef void (*OvenOperationalStateGeneratedCommandListListAttributeCallback)(
+        chip::app::Clusters::OvenCavityOperationalState::Structs::OperationalStateStruct::DecodableType> & data);
+typedef void (*OvenCavityOperationalStateGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*OvenOperationalStateAcceptedCommandListListAttributeCallback)(
+typedef void (*OvenCavityOperationalStateAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*OvenOperationalStateEventListListAttributeCallback)(void * context,
-                                                                   const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*OvenOperationalStateAttributeListListAttributeCallback)(
+typedef void (*OvenCavityOperationalStateEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*OvenCavityOperationalStateAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*ModeSelectSupportedModesListAttributeCallback)(
     void * context,

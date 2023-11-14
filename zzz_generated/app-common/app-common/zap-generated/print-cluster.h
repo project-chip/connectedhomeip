@@ -288,7 +288,7 @@
 
 #if defined(ZCL_USING_OPERATIONAL_STATE_OVEN_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_STATE_OVEN_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_OVEN_CLUSTER                                                                           \
-    { chip::app::Clusters::OvenOperationalState::Id, "Oven Operational State" },
+    { chip::app::Clusters::OvenCavityOperationalState::Id, "Oven Cavity Operational State" },
 #else
 #define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_OVEN_CLUSTER
 #endif

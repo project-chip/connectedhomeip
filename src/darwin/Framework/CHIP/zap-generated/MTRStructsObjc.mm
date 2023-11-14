@@ -2878,7 +2878,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROvenOperationalStateClusterErrorStateStruct
+@implementation MTROvenCavityOperationalStateClusterErrorStateStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2894,7 +2894,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROvenOperationalStateClusterErrorStateStruct alloc] init];
+    auto other = [[MTROvenCavityOperationalStateClusterErrorStateStruct alloc] init];
 
     other.errorStateID = self.errorStateID;
     other.errorStateLabel = self.errorStateLabel;
@@ -2911,7 +2911,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROvenOperationalStateClusterOperationalStateStruct
+@implementation MTROvenCavityOperationalStateClusterOperationalStateStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2925,7 +2925,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROvenOperationalStateClusterOperationalStateStruct alloc] init];
+    auto other = [[MTROvenCavityOperationalStateClusterOperationalStateStruct alloc] init];
 
     other.operationalStateID = self.operationalStateID;
     other.operationalStateLabel = self.operationalStateLabel;
@@ -2941,19 +2941,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROvenOperationalStateClusterOperationalErrorEvent
+@implementation MTROvenCavityOperationalStateClusterOperationalErrorEvent
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _errorState = [MTROvenOperationalStateClusterErrorStateStruct new];
+        _errorState = [MTROvenCavityOperationalStateClusterErrorStateStruct new];
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROvenOperationalStateClusterOperationalErrorEvent alloc] init];
+    auto other = [[MTROvenCavityOperationalStateClusterOperationalErrorEvent alloc] init];
 
     other.errorState = self.errorState;
 
@@ -2968,7 +2968,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROvenOperationalStateClusterOperationCompletionEvent
+@implementation MTROvenCavityOperationalStateClusterOperationCompletionEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2984,7 +2984,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROvenOperationalStateClusterOperationCompletionEvent alloc] init];
+    auto other = [[MTROvenCavityOperationalStateClusterOperationCompletionEvent alloc] init];
 
     other.completionErrorCode = self.completionErrorCode;
     other.totalOperationalTime = self.totalOperationalTime;

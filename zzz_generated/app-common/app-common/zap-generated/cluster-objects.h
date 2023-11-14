@@ -14365,7 +14365,7 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace IcdManagement
-namespace OvenOperationalState {
+namespace OvenCavityOperationalState {
 namespace Structs {
 namespace ErrorStateStruct       = Clusters::detail::Structs::ErrorStateStruct;
 namespace OperationalStateStruct = Clusters::detail::Structs::OperationalStateStruct;
@@ -14412,11 +14412,11 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Pause::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = Clusters::OvenOperationalState::Commands::OperationalCommandResponse::DecodableType;
+    using ResponseType = Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -14425,7 +14425,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::Pause::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -14440,11 +14440,11 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = Clusters::OvenOperationalState::Commands::OperationalCommandResponse::DecodableType;
+    using ResponseType = Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -14453,7 +14453,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -14468,11 +14468,11 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Start::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = Clusters::OvenOperationalState::Commands::OperationalCommandResponse::DecodableType;
+    using ResponseType = Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -14481,7 +14481,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::Start::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -14496,11 +14496,11 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Resume::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = Clusters::OvenOperationalState::Commands::OperationalCommandResponse::DecodableType;
+    using ResponseType = Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -14509,7 +14509,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::Resume::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -14525,7 +14525,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::OperationalCommandResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 
     Structs::ErrorStateStruct::Type commandResponseState;
 
@@ -14540,7 +14540,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::OperationalCommandResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 
     Structs::ErrorStateStruct::DecodableType commandResponseState;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -14557,7 +14557,7 @@ struct TypeInfo
     using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>>;
     using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhaseList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -14569,7 +14569,7 @@ struct TypeInfo
     using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
     using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPhase::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -14581,7 +14581,7 @@ struct TypeInfo
     using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
     using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CountdownTime::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -14589,13 +14589,14 @@ struct TypeInfo
 namespace OperationalStateList {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::OvenOperationalState::Structs::OperationalStateStruct::Type>;
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::OvenCavityOperationalState::Structs::OperationalStateStruct::Type>;
     using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OvenOperationalState::Structs::OperationalStateStruct::DecodableType>;
+        chip::app::Clusters::OvenCavityOperationalState::Structs::OperationalStateStruct::DecodableType>;
     using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OvenOperationalState::Structs::OperationalStateStruct::DecodableType> &;
+        chip::app::Clusters::OvenCavityOperationalState::Structs::OperationalStateStruct::DecodableType> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalStateList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -14607,7 +14608,7 @@ struct TypeInfo
     using DecodableType    = uint8_t;
     using DecodableArgType = uint8_t;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalState::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -14615,11 +14616,11 @@ struct TypeInfo
 namespace OperationalError {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::OvenOperationalState::Structs::ErrorStateStruct::Type;
-    using DecodableType    = chip::app::Clusters::OvenOperationalState::Structs::ErrorStateStruct::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::OvenOperationalState::Structs::ErrorStateStruct::DecodableType &;
+    using Type             = chip::app::Clusters::OvenCavityOperationalState::Structs::ErrorStateStruct::Type;
+    using DecodableType    = chip::app::Clusters::OvenCavityOperationalState::Structs::ErrorStateStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::OvenCavityOperationalState::Structs::ErrorStateStruct::DecodableType &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalError::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -14627,37 +14628,37 @@ struct TypeInfo
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 };
 } // namespace AcceptedCommandList
 namespace EventList {
 struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 };
 } // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
 struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
 struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 };
 } // namespace ClusterRevision
 
@@ -14665,7 +14666,7 @@ struct TypeInfo
 {
     struct DecodableType
     {
-        static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+        static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
@@ -14698,7 +14699,7 @@ struct Type
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::OperationalError::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
     static constexpr bool kIsFabricScoped = false;
 
     Structs::ErrorStateStruct::Type errorState;
@@ -14711,7 +14712,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::OperationalError::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 
     Structs::ErrorStateStruct::DecodableType errorState;
 
@@ -14733,7 +14734,7 @@ struct Type
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::OperationCompletion::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
     static constexpr bool kIsFabricScoped = false;
 
     uint8_t completionErrorCode = static_cast<uint8_t>(0);
@@ -14748,7 +14749,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::OperationCompletion::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenOperationalState::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
 
     uint8_t completionErrorCode = static_cast<uint8_t>(0);
     Optional<DataModel::Nullable<uint32_t>> totalOperationalTime;
@@ -14758,7 +14759,7 @@ public:
 };
 } // namespace OperationCompletion
 } // namespace Events
-} // namespace OvenOperationalState
+} // namespace OvenCavityOperationalState
 namespace ModeSelect {
 namespace Structs {
 namespace SemanticTagStruct {

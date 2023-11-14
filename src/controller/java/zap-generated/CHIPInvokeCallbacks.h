@@ -494,17 +494,17 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPOvenOperationalStateClusterOperationalCommandResponseCallback
-    : public Callback::Callback<CHIPOvenOperationalStateClusterOperationalCommandResponseCallbackType>
+class CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback
+    : public Callback::Callback<CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallbackType>
 {
 public:
-    CHIPOvenOperationalStateClusterOperationalCommandResponseCallback(jobject javaCallback);
+    CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback(jobject javaCallback);
 
-    ~CHIPOvenOperationalStateClusterOperationalCommandResponseCallback();
+    ~CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback();
 
     static void
     CallbackFn(void * context,
-               const chip::app::Clusters::OvenOperationalState::Commands::OperationalCommandResponse::DecodableType & data);
+               const chip::app::Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

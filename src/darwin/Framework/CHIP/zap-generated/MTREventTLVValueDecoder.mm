@@ -1644,9 +1644,9 @@ static id _Nullable DecodeEventPayloadForICDManagementCluster(EventId aEventId, 
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForOvenOperationalStateCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForOvenCavityOperationalStateCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::OvenOperationalState;
+    using namespace Clusters::OvenCavityOperationalState;
     switch (aEventId) {
     case Events::OperationalError::Id: {
         Events::OperationalError::DecodableType cppValue;
@@ -1655,11 +1655,11 @@ static id _Nullable DecodeEventPayloadForOvenOperationalStateCluster(EventId aEv
             return nil;
         }
 
-        __auto_type * value = [MTROvenOperationalStateClusterOperationalErrorEvent new];
+        __auto_type * value = [MTROvenCavityOperationalStateClusterOperationalErrorEvent new];
 
         do {
-            MTROvenOperationalStateClusterErrorStateStruct * _Nonnull memberValue;
-            memberValue = [MTROvenOperationalStateClusterErrorStateStruct new];
+            MTROvenCavityOperationalStateClusterErrorStateStruct * _Nonnull memberValue;
+            memberValue = [MTROvenCavityOperationalStateClusterErrorStateStruct new];
             memberValue.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorState.errorStateID];
             if (cppValue.errorState.errorStateLabel.HasValue()) {
                 memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel.Value());
@@ -1693,7 +1693,7 @@ static id _Nullable DecodeEventPayloadForOvenOperationalStateCluster(EventId aEv
             return nil;
         }
 
-        __auto_type * value = [MTROvenOperationalStateClusterOperationCompletionEvent new];
+        __auto_type * value = [MTROvenCavityOperationalStateClusterOperationCompletionEvent new];
 
         do {
             NSNumber * _Nonnull memberValue;
@@ -3490,8 +3490,8 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::IcdManagement::Id: {
         return DecodeEventPayloadForICDManagementCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::OvenOperationalState::Id: {
-        return DecodeEventPayloadForOvenOperationalStateCluster(aPath.mEventId, aReader, aError);
+    case Clusters::OvenCavityOperationalState::Id: {
+        return DecodeEventPayloadForOvenCavityOperationalStateCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ModeSelect::Id: {
         return DecodeEventPayloadForModeSelectCluster(aPath.mEventId, aReader, aError);

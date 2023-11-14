@@ -1215,9 +1215,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(OvenOperationalState::ErrorStateEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenCavityOperationalState::ErrorStateEnum val)
 {
-    using EnumType = OvenOperationalState::ErrorStateEnum;
+    using EnumType = OvenCavityOperationalState::ErrorStateEnum;
     switch (val)
     {
     case EnumType::kNoError:
@@ -1229,9 +1229,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OvenOperationalState::E
         return static_cast<EnumType>(4);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OvenOperationalState::OperationalStateEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenCavityOperationalState::OperationalStateEnum val)
 {
-    using EnumType = OvenOperationalState::OperationalStateEnum;
+    using EnumType = OvenCavityOperationalState::OperationalStateEnum;
     switch (val)
     {
     case EnumType::kRunning:

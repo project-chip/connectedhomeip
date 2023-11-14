@@ -3678,7 +3678,7 @@ public static class IcdManagementClusterMonitoringRegistrationStruct {
     return output.toString();
   }
 }
-public static class OvenOperationalStateClusterErrorStateStruct {
+public static class OvenCavityOperationalStateClusterErrorStateStruct {
   public Integer errorStateID;
   public Optional<String> errorStateLabel;
   public Optional<String> errorStateDetails;
@@ -3686,7 +3686,7 @@ public static class OvenOperationalStateClusterErrorStateStruct {
   private static final long ERROR_STATE_LABEL_ID = 1L;
   private static final long ERROR_STATE_DETAILS_ID = 2L;
 
-  public OvenOperationalStateClusterErrorStateStruct(
+  public OvenCavityOperationalStateClusterErrorStateStruct(
     Integer errorStateID,
     Optional<String> errorStateLabel,
     Optional<String> errorStateDetails
@@ -3705,7 +3705,7 @@ public static class OvenOperationalStateClusterErrorStateStruct {
     return new StructType(values);
   }
 
-  public static OvenOperationalStateClusterErrorStateStruct decodeTlv(BaseTLVType tlvValue) {
+  public static OvenCavityOperationalStateClusterErrorStateStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -3730,7 +3730,7 @@ public static class OvenOperationalStateClusterErrorStateStruct {
         }
       }
     }
-    return new OvenOperationalStateClusterErrorStateStruct(
+    return new OvenCavityOperationalStateClusterErrorStateStruct(
       errorStateID,
       errorStateLabel,
       errorStateDetails
@@ -3740,7 +3740,7 @@ public static class OvenOperationalStateClusterErrorStateStruct {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("OvenOperationalStateClusterErrorStateStruct {\n");
+    output.append("OvenCavityOperationalStateClusterErrorStateStruct {\n");
     output.append("\terrorStateID: ");
     output.append(errorStateID);
     output.append("\n");
@@ -3754,13 +3754,13 @@ public static class OvenOperationalStateClusterErrorStateStruct {
     return output.toString();
   }
 }
-public static class OvenOperationalStateClusterOperationalStateStruct {
+public static class OvenCavityOperationalStateClusterOperationalStateStruct {
   public Integer operationalStateID;
   public Optional<String> operationalStateLabel;
   private static final long OPERATIONAL_STATE_I_D_ID = 0L;
   private static final long OPERATIONAL_STATE_LABEL_ID = 1L;
 
-  public OvenOperationalStateClusterOperationalStateStruct(
+  public OvenCavityOperationalStateClusterOperationalStateStruct(
     Integer operationalStateID,
     Optional<String> operationalStateLabel
   ) {
@@ -3776,7 +3776,7 @@ public static class OvenOperationalStateClusterOperationalStateStruct {
     return new StructType(values);
   }
 
-  public static OvenOperationalStateClusterOperationalStateStruct decodeTlv(BaseTLVType tlvValue) {
+  public static OvenCavityOperationalStateClusterOperationalStateStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -3795,7 +3795,7 @@ public static class OvenOperationalStateClusterOperationalStateStruct {
         }
       }
     }
-    return new OvenOperationalStateClusterOperationalStateStruct(
+    return new OvenCavityOperationalStateClusterOperationalStateStruct(
       operationalStateID,
       operationalStateLabel
     );
@@ -3804,7 +3804,7 @@ public static class OvenOperationalStateClusterOperationalStateStruct {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("OvenOperationalStateClusterOperationalStateStruct {\n");
+    output.append("OvenCavityOperationalStateClusterOperationalStateStruct {\n");
     output.append("\toperationalStateID: ");
     output.append(operationalStateID);
     output.append("\n");

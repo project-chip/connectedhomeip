@@ -10632,7 +10632,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace IcdManagement
-namespace OvenOperationalState {
+namespace OvenCavityOperationalState {
 namespace Structs {} // namespace Structs
 
 namespace Commands {
@@ -10870,7 +10870,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace OperationCompletion.
 } // namespace Events
 
-} // namespace OvenOperationalState
+} // namespace OvenCavityOperationalState
 namespace ModeSelect {
 namespace Structs {
 
@@ -23413,7 +23413,7 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::OvenOperationalState::Id: {
+    case Clusters::OvenCavityOperationalState::Id: {
         switch (aCommand)
         {
         default:

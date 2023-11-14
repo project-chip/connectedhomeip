@@ -75,7 +75,7 @@
 | ProxyValid                                                          | 0x0044 |
 | BooleanState                                                        | 0x0045 |
 | IcdManagement                                                       | 0x0046 |
-| OvenOperationalState                                                | 0x0048 |
+| OvenCavityOperationalState                                          | 0x0048 |
 | ModeSelect                                                          | 0x0050 |
 | LaundryWasherMode                                                   | 0x0051 |
 | RefrigeratorAndTemperatureControlledCabinetMode                     | 0x0052 |
@@ -4710,7 +4710,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster OvenOperationalState                                        | 0x0048 |
+| Cluster OvenCavityOperationalState                                  | 0x0048 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Pause                                                             |   0x00 |
@@ -4740,18 +4740,18 @@ private:
 /*
  * Command Pause
  */
-class OvenOperationalStatePause : public ClusterCommand
+class OvenCavityOperationalStatePause : public ClusterCommand
 {
 public:
-    OvenOperationalStatePause(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("pause", credsIssuerConfig)
+    OvenCavityOperationalStatePause(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("pause", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenOperationalState::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::OvenOperationalState::Commands::Pause::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenCavityOperationalState::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OvenCavityOperationalState::Commands::Pause::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -4760,8 +4760,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenOperationalState::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::OvenOperationalState::Commands::Pause::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenCavityOperationalState::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OvenCavityOperationalState::Commands::Pause::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -4770,24 +4770,24 @@ public:
     }
 
 private:
-    chip::app::Clusters::OvenOperationalState::Commands::Pause::Type mRequest;
+    chip::app::Clusters::OvenCavityOperationalState::Commands::Pause::Type mRequest;
 };
 
 /*
  * Command Stop
  */
-class OvenOperationalStateStop : public ClusterCommand
+class OvenCavityOperationalStateStop : public ClusterCommand
 {
 public:
-    OvenOperationalStateStop(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("stop", credsIssuerConfig)
+    OvenCavityOperationalStateStop(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("stop", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenOperationalState::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::OvenOperationalState::Commands::Stop::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenCavityOperationalState::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OvenCavityOperationalState::Commands::Stop::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -4796,8 +4796,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenOperationalState::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::OvenOperationalState::Commands::Stop::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenCavityOperationalState::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OvenCavityOperationalState::Commands::Stop::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -4806,24 +4806,24 @@ public:
     }
 
 private:
-    chip::app::Clusters::OvenOperationalState::Commands::Stop::Type mRequest;
+    chip::app::Clusters::OvenCavityOperationalState::Commands::Stop::Type mRequest;
 };
 
 /*
  * Command Start
  */
-class OvenOperationalStateStart : public ClusterCommand
+class OvenCavityOperationalStateStart : public ClusterCommand
 {
 public:
-    OvenOperationalStateStart(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("start", credsIssuerConfig)
+    OvenCavityOperationalStateStart(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("start", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenOperationalState::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::OvenOperationalState::Commands::Start::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenCavityOperationalState::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OvenCavityOperationalState::Commands::Start::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -4832,8 +4832,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenOperationalState::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::OvenOperationalState::Commands::Start::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenCavityOperationalState::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OvenCavityOperationalState::Commands::Start::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -4842,24 +4842,24 @@ public:
     }
 
 private:
-    chip::app::Clusters::OvenOperationalState::Commands::Start::Type mRequest;
+    chip::app::Clusters::OvenCavityOperationalState::Commands::Start::Type mRequest;
 };
 
 /*
  * Command Resume
  */
-class OvenOperationalStateResume : public ClusterCommand
+class OvenCavityOperationalStateResume : public ClusterCommand
 {
 public:
-    OvenOperationalStateResume(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("resume", credsIssuerConfig)
+    OvenCavityOperationalStateResume(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("resume", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenOperationalState::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::OvenOperationalState::Commands::Resume::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenCavityOperationalState::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OvenCavityOperationalState::Commands::Resume::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -4868,8 +4868,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenOperationalState::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::OvenOperationalState::Commands::Resume::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenCavityOperationalState::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OvenCavityOperationalState::Commands::Resume::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -4878,7 +4878,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::OvenOperationalState::Commands::Resume::Type mRequest;
+    chip::app::Clusters::OvenCavityOperationalState::Commands::Resume::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -15432,21 +15432,21 @@ void registerClusterIcdManagement(Commands & commands, CredentialIssuerCommands 
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
-void registerClusterOvenOperationalState(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterOvenCavityOperationalState(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::OvenOperationalState;
+    using namespace chip::app::Clusters::OvenCavityOperationalState;
 
-    const char * clusterName = "OvenOperationalState";
+    const char * clusterName = "OvenCavityOperationalState";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),         //
-        make_unique<OvenOperationalStatePause>(credsIssuerConfig),  //
-        make_unique<OvenOperationalStateStop>(credsIssuerConfig),   //
-        make_unique<OvenOperationalStateStart>(credsIssuerConfig),  //
-        make_unique<OvenOperationalStateResume>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),               //
+        make_unique<OvenCavityOperationalStatePause>(credsIssuerConfig),  //
+        make_unique<OvenCavityOperationalStateStop>(credsIssuerConfig),   //
+        make_unique<OvenCavityOperationalStateStart>(credsIssuerConfig),  //
+        make_unique<OvenCavityOperationalStateResume>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -15471,13 +15471,13 @@ void registerClusterOvenOperationalState(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "countdown-time", 0, UINT32_MAX,
                                                                               Attributes::CountdownTime::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::OvenOperationalState::Structs::OperationalStateStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::OvenCavityOperationalState::Structs::OperationalStateStruct::Type>>>(
             Id, "operational-state-list", Attributes::OperationalStateList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "operational-state", 0, UINT8_MAX, Attributes::OperationalState::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::Clusters::OvenOperationalState::Structs::ErrorStateStruct::Type>>(
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::OvenCavityOperationalState::Structs::ErrorStateStruct::Type>>(
             Id, "operational-error", Attributes::OperationalError::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -22203,7 +22203,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterProxyValid(commands, credsIssuerConfig);
     registerClusterBooleanState(commands, credsIssuerConfig);
     registerClusterIcdManagement(commands, credsIssuerConfig);
-    registerClusterOvenOperationalState(commands, credsIssuerConfig);
+    registerClusterOvenCavityOperationalState(commands, credsIssuerConfig);
     registerClusterModeSelect(commands, credsIssuerConfig);
     registerClusterLaundryWasherMode(commands, credsIssuerConfig);
     registerClusterRefrigeratorAndTemperatureControlledCabinetMode(commands, credsIssuerConfig);

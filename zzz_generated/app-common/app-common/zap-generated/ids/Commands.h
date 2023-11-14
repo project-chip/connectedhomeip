@@ -647,7 +647,7 @@ static constexpr CommandId Id = 0x00000003;
 } // namespace Commands
 } // namespace IcdManagement
 
-namespace OvenOperationalState {
+namespace OvenCavityOperationalState {
 namespace Commands {
 
 namespace Pause {
@@ -671,7 +671,7 @@ static constexpr CommandId Id = 0x00000004;
 } // namespace OperationalCommandResponse
 
 } // namespace Commands
-} // namespace OvenOperationalState
+} // namespace OvenCavityOperationalState
 
 namespace ModeSelect {
 namespace Commands {
