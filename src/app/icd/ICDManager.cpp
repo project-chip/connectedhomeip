@@ -355,7 +355,7 @@ System::Clock::Milliseconds32 ICDManager::GetSlowPollingInterval()
     return kSlowPollingInterval;
 }
 
-ObserverPointer * ICDManager::RegisterObserver(ICDStateObserver * observer)
+ICDManager::ObserverPointer * ICDManager::RegisterObserver(ICDStateObserver * observer)
 {
     return mStateObserverPool.CreateObject(observer);
 }
