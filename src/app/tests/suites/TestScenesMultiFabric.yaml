@@ -15,7 +15,7 @@
 # !!!!!!!!!! TEST INFORMATION !!!!!!!!!!!!!!!!!!
 # This test covers multi fabric support for scenes cluster attributes such as LastConfiguredBy and FabricSceneInfo
 
-name: Scenes FabricSceneInfo testing
+name: Scenes Multi-fabric testing
 
 PICS:
     - MCORE.ROLE.COMMISSIONEE
@@ -157,7 +157,6 @@ tests:
               type: list
 
     - label: "TH reads from the DUT the (0x0006) SceneTableSize attribute"
-      PICS: S.S.A0006
       command: "readAttribute"
       attribute: "SceneTableSize"
       response:
@@ -324,14 +323,12 @@ tests:
                 value: G1
 
     - label: "TH1 Reads LastConfiguredBy attribute"
-      PICS: S.S.A0005
       command: "readAttribute"
       attribute: "LastConfiguredBy"
       response:
           value: null
 
     - label: "TH2 reads LastConfiguredBy attribute"
-      PICS: S.S.A0005
       identity: "beta"
       command: "readAttribute"
       attribute: "LastConfiguredBy"
@@ -537,7 +534,6 @@ tests:
               ]
 
     - label: "TH1 copies Scene 1 from G1 to Scene 2 in G1"
-      PICS: S.S.C42.Rsp
       command: "CopyScene"
       arguments:
           values:
@@ -673,7 +669,6 @@ tests:
               ]
 
     - label: "TH1 copies all Scenes from G1 to G1"
-      PICS: S.S.C42.Rsp
       command: "CopyScene"
       arguments:
           values:
@@ -832,7 +827,7 @@ tests:
                   },
               ]
 
-    - label: "TH1 confirms its FabricSceneInfo's field SceneValid was updated"
+    - label: "TH1 confirms its FabricSceneInfo's field SceneValid remains unchanged"
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:
@@ -843,7 +838,7 @@ tests:
                       CurrentScene: 0x01,
                       CurrentGroup: G2,
                       FabricIndex: th1FabricIndex,
-                      SceneValid: false,
+                      SceneValid: true,
                       RemainingCapacity: fabricCapacity - 4,
                   },
               ]
@@ -891,7 +886,7 @@ tests:
                   },
               ]
 
-    - label: "TH1 confirms its FabricSceneInfo's field SceneValid was updated"
+    - label: "TH1 confirms its FabricSceneInfo's field SceneCount and RemainingCapacity were updated"
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:
@@ -902,7 +897,7 @@ tests:
                       CurrentScene: 0x01,
                       CurrentGroup: G2,
                       FabricIndex: th1FabricIndex,
-                      SceneValid: false,
+                      SceneValid: true,
                       RemainingCapacity: fabricCapacity - 2,
                   },
               ]
@@ -966,7 +961,7 @@ tests:
                       CurrentScene: 0x01,
                       CurrentGroup: G2,
                       FabricIndex: th1FabricIndex,
-                      SceneValid: false,
+                      SceneValid: true,
                       RemainingCapacity: fabricCapacity - 2,
                   },
               ]
