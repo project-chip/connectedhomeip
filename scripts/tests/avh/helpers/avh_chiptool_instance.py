@@ -34,17 +34,17 @@ class AvhChiptoolInstance(AvhInstance):
         self.log_in_to_console()
 
         # set current date and time
-        self.console_exec_command("sudo timedatectl set-ntp false", timeout=300)
+        self.console_exec_command("sudo timedatectl set-ntp false", timeout_s=300)
         self.console_exec_command(
             f"sudo timedatectl set-time '{datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}'",
-            timeout=300,
+            timeout_s=300,
         )
-        self.console_exec_command("sudo timedatectl set-ntp true", timeout=300)
+        self.console_exec_command("sudo timedatectl set-ntp true", timeout_s=300)
 
         # install network manager
-        self.console_exec_command("sudo apt-get update", timeout=300)
+        self.console_exec_command("sudo apt-get update", timeout_s=300)
         self.console_exec_command(
-            "sudo apt-get -y install network-manager", timeout=300
+            "sudo apt-get -y install network-manager", timeout_s=300
         )
 
         # connect Wi-Fi to the Arm ssid
@@ -58,21 +58,21 @@ class AvhChiptoolInstance(AvhInstance):
     def pairing_ble_wifi(self, node_id, ssid, password, pin_code, discriminator):
         output = self.console_exec_command(
             f"./{APPLICATION_BINARY} pairing ble-wifi {node_id} {ssid} {password} {pin_code} {discriminator}",
-            timeout=120.0,
+            timeout_s=120.0,
         )
 
         return output
 
     def on(self, node_id):
         output = self.console_exec_command(
-            f"./{APPLICATION_BINARY} onoff on {node_id} 1", timeout=30.0
+            f"./{APPLICATION_BINARY} onoff on {node_id} 1", timeout_s=30.0
         )
 
         return output
 
     def off(self, node_id):
         output = self.console_exec_command(
-            f"./{APPLICATION_BINARY} onoff off {node_id} 1", timeout=30.0
+            f"./{APPLICATION_BINARY} onoff off {node_id} 1", timeout_s=30.0
         )
 
         return output

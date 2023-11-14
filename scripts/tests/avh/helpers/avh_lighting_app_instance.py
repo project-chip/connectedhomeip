@@ -37,17 +37,17 @@ class AvhLightingAppInstance(AvhInstance):
         self.log_in_to_console()
 
         # set current date and time
-        self.console_exec_command("sudo timedatectl set-ntp false", timeout=300)
+        self.console_exec_command("sudo timedatectl set-ntp false", timeout_s=300)
         self.console_exec_command(
             f"sudo timedatectl set-time '{datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}'",
-            timeout=300,
+            timeout_s=300,
         )
-        self.console_exec_command("sudo timedatectl set-ntp true", timeout=300)
+        self.console_exec_command("sudo timedatectl set-ntp true", timeout_s=300)
 
         # install network manager
-        self.console_exec_command("sudo apt-get update", timeout=300)
+        self.console_exec_command("sudo apt-get update", timeout_s=300)
         self.console_exec_command(
-            "sudo apt-get -y install network-manager", timeout=300
+            "sudo apt-get -y install network-manager", timeout_s=300
         )
 
         # remove the Wi-Fi configuration and disable network manager on the Wi-Fi interface
@@ -75,14 +75,14 @@ class AvhLightingAppInstance(AvhInstance):
         self.console.send("\03")  # CTRL-C
         super().wait_for_console_prompt()
 
-    def get_application_output(self, timeout=5.0):
+    def get_application_output(self, timeout_s=5.0):
         self.console.settimeout(1.0)
 
         start_time = time.monotonic()
         output = b""
 
         while True:
-            if (time.monotonic() - start_time) > timeout:
+            if (time.monotonic() - start_time) > timeout_s:
                 break
 
             try:
