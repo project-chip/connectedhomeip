@@ -26,6 +26,10 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/core/CHIPError.h>
 
+#if defined(CONFIG_CHIP_USE_MARS_SENSOR) && !defined(CONFIG_PM)
+#define USE_COLOR_TEMPERATURE_LIGHT
+#endif
+
 class SensorManager
 {
 public:
@@ -40,6 +44,10 @@ private:
 
 #ifdef CONFIG_CHIP_USE_MARS_SENSOR
     static void SensorBanForNextMeasurTimerTimeoutCallback(k_timer * timer);
+
+#ifdef USE_COLOR_TEMPERATURE_LIGHT
+    int SetColorTemperatureLight(int8_t temp);
+#endif // USE_COLOR_TEMPERATURE_LIGHT
 
     // SHT30 operating range −40…125°C
     int16_t mMinMeasuredTempCelsius = -40;

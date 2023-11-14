@@ -19,6 +19,10 @@
 #include "SensorManagerCommon.h"
 #ifdef CONFIG_CHIP_USE_MARS_SENSOR
 #include <zephyr/drivers/sensor.h>
+
+#ifdef USE_COLOR_TEMPERATURE_LIGHT
+#include <zephyr/drivers/led_strip.h>
+#endif // CONFIG_PM
 #endif // CONFIG_CHIP_USE_MARS_SENSOR
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -34,6 +38,17 @@ volatile bool mSensorBanForNextMeasurFlag = false;
 constexpr uint16_t kSensorBanForNextMeasurTimeout = 1000; // 1s timeout
 
 const struct device *const sht3xd_dev = DEVICE_DT_GET_ONE(sensirion_sht3xd);
+
+#ifdef USE_COLOR_TEMPERATURE_LIGHT
+const struct device *const ws2812_dev = DEVICE_DT_GET(DT_ALIAS(led_strip));
+
+#define STRIP_NUM_PIXELS    DT_PROP(DT_ALIAS(led_strip), chain_length)
+
+#define RGB_MAX_VALUE       255
+
+#define TEMP_LOW_LIM        0   // °C
+#define TEMP_HIGH_LIM       40  // °C
+#endif // USE_COLOR_TEMPERATURE_LIGHT
 #else
 constexpr float kSimulatedHum                 = 55.5; // percents
 constexpr uint16_t kSimulatedReadingFrequency = 4;    // change simulated number
@@ -50,6 +65,20 @@ CHIP_ERROR SensorManager::Init()
         LOG_ERR("Device %s is not ready", sht3xd_dev->name);
         return CHIP_ERROR_INCORRECT_STATE;
 	}
+
+#ifdef USE_COLOR_TEMPERATURE_LIGHT
+    if (!device_is_ready(ws2812_dev))
+    {
+        LOG_ERR("Device %s is not ready", ws2812_dev->name);
+        return CHIP_ERROR_INCORRECT_STATE;
+	}
+
+    int status = SetColorTemperatureLight(mMinMeasuredTempCelsius);
+    if (status) {
+        LOG_ERR("Couldn't update strip: %d", status);
+        return System::MapErrorZephyr(status);
+    }
+#endif // USE_COLOR_TEMPERATURE_LIGHT
 
     // Initialise the timer to ban sensor measurement
     k_timer_init(&sSensorBanForNextMeasurTimer, &SensorManager::SensorBanForNextMeasurTimerTimeoutCallback, nullptr);
@@ -68,10 +97,11 @@ CHIP_ERROR SensorManager::GetTempAndHumMeasurValue(int16_t *pTempMeasured, uint1
 #ifdef CONFIG_CHIP_USE_MARS_SENSOR
     static struct sensor_value sensorTemp = {0};
     static struct sensor_value sensorHum = {0};
+    int status;
 
     if (!mSensorBanForNextMeasurFlag)
     {
-        int status = sensor_sample_fetch(sht3xd_dev);
+        status = sensor_sample_fetch(sht3xd_dev);
         if (status)
         {
             LOG_ERR("Device %s is not ready to fetch the sensor samples (status: %d)", sht3xd_dev->name, status);
@@ -100,6 +130,14 @@ CHIP_ERROR SensorManager::GetTempAndHumMeasurValue(int16_t *pTempMeasured, uint1
 
     temp = (float)sensor_value_to_double(&sensorTemp);
     hum = (float)sensor_value_to_double(&sensorHum);
+
+#ifdef USE_COLOR_TEMPERATURE_LIGHT
+    status = SetColorTemperatureLight(temp);
+    if (status) {
+        LOG_ERR("Couldn't update strip: %d", status);
+        return System::MapErrorZephyr(status);
+    }
+#endif // USE_COLOR_TEMPERATURE_LIGHT
 #else
     /* Temperature simulation is used */
     static uint8_t nbOfRepetition = 0;
@@ -166,4 +204,63 @@ void SensorManager::SensorBanForNextMeasurTimerTimeoutCallback(k_timer * timer)
 
     mSensorBanForNextMeasurFlag = false;
 }
+
+#ifdef USE_COLOR_TEMPERATURE_LIGHT
+int SensorManager::SetColorTemperatureLight(int8_t temp)
+{
+    int status;
+    struct led_rgb rgb = {0};
+
+    if (temp >= mMinMeasuredTempCelsius && temp <= TEMP_LOW_LIM)
+    {
+        /* Set Color Temperature Light in range -40...0°C */
+        rgb.b = RGB_MAX_VALUE * (1 - ((float)temp - TEMP_LOW_LIM)/(mMinMeasuredTempCelsius - TEMP_LOW_LIM));
+    }
+    else if (temp >= TEMP_HIGH_LIM && temp <= mMaxMeasuredTempCelsius)
+    {
+        /* Set Color Temperature Light in range 40...125°C */
+        rgb.r = RGB_MAX_VALUE * (1 - ((float)temp - TEMP_HIGH_LIM)/(mMaxMeasuredTempCelsius - TEMP_HIGH_LIM));
+    }
+    else if (temp > TEMP_LOW_LIM && temp < TEMP_HIGH_LIM)
+    {
+        uint8_t steps_in_part = (TEMP_HIGH_LIM - TEMP_LOW_LIM) / 4;
+        uint8_t step_num = temp % steps_in_part;
+        float step_val = (float)RGB_MAX_VALUE / steps_in_part;
+
+        if (temp < steps_in_part)
+        {
+            /* Set Color Temperature Light in range 1...9°C */
+            rgb.b = RGB_MAX_VALUE;
+            rgb.g = step_num * step_val;
+        }
+        else if (temp < 2 * steps_in_part)
+        {
+            /* Set Color Temperature Light in range 10...19°C */
+            rgb.b = RGB_MAX_VALUE;
+            rgb.g = RGB_MAX_VALUE;
+            rgb.r = step_num * step_val;
+        }
+        else if (temp < 3 * steps_in_part)
+        {
+            /* Set Color Temperature Light in range 20...29°C */
+            rgb.r = RGB_MAX_VALUE;
+            rgb.g = RGB_MAX_VALUE;
+            rgb.b = RGB_MAX_VALUE - (step_num * step_val) ;
+        }
+        else
+        {
+            /* Set Color Temperature Light in range 30...39°C */
+            rgb.r = RGB_MAX_VALUE;
+            rgb.g = RGB_MAX_VALUE - (step_num * step_val) ;
+        }
+    }
+    else
+    {
+        LOG_ERR("Couldn't set the Color Temperature Light");
+    }
+
+    status = led_strip_update_rgb(ws2812_dev, &rgb, STRIP_NUM_PIXELS);
+    return status;
+}
+#endif // USE_COLOR_TEMPERATURE_LIGHT
 #endif // CONFIG_CHIP_USE_MARS_SENSOR
