@@ -855,11 +855,11 @@ bool emberAfThermostatClusterGetRelayStatusLogCallback(
 // ----------------------------------------------
 
 // Object Tracking
-static ThermostatMatterScheduleEditor * firstMatterScheduleEditor = nullptr;
+static ThermostatMatterScheduleManager * firstMatterScheduleEditor = nullptr;
 
-static ThermostatMatterScheduleEditor * inst(EndpointId endpoint)
+static ThermostatMatterScheduleManager * inst(EndpointId endpoint)
 {
-    ThermostatMatterScheduleEditor * current = firstMatterScheduleEditor;
+    ThermostatMatterScheduleManager * current = firstMatterScheduleEditor;
     while (current != nullptr && current->mEndpoint != endpoint)
     {
         current = current->next();
@@ -868,13 +868,13 @@ static ThermostatMatterScheduleEditor * inst(EndpointId endpoint)
     return current;
 }
 
-static inline void reg(ThermostatMatterScheduleEditor * inst)
+static inline void reg(ThermostatMatterScheduleManager * inst)
 {
     inst->setNext(firstMatterScheduleEditor);
     firstMatterScheduleEditor = inst;
 }
 
-static inline void unreg(ThermostatMatterScheduleEditor * inst)
+static inline void unreg(ThermostatMatterScheduleManager * inst)
 {
     if (firstMatterScheduleEditor == inst)
     {
@@ -882,8 +882,8 @@ static inline void unreg(ThermostatMatterScheduleEditor * inst)
     }
     else
     {
-        ThermostatMatterScheduleEditor * previous = firstMatterScheduleEditor;
-        ThermostatMatterScheduleEditor * current  = firstMatterScheduleEditor->next();
+        ThermostatMatterScheduleManager * previous = firstMatterScheduleEditor;
+        ThermostatMatterScheduleManager * current  = firstMatterScheduleEditor->next();
 
         while (current != nullptr && current != inst)
         {
@@ -899,17 +899,33 @@ static inline void unreg(ThermostatMatterScheduleEditor * inst)
 }
 
 // Object LifeCycle
-ThermostatMatterScheduleEditor::ThermostatMatterScheduleEditor(chip::EndpointId endpoint, onEditStartCb onEditStart, onEditCancelCb onEditCancel,
-                                onEditCommitCb onEditCommit)
+ThermostatMatterScheduleManager::ThermostatMatterScheduleManager(   chip::EndpointId endpoint, 
+                                                                    onEditStartCb onEditStart, 
+                                                                    onEditCancelCb onEditCancel,
+                                                                    onEditCommitCb onEditCommit,
+
+                                                                    getPresetTypeAtIndexCB getPresetTypeAtIndex,
+                                                                    getPresetAtIndexCB getPresetAtIndex,
+                                                                    setPresetAtIndexCB setPresetAtIndex,
+
+                                                                    getScheduleTypeAtIndexCB getScheduleTypeAtIndex,
+                                                                    getScheduleAtIndexCB getScheduleAtIndex,
+                                                                    setScheduleAtIndexCB setScheduleAtIndex)
     : mEndpoint(endpoint)
     , mOnEditStartCb(onEditStart) 
     , mOnEditCancelCb(onEditCancel) 
     , mOnEditCommitCb(onEditCommit)
+    , mGetPresetTypeAtIndexCb(getPresetTypeAtIndex)
+    , mGetPresetAtIndexCb(getPresetAtIndex)
+    , mSetPresetAtIndexCb(setPresetAtIndex)
+    , mGetScheduleTypeAtIndexCb(getScheduleTypeAtIndex)
+    , mGetScheduleAtIndexCb(getScheduleAtIndex)
+    , mSetScheduleAtIndexCb(setScheduleAtIndex)
 {
     reg(this);
 };
 
-ThermostatMatterScheduleEditor::~ThermostatMatterScheduleEditor()
+ThermostatMatterScheduleManager::~ThermostatMatterScheduleManager()
 {
     unreg(this);
 }
@@ -918,7 +934,7 @@ ThermostatMatterScheduleEditor::~ThermostatMatterScheduleEditor()
 static void onThermostatScheduleEditorTick(chip::System::Layer * systemLayer, void * appState)
 {
     bool currentlyEditing = false;
-    ThermostatMatterScheduleEditor * schedules = reinterpret_cast<ThermostatMatterScheduleEditor *>(appState);
+    ThermostatMatterScheduleManager * schedules = reinterpret_cast<ThermostatMatterScheduleManager *>(appState);
 
     if (nullptr != schedules)
     {
@@ -926,7 +942,7 @@ static void onThermostatScheduleEditorTick(chip::System::Layer * systemLayer, vo
         if ((EMBER_ZCL_STATUS_SUCCESS == SchedulesEditable::Get(endpoint, &currentlyEditing)) && currentlyEditing)
         {
             SchedulesEditable::Set(endpoint, false);
-            schedules->mOnEditCancelCb(schedules, ThermostatMatterScheduleEditor::Schedules);
+            schedules->mOnEditCancelCb(schedules, ThermostatMatterScheduleManager::Schedules);
         }
     }
 }
@@ -934,7 +950,7 @@ static void onThermostatScheduleEditorTick(chip::System::Layer * systemLayer, vo
 static void onThermostatPresetEditorTick(chip::System::Layer * systemLayer, void * appState)
 {
     bool currentlyEditing = false;
-    ThermostatMatterScheduleEditor * schedules = reinterpret_cast<ThermostatMatterScheduleEditor *>(appState);
+    ThermostatMatterScheduleManager * schedules = reinterpret_cast<ThermostatMatterScheduleManager *>(appState);
 
     if (nullptr != schedules)
     {
@@ -942,7 +958,7 @@ static void onThermostatPresetEditorTick(chip::System::Layer * systemLayer, void
         if ((EMBER_ZCL_STATUS_SUCCESS == PresetsEditable::Get(endpoint, &currentlyEditing)) && currentlyEditing)
         {
             PresetsEditable::Set(endpoint, false);
-            schedules->mOnEditCancelCb(schedules, ThermostatMatterScheduleEditor::Presets);
+            schedules->mOnEditCancelCb(schedules, ThermostatMatterScheduleManager::Presets);
         }
     }
 }
@@ -950,16 +966,16 @@ static void onThermostatPresetEditorTick(chip::System::Layer * systemLayer, void
 // Edit/Cancel/Commit logic
 
 static bool StartEditRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    uint16_t timeoutSeconds, ThermostatMatterScheduleEditor::editType editType)
+    uint16_t timeoutSeconds, ThermostatMatterScheduleManager::editType editType)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_COMMAND;
     bool currentlyEditing = false;
     chip::System::TimerCompleteCallback timerCB = nullptr;
 
-    ThermostatMatterScheduleEditor * editor = inst(commandPath.mEndpointId);
-    VerifyOrExit(editor != nullptr, status = EMBER_ZCL_STATUS_INVALID_COMMAND);
+    ThermostatMatterScheduleManager * manager = inst(commandPath.mEndpointId);
+    VerifyOrExit(manager != nullptr, status = EMBER_ZCL_STATUS_INVALID_COMMAND);
 
-    if (editType == ThermostatMatterScheduleEditor::Presets)
+    if (editType == ThermostatMatterScheduleManager::Presets)
     {
         timerCB = onThermostatPresetEditorTick;
         status = PresetsEditable::Get(commandPath.mEndpointId, &currentlyEditing);
@@ -972,23 +988,23 @@ static bool StartEditRequest(chip::app::CommandHandler * commandObj, const chip:
     SuccessOrExit(status);
 
 #if 0
-    if (currentlyEditing && (CurrentFabric == scheduledFabricAndNode))
+    if (currentlyEditing && (CurrentFabricAndNode == scheduledFabricAndNode))
     {
-        (void) chip::DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Seconds16(timeoutSeconds), timerCB, editor)        
+        (void) chip::DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Seconds16(timeoutSeconds), timerCB, manager)        
     }
     else
 #endif
     {
         VerifyOrExit(currentlyEditing == false, status = EMBER_ZCL_STATUS_BUSY);
 
-        if (editType == ThermostatMatterScheduleEditor::Presets)
+        if (editType == ThermostatMatterScheduleManager::Presets)
             status = PresetsEditable::Set(commandPath.mEndpointId, true);
         else
             status = SchedulesEditable::Set(commandPath.mEndpointId, true);            
         SuccessOrExit(status);
 
-        editor->mOnEditStartCb(editor, editType);                
-        (void) chip::DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(timeoutSeconds), timerCB, editor);
+        manager->mOnEditStartCb(manager, editType);                
+        (void) chip::DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(timeoutSeconds), timerCB, manager);
     }        
 
 exit:
@@ -997,16 +1013,16 @@ exit:
 }
 
 static bool CancelEditRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                              ThermostatMatterScheduleEditor::editType editType)
+                              ThermostatMatterScheduleManager::editType editType)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_COMMAND;
     bool currentlyEditing = false;
     chip::System::TimerCompleteCallback timerCB = nullptr;
 
-    ThermostatMatterScheduleEditor * editor = inst(commandPath.mEndpointId);
-    VerifyOrExit(editor != nullptr, status = EMBER_ZCL_STATUS_INVALID_COMMAND);
+    ThermostatMatterScheduleManager * manager = inst(commandPath.mEndpointId);
+    VerifyOrExit(manager != nullptr, status = EMBER_ZCL_STATUS_INVALID_COMMAND);
 
-    if (editType == ThermostatMatterScheduleEditor::Presets)
+    if (editType == ThermostatMatterScheduleManager::Presets)
     {
         timerCB = onThermostatPresetEditorTick;
         status = PresetsEditable::Get(commandPath.mEndpointId, &currentlyEditing);
@@ -1019,7 +1035,7 @@ static bool CancelEditRequest(chip::app::CommandHandler * commandObj, const chip
     SuccessOrExit(status);
 
     #if 0
-    if (currentlyEditing && (CurrentFabric != scheduledFabricAndNode))
+    if (currentlyEditing && (CurrentFabricAndNode != scheduledFabricAndNode))
     {
         status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
     }  
@@ -1028,7 +1044,7 @@ static bool CancelEditRequest(chip::app::CommandHandler * commandObj, const chip
     {
         VerifyOrExit(currentlyEditing == true, status=EMBER_ZCL_STATUS_INVALID_IN_STATE);
 
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(timerCB, editor);
+        (void) chip::DeviceLayer::SystemLayer().CancelTimer(timerCB, manager);
     }
 
 exit:
@@ -1037,16 +1053,16 @@ exit:
 }
 
 static bool CommitEditRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, 
-                                ThermostatMatterScheduleEditor::editType editType)
+                                ThermostatMatterScheduleManager::editType editType)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_COMMAND;
     bool currentlyEditing = false;
     chip::System::TimerCompleteCallback timerCB = nullptr;
 
-    ThermostatMatterScheduleEditor * editor = inst(commandPath.mEndpointId);
-    VerifyOrExit(editor != nullptr, status = EMBER_ZCL_STATUS_INVALID_COMMAND);
+    ThermostatMatterScheduleManager * manager = inst(commandPath.mEndpointId);
+    VerifyOrExit(manager != nullptr, status = EMBER_ZCL_STATUS_INVALID_COMMAND);
 
-    if (editType == ThermostatMatterScheduleEditor::Presets)
+    if (editType == ThermostatMatterScheduleManager::Presets)
     {
         timerCB = onThermostatPresetEditorTick;
         status = PresetsEditable::Get(commandPath.mEndpointId, &currentlyEditing);
@@ -1059,7 +1075,7 @@ static bool CommitEditRequest(chip::app::CommandHandler * commandObj, const chip
     SuccessOrExit(status);
 
     #if 0
-    if (currentlyEditing && (CurrentFabric != scheduledFabricAndNode))
+    if (currentlyEditing && (CurrentFabricAndNode != scheduledFabricAndNode))
     {
         status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
     }  
@@ -1068,14 +1084,14 @@ static bool CommitEditRequest(chip::app::CommandHandler * commandObj, const chip
     {
         VerifyOrExit(currentlyEditing == true, status=EMBER_ZCL_STATUS_INVALID_IN_STATE);
 
-        editor->mOnEditCommitCb(editor, editType);
-        if (editType == ThermostatMatterScheduleEditor::Presets)
+        manager->mOnEditCommitCb(manager, editType);
+        if (editType == ThermostatMatterScheduleManager::Presets)
             status = PresetsEditable::Set(commandPath.mEndpointId, false);
         else
             status = SchedulesEditable::Set(commandPath.mEndpointId, false);            
         SuccessOrExit(status);
 
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(timerCB, editor);
+        (void) chip::DeviceLayer::SystemLayer().CancelTimer(timerCB, manager);
     }
 
 exit:
@@ -1089,15 +1105,82 @@ bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData)
 {
-    // TODO
-    return false;
+    EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_COMMAND;
+    uint32_t ourFeatureMap;
+    bool enhancedSchedulesSupported = (FeatureMap::Get(commandPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
+        ((ourFeatureMap & to_underlying(Feature::kMatterScheduleConfiguration)) != 0);
+
+    if (enhancedSchedulesSupported)
+    {
+        ThermostatMatterScheduleManager * manager = inst(commandPath.mEndpointId);
+        VerifyOrExit(manager != nullptr, status = EMBER_ZCL_STATUS_INVALID_COMMAND);
+        VerifyOrExit(manager->mGetScheduleAtIndexCb != nullptr, status = EMBER_ZCL_STATUS_INVALID_COMMAND);
+
+        const chip::ByteSpan &scheduleHandle = commandData.scheduleHandle;
+        ScheduleStruct::Type schedule;
+        bool found = false;
+        int8_t index = 0;
+
+        while (manager->mGetScheduleAtIndexCb(manager, index, schedule) != CHIP_ERROR_NOT_FOUND)
+        {
+            if (scheduleHandle.data_equal(schedule.sceduleHandle))
+            {
+                status = ActiveScheduleHandle::Set(commandPath.mEndpointId, scheduleHandle);
+                SuccessOrExit(status);
+                found = true;
+                break;
+            }
+            index++;
+        }
+
+        VerifyOrExit(found == true, status = EMBER_ZCL_STATUS_INVALID_COMMAND);
+    }
+
+exit:
+    commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
+    return true;
 }
+
 bool emberAfThermostatClusterSetActivePresetRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData)
 {
-    // TODO
-    return false;
+    EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_COMMAND;
+    uint32_t ourFeatureMap;
+    bool presetsSupported = (FeatureMap::Get(commandPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
+        ((ourFeatureMap & to_underlying(Feature::kPresets)) != 0);
+
+    if (presetsSupported)
+    {
+        ThermostatMatterScheduleManager * manager = inst(commandPath.mEndpointId);
+        VerifyOrExit(manager != nullptr, status = EMBER_ZCL_STATUS_INVALID_COMMAND);
+        VerifyOrExit(manager->mGetPresetAtIndexCb != nullptr, status = EMBER_ZCL_STATUS_INVALID_COMMAND);
+
+        const chip::ByteSpan &presetHandle = commandData.presetHandle;
+        // TODO: Delay argument
+
+        PresetStruct::Type preset;
+        bool found = false;
+        int8_t index = 0;
+
+        while (manager->mGetPresetAtIndexCb(manager, index, preset) != CHIP_ERROR_NOT_FOUND)
+        {
+            if (presetHandle.data_equal(preset.presetHandle))
+            {
+                status = ActivePresetHandle::Set(commandPath.mEndpointId, presetHandle);
+                SuccessOrExit(status);
+                found = true;
+                break;
+            }
+            index++;
+        }
+
+        VerifyOrExit(found == true, status = EMBER_ZCL_STATUS_INVALID_COMMAND);
+    }
+
+exit:
+    commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
+    return true;
 }
 
 bool emberAfThermostatClusterStartSchedulesEditRequestCallback(
@@ -1109,7 +1192,7 @@ bool emberAfThermostatClusterStartSchedulesEditRequestCallback(
         ((ourFeatureMap & to_underlying(Feature::kMatterScheduleConfiguration)) != 0);
 
     if (enhancedSchedulesSupported)
-        return StartEditRequest(commandObj, commandPath, commandData.timeoutSeconds, ThermostatMatterScheduleEditor::Schedules);        
+        return StartEditRequest(commandObj, commandPath, commandData.timeoutSeconds, ThermostatMatterScheduleManager::Schedules);        
 
     commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(EMBER_ZCL_STATUS_INVALID_COMMAND));
     return true;
@@ -1124,7 +1207,7 @@ bool emberAfThermostatClusterCancelSchedulesEditRequestCallback(
         ((ourFeatureMap & to_underlying(Feature::kMatterScheduleConfiguration)) != 0);
 
     if (enhancedSchedulesSupported)
-        return CancelEditRequest(commandObj, commandPath, ThermostatMatterScheduleEditor::Schedules);        
+        return CancelEditRequest(commandObj, commandPath, ThermostatMatterScheduleManager::Schedules);        
 
     commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(EMBER_ZCL_STATUS_INVALID_COMMAND));
     return true;
@@ -1139,7 +1222,7 @@ bool emberAfThermostatClusterCommitSchedulesEditRequestCallback(
         ((ourFeatureMap & to_underlying(Feature::kMatterScheduleConfiguration)) != 0);
 
     if (enhancedSchedulesSupported)
-        return CommitEditRequest(commandObj, commandPath, ThermostatMatterScheduleEditor::Schedules);        
+        return CommitEditRequest(commandObj, commandPath, ThermostatMatterScheduleManager::Schedules);        
 
     commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(EMBER_ZCL_STATUS_INVALID_COMMAND));
     return true;
@@ -1154,7 +1237,7 @@ bool emberAfThermostatClusterStartPresetsEditRequestCallback(
         ((ourFeatureMap & to_underlying(Feature::kPresets)) != 0);
 
     if (presetsSupported)
-        return StartEditRequest(commandObj, commandPath, commandData.timeoutSeconds, ThermostatMatterScheduleEditor::Presets);        
+        return StartEditRequest(commandObj, commandPath, commandData.timeoutSeconds, ThermostatMatterScheduleManager::Presets);        
 
     commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(EMBER_ZCL_STATUS_INVALID_COMMAND));
     return true;
@@ -1165,11 +1248,11 @@ bool emberAfThermostatClusterCancelPresetsEditRequestCallback(
     const chip::app::Clusters::Thermostat::Commands::CancelPresetsEditRequest::DecodableType & commandData)
 {
     uint32_t ourFeatureMap;
-    bool enhancedSchedulesSupported = (FeatureMap::Get(commandPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
+    bool presetsSupported = (FeatureMap::Get(commandPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
         ((ourFeatureMap & to_underlying(Feature::kPresets)) != 0);
 
-    if (enhancedSchedulesSupported)
-        return CancelEditRequest(commandObj, commandPath, ThermostatMatterScheduleEditor::Presets);        
+    if (presetsSupported)
+        return CancelEditRequest(commandObj, commandPath, ThermostatMatterScheduleManager::Presets);        
 
     commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(EMBER_ZCL_STATUS_INVALID_COMMAND));
     return true;
@@ -1180,11 +1263,11 @@ bool emberAfThermostatClusterCommitPresetsEditRequestCallback(
     const chip::app::Clusters::Thermostat::Commands::CommitPresetsEditRequest::DecodableType & commandData)
 {
     uint32_t ourFeatureMap;
-    bool enhancedSchedulesSupported = (FeatureMap::Get(commandPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
+    bool presetsSupported = (FeatureMap::Get(commandPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
         ((ourFeatureMap & to_underlying(Feature::kPresets)) != 0);
 
-    if (enhancedSchedulesSupported)
-        return CommitEditRequest(commandObj, commandPath, ThermostatMatterScheduleEditor::Presets);        
+    if (presetsSupported)
+        return CommitEditRequest(commandObj, commandPath, ThermostatMatterScheduleManager::Presets);        
 
     commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(EMBER_ZCL_STATUS_INVALID_COMMAND));
     return true;
@@ -1202,8 +1285,21 @@ bool emberAfThermostatClusterSetTemperatureSetpointHoldPolicyCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::SetTemperatureSetpointHoldPolicy::DecodableType & commandData)
 {
-    // TODO
-    return false;
+    EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_COMMAND;
+    uint32_t ourFeatureMap;
+    bool presetsSupported = (FeatureMap::Get(commandPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
+        ((ourFeatureMap & to_underlying(Feature::kPresets)) != 0);
+
+    if (presetsSupported)
+    {
+        auto holdPolicy = commandData.temperatureSetpointHoldPolicy;
+        status = TemperatureSetpointHoldPolicy::Set(commandPath.mEndpointId, holdPolicy);
+        SuccessOrExit(status);
+    }
+
+exit:
+    commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
+    return true;
 }
 
 void MatterThermostatPluginServerInitCallback()
