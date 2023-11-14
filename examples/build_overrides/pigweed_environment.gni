@@ -26,7 +26,7 @@ import("${_bootstrap_root}/build_overrides/pigweed_environment.gni")
 # pw_env_setup_CIPD_PIGWEED = "//../home/vscode/pigweed/env/cipd/packages/pigweed"
 #
 # Existing logic:
-#   - this file is imported from `examples/common/pigweed`
+#   - this file is imported from `examples/common/pigweed` or similar
 #   - we transform paths from "//../" into "//../../../"
 #
 # This was done after protoc path detection started failing when using
@@ -34,7 +34,8 @@ import("${_bootstrap_root}/build_overrides/pigweed_environment.gni")
 #
 # https://github.com/google/pigweed/commit/ddbc9fc7f5c601ab417db37e02cbe5294f21ad6d
 #
-# TODO: need a better expansion here. This replacement logic seems very brittle.
+# TODO: need a better expansion here. This replacement logic seems very brittle and
+#       it is unclear how we know exactly 3 levels of indirections are correct
 #
 if (defined(pw_env_setup_CIPD_ARM)) {
   _split_arm = string_split(pw_env_setup_CIPD_ARM, "/")
