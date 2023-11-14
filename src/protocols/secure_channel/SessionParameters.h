@@ -74,19 +74,22 @@ public:
     }
 
     const Optional<uint16_t> & GetDataModelRevision() const { return mDataModelRevision; }
-    void SetDataModelRevision(const uint16_t dataModelRev) { mDataModelRevision = MakeOptional(dataModelRev); }
+    void SetDataModelRevision(const uint16_t dataModelRevision) { mDataModelRevision = MakeOptional(dataModelRevision); }
 
     const Optional<uint16_t> & GetInteractionModelRevision() const { return mInteractionModelRevision; }
-    void SetInteractionModelRevision(const uint16_t interactionModelRev)
+    void SetInteractionModelRevision(const uint16_t interactionModelRevision)
     {
-        mInteractionModelRevision = MakeOptional(interactionModelRev);
+        mInteractionModelRevision = MakeOptional(interactionModelRevision);
     }
 
     const Optional<uint32_t> & GetSpecificationVersion() const { return mSpecificationVersion; }
-    void SetSpecificationVersion(const uint32_t specVersion) { mSpecificationVersion = MakeOptional(specVersion); }
+    void SetSpecificationVersion(const uint32_t specificationVersion)
+    {
+        mSpecificationVersion = MakeOptional(specificationVersion);
+    }
 
-    uint16_t GetMaxPathsPerInvoke() const { return mMaxPathPerInvoke; }
-    void SetMaxPathsPerInvoke(const uint16_t maxPathsPerInvoke) { mMaxPathPerInvoke = maxPathsPerInvoke; }
+    uint16_t GetMaxPathsPerInvoke() const { return mMaxPathsPerInvoke; }
+    void SetMaxPathsPerInvoke(const uint16_t maxPathsPerInvoke) { mMaxPathsPerInvoke = maxPathsPerInvoke; }
 
 private:
     ReliableMessageProtocolConfig mMRPConfig;
@@ -100,7 +103,7 @@ private:
     // 0x01030000. But there isn't a way to know for certain.
     Optional<uint32_t> mSpecificationVersion;
     // When maxPathsPerInvoke is not provided legacy is always 1
-    uint16_t mMaxPathPerInvoke = 1;
+    uint16_t mMaxPathsPerInvoke = 1;
 };
 
 } // namespace chip

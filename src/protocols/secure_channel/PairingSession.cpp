@@ -96,8 +96,8 @@ CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const Optional<
                                                    TLV::TLVWriter & tlvWriter)
 {
     // TODO: https://github.com/project-chip/connectedhomeip/issues/30456. Based on the spec we need to send values here now,
-    // but it is not entirely clear what we should be sending here when `providedMrpConfig.HasValue() == false`. This is a
-    // followup TODO.
+    // but it is not entirely clear what we should be sending here when `providedMrpConfig.HasValue() == false`. For now we
+    // are sending the default MRP config values.
     ReliableMessageProtocolConfig mrpLocalConfig = GetDefaultMRPConfig();
     if (providedMrpConfig.HasValue())
     {
@@ -177,9 +177,9 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
 
     if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kDataModelRevision)
     {
-        uint16_t SetDataModelRevision;
-        ReturnErrorOnFailure(tlvReader.Get(SetDataModelRevision));
-        mRemoteSessionParams.SetDataModelRevision(SetDataModelRevision);
+        uint16_t dataModelRevision;
+        ReturnErrorOnFailure(tlvReader.Get(dataModelRevision));
+        mRemoteSessionParams.SetDataModelRevision(dataModelRevision);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
@@ -187,9 +187,9 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
 
     if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kInteractionModelRevision)
     {
-        uint16_t interactionModelRev;
-        ReturnErrorOnFailure(tlvReader.Get(interactionModelRev));
-        mRemoteSessionParams.SetInteractionModelRevision(interactionModelRev);
+        uint16_t interactionModelRevision;
+        ReturnErrorOnFailure(tlvReader.Get(interactionModelRevision));
+        mRemoteSessionParams.SetInteractionModelRevision(interactionModelRevision);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
