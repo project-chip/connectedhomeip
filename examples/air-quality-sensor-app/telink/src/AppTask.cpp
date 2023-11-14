@@ -38,18 +38,18 @@ AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
-    CHIP_ERROR ret;
+    CHIP_ERROR err;
 
 #if APP_USE_EXAMPLE_START_BUTTON
     SetExampleButtonCallbacks(AirQualitySensorMeasurActionEventHandler);
 #endif
     InitCommonParts();
 
-    ret = SensorMgr().Init();
-    if (ret != CHIP_NO_ERROR)
+    err = SensorMgr().Init();
+    if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("Init of the Sensor Manager failed");
-        return ret;
+        return err;
     }
 
     // Initialize sensor measurement timer
