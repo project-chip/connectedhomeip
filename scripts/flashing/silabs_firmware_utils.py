@@ -49,7 +49,6 @@ operations:
                         Do not reset device after flashing
 """
 
-import os
 import sys
 
 import firmware_utils
@@ -134,18 +133,9 @@ class Flasher(firmware_utils.Flasher):
 
     def flash(self, image):
         """Flash image."""
-        ext = os.path.splitext(image)[-1].lower()
-
-        if ext == ".rps":
-            # rps load command for .rps files
-            arguments = ['rps', 'load']
-        else:
-            # flash command for .s37 files
-            arguments = ['flash']
-
         return self.run_tool(
             'commander',
-            [arguments, self.DEVICE_ARGUMENTS, image],
+            ['flash', self.DEVICE_ARGUMENTS, image],
             name='Flash')
 
     def reset(self):
