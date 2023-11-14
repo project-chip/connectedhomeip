@@ -171,6 +171,7 @@ class AvhInstance:
             try:
                 self.avh_client.instance_state(self.instance_id)
             except avh_api.exceptions.NotFoundException:
+                # Not Found implies deleted
                 break
 
             if (time.monotonic() - start_time) > timeout_s:
