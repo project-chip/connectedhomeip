@@ -67,6 +67,11 @@ namespace Channel {
 using ChannelStatusEnum = StatusEnum;
 } // namespace Channel
 
+namespace TargetNavigator {
+// https://github.com/project-chip/connectedhomeip/pull/30322 renamed this
+using TargetNavigatorStatusEnum = StatusEnum;
+} // namespace TargetNavigator
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

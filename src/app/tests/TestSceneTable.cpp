@@ -102,21 +102,21 @@ static const SceneStorageId sceneId12(kScene6, kGroup4);
 CharSpan empty;
 
 // Scene data
-static const SceneData sceneData1(CharSpan("Scene #1"));
-static const SceneData sceneData2(CharSpan("Scene #2"), 2000);
-static const SceneData sceneData3(CharSpan("Scene #3"), 250);
-static const SceneData sceneData4(CharSpan("Scene num4"), 5000);
+static const SceneData sceneData1("Scene #1"_span);
+static const SceneData sceneData2("Scene #2"_span, 2000);
+static const SceneData sceneData3("Scene #3"_span, 250);
+static const SceneData sceneData4("Scene num4"_span, 5000);
 static const SceneData sceneData5(empty);
-static const SceneData sceneData6(CharSpan("Scene #6"), 3000);
-static const SceneData sceneData7(CharSpan("Scene #7"), 20000);
-static const SceneData sceneData8(CharSpan("NAME TOO LOOONNG!"), 15000);
-static const SceneData sceneData9(CharSpan("Scene #9"), 3000);
-static const SceneData sceneData10(CharSpan("Scene #10"), 1000);
-static const SceneData sceneData11(CharSpan("Scene #11"), 50);
-static const SceneData sceneData12(CharSpan("Scene #12"), 100);
-static const SceneData sceneData13(CharSpan("Scene #13"), 100);
-static const SceneData sceneData14(CharSpan("Scene #14"), 100);
-static const SceneData sceneData15(CharSpan("Scene #15"), 100);
+static const SceneData sceneData6("Scene #6"_span, 3000);
+static const SceneData sceneData7("Scene #7"_span, 20000);
+static const SceneData sceneData8("NAME TOO LOOONNG!"_span, 15000);
+static const SceneData sceneData9("Scene #9"_span, 3000);
+static const SceneData sceneData10("Scene #10"_span, 1000);
+static const SceneData sceneData11("Scene #11"_span, 50);
+static const SceneData sceneData12("Scene #12"_span, 100);
+static const SceneData sceneData13("Scene #13"_span, 100);
+static const SceneData sceneData14("Scene #14"_span, 100);
+static const SceneData sceneData15("Scene #15"_span, 100);
 
 // Scenes
 SceneTableEntry scene1(sceneId1, sceneData1);
