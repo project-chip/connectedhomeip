@@ -25,14 +25,14 @@ import("${_bootstrap_root}/build_overrides/pigweed_environment.gni")
 #
 # pw_env_setup_CIPD_PIGWEED = "//../home/vscode/pigweed/env/cipd/packages/pigweed"
 #
+# and these paths are used by things like protoc since
+# https://github.com/google/pigweed/commit/ddbc9fc7f5c601ab417db37e02cbe5294f21ad6d
+#
+# See https://github.com/project-chip/connectedhomeip/issues/30475
+#
 # Existing logic:
 #   - this file is imported from `examples/common/pigweed` or similar
 #   - we transform paths from "//../" into "//../../../"
-#
-# This was done after protoc path detection started failing when using
-# a PW_ENVIRONMENT_ROOT that is out of tree after
-#
-# https://github.com/google/pigweed/commit/ddbc9fc7f5c601ab417db37e02cbe5294f21ad6d
 #
 # TODO: need a better expansion here. This replacement logic seems very brittle and
 #       it is unclear how we know exactly 3 levels of indirections are correct
