@@ -31,7 +31,6 @@ fi
 set -x
 env
 USE_WIFI=false
-USE_RPS_EXTENSION=false
 USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
 USE_SLC=false
@@ -285,7 +284,6 @@ else
     if [ "$SILABS_BOARD" == "BRD4325B" ] || [ "$SILABS_BOARD" == "BRD4325C" ] || [ "$SILABS_BOARD" == "BRD4338A" ] || [ "$SILABS_BOARD" == "BRD4325G" ]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
-        USE_RPS_EXTENSION=true
         optArgs+="chip_device_platform =\"SiWx917\" "
     fi
 
@@ -340,21 +338,21 @@ else
 
     # add bootloader to generated image
     if [ "$USE_BOOTLOADER" == true ]; then
-        # Get .s37 path and name
-        binName="$(find "$BUILD_DIR" -type f -name "*.s37")"
+
+        binName=""
+        InternalBootloaderBoards=("BRD4337A" "BRD2704A" "BRD2703A" "BRD4319A")
+        bootloaderPath=""
+        commanderPath=""
+        # find the matter root folder
+        if [ -z "$MATTER_ROOT" ]; then
+            MATTER_ROOT="$CHIP_ROOT"
+        fi
 
         # set commander path
         if [ -z "$COMMANDER_PATH" ]; then
             commanderPath="commander"
         else
             commanderPath="$COMMANDER_PATH"
-        fi
-        InternalBootloaderBoards=("BRD4337A" "BRD2704A" "BRD2703A" "BRD4319A")
-        bootloaderPath=""
-
-        # find the matter root folder
-        if [ -z "$MATTER_ROOT" ]; then
-            MATTER_ROOT="$CHIP_ROOT"
         fi
 
         # search bootloader directory for the respective bootloaders for the input board
@@ -374,6 +372,7 @@ else
             bootloaderPath="${bootloaderFiles[0]}"
         fi
         echo "$bootloaderPath"
+        binName="$(find "$BUILD_DIR" -type f -name "*.s37")"
         echo "$binName"
         "$commanderPath" convert "$binName" "$bootloaderPath" -o "$binName"
     fi
