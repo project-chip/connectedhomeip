@@ -595,15 +595,13 @@ void BLEManagerImpl::DriveBLEState()
             // Configure advertising data if it hasn't been done yet.
             if (!mFlags.Has(Flags::kAdvertisingConfigured))
             {
-                err = mBLEAdvertisement.Init(mEndpoint, mBLEAdvType, mpBLEAdvUUID, mBLEAdvDurationMs);
-                SuccessOrExit(err);
+                SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, mBLEAdvType, mpBLEAdvUUID, mBLEAdvDurationMs));
                 mFlags.Set(Flags::kAdvertisingConfigured);
             }
 
             // Start advertising. This is an asynchronous step. BLE manager will be notified of
             // advertising start completion via a call to NotifyBLEPeripheralAdvStartComplete.
-            err = mBLEAdvertisement.Start();
-            SuccessOrExit(err);
+            SuccessOrExit(err = mBLEAdvertisement.Start());
             mFlags.Set(Flags::kControlOpInProgress);
             ExitNow();
         }
@@ -614,8 +612,7 @@ void BLEManagerImpl::DriveBLEState()
     {
         if (mFlags.Has(Flags::kAdvertising))
         {
-            err = mBLEAdvertisement.Stop();
-            SuccessOrExit(err);
+            SuccessOrExit(err = mBLEAdvertisement.Stop());
             mFlags.Set(Flags::kControlOpInProgress);
 
             ExitNow();
