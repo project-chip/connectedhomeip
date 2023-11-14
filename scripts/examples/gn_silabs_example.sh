@@ -352,7 +352,7 @@ else
     if [ "$USE_RPS_EXTENSION" == true ]; then
 
         # Create .rps
-        rpsName=$(sed 's/[^\.]*$/rps/' <<< "$binName")
+        rpsName=$(sed 's/[^\.]*$/rps/' <<<"$binName")
         "$commanderPath" rps create "$rpsName" --app "$binName"
     fi
 
