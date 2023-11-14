@@ -31,9 +31,8 @@ private:
 
     CHIP_ERROR Init(void);
 
-    static void AirQualitySensorMeasurTimerTimeoutCallback(k_timer * timer);
-    static void AirQualitySensorBanForNextMeasurTimerTimeoutCallback(k_timer * timer);
-    static void AirQualitySensorMeasurActionEventHandler(AppEvent * aEvent);
+    static void AirQualitySensorUpdateTimerTimeoutCallback(k_timer * timer);
+    static void AirQualitySensorUpdateTimerEventHandler(AppEvent * aEvent);
 
     static AppTask sAppTask;
 };

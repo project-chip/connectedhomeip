@@ -65,7 +65,7 @@ else()
   set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${MARS_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
 endif()
 
-set(CONF_FILE ${MARS_CONF_OVERLAY_FILE} prj.conf)
+set(CONF_FILE prj.conf ${MARS_CONF_OVERLAY_FILE})
 
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/telink/chip-module)
@@ -92,10 +92,10 @@ add_definitions(
 
 target_sources(app PRIVATE
                src/AppTask.cpp
-               src/SensorManager.cpp
                src/ZclCallbacks.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
+               ${TELINK_COMMON}/common/src/SensorManagerCommon.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp
