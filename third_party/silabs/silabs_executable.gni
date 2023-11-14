@@ -19,8 +19,7 @@ import("silabs_board.gni")
 
 template("silabs_executable") {
   output_base_name = get_path_info(invoker.output_name, "name")
-  extension = ".s37"
-  objcopy_image_name = output_base_name + extension
+  objcopy_image_name = output_base_name + ".s37"
   objcopy_image_format = "srec"
   objcopy = "arm-none-eabi-objcopy"
 
