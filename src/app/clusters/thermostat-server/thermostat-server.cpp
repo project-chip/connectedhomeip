@@ -68,6 +68,86 @@ constexpr int8_t kDefaultDeadBand                 = 25; // 2.5C is the default
 
 #define FEATURE_MAP_DEFAULT FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO
 
+// ----------------------------------------------
+// - Schedules and Presets Manager object       - 
+// ----------------------------------------------
+
+// Object Tracking
+static ThermostatMatterScheduleManager * firstMatterScheduleEditor = nullptr;
+
+static ThermostatMatterScheduleManager * inst(EndpointId endpoint)
+{
+    ThermostatMatterScheduleManager * current = firstMatterScheduleEditor;
+    while (current != nullptr && current->mEndpoint != endpoint)
+    {
+        current = current->next();
+    }
+
+    return current;
+}
+
+static inline void reg(ThermostatMatterScheduleManager * inst)
+{
+    inst->setNext(firstMatterScheduleEditor);
+    firstMatterScheduleEditor = inst;
+}
+
+static inline void unreg(ThermostatMatterScheduleManager * inst)
+{
+    if (firstMatterScheduleEditor == inst)
+    {
+        firstMatterScheduleEditor = firstMatterScheduleEditor->next();
+    }
+    else
+    {
+        ThermostatMatterScheduleManager * previous = firstMatterScheduleEditor;
+        ThermostatMatterScheduleManager * current  = firstMatterScheduleEditor->next();
+
+        while (current != nullptr && current != inst)
+        {
+            previous = current;
+            current  = current->next();
+        }
+
+        if (current != nullptr)
+        {
+            previous->setNext(current->next());
+        }
+    }
+}
+
+// Object LifeCycle
+ThermostatMatterScheduleManager::ThermostatMatterScheduleManager(   chip::EndpointId endpoint, 
+                                                                    onEditStartCb onEditStart, 
+                                                                    onEditCancelCb onEditCancel,
+                                                                    onEditCommitCb onEditCommit,
+
+                                                                    getPresetTypeAtIndexCB getPresetTypeAtIndex,
+                                                                    getPresetAtIndexCB getPresetAtIndex,
+                                                                    setPresetAtIndexCB setPresetAtIndex,
+
+                                                                    getScheduleTypeAtIndexCB getScheduleTypeAtIndex,
+                                                                    getScheduleAtIndexCB getScheduleAtIndex,
+                                                                    setScheduleAtIndexCB setScheduleAtIndex)
+    : mEndpoint(endpoint)
+    , mOnEditStartCb(onEditStart) 
+    , mOnEditCancelCb(onEditCancel) 
+    , mOnEditCommitCb(onEditCommit)
+    , mGetPresetTypeAtIndexCb(getPresetTypeAtIndex)
+    , mGetPresetAtIndexCb(getPresetAtIndex)
+    , mSetPresetAtIndexCb(setPresetAtIndex)
+    , mGetScheduleTypeAtIndexCb(getScheduleTypeAtIndex)
+    , mGetScheduleAtIndexCb(getScheduleAtIndex)
+    , mSetScheduleAtIndexCb(setScheduleAtIndex)
+{
+    reg(this);
+};
+
+ThermostatMatterScheduleManager::~ThermostatMatterScheduleManager()
+{
+    unreg(this);
+}
+
 namespace {
 
 class ThermostatAttrAccess : public AttributeAccessInterface
@@ -86,8 +166,10 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     VerifyOrDie(aPath.mClusterId == Thermostat::Id);
 
     uint32_t ourFeatureMap;
-    bool localTemperatureNotExposedSupported = (FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
+    const bool localTemperatureNotExposedSupported = (FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
         ((ourFeatureMap & to_underlying(Feature::kLocalTemperatureNotExposed)) != 0);
+    const bool presetsSupported = ourFeatureMap & to_underlying(Feature::kPresets);
+    const bool enhancedSchedulesSupported = ourFeatureMap & to_underlying(Feature::kMatterScheduleConfiguration);
 
     switch (aPath.mAttributeId)
     {
@@ -109,6 +191,102 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
             }
             valueRemoteSensing &= 0xFE; // clear bit 1 (LocalTemperature RemoteSensing bit)
             return aEncoder.Encode(valueRemoteSensing);
+        }
+        break;
+    case PresetTypes::Id:
+        if (presetsSupported)
+        {
+            ThermostatMatterScheduleManager * manager = inst(aPath.mEndpointId);
+            if (manager == nullptr)
+                return CHIP_ERROR_NOT_IMPLEMENTED;
+
+            return aEncoder.EncodeList([manager](const auto & encoder) -> CHIP_ERROR {
+                PresetTypeStruct::Type presetType;
+                size_t index   = 0;
+                CHIP_ERROR err = CHIP_NO_ERROR;
+                while ((err = manager->mGetPresetTypeAtIndexCb(manager, index, presetType)) == CHIP_NO_ERROR)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(presetType));
+                    index++;
+                }
+                if (err == CHIP_ERROR_NOT_FOUND)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                return err;
+            });
+        }
+        break;
+    case Presets::Id:
+        if (presetsSupported)
+        {
+            ThermostatMatterScheduleManager * manager = inst(aPath.mEndpointId);
+            if (manager == nullptr)
+                return CHIP_ERROR_NOT_IMPLEMENTED;
+
+            return aEncoder.EncodeList([manager](const auto & encoder) -> CHIP_ERROR {
+                PresetStruct::Type preset;
+                size_t index   = 0;
+                CHIP_ERROR err = CHIP_NO_ERROR;
+                while ((err = manager->mGetPresetAtIndexCb(manager, index, preset)) == CHIP_NO_ERROR)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(preset));
+                    index++;
+                }
+                if (err == CHIP_ERROR_NOT_FOUND)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                return err;
+            });
+        }
+        break;
+    case ScheduleTypes::Id:
+        if (enhancedSchedulesSupported)
+        {
+            ThermostatMatterScheduleManager * manager = inst(aPath.mEndpointId);
+            if (manager == nullptr)
+                return CHIP_ERROR_NOT_IMPLEMENTED;
+
+            return aEncoder.EncodeList([manager](const auto & encoder) -> CHIP_ERROR {
+                ScheduleTypeStruct::Type scheduleType;
+                size_t index   = 0;
+                CHIP_ERROR err = CHIP_NO_ERROR;
+                while ((err = manager->mGetScheduleTypeAtIndexCb(manager, index, scheduleType)) == CHIP_NO_ERROR)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(scheduleType));
+                    index++;
+                }
+                if (err == CHIP_ERROR_NOT_FOUND)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                return err;
+            });
+        }
+        break;
+    case Schedules::Id:
+        if (enhancedSchedulesSupported)
+        {
+            ThermostatMatterScheduleManager * manager = inst(aPath.mEndpointId);
+            if (manager == nullptr)
+                return CHIP_ERROR_NOT_IMPLEMENTED;
+
+            return aEncoder.EncodeList([manager](const auto & encoder) -> CHIP_ERROR {
+                ScheduleStruct::Type schedule;
+                size_t index   = 0;
+                CHIP_ERROR err = CHIP_NO_ERROR;
+                while ((err = manager->mGetScheduleAtIndexCb(manager, index, schedule)) == CHIP_NO_ERROR)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(schedule));
+                    index++;
+                }
+                if (err == CHIP_ERROR_NOT_FOUND)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                return err;
+            });
         }
         break;
     default: // return CHIP_NO_ERROR and just read from the attribute store in default
@@ -850,86 +1028,6 @@ bool emberAfThermostatClusterGetRelayStatusLogCallback(
     return false;
 }
 
-// ----------------------------------------------
-// - Schedules and Presets Commands and Support - 
-// ----------------------------------------------
-
-// Object Tracking
-static ThermostatMatterScheduleManager * firstMatterScheduleEditor = nullptr;
-
-static ThermostatMatterScheduleManager * inst(EndpointId endpoint)
-{
-    ThermostatMatterScheduleManager * current = firstMatterScheduleEditor;
-    while (current != nullptr && current->mEndpoint != endpoint)
-    {
-        current = current->next();
-    }
-
-    return current;
-}
-
-static inline void reg(ThermostatMatterScheduleManager * inst)
-{
-    inst->setNext(firstMatterScheduleEditor);
-    firstMatterScheduleEditor = inst;
-}
-
-static inline void unreg(ThermostatMatterScheduleManager * inst)
-{
-    if (firstMatterScheduleEditor == inst)
-    {
-        firstMatterScheduleEditor = firstMatterScheduleEditor->next();
-    }
-    else
-    {
-        ThermostatMatterScheduleManager * previous = firstMatterScheduleEditor;
-        ThermostatMatterScheduleManager * current  = firstMatterScheduleEditor->next();
-
-        while (current != nullptr && current != inst)
-        {
-            previous = current;
-            current  = current->next();
-        }
-
-        if (current != nullptr)
-        {
-            previous->setNext(current->next());
-        }
-    }
-}
-
-// Object LifeCycle
-ThermostatMatterScheduleManager::ThermostatMatterScheduleManager(   chip::EndpointId endpoint, 
-                                                                    onEditStartCb onEditStart, 
-                                                                    onEditCancelCb onEditCancel,
-                                                                    onEditCommitCb onEditCommit,
-
-                                                                    getPresetTypeAtIndexCB getPresetTypeAtIndex,
-                                                                    getPresetAtIndexCB getPresetAtIndex,
-                                                                    setPresetAtIndexCB setPresetAtIndex,
-
-                                                                    getScheduleTypeAtIndexCB getScheduleTypeAtIndex,
-                                                                    getScheduleAtIndexCB getScheduleAtIndex,
-                                                                    setScheduleAtIndexCB setScheduleAtIndex)
-    : mEndpoint(endpoint)
-    , mOnEditStartCb(onEditStart) 
-    , mOnEditCancelCb(onEditCancel) 
-    , mOnEditCommitCb(onEditCommit)
-    , mGetPresetTypeAtIndexCb(getPresetTypeAtIndex)
-    , mGetPresetAtIndexCb(getPresetAtIndex)
-    , mSetPresetAtIndexCb(setPresetAtIndex)
-    , mGetScheduleTypeAtIndexCb(getScheduleTypeAtIndex)
-    , mGetScheduleAtIndexCb(getScheduleAtIndex)
-    , mSetScheduleAtIndexCb(setScheduleAtIndex)
-{
-    reg(this);
-};
-
-ThermostatMatterScheduleManager::~ThermostatMatterScheduleManager()
-{
-    unreg(this);
-}
-
 // Timer Callbacks
 static void onThermostatScheduleEditorTick(chip::System::Layer * systemLayer, void * appState)
 {
@@ -1119,7 +1217,7 @@ bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
         const chip::ByteSpan &scheduleHandle = commandData.scheduleHandle;
         ScheduleStruct::Type schedule;
         bool found = false;
-        int8_t index = 0;
+        size_t index = 0;
 
         while (manager->mGetScheduleAtIndexCb(manager, index, schedule) != CHIP_ERROR_NOT_FOUND)
         {
@@ -1161,7 +1259,7 @@ bool emberAfThermostatClusterSetActivePresetRequestCallback(
 
         PresetStruct::Type preset;
         bool found = false;
-        int8_t index = 0;
+        size_t index = 0;
 
         while (manager->mGetPresetAtIndexCb(manager, index, preset) != CHIP_ERROR_NOT_FOUND)
         {

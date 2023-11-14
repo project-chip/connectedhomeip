@@ -39,12 +39,12 @@ struct ThermostatMatterScheduleManager
     using onEditCancelCb = onEditStartCb;
     using onEditCommitCb = onEditStartCb;
 
-    using getPresetTypeAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, uint8_t index, PresetTypeStruct::Type &scheduleType);
-    using getPresetAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, uint8_t index, PresetStruct::Type &schedule);
+    using getPresetTypeAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, PresetTypeStruct::Type &scheduleType);
+    using getPresetAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, PresetStruct::Type &schedule);
     using setPresetAtIndexCB = getPresetAtIndexCB;
 
-    using getScheduleTypeAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, uint8_t index, ScheduleTypeStruct::Type &scheduleType);
-    using getScheduleAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, uint8_t index, ScheduleStruct::Type &schedule);
+    using getScheduleTypeAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, ScheduleTypeStruct::Type &scheduleType);
+    using getScheduleAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, ScheduleStruct::Type &schedule);
     using setScheduleAtIndexCB = getScheduleAtIndexCB;
 
     /**
