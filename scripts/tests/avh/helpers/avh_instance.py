@@ -209,6 +209,8 @@ class AvhInstance:
             try:
                 output += self.console.recv()
             except websocket.WebSocketTimeoutException:
+                # ignore timeout exceptions as the AVH instance might not produce console output
+                # while processing commands, the timeout will be managed by the while loop
                 pass
 
             if expected_output in output:
