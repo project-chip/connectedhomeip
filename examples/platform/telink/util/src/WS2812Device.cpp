@@ -29,15 +29,15 @@ using namespace chip;
 CHIP_ERROR WS2812Device::Init(const struct device * ws2812Device, uint32_t aChainLength)
 {
     mWs2812Device = ws2812Device;
-    mChainLength = aChainLength;
-    mState = kRgbState_Off;
+    mChainLength  = aChainLength;
+    mState        = kRgbState_Off;
     memset(&mLedRgb, RGB_MAX_VALUE, sizeof(RgbColor_t));
 
     if (!device_is_ready(mWs2812Device))
     {
         LOG_ERR("Device %s is not ready", mWs2812Device->name);
         return CHIP_ERROR_INCORRECT_STATE;
-	}
+    }
 
     UpdateRgbLight();
 
@@ -47,7 +47,7 @@ CHIP_ERROR WS2812Device::Init(const struct device * ws2812Device, uint32_t aChai
 void WS2812Device::UpdateRgbLight()
 {
     int status;
-    led_rgb setRgb = {0};
+    led_rgb setRgb = { 0 };
 
     if (mState == kRgbState_On)
     {

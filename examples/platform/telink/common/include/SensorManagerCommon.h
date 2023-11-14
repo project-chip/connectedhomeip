@@ -34,7 +34,7 @@ class SensorManager
 {
 public:
     CHIP_ERROR Init();
-    CHIP_ERROR GetTempAndHumMeasurValue(int16_t *pTempMeasured, uint16_t *pHumMeasured);
+    CHIP_ERROR GetTempAndHumMeasurValue(int16_t * pTempMeasured, uint16_t * pHumMeasured);
 
     int16_t GetMinMeasuredTempValue();
     int16_t GetMaxMeasuredTempValue();

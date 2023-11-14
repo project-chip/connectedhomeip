@@ -28,9 +28,9 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
 #ifdef CONFIG_WS2812_STRIP
-const struct device *const ws2812_dev = DEVICE_DT_GET(DT_ALIAS(led_strip));
+const struct device * const ws2812_dev = DEVICE_DT_GET(DT_ALIAS(led_strip));
 #else
-const struct pwm_dt_spec sPwmRgbSpecBlueLed = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0));
+const struct pwm_dt_spec sPwmRgbSpecBlueLed  = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0));
 #if USE_RGB_PWM
 const struct pwm_dt_spec sPwmRgbSpecGreenLed = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
 const struct pwm_dt_spec sPwmRgbSpecRedLed   = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led2));
@@ -152,7 +152,8 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
         actor = AppEvent::kEventType_Button;
     }
 
-    if (action != PWMDevice::INVALID_ACTION && (
+    if (action != PWMDevice::INVALID_ACTION &&
+        (
 #if USE_RGB_PWM
             !sAppTask.mPwmRgbRedLed.InitiateAction(action, actor, NULL) ||
             !sAppTask.mPwmRgbGreenLed.InitiateAction(action, actor, NULL) ||
@@ -211,9 +212,8 @@ void AppTask::UpdateClusterState(void)
 #ifdef CONFIG_WS2812_STRIP
     isTurnedOn = sAppTask.mWS2812Device.IsTurnedOn();
 #else
-    isTurnedOn = sAppTask.mPwmRgbRedLed.IsTurnedOn()
-            || sAppTask.mPwmRgbGreenLed.IsTurnedOn()
-            || sAppTask.mPwmRgbBlueLed.IsTurnedOn();
+    isTurnedOn =
+        sAppTask.mPwmRgbRedLed.IsTurnedOn() || sAppTask.mPwmRgbGreenLed.IsTurnedOn() || sAppTask.mPwmRgbBlueLed.IsTurnedOn();
 #endif // CONFIG_WS2812_STRIP
 
     if (sColorAction == PWMDevice::COLOR_ACTION_XY || sColorAction == PWMDevice::COLOR_ACTION_HSV ||
@@ -235,7 +235,7 @@ void AppTask::UpdateClusterState(void)
     }
 #else
     isTurnedOn = sAppTask.mPwmRgbBlueLed.IsTurnedOn();
-    setLevel = sAppTask.mPwmRgbBlueLed.GetLevel();
+    setLevel   = sAppTask.mPwmRgbBlueLed.GetLevel();
 #endif // CONFIG_WS2812_STRIP || USE_RGB_PWM
 
     // write the new on/off value

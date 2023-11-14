@@ -47,8 +47,10 @@ CHIP_ERROR AppTask::Init(void)
     k_timer_start(&sTemperatureMeasurementUpdateTimer, K_MSEC(kTemperatureMeasurementUpdateTimerPeriodMs), K_NO_WAIT);
 
     PlatformMgr().LockChipStack();
-    app::Clusters::TemperatureMeasurement::Attributes::MinMeasuredValue::Set(kExampleEndpointId, SensorMgr().GetMinMeasuredTempValue());
-    app::Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(kExampleEndpointId, SensorMgr().GetMaxMeasuredTempValue());
+    app::Clusters::TemperatureMeasurement::Attributes::MinMeasuredValue::Set(kExampleEndpointId,
+                                                                             SensorMgr().GetMinMeasuredTempValue());
+    app::Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(kExampleEndpointId,
+                                                                             SensorMgr().GetMaxMeasuredTempValue());
     PlatformMgr().UnlockChipStack();
 
     return CHIP_NO_ERROR;

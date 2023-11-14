@@ -23,12 +23,12 @@
 
 #include <system/SystemError.h>
 
-#define STRIP_NUM_PIXELS(LED_STRIP)     DT_PROP(DT_ALIAS(LED_STRIP), chain_length)
-#define RGB_MIN_VALUE                   0
-#define RGB_MAX_VALUE                   255
+#define STRIP_NUM_PIXELS(LED_STRIP) DT_PROP(DT_ALIAS(LED_STRIP), chain_length)
+#define RGB_MIN_VALUE 0
+#define RGB_MAX_VALUE 255
 
-#define SET_RGB_TURN_OFF                0
-#define SET_RGB_TURN_ON                 1
+#define SET_RGB_TURN_OFF 0
+#define SET_RGB_TURN_ON 1
 
 class WS2812Device
 {

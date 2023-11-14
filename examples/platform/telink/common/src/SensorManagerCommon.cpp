@@ -26,21 +26,21 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 
-constexpr float kMinTempDelta                 = 0.5;  // 0.5 degree Celsius
+constexpr float kMinTempDelta = 0.5; // 0.5 degree Celsius
 
 #ifdef CONFIG_CHIP_USE_MARS_SENSOR
 k_timer sSensorBanForNextMeasurTimer;
-volatile bool mSensorBanForNextMeasurFlag = false;
+volatile bool mSensorBanForNextMeasurFlag         = false;
 constexpr uint16_t kSensorBanForNextMeasurTimeout = 1000; // 1s timeout
 
-const struct device *const sht3xd_dev = DEVICE_DT_GET_ONE(sensirion_sht3xd);
+const struct device * const sht3xd_dev = DEVICE_DT_GET_ONE(sensirion_sht3xd);
 
 #ifdef USE_COLOR_TEMPERATURE_LIGHT
-const struct device *const ws2812_dev = DEVICE_DT_GET(DT_ALIAS(led_strip));
+const struct device * const ws2812_dev = DEVICE_DT_GET(DT_ALIAS(led_strip));
 
-#define TEMP_LOW_LIM        0   // °C
-#define TEMP_HIGH_LIM       40  // °C
-#endif // USE_COLOR_TEMPERATURE_LIGHT
+#define TEMP_LOW_LIM 0   // °C
+#define TEMP_HIGH_LIM 40 // °C
+#endif                   // USE_COLOR_TEMPERATURE_LIGHT
 #else
 constexpr float kSimulatedHum                 = 55.5; // percents
 constexpr uint16_t kSimulatedReadingFrequency = 4;    // change simulated number
@@ -56,10 +56,10 @@ CHIP_ERROR SensorManager::Init()
     {
         LOG_ERR("Device %s is not ready", sht3xd_dev->name);
         return CHIP_ERROR_INCORRECT_STATE;
-	}
+    }
 
 #ifdef USE_COLOR_TEMPERATURE_LIGHT
-    RgbColor_t rgb = {0};
+    RgbColor_t rgb = { 0 };
 
     CHIP_ERROR err = sSensorManager.mWS2812Device.Init(ws2812_dev, STRIP_NUM_PIXELS(led_strip));
     if (err != CHIP_NO_ERROR)
@@ -80,15 +80,15 @@ CHIP_ERROR SensorManager::Init()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SensorManager::GetTempAndHumMeasurValue(int16_t *pTempMeasured, uint16_t *pHumMeasured)
+CHIP_ERROR SensorManager::GetTempAndHumMeasurValue(int16_t * pTempMeasured, uint16_t * pHumMeasured)
 {
     static float lastTemp = 0.0;
     float temp            = 0.0;
     float hum             = 0.0;
 
 #ifdef CONFIG_CHIP_USE_MARS_SENSOR
-    static struct sensor_value sensorTemp = {0};
-    static struct sensor_value sensorHum = {0};
+    static struct sensor_value sensorTemp = { 0 };
+    static struct sensor_value sensorHum  = { 0 };
 
     if (!mSensorBanForNextMeasurFlag)
     {
@@ -119,8 +119,8 @@ CHIP_ERROR SensorManager::GetTempAndHumMeasurValue(int16_t *pTempMeasured, uint1
         k_timer_start(&sSensorBanForNextMeasurTimer, K_MSEC(kSensorBanForNextMeasurTimeout), K_NO_WAIT);
     }
 
-    temp = (float)sensor_value_to_double(&sensorTemp);
-    hum = (float)sensor_value_to_double(&sensorHum);
+    temp = (float) sensor_value_to_double(&sensorTemp);
+    hum  = (float) sensor_value_to_double(&sensorHum);
 
 #ifdef USE_COLOR_TEMPERATURE_LIGHT
     SetColorTemperatureLight(temp);
@@ -165,7 +165,7 @@ CHIP_ERROR SensorManager::GetTempAndHumMeasurValue(int16_t *pTempMeasured, uint1
 
     if (pHumMeasured != NULL)
     {
-        *pHumMeasured =  (uint16_t) hum;
+        *pHumMeasured = (uint16_t) hum;
     }
 
     return CHIP_NO_ERROR;
@@ -195,23 +195,23 @@ void SensorManager::SensorBanForNextMeasurTimerTimeoutCallback(k_timer * timer)
 #ifdef USE_COLOR_TEMPERATURE_LIGHT
 void SensorManager::SetColorTemperatureLight(int8_t temp)
 {
-    RgbColor_t rgb = {0};
+    RgbColor_t rgb = { 0 };
 
     if (temp >= mMinMeasuredTempCelsius && temp <= TEMP_LOW_LIM)
     {
         /* Set Color Temperature Light in range -40...0°C */
-        rgb.b = RGB_MAX_VALUE * (1 - ((float)temp - TEMP_LOW_LIM)/(mMinMeasuredTempCelsius - TEMP_LOW_LIM));
+        rgb.b = RGB_MAX_VALUE * (1 - ((float) temp - TEMP_LOW_LIM) / (mMinMeasuredTempCelsius - TEMP_LOW_LIM));
     }
     else if (temp >= TEMP_HIGH_LIM && temp <= mMaxMeasuredTempCelsius)
     {
         /* Set Color Temperature Light in range 40...125°C */
-        rgb.r = RGB_MAX_VALUE * (1 - ((float)temp - TEMP_HIGH_LIM)/(mMaxMeasuredTempCelsius - TEMP_HIGH_LIM));
+        rgb.r = RGB_MAX_VALUE * (1 - ((float) temp - TEMP_HIGH_LIM) / (mMaxMeasuredTempCelsius - TEMP_HIGH_LIM));
     }
     else if (temp > TEMP_LOW_LIM && temp < TEMP_HIGH_LIM)
     {
         uint8_t steps_in_part = (TEMP_HIGH_LIM - TEMP_LOW_LIM) / 4;
-        uint8_t step_num = temp % steps_in_part;
-        float step_val = (float)RGB_MAX_VALUE / steps_in_part;
+        uint8_t step_num      = temp % steps_in_part;
+        float step_val        = (float) RGB_MAX_VALUE / steps_in_part;
 
         if (temp < steps_in_part)
         {
@@ -231,13 +231,13 @@ void SensorManager::SetColorTemperatureLight(int8_t temp)
             /* Set Color Temperature Light in range 20...29°C */
             rgb.r = RGB_MAX_VALUE;
             rgb.g = RGB_MAX_VALUE;
-            rgb.b = RGB_MAX_VALUE - (step_num * step_val) ;
+            rgb.b = RGB_MAX_VALUE - (step_num * step_val);
         }
         else
         {
             /* Set Color Temperature Light in range 30...39°C */
             rgb.r = RGB_MAX_VALUE;
-            rgb.g = RGB_MAX_VALUE - (step_num * step_val) ;
+            rgb.g = RGB_MAX_VALUE - (step_num * step_val);
         }
     }
     else
