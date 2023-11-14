@@ -35,7 +35,7 @@ def chiptool_runner_options(f):
     f = click.option('--server_path', type=click.Path(exists=True), default=None,
                      help='Path to a websocket server that will be executed to forward parsed command. Most likely you want to use chiptool.')(f)
     f = click.option('--server_name', type=str, default='chip-tool',
-                     help='If server_path is not provided, we use this argument to seach various directories within SDK binary that matches this name.')(f)
+                     help='If server_path is not provided, we use this argument to seach various directories within the SDK for a binary that matches this name.')(f)
     f = click.option('--server_arguments', type=str, default='interactive server',
                      help='Arguments to pass to the websocket server at launch.')(f)
     f = click.option('--show_adapter_logs', type=bool, default=False, show_default=True,
