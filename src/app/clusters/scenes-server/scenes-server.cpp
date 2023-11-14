@@ -541,8 +541,8 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
 CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & endpointID, const GroupId & groupID,
                            const SceneId & sceneID, GroupDataProvider * groupProvider)
 {
-    // Make SceneValid false for all fabrics before store scenes
-    ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpointID);
+    // Make current fabric's SceneValid false before store scenes
+    ScenesServer::Instance().MakeSceneInvalid(endpointID, fabricIdx);
 
     uint16_t endpointTableSize = 0;
     ReturnErrorOnFailure(
