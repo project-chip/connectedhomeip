@@ -32,8 +32,8 @@ namespace Clusters {
 namespace DiagnosticLogs {
 /**
  * The BDX transfer handler than initiates a BDX transfer session as a Sender using the synchronous Sender Drive
- * transfer mode. It gets the chunks of the log from the accessory and sends the block accross to the receiver until
- * all the blocks have been transferred and the accessory reports that end of file is reached.
+ * transfer mode. It gets the chunks of the log and sends the block accross to the receiver until
+ * all the blocks have been transferred and the delegate reports that end of file is reached.
  */
 class DiagnosticLogsBDXTransferHandler : public chip::bdx::Initiator
 {

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,9 +51,9 @@ public:
      *
      * @param endpoint ID of the endpoint
      *
-     * @param delegate The default lofg provider delegate at the endpoint
+     * @param delegate The log provider delegate at the endpoint
      */
-    void SetDefaultLogProviderDelegate(EndpointId endpoint, LogProviderDelegate * delegate);
+    void SetLogProviderDelegate(EndpointId endpoint, LogProviderDelegate * delegate);
 
     void HandleLogRequestForResponsePayload(chip::app::CommandHandler * commandHandler, chip::app::ConcreteCommandPath path,
                                             IntentEnum intent);

@@ -104,7 +104,7 @@ void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSessi
         Reset();
         break;
     case TransferSession::OutputEventType::kStatusReceived:
-        ChipLogError(BDX, "Got StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
+        ChipLogError(BDX, "Got StatusReport %x", to_underlying(event.statusData.statusCode));
         DiagnosticLogsServer::Instance().HandleBDXResponse(CHIP_ERROR_INTERNAL);
         Reset();
         break;
@@ -150,12 +150,12 @@ void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSessi
 
         if (mLogSessionHandle == kInvalidLogSessionHandle)
         {
-            ChipLogError(BDX, "Invalid log session handle");
+            ChipLogError(BDX, "No log available for intent enum %d", to_underlying(mIntent));
             DiagnosticLogsServer::Instance().HandleBDXResponse(CHIP_ERROR_INCORRECT_STATE);
             mTransfer.AbortTransfer(StatusCode::kUnknown);
             return;
         }
-        // Send a response to the RetreiveLogRequest since we got a SendAccept message.
+        // Send a response to the RetreiveLogRequest, since we got a SendAccept message.
         DiagnosticLogsServer::Instance().HandleBDXResponse(CHIP_NO_ERROR);
         [[fallthrough]];
     }

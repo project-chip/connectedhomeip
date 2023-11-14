@@ -56,7 +56,7 @@ public:
 
     ~LogProvider(){};
 
-    static inline LogProvider & getLogProvider() { return sInstance; }
+    static inline LogProvider & GetInstance() { return sInstance; }
 
 private:
     const char * GetLogFilePath(IntentEnum logType);

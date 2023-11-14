@@ -1465,8 +1465,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             }
 
             MTRDiagnosticLogsClusterRetrieveLogsRequestParams * requestParams = [[MTRDiagnosticLogsClusterRetrieveLogsRequestParams alloc] init];
-            requestParams.intent = [NSNumber numberWithInteger:type];
-            requestParams.requestedProtocol = [NSNumber numberWithUnsignedChar:chip::to_underlying(chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum::kBdx)];
+            requestParams.intent = @(type);
+            requestParams.requestedProtocol = @(chip::to_underlying(chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum::kBdx));
             requestParams.transferFileDesignator = [self _getFileDesignatorForLogType:type];
             [cluster retrieveLogsRequestWithParams:requestParams expectedValues:nil expectedValueInterval:nil
                                         completion:^(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable response, NSError * _Nullable error) {

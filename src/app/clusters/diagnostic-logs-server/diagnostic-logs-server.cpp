@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ LogProviderDelegate * GetLogProviderDelegate(EndpointId endpoint)
     return (ep >= kDiagnosticLogsLogProviderDelegateTableSize ? nullptr : gLogProviderDelegateTable[ep]);
 }
 
-bool isLogProviderDelegateNull(LogProviderDelegate * logProviderDelegate, EndpointId endpoint)
+bool IsLogProviderDelegateNull(LogProviderDelegate * logProviderDelegate, EndpointId endpoint)
 {
     if (logProviderDelegate == nullptr)
     {
