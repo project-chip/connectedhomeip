@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Flash an EFR32 device.
+"""Flash an SILABS device.
 
 This is layered so that a caller can perform individual operations
 through an `Flasher` instance, or operations according to a command line.
@@ -24,7 +24,7 @@ usage: silabs_firmware_utils.py [-h] [--verbose] [--erase] [--application FILE]
                                [--commander FILE] [--device DEVICE]
                                [--serialno SERIAL] [--ip ADDRESS]
 
-Flash EFR32 device
+Flash SILABS device
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -56,7 +56,7 @@ import firmware_utils
 
 # Additional options that can be use to configure an `Flasher`
 # object (as dictionary keys) and/or passed as command line options.
-EFR32_OPTIONS = {
+SILABS_OPTIONS = {
     # Configuration options define properties used in flashing operations.
     'configuration': {
         # Tool configuration options.
@@ -72,7 +72,7 @@ EFR32_OPTIONS = {
                 Unable to execute {commander}.
 
                 Please ensure that this tool is installed and
-                available. See the EFR32 example README for
+                available. See the SILABS example README for
                 installation instructions.
 
                 """,
@@ -106,11 +106,11 @@ EFR32_OPTIONS = {
 
 
 class Flasher(firmware_utils.Flasher):
-    """Manage efr32 flashing."""
+    """Manage silabs flashing."""
 
     def __init__(self, **options):
-        super().__init__(platform='EFR32', module=__name__, **options)
-        self.define_options(EFR32_OPTIONS)
+        super().__init__(platform='SILABS', module=__name__, **options)
+        self.define_options(SILABS_OPTIONS)
 
     # Common command line arguments for commander device subcommands.
     DEVICE_ARGUMENTS = [{'optional': 'serialno'}, {
