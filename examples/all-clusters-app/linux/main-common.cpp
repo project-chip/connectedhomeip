@@ -20,7 +20,7 @@
 #include "AppOptions.h"
 #include "WindowCoveringManager.h"
 #include "air-quality-instance.h"
-#include "diagnostic-logs-provider-delegate-impl.h"
+#include "include/diagnostic-logs-provider-delegate-impl.h"
 #include "dishwasher-mode.h"
 #include "include/tv-callbacks.h"
 #include "laundry-washer-controls-delegate-impl.h"

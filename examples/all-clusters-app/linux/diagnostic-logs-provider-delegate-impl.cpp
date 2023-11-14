@@ -15,7 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "diagnostic-logs-provider-delegate-impl.h"
+#include "include/diagnostic-logs-provider-delegate-impl.h"
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-provider-delegate.h>
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 
