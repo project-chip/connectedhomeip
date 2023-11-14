@@ -22,8 +22,6 @@
 namespace chip {
 namespace scenes {
 
-using ClusterId = chip::ClusterId;
-
 /// @brief Default implementation of handler, handle EFS from add scene and view scene commands for any cluster
 ///        The implementation of SerializeSave and ApplyScene were omitted and must be implemented in a way that
 ///        is compatible with the SerializeAdd output in order to function with the Default Scene Handler.
@@ -32,19 +30,19 @@ using ClusterId = chip::ClusterId;
 class DefaultSceneHandlerImpl : public scenes::SceneHandler
 {
     template <typename T>
-    using List = chip::app::DataModel::List<T>;
+    using List = app::DataModel::List<T>;
 
     template <typename T>
-    using DecodableList = chip::app::DataModel::DecodableList<T>;
+    using DecodableList = app::DataModel::DecodableList<T>;
 
-    using AttributeValuePairType          = chip::app::Clusters::Scenes::Structs::AttributeValuePair::Type;
-    using AttributeValuePairDecodableType = chip::app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType;
-    using ExtensionFieldSetDecodableType  = chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType;
-    using ExtensionFieldSetType           = chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type;
+    using AttributeValuePairType          = app::Clusters::Scenes::Structs::AttributeValuePair::Type;
+    using AttributeValuePairDecodableType = app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType;
+    using ExtensionFieldSetDecodableType  = app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType;
+    using ExtensionFieldSetType           = app::Clusters::Scenes::Structs::ExtensionFieldSet::Type;
 
 public:
     /// @brief Struct meant to map the state of a cluster to a specific endpoint. Meant to be used to apply scenes using a timer for
-    /// transitionning
+    /// transitioning
     /// @tparam ValueType type of the value to map to the endpoint, must implement operator= and operator== for complex types
     template <typename ValueType>
     struct EndpointStatePair
@@ -59,6 +57,9 @@ public:
     template <typename ValueType, size_t MaxEndpointCount>
     struct StatePairBuffer
     {
+        static_assert(std::is_trivial<ValueType>::value, "ValueType must be trivial");
+        static_assert(MaxEndpointCount < std::numeric_limits<uint16_t>::max(), "MaxEndpointCount must be less than 65535");
+
         bool IsEmpty() const { return (mPairCount == 0); }
 
         CHIP_ERROR FindPair(const EndpointId endpoint, uint16_t & found_index) const
@@ -137,30 +138,12 @@ public:
     /// @brief Struct meant to allow to save context for a cluster that needs to apply a scene after a transition time but does not
     /// own a time property in its commands
     /// @tparam MaxEndpointCount
-    template <size_t MaxEndpointCount>
+    template <size_t MaxEndpointCount, size_t FixedEndpointCount>
     struct TransitionTimeInterface
     {
         EmberEventControl sceneHandlerEventControls[MaxEndpointCount];
 
         TransitionTimeInterface(ClusterId clusterId, void (*callback)(EndpointId)) : mClusterId(clusterId), mCallback(callback) {}
-
-        /**
-         * @brief event control object for an endpoint
-         *
-         * @param[in] endpoint target endpoint
-         * @param[in] eventControlArray Array where to find the event control
-         * @return EmberEventControl* configured event control
-         */
-        EmberEventControl * getEventControl(EndpointId endpoint, const Span<EmberEventControl> & eventControlArray)
-        {
-            uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, mClusterId, MaxEndpointCount);
-            if (index >= eventControlArray.size())
-            {
-                return nullptr;
-            }
-
-            return &eventControlArray[index];
-        }
 
         /**
          * @brief Configures EventControl callback
@@ -181,6 +164,25 @@ public:
 
         ClusterId mClusterId;
         void (*mCallback)(EndpointId);
+
+    private:
+        /**
+         * @brief event control object for an endpoint
+         *
+         * @param[in] endpoint target endpoint
+         * @param[in] eventControlArray Array where to find the event control
+         * @return EmberEventControl* configured event control
+         */
+        EmberEventControl * getEventControl(EndpointId endpoint, const Span<EmberEventControl> & eventControlArray)
+        {
+            uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, mClusterId, FixedEndpointCount);
+            if (index >= eventControlArray.size())
+            {
+                return nullptr;
+            }
+
+            return &eventControlArray[index];
+        }
     };
 
     static constexpr uint8_t kMaxAvPair = CHIP_CONFIG_SCENES_MAX_AV_PAIRS_EFS;

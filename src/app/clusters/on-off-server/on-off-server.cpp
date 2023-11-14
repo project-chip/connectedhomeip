@@ -105,8 +105,9 @@ static constexpr size_t kOnOffMaxEnpointCount =
 
 #ifdef EMBER_AF_PLUGIN_SCENES
 static void sceneOnOffCallback(EndpointId endpoint);
-using OnOffEndPointPair        = chip::scenes::DefaultSceneHandlerImpl::EndpointStatePair<bool>;
-using sTransitionTimeInterface = chip::scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<kOnOffMaxEnpointCount>;
+using OnOffEndPointPair = scenes::DefaultSceneHandlerImpl::EndpointStatePair<bool>;
+using OnOffTransitionTimeInterface =
+    scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<kOnOffMaxEnpointCount, EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT>;
 
 class DefaultOnOffSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
@@ -219,7 +220,7 @@ public:
     }
 
 private:
-    sTransitionTimeInterface mTransitionTimeInterface = sTransitionTimeInterface(Attributes::OnOff::Id, sceneOnOffCallback);
+    OnOffTransitionTimeInterface mTransitionTimeInterface = OnOffTransitionTimeInterface(Attributes::OnOff::Id, sceneOnOffCallback);
 };
 static DefaultOnOffSceneHandler sOnOffSceneHandler;
 
@@ -227,7 +228,7 @@ static void sceneOnOffCallback(EndpointId endpoint)
 {
     OnOffEndPointPair savedState;
     ReturnOnFailure(sOnOffSceneHandler.mSceneEndpointStatePairs.GetPair(endpoint, savedState));
-    chip::CommandId command = (savedState.mValue) ? Commands::On::Id : Commands::Off::Id;
+    CommandId command = (savedState.mValue) ? Commands::On::Id : Commands::Off::Id;
     OnOffServer::Instance().setOnOffValue(endpoint, command, false);
     ReturnOnFailure(sOnOffSceneHandler.mSceneEndpointStatePairs.RemovePair(endpoint));
 }
