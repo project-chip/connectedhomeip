@@ -38,8 +38,8 @@ import("${_bootstrap_root}/build_overrides/pigweed_environment.gni")
 #       it is unclear how we know exactly 3 levels of indirections are correct
 #
 if (defined(pw_env_setup_CIPD_ARM)) {
-  _split_arm = string_split(pw_env_setup_CIPD_ARM, "/")
-  if (_split_arm[0] == "" && _split_arm[1] == "" && _split_arm[2] == "..") {
+  _split_arm = string_split(pw_env_setup_CIPD_ARM, "//../")
+  if (_split_arm[0] == "") {
     pw_env_setup_CIPD_ARM = get_path_info(
             string_replace(pw_env_setup_CIPD_ARM, "//../", "//../../../"),
             "abspath")
@@ -49,9 +49,8 @@ if (defined(pw_env_setup_CIPD_ARM)) {
   }
 }
 if (defined(pw_env_setup_CIPD_PIGWEED)) {
-  _split_pigweed = string_split(pw_env_setup_CIPD_PIGWEED, "/")
-  if (_split_pigweed[0] == "" && _split_pigweed[1] == "" &&
-      _split_pigweed[2] == "..") {
+  _split_pigweed = string_split(pw_env_setup_CIPD_PIGWEED, "//../")
+  if (_split_pigweed[0] == "") {
     pw_env_setup_CIPD_PIGWEED =
         get_path_info(
             string_replace(pw_env_setup_CIPD_PIGWEED, "//../", "//../../../"),
@@ -64,9 +63,8 @@ if (defined(pw_env_setup_CIPD_PIGWEED)) {
 }
 
 if (defined(pw_env_setup_CIPD_PYTHON)) {
-  _split_python = string_split(pw_env_setup_CIPD_PYTHON, "/")
-  if (_split_python[0] == "" && _split_python[1] == "" &&
-      _split_python[2] == "..") {
+  _split_python = string_split(pw_env_setup_CIPD_PYTHON, "//../")
+  if (_split_python[0] == "") {
     pw_env_setup_CIPD_PYTHON =
         get_path_info(
             string_replace(pw_env_setup_CIPD_PYTHON, "//../", "//../../../"),
@@ -78,8 +76,8 @@ if (defined(pw_env_setup_CIPD_PYTHON)) {
   }
 }
 if (defined(pw_env_setup_VIRTUAL_ENV)) {
-  _split_env = string_split(pw_env_setup_VIRTUAL_ENV, "/")
-  if (_split_env[0] == "" && _split_env[1] == "" && _split_env[2] == "..") {
+  _split_env = string_split(pw_env_setup_VIRTUAL_ENV, "//../")
+  if (_split_env[0] == "") {
     pw_env_setup_VIRTUAL_ENV =
         get_path_info(
             string_replace(pw_env_setup_VIRTUAL_ENV, "//../", "//../../../"),
