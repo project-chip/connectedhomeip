@@ -4734,13 +4734,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @end
 
-/**
- * Cluster Timer
- *
- * This cluster supports creating a simple timer functionality.
- */
-MTR_PROVISIONALLY_AVAILABLE
-@interface MTRBaseClusterTimer : MTRCluster
+@interface MTRBaseClusterICDManagement (Availability)
 
 /**
  * For all instance methods (reads, writes, commands) that take a completion,
@@ -4748,7 +4742,17 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
-                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_PROVISIONALLY_AVAILABLE;
+                                   queue:(dispatch_queue_t)queue MTR_PROVISIONALLY_AVAILABLE;
+
+@end
+
+/**
+ * Cluster Timer
+ *
+ * This cluster supports creating a simple timer functionality.
+ */
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRBaseClusterTimer : MTRGenericBaseCluster
 
 /**
  * Command SetTimer
@@ -4836,13 +4840,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @end
 
-/**
- * Cluster Mode Select
- *
- * Attributes and commands for selecting a mode from a list of supported options.
- */
-MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBaseClusterModeSelect : MTRCluster
+@interface MTRBaseClusterTimer (Availability)
 
 /**
  * For all instance methods (reads, writes, commands) that take a completion,
@@ -4850,7 +4848,17 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
-                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+                                   queue:(dispatch_queue_t)queue MTR_PROVISIONALLY_AVAILABLE;
+
+@end
+
+/**
+ * Cluster Mode Select
+ *
+ * Attributes and commands for selecting a mode from a list of supported options.
+ */
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+@interface MTRBaseClusterModeSelect : MTRGenericBaseCluster
 
 /**
  * Command ChangeToMode

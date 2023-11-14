@@ -2183,12 +2183,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @end
 
-/**
- * Cluster Timer
- *    This cluster supports creating a simple timer functionality.
- */
-MTR_PROVISIONALLY_AVAILABLE
-@interface MTRClusterTimer : MTRCluster
+@interface MTRClusterICDManagement (Availability)
 
 /**
  * For all instance methods that take a completion (i.e. command invocations),
@@ -2196,12 +2191,16 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
-                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_PROVISIONALLY_AVAILABLE;
+                                   queue:(dispatch_queue_t)queue MTR_PROVISIONALLY_AVAILABLE;
+
+@end
 
 /**
- * The device this cluster object is associated with.
+ * Cluster Timer
+ *    This cluster supports creating a simple timer functionality.
  */
-@property (nonatomic, readonly) MTRDevice * device MTR_PROVISIONALLY_AVAILABLE;
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRClusterTimer : MTRGenericCluster
 
 - (void)setTimerWithParams:(MTRTimerClusterSetTimerParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)resetTimerWithParams:(MTRTimerClusterResetTimerParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
@@ -2233,12 +2232,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @end
 
-/**
- * Cluster Mode Select
- *    Attributes and commands for selecting a mode from a list of supported options.
- */
-MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRClusterModeSelect : MTRCluster
+@interface MTRClusterTimer (Availability)
 
 /**
  * For all instance methods that take a completion (i.e. command invocations),
@@ -2246,13 +2240,16 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
-                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+                                   queue:(dispatch_queue_t)queue MTR_PROVISIONALLY_AVAILABLE;
+
+@end
 
 /**
  * Cluster Mode Select
  *    Attributes and commands for selecting a mode from a list of supported options.
  */
-@property (nonatomic, readonly) MTRDevice * device MTR_NEWLY_AVAILABLE;
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+@interface MTRClusterModeSelect : MTRGenericCluster
 
 - (void)changeToModeWithParams:(MTRModeSelectClusterChangeToModeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 

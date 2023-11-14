@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class TimerCluster(private val endpointId: UShort) {
+class TimerCluster(private val controller: MatterController, private val endpointId: UShort) {
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   class AcceptedCommandListAttribute(val value: List<UInt>)
@@ -29,6 +30,8 @@ class TimerCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun setTimer(newTime: UInt, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -37,6 +40,8 @@ class TimerCluster(private val endpointId: UShort) {
   }
 
   suspend fun resetTimer(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -45,6 +50,8 @@ class TimerCluster(private val endpointId: UShort) {
   }
 
   suspend fun addTime(additionalTime: UInt, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -53,6 +60,8 @@ class TimerCluster(private val endpointId: UShort) {
   }
 
   suspend fun reduceTime(timeReduction: UInt, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 3L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
