@@ -19,10 +19,6 @@
 #include "SensorManagerCommon.h"
 #ifdef CONFIG_CHIP_USE_MARS_SENSOR
 #include <zephyr/drivers/sensor.h>
-
-#ifdef USE_COLOR_TEMPERATURE_LIGHT
-#include <zephyr/drivers/led_strip.h>
-#endif // CONFIG_PM
 #endif // CONFIG_CHIP_USE_MARS_SENSOR
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -41,10 +37,6 @@ const struct device *const sht3xd_dev = DEVICE_DT_GET_ONE(sensirion_sht3xd);
 
 #ifdef USE_COLOR_TEMPERATURE_LIGHT
 const struct device *const ws2812_dev = DEVICE_DT_GET(DT_ALIAS(led_strip));
-
-#define STRIP_NUM_PIXELS    DT_PROP(DT_ALIAS(led_strip), chain_length)
-
-#define RGB_MAX_VALUE       255
 
 #define TEMP_LOW_LIM        0   // °C
 #define TEMP_HIGH_LIM       40  // °C
@@ -67,17 +59,17 @@ CHIP_ERROR SensorManager::Init()
 	}
 
 #ifdef USE_COLOR_TEMPERATURE_LIGHT
-    if (!device_is_ready(ws2812_dev))
-    {
-        LOG_ERR("Device %s is not ready", ws2812_dev->name);
-        return CHIP_ERROR_INCORRECT_STATE;
-	}
+    RgbColor_t rgb = {0};
 
-    int status = SetColorTemperatureLight(mMinMeasuredTempCelsius);
-    if (status) {
-        LOG_ERR("Couldn't update strip: %d", status);
-        return System::MapErrorZephyr(status);
+    CHIP_ERROR err = sSensorManager.mWS2812Device.Init(ws2812_dev, STRIP_NUM_PIXELS(led_strip));
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("WS2812 Device Init fail");
+        return err;
     }
+
+    sSensorManager.mWS2812Device.SetLevel(&rgb);
+    sSensorManager.mWS2812Device.Set(SET_RGB_TURN_ON);
 #endif // USE_COLOR_TEMPERATURE_LIGHT
 
     // Initialise the timer to ban sensor measurement
@@ -97,11 +89,10 @@ CHIP_ERROR SensorManager::GetTempAndHumMeasurValue(int16_t *pTempMeasured, uint1
 #ifdef CONFIG_CHIP_USE_MARS_SENSOR
     static struct sensor_value sensorTemp = {0};
     static struct sensor_value sensorHum = {0};
-    int status;
 
     if (!mSensorBanForNextMeasurFlag)
     {
-        status = sensor_sample_fetch(sht3xd_dev);
+        int status = sensor_sample_fetch(sht3xd_dev);
         if (status)
         {
             LOG_ERR("Device %s is not ready to fetch the sensor samples (status: %d)", sht3xd_dev->name, status);
@@ -132,11 +123,7 @@ CHIP_ERROR SensorManager::GetTempAndHumMeasurValue(int16_t *pTempMeasured, uint1
     hum = (float)sensor_value_to_double(&sensorHum);
 
 #ifdef USE_COLOR_TEMPERATURE_LIGHT
-    status = SetColorTemperatureLight(temp);
-    if (status) {
-        LOG_ERR("Couldn't update strip: %d", status);
-        return System::MapErrorZephyr(status);
-    }
+    SetColorTemperatureLight(temp);
 #endif // USE_COLOR_TEMPERATURE_LIGHT
 #else
     /* Temperature simulation is used */
@@ -206,10 +193,9 @@ void SensorManager::SensorBanForNextMeasurTimerTimeoutCallback(k_timer * timer)
 }
 
 #ifdef USE_COLOR_TEMPERATURE_LIGHT
-int SensorManager::SetColorTemperatureLight(int8_t temp)
+void SensorManager::SetColorTemperatureLight(int8_t temp)
 {
-    int status;
-    struct led_rgb rgb = {0};
+    RgbColor_t rgb = {0};
 
     if (temp >= mMinMeasuredTempCelsius && temp <= TEMP_LOW_LIM)
     {
@@ -259,8 +245,7 @@ int SensorManager::SetColorTemperatureLight(int8_t temp)
         LOG_ERR("Couldn't set the Color Temperature Light");
     }
 
-    status = led_strip_update_rgb(ws2812_dev, &rgb, STRIP_NUM_PIXELS);
-    return status;
+    sSensorManager.mWS2812Device.SetLevel(&rgb);
 }
 #endif // USE_COLOR_TEMPERATURE_LIGHT
 #endif // CONFIG_CHIP_USE_MARS_SENSOR

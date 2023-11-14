@@ -25,7 +25,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
-LOG_MODULE_DECLARE(app);
+LOG_MODULE_REGISTER(PWMDevice);
 
 constexpr uint32_t kBreatheStepTimeMS = 10;
 

@@ -65,7 +65,7 @@ else()
   set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${MARS_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
 endif()
 
-set(CONF_FILE prj.conf ${MARS_CONF_OVERLAY_FILE})
+set(CONF_FILE ${MARS_CONF_OVERLAY_FILE} prj.conf)
 
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/telink/chip-module)
@@ -100,6 +100,7 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp
                ${TELINK_COMMON}/util/src/PWMDevice.cpp
+               ${TELINK_COMMON}/util/src/WS2812Device.cpp
                ${CHIP_ROOT}/examples/air-quality-sensor-app/air-quality-sensor-common/src/air-quality-sensor-manager.cpp)
 
 chip_configure_data_model(app
