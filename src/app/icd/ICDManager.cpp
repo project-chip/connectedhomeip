@@ -377,26 +377,22 @@ void ICDManager::postObserverEvent(ObserverEventType event)
     mStateObserverPool.ForEachActiveObject([event](ObserverPointer * obs) {
         switch (event)
         {
-            case ObserverEventType::EnterActiveMode:
-            {
-                obs->mObserver->OnEnterActiveMode();
-                return Loop::Continue;
-            }
-            case ObserverEventType::TransitionToIdle:
-            {
-                obs->mObserver->OnTransitionToIdle();
-                return Loop::Continue;
-            }
-            case ObserverEventType::ICDModeChange:
-            {
-                obs->mObserver->OnICDModeChange();
-                return Loop::Continue;
-            }
-            default:
-            {
-                ChipLogError(DeviceLayer, "Invalid ICD Observer event type");
-                return Loop::Break;
-            }
+        case ObserverEventType::EnterActiveMode: {
+            obs->mObserver->OnEnterActiveMode();
+            return Loop::Continue;
+        }
+        case ObserverEventType::TransitionToIdle: {
+            obs->mObserver->OnTransitionToIdle();
+            return Loop::Continue;
+        }
+        case ObserverEventType::ICDModeChange: {
+            obs->mObserver->OnICDModeChange();
+            return Loop::Continue;
+        }
+        default: {
+            ChipLogError(DeviceLayer, "Invalid ICD Observer event type");
+            return Loop::Break;
+        }
         }
     });
 }
