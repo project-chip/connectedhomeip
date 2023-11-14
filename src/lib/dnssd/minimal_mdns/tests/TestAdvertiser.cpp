@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/AppConfig.h>
 #include <lib/dnssd/Advertiser.h>
 
 #include <string>
@@ -192,6 +193,7 @@ FullQName txtCommissionableNodeParamsLargeEnhancedName    = FullQName(txtCommiss
 TxtResourceRecord txtCommissionableNodeParamsLargeEnhanced =
     TxtResourceRecord(instanceName, txtCommissionableNodeParamsLargeEnhancedName);
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
 CommissionAdvertisingParameters commissionableNodeParamsEnhancedAsICDLIT =
     CommissionAdvertisingParameters()
         .SetCommissionAdvertiseMode(CommssionAdvertiseMode::kCommissionableNode)
@@ -215,6 +217,7 @@ QNamePart txtCommissionableNodeParamsEnhancedAsICDLITParts[] = { "D=22",        
 FullQName txtCommissionableNodeParamsEnhancedAsICDLITName    = FullQName(txtCommissionableNodeParamsEnhancedAsICDLITParts);
 TxtResourceRecord txtCommissionableNodeParamsEnhancedAsICDLIT =
     TxtResourceRecord(instanceName, txtCommissionableNodeParamsEnhancedAsICDLITName);
+#endif
 
 // Our server doesn't do anything with this, blank is fine.
 Inet::IPPacketInfo packetInfo;
@@ -479,9 +482,9 @@ void CommissionableAdverts(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(commissionableNodeParamsEnhancedAsICDLIT) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.FinalizeServiceUpdate() == CHIP_NO_ERROR);
-
     ChipLogProgress(Discovery, "Testing response to _matterc._udp.local for enhanced parameters With ICD as LIT");
     server.Reset();
     server.AddExpectedRecord(&ptrCommissionableNode);
@@ -499,6 +502,7 @@ void CommissionableAdverts(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, SendQuery(instanceName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+#endif
 }
 
 void CommissionableAndOperationalAdverts(nlTestSuite * inSuite, void * inContext)

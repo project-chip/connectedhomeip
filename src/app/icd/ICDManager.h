@@ -34,12 +34,6 @@ namespace app {
 class TestICDManager;
 
 // This structure is used for the creation an ObjectPool of ICDStateObserver pointers
-struct ObserverPointer
-{
-    ObserverPointer(ICDStateObserver * obs) : mObserver(obs) {}
-    ~ObserverPointer() { mObserver = nullptr; }
-    ICDStateObserver * mObserver;
-};
 
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
@@ -47,6 +41,13 @@ struct ObserverPointer
 class ICDManager : public ICDListener
 {
 public:
+    struct ObserverPointer
+    {
+        ObserverPointer(ICDStateObserver * obs) : mObserver(obs) {}
+        ~ObserverPointer() { mObserver = nullptr; }
+        ICDStateObserver * mObserver;
+    };
+    
     enum class OperationalState : uint8_t
     {
         IdleMode,
