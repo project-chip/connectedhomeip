@@ -85,26 +85,21 @@ Davis, CA 95616, USA
             <mandatoryConform/>
           </item>
         </enum>
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="ErrorStateLabel" type="string" default="empty">
-        <access read="true" write="true"/>
         <constraint type="maxLength" value="64"/>
       </field>
       <field id="2" name="ErrorStateDetails" type="string" default="empty">
-        <access read="true" write="true"/>
         <optionalConform/>
         <constraint type="maxLength" value="64"/>
       </field>
     </struct>
     <struct name="OperationalStateStruct">
       <field id="0" name="OperationalStateID" type="OperationalStateEnum" default="0">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="OperationalStateLabel" type="string">
-        <access read="true" write="true"/>
         <constraint type="maxLength" value="64"/>
       </field>
     </struct>
@@ -131,7 +126,8 @@ Davis, CA 95616, USA
       <optionalConform/>
       <constraint type="max" value="259200"/>
     </attribute>
-    <attribute id="0x0003" name="OperationalStateList" type="list[OperationalStateStruct Type]" default="MS">
+    <attribute id="0x0003" name="OperationalStateList" type="list" default="MS">
+      <entry type="OperationalStateStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint type="desc"/>

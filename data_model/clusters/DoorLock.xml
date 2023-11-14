@@ -215,10 +215,10 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="DoorLockStatus">
-      <item value="2" summary="Entry would cause a duplicate credential/ID.">
+      <item value="2" name="DUPLICATE" summary="Entry would cause a duplicate credential/ID.">
         <mandatoryConform/>
       </item>
-      <item value="3" summary="Entry would replace an occupied slot.">
+      <item value="3" name="OCCUPIED" summary="Entry would replace an occupied slot.">
         <mandatoryConform/>
       </item>
     </enum>
@@ -486,11 +486,9 @@ Davis, CA 95616, USA
     </bitmap>
     <struct name="CredentialStruct">
       <field id="0" name="CredentialType" type="CredentialTypeEnum">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="CredentialIndex" type="uint16" default="0">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
     </struct>
@@ -659,14 +657,14 @@ Davis, CA 95616, USA
         <feature name="RID"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x001a" name="MinRFIDCodeLength" type="uint8" default="MS">
+    <attribute id="0x001A" name="MinRFIDCodeLength" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
         <feature name="RID"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x001b" name="CredentialRulesSupport" type="map8" default="1">
+    <attribute id="0x001B" name="CredentialRulesSupport" type="map8" default="1">
       <bitmap>
         <bitfield name="Single" bit="0" summary="Only one credential is required for lock operation">
           <mandatoryConform/>
@@ -684,7 +682,7 @@ Davis, CA 95616, USA
         <feature name="USR"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x001c" name="NumberOfCredentialsSupportedPerUser" type="uint8" default="0">
+    <attribute id="0x001C" name="NumberOfCredentialsSupportedPerUser" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
@@ -799,17 +797,17 @@ than 0">
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x002a" name="EnableInsideStatusLED" type="bool" default="0">
+    <attribute id="0x002A" name="EnableInsideStatusLED" type="bool" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x002b" name="EnablePrivacyModeButton" type="bool" default="0">
+    <attribute id="0x002B" name="EnablePrivacyModeButton" type="bool" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x002c" name="LocalProgrammingFeatures" type="map8" default="0">
+    <attribute id="0x002C" name="LocalProgrammingFeatures" type="map8" default="0">
       <bitmap>
         <bitfield name="Add Locally" bit="0" summary="0 - The ability to add Users/credentials/Schedules locally is disabled
 
@@ -1205,7 +1203,7 @@ User Status: default or status cleared.">
       <mandatoryConform/>
       <field id="0" name="PINCode
 
-        PIN/RFID Code&amp;#8224;" type="octets">
+        PIN/RFID Code&amp;#8224;" type="octstr">
         <optionalConform>
           <andTerm>
             <feature name="COTA"/>
@@ -1219,7 +1217,7 @@ User Status: default or status cleared.">
       <mandatoryConform/>
       <field id="0" name="PINCode
 
-        PIN/RFID Code&amp;#8224;" type="octets">
+        PIN/RFID Code&amp;#8224;" type="octstr">
         <optionalConform>
           <andTerm>
             <feature name="COTA"/>
@@ -1240,7 +1238,7 @@ User Status: default or status cleared.">
       </field>
       <field id="1" name="PINCode
 
-        PIN/RFID Code&amp;#8224;" type="octets">
+        PIN/RFID Code&amp;#8224;" type="octstr">
         <optionalConform>
           <andTerm>
             <feature name="COTA"/>
@@ -1298,7 +1296,7 @@ User Status: default or status cleared.">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="6" name="PIN" type="octets">
+      <field id="6" name="PIN" type="octstr">
         <mandatoryConform/>
       </field>
     </command>
@@ -1326,7 +1324,7 @@ User Status: default or status cleared.">
         <mandatoryConform/>
         <constraint type="allowed" value="UserTypeEnum"/>
       </field>
-      <field id="3" name="PIN" type="octets">
+      <field id="3" name="PIN" type="octstr">
         <mandatoryConform/>
       </field>
     </command>
@@ -1369,7 +1367,7 @@ User Status: default or status cleared.">
         <mandatoryConform/>
         <constraint type="allowed" value="UserTypeEnum"/>
       </field>
-      <field id="3" name="PIN Code" type="octets" default="empty">
+      <field id="3" name="PIN Code" type="octstr" default="empty">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -1426,7 +1424,7 @@ User Status: default or status cleared.">
         <constraint type="allowed" value="UserStatusEnum"/>
       </field>
     </command>
-    <command id="0x0a" name="Get User Status" response="Get User Status Response">
+    <command id="0x0A" name="Get User Status" response="Get User Status Response">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <andTerm>
@@ -1445,7 +1443,7 @@ User Status: default or status cleared.">
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x0a" name="Get User Status Response" direction="responseFromServer">
+    <command id="0x0A" name="Get User Status Response" direction="responseFromServer">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <notTerm>
@@ -1461,7 +1459,7 @@ User Status: default or status cleared.">
         <constraint type="allowed" value="UserStatusEnum"/>
       </field>
     </command>
-    <command id="0x0b" name="Set Week Day Schedule" response="Y">
+    <command id="0x0B" name="Set Week Day Schedule" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="WDSCH"/>
@@ -1498,7 +1496,7 @@ User Status: default or status cleared.">
         <constraint type="between" from="0" to="59"/>
       </field>
     </command>
-    <command id="0x0c" name="Get Week Day Schedule" response="Get Week Day Schedule Response">
+    <command id="0x0C" name="Get Week Day Schedule" response="Get Week Day Schedule Response">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="WDSCH"/>
@@ -1516,7 +1514,7 @@ User Status: default or status cleared.">
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
     </command>
-    <command id="0x0c" name="Get Week Day Schedule Response" direction="responseFromServer">
+    <command id="0x0C" name="Get Week Day Schedule Response" direction="responseFromServer">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="WDSCH"/>
@@ -1557,7 +1555,7 @@ User Status: default or status cleared.">
         <constraint type="between" from="0" to="59"/>
       </field>
     </command>
-    <command id="0x0d" name="Clear Week Day Schedule" response="Y">
+    <command id="0x0D" name="Clear Week Day Schedule" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="WDSCH"/>
@@ -1576,7 +1574,7 @@ User Status: default or status cleared.">
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
     </command>
-    <command id="0x0e" name="Set Year Day Schedule" response="Y">
+    <command id="0x0E" name="Set Year Day Schedule" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="YDSCH"/>
@@ -1600,7 +1598,7 @@ User Status: default or status cleared.">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0f" name="Get Year Day Schedule" response="Get Year Day Schedule Response">
+    <command id="0x0F" name="Get Year Day Schedule" response="Get Year Day Schedule Response">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="YDSCH"/>
@@ -1618,7 +1616,7 @@ User Status: default or status cleared.">
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
     </command>
-    <command id="0x0f" name="Get Year Day Schedule Response" direction="responseFromServer">
+    <command id="0x0F" name="Get Year Day Schedule Response" direction="responseFromServer">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="YDSCH"/>
@@ -1821,7 +1819,7 @@ User Status: default or status cleared.">
         <mandatoryConform/>
         <constraint type="allowed" value="UserTypeEnum"/>
       </field>
-      <field id="3" name="RFID Code" type="octets">
+      <field id="3" name="RFID Code" type="octstr">
         <mandatoryConform/>
       </field>
     </command>
@@ -1864,7 +1862,7 @@ User Status: default or status cleared.">
         <mandatoryConform/>
         <constraint type="allowed" value="UserTypeEnum"/>
       </field>
-      <field id="3" name="RFID Code" type="octets" default="empty">
+      <field id="3" name="RFID Code" type="octstr" default="empty">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -1898,7 +1896,7 @@ User Status: default or status cleared.">
         </andTerm>
       </mandatoryConform>
     </command>
-    <command id="0x1a" name="Set User" response="Y">
+    <command id="0x1A" name="Set User" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -1943,7 +1941,7 @@ User Status: default or status cleared.">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x1b" name="Get User" response="Get User Response">
+    <command id="0x1B" name="Get User" response="Get User Response">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -1953,7 +1951,7 @@ User Status: default or status cleared.">
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
     </command>
-    <command id="0x1c" name="Get User Response" direction="responseFromServer">
+    <command id="0x1C" name="Get User Response" direction="responseFromServer">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -2004,7 +2002,7 @@ User Status: default or status cleared.">
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
     </command>
-    <command id="0x1d" name="Clear User" response="Y">
+    <command id="0x1D" name="Clear User" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -2038,7 +2036,7 @@ User Status: default or status cleared.">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="3" name="PIN" type="octets">
+      <field id="3" name="PIN" type="octstr">
         <mandatoryConform/>
       </field>
       <field id="4" name="User Type" type="enum8">
@@ -2069,7 +2067,7 @@ User Status: default or status cleared.">
       <field id="1" name="Credential" type="CredentialStruct">
         <mandatoryConform/>
       </field>
-      <field id="2" name="CredentialData" type="octets">
+      <field id="2" name="CredentialData" type="octstr">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -2168,7 +2166,7 @@ User Status: default or status cleared.">
       <mandatoryConform>
         <feature name="UBOLT"/>
       </mandatoryConform>
-      <field id="0" name="PINCode" type="octets">
+      <field id="0" name="PINCode" type="octstr">
         <optionalConform>
           <andTerm>
             <feature name="COTA"/>

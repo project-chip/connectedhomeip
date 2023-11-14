@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x005c" name="Smoke CO Alarm" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x005C" name="Smoke CO Alarm" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
@@ -207,19 +207,19 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x000a" name="ContaminationState" type="ContaminationStateEnum">
+    <attribute id="0x000A" name="ContaminationState" type="ContaminationStateEnum">
       <access read="true" readPrivilege="view"/>
       <optionalConform>
         <feature name="SMOKE"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x000b" name="SmokeSensitivityLevel" type="SensitivityEnum">
+    <attribute id="0x000B" name="SmokeSensitivityLevel" type="SensitivityEnum">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform>
         <feature name="SMOKE"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x000c" name="ExpiryDate" type="epoch-s">
+    <attribute id="0x000C" name="ExpiryDate" type="epoch-s">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <optionalConform/>
@@ -295,7 +295,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </event>
-    <event id="0x0a" name="AllClear" priority="info">
+    <event id="0x0A" name="AllClear" priority="info">
       <access readPrivilege="view"/>
       <mandatoryConform/>
     </event>

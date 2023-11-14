@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050b" name="Audio Output" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050B" name="Audio Output" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
@@ -88,22 +88,20 @@ Davis, CA 95616, USA
     </enum>
     <struct name="OutputInfoStruct">
       <field id="0" name="Index" type="uint8">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="OutputType" type="OutputTypeEnum">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="2" name="Name" type="string">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="OutputList" type="list[OutputInfoStruct Type]">
+    <attribute id="0x0000" name="OutputList" type="list">
+      <entry type="OutputInfoStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>

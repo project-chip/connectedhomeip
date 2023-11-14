@@ -67,13 +67,14 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="between" from="1" to="2047"/>
       </field>
-      <field id="1" name="ClientIdentifier" type="octets">
+      <field id="1" name="ClientIdentifier" type="octstr">
         <mandatoryConform/>
         <constraint type="maxLength" value="20"/>
       </field>
-      <field id="2" name="Endorsements" type="list[EndorsementStruct Type]">
+      <field id="2" name="Endorsements" type="list">
+        <entry type="EndorsementStruct"/>
         <mandatoryConform/>
-        <constraint type="between" from="1" to="SupportedFabrics"/>
+        <constraint type="countBetween" from="1" to="SupportedFabrics"/>
       </field>
     </struct>
     <struct name="EndorsementStruct">
@@ -85,22 +86,23 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="NetworkIdentifier" type="octets" default="null">
+    <attribute id="0x0000" name="NetworkIdentifier" type="octstr" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
       <constraint type="maxLength" value="20"/>
     </attribute>
-    <attribute id="0x0001" name="NetworkIdentity" type="octets" default="null">
+    <attribute id="0x0001" name="NetworkIdentity" type="octstr" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
       <constraint type="maxLength" value="140"/>
     </attribute>
-    <attribute id="0x0002" name="Clients" type="list[ClientStruct Type]">
+    <attribute id="0x0002" name="Clients" type="list">
+      <entry type="ClientStruct"/>
       <access read="true" readPrivilege="admin"/>
       <mandatoryConform/>
-      <constraint type="max" value="ClientTableSize"/>
+      <constraint type="maxCount" value="ClientTableSize"/>
     </attribute>
     <attribute id="0x0003" name="ClientTableSize" type="uint16" default="500">
       <access read="true" readPrivilege="view"/>
@@ -113,11 +115,11 @@ Davis, CA 95616, USA
     <command id="0x00" name="SetNetworkIdentity" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform/>
-      <field id="0" name="NetworkIdentity" type="octets">
+      <field id="0" name="NetworkIdentity" type="octstr">
         <mandatoryConform/>
         <constraint type="maxLength" value="140"/>
       </field>
-      <field id="1" name="PrivateKey" type="octets">
+      <field id="1" name="PrivateKey" type="octstr">
         <mandatoryConform/>
         <constraint type="maxLength" value="32"/>
       </field>
@@ -125,7 +127,7 @@ Davis, CA 95616, USA
     <command id="0x01" name="AddOrUpdateClient" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform/>
-      <field id="0" name="ClientIdentity" type="octets">
+      <field id="0" name="ClientIdentity" type="octstr">
         <mandatoryConform/>
         <constraint type="maxLength" value="140"/>
       </field>
@@ -139,7 +141,7 @@ Davis, CA 95616, USA
       <field id="0" name="ClientNumber" type="uint16">
         <optionalConform choice="a"/>
       </field>
-      <field id="1" name="ClientIdentifier" type="octets">
+      <field id="1" name="ClientIdentifier" type="octstr">
         <optionalConform choice="a"/>
         <constraint type="maxLength" value="20"/>
       </field>

@@ -173,7 +173,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint type="between" from="0" to="2"/>
     </attribute>
-    <attribute id="0x000f" name="Options" type="map8" default="0">
+    <attribute id="0x000F" name="Options" type="map8" default="0">
       <bitmap>
         <bitfield name="ExecuteIfOff" bit="0" summary="0 – Do not execute command if the On/Off cluster, OnOff attribute is FALSE. +
                      1 – Execute command if the On/Off cluster, OnOff attribute is FALSE.">
@@ -230,13 +230,13 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint type="between" from="0" to="0xFEFF"/>
     </attribute>
-    <attribute id="0x001a" name="Primary3Y" type="uint16" default="-">
+    <attribute id="0x001A" name="Primary3Y" type="uint16" default="-">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
       <constraint type="between" from="0" to="0xFEFF"/>
     </attribute>
-    <attribute id="0x001b" name="Primary3Intensity" type="uint8" default="-">
+    <attribute id="0x001B" name="Primary3Intensity" type="uint8" default="-">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
@@ -287,7 +287,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint type="between" from="0" to="0xFEFF"/>
     </attribute>
-    <attribute id="0x002a" name="Primary6Intensity" type="uint8" default="-">
+    <attribute id="0x002A" name="Primary6Intensity" type="uint8" default="-">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
@@ -332,17 +332,17 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x003a" name="ColorPointBX" type="uint16" default="-">
+    <attribute id="0x003A" name="ColorPointBX" type="uint16" default="-">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint type="between" from="0" to="0xFEFF"/>
     </attribute>
-    <attribute id="0x003b" name="ColorPointBY" type="uint16" default="-">
+    <attribute id="0x003B" name="ColorPointBY" type="uint16" default="-">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint type="between" from="0" to="0xFEFF"/>
     </attribute>
-    <attribute id="0x003c" name="ColorPointBIntensity" type="uint8" default="-">
+    <attribute id="0x003C" name="ColorPointBIntensity" type="uint8" default="-">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform/>
@@ -407,26 +407,26 @@ Davis, CA 95616, USA
         <feature name="CL"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x400a" name="ColorCapabilities" type="map16" default="0">
+    <attribute id="0x400A" name="ColorCapabilities" type="map16" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint type="between" from="0" to="0x001F"/>
     </attribute>
-    <attribute id="0x400b" name="ColorTempPhysicalMinMireds" type="uint16" default="0">
+    <attribute id="0x400B" name="ColorTempPhysicalMinMireds" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="CT"/>
       </mandatoryConform>
       <constraint type="between" from="0" to="0xFEFF"/>
     </attribute>
-    <attribute id="0x400c" name="ColorTempPhysicalMaxMireds" type="uint16" default="0xFEFF">
+    <attribute id="0x400C" name="ColorTempPhysicalMaxMireds" type="uint16" default="0xFEFF">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="CT"/>
       </mandatoryConform>
       <constraint type="between" from="0" to="0xFEFF"/>
     </attribute>
-    <attribute id="0x400d" name="CoupleColorTempToLevelMinMireds" type="uint16" default="MS">
+    <attribute id="0x400D" name="CoupleColorTempToLevelMinMireds" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <orTerm>
@@ -753,7 +753,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x0a" name="MoveToColorTemperature" response="Y">
+    <command id="0x0A" name="MoveToColorTemperature" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="CT"/>
@@ -878,7 +878,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="UpdateFlags" type="map8">
         <bitmap>
-          <bitfield name="(Reserved)">
+          <bitfield name="(Reserved)" bit="4-7">
             <mandatoryConform/>
           </bitfield>
           <bitfield name="UpdateAction" bit="0">
@@ -957,7 +957,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x4b" name="MoveColorTemperature" response="Y">
+    <command id="0x4B" name="MoveColorTemperature" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="CT"/>
@@ -986,7 +986,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x4c" name="StepColorTemperature" response="Y">
+    <command id="0x4C" name="StepColorTemperature" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="CT"/>

@@ -65,7 +65,7 @@ Davis, CA 95616, USA
     <revision revision="5" summary="New data model format and notation"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x001c" name="Pulse Width Modulation"/>
+    <clusterId id="0x001C" name="Pulse Width Modulation"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="LVL" scope="Endpoint"/>
   <features>
@@ -161,7 +161,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="min" value="MinFrequency"/>
     </attribute>
-    <attribute id="0x000f" name="Options" type="OptionsBitmap" default="0">
+    <attribute id="0x000F" name="Options" type="OptionsBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform/>
       <constraint type="desc"/>

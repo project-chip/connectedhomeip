@@ -16,6 +16,7 @@
 
 import glob
 import os
+import re
 import subprocess
 
 import click
@@ -53,6 +54,8 @@ def main(scraper, spec_root, output_dir, dry_run):
     # Clusters need to be scraped first because the cluster directory is passed to the device type directory
     scrape_clusters(scraper, spec_root, output_dir, dry_run)
     scrape_device_types(scraper, spec_root, output_dir, dry_run)
+    if not dry_run:
+        dump_versions(scraper, spec_root, output_dir)
 
 
 def scrape_clusters(scraper, spec_root, output_dir, dry_run):
@@ -94,13 +97,6 @@ def scrape_clusters(scraper, spec_root, output_dir, dry_run):
         filename = f'{dm_clusters_dir}/{f}'
         scrape_cluster(filename)
 
-    # Put the current spec sha into the cluster dir
-    sha_file = os.path.abspath(os.path.join(output_dir, 'spec_sha'))
-    out = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, encoding="utf8", cwd=spec_root)
-    sha = out.stdout
-    with open(sha_file, 'wt', encoding='utf8') as output:
-        output.write(sha)
-
 
 def scrape_device_types(scraper, spec_root, output_dir, dry_run):
     device_type_dir = os.path.abspath(os.path.join(spec_root, 'src', 'device_types'))
@@ -112,7 +108,6 @@ def scrape_device_types(scraper, spec_root, output_dir, dry_run):
 
     def scrape_device_type(filename: str) -> None:
         xml_path = get_xml_path(filename, device_types_output_dir)
-        print(xml_path)
         cmd = [scraper, 'devicetype', '-c', clusters_output_dir, '-nd', filename, xml_path]
         if dry_run:
             print(cmd)
@@ -120,8 +115,25 @@ def scrape_device_types(scraper, spec_root, output_dir, dry_run):
             print(' '.join(cmd))
             subprocess.run(cmd)
 
+    exclude_list = [r"section_*"]
     for filename in glob.glob(f'{device_type_dir}/*.adoc'):
-        scrape_device_type(filename)
+        for exclude in exclude_list:
+            if not re.match(exclude, os.path.basename(filename)):
+                scrape_device_type(filename)
+
+
+def dump_versions(scraper, spec_root, output_dir):
+    sha_file = os.path.abspath(os.path.join(output_dir, 'spec_sha'))
+    out = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, encoding="utf8", cwd=spec_root)
+    sha = out.stdout
+    with open(sha_file, 'wt', encoding='utf8') as output:
+        output.write(sha)
+
+    scraper_file = os.path.abspath(os.path.join(output_dir, 'scraper_version'))
+    out = subprocess.run([scraper, '--version'], capture_output=True, encoding="utf8")
+    version = out.stdout
+    with open(scraper_file, "wt", encoding='utf8') as output:
+        output.write(version)
 
 
 if __name__ == '__main__':

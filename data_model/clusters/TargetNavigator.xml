@@ -83,7 +83,8 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="TargetList" type="list[TargetInfoStruct Type]">
+    <attribute id="0x0000" name="TargetList" type="list">
+      <entry type="TargetInfoStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>

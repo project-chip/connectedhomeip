@@ -179,14 +179,12 @@ Davis, CA 95616, USA
     </bitmap>
     <struct name="MessageResponseOptionStruct">
       <field id="0" name="MessageResponseID" type="uint32">
-        <access read="true" write="true"/>
         <mandatoryConform>
           <feature name="RESP"/>
         </mandatoryConform>
         <constraint type="min" value="1"/>
       </field>
       <field id="1" name="Label" type="string">
-        <access read="true" write="true"/>
         <mandatoryConform>
           <feature name="RPLY"/>
         </mandatoryConform>
@@ -221,22 +219,25 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="maxLength" value="256"/>
       </field>
-      <field id="6" name="Responses" type="list[MessageResponseOptionStruct Type]" default="empty">
+      <field id="6" name="Responses" type="list" default="empty">
+        <entry type="MessageResponseOptionStruct"/>
         <access read="true"/>
         <mandatoryConform>
           <feature name="RESP"/>
         </mandatoryConform>
-        <constraint type="max" value="4"/>
+        <constraint type="maxCount" value="4"/>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="Messages" type="list[MessageStruct Type]" default="empty">
+    <attribute id="0x0000" name="Messages" type="list" default="empty">
+      <entry type="MessageStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="max" value="8"/>
+      <constraint type="maxCount" value="8"/>
     </attribute>
-    <attribute id="0x0001" name="ActiveMessageIDs" type="list[MessageID Type]" default="empty">
+    <attribute id="0x0001" name="ActiveMessageIDs" type="list" default="empty">
+      <entry type="MessageID"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
@@ -245,14 +246,16 @@ Davis, CA 95616, USA
     <command id="0x00" name="PresentMessagesRequest" response="Y">
       <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="0" name="Messages" type="list[MessageStruct Type]">
+      <field id="0" name="Messages" type="list">
+        <entry type="MessageStruct"/>
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x01" name="CancelMessagesRequest" response="Y">
       <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="0" name="MessageIDs" type="list[MessageID Type]">
+      <field id="0" name="MessageIDs" type="list">
+        <entry type="MessageID"/>
         <mandatoryConform/>
       </field>
     </command>

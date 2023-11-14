@@ -137,7 +137,8 @@ Davis, CA 95616, USA
         <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
-      <field id="1" name="AttributeValueList" type="list[AttributeValuePairStruct Type]">
+      <field id="1" name="AttributeValueList" type="list">
+        <entry type="AttributeValuePairStruct"/>
         <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
@@ -159,7 +160,8 @@ Davis, CA 95616, USA
       <field id="3" name="SceneTransitionTime" type="uint16" default="0">
         <mandatoryConform/>
       </field>
-      <field id="4" name="ExtensionFields" type="list[ExtensionFieldSetStruct Type]" default="empty">
+      <field id="4" name="ExtensionFields" type="list" default="empty">
+        <entry type="ExtensionFieldSetStruct"/>
         <mandatoryConform/>
       </field>
       <field id="5" name="TransitionTime100ms" type="uint8" default="0">
@@ -244,7 +246,8 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0007" name="FabricSceneInfo" type="list[SceneInfoStruct Type]">
+    <attribute id="0x0007" name="FabricSceneInfo" type="list">
+      <entry type="SceneInfoStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="FS"/>
@@ -270,7 +273,8 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="maxLength" value="16"/>
       </field>
-      <field id="4" name="ExtensionFieldSetStructs" type="list[ExtensionFieldSetStruct Type]">
+      <field id="4" name="ExtensionFieldSetStructs" type="list">
+        <entry type="ExtensionFieldSetStruct"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -318,7 +322,9 @@ Davis, CA 95616, USA
       <field id="4" name="SceneName" type="string">
         <constraint type="maxLength" value="16"/>
       </field>
-      <field id="5" name="ExtensionFieldSetStructs" type="list[ExtensionFieldSetStruct Type]"/>
+      <field id="5" name="ExtensionFieldSetStructs" type="list">
+        <entry type="ExtensionFieldSetStruct"/>
+      </field>
     </command>
     <command id="0x02" name="RemoveScene" response="RemoveSceneResponse">
       <access invokePrivilege="manage"/>
@@ -443,7 +449,8 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="maxLength" value="16"/>
       </field>
-      <field id="4" name="ExtensionFieldSetStructs" type="list[ExtensionFieldSetStruct Type]">
+      <field id="4" name="ExtensionFieldSetStructs" type="list">
+        <entry type="ExtensionFieldSetStruct"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -479,7 +486,9 @@ Davis, CA 95616, USA
       <field id="4" name="SceneName" type="string">
         <constraint type="maxLength" value="16"/>
       </field>
-      <field id="5" name="ExtensionFieldSetStructs" type="list[ExtensionFieldSetStruct Type]"/>
+      <field id="5" name="ExtensionFieldSetStructs" type="list">
+        <entry type="ExtensionFieldSetStruct"/>
+      </field>
     </command>
     <command id="0x42" name="CopyScene" response="CopySceneResponse">
       <access invokePrivilege="manage"/>

@@ -64,7 +64,7 @@ Davis, CA 95616, USA
   <classification class="utility" scope="endpoint"/>
   <conditions/>
   <clusters>
-    <cluster id="0x002e" name="Power Source Configuration" side="server">
+    <cluster id="0x002E" name="Power Source Configuration" side="server">
       <otherwiseConform>
         <mandatoryConform>
           <condition name="BridgedPowerSourceInfo"/>
@@ -72,7 +72,7 @@ Davis, CA 95616, USA
         <deprecateConform/>
       </otherwiseConform>
     </cluster>
-    <cluster id="0x002f" name="Power Source" side="server">
+    <cluster id="0x002F" name="Power Source" side="server">
       <mandatoryConform>
         <condition name="BridgedPowerSourceInfo"/>
       </mandatoryConform>
