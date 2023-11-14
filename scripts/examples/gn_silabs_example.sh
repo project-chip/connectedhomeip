@@ -338,27 +338,17 @@ else
     #print stats
     arm-none-eabi-size -A "$BUILD_DIR"/*.out
 
-    # Get .s37 path and name
-    binName="$(find "$BUILD_DIR" -type f -name "*.s37")"
-
-    # set commander path
-    if [ -z "$COMMANDER_PATH" ]; then
-        commanderPath="commander"
-    else
-        commanderPath="$COMMANDER_PATH"
-    fi
-
-    # # Generate RPS file from .s37 for 917 SoC builds
-    if [ "$USE_RPS_EXTENSION" == true ]; then
-
-        # Create .rps
-        rpsName=$(sed 's/[^\.]*$/rps/' <<<"$binName")
-        "$commanderPath" rps create "$rpsName" --app "$binName"
-    fi
-
     # add bootloader to generated image
     if [ "$USE_BOOTLOADER" == true ]; then
+        # Get .s37 path and name
+        binName="$(find "$BUILD_DIR" -type f -name "*.s37")"
 
+        # set commander path
+        if [ -z "$COMMANDER_PATH" ]; then
+            commanderPath="commander"
+        else
+            commanderPath="$COMMANDER_PATH"
+        fi
         InternalBootloaderBoards=("BRD4337A" "BRD2704A" "BRD2703A" "BRD4319A")
         bootloaderPath=""
 
