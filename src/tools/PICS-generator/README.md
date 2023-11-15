@@ -2,6 +2,19 @@
 orphan: true
 ---
 
+# Tool information
+
+This tool reads out the supported elements and generates the appropriate PICS
+files for the device.
+The tool outputs the PICS for all endpoints and outputs these in a single folder.
+
+Note: The tool does relay on what the the device is able to express and for now
+there are areas which the tool can not cover:
+
+- PICS in base.xml
+- Only mandatory events are marked as supported, since the EventList is
+provisional
+
 # Setup
 
 This tool uses the python environment used by the python_testing efforts, which
