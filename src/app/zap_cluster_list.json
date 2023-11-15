@@ -105,6 +105,7 @@
         "TIME_CLUSTER": [],
         "TIME_FORMAT_LOCALIZATION_CLUSTER": [],
         "TIME_SYNCHRONIZATION_CLUSTER": [],
+        "TIMER_CLUSTER": [],
         "TRUSTED_ROOT_CERTIFICATES_CLUSTER": [],
         "UNIT_LOCALIZATION_CLUSTER": [],
         "UNIT_TESTING_CLUSTER": [],
@@ -258,6 +259,7 @@
         "TIME_CLUSTER": [],
         "TIME_FORMAT_LOCALIZATION_CLUSTER": ["time-format-localization-server"],
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
+        "TIMER_CLUSTER": ["timer-server"],
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],

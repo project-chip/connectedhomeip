@@ -410,6 +410,14 @@ namespace ReorderNetwork {
 static constexpr CommandId Id = 0x00000008;
 } // namespace ReorderNetwork
 
+namespace QueryIdentity {
+static constexpr CommandId Id = 0x00000009;
+} // namespace QueryIdentity
+
+namespace QueryIdentityResponse {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace QueryIdentityResponse
+
 } // namespace Commands
 } // namespace NetworkCommissioning
 
@@ -639,6 +647,28 @@ static constexpr CommandId Id = 0x00000003;
 } // namespace Commands
 } // namespace IcdManagement
 
+namespace Timer {
+namespace Commands {
+
+namespace SetTimer {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SetTimer
+
+namespace ResetTimer {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ResetTimer
+
+namespace AddTime {
+static constexpr CommandId Id = 0x00000002;
+} // namespace AddTime
+
+namespace ReduceTime {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ReduceTime
+
+} // namespace Commands
+} // namespace Timer
+
 namespace ModeSelect {
 namespace Commands {
 
@@ -866,6 +896,32 @@ static constexpr CommandId Id = 0x00000002;
 
 } // namespace Commands
 } // namespace ValveConfigurationAndControl
+
+namespace DemandResponseLoadControl {
+namespace Commands {
+
+namespace RegisterLoadControlProgramRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace RegisterLoadControlProgramRequest
+
+namespace UnregisterLoadControlProgramRequest {
+static constexpr CommandId Id = 0x00000001;
+} // namespace UnregisterLoadControlProgramRequest
+
+namespace AddLoadControlEventRequest {
+static constexpr CommandId Id = 0x00000002;
+} // namespace AddLoadControlEventRequest
+
+namespace RemoveLoadControlEventRequest {
+static constexpr CommandId Id = 0x00000003;
+} // namespace RemoveLoadControlEventRequest
+
+namespace ClearLoadControlEventsRequest {
+static constexpr CommandId Id = 0x00000004;
+} // namespace ClearLoadControlEventsRequest
+
+} // namespace Commands
+} // namespace DemandResponseLoadControl
 
 namespace DoorLock {
 namespace Commands {

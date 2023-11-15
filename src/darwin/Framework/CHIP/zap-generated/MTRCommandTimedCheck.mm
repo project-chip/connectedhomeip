@@ -374,6 +374,15 @@ static BOOL CommandNeedsTimedInvokeInICDManagementCluster(AttributeId aAttribute
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInTimerCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Timer;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInModeSelectCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ModeSelect;
@@ -548,6 +557,15 @@ static BOOL CommandNeedsTimedInvokeInBooleanSensorConfigurationCluster(Attribute
 static BOOL CommandNeedsTimedInvokeInValveConfigurationAndControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ValveConfigurationAndControl;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DemandResponseLoadControl;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1071,6 +1089,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::IcdManagement::Id: {
         return CommandNeedsTimedInvokeInICDManagementCluster(commandID);
     }
+    case Clusters::Timer::Id: {
+        return CommandNeedsTimedInvokeInTimerCluster(commandID);
+    }
     case Clusters::ModeSelect::Id: {
         return CommandNeedsTimedInvokeInModeSelectCluster(commandID);
     }
@@ -1130,6 +1151,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ValveConfigurationAndControl::Id: {
         return CommandNeedsTimedInvokeInValveConfigurationAndControlCluster(commandID);
+    }
+    case Clusters::DemandResponseLoadControl::Id: {
+        return CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(commandID);
     }
     case Clusters::DoorLock::Id: {
         return CommandNeedsTimedInvokeInDoorLockCluster(commandID);

@@ -32,19 +32,19 @@ tests:
       command: "readAttribute"
       attribute: "IdleModeDuration"
       response:
-          value: 300
+          value: 3600
 
     - label: "Read ActiveModeDuration"
       command: "readAttribute"
       attribute: "ActiveModeDuration"
       response:
-          value: 300
+          value: 10000
 
     - label: "Read ActiveModeThreshold"
       command: "readAttribute"
       attribute: "ActiveModeThreshold"
       response:
-          value: 300
+          value: 1000
 
     - label: "Read ICDCounter"
       command: "readAttribute"

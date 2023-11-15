@@ -172,7 +172,7 @@ void InitOTARequestor(void)
     // TODO: instatiate and initialize these values when QueryImageResponse tells us an image is available
     // TODO: add API for OTARequestor to pass QueryImageResponse info to the application to use for OTADownloader init
     // OTAImageProcessor ipParams;
-    // ipParams.imageFile = CharSpan("dnld_img.txt");
+    // ipParams.imageFile = "dnld_img.txt"_span;
     // gImageProcessor.SetOTAImageProcessorParams(ipParams);
     gImageProcessor.SetOTADownloader(&gDownloader);
 

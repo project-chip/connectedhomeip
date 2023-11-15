@@ -132,7 +132,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Delete();
+    CHIP_ERROR DestroyKey();
 
 protected:
     void * mContext      = nullptr;

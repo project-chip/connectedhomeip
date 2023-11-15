@@ -905,6 +905,35 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DefaultSceneTableImpl::RemoveEndpoint()
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
+
+    for (FabricIndex fabric_index = kMinValidFabricIndex; fabric_index < kMaxValidFabricIndex; fabric_index++)
+    {
+        FabricSceneData fabric(mEndpointId, fabric_index);
+        CHIP_ERROR err = fabric.Load(mStorage);
+        VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
+        if (CHIP_ERROR_NOT_FOUND == err)
+        {
+            continue;
+        }
+
+        SceneIndex idx = 0;
+        while (idx < mMaxScenesPerFabric)
+        {
+            err = RemoveSceneTableEntryAtPosition(mEndpointId, fabric_index, idx);
+            VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
+            idx++;
+        };
+
+        // Remove fabric scenes on endpoint
+        ReturnErrorOnFailure(fabric.Delete(mStorage));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 /// @brief wrapper function around emberAfGetClustersFromEndpoint to allow testing, shimmed in test configuration because
 /// emberAfGetClusterFromEndpoint relies on <app/util/attribute-storage.h>, which relies on zap generated files
 uint8_t DefaultSceneTableImpl::GetClustersFromEndpoint(ClusterId * clusterList, uint8_t listLen)

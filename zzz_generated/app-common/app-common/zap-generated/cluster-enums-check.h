@@ -118,39 +118,25 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::StartUpOnOffEnum
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::MoveMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::MoveModeEnum val)
 {
-    using EnumType = LevelControl::MoveMode;
+    using EnumType = LevelControl::MoveModeEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUp:
     case EnumType::kDown:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_MOVE_MODE_UP:
-    case EMBER_ZCL_MOVE_MODE_DOWN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(2);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::StepMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::StepModeEnum val)
 {
-    using EnumType = LevelControl::StepMode;
+    using EnumType = LevelControl::StepModeEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUp:
     case EnumType::kDown:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_STEP_MODE_UP:
-    case EMBER_ZCL_STEP_MODE_DOWN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(2);
@@ -1215,6 +1201,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(Timer::TimerStatusEnum val)
+{
+    using EnumType = Timer::TimerStatusEnum;
+    switch (val)
+    {
+    case EnumType::kRunning:
+    case EnumType::kPaused:
+    case EnumType::kExpired:
+    case EnumType::kReady:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherControls::NumberOfRinsesEnum val)
 {
     using EnumType = LaundryWasherControls::NumberOfRinsesEnum;
@@ -1480,6 +1481,88 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ValveConfigurationAndCo
         return val;
     default:
         return static_cast<EnumType>(2);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::CriticalityLevelEnum val)
+{
+    using EnumType = DemandResponseLoadControl::CriticalityLevelEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kGreen:
+    case EnumType::kLevel1:
+    case EnumType::kLevel2:
+    case EnumType::kLevel3:
+    case EnumType::kLevel4:
+    case EnumType::kLevel5:
+    case EnumType::kEmergency:
+    case EnumType::kPlannedOutage:
+    case EnumType::kServiceDisconnect:
+        return val;
+    default:
+        return static_cast<EnumType>(10);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::HeatingSourceEnum val)
+{
+    using EnumType = DemandResponseLoadControl::HeatingSourceEnum;
+    switch (val)
+    {
+    case EnumType::kAny:
+    case EnumType::kElectric:
+    case EnumType::kNonElectric:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::LoadControlEventChangeSourceEnum val)
+{
+    using EnumType = DemandResponseLoadControl::LoadControlEventChangeSourceEnum;
+    switch (val)
+    {
+    case EnumType::kAutomatic:
+    case EnumType::kUserAction:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::LoadControlEventStatusEnum val)
+{
+    using EnumType = DemandResponseLoadControl::LoadControlEventStatusEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kReceived:
+    case EnumType::kInProgress:
+    case EnumType::kCompleted:
+    case EnumType::kOptedOut:
+    case EnumType::kOptedIn:
+    case EnumType::kCanceled:
+    case EnumType::kSuperseded:
+    case EnumType::kPartialOptedOut:
+    case EnumType::kPartialOptedIn:
+    case EnumType::kNoParticipation:
+    case EnumType::kUnavailable:
+    case EnumType::kFailed:
+        return val;
+    default:
+        return static_cast<EnumType>(13);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::PowerSavingsEnum val)
+{
+    using EnumType = DemandResponseLoadControl::PowerSavingsEnum;
+    switch (val)
+    {
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
     }
 }
 
@@ -2006,8 +2089,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeSequ
     case EnumType::kOffLowHigh:
     case EnumType::kOffLowMedHighAuto:
     case EnumType::kOffLowHighAuto:
-    case EnumType::kOffOnAuto:
-    case EnumType::kOffOn:
+    case EnumType::kOffHighAuto:
+    case EnumType::kOffHigh:
         return val;
     default:
         return static_cast<EnumType>(6);
@@ -2020,6 +2103,48 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::StepDirecti
     {
     case EnumType::kIncrease:
     case EnumType::kDecrease:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(ThermostatUserInterfaceConfiguration::KeypadLockoutEnum val)
+{
+    using EnumType = ThermostatUserInterfaceConfiguration::KeypadLockoutEnum;
+    switch (val)
+    {
+    case EnumType::kNoLockout:
+    case EnumType::kLockout1:
+    case EnumType::kLockout2:
+    case EnumType::kLockout3:
+    case EnumType::kLockout4:
+    case EnumType::kLockout5:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
+    }
+}
+static auto __attribute__((unused))
+EnsureKnownEnumValue(ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum val)
+{
+    using EnumType = ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum;
+    switch (val)
+    {
+    case EnumType::kScheduleProgrammingPermitted:
+    case EnumType::kScheduleProgrammingDenied:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum val)
+{
+    using EnumType = ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum;
+    switch (val)
+    {
+    case EnumType::kCelsius:
+    case EnumType::kFahrenheit:
         return val;
     default:
         return static_cast<EnumType>(2);
@@ -2662,9 +2787,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::StatusEnum val
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(TargetNavigator::TargetNavigatorStatusEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TargetNavigator::StatusEnum val)
 {
-    using EnumType = TargetNavigator::TargetNavigatorStatusEnum;
+    using EnumType = TargetNavigator::StatusEnum;
     switch (val)
     {
     case EnumType::kSuccess:
@@ -2826,9 +2951,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CecKeyCode
         return static_cast<EnumType>(14);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::KeypadInputStatusEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::StatusEnum val)
 {
-    using EnumType = KeypadInput::KeypadInputStatusEnum;
+    using EnumType = KeypadInput::StatusEnum;
     switch (val)
     {
     case EnumType::kSuccess:
@@ -2840,19 +2965,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::KeypadInpu
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::ContentLaunchStatusEnum val)
-{
-    using EnumType = ContentLauncher::ContentLaunchStatusEnum;
-    switch (val)
-    {
-    case EnumType::kSuccess:
-    case EnumType::kUrlNotAvailable:
-    case EnumType::kAuthFailed:
-        return val;
-    default:
-        return static_cast<EnumType>(3);
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::MetricTypeEnum val)
 {
     using EnumType = ContentLauncher::MetricTypeEnum;
@@ -2887,6 +2999,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::Parame
         return val;
     default:
         return static_cast<EnumType>(14);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::StatusEnum val)
+{
+    using EnumType = ContentLauncher::StatusEnum;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kURLNotAvailable:
+    case EnumType::kAuthFailed:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
     }
 }
 

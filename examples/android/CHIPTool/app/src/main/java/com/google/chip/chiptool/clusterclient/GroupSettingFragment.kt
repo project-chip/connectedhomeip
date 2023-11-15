@@ -12,19 +12,12 @@ import android.widget.EditText
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
-import chip.devicecontroller.ClusterIDMapping
+import chip.devicecontroller.ChipStructs
+import chip.devicecontroller.ChipStructs.AccessControlClusterAccessControlEntryStruct
+import chip.devicecontroller.ChipStructs.GroupKeyManagementClusterGroupKeySetStruct
 import chip.devicecontroller.GroupKeySecurityPolicy
-import chip.devicecontroller.InvokeCallback
-import chip.devicecontroller.ReportCallback
-import chip.devicecontroller.WriteAttributesCallback
-import chip.devicecontroller.cluster.structs.AccessControlClusterAccessControlEntryStruct
-import chip.devicecontroller.cluster.structs.GroupKeyManagementClusterGroupKeySetStruct
-import chip.devicecontroller.model.AttributeWriteRequest
-import chip.devicecontroller.model.ChipAttributePath
-import chip.devicecontroller.model.ChipEventPath
-import chip.devicecontroller.model.InvokeElement
-import chip.devicecontroller.model.NodeState
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
@@ -33,10 +26,6 @@ import com.google.chip.chiptool.util.DeviceIdUtil
 import java.lang.Exception
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import matter.tlv.AnonymousTag
-import matter.tlv.ContextSpecificTag
-import matter.tlv.TlvReader
-import matter.tlv.TlvWriter
 
 class GroupSettingFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -260,14 +249,17 @@ class GroupSettingFragment : Fragment() {
       scope.launch {
         val keySetWritestruct =
           GroupKeyManagementClusterGroupKeySetStruct(
-            keySetIdEd.text.toString().toUInt(),
-            GroupKeySecurityPolicy.valueOf(keySecurityPolicySp.selectedItem.toString()).id.toUInt(),
+            keySetIdEd.text.toString().toUInt().toInt(),
+            GroupKeySecurityPolicy.valueOf(keySecurityPolicySp.selectedItem.toString())
+              .id
+              .toUInt()
+              .toInt(),
             hexStringToByteArray(epochKey0Ed.text.toString()),
-            epochStartTime0Ed.text.toString().toULong(),
+            epochStartTime0Ed.text.toString().toULong().toLong(),
             hexStringToByteArray(epochKey1Ed.text.toString()),
-            epochStartTime1Ed.text.toString().toULong(),
+            epochStartTime1Ed.text.toString().toULong().toLong(),
             hexStringToByteArray(epochKey2Ed.text.toString()),
-            epochStartTime2Ed.text.toString().toULong()
+            epochStartTime2Ed.text.toString().toULong().toLong()
           )
         sendKeySetWrite(keySetWritestruct)
         requireActivity().runOnUiThread { dialog.dismiss() }
@@ -279,41 +271,24 @@ class GroupSettingFragment : Fragment() {
   private suspend fun sendKeySetWrite(
     groupKeySetStruct: GroupKeyManagementClusterGroupKeySetStruct
   ) {
-    val tlvWriter =
-      TlvWriter()
-        .startStructure(AnonymousTag)
-        .apply {
-          groupKeySetStruct.toTlv(
-            ContextSpecificTag(
-              ClusterIDMapping.GroupKeyManagement.KeySetWriteCommandField.GroupKeySet.id
-            ),
-            this
-          )
-        }
-        .endStructure()
-
-    deviceController.invoke(
-      object : InvokeCallback {
-        override fun onError(e: java.lang.Exception?) {
+    val cluster =
+      ChipClusters.GroupKeyManagementCluster(
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+        0
+      )
+    cluster.keySetWrite(
+      object : ChipClusters.DefaultClusterCallback {
+        override fun onError(e: Exception?) {
           Log.d(TAG, "onError : ", e)
           showMessage("onError : ${e.toString()}")
         }
 
-        override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+        override fun onSuccess() {
           Log.d(TAG, "onResponse")
-          showMessage("onResponse : $successCode")
+          showMessage("onResponse")
         }
       },
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
-      InvokeElement.newInstance(
-        0,
-        ClusterIDMapping.GroupKeyManagement.ID,
-        ClusterIDMapping.GroupKeyManagement.Command.KeySetWrite.id,
-        tlvWriter.getEncoded(),
-        null
-      ),
-      0,
-      0
+      groupKeySetStruct
     )
   }
 
@@ -336,39 +311,30 @@ class GroupSettingFragment : Fragment() {
   }
 
   private suspend fun writeGroupKeyMap(groupId: UInt, groupKeySetId: UInt) {
-    val tlvWriter =
-      TlvWriter().apply {
-        startArray(AnonymousTag)
-        startStructure(AnonymousTag)
-        put(ContextSpecificTag(1), groupId)
-        put(ContextSpecificTag(2), groupKeySetId)
-        endStructure()
-        endArray()
-      }
-
-    deviceController.write(
-      object : WriteAttributesCallback {
-        override fun onError(attributePath: ChipAttributePath?, e: Exception?) {
+    val cluster =
+      ChipClusters.GroupKeyManagementCluster(
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+        0
+      )
+    cluster.writeGroupKeyMapAttribute(
+      object : ChipClusters.DefaultClusterCallback {
+        override fun onError(e: Exception?) {
           Log.d(TAG, "onError : ", e)
           showMessage("Error : ${e.toString()}")
         }
 
-        override fun onResponse(attributePath: ChipAttributePath?) {
+        override fun onSuccess() {
           Log.d(TAG, "onResponse")
           showMessage("write Success")
         }
       },
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
-      listOf(
-        AttributeWriteRequest.newInstance(
-          0,
-          ClusterIDMapping.GroupKeyManagement.ID,
-          ClusterIDMapping.GroupKeyManagement.Attribute.GroupKeyMap.id,
-          tlvWriter.getEncoded()
+      arrayListOf(
+        ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct(
+          groupId.toInt(),
+          groupKeySetId.toInt(),
+          deviceController.fabricIndex
         )
-      ),
-      0,
-      0
+      )
     )
   }
 
@@ -390,75 +356,52 @@ class GroupSettingFragment : Fragment() {
   }
 
   private suspend fun sendAddGroup(groupId: UInt, groupName: String) {
-    val tlvWriter =
-      TlvWriter().apply {
-        startStructure(AnonymousTag)
-        put(ContextSpecificTag(0), groupId)
-        put(ContextSpecificTag(1), groupName)
-        endStructure()
-      }
-
-    deviceController.invoke(
-      object : InvokeCallback {
+    val cluster =
+      ChipClusters.GroupsCluster(
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+        0
+      )
+    cluster.addGroup(
+      object : ChipClusters.GroupsCluster.AddGroupResponseCallback {
         override fun onError(e: Exception?) {
           Log.d(TAG, "onError : ", e)
           showMessage("Error : ${e.toString()}")
         }
 
-        override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+        override fun onSuccess(status: Int?, groupID: Int?) {
           Log.d(TAG, "onResponse")
-          showMessage("onResponse : $successCode")
+          showMessage("onResponse : $status, $groupID")
         }
       },
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
-      InvokeElement.newInstance(
-        0,
-        ClusterIDMapping.Groups.ID,
-        ClusterIDMapping.Groups.Command.AddGroup.id,
-        tlvWriter.getEncoded(),
-        null
-      ),
-      0,
-      0
+      groupId.toInt(),
+      groupName
     )
   }
 
   private suspend fun readAccessControl() {
-    val endpointId = 0
-    val clusterId = ClusterIDMapping.AccessControl.ID
-    val attributeId = ClusterIDMapping.AccessControl.Attribute.Acl.id
-
-    val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
-    deviceController.readAttributePath(
-      object : ReportCallback {
-        override fun onError(
-          attributePath: ChipAttributePath?,
-          eventPath: ChipEventPath?,
-          e: Exception
-        ) {
+    val cluster =
+      ChipClusters.AccessControlCluster(
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+        0
+      )
+    cluster.readAclAttribute(
+      object : ChipClusters.AccessControlCluster.AclAttributeCallback {
+        override fun onError(e: Exception?) {
           Log.d(TAG, "onError : ", e)
           showMessage("Error : $e")
         }
 
-        override fun onReport(nodeState: NodeState?) {
-          Log.d(TAG, "onResponse")
-          val tlv =
-            nodeState
-              ?.getEndpointState(endpointId)
-              ?.getClusterState(clusterId)
-              ?.getAttributeState(attributeId)
-              ?.tlv
-          requireActivity().runOnUiThread { showAddAccessControlDialog(tlv) }
+        override fun onSuccess(value: MutableList<AccessControlClusterAccessControlEntryStruct>?) {
+          requireActivity().runOnUiThread { showAddAccessControlDialog(value) }
         }
-      },
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
-      listOf(attributePath),
-      0
+      }
     )
   }
 
-  private fun showAddAccessControlDialog(tlv: ByteArray?) {
-    if (tlv == null) {
+  private fun showAddAccessControlDialog(
+    value: List<AccessControlClusterAccessControlEntryStruct>?
+  ) {
+    if (value == null) {
       Log.d(TAG, "Access Control read fail")
       showMessage("Access Control read fail")
       return
@@ -479,7 +422,7 @@ class GroupSettingFragment : Fragment() {
     dialogView.findViewById<Button>(R.id.addAccessControlBtn).setOnClickListener {
       scope.launch {
         sendAccessControl(
-          tlv,
+          value,
           groupIdEd.text.toString().toUInt(),
           AccessControlEntry.valueOf(accessControlEntrySp.selectedItem.toString()).id
         )
@@ -489,66 +432,52 @@ class GroupSettingFragment : Fragment() {
     dialog.show()
   }
 
-  private suspend fun sendAccessControl(tlv: ByteArray, groupId: UInt, privilege: UInt) {
-    val tlvWriter = TlvWriter().startArray(AnonymousTag)
-    var entryStructList: List<AccessControlClusterAccessControlEntryStruct>
-    TlvReader(tlv).also {
-      entryStructList = buildList {
-        it.enterArray(AnonymousTag)
-        while (!it.isEndOfContainer()) {
-          add(AccessControlClusterAccessControlEntryStruct.fromTlv(AnonymousTag, it))
-        }
-        it.exitContainer()
-      }
-    }
-
+  private suspend fun sendAccessControl(
+    value: List<AccessControlClusterAccessControlEntryStruct>,
+    groupId: UInt,
+    privilege: UInt
+  ) {
     // If GroupID is already added to AccessControl, do not add it.
-    for (entry in entryStructList) {
+    val cluster =
+      ChipClusters.AccessControlCluster(
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+        0
+      )
+    val sendEntry = ArrayList<AccessControlClusterAccessControlEntryStruct>()
+    for (entry in value) {
       if (
-        entry.authMode == 3U /* Group */ &&
+        entry.authMode == AccessControlEntry.Operate.id.toInt() /* Group */ &&
           entry.subjects != null &&
-          entry.subjects!!.contains(groupId.toULong())
+          entry.subjects!!.contains(groupId.toULong().toLong())
       ) {
         continue
       }
-
-      entry.toTlv(AnonymousTag, tlvWriter)
+      sendEntry.add(entry)
     }
 
     val newEntry =
       AccessControlClusterAccessControlEntryStruct(
-        privilege,
-        3U /* Group */,
-        listOf(groupId.toULong()),
+        privilege.toInt(),
+        AccessControlEntry.Operate.id.toInt() /* Group */,
+        arrayListOf(groupId.toULong().toLong()),
         null,
-        deviceController.fabricIndex.toUInt()
+        deviceController.fabricIndex.toUInt().toInt()
       )
-    newEntry.toTlv(AnonymousTag, tlvWriter)
-    tlvWriter.endArray()
+    sendEntry.add(newEntry)
 
-    deviceController.write(
-      object : WriteAttributesCallback {
-        override fun onError(attributePath: ChipAttributePath?, e: Exception?) {
+    cluster.writeAclAttribute(
+      object : ChipClusters.DefaultClusterCallback {
+        override fun onError(e: Exception?) {
           Log.d(TAG, "onError : ", e)
           showMessage("Error : ${e.toString()}")
         }
 
-        override fun onResponse(attributePath: ChipAttributePath?) {
+        override fun onSuccess() {
           Log.d(TAG, "onResponse")
           showMessage("write Success")
         }
       },
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
-      listOf(
-        AttributeWriteRequest.newInstance(
-          0,
-          ClusterIDMapping.AccessControl.ID,
-          ClusterIDMapping.AccessControl.Attribute.Acl.id,
-          tlvWriter.getEncoded()
-        )
-      ),
-      0,
-      0
+      sendEntry
     )
   }
 

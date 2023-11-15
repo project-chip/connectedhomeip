@@ -24,10 +24,11 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Callable
 
+import chip.clusters as Clusters
 from chip.tlv import uint
 from conformance_support import (DEPRECATE_CONFORM, DISALLOW_CONFORM, MANDATORY_CONFORM, OPTIONAL_CONFORM, OTHERWISE_CONFORM,
                                  PROVISIONAL_CONFORM, ConformanceDecision, ConformanceException, ConformanceParseParameters,
-                                 or_operation, parse_callable_from_xml)
+                                 feature, or_operation, parse_callable_from_xml)
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, EventPathLocation,
                                     FeaturePathLocation, ProblemNotice, ProblemSeverity)
 
@@ -76,22 +77,6 @@ class XmlCluster:
 class CommandType(Enum):
     ACCEPTED = auto()
     GENERATED = auto()
-
-
-def has_zigbee_conformance(conformance: ElementTree.Element) -> bool:
-    # For clusters, things with zigbee conformance can share IDs with the matter elements, so we don't want them
-
-    # TODO: it's actually possible for a thing to have a zigbee conformance AND to have other conformances, and we should check
-    # for that, but for now, this is fine because that hasn't happened in the cluster conformances YET.
-    # It does happen for device types, so we need to be careful there.
-    condition = conformance.iter('condition')
-    for c in condition:
-        try:
-            c.attrib['name'].lower() == "zigbee"
-            return True
-        except KeyError:
-            continue
-    return False
 
 
 class ClusterParser:
@@ -150,8 +135,6 @@ class ClusterParser:
                     # This is a conformance tag, which uses the same name
                     continue
                 conformance = self.get_conformance(element)
-                if has_zigbee_conformance(conformance):
-                    continue
                 ret.append((element, conformance))
         return ret
 
@@ -264,7 +247,11 @@ class ClusterParser:
         return events
 
     def create_cluster(self) -> XmlCluster:
-        return XmlCluster(revision=self._cluster.attrib['revision'], derived=self._derived,
+        try:
+            revision = int(self._cluster.attrib['revision'], 0)
+        except ValueError:
+            revision = 0
+        return XmlCluster(revision=revision, derived=self._derived,
                           name=self._name, feature_map=self.params.feature_map,
                           attribute_map=self.params.attribute_map, command_map=self.params.command_map,
                           features=self.parse_features(),
@@ -342,22 +329,44 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
             clusters[id] = new
 
     # workaround for aliased clusters not appearing in the xml. Remove this once https://github.com/csa-data-model/projects/issues/373 is addressed
-    aliased_clusters = {0x040C: 'Carbon Monoxide Concentration Measurement',
-                        0x040D: 'Carbon Dioxide Concentration Measurement',
-                        0x0413: 'Nitrogen Dioxide Concentration Measurement',
-                        0x0415: 'Ozone Concentration Measurement',
-                        0x042A: 'PM2.5 Concentration Measurement',
-                        0x042B: 'Formaldehyde Concentration Measurement',
-                        0x042C: 'PM1 Concentration Measurement',
-                        0x042D: 'PM10 Concentration Measurement',
-                        0x042E: 'Total Volatile Organic Compounds Concentration Measurement',
-                        0x042F: 'Radon Concentration Measurement'}
-    alias_base_name = 'Concentration Measurement Clusters'
-    for id, alias_name in aliased_clusters.items():
-        base = derived_clusters[alias_base_name]
-        new = deepcopy(base)
-        new.derived = alias_base_name
-        new.name = alias_name
-        clusters[id] = new
+    conc_clusters = {0x040C: 'Carbon Monoxide Concentration Measurement',
+                     0x040D: 'Carbon Dioxide Concentration Measurement',
+                     0x0413: 'Nitrogen Dioxide Concentration Measurement',
+                     0x0415: 'Ozone Concentration Measurement',
+                     0x042A: 'PM2.5 Concentration Measurement',
+                     0x042B: 'Formaldehyde Concentration Measurement',
+                     0x042C: 'PM1 Concentration Measurement',
+                     0x042D: 'PM10 Concentration Measurement',
+                     0x042E: 'Total Volatile Organic Compounds Concentration Measurement',
+                     0x042F: 'Radon Concentration Measurement'}
+    conc_base_name = 'Concentration Measurement Clusters'
+    resource_clusters = {0x0071: 'HEPA Filter Monitoring',
+                         0x0072: 'Activated Carbon Filter Monitoring'}
+    resource_base_name = 'Resource Monitoring Clusters'
+    water_clusters = {0x0405: 'Relative Humidity Measurement',
+                      0x0407: 'Leaf Wetness Measurement',
+                      0x0408: 'Soil Moisture Measurement'}
+    water_base_name = 'Water Content Measurement Clusters'
+    aliases = {conc_base_name: conc_clusters, resource_base_name: resource_clusters, water_base_name: water_clusters}
+    for alias_base_name, aliased_clusters in aliases.items():
+        for id, alias_name in aliased_clusters.items():
+            base = derived_clusters[alias_base_name]
+            new = deepcopy(base)
+            new.derived = alias_base_name
+            new.name = alias_name
+            clusters[id] = new
+
+    # Workaround for temp control cluster - this is parsed incorrectly in the DM XML and is missing all its attributes
+    # Remove this workaround when https://github.com/csa-data-model/projects/issues/330 is fixed
+    temp_control_id = Clusters.TemperatureControl.id
+    if temp_control_id in clusters and not clusters[temp_control_id].attributes:
+        clusters[temp_control_id].attributes = {
+            0x00: XmlAttribute(name='TemperatureSetpoint', datatype='temperature', conformance=feature(0x01, 'TN')),
+            0x01: XmlAttribute(name='MinTemperature', datatype='temperature', conformance=feature(0x01, 'TN')),
+            0x02: XmlAttribute(name='MaxTemperature', datatype='temperature', conformance=feature(0x01, 'TN')),
+            0x03: XmlAttribute(name='Step', datatype='temperature', conformance=feature(0x04, 'STEP')),
+            0x04: XmlAttribute(name='SelectedTemperatureLevel', datatype='uint8', conformance=feature(0x02, 'TL')),
+            0x05: XmlAttribute(name='SupportedTemperatureLevels', datatype='list', conformance=feature(0x02, 'TL')),
+        }
 
     return clusters, problems
