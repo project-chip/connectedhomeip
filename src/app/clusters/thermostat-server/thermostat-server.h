@@ -39,13 +39,16 @@ struct ThermostatMatterScheduleManager
     using onEditCancelCb = onEditStartCb;
     using onEditCommitCb = onEditStartCb;
 
-    using getPresetTypeAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, PresetTypeStruct::Type &scheduleType);
-    using getPresetAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, PresetStruct::Type &schedule);
+    using getPresetTypeAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, PresetTypeStruct::Type &presetType);
+    using getPresetAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, PresetStruct::Type &preset);
     using setPresetAtIndexCB = getPresetAtIndexCB;
+    using clearPresetsCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *);
+    using appendPresetCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, const PresetStruct::DecodableType &preset);
 
     using getScheduleTypeAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, ScheduleTypeStruct::Type &scheduleType);
     using getScheduleAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, ScheduleStruct::Type &schedule);
-    using setScheduleAtIndexCB = getScheduleAtIndexCB;
+    using clearSchedulesCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *);
+    using appendScheduleCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, const ScheduleStruct::DecodableType &schedule);
 
     /**
      * @brief Construct a new ThermostatMatterScheduleManager object
@@ -66,6 +69,8 @@ struct ThermostatMatterScheduleManager
      * @param getScheduleAtIndex callback requesting from the app a preset at a given index.
      * @param setScheduleAtIndex callback requesting the app to set a preset at a given index.
      */
+
+    // If the endpoint supports both editable presets and editable schedules
     ThermostatMatterScheduleManager( chip::EndpointId endpoint, 
                                     onEditStartCb onEditStart, 
                                     onEditCancelCb onEditCancel,
@@ -73,11 +78,36 @@ struct ThermostatMatterScheduleManager
 
                                     getPresetTypeAtIndexCB getPresetTypeAtIndex,
                                     getPresetAtIndexCB getPresetAtIndex,
-                                    setPresetAtIndexCB setPresetAtIndex,
+                                    appendPresetCB appendPreset,
+                                    clearPresetsCB clearPresets,
 
                                     getScheduleTypeAtIndexCB getScheduleTypeAtIndexCB,
                                     getScheduleAtIndexCB getScheduleAtIndex,
-                                    setScheduleAtIndexCB setScheduleAtIndex);
+                                    appendScheduleCB appendSchedule,
+                                    clearSchedulesCB clearSchedules);
+
+    // If the endpoint supports editable schedules
+    ThermostatMatterScheduleManager( chip::EndpointId endpoint, 
+                                    onEditStartCb onEditStart, 
+                                    onEditCancelCb onEditCancel,
+                                    onEditCommitCb onEditCommit,
+
+                                    getScheduleTypeAtIndexCB getScheduleTypeAtIndexCB,
+                                    getScheduleAtIndexCB getScheduleAtIndex,
+                                    appendScheduleCB appendSchedule,
+                                    clearSchedulesCB clearSchedules);
+
+    // If the endpoint supports editable presets
+    ThermostatMatterScheduleManager( chip::EndpointId endpoint, 
+                                    onEditStartCb onEditStart, 
+                                    onEditCancelCb onEditCancel,
+                                    onEditCommitCb onEditCommit,
+
+                                    getPresetTypeAtIndexCB getPresetTypeAtIndex,
+                                    getPresetAtIndexCB getPresetAtIndex,
+                                    appendPresetCB appendPreset,
+                                    clearPresetsCB clearPresets);
+
     ~ThermostatMatterScheduleManager();
 
     chip::EndpointId mEndpoint;
@@ -87,11 +117,13 @@ struct ThermostatMatterScheduleManager
 
     getPresetTypeAtIndexCB mGetPresetTypeAtIndexCb = nullptr;
     getPresetAtIndexCB mGetPresetAtIndexCb = nullptr;
-    setPresetAtIndexCB mSetPresetAtIndexCb = nullptr;
+    appendPresetCB mAppendPresetCb = nullptr;
+    clearPresetsCB mClearPresetsCb = nullptr;
 
     getScheduleTypeAtIndexCB mGetScheduleTypeAtIndexCb = nullptr;
     getScheduleAtIndexCB mGetScheduleAtIndexCb = nullptr;
-    setScheduleAtIndexCB mSetScheduleAtIndexCb = nullptr;
+    appendScheduleCB mAppendScheduleCb = nullptr;
+    clearSchedulesCB mClearSchedulesCb = nullptr;
 
     ThermostatMatterScheduleManager * nextEditor = nullptr;
 
