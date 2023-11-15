@@ -39,8 +39,6 @@ class PlayServices(EcosystemCapture):
     """
 
     def __init__(self, platform: Android, artifact_dir: str) -> None:
-        self.logcat_fd = None
-        self.logger = logger
         self.artifact_dir = artifact_dir
 
         if not isinstance(platform, Android):
@@ -63,7 +61,7 @@ class PlayServices(EcosystemCapture):
 
     def _write_standard_info_file(self) -> None:
         for k, v in self.standard_info_data.items():
-            self.logger.info(f"{k}: {v}")
+            logger.info(f"{k}: {v}")
         standard_info_data_json = json.dumps(self.standard_info_data, indent=2)
         with open(self.standard_info_file_path, mode='w+') as standard_info_file:
             standard_info_file.write(standard_info_data_json)
@@ -98,15 +96,14 @@ class PlayServices(EcosystemCapture):
 
     async def analyze_capture(self):
         try:
-            self.logcat_fd = open(self.logcat_stream.logcat_artifact, "r")
+            logcat_fd = open(self.logcat_stream.logcat_artifact, "r")
             while True:
                 self.analysis.do_analysis(self.logcat_fd.readlines())
                 # Releasing async event loop for other analysis / monitor topics
                 await asyncio.sleep(0.5)
         except asyncio.CancelledError:
-            self.logger.info("Closing logcat stream")
-            if self.logcat_fd is not None:
-                self.logcat_fd.close()
+            logger.info("Closing logcat stream")
+            logcat_fd.close()
 
     async def stop_capture(self) -> None:
         self.analysis.show_analysis()
@@ -115,4 +112,4 @@ class PlayServices(EcosystemCapture):
         if config.enable_foyer_probers:
             await PlayServicesProber(self.platform, self.artifact_dir).probe_services()
         else:
-            self.logger.critical("Foyer probers disabled in config!")
+            logger.critical("Foyer probers disabled in config!")
