@@ -126,6 +126,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeUserLabelID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000041,
     MTRClusterIDTypeBooleanStateID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000045,
     MTRClusterIDTypeICDManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000046,
+    MTRClusterIDTypeTimerID MTR_PROVISIONALLY_AVAILABLE = 0x00000047,
     MTRClusterIDTypeModeSelectID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000050,
     MTRClusterIDTypeLaundryWasherModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000051,
     MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000052,
@@ -2249,6 +2250,17 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterICDManagementAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterICDManagementAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterICDManagementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster Timer attributes
+    MTRAttributeIDTypeClusterTimerAttributeSetTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterTimerAttributeTimeRemainingID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterTimerAttributeTimerStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterTimerAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterTimerAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterTimerAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
+    MTRAttributeIDTypeClusterTimerAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterTimerAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterTimerAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ModeSelect deprecated attribute names
     MTRClusterModeSelectAttributeDescriptionID
@@ -5969,6 +5981,12 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterICDManagementCommandRegisterClientResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterICDManagementCommandUnregisterClientID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
     MTRCommandIDTypeClusterICDManagementCommandStayActiveRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+
+    // Cluster Timer commands
+    MTRCommandIDTypeClusterTimerCommandSetTimerID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterTimerCommandResetTimerID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterTimerCommandAddTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterTimerCommandReduceTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
 
     // Cluster ModeSelect deprecated command id names
     MTRClusterModeSelectCommandChangeToModeID

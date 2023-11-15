@@ -1916,6 +1916,42 @@ static BOOL AttributeIsSpecifiedInICDManagementCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInTimerCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Timer;
+    switch (aAttributeId) {
+    case Attributes::SetTime::Id: {
+        return YES;
+    }
+    case Attributes::TimeRemaining::Id: {
+        return YES;
+    }
+    case Attributes::TimerState::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInModeSelectCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ModeSelect;
@@ -5687,6 +5723,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::IcdManagement::Id: {
         return AttributeIsSpecifiedInICDManagementCluster(aAttributeId);
+    }
+    case Clusters::Timer::Id: {
+        return AttributeIsSpecifiedInTimerCluster(aAttributeId);
     }
     case Clusters::ModeSelect::Id: {
         return AttributeIsSpecifiedInModeSelectCluster(aAttributeId);

@@ -98,6 +98,7 @@
         "thread-network-diagnostics-cluster.xml",
         "time-format-localization-cluster.xml",
         "time-synchronization-cluster.xml",
+        "timer-cluster.xml",
         "user-label-cluster.xml",
         "unit-localization-cluster.xml",
         "wake-on-lan-cluster.xml",
