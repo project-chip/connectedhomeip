@@ -17,16 +17,14 @@
 
 from capture import ecosystem, platform
 
-from .controller import EcosystemCapture, EcosystemFactory, Orchestrator, PlatformFactory, PlatformLogStreamer
+from .controller import EcosystemCapture, PlatformLogStreamer
 from .pcap import PacketCaptureRunner
 
 __all__ = [
     'ecosystem',
     'platform',
+    'controller',
     'EcosystemCapture',
-    'EcosystemFactory',
-    'Orchestrator',
     'PacketCaptureRunner',
-    'PlatformFactory',
     'PlatformLogStreamer',
 ]

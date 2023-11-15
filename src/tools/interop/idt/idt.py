@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 import probe.runner as probe_runner
-from capture import EcosystemFactory, Orchestrator, PacketCaptureRunner, PlatformFactory
+from capture import PacketCaptureRunner, controller
 from discovery import MatterBleScanner, MatterDnssdListener
 from utils.artifact import create_file_timestamp, safe_mkdir
 from utils.host_platform import get_available_interfaces, verify_host_dependencies
@@ -75,11 +75,11 @@ class InteropDebuggingTool:
             safe_mkdir(self.artifact_dir)
             border_print(f"Using artifact dir {self.artifact_dir}")
 
-        self.available_platforms = PlatformFactory.list_available_platforms()
+        self.available_platforms = controller.list_available_platforms()
         self.available_platforms_default = 'Android' if 'Android' in self.available_platforms else None
         self.platform_required = self.available_platforms_default is None
 
-        self.available_ecosystems = EcosystemFactory.list_available_ecosystems()
+        self.available_ecosystems = controller.list_available_ecosystems()
         self.available_ecosystems_default = 'ALL'
         self.available_ecosystems.append(self.available_ecosystems_default)
 
@@ -195,23 +195,23 @@ class InteropDebuggingTool:
             safe_mkdir(self.pcap_artifact_dir)
             pcap_runner.start_pcap()
 
-        asyncio.run(EcosystemFactory.init_ecosystems(args.platform,
+        asyncio.run(controller.init_ecosystems(args.platform,
                                                      args.ecosystem,
                                                      self.artifact_dir))
-        asyncio.run(Orchestrator.start())
-        asyncio.run(Orchestrator.run_analyzers())
+        asyncio.run(controller.start())
+        asyncio.run(controller.run_analyzers())
 
         if pcap:
             border_print("Stopping pcap")
             pcap_runner.stop_pcap()
 
-        asyncio.run(Orchestrator.stop())
+        asyncio.run(controller.stop())
 
-        asyncio.run(Orchestrator.probe())
+        asyncio.run(controller.probe())
 
-        if Orchestrator.has_errors():
+        if controller.has_errors():
             border_print("Errors seen this run:")
-            Orchestrator.error_report(self.artifact_dir)
+            controller.error_report(self.artifact_dir)
 
         border_print("Compressing artifacts...")
         self.zip_artifacts()
