@@ -132,7 +132,7 @@ Protocols::InteractionModel::Status MicrowaveOvenDelegates::HandleSetCookingPara
 {
     VerifyOrDie(gOperationalStateInstance != nullptr && gMicrowaveOvenControlInstance != nullptr);
     uint8_t opState;
-    
+
     //TODO: check if the input cook mode value is invalid
 
     if(cookTime.HasValue() && (!IsCookTimeInRange(cookTime.Value())))
@@ -240,7 +240,7 @@ void MicrowaveOvenControl::Shutdown()
         delete gMicrowaveOvenControlInstance;
         gMicrowaveOvenControlInstance = nullptr;
     }
-    
+
     if (gMicrowaveOvenDelegates != nullptr)
     {
         delete gMicrowaveOvenDelegates;
@@ -257,7 +257,7 @@ void emberAfMicrowaveOvenControlClusterInitCallback(chip::EndpointId endpointId)
     EndpointId aEndpoint = 0x01;
     gOperationalStateInstance         = new OperationalState::Instance(gMicrowaveOvenDelegates, aEndpoint, Clusters::OperationalState::Id);
     gMicrowaveOvenControlInstance     = new MicrowaveOvenControl::Instance(gMicrowaveOvenDelegates, aEndpoint, Clusters::MicrowaveOvenControl::Id);
-    
+
     //Initialize instance of Operational state cluster
     gOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     gOperationalStateInstance->Init();

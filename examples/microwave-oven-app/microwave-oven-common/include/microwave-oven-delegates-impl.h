@@ -55,7 +55,7 @@ public:
      * Set the value of MinPower.
      */
     void SetMinPower(uint8_t minPower) override {return;}
-    
+
     /**
      * Get the value of MaxPower.
      */
