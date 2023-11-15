@@ -53,7 +53,6 @@ enum InternalPlatformSpecificEventTypes
     kPlatformLinuxBLEC1WriteEvent,
     kPlatformLinuxBLEOutOfBuffersEvent,
     kPlatformLinuxBLEPeripheralRegisterAppComplete,
-    kPlatformLinuxBLEPeripheralAdvConfiguredComplete,
     kPlatformLinuxBLEPeripheralAdvStartComplete,
     kPlatformLinuxBLEPeripheralAdvStopComplete
 };

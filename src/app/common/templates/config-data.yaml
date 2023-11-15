@@ -65,6 +65,7 @@ ClustersWithInitFunctions:
     - Thermostat
     - Mode Select
     - Sample MEI
+    - Scenes
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic
@@ -81,6 +82,7 @@ ClustersWithShutdownFunctions:
     - Level Control
     - Color Control
     - Sample MEI
+    - Scenes
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
