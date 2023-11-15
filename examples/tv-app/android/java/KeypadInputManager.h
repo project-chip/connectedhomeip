@@ -32,7 +32,7 @@ public:
     void InitializeWithObjects(jobject managerObject);
 
     void HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper,
-                       const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
+                       const chip::app::Clusters::KeypadInput::CecKeyCodeEnum & keyCode) override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
 

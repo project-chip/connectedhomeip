@@ -21,7 +21,7 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 
-CHIP_ERROR SendKeyCommand::Invoke(const chip::app::Clusters::KeypadInput::CecKeyCode keyCode,
+CHIP_ERROR SendKeyCommand::Invoke(const chip::app::Clusters::KeypadInput::CecKeyCodeEnum keyCode,
                                   std::function<void(CHIP_ERROR)> responseCallback)
 {
     KeypadInput::Commands::SendKey::Type request;

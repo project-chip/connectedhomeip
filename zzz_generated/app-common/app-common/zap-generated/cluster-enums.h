@@ -4063,8 +4063,8 @@ namespace LowPower {} // namespace LowPower
 
 namespace KeypadInput {
 
-// Enum for CecKeyCode
-enum class CecKeyCode : uint8_t
+// Enum for CecKeyCodeEnum
+enum class CecKeyCodeEnum : uint8_t
 {
     kSelect                    = 0x00,
     kUp                        = 0x01,

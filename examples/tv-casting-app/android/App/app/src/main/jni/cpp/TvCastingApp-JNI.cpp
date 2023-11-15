@@ -1663,7 +1663,7 @@ JNI_METHOD(jboolean, keypadInput_1sendKey)
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->KeypadInput_SendKey(
-        &endpoint, static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(keyCode),
+        &endpoint, static_cast<chip::app::Clusters::KeypadInput::CecKeyCodeEnum>(keyCode),
         [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(KeypadInput_SendKey).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer.KeypadInput_SendKey failed %" CHIP_ERROR_FORMAT, err.Format()));

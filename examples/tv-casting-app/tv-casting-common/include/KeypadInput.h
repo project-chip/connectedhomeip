@@ -29,5 +29,5 @@ class SendKeyCommand : public MediaCommandBase<chip::app::Clusters::KeypadInput:
 public:
     SendKeyCommand() : MediaCommandBase(chip::app::Clusters::KeypadInput::Id) {}
 
-    CHIP_ERROR Invoke(const chip::app::Clusters::KeypadInput::CecKeyCode keyCode, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Invoke(const chip::app::Clusters::KeypadInput::CecKeyCodeEnum keyCode, std::function<void(CHIP_ERROR)> responseCallback);
 };

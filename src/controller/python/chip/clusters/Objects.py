@@ -35446,7 +35446,7 @@ class KeypadInput(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class CecKeyCode(MatterIntEnum):
+        class CecKeyCodeEnum(MatterIntEnum):
             kSelect = 0x00
             kUp = 0x01
             kDown = 0x02
@@ -35567,10 +35567,10 @@ class KeypadInput(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="keyCode", Tag=0, Type=KeypadInput.Enums.CecKeyCode),
+                        ClusterObjectFieldDescriptor(Label="keyCode", Tag=0, Type=KeypadInput.Enums.CecKeyCodeEnum),
                     ])
 
-            keyCode: 'KeypadInput.Enums.CecKeyCode' = 0
+            keyCode: 'KeypadInput.Enums.CecKeyCodeEnum' = 0
 
         @dataclass
         class SendKeyResponse(ClusterCommand):

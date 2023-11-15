@@ -61,6 +61,8 @@ using ApplicationLauncherStatusEnum = StatusEnum;
 namespace KeypadInput {
 // https://github.com/project-chip/connectedhomeip/pull/30316 renamed this
 using KeypadInputStatusEnum = StatusEnum;
+// https://github.com/project-chip/connectedhomeip/pull/<TODO> renamed this
+using CecKeyCode = CecKeyCodeEnum;
 } // namespace KeypadInput
 
 namespace Channel {
