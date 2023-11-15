@@ -20,6 +20,7 @@ executable("thermostat-app") {
     "include/low-power/LowPowerManager.cpp",
     "include/low-power/LowPowerManager.h",
     "main.cpp",
+    "thermostat-schedules-manager.cpp",
   ]
 
   deps = [
