@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include <operational-state-delegate-impl.h>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -123,13 +124,12 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(gOperationalStateInstance == nullptr && gOperationalStateDelegate == nullptr);
 
     gOperationalStateDelegate           = new OperationalStateDelegate;
-    //EndpointId operationalStateEndpoint = 0x01;
+    EndpointId operationalStateEndpoint = 0x01;
     gOperationalStateInstance = new Instance(gOperationalStateDelegate, operationalStateEndpoint, Clusters::OperationalState::Id);
 
     gOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
 
     gOperationalStateInstance->Init();
-
 }
 
 // Init RVC Operational State cluster
