@@ -399,6 +399,7 @@ CHIP_ERROR BasicAttrAccess::ReadSpecificationVersion(AttributeValueEncoder & aEn
     uint32_t specification_version = CHIP_DEVICE_SPECIFICATION_VERSION;
     return aEncoder.Encode(specification_version);
 }
+
 CHIP_ERROR BasicAttrAccess::ReadMaxPathsPerInvoke(AttributeValueEncoder & aEncoder)
 {
     uint16_t max_path_per_invoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;

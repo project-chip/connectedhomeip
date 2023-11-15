@@ -114,6 +114,8 @@ tests:
                   18,
                   19,
                   20,
+                  21,
+                  22,
                   0xFFF8, # GeneratedCommandList
                   0xFFF9, # AcceptedCommandList
                   0xFFFB, # AttributeList
