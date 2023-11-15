@@ -121,8 +121,7 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="InputList" type="list">
-      <entry type="InputInfoStruct"/>
+    <attribute id="0x0000" name="InputList" type="list[InputInfoStruct Type]">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>

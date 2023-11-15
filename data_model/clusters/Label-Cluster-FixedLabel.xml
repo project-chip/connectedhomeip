@@ -62,8 +62,7 @@ Davis, CA 95616, USA
   <classification hierarchy="derived" baseCluster="Label" role="utility" picsCode="FLABEL" scope="Endpoint"/>
   <dataTypes/>
   <attributes>
-    <attribute id="0x0000" name="LabelList" type="list" default="empty">
-      <entry type="LabelStruct"/>
+    <attribute id="0x0000" name="LabelList" type="list[LabelStruct Type]" default="empty">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>

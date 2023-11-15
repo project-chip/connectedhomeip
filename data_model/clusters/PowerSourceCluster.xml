@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002F" name="Power Source" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002f" name="Power Source" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Added EndpointList attribute that maps a power source to a list of endpoints"/>
@@ -673,21 +673,20 @@ Davis, CA 95616, USA
         <feature name="WIRED"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x000A" name="ActiveWiredFaults" type="list">
-      <entry type="WiredFaultEnum"/>
+    <attribute id="0x000a" name="ActiveWiredFaults" type="list[WiredFaultEnum Type]">
       <access read="true" readPrivilege="view"/>
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x000B" name="BatVoltage" type="uint32">
+    <attribute id="0x000b" name="BatVoltage" type="uint32">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x000C" name="BatPercentRemaining" type="uint8">
+    <attribute id="0x000c" name="BatPercentRemaining" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform>
@@ -695,21 +694,21 @@ Davis, CA 95616, USA
       </optionalConform>
       <constraint type="between" from="0" to="200"/>
     </attribute>
-    <attribute id="0x000D" name="BatTimeRemaining" type="uint32">
+    <attribute id="0x000d" name="BatTimeRemaining" type="uint32">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x000E" name="BatChargeLevel" type="BatChargeLevelEnum">
+    <attribute id="0x000e" name="BatChargeLevel" type="BatChargeLevelEnum">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="BAT"/>
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x000F" name="BatReplacementNeeded" type="bool">
+    <attribute id="0x000f" name="BatReplacementNeeded" type="bool">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="BAT"/>
@@ -728,8 +727,7 @@ Davis, CA 95616, USA
         <feature name="BAT"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x0012" name="ActiveBatFaults" type="list">
-      <entry type="BatFaultEnum"/>
+    <attribute id="0x0012" name="ActiveBatFaults" type="list[BatFaultEnum Type]">
       <access read="true" readPrivilege="view"/>
       <optionalConform>
         <feature name="BAT"/>
@@ -792,42 +790,41 @@ Davis, CA 95616, USA
         <feature name="REPLC"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x001A" name="BatChargeState" type="BatChargeStateEnum">
+    <attribute id="0x001a" name="BatChargeState" type="BatChargeStateEnum">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="RECHG"/>
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x001B" name="BatTimeToFullCharge" type="uint32">
+    <attribute id="0x001b" name="BatTimeToFullCharge" type="uint32">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform>
         <feature name="RECHG"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x001C" name="BatFunctionalWhileCharging" type="bool">
+    <attribute id="0x001c" name="BatFunctionalWhileCharging" type="bool">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="RECHG"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x001D" name="BatChargingCurrent" type="uint32">
+    <attribute id="0x001d" name="BatChargingCurrent" type="uint32">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform>
         <feature name="RECHG"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x001E" name="ActiveBatChargeFaults" type="list">
-      <entry type="BatChargeFaultEnum"/>
+    <attribute id="0x001e" name="ActiveBatChargeFaults" type="list[BatChargeFaultEnum Type]">
       <access read="true" readPrivilege="view"/>
       <optionalConform>
         <feature name="RECHG"/>
       </optionalConform>
-      <constraint type="maxCount" value="16"/>
+      <constraint type="max" value="16"/>
     </attribute>
-    <attribute id="0x001F" name="EndpointList" type="list">
+    <attribute id="0x001f" name="EndpointList" type="list">
       <entry type="endpoint-no"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
@@ -899,7 +896,7 @@ Davis, CA 95616, USA
         <feature name="WIRED"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x002A" name="WiredAbsMaxAmperage" type="uint32" default="null">
+    <attribute id="0x002a" name="WiredAbsMaxAmperage" type="uint32" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <optionalConform>
@@ -954,11 +951,11 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
-      <field id="0" name="Current" type="ref_DataTypeList[WiredFaultEnum Type]" default="empty">
+      <field id="0" name="Current" type="&lt;&lt;ref_DataTypeList&gt;&gt;[WiredFaultEnum Type]" default="empty">
         <mandatoryConform/>
         <constraint type="max" value="8"/>
       </field>
-      <field id="1" name="Previous" type="ref_DataTypeList[WiredFaultEnum Type]" default="empty">
+      <field id="1" name="Previous" type="&lt;&lt;ref_DataTypeList&gt;&gt;[WiredFaultEnum Type]" default="empty">
         <mandatoryConform/>
         <constraint type="max" value="8"/>
       </field>
@@ -968,11 +965,11 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
-      <field id="0" name="Current" type="ref_DataTypeList[BatFaultEnum Type]" default="empty">
+      <field id="0" name="Current" type="&lt;&lt;ref_DataTypeList&gt;&gt;[BatFaultEnum Type]" default="empty">
         <mandatoryConform/>
         <constraint type="max" value="8"/>
       </field>
-      <field id="1" name="Previous" type="ref_DataTypeList[BatFaultEnum Type]" default="empty">
+      <field id="1" name="Previous" type="&lt;&lt;ref_DataTypeList&gt;&gt;[BatFaultEnum Type]" default="empty">
         <mandatoryConform/>
         <constraint type="max" value="8"/>
       </field>
@@ -982,11 +979,11 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="RECHG"/>
       </optionalConform>
-      <field id="0" name="Current" type="ref_DataTypeList[BatChargeFaultEnum Type]" default="empty">
+      <field id="0" name="Current" type="&lt;&lt;ref_DataTypeList&gt;&gt;[BatChargeFaultEnum Type]" default="empty">
         <mandatoryConform/>
         <constraint type="max" value="16"/>
       </field>
-      <field id="1" name="Previous" type="ref_DataTypeList[BatChargeFaultEnum Type]" default="empty">
+      <field id="1" name="Previous" type="&lt;&lt;ref_DataTypeList&gt;&gt;[BatChargeFaultEnum Type]" default="empty">
         <mandatoryConform/>
         <constraint type="max" value="16"/>
       </field>

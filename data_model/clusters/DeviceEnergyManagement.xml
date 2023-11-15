@@ -239,31 +239,38 @@ Davis, CA 95616, USA
     </struct>
     <struct name="PowerLimitsStruct structure">
       <field id="0" name="StartTime" type="epoch-s">
+        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="1" name="Duration" type="elapsed-s">
+        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="2" name="NominalPower" type="Power">
+        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="3" name="MaximumEnergy" type="Energy">
+        <access read="true" write="true"/>
         <optionalConform/>
       </field>
     </struct>
     <struct name="SlotAdjustmentStruct">
       <field id="0" name="SlotIndex" type="uint16">
+        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="1" name="NominalPower" type="Power">
+        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="2" name="Duration" type="elapsed-s">
+        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -309,11 +316,10 @@ Davis, CA 95616, USA
         <access read="true"/>
         <mandatoryConform/>
       </field>
-      <field id="10" name="Costs" type="list">
-        <entry type="CostStruct"/>
+      <field id="10" name="Costs" type="list[CostStruct Type]">
         <access read="true"/>
         <optionalConform/>
-        <constraint type="maxCount" value="5"/>
+        <constraint type="max" value="5"/>
       </field>
       <field id="11" name="MinPowerAdjustment" type="Power">
         <access read="true"/>
@@ -365,14 +371,13 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0005" name="PowerAdjustmentCapability" type="list" default="null">
-      <entry type="PowerAdjustStruct"/>
+    <attribute id="0x0005" name="PowerAdjustmentCapability" type="list[PowerAdjustStruct Type]" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
         <feature name="PA"/>
       </mandatoryConform>
-      <constraint type="maxCount" value="16"/>
+      <constraint type="max" value="16"/>
     </attribute>
     <attribute id="0x0006" name="PowerForecast" type="PowerForecastStruct" default="null">
       <access read="true" readPrivilege="view"/>
@@ -429,8 +434,7 @@ Davis, CA 95616, USA
       <field id="0" name="ForecastId" type="uint32">
         <mandatoryConform/>
       </field>
-      <field id="1" name="SlotAdjustments" type="list">
-        <entry type="SlotAdjustmentStruct"/>
+      <field id="1" name="SlotAdjustments" type="list[SlotAdjustmentStruct Type]">
         <mandatoryConform/>
       </field>
     </command>
@@ -439,10 +443,9 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="PFA"/>
       </optionalConform>
-      <field id="1" name="PowerLimits" type="list">
-        <entry type="PowerLimitsStruct structure"/>
+      <field id="1" name="PowerLimits" type="list[PowerLimitsStruct structure]">
         <mandatoryConform/>
-        <constraint type="maxCount" value="10"/>
+        <constraint type="max" value="10"/>
       </field>
     </command>
   </commands>

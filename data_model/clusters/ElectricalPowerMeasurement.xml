@@ -228,14 +228,12 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="Accuracy" type="list">
-      <entry type="MeasurementAccuracyStruct"/>
+    <attribute id="0x0001" name="Accuracy" type="list[MeasurementAccuracyStruct Type]">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0002" name="Ranges" type="list">
-      <entry type="MeasurementRangeStruct"/>
+    <attribute id="0x0002" name="Ranges" type="list[MeasurementRangeStruct Type]">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
@@ -282,7 +280,7 @@ Davis, CA 95616, USA
         <feature name="ALTC"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x000A" name="Frequency" type="int64" default="null">
+    <attribute id="0x000a" name="Frequency" type="int64" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
@@ -290,8 +288,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="between" from="0" to="1000000"/>
     </attribute>
-    <attribute id="0x000B" name="HarmonicCurrents" type="list" default="null">
-      <entry type="HarmonicMeasurementStruct"/>
+    <attribute id="0x000b" name="HarmonicCurrents" type="list[HarmonicMeasurementStruct Type]" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
@@ -299,8 +296,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x000C" name="HarmonicPhases" type="list" default="null">
-      <entry type="HarmonicMeasurementStruct"/>
+    <attribute id="0x000c" name="HarmonicPhases" type="list[HarmonicMeasurementStruct Type]" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
@@ -308,13 +304,13 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x000D" name="PowerFactor" type="int64" default="null">
+    <attribute id="0x000d" name="PowerFactor" type="int64" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform/>
       <constraint type="between" from="-10000" to="+10000"/>
     </attribute>
-    <attribute id="0x000E" name="LineCurrent" type="int64" default="null">
+    <attribute id="0x000e" name="LineCurrent" type="int64" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
@@ -322,7 +318,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="min" value="0"/>
     </attribute>
-    <attribute id="0x000F" name="NeutralCurrent" type="int64" default="null">
+    <attribute id="0x000f" name="NeutralCurrent" type="int64" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>

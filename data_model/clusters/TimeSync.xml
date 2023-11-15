@@ -111,19 +111,19 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="ValidStarting" type="ref_DataTypeEpochUs">
+      <field id="1" name="ValidStarting" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;">
         <mandatoryConform/>
       </field>
-      <field id="2" name="ValidUntil" type="ref_DataTypeEpochUs">
+      <field id="2" name="ValidUntil" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
     </struct>
     <struct name="FabricScopedTrustedTimeSourceStruct">
-      <field id="0" name="NodeID" type="ref_DataTypeNodeId">
+      <field id="0" name="NodeID" type="&lt;&lt;ref_DataTypeNodeId&gt;&gt;">
         <mandatoryConform/>
       </field>
-      <field id="1" name="Endpoint" type="ref_DataTypeEndpointNumber">
+      <field id="1" name="Endpoint" type="&lt;&lt;ref_DataTypeEndpointNumber&gt;&gt;">
         <mandatoryConform/>
       </field>
     </struct>
@@ -132,22 +132,22 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="between" from="-43200" to="50400"/>
       </field>
-      <field id="1" name="ValidAt" type="ref_DataTypeEpochUs">
+      <field id="1" name="ValidAt" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;">
         <mandatoryConform/>
       </field>
-      <field id="2" name="Name" type="ref_DataTypeString">
+      <field id="2" name="Name" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
         <optionalConform/>
         <constraint type="between" from="0" to="64"/>
       </field>
     </struct>
     <struct name="TrustedTimeSourceStruct">
-      <field id="0" name="FabricIndex" type="ref_FabricIdx">
+      <field id="0" name="FabricIndex" type="&lt;&lt;ref_FabricIdx&gt;&gt;">
         <mandatoryConform/>
       </field>
-      <field id="1" name="NodeID" type="ref_DataTypeNodeId">
+      <field id="1" name="NodeID" type="&lt;&lt;ref_DataTypeNodeId&gt;&gt;">
         <mandatoryConform/>
       </field>
-      <field id="2" name="Endpoint" type="ref_DataTypeEndpointNumber">
+      <field id="2" name="Endpoint" type="&lt;&lt;ref_DataTypeEndpointNumber&gt;&gt;">
         <mandatoryConform/>
       </field>
     </struct>
@@ -177,9 +177,9 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="between" from="-43200" to="50400"/>
       </field>
-      <field id="1" name="Name" type="ref_DataTypeString">
+      <field id="1" name="Name" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
         <optionalConform/>
-        <constraint type="between" from="0" to="64 bytes"/>
+        <constraint type="between" from="0" to="64"/>
       </field>
     </event>
     <event id="0x03" name="TimeFailure" priority="info">

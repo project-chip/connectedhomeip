@@ -93,22 +93,22 @@ Davis, CA 95616, USA
     <attribute id="0x0009" name="SoftwareVersion">
       <optionalConform/>
     </attribute>
-    <attribute id="0x000A" name="SoftwareVersionString">
+    <attribute id="0x000a" name="SoftwareVersionString">
       <optionalConform/>
     </attribute>
-    <attribute id="0x000B" name="ManufacturingDate">
+    <attribute id="0x000b" name="ManufacturingDate">
       <optionalConform/>
     </attribute>
-    <attribute id="0x000C" name="PartNumber">
+    <attribute id="0x000c" name="PartNumber">
       <optionalConform/>
     </attribute>
-    <attribute id="0x000D" name="ProductURL">
+    <attribute id="0x000d" name="ProductURL">
       <optionalConform/>
     </attribute>
-    <attribute id="0x000E" name="ProductLabel">
+    <attribute id="0x000e" name="ProductLabel">
       <optionalConform/>
     </attribute>
-    <attribute id="0x000F" name="SerialNumber">
+    <attribute id="0x000f" name="SerialNumber">
       <optionalConform/>
     </attribute>
     <attribute id="0x0010" name="LocalConfigDisabled">

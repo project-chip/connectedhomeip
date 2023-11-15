@@ -55,13 +55,13 @@ Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x004A" name="Laundry Dryer Controls" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x004a" name="Laundry Dryer Controls" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
   <classification hierarchy="base" role="application" picsCode="DRYERCTRL" scope="Endpoint"/>
   <attributes>
-    <attribute id="0x0000" name="SupportedDrynessLevels" type="list[ semtag ]">
+    <attribute id="0x0000" name="SupportedDrynessLevels" type="list[&lt;&lt; semtag &gt;&gt;]">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint type="max" value="16"/>
