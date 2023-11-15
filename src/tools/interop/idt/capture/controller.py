@@ -36,10 +36,6 @@ _ERROR_REPORT: typing.Dict[str, list[(str, str, str)]] = {}
 logger = log.get_logger(__file__)
 
 
-def get_timeout():
-    return asyncio.get_running_loop().time() + config.orchestrator_async_step_timeout
-
-
 class PlatformFactory:
 
     @staticmethod
@@ -58,7 +54,7 @@ class PlatformFactory:
         safe_mkdir(platform_artifact_dir)
         platform_inst = platform_class(platform_artifact_dir)
         _PLATFORM_MAP[platform] = platform_inst
-        async with asyncio.timeout_at(get_timeout()):
+        async with asyncio.timeout(config.orchestrator_async_step_timeout_seconds):
             await platform_inst.connect()
         return platform_inst
 
@@ -117,7 +113,7 @@ class Orchestrator:
         for ecosystem in _ECOSYSTEM_MAP:
             try:
                 border_print(f"{attr} for {ecosystem}")
-                async with asyncio.timeout_at(get_timeout()):
+                async with asyncio.timeout(config.orchestrator_async_step_timeout_seconds):
                     await getattr(_ECOSYSTEM_MAP[ecosystem], attr)()
             except TimeoutError as e:
                 logger.error(f"Timeout {attr} {ecosystem}")

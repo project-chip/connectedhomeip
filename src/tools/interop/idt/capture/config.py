@@ -31,7 +31,7 @@ async def not_actually_async():
     time.sleep(sleep_time * 2)  # Blocking the EL!
 
 async def try_timeout():
-    async with asyncio.timeout_at(asyncio.get_running_loop().time() + sleep_time):
+    async with asyncio.timeout(sleep_time):
         await not_actually_async()
     print("Timeout was NOT thrown!")
 
@@ -47,4 +47,4 @@ async def not_actually_async():  # Now it is_actually_async because we
 Result: The timeout error will be raised.
 
 """
-orchestrator_async_step_timeout = 120.0
+orchestrator_async_step_timeout_seconds = 240
