@@ -30,6 +30,8 @@ namespace {
 
 constexpr uint32_t kMaxCookTime                                = 65535;
 constexpr uint32_t kMinCookTime                                = 1;
+constexpr uint32_t kDefaultCookTime                            = 30;
+
 
 OperationalState::Instance * gOperationalStateInstance         = nullptr;
 MicrowaveOvenControl::Instance * gMicrowaveOvenControlInstance = nullptr;
@@ -165,7 +167,7 @@ Protocols::InteractionModel::Status MicrowaveOvenDelegates::HandleSetCookingPara
         else
         {
             // set Microwave Oven cooking time to 30 seconds(default).
-            gMicrowaveOvenControlInstance->SetCookTime(30);
+            gMicrowaveOvenControlInstance->SetCookTime(kDefaultCookTime);
         }
 
         if (powerSetting.HasValue())

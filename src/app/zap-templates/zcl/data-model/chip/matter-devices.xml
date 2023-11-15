@@ -1977,11 +1977,10 @@ limitations under the License.
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Microwave Oven Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Microwave Oven Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Microwave Oven Mode"  client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Microwave Oven Control"  client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>

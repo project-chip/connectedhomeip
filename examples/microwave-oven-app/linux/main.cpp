@@ -15,7 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-//#include "operational-state-delegate-impl.h"
 #include "microwave-oven-delegates-impl.h"
 #include <AppMain.h>
 
@@ -27,7 +26,6 @@ void ApplicationInit() {}
 
 void ApplicationShutdown()
 {
-    //OperationalState::Shutdown();
     MicrowaveOvenControl::Shutdown();
 }
 

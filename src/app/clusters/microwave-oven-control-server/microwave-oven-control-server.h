@@ -29,6 +29,12 @@ namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
 
+inline constexpr uint32_t kDefaultCookTime              = 30;
+inline constexpr uint8_t kDefaultPowerSetting           = 100;
+inline constexpr uint8_t kDefaultMinPower               = 10;
+inline constexpr uint8_t kDefaultMaxPower               = 100;
+inline constexpr uint8_t kDefaultPowerStep              = 10;
+
 class Delegate;
 
 class Instance : public CommandHandlerInterface, public AttributeAccessInterface
@@ -54,7 +60,9 @@ public:
      */
     CHIP_ERROR Init();
 
-    //defined the get/set api for the mandatory attributes
+    /**
+     * @brief defined the get/set api for the mandatory attributes
+     */
     uint32_t GetCookTime();
     void SetCookTime(uint32_t cookTime);
 
@@ -67,9 +75,11 @@ private:
     EndpointId mEndpointId;
     ClusterId mClusterId;
 
-    //set default values
-    uint32_t mCookTime               = 30;
-    uint8_t mPowerSettng             = 100;
+    /**
+     * set default values
+     */
+    uint32_t mCookTime               = kDefaultCookTime;
+    uint8_t mPowerSettng             = kDefaultPowerSetting;
 
     /**
      * IM-level implementation of read
@@ -78,17 +88,17 @@ private:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
     /**
-     * Inherited from CommandHandlerInterface
+     * @brief Inherited from CommandHandlerInterface
      */
     void InvokeCommand(HandlerContext & ctx) override;
 
     /**
-     * Handle Command: SetCookingParameters.
+     * @brief Handle Command: SetCookingParameters.
      */
     void HandleSetCookingParameters(HandlerContext & ctx, const Commands::SetCookingParameters::DecodableType & req);
 
     /**
-     * Handle Command: AddMoreTime.
+     * @brief Handle Command: AddMoreTime.
      */
     void HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTime::DecodableType & req);
 
@@ -121,19 +131,19 @@ public:
      *   @brief defined the get/set interface for MinPower
      */
     virtual uint8_t GetMinPower() = 0;
-    virtual void SetMinPower() = 0;
+    virtual void SetMinPower(uint8_t minPower) = 0;
 
     /**
      *   @brief defined the get/set interface for MaxPower
      */
     virtual uint8_t GetMaxPower() = 0;
-    virtual void SetMaxPower() = 0;
+    virtual void SetMaxPower(uint8_t maxPower) = 0;
 
     /**
      *   @brief defined the get/set interface for PowerStep
      */
     virtual uint8_t GetPowerStep() = 0;
-    virtual void SetPowerStep() = 0;
+    virtual void SetPowerStep(uint8_t powerStep) = 0;
 
     
 
@@ -151,10 +161,12 @@ private:
 protected:
     Instance * GetInstance() const { return mInstance; }
 
-    //set default values
-    uint8_t mMinPower     = static_cast<uint8_t>(10);
-    uint8_t mMaxPower     = static_cast<uint8_t>(100);
-    uint8_t mPowerStep    = static_cast<uint8_t>(10);
+    /**
+     * set default values
+     */
+    uint8_t mMinPower     = kDefaultMinPower;
+    uint8_t mMaxPower     = kDefaultMaxPower;
+    uint8_t mPowerStep    = kDefaultPowerStep;
 };
 
 

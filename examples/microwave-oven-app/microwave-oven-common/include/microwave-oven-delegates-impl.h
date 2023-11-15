@@ -54,7 +54,7 @@ public:
     /**
      * Set the value of MinPower.
      */
-    void SetMinPower() override {return;}
+    void SetMinPower(uint8_t minPower) override {return;}
     
     /**
      * Get the value of MaxPower.
@@ -64,7 +64,7 @@ public:
     /**
      * Set the value of MaxPower.
      */
-    void SetMaxPower() override {return;}
+    void SetMaxPower(uint8_t maxPower) override {return;}
 
     /**
      * Get the value of PowerStep.
@@ -74,7 +74,7 @@ public:
     /**
      * Set the value of PowerStep.
      */
-    void SetPowerStep() override {return;}
+    void SetPowerStep(uint8_t powerStep) override {return;}
 
     //Operational State Cluster delegate
     /**
