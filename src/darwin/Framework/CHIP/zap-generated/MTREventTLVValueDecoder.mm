@@ -1245,7 +1245,6 @@ static id _Nullable DecodeEventPayloadForTimeSynchronizationCluster(EventId aEve
 {
     using namespace Clusters::TimeSynchronization;
     switch (aEventId) {
-#if MTR_ENABLE_PROVISIONAL
     case Events::DSTTableEmpty::Id: {
         Events::DSTTableEmpty::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1257,8 +1256,6 @@ static id _Nullable DecodeEventPayloadForTimeSynchronizationCluster(EventId aEve
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::DSTStatus::Id: {
         Events::DSTStatus::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1276,8 +1273,6 @@ static id _Nullable DecodeEventPayloadForTimeSynchronizationCluster(EventId aEve
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::TimeZoneStatus::Id: {
         Events::TimeZoneStatus::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1309,8 +1304,6 @@ static id _Nullable DecodeEventPayloadForTimeSynchronizationCluster(EventId aEve
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::TimeFailure::Id: {
         Events::TimeFailure::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1322,8 +1315,6 @@ static id _Nullable DecodeEventPayloadForTimeSynchronizationCluster(EventId aEve
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::MissingTrustedTimeSource::Id: {
         Events::MissingTrustedTimeSource::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1335,7 +1326,6 @@ static id _Nullable DecodeEventPayloadForTimeSynchronizationCluster(EventId aEve
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -1654,6 +1644,18 @@ static id _Nullable DecodeEventPayloadForICDManagementCluster(EventId aEventId, 
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForTimerCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::Timer;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForModeSelectCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ModeSelect;
@@ -1742,7 +1744,6 @@ static id _Nullable DecodeEventPayloadForRefrigeratorAlarmCluster(EventId aEvent
 {
     using namespace Clusters::RefrigeratorAlarm;
     switch (aEventId) {
-#if MTR_ENABLE_PROVISIONAL
     case Events::Notify::Id: {
         Events::Notify::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1775,7 +1776,6 @@ static id _Nullable DecodeEventPayloadForRefrigeratorAlarmCluster(EventId aEvent
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -1812,7 +1812,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 {
     using namespace Clusters::SmokeCoAlarm;
     switch (aEventId) {
-#if MTR_ENABLE_PROVISIONAL
     case Events::SmokeAlarm::Id: {
         Events::SmokeAlarm::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1830,8 +1829,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::COAlarm::Id: {
         Events::COAlarm::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1849,8 +1846,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::LowBattery::Id: {
         Events::LowBattery::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1868,8 +1863,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::HardwareFault::Id: {
         Events::HardwareFault::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1881,8 +1874,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::EndOfService::Id: {
         Events::EndOfService::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1894,8 +1885,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::SelfTestComplete::Id: {
         Events::SelfTestComplete::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1907,8 +1896,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::AlarmMuted::Id: {
         Events::AlarmMuted::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1920,8 +1907,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::MuteEnded::Id: {
         Events::MuteEnded::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1933,8 +1918,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::InterconnectSmokeAlarm::Id: {
         Events::InterconnectSmokeAlarm::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1952,8 +1935,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::InterconnectCOAlarm::Id: {
         Events::InterconnectCOAlarm::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1971,8 +1952,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::AllClear::Id: {
         Events::AllClear::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -1984,7 +1963,6 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -1997,7 +1975,6 @@ static id _Nullable DecodeEventPayloadForDishwasherAlarmCluster(EventId aEventId
 {
     using namespace Clusters::DishwasherAlarm;
     switch (aEventId) {
-#if MTR_ENABLE_PROVISIONAL
     case Events::Notify::Id: {
         Events::Notify::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -2030,7 +2007,6 @@ static id _Nullable DecodeEventPayloadForDishwasherAlarmCluster(EventId aEventId
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -2067,7 +2043,6 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
 {
     using namespace Clusters::OperationalState;
     switch (aEventId) {
-#if MTR_ENABLE_PROVISIONAL
     case Events::OperationalError::Id: {
         Events::OperationalError::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -2106,8 +2081,6 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::OperationCompletion::Id: {
         Events::OperationCompletion::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -2151,7 +2124,6 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -2164,7 +2136,6 @@ static id _Nullable DecodeEventPayloadForRVCOperationalStateCluster(EventId aEve
 {
     using namespace Clusters::RvcOperationalState;
     switch (aEventId) {
-#if MTR_ENABLE_PROVISIONAL
     case Events::OperationalError::Id: {
         Events::OperationalError::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -2203,8 +2174,6 @@ static id _Nullable DecodeEventPayloadForRVCOperationalStateCluster(EventId aEve
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
     case Events::OperationCompletion::Id: {
         Events::OperationCompletion::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
@@ -2248,7 +2217,6 @@ static id _Nullable DecodeEventPayloadForRVCOperationalStateCluster(EventId aEve
 
         return value;
     }
-#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -2273,6 +2241,164 @@ static id _Nullable DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(
 {
     using namespace Clusters::ActivatedCarbonFilterMonitoring;
     switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForDemandResponseLoadControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::DemandResponseLoadControl;
+    switch (aEventId) {
+    case Events::LoadControlEventStatusChange::Id: {
+        Events::LoadControlEventStatusChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDemandResponseLoadControlClusterLoadControlEventStatusChangeEvent new];
+
+        do {
+            NSData * _Nonnull memberValue;
+            memberValue = AsData(cppValue.eventID);
+            value.eventID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.transitionIndex.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.transitionIndex.Value()];
+            }
+            value.transitionIndex = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.status)];
+            value.status = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.criticality)];
+            value.criticality = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.control.Raw()];
+            value.control = memberValue;
+        } while (0);
+        do {
+            MTRDemandResponseLoadControlClusterTemperatureControlStruct * _Nullable memberValue;
+            if (cppValue.temperatureControl.HasValue()) {
+                if (cppValue.temperatureControl.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [MTRDemandResponseLoadControlClusterTemperatureControlStruct new];
+                    if (cppValue.temperatureControl.Value().Value().coolingTempOffset.HasValue()) {
+                        if (cppValue.temperatureControl.Value().Value().coolingTempOffset.Value().IsNull()) {
+                            memberValue.coolingTempOffset = nil;
+                        } else {
+                            memberValue.coolingTempOffset = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.Value().Value().coolingTempOffset.Value().Value()];
+                        }
+                    } else {
+                        memberValue.coolingTempOffset = nil;
+                    }
+                    if (cppValue.temperatureControl.Value().Value().heatingtTempOffset.HasValue()) {
+                        if (cppValue.temperatureControl.Value().Value().heatingtTempOffset.Value().IsNull()) {
+                            memberValue.heatingtTempOffset = nil;
+                        } else {
+                            memberValue.heatingtTempOffset = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.Value().Value().heatingtTempOffset.Value().Value()];
+                        }
+                    } else {
+                        memberValue.heatingtTempOffset = nil;
+                    }
+                    if (cppValue.temperatureControl.Value().Value().coolingTempSetpoint.HasValue()) {
+                        if (cppValue.temperatureControl.Value().Value().coolingTempSetpoint.Value().IsNull()) {
+                            memberValue.coolingTempSetpoint = nil;
+                        } else {
+                            memberValue.coolingTempSetpoint = [NSNumber numberWithShort:cppValue.temperatureControl.Value().Value().coolingTempSetpoint.Value().Value()];
+                        }
+                    } else {
+                        memberValue.coolingTempSetpoint = nil;
+                    }
+                    if (cppValue.temperatureControl.Value().Value().heatingTempSetpoint.HasValue()) {
+                        if (cppValue.temperatureControl.Value().Value().heatingTempSetpoint.Value().IsNull()) {
+                            memberValue.heatingTempSetpoint = nil;
+                        } else {
+                            memberValue.heatingTempSetpoint = [NSNumber numberWithShort:cppValue.temperatureControl.Value().Value().heatingTempSetpoint.Value().Value()];
+                        }
+                    } else {
+                        memberValue.heatingTempSetpoint = nil;
+                    }
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.temperatureControl = memberValue;
+        } while (0);
+        do {
+            MTRDemandResponseLoadControlClusterAverageLoadControlStruct * _Nullable memberValue;
+            if (cppValue.averageLoadControl.HasValue()) {
+                if (cppValue.averageLoadControl.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [MTRDemandResponseLoadControlClusterAverageLoadControlStruct new];
+                    memberValue.loadAdjustment = [NSNumber numberWithChar:cppValue.averageLoadControl.Value().Value().loadAdjustment];
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.averageLoadControl = memberValue;
+        } while (0);
+        do {
+            MTRDemandResponseLoadControlClusterDutyCycleControlStruct * _Nullable memberValue;
+            if (cppValue.dutyCycleControl.HasValue()) {
+                if (cppValue.dutyCycleControl.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [MTRDemandResponseLoadControlClusterDutyCycleControlStruct new];
+                    memberValue.dutyCycle = [NSNumber numberWithUnsignedChar:cppValue.dutyCycleControl.Value().Value().dutyCycle];
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.dutyCycleControl = memberValue;
+        } while (0);
+        do {
+            MTRDemandResponseLoadControlClusterPowerSavingsControlStruct * _Nullable memberValue;
+            if (cppValue.powerSavingsControl.HasValue()) {
+                if (cppValue.powerSavingsControl.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [MTRDemandResponseLoadControlClusterPowerSavingsControlStruct new];
+                    memberValue.powerSavings = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.powerSavingsControl.Value().Value().powerSavings)];
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.powerSavingsControl = memberValue;
+        } while (0);
+        do {
+            MTRDemandResponseLoadControlClusterHeatingSourceControlStruct * _Nullable memberValue;
+            if (cppValue.heatingSourceControl.HasValue()) {
+                if (cppValue.heatingSourceControl.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [MTRDemandResponseLoadControlClusterHeatingSourceControlStruct new];
+                    memberValue.heatingSource = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.heatingSourceControl.Value().Value().heatingSource)];
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.heatingSourceControl = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         break;
     }
@@ -3441,6 +3567,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::IcdManagement::Id: {
         return DecodeEventPayloadForICDManagementCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::Timer::Id: {
+        return DecodeEventPayloadForTimerCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::ModeSelect::Id: {
         return DecodeEventPayloadForModeSelectCluster(aPath.mEventId, aReader, aError);
     }
@@ -3494,6 +3623,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::DemandResponseLoadControl::Id: {
+        return DecodeEventPayloadForDemandResponseLoadControlCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);

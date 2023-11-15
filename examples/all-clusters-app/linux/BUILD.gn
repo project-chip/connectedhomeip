@@ -48,9 +48,6 @@ source_set("chip-all-clusters-common") {
   deps = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/examples/platform/linux:app-main",
-
-    # Issue 29397 for the icd:cluster dep
-    "${chip_root}/src/app/icd:cluster",
     "${chip_root}/src/app/tests/suites/credentials:dac_provider",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/jsoncpp",

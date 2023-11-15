@@ -92,7 +92,7 @@ if [ "$#" == "0" ]; then
             Build wifi example with extension board SiWx917. (Default false)
         use_wf200
             Build wifi example with extension board wf200. (Default false)
-        'import("//with_pw_rpc.gni")'
+        use_pw_rpc
             Use to build the example with pigweed RPC
         ota_periodic_query_timeout_sec
             Periodic query timeout variable for OTA in seconds
@@ -242,6 +242,10 @@ else
                 USE_SLC=true
                 shift
                 ;;
+            --use_pw_rpc)
+                optArgs+="import(\"//with_pw_rpc.gni\") "
+                shift
+                ;;
             --slc_reuse_files)
                 optArgs+="slc_reuse_files=true "
                 USE_SLC=true
@@ -281,7 +285,7 @@ else
     fi
 
     # 917 exception. TODO find a more generic way
-    if [ "$SILABS_BOARD" == "BRD4325B" ] || [ "$SILABS_BOARD" == "BRD4325C" ] || [ "$SILABS_BOARD" == "BRD4338A" ]; then
+    if [ "$SILABS_BOARD" == "BRD4325B" ] || [ "$SILABS_BOARD" == "BRD4325C" ] || [ "$SILABS_BOARD" == "BRD4338A" ] || [ "$SILABS_BOARD" == "BRD4325G" ]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
         optArgs+="chip_device_platform =\"SiWx917\" "
@@ -291,7 +295,7 @@ else
         {
             ShortCommitSha=$(git describe --always --dirty --exclude '*')
             branchName=$(git rev-parse --abbrev-ref HEAD)
-            optArgs+="sl_matter_version_str=\"v1.1-$branchName-$ShortCommitSha\" "
+            optArgs+="sl_matter_version_str=\"v1.2-$branchName-$ShortCommitSha\" "
         } &>/dev/null
     fi
 

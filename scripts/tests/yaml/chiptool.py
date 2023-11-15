@@ -19,9 +19,11 @@ import relative_importer  # isort: split # noqa: F401
 import sys
 from typing import List
 
+import chiptest
 import click
 from paths_finder import PathsFinder
 from runner import CONTEXT_SETTINGS, chiptool
+from tests_finder import TestsFinder
 from tests_tool import send_raw_command, send_yaml_command
 
 _DEFAULT_EXTENSIONS_DIR = 'scripts/tests/yaml/extensions'
@@ -31,11 +33,11 @@ _DEFAULT_SPECIFICATIONS_DIR = 'src/app/zap-templates/zcl/data-model/chip/*.xml'
 
 def chiptool_runner_options(f):
     f = click.option('--server_path', type=click.Path(exists=True), default=None,
-                     help='Path to an websocket server to run at launch.')(f)
+                     help='Path to a websocket server that will be executed to forward parsed command. Most likely you want to use chiptool.')(f)
     f = click.option('--server_name', type=str, default='chip-tool',
-                     help='Name of a websocket server to run at launch.')(f)
+                     help='If server_path is not provided, we use this argument to seach various directories within the SDK for a binary that matches this name.')(f)
     f = click.option('--server_arguments', type=str, default='interactive server',
-                     help='Optional arguments to pass to the websocket server at launch.')(f)
+                     help='Arguments to pass to the websocket server at launch.')(f)
     f = click.option('--show_adapter_logs', type=bool, default=False, show_default=True,
                      help='Show additional logs provided by the adapter.')(f)
     f = click.option('--trace_file', type=click.Path(), default=None,
@@ -89,7 +91,18 @@ def chiptool_py(ctx, commands: List[str], server_path: str, server_name: str, se
     server_arguments = maybe_update_server_arguments(ctx)
     maybe_update_stop_on_error(ctx)
 
-    if len(commands) > 1 and commands[0] == 'tests':
+    if len(commands) == 1 and commands[0] == 'list':
+        print('List of all individual tests that can be run:')
+        for test in chiptest.AllChipToolYamlTests():
+            print(f'   {test.name}')
+
+        tests_finder = TestsFinder()
+        tests_collections = tests_finder.get_collections()
+        if tests_collections:
+            print('\nList of all collections tests that can be run:')
+            for test in tests_collections:
+                print(f'   {test}')
+    elif len(commands) > 1 and commands[0] == 'tests':
         success = send_yaml_command(chiptool, commands[1], server_path, server_arguments, show_adapter_logs, specifications_paths, pics,
                                     additional_pseudo_clusters_directory, commands[2:])
     else:

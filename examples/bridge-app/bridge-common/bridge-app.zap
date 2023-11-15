@@ -2339,7 +2339,7 @@
               "code": 10,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "int16u",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -2355,7 +2355,7 @@
               "code": 11,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "int16u",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -2371,7 +2371,7 @@
               "code": 12,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "int16u",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -3167,7 +3167,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveNetworkFaults",
+              "name": "ActiveNetworkFaultsList",
               "code": 62,
               "mfgCode": null,
               "side": "server",
@@ -5221,7 +5221,7 @@
               "code": 15,
               "mfgCode": null,
               "side": "server",
-              "type": "LevelControlOptions",
+              "type": "OptionsBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -5721,5 +5721,6 @@
       "endpointId": 2,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }

@@ -91,6 +91,8 @@ static_library("Linux") {
       "BlePlatformConfig.h",
       "bluez/AdapterIterator.cpp",
       "bluez/AdapterIterator.h",
+      "bluez/BluezAdvertisement.cpp",
+      "bluez/BluezAdvertisement.h",
       "bluez/BluezConnection.cpp",
       "bluez/BluezConnection.h",
       "bluez/BluezEndpoint.cpp",

@@ -15,16 +15,16 @@
 
 {%- macro encode_tlv(encodable, tag, name, depth) %}
   {%- if encodable.is_nullable -%}
-    if ({{name}} != null) {
-      {{encode_tlv(encodable.without_nullable(), tag, name, depth + 1)}}
-    } else {
-      putNull({{tag}})
-    }
+      if ({{name}} != null) {
+        {{encode_tlv(encodable.without_nullable(), tag, name, depth + 1)}}
+      } else {
+        putNull({{tag}})
+      }
   {%- elif encodable.is_optional -%}
-    if ({{name}}.isPresent) {
-      val opt{{name}} = {{name}}.get()
-      {{encode_tlv(encodable.without_optional(), tag, "opt" + name, depth + 1)}}
-    }
+      if ({{name}}.isPresent) {
+        val opt{{name}} = {{name}}.get()
+        {{encode_tlv(encodable.without_optional(), tag, "opt" + name, depth + 1)}}
+      }
   {%- elif encodable.is_list -%}
       startArray({{tag}})
       for (item in {{name}}.iterator()) {
@@ -40,27 +40,27 @@
 
 {%- macro decode_tlv(source, encodable, tag, depth) %}
   {%- if encodable.is_nullable -%}
-    if (!tlvReader.isNull()) {
-      {{decode_tlv(source, encodable.without_nullable(), tag, depth + 1)}}
-    } else {
-      tlvReader.getNull({{tag}})
-      null
-    }
-  {%- elif encodable.is_optional -%}
-    if (tlvReader.isNextTag({{tag}})) {
-      Optional.of({{decode_tlv(source, encodable.without_optional(), tag, depth + 1)}})
-    } else {
-      Optional.empty()
-    }
-  {%- elif encodable.is_list -%}
-    {%- set encodablewithoutlist = encodable.without_list() -%}
-    buildList <{{encode_value(source, encodablewithoutlist, depth + 1)}}> {
-      tlvReader.enterArray({{tag}})
-      while(!tlvReader.isEndOfContainer()) {
-        this.add({{decode_tlv(source, encodablewithoutlist, "AnonymousTag", depth + 1)}})
+      if (!tlvReader.isNull()) {
+        {{decode_tlv(source, encodable.without_nullable(), tag, depth + 1)}}
+      } else {
+        tlvReader.getNull({{tag}})
+        null
       }
-      tlvReader.exitContainer()
-    }
+  {%- elif encodable.is_optional -%}
+      if (tlvReader.isNextTag({{tag}})) {
+        Optional.of({{decode_tlv(source, encodable.without_optional(), tag, depth + 1)}})
+      } else {
+        Optional.empty()
+      }
+  {%- elif encodable.is_list -%}
+      {%- set encodablewithoutlist = encodable.without_list() -%}
+      buildList <{{encode_value(source, encodablewithoutlist, depth + 1)}}> {
+        tlvReader.enterArray({{tag}})
+        while(!tlvReader.isEndOfContainer()) {
+          this.add({{decode_tlv(source, encodablewithoutlist, "AnonymousTag", depth + 1)}})
+        }
+        tlvReader.exitContainer()
+      }
   {%- elif encodable.is_struct -%}
       {%- set struct = encodable.get_underlying_struct() -%}
       matter.devicecontroller.cluster.structs.{{source.name}}Cluster{{struct.name}}.fromTlv({{tag}}, tlvReader)
@@ -91,23 +91,22 @@
  */
 package matter.devicecontroller.cluster.eventstructs
 
+import java.util.Optional
 import matter.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class {{cluster.name}}Cluster{{event.name}}Event (
-  {%- for field in event.fields -%}
-    {%- set encodable = field | asEncodable(typeLookup) %}
-    val {{field.name}}: {{encode_value(cluster, encodable, 0)}}
-    {%- if loop.index0 < loop.length - 1 -%}{{","}}{%- endif -%}
-  {%- endfor -%}) {
-  override fun toString(): String  = buildString {
+class {{cluster.name}}Cluster{{event.name}}Event(
+{%- for field in event.fields -%}
+  {%- set encodable = field | asEncodable(typeLookup) %}
+  val {{field.name}}: {{encode_value(cluster, encodable, 0)}}
+  {%- if loop.index0 < loop.length - 1 -%}{{","}}{%- endif -%}
+{%- endfor %}
+) {
+  override fun toString(): String = buildString {
     append("{{cluster.name}}Cluster{{event.name}}Event {\n")
     {%- for field in event.fields %}
     append("\t{{field.name}} : ${{field.name}}\n")

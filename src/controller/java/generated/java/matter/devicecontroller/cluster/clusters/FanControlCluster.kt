@@ -68,14 +68,6 @@ class FanControlCluster(private val controller: MatterController, private val en
     // Implementation needs to be added here
   }
 
-  suspend fun writeFanModeSequenceAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
-    if (timedWriteTimeoutMs != null) {
-      // Do the action with timedWriteTimeoutMs
-    } else {
-      // Do the action without timedWriteTimeoutMs
-    }
-  }
-
   suspend fun subscribeFanModeSequenceAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }

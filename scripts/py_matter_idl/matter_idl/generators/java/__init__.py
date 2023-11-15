@@ -510,6 +510,37 @@ class EncodableValue:
             return "Object"
 
     @property
+    def java_tlv_type(self):
+        t = ParseDataType(self.data_type, self.context)
+
+        if isinstance(t, FundamentalType):
+            if t == FundamentalType.BOOL:
+                return "Boolean"
+            elif t == FundamentalType.FLOAT:
+                return "Float"
+            elif t == FundamentalType.DOUBLE:
+                return "Double"
+            else:
+                raise Exception("Unknown fundamental type")
+        elif isinstance(t, BasicInteger):
+            # the >= 3 will include int24_t to be considered "long"
+            if t.is_signed:
+                return "Int"
+            else:
+                return "UInt"
+        elif isinstance(t, BasicString):
+            if t.is_binary:
+                return "ByteArray"
+            else:
+                return "String"
+        elif isinstance(t, IdlEnumType):
+            return "UInt"
+        elif isinstance(t, IdlBitmapType):
+            return "UInt"
+        else:
+            return "Any"
+
+    @property
     def kotlin_type(self):
         t = ParseDataType(self.data_type, self.context)
 
