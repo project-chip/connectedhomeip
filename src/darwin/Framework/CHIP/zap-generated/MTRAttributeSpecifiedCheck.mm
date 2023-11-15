@@ -2696,6 +2696,60 @@ static BOOL AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(Attribu
     }
     }
 }
+static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DemandResponseLoadControl;
+    switch (aAttributeId) {
+    case Attributes::DeviceClass::Id: {
+        return YES;
+    }
+    case Attributes::LoadControlPrograms::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfLoadControlPrograms::Id: {
+        return YES;
+    }
+    case Attributes::Events::Id: {
+        return YES;
+    }
+    case Attributes::ActiveEvents::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfEventsPerProgram::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfTransistions::Id: {
+        return YES;
+    }
+    case Attributes::DefaultRandomStart::Id: {
+        return YES;
+    }
+    case Attributes::DefaultRandomDuration::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInDoorLockCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DoorLock;
@@ -5780,6 +5834,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(aAttributeId);
+    }
+    case Clusters::DemandResponseLoadControl::Id: {
+        return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);
     }
     case Clusters::DoorLock::Id: {
         return AttributeIsSpecifiedInDoorLockCluster(aAttributeId);

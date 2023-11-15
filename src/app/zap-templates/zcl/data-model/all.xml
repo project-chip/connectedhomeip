@@ -23,6 +23,7 @@
    <xi:include href="chip/diagnostic-logs-cluster.xml" />
    <xi:include href="chip/dishwasher-alarm-cluster.xml" />
    <xi:include href="chip/dishwasher-mode-cluster.xml" />
+   <xi:include href="chip/drlc.xml" />
    <xi:include href="chip/microwave-oven-mode-cluster.xml" />
    <xi:include href="chip/microwave-oven-control-cluster.xml" />
    <xi:include href="chip/door-lock-cluster.xml" />

@@ -8284,6 +8284,175 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readDemandResponseLoadControlInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readDemandResponseLoadControlDeviceClassCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDemandResponseLoadControlDeviceClassAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DemandResponseLoadControlCluster) cluster).readDeviceClassAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readDemandResponseLoadControlDeviceClassCommandParams
+        );
+        result.put("readDeviceClassAttribute", readDemandResponseLoadControlDeviceClassAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDemandResponseLoadControlLoadControlProgramsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDemandResponseLoadControlLoadControlProgramsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DemandResponseLoadControlCluster) cluster).readLoadControlProgramsAttribute(
+              (ChipClusters.DemandResponseLoadControlCluster.LoadControlProgramsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDemandResponseLoadControlClusterLoadControlProgramsAttributeCallback(),
+          readDemandResponseLoadControlLoadControlProgramsCommandParams
+        );
+        result.put("readLoadControlProgramsAttribute", readDemandResponseLoadControlLoadControlProgramsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDemandResponseLoadControlNumberOfLoadControlProgramsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDemandResponseLoadControlNumberOfLoadControlProgramsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DemandResponseLoadControlCluster) cluster).readNumberOfLoadControlProgramsAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readDemandResponseLoadControlNumberOfLoadControlProgramsCommandParams
+        );
+        result.put("readNumberOfLoadControlProgramsAttribute", readDemandResponseLoadControlNumberOfLoadControlProgramsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDemandResponseLoadControlEventsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDemandResponseLoadControlEventsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DemandResponseLoadControlCluster) cluster).readEventsAttribute(
+              (ChipClusters.DemandResponseLoadControlCluster.EventsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDemandResponseLoadControlClusterEventsAttributeCallback(),
+          readDemandResponseLoadControlEventsCommandParams
+        );
+        result.put("readEventsAttribute", readDemandResponseLoadControlEventsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDemandResponseLoadControlActiveEventsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDemandResponseLoadControlActiveEventsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DemandResponseLoadControlCluster) cluster).readActiveEventsAttribute(
+              (ChipClusters.DemandResponseLoadControlCluster.ActiveEventsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDemandResponseLoadControlClusterActiveEventsAttributeCallback(),
+          readDemandResponseLoadControlActiveEventsCommandParams
+        );
+        result.put("readActiveEventsAttribute", readDemandResponseLoadControlActiveEventsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDemandResponseLoadControlNumberOfEventsPerProgramCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDemandResponseLoadControlNumberOfEventsPerProgramAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DemandResponseLoadControlCluster) cluster).readNumberOfEventsPerProgramAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readDemandResponseLoadControlNumberOfEventsPerProgramCommandParams
+        );
+        result.put("readNumberOfEventsPerProgramAttribute", readDemandResponseLoadControlNumberOfEventsPerProgramAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDemandResponseLoadControlNumberOfTransistionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDemandResponseLoadControlNumberOfTransistionsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DemandResponseLoadControlCluster) cluster).readNumberOfTransistionsAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readDemandResponseLoadControlNumberOfTransistionsCommandParams
+        );
+        result.put("readNumberOfTransistionsAttribute", readDemandResponseLoadControlNumberOfTransistionsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDemandResponseLoadControlDefaultRandomStartCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDemandResponseLoadControlDefaultRandomStartAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DemandResponseLoadControlCluster) cluster).readDefaultRandomStartAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readDemandResponseLoadControlDefaultRandomStartCommandParams
+        );
+        result.put("readDefaultRandomStartAttribute", readDemandResponseLoadControlDefaultRandomStartAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDemandResponseLoadControlDefaultRandomDurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDemandResponseLoadControlDefaultRandomDurationAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DemandResponseLoadControlCluster) cluster).readDefaultRandomDurationAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readDemandResponseLoadControlDefaultRandomDurationCommandParams
+        );
+        result.put("readDefaultRandomDurationAttribute", readDemandResponseLoadControlDefaultRandomDurationAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDemandResponseLoadControlGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDemandResponseLoadControlGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DemandResponseLoadControlCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.DemandResponseLoadControlCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDemandResponseLoadControlClusterGeneratedCommandListAttributeCallback(),
+          readDemandResponseLoadControlGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readDemandResponseLoadControlGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDemandResponseLoadControlAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDemandResponseLoadControlAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DemandResponseLoadControlCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.DemandResponseLoadControlCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDemandResponseLoadControlClusterAcceptedCommandListAttributeCallback(),
+          readDemandResponseLoadControlAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readDemandResponseLoadControlAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDemandResponseLoadControlEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDemandResponseLoadControlEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DemandResponseLoadControlCluster) cluster).readEventListAttribute(
+              (ChipClusters.DemandResponseLoadControlCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDemandResponseLoadControlClusterEventListAttributeCallback(),
+          readDemandResponseLoadControlEventListCommandParams
+        );
+        result.put("readEventListAttribute", readDemandResponseLoadControlEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDemandResponseLoadControlAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDemandResponseLoadControlAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DemandResponseLoadControlCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.DemandResponseLoadControlCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDemandResponseLoadControlClusterAttributeListAttributeCallback(),
+          readDemandResponseLoadControlAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readDemandResponseLoadControlAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDemandResponseLoadControlFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDemandResponseLoadControlFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DemandResponseLoadControlCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readDemandResponseLoadControlFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readDemandResponseLoadControlFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDemandResponseLoadControlClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDemandResponseLoadControlClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DemandResponseLoadControlCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readDemandResponseLoadControlClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readDemandResponseLoadControlClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readDoorLockInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readDoorLockLockStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readDoorLockLockStateAttributeInteractionInfo = new InteractionInfo(
@@ -17851,6 +18020,7 @@ public class ClusterReadMapping {
             put("rvcOperationalState", readRvcOperationalStateInteractionInfo());
             put("hepaFilterMonitoring", readHepaFilterMonitoringInteractionInfo());
             put("activatedCarbonFilterMonitoring", readActivatedCarbonFilterMonitoringInteractionInfo());
+            put("demandResponseLoadControl", readDemandResponseLoadControlInteractionInfo());
             put("doorLock", readDoorLockInteractionInfo());
             put("windowCovering", readWindowCoveringInteractionInfo());
             put("barrierControl", readBarrierControlInteractionInfo());

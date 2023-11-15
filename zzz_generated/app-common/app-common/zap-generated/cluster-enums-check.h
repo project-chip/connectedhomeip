@@ -1471,6 +1471,88 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ActivatedCarbonFilterMo
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::CriticalityLevelEnum val)
+{
+    using EnumType = DemandResponseLoadControl::CriticalityLevelEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kGreen:
+    case EnumType::kLevel1:
+    case EnumType::kLevel2:
+    case EnumType::kLevel3:
+    case EnumType::kLevel4:
+    case EnumType::kLevel5:
+    case EnumType::kEmergency:
+    case EnumType::kPlannedOutage:
+    case EnumType::kServiceDisconnect:
+        return val;
+    default:
+        return static_cast<EnumType>(10);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::HeatingSourceEnum val)
+{
+    using EnumType = DemandResponseLoadControl::HeatingSourceEnum;
+    switch (val)
+    {
+    case EnumType::kAny:
+    case EnumType::kElectric:
+    case EnumType::kNonElectric:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::LoadControlEventChangeSourceEnum val)
+{
+    using EnumType = DemandResponseLoadControl::LoadControlEventChangeSourceEnum;
+    switch (val)
+    {
+    case EnumType::kAutomatic:
+    case EnumType::kUserAction:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::LoadControlEventStatusEnum val)
+{
+    using EnumType = DemandResponseLoadControl::LoadControlEventStatusEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kReceived:
+    case EnumType::kInProgress:
+    case EnumType::kCompleted:
+    case EnumType::kOptedOut:
+    case EnumType::kOptedIn:
+    case EnumType::kCanceled:
+    case EnumType::kSuperseded:
+    case EnumType::kPartialOptedOut:
+    case EnumType::kPartialOptedIn:
+    case EnumType::kNoParticipation:
+    case EnumType::kUnavailable:
+    case EnumType::kFailed:
+        return val;
+    default:
+        return static_cast<EnumType>(13);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::PowerSavingsEnum val)
+{
+    using EnumType = DemandResponseLoadControl::PowerSavingsEnum;
+    switch (val)
+    {
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
     using EnumType = DoorLock::AlarmCodeEnum;
