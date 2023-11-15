@@ -97,7 +97,6 @@ void MicrowaveOvenMode::Shutdown()
 
 void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gMicrowaveOvenModeDelegate == nullptr && gMicrowaveOvenModeInstance == nullptr);
     gMicrowaveOvenModeDelegate = new MicrowaveOvenMode::MicrowaveOvenModeDelegate;
     gMicrowaveOvenModeInstance =
