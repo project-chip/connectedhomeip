@@ -23,9 +23,9 @@
 
 #include <cstdint>
 
-void ChipToolICDRegistrationDelegate::SetControllerNodeId(chip::NodeId checkInNodeId)
+void ChipToolICDRegistrationDelegate::SetCheckInNodeId(chip::NodeId checkInNodeId)
 {
-    mControllerNodeId = checkInNodeId;
+    mCheckInNodeId = checkInNodeId;
 }
 
 void ChipToolICDRegistrationDelegate::GenerateSymmetricKey(chip::NodeId device,

@@ -1221,6 +1221,10 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
     info.icdCounter = data.ICDCounter;
     report.Set<ICDRegistrationResponseInfo>(info);
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+    if (commissioner->mICDRegistrationDelegate != nullptr)
+    {
+        commissioner->mICDRegistrationDelegate->ICDRegistrationComplete(GetNodeId(), optionalIcdCounter.Value());
+    }
 }
 
 bool DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
@@ -1759,16 +1763,6 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
     if (completionStatus.err == CHIP_NO_ERROR)
     {
         mPairingDelegate->OnCommissioningSuccess(peerId);
-        if (mICDRegistrationDelegate != nullptr)
-        {
-            // If the commissionee is an ICD device, and we enabled ICD registration during
-            // commissioning, then we should have an ICD Counter now.
-            auto optionalIcdCounter = mCommissioningDelegate->GetCommissioningParameters().GetICDCounter();
-            if (optionalIcdCounter.HasValue())
-            {
-                mICDRegistrationDelegate->ICDRegistrationComplete(GetNodeId(), optionalIcdCounter.Value());
-            }
-        }
     }
     else
     {

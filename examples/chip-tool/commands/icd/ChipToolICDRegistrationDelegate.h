@@ -28,9 +28,9 @@
 class ChipToolICDRegistrationDelegate : public chip::Controller::ICDRegistrationDelegate
 {
 public:
-    ChipToolICDRegistrationDelegate() : mControllerNodeId(chip::kUndefinedNodeId){};
+    ChipToolICDRegistrationDelegate() : mCheckInNodeId(chip::kUndefinedNodeId){};
 
-    void SetControllerNodeId(chip::NodeId checkInNodeId);
+    void SetCheckInNodeId(chip::NodeId checkInNodeId);
 
     void GenerateSymmetricKey(chip::NodeId device,
                               chip::Callback::Callback<OnSymmetricKeyGenerationCompleted> * onCompletion) override;
@@ -38,5 +38,5 @@ public:
     void ICDRegistrationComplete(chip::NodeId device, uint32_t icdCounter) override;
 
 private:
-    chip::NodeId mControllerNodeId;
+    chip::NodeId mCheckInNodeId;
 };

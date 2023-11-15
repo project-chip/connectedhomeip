@@ -80,7 +80,7 @@ private:
     // been provided that matches the thread/wifi endpoint of the target.
     CommissioningStage GetNextCommissioningStageNetworkSetup(CommissioningStage currentStage, CHIP_ERROR & lastErr);
     // Helper function to determine whether next stage should be kICDSymmetricKeyGeneration,
-    // or kFindOperational, depending whether the device is an ICD device.
+    // or kFindOperational, depending on whether the device is an ICD.
     CommissioningStage GetNextStateAfterNetworkCommissioning();
 
     // Helper function to determine if a scan attempt should be made given the
