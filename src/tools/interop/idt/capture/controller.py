@@ -21,19 +21,36 @@ import os
 import sys
 import traceback
 import typing
+from dataclasses import dataclass
 
 import capture
 from capture.base import EcosystemCapture, PlatformLogStreamer, UnsupportedCapturePlatformException
 from utils.artifact import create_standard_log_name, log, safe_mkdir
-from utils.log import border_print
+from utils.log import border_print, add_border
 
 from . import config
 
+
+@dataclass(repr=True)
+class ErrorRecord:
+    ecosystem: str
+    help_message: str
+    stack_trace: str
+
+
 _PLATFORM_MAP: typing.Dict[str, PlatformLogStreamer] = {}
 _ECOSYSTEM_MAP: typing.Dict[str, PlatformLogStreamer] = {}
-_ERROR_REPORT: typing.Dict[str, list[(str, str, str)]] = {}
+_ERROR_REPORT: typing.Dict[str, ErrorRecord] = {}
 
 logger = log.get_logger(__file__)
+
+
+def track_error(ecosystem: str, help_message: str) -> None:
+    if ecosystem not in _ERROR_REPORT:
+        _ERROR_REPORT[ecosystem] = []
+    record = ErrorRecord(ecosystem, help_message, traceback.format_exc())
+    logger.error(record)
+    _ERROR_REPORT[ecosystem].append(record)
 
 
 def list_available_platforms() -> typing.List[str]:
@@ -83,20 +100,14 @@ async def init_ecosystems(platform, ecosystem, artifact_dir):
         try:
             await get_ecosystem_impl(
                 ecosystem, platform, artifact_dir)
-        except UnsupportedCapturePlatformException as e:
-            logger.error(f"Unsupported platform {ecosystem} {platform}")
-            track_error(ecosystem, "UNSUPPORTED_PLATFORM", str(e))
-        except Exception as e:
-            logger.error(f"Unknown error instantiating ecosystem {ecosystem} {platform}")
-            track_error(ecosystem, "UNEXPECTED", str(e))
-
-
-def track_error(ecosystem: str, error_type: str, error_message: str) -> None:
-    if ecosystem not in _ERROR_REPORT:
-        _ERROR_REPORT[ecosystem] = []
-    e = traceback.format_exc()
-    logger.error(e)
-    _ERROR_REPORT[ecosystem].append((error_type, error_message, e))
+        except UnsupportedCapturePlatformException:
+            help_message = f"Unsupported platform {ecosystem} {platform}"
+            logger.error(help_message)
+            track_error(ecosystem, help_message)
+        except Exception:
+            help_message = f"Unknown error instantiating ecosystem {ecosystem} {platform}"
+            logger.error(help_message)
+            track_error(ecosystem, help_message)
 
 
 async def handle_capture(attr):
@@ -106,16 +117,19 @@ async def handle_capture(attr):
             border_print(f"{attr} for {ecosystem}")
             async with asyncio.timeout(config.orchestrator_async_step_timeout_seconds):
                 await getattr(_ECOSYSTEM_MAP[ecosystem], attr)()
-        except TimeoutError as e:
-            logger.error(f"Timeout {attr} {ecosystem}")
-            track_error(ecosystem, "TIMEOUT", str(e))
-        except Exception as e:
-            logger.error(f"Unexpected error {attr} {ecosystem}")
-            track_error(ecosystem, "UNEXPECTED", str(e))
+        except TimeoutError:
+            help_message = f"Timeout after {config.orchestrator_async_step_timeout_seconds} seconds {attr} {ecosystem}"
+            logger.error(help_message)
+            track_error(ecosystem, help_message)
+        except Exception:
+            help_message = f"Unexpected error {attr} {ecosystem}"
+            logger.error(help_message)
+            track_error(ecosystem, help_message)
 
 
 async def start():
     for platform_name, platform, in _PLATFORM_MAP.items():
+        # TODO: Write error log if halt here
         border_print(f"Starting streaming for platform {platform_name}")
         await platform.start_streaming()
     await handle_capture("start")
@@ -123,6 +137,7 @@ async def start():
 
 async def stop():
     for platform_name, platform, in _PLATFORM_MAP.items():
+        # TODO: Write error log if halt here
         border_print(f"Stopping streaming for platform {platform_name}")
         await platform.stop_streaming()
     await handle_capture("stop")
@@ -155,12 +170,14 @@ async def probe():
     await handle_capture("probe")
 
 
-def error_report(artifact_dir: str):
-    error_report_file_name = create_standard_log_name("error_report", "txt", parent=artifact_dir)
-    with open(error_report_file_name, 'a+') as error_report_file:
-        for k, v in _ERROR_REPORT.items():
-            log.print_and_write(f"{k}: {v}", error_report_file)
-
-
-def has_errors():
-    return len(_ERROR_REPORT) > 0
+def write_error_report(artifact_dir: str):
+    if _ERROR_REPORT:
+        logger.critical("DETECTED ERRORS THIS RUN!")
+        error_report_file_name = create_standard_log_name("error_report", "txt", parent=artifact_dir)
+        with open(error_report_file_name, "a+") as error_report_file:
+            for ecosystem in _ERROR_REPORT:
+                log.print_and_write(add_border(f"Errors for {ecosystem}"), error_report_file)
+                for record in _ERROR_REPORT[ecosystem]:
+                    log.print_and_write(str(record), error_report_file)
+    else:
+        logger.info("No errors seen this run!")

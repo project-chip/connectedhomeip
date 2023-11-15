@@ -194,25 +194,18 @@ class InteropDebuggingTool:
             border_print("Starting pcap")
             safe_mkdir(self.pcap_artifact_dir)
             pcap_runner.start_pcap()
-
         asyncio.run(controller.init_ecosystems(args.platform,
                                                      args.ecosystem,
                                                      self.artifact_dir))
         asyncio.run(controller.start())
         asyncio.run(controller.run_analyzers())
-
         if pcap:
             border_print("Stopping pcap")
             pcap_runner.stop_pcap()
-
         asyncio.run(controller.stop())
-
         asyncio.run(controller.probe())
-
-        if controller.has_errors():
-            border_print("Errors seen this run:")
-            controller.error_report(self.artifact_dir)
-
+        border_print("Checking error report")
+        controller.write_error_report(self.artifact_dir)
         border_print("Compressing artifacts...")
         self.zip_artifacts()
 
