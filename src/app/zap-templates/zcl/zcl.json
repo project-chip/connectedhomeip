@@ -69,6 +69,7 @@
         "operational-credentials-cluster.xml",
         "operational-state-cluster.xml",
         "operational-state-rvc-cluster.xml",
+        "oven-mode-cluster.xml",
         "pressure-measurement-cluster.xml",
         "power-source-cluster.xml",
         "power-source-configuration-cluster.xml",

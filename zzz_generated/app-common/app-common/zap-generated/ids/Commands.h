@@ -669,6 +669,20 @@ static constexpr CommandId Id = 0x00000003;
 } // namespace Commands
 } // namespace Timer
 
+namespace OvenMode {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace OvenMode
+
 namespace ModeSelect {
 namespace Commands {
 
