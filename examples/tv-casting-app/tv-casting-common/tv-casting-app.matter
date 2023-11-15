@@ -182,12 +182,12 @@ client cluster OnOff = 6 {
 
 /** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
 client cluster LevelControl = 8 {
-  enum MoveMode : enum8 {
+  enum MoveModeEnum : enum8 {
     kUp = 0;
     kDown = 1;
   }
 
-  enum StepMode : enum8 {
+  enum StepModeEnum : enum8 {
     kUp = 0;
     kDown = 1;
   }
@@ -198,7 +198,7 @@ client cluster LevelControl = 8 {
     kFrequency = 0x4;
   }
 
-  bitmap LevelControlOptions : bitmap8 {
+  bitmap OptionsBitmap : bitmap8 {
     kExecuteIfOff = 0x1;
     kCoupleColorTempToLevel = 0x2;
   }
@@ -210,7 +210,7 @@ client cluster LevelControl = 8 {
   readonly attribute optional int16u currentFrequency = 4;
   readonly attribute optional int16u minFrequency = 5;
   readonly attribute optional int16u maxFrequency = 6;
-  attribute LevelControlOptions options = 15;
+  attribute OptionsBitmap options = 15;
   attribute optional int16u onOffTransitionTime = 16;
   attribute nullable int8u onLevel = 17;
   attribute optional nullable int16u onTransitionTime = 18;
@@ -227,55 +227,55 @@ client cluster LevelControl = 8 {
   request struct MoveToLevelRequest {
     int8u level = 0;
     nullable int16u transitionTime = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct MoveRequest {
-    MoveMode moveMode = 0;
+    MoveModeEnum moveMode = 0;
     nullable int8u rate = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct StepRequest {
-    StepMode stepMode = 0;
+    StepModeEnum stepMode = 0;
     int8u stepSize = 1;
     nullable int16u transitionTime = 2;
-    LevelControlOptions optionsMask = 3;
-    LevelControlOptions optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct StopRequest {
-    LevelControlOptions optionsMask = 0;
-    LevelControlOptions optionsOverride = 1;
+    OptionsBitmap optionsMask = 0;
+    OptionsBitmap optionsOverride = 1;
   }
 
   request struct MoveToLevelWithOnOffRequest {
     int8u level = 0;
     nullable int16u transitionTime = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct MoveWithOnOffRequest {
-    MoveMode moveMode = 0;
+    MoveModeEnum moveMode = 0;
     nullable int8u rate = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct StepWithOnOffRequest {
-    StepMode stepMode = 0;
+    StepModeEnum stepMode = 0;
     int8u stepSize = 1;
     nullable int16u transitionTime = 2;
-    LevelControlOptions optionsMask = 3;
-    LevelControlOptions optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct StopWithOnOffRequest {
-    LevelControlOptions optionsMask = 0;
-    LevelControlOptions optionsOverride = 1;
+    OptionsBitmap optionsMask = 0;
+    OptionsBitmap optionsOverride = 1;
   }
 
   request struct MoveToClosestFrequencyRequest {
@@ -677,13 +677,13 @@ server cluster GeneralCommissioning = 48 {
 
   request struct SetRegulatoryConfigRequest {
     RegulatoryLocationTypeEnum newRegulatoryConfig = 0;
-    char_string countryCode = 1;
+    char_string<2> countryCode = 1;
     int64u breadcrumb = 2;
   }
 
   response struct ArmFailSafeResponse = 1 {
     CommissioningErrorEnum errorCode = 0;
-    char_string debugText = 1;
+    char_string<128> debugText = 1;
   }
 
   response struct SetRegulatoryConfigResponse = 3 {
@@ -1436,7 +1436,7 @@ client cluster Channel = 1284 {
 
 /** This cluster provides an interface for UX navigation within a set of targets on a device or endpoint. */
 client cluster TargetNavigator = 1285 {
-  enum TargetNavigatorStatusEnum : enum8 {
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kTargetNotFound = 1;
     kNotAllowed = 2;
@@ -1444,7 +1444,7 @@ client cluster TargetNavigator = 1285 {
 
   struct TargetInfoStruct {
     int8u identifier = 0;
-    char_string<32> name = 1;
+    char_string name = 1;
   }
 
   readonly attribute TargetInfoStruct targetList[] = 0;
@@ -1462,7 +1462,7 @@ client cluster TargetNavigator = 1285 {
   }
 
   response struct NavigateTargetResponse = 1 {
-    TargetNavigatorStatusEnum status = 0;
+    StatusEnum status = 0;
     optional char_string data = 1;
   }
 
