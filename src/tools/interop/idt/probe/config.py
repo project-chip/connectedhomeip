@@ -15,8 +15,5 @@
 #    limitations under the License.
 #
 
-from .android import Android
-
-__all__ = [
-    'Android',
-]
+ping_count = 4
+dnssd_browsing_time_seconds = 4

@@ -15,8 +15,5 @@
 #    limitations under the License.
 #
 
-from .android import Android
-
-__all__ = [
-    'Android',
-]
+enable_foyer_probers = True
+foyer_prober_traceroute_limit = 32

@@ -15,8 +15,11 @@
 #    limitations under the License.
 #
 
-from .android import Android
+from . import artifact, host_platform, log, shell
 
 __all__ = [
-    'Android',
+    'artifact',
+    'host_platform',
+    'log',
+    'shell',
 ]

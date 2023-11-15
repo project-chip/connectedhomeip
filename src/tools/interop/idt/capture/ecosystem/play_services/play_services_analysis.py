@@ -17,13 +17,17 @@
 
 import os
 
-from capture.file_utils import add_border, create_standard_log_name, print_and_write
 from capture.platform.android import Android
+from utils.artifact import create_standard_log_name, log
+from utils.log import add_border, print_and_write
+
+logger = log.get_logger(__file__)
 
 
 class PlayServicesAnalysis:
 
     def __init__(self, platform: Android, artifact_dir: str) -> None:
+        self.logger = logger
         self.artifact_dir = artifact_dir
         self.analysis_file_name = os.path.join(
             self.artifact_dir, create_standard_log_name(
@@ -41,6 +45,7 @@ class PlayServicesAnalysis:
     def _log_proc_matter_commissioner(self, line: str) -> None:
         """Core commissioning flow"""
         if 'MatterCommissioner' in line:
+            self.logger.info(line)
             self.matter_commissioner_logs += line
 
     def _log_proc_commissioning_failed(self, line: str) -> None:
@@ -51,24 +56,28 @@ class PlayServicesAnalysis:
             self.failure_stack_trace += line
             self.fail_trace_line_counter += 1
         if 'SetupDeviceView' and 'Commissioning failed' in line:
+            self.logger.info(line)
             self.fail_trace_line_counter = 0
             self.failure_stack_trace += line
 
     def _log_proc_pake(self, line: str) -> None:
         """Three logs for pake 1-3 expected"""
         if "Pake" in line and "chip_logging" in line:
+            self.logger.info(line)
             self.pake_logs += line
 
     def _log_proc_mdns(self, line: str) -> None:
         if "_matter" in line and "ServiceResolverAdapter" in line:
+            self.logger.info(line)
             self.resolver_logs += line
 
     def _log_proc_sigma(self, line: str) -> None:
         """Three logs expected for sigma 1-3"""
         if "Sigma" in line and "chip_logging" in line:
+            self.logger.info(line)
             self.sigma_logs += line
 
-    def _show_analysis(self) -> None:
+    def show_analysis(self) -> None:
         analysis_file = open(self.analysis_file_name, mode="w+")
         print_and_write(add_border('Matter commissioner logs'), analysis_file)
         print_and_write(self.matter_commissioner_logs, analysis_file)
@@ -85,11 +94,9 @@ class PlayServicesAnalysis:
         analysis_file.close()
 
     def process_line(self, line: str) -> None:
-        for line_func in filter(lambda s: s.startswith('_log'), dir(self)):
+        for line_func in [s for s in dir(self) if s.startswith('_log')]:
             getattr(self, line_func)(line)
 
-    def do_analysis(self) -> None:
-        with open(self.platform.logcat_output_path, mode='r') as logcat_file:
-            for line in logcat_file:
-                self.process_line(line)
-        self._show_analysis()
+    def do_analysis(self, batch: [str]) -> None:
+        for line in batch:
+            self.process_line(line)

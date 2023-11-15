@@ -15,8 +15,5 @@
 #    limitations under the License.
 #
 
-from .android import Android
-
-__all__ = [
-    'Android',
-]
+sudo killall tcpdump
+sudo killall adb

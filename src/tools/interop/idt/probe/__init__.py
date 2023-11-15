@@ -15,8 +15,11 @@
 #    limitations under the License.
 #
 
-from .android import Android
+from dataclasses import dataclass
 
-__all__ = [
-    'Android',
-]
+
+@dataclass(repr=True)
+class ProbeTarget:
+    name: str
+    ip: str
+    port: str

@@ -14,9 +14,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+import logging
 
-from .android import Android
-
-__all__ = [
-    'Android',
-]
+enable_color = True
+log_level = logging.INFO
+py_major_version = 3
+py_minor_version = 11

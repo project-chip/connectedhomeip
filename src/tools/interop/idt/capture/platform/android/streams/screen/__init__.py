@@ -15,8 +15,6 @@
 #    limitations under the License.
 #
 
-from .android import Android
+from .screen import ScreenRecorder
 
-__all__ = [
-    'Android',
-]
+__all__ = ["ScreenRecorder"]

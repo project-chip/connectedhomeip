@@ -15,8 +15,14 @@
 #    limitations under the License.
 #
 
-from .android import Android
+from utils.host_platform import is_mac
 
-__all__ = [
-    'Android',
-]
+from .linux import ProberLinuxHost
+from .mac import ProberMacHost
+
+
+def run_probes(artifact_dir: str, dnssd_dir: str) -> None:
+    if is_mac():
+        ProberMacHost(artifact_dir, dnssd_dir).probe()
+    else:
+        ProberLinuxHost(artifact_dir, dnssd_dir).probe()
