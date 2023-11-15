@@ -18,6 +18,10 @@
 
 #include <protocols/secure_channel/PairingSession.h>
 
+#include <app/DataModelRevision.h>
+#include <app/InteractionModelRevision.h>
+#include <app/SpecificationVersion.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVTypes.h>
 #include <lib/support/SafeInt.h>
 
@@ -44,7 +48,7 @@ CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & 
 
     // Call Activate last, otherwise errors on anything after would lead to
     // a partially valid session.
-    secureSession->Activate(GetLocalScopedNodeId(), GetPeer(), GetPeerCATs(), peerSessionId, mRemoteMRPConfig);
+    secureSession->Activate(GetLocalScopedNodeId(), GetPeer(), GetPeerCATs(), peerSessionId, GetRemoteMRPConfig());
 
     ChipLogDetail(Inet, "New secure session activated for device " ChipLogFormatScopedNodeId ", LSID:%d PSID:%d!",
                   ChipLogValueScopedNodeId(GetPeer()), secureSession->GetLocalSessionId(), peerSessionId);
@@ -88,19 +92,44 @@ void PairingSession::DiscardExchange()
     }
 }
 
-CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpLocalConfig,
-                                               TLV::TLVWriter & tlvWriter)
+CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const Optional<ReliableMessageProtocolConfig> & providedMrpConfig,
+                                                   TLV::TLVWriter & tlvWriter)
 {
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/30456. Based on the spec we need to send values here now,
+    // but it is not entirely clear what we should be sending here when `providedMrpConfig.HasValue() == false`. For now we
+    // are sending the default MRP config values.
+    ReliableMessageProtocolConfig mrpLocalConfig = GetDefaultMRPConfig();
+    if (providedMrpConfig.HasValue())
+    {
+        mrpLocalConfig = providedMrpConfig.Value();
+    }
     TLV::TLVType mrpParamsContainer;
     ReturnErrorOnFailure(tlvWriter.StartContainer(tag, TLV::kTLVType_Structure, mrpParamsContainer));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mrpLocalConfig.mIdleRetransTimeout.count()));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), mrpLocalConfig.mActiveRetransTimeout.count()));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), mrpLocalConfig.mActiveThresholdTime.count()));
+    ReturnErrorOnFailure(
+        tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSessionIdleInterval), mrpLocalConfig.mIdleRetransTimeout.count()));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSessionActiveInterval),
+                                       mrpLocalConfig.mActiveRetransTimeout.count()));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSessionActiveThreshold),
+                                       mrpLocalConfig.mActiveThresholdTime.count()));
+
+    uint16_t dataModel = CHIP_DEVICE_DATA_MODEL_REVISION;
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kDataModelRevision), dataModel));
+
+    uint16_t interactionModel = CHIP_DEVICE_INTERACTION_MODEL_REVISION;
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kInteractionModelRevision), interactionModel));
+
+    uint32_t specVersion = CHIP_DEVICE_SPECIFICATION_VERSION;
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSpecificationVersion), specVersion));
+
+    uint16_t maxPathsPerInvoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kMaxPathsPerInvoke), maxPathsPerInvoke));
     return tlvWriter.EndContainer(mrpParamsContainer);
 }
 
 CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     // The MRP parameters are optional.
     if (tlvReader.GetTag() != expectedTag)
     {
@@ -110,50 +139,89 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     TLV::TLVType containerType = TLV::kTLVType_Structure;
     ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
 
-    uint32_t tlvElementValue = 0;
-
     ReturnErrorOnFailure(tlvReader.Next());
 
     ChipLogDetail(SecureChannel, "Found MRP parameters in the message");
 
     // All TLV elements in the structure are optional. If the first element is present, process it and move
     // the TLV reader to the next element.
-    if (TLV::TagNumFromTag(tlvReader.GetTag()) == 1)
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kSessionIdleInterval)
     {
-        ReturnErrorOnFailure(tlvReader.Get(tlvElementValue));
-        mRemoteMRPConfig.mIdleRetransTimeout = System::Clock::Milliseconds32(tlvElementValue);
+        uint32_t idleRetransTimeout;
+        ReturnErrorOnFailure(tlvReader.Get(idleRetransTimeout));
+        mRemoteSessionParams.SetMRPIdleRetransTimeout(System::Clock::Milliseconds32(idleRetransTimeout));
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
-        CHIP_ERROR err = tlvReader.Next();
-        if (err == CHIP_END_OF_TLV)
-        {
-            return tlvReader.ExitContainer(containerType);
-        }
-        ReturnErrorOnFailure(err);
+        SuccessOrExit(err = tlvReader.Next());
     }
 
-    if (TLV::TagNumFromTag(tlvReader.GetTag()) == 2)
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kSessionActiveInterval)
     {
-        ReturnErrorOnFailure(tlvReader.Get(tlvElementValue));
-        mRemoteMRPConfig.mActiveRetransTimeout = System::Clock::Milliseconds32(tlvElementValue);
+        uint32_t activeRetransTimeout;
+        ReturnErrorOnFailure(tlvReader.Get(activeRetransTimeout));
+        mRemoteSessionParams.SetMRPActiveRetransTimeout(System::Clock::Milliseconds32(activeRetransTimeout));
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
-        CHIP_ERROR err = tlvReader.Next();
-        if (err == CHIP_END_OF_TLV)
-        {
-            return tlvReader.ExitContainer(containerType);
-        }
-        ReturnErrorOnFailure(err);
+        SuccessOrExit(err = tlvReader.Next());
     }
 
-    if (TLV::TagNumFromTag(tlvReader.GetTag()) == 3)
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kSessionActiveThreshold)
     {
-        ReturnErrorOnFailure(tlvReader.Get(tlvElementValue));
-        mRemoteMRPConfig.mActiveThresholdTime = System::Clock::Milliseconds16(tlvElementValue);
+        uint16_t activeThresholdTime;
+        ReturnErrorOnFailure(tlvReader.Get(activeThresholdTime));
+        mRemoteSessionParams.SetMRPActiveThresholdTime(System::Clock::Milliseconds16(activeThresholdTime));
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
     }
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kDataModelRevision)
+    {
+        uint16_t dataModelRevision;
+        ReturnErrorOnFailure(tlvReader.Get(dataModelRevision));
+        mRemoteSessionParams.SetDataModelRevision(dataModelRevision);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kInteractionModelRevision)
+    {
+        uint16_t interactionModelRevision;
+        ReturnErrorOnFailure(tlvReader.Get(interactionModelRevision));
+        mRemoteSessionParams.SetInteractionModelRevision(interactionModelRevision);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kSpecificationVersion)
+    {
+        uint32_t specificationVersion;
+        ReturnErrorOnFailure(tlvReader.Get(specificationVersion));
+        mRemoteSessionParams.SetSpecificationVersion(specificationVersion);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kMaxPathsPerInvoke)
+    {
+        uint16_t maxPathsPerInvoke;
+        ReturnErrorOnFailure(tlvReader.Get(maxPathsPerInvoke));
+        mRemoteSessionParams.SetMaxPathsPerInvoke(maxPathsPerInvoke);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
     // Future proofing - Don't error out if there are other tags
-
-    return tlvReader.ExitContainer(containerType);
+exit:
+    if (err == CHIP_END_OF_TLV)
+    {
+        return tlvReader.ExitContainer(containerType);
+    }
+    return err;
 }
 
 bool PairingSession::IsSessionEstablishmentInProgress()
