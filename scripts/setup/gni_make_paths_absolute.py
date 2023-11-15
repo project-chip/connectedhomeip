@@ -27,13 +27,13 @@ def _make_paths_absolute(gni_file: str, root: str):
     if not root.endswith("/"):
         root = root + "/"
 
-    new_data = data.replace('"//../', f'"{root}')
+    new_data = data.replace('"//../', f'"{root}../')
 
     if new_data == data:
         return
 
     with open(gni_file, "wt", encoding="utf8") as f:
-        f.write(new_data)
+       f.write(new_data)
 
 
 def main():
@@ -43,7 +43,7 @@ def main():
     )
     parser.add_argument(
         '--root', '-r', required=True,
-        help="Set the root used by the build (usually PW_ENVIRONMENT_ROOT)"
+        help="Set the root used by the build (usually CHIP_ROOT)"
     )
     parser.add_argument('gni_file', type=str, help="GNI file to process")
     _make_paths_absolute(**vars(parser.parse_args()))

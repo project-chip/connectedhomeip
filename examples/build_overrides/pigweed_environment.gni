@@ -33,16 +33,15 @@ if (defined(pw_env_setup_CIPD_PIGWEED)) {
   _split_CIPD_PIGWEED = string_split(pw_env_setup_CIPD_PIGWEED, "//")
   if (_split_CIPD_PIGWEED[0] == "") {
     pw_env_setup_CIPD_PIGWEED =
-        get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_PIGWEED}",
-                      "abspath")
+    get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_PIGWEED}", "abspath")
   }
 }
 if (defined(pw_env_setup_CIPD_PYTHON)) {
   _split_CIPD_PYTHON = string_split(pw_env_setup_CIPD_PYTHON, "//")
   if (_split_CIPD_PYTHON[0] == "") {
     pw_env_setup_CIPD_PYTHON =
-        get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_PYTHON}",
-                      "abspath")
+    get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_PYTHON}",
+        "abspath")
   }
 }
 if (defined(pw_env_setup_VIRTUAL_ENV)) {

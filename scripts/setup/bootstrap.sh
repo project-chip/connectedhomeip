@@ -171,7 +171,7 @@ fi
 # See https://github.com/project-chip/connectedhomeip/issues/30475
 # for details
 scripts/setup/gni_make_paths_absolute.py \
-    --root "$_ORIGINAL_PW_ENVIRONMENT_ROOT" \
+    --root "$_CHIP_ROOT" \
     build_overrides/pigweed_environment.gni
 
 unset -f _bootstrap_or_activate
