@@ -7833,6 +7833,7 @@
           # Targeting Spring 2024 Matter release
           - MicrowaveOvenControl
           - MicrowaveOvenMode
+          - DemandResponseLoadControl
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
