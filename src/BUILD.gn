@@ -141,14 +141,7 @@ if (chip_build_tests) {
     }
 
     if (chip_monolithic_tests) {
-      # TODO [PW_MIGRATION] Remove this if after migartion to PW_TEST is completed for all platforms
-      # TODO [PW_MIGRATION] There will be a list of already migrated platforms
-      if (chip_device_platform == "esp32" ||
-          chip_device_platform == "nrfconnect" ||
-          chip_device_platform == "openiotsdk" ||
-          chip_device_platform == "efr32") {
-        deps += [ "${chip_root}/src/lib/support:pw_tests_wrapper" ]
-      }
+      deps += [ "${chip_root}/src/lib/support:pw_tests_wrapper" ]
       build_monolithic_library = true
       output_name = "libCHIP_tests"
       output_dir = "${root_out_dir}/lib"
