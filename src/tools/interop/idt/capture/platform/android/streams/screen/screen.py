@@ -47,7 +47,7 @@ class ScreenRecorder(AndroidStream):
     def check_screen(self) -> bool:
         screen_cmd_output = self.platform.run_adb_command(
             self.screen_check_command, capture_output=True)
-        return "true" in screen_cmd_output.get_captured_output()
+        return "mScreenOn=true" == screen_cmd_output.get_captured_output().strip()
 
     async def prepare_screen_recording(self) -> None:
         screen_on = self.check_screen()
