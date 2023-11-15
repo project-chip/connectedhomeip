@@ -2471,8 +2471,8 @@ public:
 
     uint8_t level = static_cast<uint8_t>(0);
     DataModel::Nullable<uint16_t> transitionTime;
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -2489,8 +2489,8 @@ public:
 
     uint8_t level = static_cast<uint8_t>(0);
     DataModel::Nullable<uint16_t> transitionTime;
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveToLevel
@@ -2510,10 +2510,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Move::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode = static_cast<MoveMode>(0);
+    MoveModeEnum moveMode = static_cast<MoveModeEnum>(0);
     DataModel::Nullable<uint8_t> rate;
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -2528,10 +2528,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Move::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode = static_cast<MoveMode>(0);
+    MoveModeEnum moveMode = static_cast<MoveModeEnum>(0);
     DataModel::Nullable<uint8_t> rate;
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Move
@@ -2552,11 +2552,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    StepMode stepMode = static_cast<StepMode>(0);
-    uint8_t stepSize  = static_cast<uint8_t>(0);
+    StepModeEnum stepMode = static_cast<StepModeEnum>(0);
+    uint8_t stepSize      = static_cast<uint8_t>(0);
     DataModel::Nullable<uint16_t> transitionTime;
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -2571,11 +2571,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    StepMode stepMode = static_cast<StepMode>(0);
-    uint8_t stepSize  = static_cast<uint8_t>(0);
+    StepModeEnum stepMode = static_cast<StepModeEnum>(0);
+    uint8_t stepSize      = static_cast<uint8_t>(0);
     DataModel::Nullable<uint16_t> transitionTime;
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Step
@@ -2593,8 +2593,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -2609,8 +2609,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Stop
@@ -2632,8 +2632,8 @@ public:
 
     uint8_t level = static_cast<uint8_t>(0);
     DataModel::Nullable<uint16_t> transitionTime;
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -2650,8 +2650,8 @@ public:
 
     uint8_t level = static_cast<uint8_t>(0);
     DataModel::Nullable<uint16_t> transitionTime;
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveToLevelWithOnOff
@@ -2671,10 +2671,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode = static_cast<MoveMode>(0);
+    MoveModeEnum moveMode = static_cast<MoveModeEnum>(0);
     DataModel::Nullable<uint8_t> rate;
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -2689,10 +2689,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode = static_cast<MoveMode>(0);
+    MoveModeEnum moveMode = static_cast<MoveModeEnum>(0);
     DataModel::Nullable<uint8_t> rate;
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveWithOnOff
@@ -2713,11 +2713,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    StepMode stepMode = static_cast<StepMode>(0);
-    uint8_t stepSize  = static_cast<uint8_t>(0);
+    StepModeEnum stepMode = static_cast<StepModeEnum>(0);
+    uint8_t stepSize      = static_cast<uint8_t>(0);
     DataModel::Nullable<uint16_t> transitionTime;
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -2732,11 +2732,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StepWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    StepMode stepMode = static_cast<StepMode>(0);
-    uint8_t stepSize  = static_cast<uint8_t>(0);
+    StepModeEnum stepMode = static_cast<StepModeEnum>(0);
+    uint8_t stepSize      = static_cast<uint8_t>(0);
     DataModel::Nullable<uint16_t> transitionTime;
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StepWithOnOff
@@ -2754,8 +2754,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -2770,8 +2770,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    chip::BitMask<LevelControlOptions> optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(0);
-    chip::BitMask<LevelControlOptions> optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(0);
+    chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
+    chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopWithOnOff
@@ -2898,9 +2898,9 @@ struct TypeInfo
 namespace Options {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions>;
+    using Type             = chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Options::Id; }
@@ -3032,7 +3032,7 @@ struct TypeInfo
         Attributes::MinFrequency::TypeInfo::DecodableType minFrequency         = static_cast<uint16_t>(0);
         Attributes::MaxFrequency::TypeInfo::DecodableType maxFrequency         = static_cast<uint16_t>(0);
         Attributes::Options::TypeInfo::DecodableType options =
-            static_cast<chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap>>(0);
         Attributes::OnOffTransitionTime::TypeInfo::DecodableType onOffTransitionTime = static_cast<uint16_t>(0);
         Attributes::OnLevel::TypeInfo::DecodableType onLevel;
         Attributes::OnTransitionTime::TypeInfo::DecodableType onTransitionTime;
