@@ -99,6 +99,11 @@ void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
     mSubscriptionId          = subscriptionInfo.mSubscriptionId;
     mMinIntervalFloorSeconds = subscriptionInfo.mMinInterval;
     mMaxInterval             = subscriptionInfo.mMaxInterval;
+
+    mResumingSubscriptionNodeId = subscriptionInfo.mNodeId;
+    mResumingSubscriptionFabricIndex = subscriptionInfo.mFabricIndex;
+    mIsResumingSubscription = true;
+
     SetStateFlag(ReadHandlerFlags::FabricFiltered, subscriptionInfo.mFabricFiltered);
 
     // Move dynamically allocated attributes and events from the SubscriptionInfo struct into
@@ -908,6 +913,11 @@ void ReadHandler::HandleDeviceConnected(void * context, Messaging::ExchangeManag
     }
     // Notify the observer that a subscription has been resumed
     _this->mObserver->OnSubscriptionEstablished(_this);
+
+    // Reset the subsription resumption parameters
+    _this->mIsResumingSubscription = false;
+    _this->mResumingSubscriptionNodeId = kUndefinedNodeId;
+    _this->mResumingSubscriptionFabricIndex = kUndefinedFabricIndex;
 
     _this->MoveToState(HandlerState::CanStartReporting);
 
