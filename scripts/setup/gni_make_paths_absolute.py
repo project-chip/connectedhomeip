@@ -15,6 +15,7 @@
 # limitations under the License.
 import argparse
 
+
 def _make_paths_absolute(gni_file: str, root: str):
     with open(gni_file, "rt", encoding="utf8") as f:
         data = f.read()
@@ -33,7 +34,7 @@ def _make_paths_absolute(gni_file: str, root: str):
         return
 
     with open(gni_file, "wt", encoding="utf8") as f:
-       f.write(new_data)
+        f.write(new_data)
 
 
 def main():
