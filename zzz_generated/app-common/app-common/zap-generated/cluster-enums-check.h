@@ -2082,6 +2082,48 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::StepDirecti
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(ThermostatUserInterfaceConfiguration::KeypadLockoutEnum val)
+{
+    using EnumType = ThermostatUserInterfaceConfiguration::KeypadLockoutEnum;
+    switch (val)
+    {
+    case EnumType::kNoLockout:
+    case EnumType::kLockout1:
+    case EnumType::kLockout2:
+    case EnumType::kLockout3:
+    case EnumType::kLockout4:
+    case EnumType::kLockout5:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
+    }
+}
+static auto __attribute__((unused))
+EnsureKnownEnumValue(ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum val)
+{
+    using EnumType = ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum;
+    switch (val)
+    {
+    case EnumType::kScheduleProgrammingPermitted:
+    case EnumType::kScheduleProgrammingDenied:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum val)
+{
+    using EnumType = ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum;
+    switch (val)
+    {
+    case EnumType::kCelsius:
+    case EnumType::kFahrenheit:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorLoopAction val)
 {
     using EnumType = ColorControl::ColorLoopAction;

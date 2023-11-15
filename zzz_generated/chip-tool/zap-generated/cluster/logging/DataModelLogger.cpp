@@ -10673,17 +10673,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TemperatureDisplayMode", 1, value);
         }
         case ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id: {
-            uint8_t value;
+            chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("KeypadLockout", 1, value);
         }
         case ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id: {
-            uint8_t value;
+            chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ScheduleProgrammingVisibility", 1, value);
         }

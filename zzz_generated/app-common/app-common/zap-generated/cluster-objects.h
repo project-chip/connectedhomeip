@@ -24200,9 +24200,9 @@ namespace Attributes {
 namespace TemperatureDisplayMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum;
+    using DecodableType    = chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum;
+    using DecodableArgType = chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureDisplayMode::Id; }
@@ -24212,9 +24212,9 @@ struct TypeInfo
 namespace KeypadLockout {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum;
+    using DecodableType    = chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum;
+    using DecodableArgType = chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::KeypadLockout::Id; }
@@ -24224,9 +24224,9 @@ struct TypeInfo
 namespace ScheduleProgrammingVisibility {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum;
+    using DecodableType    = chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum;
+    using DecodableArgType = chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ScheduleProgrammingVisibility::Id; }
@@ -24278,9 +24278,12 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::TemperatureDisplayMode::TypeInfo::DecodableType temperatureDisplayMode               = static_cast<uint8_t>(0);
-        Attributes::KeypadLockout::TypeInfo::DecodableType keypadLockout                                 = static_cast<uint8_t>(0);
-        Attributes::ScheduleProgrammingVisibility::TypeInfo::DecodableType scheduleProgrammingVisibility = static_cast<uint8_t>(0);
+        Attributes::TemperatureDisplayMode::TypeInfo::DecodableType temperatureDisplayMode =
+            static_cast<chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum>(0);
+        Attributes::KeypadLockout::TypeInfo::DecodableType keypadLockout =
+            static_cast<chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum>(0);
+        Attributes::ScheduleProgrammingVisibility::TypeInfo::DecodableType scheduleProgrammingVisibility =
+            static_cast<chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

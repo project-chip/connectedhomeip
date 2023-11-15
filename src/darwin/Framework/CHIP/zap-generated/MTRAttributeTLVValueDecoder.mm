@@ -9327,7 +9327,7 @@ static id _Nullable DecodeAttributeValueForThermostatUserInterfaceConfigurationC
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::KeypadLockout::Id: {
@@ -9338,7 +9338,7 @@ static id _Nullable DecodeAttributeValueForThermostatUserInterfaceConfigurationC
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::ScheduleProgrammingVisibility::Id: {
@@ -9349,7 +9349,7 @@ static id _Nullable DecodeAttributeValueForThermostatUserInterfaceConfigurationC
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     default: {

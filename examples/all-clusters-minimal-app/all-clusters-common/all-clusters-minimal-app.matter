@@ -2916,8 +2916,27 @@ provisional server cluster FanControl = 514 {
 
 /** An interface for configuring the user interface of a thermostat (which may be remote from the thermostat). */
 server cluster ThermostatUserInterfaceConfiguration = 516 {
-  attribute enum8 temperatureDisplayMode = 0;
-  attribute access(write: manage) enum8 keypadLockout = 1;
+  enum KeypadLockoutEnum : enum8 {
+    kNoLockout = 0;
+    kLockout1 = 1;
+    kLockout2 = 2;
+    kLockout3 = 3;
+    kLockout4 = 4;
+    kLockout5 = 5;
+  }
+
+  enum ScheduleProgrammingVisibilityEnum : enum8 {
+    kScheduleProgrammingPermitted = 0;
+    kScheduleProgrammingDenied = 1;
+  }
+
+  enum TemperatureDisplayModeEnum : enum8 {
+    kCelsius = 0;
+    kFahrenheit = 1;
+  }
+
+  attribute TemperatureDisplayModeEnum temperatureDisplayMode = 0;
+  attribute access(write: manage) KeypadLockoutEnum keypadLockout = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
