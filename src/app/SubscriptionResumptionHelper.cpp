@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <app/SubscriptionResumptionHelper.h>
 #include <app/InteractionModelEngine.h>
+#include <app/SubscriptionResumptionHelper.h>
 
 namespace chip {
 namespace app {
@@ -27,12 +27,12 @@ SubscriptionResumptionHelper::SubscriptionResumptionHelper() :
 CHIP_ERROR SubscriptionResumptionHelper::ResumeSubscription(CASESessionManager & caseSessionManager,
                                                             SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo)
 {
-    mNodeId = subscriptionInfo.mNodeId;
-    mFabricIndex = subscriptionInfo.mFabricIndex;
-    mSubscriptionId = subscriptionInfo.mSubscriptionId;
+    mNodeId                  = subscriptionInfo.mNodeId;
+    mFabricIndex             = subscriptionInfo.mFabricIndex;
+    mSubscriptionId          = subscriptionInfo.mSubscriptionId;
     mMinIntervalFloorSeconds = subscriptionInfo.mMinInterval;
-    mMaxInterval = subscriptionInfo.mMaxInterval;
-    mFabricFiltered = subscriptionInfo.mFabricFiltered;
+    mMaxInterval             = subscriptionInfo.mMaxInterval;
+    mFabricFiltered          = subscriptionInfo.mFabricFiltered;
 
     if (subscriptionInfo.mAttributePaths.AllocatedSize() > 0)
     {
@@ -62,15 +62,16 @@ void SubscriptionResumptionHelper::HandleDeviceConnected(void * context, Messagi
                                                          const SessionHandle & sessionHandle)
 {
     Platform::UniquePtr<SubscriptionResumptionHelper> _this(static_cast<SubscriptionResumptionHelper *>(context));
-    InteractionModelEngine *imEngine = InteractionModelEngine::GetInstance();
+    InteractionModelEngine * imEngine = InteractionModelEngine::GetInstance();
     if (!imEngine->EnsureResourceForSubscription(_this->mFabricIndex, _this->mAttributePaths.AllocatedSize(),
                                                  _this->mEventPaths.AllocatedSize()))
     {
         ChipLogProgress(InteractionModel, "no resource for subscription resumption");
         return;
     }
-    ReadHandler *readHandler = imEngine->mReadHandlers.CreateObject(*imEngine, imEngine->GetReportScheduler());
-    if (readHandler == nullptr) {
+    ReadHandler * readHandler = imEngine->mReadHandlers.CreateObject(*imEngine, imEngine->GetReportScheduler());
+    if (readHandler == nullptr)
+    {
         ChipLogProgress(InteractionModel, "no resource for ReadHandler creation");
         return;
     }
@@ -81,7 +82,7 @@ void SubscriptionResumptionHelper::HandleDeviceConnectionFailure(void * context,
 {
     Platform::UniquePtr<SubscriptionResumptionHelper> _this(static_cast<SubscriptionResumptionHelper *>(context));
     ChipLogError(DataManagement, "Failed to establish CASE for subscription-resumption with error '%" CHIP_ERROR_FORMAT "'",
-                                 error.Format());
+                 error.Format());
     // Delete the persistent subscription information
     auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
     if (subscriptionResumptionStorage)

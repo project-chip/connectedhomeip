@@ -109,7 +109,8 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle, Sub
     }
     for (size_t i = 0; i < helper.mEventPaths.AllocatedSize(); i++)
     {
-        CHIP_ERROR err = InteractionModelEngine::GetInstance()->PushFrontEventPathParamsList(mpEventPathList, helper.mEventPaths[i]);
+        CHIP_ERROR err =
+            InteractionModelEngine::GetInstance()->PushFrontEventPathParamsList(mpEventPathList, helper.mEventPaths[i]);
         if (err != CHIP_NO_ERROR)
         {
             Close();

@@ -26,7 +26,8 @@ namespace app {
 class InteractionModelEngine;
 class ReadHandler;
 
-class SubscriptionResumptionHelper {
+class SubscriptionResumptionHelper
+{
 public:
     SubscriptionResumptionHelper();
 
