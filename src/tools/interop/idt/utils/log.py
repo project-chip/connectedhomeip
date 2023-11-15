@@ -17,40 +17,30 @@
 
 import logging
 from typing import TextIO
+from termcolor import colored
 
 import config
 
 _CONFIG_LEVEL = config.log_level
 
-blue = "\x1b[34;1m"
-cyan = "\x1b[36;1m"
-green = "\x1b[32;1m"
-grey = "\x1b[38;20m"
-magenta = "\x1b[35;1m"
-yellow = "\x1b[33;20m"
-bold_red = "\x1b[1;31m"
-bold_red_yellow_background = "\x1b[31;43;1m"
-
-reset = "\x1b[0m"
-
-format_pre = "%(asctime)s %(levelname)s {%(module)s} [%(funcName)s] " + reset
-format_pre = cyan + format_pre if config.enable_color else format_pre
-format_post = "%(message)s" + reset
-format_no_color = format_pre+format_post
+_FORMAT_PRE_FSTRING = "%(asctime)s %(levelname)s {%(module)s} [%(funcName)s] "
+_FORMAT_PRE = colored(_FORMAT_PRE_FSTRING, "blue") if config.enable_color else _FORMAT_PRE_FSTRING
+_FORMAT_POST = "%(message)s"
+_FORMAT_NO_COLOR = _FORMAT_PRE_FSTRING+_FORMAT_POST
 
 FORMATS = {
-    logging.DEBUG: format_pre + blue + format_post,
-    logging.INFO: format_pre + green + format_post,
-    logging.WARNING: format_pre + yellow + format_post,
-    logging.ERROR: format_pre + bold_red + format_post,
-    logging.CRITICAL: format_pre + bold_red_yellow_background + format_post
+    logging.DEBUG: _FORMAT_PRE + colored(_FORMAT_POST, "blue"),
+    logging.INFO: _FORMAT_PRE + colored(_FORMAT_POST, "green"),
+    logging.WARNING: _FORMAT_PRE + colored(_FORMAT_POST, "yellow"),
+    logging.ERROR: _FORMAT_PRE + colored(_FORMAT_POST, "red", attrs=["bold"]),
+    logging.CRITICAL: _FORMAT_PRE + colored(_FORMAT_POST, "red",  "on_yellow", attrs=["bold"]),
 }
 
 
 class LoggingFormatter(logging.Formatter):
 
     def format(self, record):
-        log_fmt = FORMATS.get(record.levelno) if config.enable_color else format_no_color
+        log_fmt = FORMATS.get(record.levelno) if config.enable_color else _FORMAT_NO_COLOR
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
 
@@ -70,19 +60,17 @@ def border_print(to_print: str, important: bool = False) -> None:
     len_borders = len(to_print)
     border = f"\n{'_' * len_borders}\n"
     i_border = f"\n{'!' * len_borders}\n" if important else ""
+    to_print = f"{border}{i_border}{to_print}{i_border}{border}"
     if config.enable_color:
-        print(magenta, end="")
-    print(f"{border}{i_border}{to_print}{i_border}{border}")
-    if config.enable_color:
-        print(reset, end="")
+        to_print = colored(to_print, "magenta")
+    print(to_print)
 
 
 def print_and_write(to_print: str, file: TextIO) -> None:
     if config.enable_color:
-        print(green, end="")
-    print(f"{to_print}")
-    if config.enable_color:
-        print(reset, end="")
+        print(colored(to_print, "green"))
+    else:
+        print(to_print)
     file.write(to_print)
 
 
