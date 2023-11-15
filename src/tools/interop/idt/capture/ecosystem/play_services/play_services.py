@@ -18,7 +18,7 @@
 import asyncio
 import json
 import os
-from typing import Dict
+from typing import Dict, IO
 
 from capture.base import EcosystemCapture, UnsupportedCapturePlatformException
 from capture.platform.android import Android
@@ -58,6 +58,7 @@ class PlayServices(EcosystemCapture):
                             '168',  # mDNS
                             ]
         self.logcat_stream: LogcatStreamer = self.platform.streams["LogcatStreamer"]
+        self.logcat_file: IO = None
 
     def _write_standard_info_file(self) -> None:
         for k, v in self.standard_info_data.items():
@@ -96,14 +97,15 @@ class PlayServices(EcosystemCapture):
 
     async def analyze_capture(self):
         try:
-            logcat_fd = open(self.logcat_stream.logcat_artifact, "r")
+            self.logcat_file = open(self.logcat_stream.logcat_artifact, "r")
             while True:
-                self.analysis.do_analysis(self.logcat_fd.readlines())
+                self.analysis.do_analysis(self.logcat_file.readlines())
                 # Releasing async event loop for other analysis / monitor topics
                 await asyncio.sleep(0.5)
         except asyncio.CancelledError:
             logger.info("Closing logcat stream")
-            logcat_fd.close()
+            if self.logcat_file:
+                self.logcat_file.close()
 
     async def stop_capture(self) -> None:
         self.analysis.show_analysis()
