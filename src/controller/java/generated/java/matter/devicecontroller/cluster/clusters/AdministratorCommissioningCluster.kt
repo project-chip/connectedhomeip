@@ -17,190 +17,141 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.controller.MatterController
+import matter.devicecontroller.cluster.structs.*
 
-class AdministratorCommissioningCluster(private val endpointId: UShort) {
-  companion object {
-    const val CLUSTER_ID: UInt = 60u
-  }
+class AdministratorCommissioningCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
+  class AdminFabricIndexAttribute(val value: UByte?)
 
-  fun openCommissioningWindow(
-    callback: DefaultClusterCallback,
-    commissioningTimeout: Integer,
+  class AdminVendorIdAttribute(val value: UShort?)
+
+  class GeneratedCommandListAttribute(val value: List<UInt>)
+
+  class AcceptedCommandListAttribute(val value: List<UInt>)
+
+  class EventListAttribute(val value: List<UInt>)
+
+  class AttributeListAttribute(val value: List<UInt>)
+
+  suspend fun openCommissioningWindow(
+    commissioningTimeout: UShort,
     PAKEPasscodeVerifier: ByteArray,
-    discriminator: Integer,
-    iterations: Long,
+    discriminator: UShort,
+    iterations: UInt,
     salt: ByteArray,
     timedInvokeTimeoutMs: Int
   ) {
+    val commandId = 0L
+
     // Implementation needs to be added here
   }
 
-  fun openBasicCommissioningWindow(
-    callback: DefaultClusterCallback,
-    commissioningTimeout: Integer,
+  suspend fun openBasicCommissioningWindow(
+    commissioningTimeout: UShort,
     timedInvokeTimeoutMs: Int
   ) {
+    val commandId = 1L
+
     // Implementation needs to be added here
   }
 
-  fun revokeCommissioning(callback: DefaultClusterCallback, timedInvokeTimeoutMs: Int) {
+  suspend fun revokeCommissioning(timedInvokeTimeoutMs: Int) {
+    val commandId = 2L
+
     // Implementation needs to be added here
   }
 
-  interface AdminFabricIndexAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AdminVendorIdAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readWindowStatusAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readWindowStatusAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  fun subscribeWindowStatusAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeWindowStatusAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAdminFabricIndexAttribute(): AdminFabricIndexAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAdminFabricIndexAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AdminFabricIndexAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAdminFabricIndexAttribute(callback: AdminFabricIndexAttributeCallback) {
+  suspend fun readAdminVendorIdAttribute(): AdminVendorIdAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeAdminFabricIndexAttribute(
-    callback: AdminFabricIndexAttributeCallback,
+  suspend fun subscribeAdminVendorIdAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AdminVendorIdAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAdminVendorIdAttribute(callback: AdminVendorIdAttributeCallback) {
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeAdminVendorIdAttribute(
-    callback: AdminVendorIdAttributeCallback,
+  suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
+  suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
+  suspend fun readEventListAttribute(): EventListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AttributeListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
+  companion object {
+    const val CLUSTER_ID: UInt = 60u
   }
 }

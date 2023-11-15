@@ -17,326 +17,228 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.controller.MatterController
+import matter.devicecontroller.cluster.structs.*
 
-class BridgedDeviceBasicInformationCluster(private val endpointId: UShort) {
+class BridgedDeviceBasicInformationCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
+  class ProductAppearanceAttribute(
+    val value: BridgedDeviceBasicInformationClusterProductAppearanceStruct?
+  )
+
+  class GeneratedCommandListAttribute(val value: List<UInt>)
+
+  class AcceptedCommandListAttribute(val value: List<UInt>)
+
+  class EventListAttribute(val value: List<UInt>)
+
+  class AttributeListAttribute(val value: List<UInt>)
+
+  suspend fun readVendorNameAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeVendorNameAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readVendorIDAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeVendorIDAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readProductNameAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeProductNameAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNodeLabelAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeNodeLabelAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeNodeLabelAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readHardwareVersionAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeHardwareVersionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readHardwareVersionStringAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeHardwareVersionStringAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSoftwareVersionAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSoftwareVersionAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSoftwareVersionStringAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSoftwareVersionStringAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readManufacturingDateAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeManufacturingDateAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPartNumberAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePartNumberAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readProductURLAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeProductURLAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readProductLabelAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeProductLabelAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSerialNumberAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSerialNumberAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readReachableAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeReachableAttribute(minInterval: Int, maxInterval: Int): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readUniqueIDAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeUniqueIDAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readProductAppearanceAttribute(): ProductAppearanceAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeProductAppearanceAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ProductAppearanceAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 57u
-  }
-
-  interface ProductAppearanceAttributeCallback {
-    fun onSuccess(value: ChipStructs.BridgedDeviceBasicInformationClusterProductAppearanceStruct?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readVendorNameAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeVendorNameAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readVendorIDAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeVendorIDAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readProductNameAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeProductNameAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNodeLabelAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeNodeLabelAttribute(callback: DefaultClusterCallback, value: String) {
-    // Implementation needs to be added here
-  }
-
-  fun writeNodeLabelAttribute(
-    callback: DefaultClusterCallback,
-    value: String,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNodeLabelAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readHardwareVersionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeHardwareVersionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readHardwareVersionStringAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeHardwareVersionStringAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSoftwareVersionAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSoftwareVersionAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSoftwareVersionStringAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSoftwareVersionStringAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readManufacturingDateAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeManufacturingDateAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPartNumberAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePartNumberAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readProductURLAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeProductURLAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readProductLabelAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeProductLabelAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSerialNumberAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSerialNumberAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readReachableAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeReachableAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readUniqueIDAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeUniqueIDAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readProductAppearanceAttribute(callback: ProductAppearanceAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeProductAppearanceAttribute(
-    callback: ProductAppearanceAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

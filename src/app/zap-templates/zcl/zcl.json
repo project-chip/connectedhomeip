@@ -36,7 +36,9 @@
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
+        "microwave-oven-mode-cluster.xml",
         "door-lock-cluster.xml",
+        "drlc-cluster.xml",
         "electrical-measurement-cluster.xml",
         "energy-evse-cluster.xml",
         "ethernet-network-diagnostics-cluster.xml",
@@ -90,6 +92,7 @@
         "switch-cluster.xml",
         "target-navigator-cluster.xml",
         "temperature-control-cluster.xml",
+        "microwave-oven-control-cluster.xml",
         "temperature-measurement-cluster.xml",
         "test-cluster.xml",
         "thermostat-cluster.xml",
@@ -97,6 +100,7 @@
         "thread-network-diagnostics-cluster.xml",
         "time-format-localization-cluster.xml",
         "time-synchronization-cluster.xml",
+        "timer-cluster.xml",
         "user-label-cluster.xml",
         "unit-localization-cluster.xml",
         "wake-on-lan-cluster.xml",
@@ -186,8 +190,7 @@
             "RebootCount",
             "UpTime",
             "TotalOperationalHours",
-            "BootReason",
-            "AverageWearCount"
+            "BootReason"
         ],
         "Group Key Management": [
             "ClusterRevision",
@@ -324,6 +327,7 @@
             "OnMode",
             "FeatureMap"
         ],
+        "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Laundry Washer Mode": [
             "SupportedModes",
             "CurrentMode",

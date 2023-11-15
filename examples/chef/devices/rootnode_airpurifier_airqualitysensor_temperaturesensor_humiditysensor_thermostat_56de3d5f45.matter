@@ -403,6 +403,7 @@ server cluster NetworkCommissioning = 49 {
     kWiFiNetworkInterface = 0x1;
     kThreadNetworkInterface = 0x2;
     kEthernetNetworkInterface = 0x4;
+    kPerDeviceCredentials = 0x8;
   }
 
   bitmap ThreadCapabilitiesBitmap : bitmap16 {
@@ -419,11 +420,14 @@ server cluster NetworkCommissioning = 49 {
     kWPAPersonal = 0x4;
     kWPA2Personal = 0x8;
     kWPA3Personal = 0x10;
+    kWPA3MatterPDC = 0x20;
   }
 
   struct NetworkInfoStruct {
     octet_string<32> networkID = 0;
     boolean connected = 1;
+    optional nullable octet_string<20> networkIdentifier = 2;
+    optional nullable octet_string<20> clientIdentifier = 3;
   }
 
   struct ThreadInterfaceScanResultStruct {
@@ -470,6 +474,9 @@ server cluster NetworkCommissioning = 49 {
     octet_string<32> ssid = 0;
     octet_string<64> credentials = 1;
     optional int64u breadcrumb = 2;
+    optional octet_string<140> networkIdentity = 3;
+    optional octet_string<20> clientIdentifier = 4;
+    optional octet_string<32> possessionNonce = 5;
   }
 
   request struct AddOrUpdateThreadNetworkRequest {
@@ -504,6 +511,8 @@ server cluster NetworkCommissioning = 49 {
     NetworkCommissioningStatusEnum networkingStatus = 0;
     optional char_string<512> debugText = 1;
     optional int8u networkIndex = 2;
+    optional octet_string<140> clientIdentity = 3;
+    optional octet_string<64> possessionSignature = 4;
   }
 
   response struct ConnectNetworkResponse = 7 {
@@ -659,7 +668,13 @@ server cluster GeneralDiagnostics = 51 {
     int64u eventTrigger = 1;
   }
 
+  response struct TimeSnapshotResponse = 2 {
+    systime_us systemTimeUs = 0;
+    nullable epoch_us UTCTimeUs = 1;
+  }
+
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
+  command TimeSnapshot(): TimeSnapshotResponse = 1;
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
@@ -1121,8 +1136,8 @@ provisional server cluster FanControl = 514 {
     kOffLowHigh = 1;
     kOffLowMedHighAuto = 2;
     kOffLowHighAuto = 3;
-    kOffOnAuto = 4;
-    kOffOn = 5;
+    kOffHighAuto = 4;
+    kOffHigh = 5;
   }
 
   enum StepDirectionEnum : enum8 {
@@ -1151,7 +1166,7 @@ provisional server cluster FanControl = 514 {
   }
 
   attribute FanModeEnum fanMode = 0;
-  attribute FanModeSequenceEnum fanModeSequence = 1;
+  readonly attribute FanModeSequenceEnum fanModeSequence = 1;
   attribute nullable percent percentSetting = 2;
   readonly attribute percent percentCurrent = 3;
   readonly attribute int8u speedMax = 4;
@@ -1172,9 +1187,9 @@ provisional server cluster FanControl = 514 {
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 server cluster TemperatureMeasurement = 1026 {
-  readonly attribute nullable int16s measuredValue = 0;
-  readonly attribute nullable int16s minMeasuredValue = 1;
-  readonly attribute nullable int16s maxMeasuredValue = 2;
+  readonly attribute nullable temperature measuredValue = 0;
+  readonly attribute nullable temperature minMeasuredValue = 1;
+  readonly attribute nullable temperature maxMeasuredValue = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1848,9 +1863,11 @@ endpoint 0 {
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0001;
+    ram      attribute clusterRevision default = 0x0002;
 
     handle command TestEventTrigger;
+    handle command TimeSnapshot;
+    handle command TimeSnapshotResponse;
   }
 
   server cluster AdministratorCommissioning {

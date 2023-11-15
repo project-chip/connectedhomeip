@@ -284,7 +284,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     uint8_t scene_count = 0;
     uint16_t max_scenes_per_fabric;
     uint16_t max_scenes_per_endpoint;
-    SceneStorageId scene_map[kMaxScenesPerFabric];
+    SceneStorageId scene_map[CHIP_CONFIG_MAX_SCENES_TABLE_SIZE];
 
     FabricSceneData(EndpointId endpoint = kInvalidEndpointId, FabricIndex fabric = kUndefinedFabricIndex,
                     uint16_t maxScenesPerFabric = kMaxScenesPerFabric, uint16_t maxScenesPerEndpoint = kMaxScenesPerEndpoint) :
@@ -897,6 +897,35 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
             VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
             idx++;
         }
+
+        // Remove fabric scenes on endpoint
+        ReturnErrorOnFailure(fabric.Delete(mStorage));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultSceneTableImpl::RemoveEndpoint()
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
+
+    for (FabricIndex fabric_index = kMinValidFabricIndex; fabric_index < kMaxValidFabricIndex; fabric_index++)
+    {
+        FabricSceneData fabric(mEndpointId, fabric_index);
+        CHIP_ERROR err = fabric.Load(mStorage);
+        VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
+        if (CHIP_ERROR_NOT_FOUND == err)
+        {
+            continue;
+        }
+
+        SceneIndex idx = 0;
+        while (idx < mMaxScenesPerFabric)
+        {
+            err = RemoveSceneTableEntryAtPosition(mEndpointId, fabric_index, idx);
+            VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
+            idx++;
+        };
 
         // Remove fabric scenes on endpoint
         ReturnErrorOnFailure(fabric.Delete(mStorage));

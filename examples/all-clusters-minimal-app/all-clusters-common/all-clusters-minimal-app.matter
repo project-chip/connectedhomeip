@@ -118,6 +118,10 @@ server cluster Groups = 4 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 provisional server cluster Scenes = 5 {
+  bitmap CopyModeBitmap : bitmap8 {
+    kCopyAllScenes = 0x1;
+  }
+
   bitmap Feature : bitmap32 {
     kSceneNames = 0x1;
     kExplicit = 0x2;
@@ -125,8 +129,8 @@ provisional server cluster Scenes = 5 {
     kFabricScenes = 0x8;
   }
 
-  bitmap ScenesCopyMode : bitmap8 {
-    kCopyAllScenes = 0x1;
+  bitmap NameSupportBitmap : bitmap8 {
+    kSceneNames = 0x80;
   }
 
   struct AttributeValuePair {
@@ -143,7 +147,7 @@ provisional server cluster Scenes = 5 {
   readonly attribute int8u currentScene = 1;
   readonly attribute group_id currentGroup = 2;
   readonly attribute boolean sceneValid = 3;
-  readonly attribute bitmap8 nameSupport = 4;
+  readonly attribute NameSupportBitmap nameSupport = 4;
   readonly attribute nullable node_id lastConfiguredBy = 5;
   readonly attribute int16u sceneTableSize = 6;
   readonly attribute int8u remainingCapacity = 7;
@@ -265,6 +269,7 @@ server cluster OnOff = 6 {
   bitmap Feature : bitmap32 {
     kLighting = 0x1;
     kDeadFrontBehavior = 0x2;
+    kOffOnly = 0x4;
   }
 
   bitmap OnOffControlBitmap : bitmap8 {
@@ -285,7 +290,7 @@ server cluster OnOff = 6 {
 
   request struct OffWithEffectRequest {
     EffectIdentifierEnum effectIdentifier = 0;
-    int8u effectVariant = 1;
+    enum8 effectVariant = 1;
   }
 
   request struct OnWithTimedOffRequest {
@@ -304,12 +309,12 @@ server cluster OnOff = 6 {
 
 /** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
 server cluster LevelControl = 8 {
-  enum MoveMode : enum8 {
+  enum MoveModeEnum : enum8 {
     kUp = 0;
     kDown = 1;
   }
 
-  enum StepMode : enum8 {
+  enum StepModeEnum : enum8 {
     kUp = 0;
     kDown = 1;
   }
@@ -320,14 +325,14 @@ server cluster LevelControl = 8 {
     kFrequency = 0x4;
   }
 
-  bitmap LevelControlOptions : bitmap8 {
+  bitmap OptionsBitmap : bitmap8 {
     kExecuteIfOff = 0x1;
     kCoupleColorTempToLevel = 0x2;
   }
 
   readonly attribute nullable int8u currentLevel = 0;
   readonly attribute int16u remainingTime = 1;
-  attribute LevelControlOptions options = 15;
+  attribute OptionsBitmap options = 15;
   attribute nullable int8u onLevel = 17;
   attribute access(write: manage) nullable int8u startUpCurrentLevel = 16384;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -340,55 +345,55 @@ server cluster LevelControl = 8 {
   request struct MoveToLevelRequest {
     int8u level = 0;
     nullable int16u transitionTime = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct MoveRequest {
-    MoveMode moveMode = 0;
+    MoveModeEnum moveMode = 0;
     nullable int8u rate = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct StepRequest {
-    StepMode stepMode = 0;
+    StepModeEnum stepMode = 0;
     int8u stepSize = 1;
     nullable int16u transitionTime = 2;
-    LevelControlOptions optionsMask = 3;
-    LevelControlOptions optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct StopRequest {
-    LevelControlOptions optionsMask = 0;
-    LevelControlOptions optionsOverride = 1;
+    OptionsBitmap optionsMask = 0;
+    OptionsBitmap optionsOverride = 1;
   }
 
   request struct MoveToLevelWithOnOffRequest {
     int8u level = 0;
     nullable int16u transitionTime = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct MoveWithOnOffRequest {
-    MoveMode moveMode = 0;
+    MoveModeEnum moveMode = 0;
     nullable int8u rate = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct StepWithOnOffRequest {
-    StepMode stepMode = 0;
+    StepModeEnum stepMode = 0;
     int8u stepSize = 1;
     nullable int16u transitionTime = 2;
-    LevelControlOptions optionsMask = 3;
-    LevelControlOptions optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct StopWithOnOffRequest {
-    LevelControlOptions optionsMask = 0;
-    LevelControlOptions optionsOverride = 1;
+    OptionsBitmap optionsMask = 0;
+    OptionsBitmap optionsOverride = 1;
   }
 
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
@@ -843,7 +848,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
       standards. As such, Nodes that visually or audibly convey information need a mechanism by which
       they can be configured to use a user’s preferred language, units, etc */
 server cluster LocalizationConfiguration = 43 {
-  attribute char_string<35> activeLocale = 0;
+  attribute access(write: manage) char_string<35> activeLocale = 0;
   readonly attribute char_string supportedLocales[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -882,7 +887,7 @@ server cluster TimeFormatLocalization = 44 {
     kCalendarFormat = 0x1;
   }
 
-  attribute HourFormatEnum hourFormat = 0;
+  attribute access(write: manage) HourFormatEnum hourFormat = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1238,6 +1243,7 @@ server cluster NetworkCommissioning = 49 {
     kWiFiNetworkInterface = 0x1;
     kThreadNetworkInterface = 0x2;
     kEthernetNetworkInterface = 0x4;
+    kPerDeviceCredentials = 0x8;
   }
 
   bitmap ThreadCapabilitiesBitmap : bitmap16 {
@@ -1254,11 +1260,14 @@ server cluster NetworkCommissioning = 49 {
     kWPAPersonal = 0x4;
     kWPA2Personal = 0x8;
     kWPA3Personal = 0x10;
+    kWPA3MatterPDC = 0x20;
   }
 
   struct NetworkInfoStruct {
     octet_string<32> networkID = 0;
     boolean connected = 1;
+    optional nullable octet_string<20> networkIdentifier = 2;
+    optional nullable octet_string<20> clientIdentifier = 3;
   }
 
   struct ThreadInterfaceScanResultStruct {
@@ -1305,6 +1314,9 @@ server cluster NetworkCommissioning = 49 {
     octet_string<32> ssid = 0;
     octet_string<64> credentials = 1;
     optional int64u breadcrumb = 2;
+    optional octet_string<140> networkIdentity = 3;
+    optional octet_string<20> clientIdentifier = 4;
+    optional octet_string<32> possessionNonce = 5;
   }
 
   request struct AddOrUpdateThreadNetworkRequest {
@@ -1339,6 +1351,8 @@ server cluster NetworkCommissioning = 49 {
     NetworkCommissioningStatusEnum networkingStatus = 0;
     optional char_string<512> debugText = 1;
     optional int8u networkIndex = 2;
+    optional octet_string<140> clientIdentity = 3;
+    optional octet_string<64> possessionSignature = 4;
   }
 
   response struct ConnectNetworkResponse = 7 {
@@ -1475,6 +1489,7 @@ server cluster GeneralDiagnostics = 51 {
 
   readonly attribute NetworkInterface networkInterfaces[] = 0;
   readonly attribute int16u rebootCount = 1;
+  readonly attribute int64u upTime = 2;
   readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1488,13 +1503,19 @@ server cluster GeneralDiagnostics = 51 {
     int64u eventTrigger = 1;
   }
 
+  response struct TimeSnapshotResponse = 2 {
+    systime_us systemTimeUs = 0;
+    nullable epoch_us UTCTimeUs = 1;
+  }
+
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
+  command TimeSnapshot(): TimeSnapshotResponse = 1;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster SoftwareDiagnostics = 52 {
   bitmap Feature : bitmap32 {
-    kWaterMarks = 0x1;
+    kWatermarks = 0x1;
   }
 
   struct ThreadMetricsStruct {
@@ -1618,9 +1639,9 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute NeighborTableStruct neighborTable[] = 7;
   readonly attribute RouteTableStruct routeTable[] = 8;
   readonly attribute nullable int32u partitionId = 9;
-  readonly attribute nullable int8u weighting = 10;
-  readonly attribute nullable int8u dataVersion = 11;
-  readonly attribute nullable int8u stableDataVersion = 12;
+  readonly attribute nullable int16u weighting = 10;
+  readonly attribute nullable int16u dataVersion = 11;
+  readonly attribute nullable int16u stableDataVersion = 12;
   readonly attribute nullable int8u leaderRouterId = 13;
   readonly attribute nullable SecurityPolicy securityPolicy = 59;
   readonly attribute nullable octet_string<4> channelPage0Mask = 60;
@@ -1677,7 +1698,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
   }
 
   info event AssociationFailure = 1 {
-    AssociationFailureCauseEnum associationFailure = 0;
+    AssociationFailureCauseEnum associationFailureCause = 0;
     int16u status = 1;
   }
 
@@ -2852,8 +2873,8 @@ provisional server cluster FanControl = 514 {
     kOffLowHigh = 1;
     kOffLowMedHighAuto = 2;
     kOffLowHighAuto = 3;
-    kOffOnAuto = 4;
-    kOffOn = 5;
+    kOffHighAuto = 4;
+    kOffHigh = 5;
   }
 
   enum StepDirectionEnum : enum8 {
@@ -2882,7 +2903,7 @@ provisional server cluster FanControl = 514 {
   }
 
   attribute FanModeEnum fanMode = 0;
-  attribute FanModeSequenceEnum fanModeSequence = 1;
+  readonly attribute FanModeSequenceEnum fanModeSequence = 1;
   attribute nullable percent percentSetting = 2;
   readonly attribute percent percentCurrent = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2895,8 +2916,27 @@ provisional server cluster FanControl = 514 {
 
 /** An interface for configuring the user interface of a thermostat (which may be remote from the thermostat). */
 server cluster ThermostatUserInterfaceConfiguration = 516 {
-  attribute enum8 temperatureDisplayMode = 0;
-  attribute access(write: manage) enum8 keypadLockout = 1;
+  enum KeypadLockoutEnum : enum8 {
+    kNoLockout = 0;
+    kLockout1 = 1;
+    kLockout2 = 2;
+    kLockout3 = 3;
+    kLockout4 = 4;
+    kLockout5 = 5;
+  }
+
+  enum ScheduleProgrammingVisibilityEnum : enum8 {
+    kScheduleProgrammingPermitted = 0;
+    kScheduleProgrammingDenied = 1;
+  }
+
+  enum TemperatureDisplayModeEnum : enum8 {
+    kCelsius = 0;
+    kFahrenheit = 1;
+  }
+
+  attribute TemperatureDisplayModeEnum temperatureDisplayMode = 0;
+  attribute access(write: manage) KeypadLockoutEnum keypadLockout = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3033,9 +3073,9 @@ server cluster IlluminanceMeasurement = 1024 {
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 server cluster TemperatureMeasurement = 1026 {
-  readonly attribute nullable int16s measuredValue = 0;
-  readonly attribute nullable int16s minMeasuredValue = 1;
-  readonly attribute nullable int16s maxMeasuredValue = 2;
+  readonly attribute nullable temperature measuredValue = 0;
+  readonly attribute nullable temperature minMeasuredValue = 1;
+  readonly attribute nullable temperature maxMeasuredValue = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3129,14 +3169,14 @@ server cluster WakeOnLan = 1283 {
 
 /** This cluster provides an interface for controlling the current Channel on a device. */
 server cluster Channel = 1284 {
-  enum ChannelStatusEnum : enum8 {
+  enum LineupInfoTypeEnum : enum8 {
+    kMSO = 0;
+  }
+
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kMultipleMatches = 1;
     kNoMatches = 2;
-  }
-
-  enum LineupInfoTypeEnum : enum8 {
-    kMSO = 0;
   }
 
   bitmap Feature : bitmap32 {
@@ -3181,7 +3221,7 @@ server cluster Channel = 1284 {
 
 /** This cluster provides an interface for UX navigation within a set of targets on a device or endpoint. */
 server cluster TargetNavigator = 1285 {
-  enum TargetNavigatorStatusEnum : enum8 {
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kTargetNotFound = 1;
     kNotAllowed = 2;
@@ -3189,7 +3229,7 @@ server cluster TargetNavigator = 1285 {
 
   struct TargetInfoStruct {
     int8u identifier = 0;
-    char_string<32> name = 1;
+    char_string name = 1;
   }
 
   readonly attribute TargetInfoStruct targetList[] = 0;
@@ -3206,7 +3246,7 @@ server cluster TargetNavigator = 1285 {
   }
 
   response struct NavigateTargetResponse = 1 {
-    TargetNavigatorStatusEnum status = 0;
+    StatusEnum status = 0;
     optional char_string data = 1;
   }
 
@@ -3215,20 +3255,20 @@ server cluster TargetNavigator = 1285 {
 
 /** This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker. */
 server cluster MediaPlayback = 1286 {
-  enum MediaPlaybackStatusEnum : enum8 {
+  enum PlaybackStateEnum : enum8 {
+    kPlaying = 0;
+    kPaused = 1;
+    kNotPlaying = 2;
+    kBuffering = 3;
+  }
+
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kInvalidStateForCommand = 1;
     kNotAllowed = 2;
     kNotActive = 3;
     kSpeedOutOfRange = 4;
     kSeekOutOfRange = 5;
-  }
-
-  enum PlaybackStateEnum : enum8 {
-    kPlaying = 0;
-    kPaused = 1;
-    kNotPlaying = 2;
-    kBuffering = 3;
   }
 
   bitmap Feature : bitmap32 {
@@ -3250,7 +3290,7 @@ server cluster MediaPlayback = 1286 {
   readonly attribute int16u clusterRevision = 65533;
 
   response struct PlaybackResponse = 10 {
-    MediaPlaybackStatusEnum status = 0;
+    StatusEnum status = 0;
     optional char_string data = 1;
   }
 
@@ -3408,7 +3448,7 @@ server cluster KeypadInput = 1289 {
     kData = 118;
   }
 
-  enum KeypadInputStatusEnum : enum8 {
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kUnsupportedKey = 1;
     kInvalidKeyInCurrentState = 2;
@@ -3432,7 +3472,7 @@ server cluster KeypadInput = 1289 {
   }
 
   response struct SendKeyResponse = 1 {
-    KeypadInputStatusEnum status = 0;
+    StatusEnum status = 0;
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
@@ -3440,12 +3480,6 @@ server cluster KeypadInput = 1289 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 server cluster ContentLauncher = 1290 {
-  enum ContentLaunchStatusEnum : enum8 {
-    kSuccess = 0;
-    kUrlNotAvailable = 1;
-    kAuthFailed = 2;
-  }
-
   enum MetricTypeEnum : enum8 {
     kPixels = 0;
     kPercentage = 1;
@@ -3468,12 +3502,18 @@ server cluster ContentLauncher = 1290 {
     kVideo = 13;
   }
 
+  enum StatusEnum : enum8 {
+    kSuccess = 0;
+    kURLNotAvailable = 1;
+    kAuthFailed = 2;
+  }
+
   bitmap Feature : bitmap32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
   }
 
-  bitmap SupportedStreamingProtocol : bitmap32 {
+  bitmap SupportedProtocolsBitmap : bitmap32 {
     kDASH = 0x1;
     kHLS = 0x2;
   }
@@ -3485,13 +3525,13 @@ server cluster ContentLauncher = 1290 {
   }
 
   struct AdditionalInfoStruct {
-    char_string name = 0;
-    char_string value = 1;
+    char_string<256> name = 0;
+    char_string<8192> value = 1;
   }
 
   struct ParameterStruct {
     ParameterEnum type = 0;
-    char_string value = 1;
+    char_string<1024> value = 1;
     optional AdditionalInfoStruct externalIDList[] = 2;
   }
 
@@ -3500,13 +3540,13 @@ server cluster ContentLauncher = 1290 {
   }
 
   struct StyleInformationStruct {
-    optional char_string imageURL = 0;
-    optional char_string color = 1;
+    optional char_string<8192> imageURL = 0;
+    optional char_string<9> color = 1;
     optional DimensionStruct size = 2;
   }
 
   struct BrandingInformationStruct {
-    char_string providerName = 0;
+    char_string<256> providerName = 0;
     optional StyleInformationStruct background = 1;
     optional StyleInformationStruct logo = 2;
     optional StyleInformationStruct progressBar = 3;
@@ -3561,7 +3601,7 @@ server cluster AudioOutput = 1291 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 server cluster ApplicationLauncher = 1292 {
-  enum ApplicationLauncherStatusEnum : enum8 {
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
@@ -3602,7 +3642,7 @@ server cluster ApplicationLauncher = 1292 {
   }
 
   response struct LauncherResponse = 3 {
-    ApplicationLauncherStatusEnum status = 0;
+    StatusEnum status = 0;
     optional octet_string data = 1;
   }
 
@@ -3660,9 +3700,9 @@ server cluster AccountLogin = 1294 {
     char_string setupPIN = 0;
   }
 
-  timed command GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
-  timed command Login(LoginRequest): DefaultSuccess = 2;
-  timed command Logout(): DefaultSuccess = 3;
+  fabric timed command access(invoke: administer) GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
+  fabric timed command access(invoke: administer) Login(LoginRequest): DefaultSuccess = 2;
+  fabric timed command Logout(): DefaultSuccess = 3;
 }
 
 /** The Test Cluster is meant to validate the generated code */
@@ -4189,15 +4229,18 @@ endpoint 0 {
   server cluster GeneralDiagnostics {
     callback attribute networkInterfaces;
     callback attribute rebootCount default = 0x0000;
+    callback attribute upTime default = 0x0000000000000000;
     callback attribute testEventTriggersEnabled;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0002;
 
     handle command TestEventTrigger;
+    handle command TimeSnapshot;
+    handle command TimeSnapshotResponse;
   }
 
   server cluster SoftwareDiagnostics {

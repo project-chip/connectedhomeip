@@ -31,7 +31,7 @@
 #include <inttypes.h>
 #include <stddef.h>
 
-#include <credentials/CHIPCert.h>
+#include <credentials/CHIPCert_Internal.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPCore.h>
@@ -152,9 +152,7 @@ static CHIP_ERROR DecodeConvertAuthorityKeyIdentifierExtension(TLVReader & reade
     {
         // keyIdentifier [0] IMPLICIT KeyIdentifier
         // KeyIdentifier ::= OCTET STRING
-        VerifyOrReturnError(reader.GetType() == kTLVType_ByteString, CHIP_ERROR_WRONG_TLV_TYPE);
-        VerifyOrReturnError(reader.GetTag() == ContextTag(kTag_AuthorityKeyIdentifier), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
-
+        ReturnErrorOnFailure(reader.Expect(kTLVType_ByteString, ContextTag(kTag_AuthorityKeyIdentifier)));
         ReturnErrorOnFailure(reader.Get(certData.mAuthKeyId));
 
         static_assert(CertificateKeyId().size() <= UINT16_MAX, "Authority key id size doesn't fit in a uint16_t");
@@ -177,9 +175,7 @@ static CHIP_ERROR DecodeConvertSubjectKeyIdentifierExtension(TLVReader & reader,
 
     // SubjectKeyIdentifier ::= KeyIdentifier
     // KeyIdentifier ::= OCTET STRING
-    VerifyOrReturnError(reader.GetType() == kTLVType_ByteString, CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrReturnError(reader.GetTag() == ContextTag(kTag_SubjectKeyIdentifier), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
-
+    ReturnErrorOnFailure(reader.Expect(kTLVType_ByteString, ContextTag(kTag_SubjectKeyIdentifier)));
     ReturnErrorOnFailure(reader.Get(certData.mSubjectKeyId));
 
     static_assert(CertificateKeyId().size() <= UINT16_MAX, "Subject key id size doesn't fit in a uint16_t");
@@ -198,8 +194,7 @@ static CHIP_ERROR DecodeConvertKeyUsageExtension(TLVReader & reader, ASN1Writer 
     certData.mCertFlags.Set(CertFlags::kExtPresent_KeyUsage);
 
     // KeyUsage ::= BIT STRING
-    VerifyOrReturnError(reader.GetTag() == ContextTag(kTag_KeyUsage), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
-
+    ReturnErrorOnFailure(reader.Expect(ContextTag(kTag_KeyUsage)));
     ReturnErrorOnFailure(reader.Get(keyUsageBits));
 
     {
@@ -229,9 +224,7 @@ static CHIP_ERROR DecodeConvertBasicConstraintsExtension(TLVReader & reader, ASN
     // BasicConstraints ::= SEQUENCE
     ASN1_START_SEQUENCE
     {
-        VerifyOrReturnError(reader.GetTag() == ContextTag(kTag_BasicConstraints), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
-        VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-
+        ReturnErrorOnFailure(reader.Expect(kTLVType_Structure, ContextTag(kTag_BasicConstraints)));
         ReturnErrorOnFailure(reader.EnterContainer(outerContainer));
 
         // cA BOOLEAN DEFAULT FALSE
@@ -282,9 +275,7 @@ static CHIP_ERROR DecodeConvertExtendedKeyUsageExtension(TLVReader & reader, ASN
     // ExtKeyUsageSyntax ::= SEQUENCE SIZE (1..MAX) OF KeyPurposeId
     ASN1_START_SEQUENCE
     {
-        VerifyOrReturnError(reader.GetTag() == ContextTag(kTag_ExtendedKeyUsage), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
-        VerifyOrReturnError(reader.GetType() == kTLVType_Array, CHIP_ERROR_WRONG_TLV_TYPE);
-
+        ReturnErrorOnFailure(reader.Expect(kTLVType_Array, ContextTag(kTag_ExtendedKeyUsage)));
         ReturnErrorOnFailure(reader.EnterContainer(outerContainer));
 
         while ((err = reader.Next(AnonymousTag())) == CHIP_NO_ERROR)
@@ -312,9 +303,7 @@ static CHIP_ERROR DecodeConvertFutureExtension(TLVReader & tlvReader, ASN1Writer
     ByteSpan extensionSequence;
     ASN1Reader reader;
 
-    VerifyOrReturnError(tlvReader.GetTag() == ContextTag(kTag_FutureExtension), CHIP_ERROR_INVALID_TLV_TAG);
-    VerifyOrReturnError(tlvReader.GetType() == kTLVType_ByteString, CHIP_ERROR_WRONG_TLV_TYPE);
-
+    ReturnErrorOnFailure(tlvReader.Expect(kTLVType_ByteString, ContextTag(kTag_FutureExtension)));
     ReturnErrorOnFailure(tlvReader.Get(extensionSequence));
 
     reader.Init(extensionSequence);
@@ -493,6 +482,8 @@ exit:
  * @param certData  Structure containing data extracted from the TBS portion of the
  *                  CHIP certificate.
  *
+ * Note: The reader must be positioned on the SerialNumber element.
+ *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 static CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
@@ -511,11 +502,12 @@ static CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, 
         }
         ASN1_END_CONSTRUCTED;
 
-        ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, ContextTag(kTag_SerialNumber)));
-
         // serialNumber CertificateSerialNumber
         // CertificateSerialNumber ::= INTEGER
-        ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, reader));
+        ReturnErrorOnFailure(reader.Expect(kTLVType_ByteString, ContextTag(kTag_SerialNumber)));
+        ReturnErrorOnFailure(reader.Get(certData.mSerialNumber));
+        ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false,
+                                             certData.mSerialNumber.data(), static_cast<uint16_t>(certData.mSerialNumber.size())));
 
         // signature AlgorithmIdentifier
         // AlgorithmIdentifier ::= SEQUENCE
@@ -554,6 +546,41 @@ exit:
 }
 
 /**
+ * Variant of DecodeConvertTBSCert that handles reading a compact-pdc-identity
+ * where only the subject public key is actually encoded. All other values are
+ * populated / written as the well-known values mandated by the specification.
+ *
+ * Note: The reader must be positioned on the EllipticCurvePublicKey element.
+ */
+static CHIP_ERROR DecodeConvertTBSCertCompactIdentity(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
+{
+    // Decode the public key, everything else is rigid
+    ReturnErrorOnFailure(reader.Expect(kTLVType_ByteString, ContextTag(kTag_EllipticCurvePublicKey)));
+    ReturnErrorOnFailure(reader.Get(certData.mPublicKey));
+
+    // Populate rigid ChipCertificateData fields
+    certData.mSerialNumber = kNetworkIdentitySerialNumberBytes;
+    certData.mSigAlgoOID   = kOID_SigAlgo_ECDSAWithSHA256;
+    InitNetworkIdentitySubject(certData.mIssuerDN);
+    certData.mNotBeforeTime = kNetworkIdentityNotBeforeTime;
+    certData.mNotAfterTime  = kNetworkIdentityNotAfterTime;
+    InitNetworkIdentitySubject(certData.mSubjectDN);
+    certData.mPubKeyAlgoOID  = kOID_PubKeyAlgo_ECPublicKey;
+    certData.mPubKeyCurveOID = kOID_EllipticCurve_prime256v1;
+    certData.mCertFlags.Set(CertFlags::kExtPresent_BasicConstraints);
+    certData.mCertFlags.Set(CertFlags::kExtPresent_KeyUsage);
+    certData.mKeyUsageFlags = kNetworkIdentityKeyUsage;
+    certData.mCertFlags.Set(CertFlags::kExtPresent_ExtendedKeyUsage);
+    certData.mKeyPurposeFlags = kNetworkIdentityKeyPurpose;
+
+    if (!writer.IsNullWriter())
+    {
+        ReturnErrorOnFailure(EncodeNetworkIdentityTBSCert(certData.mPublicKey, writer));
+    }
+    return CHIP_NO_ERROR;
+}
+
+/**
  * Decode a CHIP TLV certificate and convert it to X.509 DER form.
  *
  * This helper function takes separate ASN1Writers for the whole Certificate
@@ -573,16 +600,24 @@ static CHIP_ERROR DecodeConvertCert(TLVReader & reader, ASN1Writer & writer, ASN
     {
         ReturnErrorOnFailure(reader.Next());
     }
-    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrReturnError(reader.GetTag() == AnonymousTag(), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
-
+    ReturnErrorOnFailure(reader.Expect(kTLVType_Structure, AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(containerType));
 
     // Certificate ::= SEQUENCE
     ASN1_START_SEQUENCE
     {
         // tbsCertificate TBSCertificate,
-        ReturnErrorOnFailure(DecodeConvertTBSCert(reader, tbsWriter, certData));
+        reader.Next();
+        if (reader.GetTag() == ContextTag(kTag_EllipticCurvePublicKey))
+        {
+            // If the struct starts with the ec-pub-key we're dealing with a
+            // Network (Client) Identity in compact-pdc-identity format.
+            DecodeConvertTBSCertCompactIdentity(reader, tbsWriter, certData);
+        }
+        else
+        {
+            ReturnErrorOnFailure(DecodeConvertTBSCert(reader, tbsWriter, certData));
+        }
 
         // signatureAlgorithm   AlgorithmIdentifier
         // AlgorithmIdentifier ::= SEQUENCE
@@ -652,7 +687,7 @@ CHIP_ERROR DecodeChipCert(TLVReader & reader, ChipCertificateData & certData, Bi
 
         // Hash the encoded TBS certificate. Only SHA256 is supported.
         VerifyOrReturnError(certData.mSigAlgoOID == kOID_SigAlgo_ECDSAWithSHA256, CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
-        chip::Crypto::Hash_SHA256(asn1TBSBuf.Get(), tbsWriter.GetLengthWritten(), certData.mTBSHash);
+        ReturnErrorOnFailure(Hash_SHA256(asn1TBSBuf.Get(), tbsWriter.GetLengthWritten(), certData.mTBSHash));
         certData.mCertFlags.Set(CertFlags::kTBSHashPresent);
     }
     else

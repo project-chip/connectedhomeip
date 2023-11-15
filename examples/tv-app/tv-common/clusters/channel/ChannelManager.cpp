@@ -131,18 +131,18 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     // Error: Found multiple matches
     if (matchedChannels.size() > 1)
     {
-        response.status = chip::app::Clusters::Channel::ChannelStatusEnum::kMultipleMatches;
+        response.status = chip::app::Clusters::Channel::StatusEnum::kMultipleMatches;
         helper.Success(response);
     }
     else if (matchedChannels.size() == 0)
     {
         // Error: Found no match
-        response.status = chip::app::Clusters::Channel::ChannelStatusEnum::kNoMatches;
+        response.status = chip::app::Clusters::Channel::StatusEnum::kNoMatches;
         helper.Success(response);
     }
     else
     {
-        response.status      = chip::app::Clusters::Channel::ChannelStatusEnum::kSuccess;
+        response.status      = chip::app::Clusters::Channel::StatusEnum::kSuccess;
         response.data        = chip::MakeOptional(CharSpan::fromCharString("data response"));
         mCurrentChannel      = matchedChannels[0];
         mCurrentChannelIndex = index;

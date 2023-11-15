@@ -23,8 +23,8 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include "cy_network_mw_core.h"
 #include "cyhal_system.h"
-#include <cy_lwip.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -155,7 +155,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     struct netif * net_interface;
     CHIP_ERROR err         = CHIP_NO_ERROR;
     NetworkInterface * ifp = new NetworkInterface();
-    net_interface          = cy_lwip_get_interface(CY_LWIP_STA_NW_INTERFACE);
+    net_interface          = (netif *) cy_network_get_nw_interface(CY_NETWORK_WIFI_STA_INTERFACE, 0);
     if (net_interface)
     {
         /* Update Network Interface list */

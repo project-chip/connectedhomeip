@@ -188,6 +188,8 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_RVCRUNM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_RVCCLEANM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_TCCM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_TCCM_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_TCCM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_TCTL_2_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         # chip-repl and chip-tool disagree on what the YAML here should look like: https://github.com/project-chip/connectedhomeip/issues/29110
         "TestClusterMultiFabric.yaml",
@@ -233,6 +235,8 @@ def target_for_name(name: str):
         return TestTarget.OTA
     if name.startswith("Test_TC_BRBINFO_") or name.startswith("Test_TC_ACT_"):
         return TestTarget.BRIDGE
+    if name.startswith("TestIcd") or name.startswith("Test_TC_ICDM_"):
+        return TestTarget.LIT_ICD
     return TestTarget.ALL_CLUSTERS
 
 

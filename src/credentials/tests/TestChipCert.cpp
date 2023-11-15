@@ -52,55 +52,55 @@ enum
     kStandardCertsCount = 3,
 };
 
-static const BitFlags<CertDecodeFlags> sNullDecodeFlag;
-static const BitFlags<CertDecodeFlags> sGenTBSHashFlag(CertDecodeFlags::kGenerateTBSHash);
-static const BitFlags<CertDecodeFlags> sTrustAnchorFlag(CertDecodeFlags::kIsTrustAnchor);
+static constexpr BitFlags<CertDecodeFlags> sNullDecodeFlag;
+static constexpr BitFlags<CertDecodeFlags> sGenTBSHashFlag(CertDecodeFlags::kGenerateTBSHash);
+static constexpr BitFlags<CertDecodeFlags> sTrustAnchorFlag(CertDecodeFlags::kIsTrustAnchor);
 
-static const BitFlags<TestCertLoadFlags> sNullLoadFlag;
-static const BitFlags<TestCertLoadFlags> sDerFormFlag(TestCertLoadFlags::kDERForm);
-static const BitFlags<TestCertLoadFlags> sSupIsCAFlag(TestCertLoadFlags::kSuppressIsCA);
-static const BitFlags<TestCertLoadFlags> sSupKeyUsageFlag(TestCertLoadFlags::kSuppressKeyUsage);
-static const BitFlags<TestCertLoadFlags> sSupKeyCertSignFlag(TestCertLoadFlags::kSuppressKeyCertSign);
-static const BitFlags<TestCertLoadFlags> sPathLenZeroFlag(TestCertLoadFlags::kSetPathLenConstZero);
+static constexpr BitFlags<TestCertLoadFlags> sNullLoadFlag;
+static constexpr BitFlags<TestCertLoadFlags> sDerFormFlag(TestCertLoadFlags::kDERForm);
+static constexpr BitFlags<TestCertLoadFlags> sSupIsCAFlag(TestCertLoadFlags::kSuppressIsCA);
+static constexpr BitFlags<TestCertLoadFlags> sSupKeyUsageFlag(TestCertLoadFlags::kSuppressKeyUsage);
+static constexpr BitFlags<TestCertLoadFlags> sSupKeyCertSignFlag(TestCertLoadFlags::kSuppressKeyCertSign);
+static constexpr BitFlags<TestCertLoadFlags> sPathLenZeroFlag(TestCertLoadFlags::kSetPathLenConstZero);
 
-static const BitFlags<KeyPurposeFlags> sNullKPFlag;
-static const BitFlags<KeyPurposeFlags> sSA(KeyPurposeFlags::kServerAuth);
-static const BitFlags<KeyPurposeFlags> sCA(KeyPurposeFlags::kClientAuth);
-static const BitFlags<KeyPurposeFlags> sCS(KeyPurposeFlags::kCodeSigning);
-static const BitFlags<KeyPurposeFlags> sEP(KeyPurposeFlags::kEmailProtection);
-static const BitFlags<KeyPurposeFlags> sTS(KeyPurposeFlags::kTimeStamping);
-static const BitFlags<KeyPurposeFlags> sOS(KeyPurposeFlags::kOCSPSigning);
-static const BitFlags<KeyPurposeFlags> sSAandCA(sSA, sCA);
-static const BitFlags<KeyPurposeFlags> sSAandCS(sSA, sCS);
-static const BitFlags<KeyPurposeFlags> sSAandEP(sSA, sEP);
-static const BitFlags<KeyPurposeFlags> sSAandTS(sSA, sTS);
+static constexpr BitFlags<KeyPurposeFlags> sNullKPFlag;
+static constexpr BitFlags<KeyPurposeFlags> sSA(KeyPurposeFlags::kServerAuth);
+static constexpr BitFlags<KeyPurposeFlags> sCA(KeyPurposeFlags::kClientAuth);
+static constexpr BitFlags<KeyPurposeFlags> sCS(KeyPurposeFlags::kCodeSigning);
+static constexpr BitFlags<KeyPurposeFlags> sEP(KeyPurposeFlags::kEmailProtection);
+static constexpr BitFlags<KeyPurposeFlags> sTS(KeyPurposeFlags::kTimeStamping);
+// static constexpr BitFlags<KeyPurposeFlags> sOS(KeyPurposeFlags::kOCSPSigning); // unused
+static constexpr BitFlags<KeyPurposeFlags> sSAandCA(sSA, sCA);
+static constexpr BitFlags<KeyPurposeFlags> sSAandCS(sSA, sCS);
+static constexpr BitFlags<KeyPurposeFlags> sSAandEP(sSA, sEP);
+static constexpr BitFlags<KeyPurposeFlags> sSAandTS(sSA, sTS);
 
-static const BitFlags<KeyUsageFlags> sNullKUFlag;
-static const BitFlags<KeyUsageFlags> sDS(KeyUsageFlags::kDigitalSignature);
-static const BitFlags<KeyUsageFlags> sNR(KeyUsageFlags::kNonRepudiation);
-static const BitFlags<KeyUsageFlags> sKE(KeyUsageFlags::kKeyEncipherment);
-static const BitFlags<KeyUsageFlags> sDE(KeyUsageFlags::kDataEncipherment);
-static const BitFlags<KeyUsageFlags> sKA(KeyUsageFlags::kKeyAgreement);
-static const BitFlags<KeyUsageFlags> sKC(KeyUsageFlags::kKeyCertSign);
-static const BitFlags<KeyUsageFlags> sCR(KeyUsageFlags::kCRLSign);
-static const BitFlags<KeyUsageFlags> sEO(KeyUsageFlags::kEncipherOnly);
-static const BitFlags<KeyUsageFlags> sDO(KeyUsageFlags::kDecipherOnly);
-static const BitFlags<KeyUsageFlags> sDSandNR(sDS, sNR);
-static const BitFlags<KeyUsageFlags> sDSandKE(sDS, sKE);
-static const BitFlags<KeyUsageFlags> sDSandDE(sDS, sDE);
-static const BitFlags<KeyUsageFlags> sDSandKA(sDS, sKA);
-static const BitFlags<KeyUsageFlags> sDSandKC(sDS, sKC);
-static const BitFlags<KeyUsageFlags> sDSandCR(sDS, sCR);
-static const BitFlags<KeyUsageFlags> sDSandEO(sDS, sEO);
-static const BitFlags<KeyUsageFlags> sDSandDO(sDS, sDO);
-static const BitFlags<KeyUsageFlags> sKCandDS(sKC, sDS);
-static const BitFlags<KeyUsageFlags> sKCandNR(sKC, sNR);
-static const BitFlags<KeyUsageFlags> sKCandKE(sKC, sKE);
-static const BitFlags<KeyUsageFlags> sKCandDE(sKC, sDE);
-static const BitFlags<KeyUsageFlags> sKCandKA(sKC, sKA);
-static const BitFlags<KeyUsageFlags> sKCandCR(sKC, sCR);
-static const BitFlags<KeyUsageFlags> sKCandEO(sKC, sEO);
-static const BitFlags<KeyUsageFlags> sKCandDO(sKC, sDO);
+static constexpr BitFlags<KeyUsageFlags> sNullKUFlag;
+static constexpr BitFlags<KeyUsageFlags> sDS(KeyUsageFlags::kDigitalSignature);
+static constexpr BitFlags<KeyUsageFlags> sNR(KeyUsageFlags::kNonRepudiation);
+static constexpr BitFlags<KeyUsageFlags> sKE(KeyUsageFlags::kKeyEncipherment);
+static constexpr BitFlags<KeyUsageFlags> sDE(KeyUsageFlags::kDataEncipherment);
+static constexpr BitFlags<KeyUsageFlags> sKA(KeyUsageFlags::kKeyAgreement);
+static constexpr BitFlags<KeyUsageFlags> sKC(KeyUsageFlags::kKeyCertSign);
+static constexpr BitFlags<KeyUsageFlags> sCR(KeyUsageFlags::kCRLSign);
+static constexpr BitFlags<KeyUsageFlags> sEO(KeyUsageFlags::kEncipherOnly);
+static constexpr BitFlags<KeyUsageFlags> sDO(KeyUsageFlags::kDecipherOnly);
+static constexpr BitFlags<KeyUsageFlags> sDSandNR(sDS, sNR);
+static constexpr BitFlags<KeyUsageFlags> sDSandKE(sDS, sKE);
+static constexpr BitFlags<KeyUsageFlags> sDSandDE(sDS, sDE);
+static constexpr BitFlags<KeyUsageFlags> sDSandKA(sDS, sKA);
+static constexpr BitFlags<KeyUsageFlags> sDSandKC(sDS, sKC);
+static constexpr BitFlags<KeyUsageFlags> sDSandCR(sDS, sCR);
+static constexpr BitFlags<KeyUsageFlags> sDSandEO(sDS, sEO);
+static constexpr BitFlags<KeyUsageFlags> sDSandDO(sDS, sDO);
+static constexpr BitFlags<KeyUsageFlags> sKCandDS(sKC, sDS);
+static constexpr BitFlags<KeyUsageFlags> sKCandNR(sKC, sNR);
+static constexpr BitFlags<KeyUsageFlags> sKCandKE(sKC, sKE);
+static constexpr BitFlags<KeyUsageFlags> sKCandDE(sKC, sDE);
+static constexpr BitFlags<KeyUsageFlags> sKCandKA(sKC, sKA);
+static constexpr BitFlags<KeyUsageFlags> sKCandCR(sKC, sCR);
+static constexpr BitFlags<KeyUsageFlags> sKCandEO(sKC, sEO);
+static constexpr BitFlags<KeyUsageFlags> sKCandDO(sKC, sDO);
 
 constexpr uint8_t sOID_Extension_SubjectAltName[] = { 0x55, 0x1d, 0x11 };
 constexpr char kExtension_SubjectAltName[]        = "test@example.com";
@@ -1187,7 +1187,7 @@ static void TestChipCert_CertUsage(nlTestSuite * inSuite, void * inContext)
 static void TestChipCert_CertType(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
-    ChipCertificateSet certSet;
+    ChipCertificateData certData;
 
     struct TestCase
     {
@@ -1209,31 +1209,27 @@ static void TestChipCert_CertType(nlTestSuite * inSuite, void * inContext)
         {  TestCert::kNode01_02,       CertType::kNode            },
         {  TestCert::kNode02_01,       CertType::kNode            },
         {  TestCert::kNode02_02,       CertType::kNode            },
+        {  TestCert::kPDCID01,         CertType::kNetworkIdentity },
     };
     // clang-format on
     for (const auto & testCase : sTestCases)
     {
         CertType certType;
 
-        err = certSet.Init(1);
+        err = DecodeTestCert(certData, testCase.Cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = LoadTestCert(certSet, testCase.Cert, sNullLoadFlag, sNullDecodeFlag);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-        err = certSet.GetCertSet()->mSubjectDN.GetCertType(certType);
+        err = certData.mSubjectDN.GetCertType(certType);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(inSuite, certType == testCase.ExpectedCertType);
-        certSet.Release();
     }
 }
 
 static void TestChipCert_CertId(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
-    ChipCertificateSet certSet;
-    ChipCertificateData certData[1];
+    ChipCertificateData certData;
 
     struct TestCase
     {
@@ -1255,23 +1251,26 @@ static void TestChipCert_CertId(nlTestSuite * inSuite, void * inContext)
         {  TestCert::kNode01_02,       0xDEDEDEDE00010002 },
         {  TestCert::kNode02_01,       0xDEDEDEDE00020001 },
         {  TestCert::kNode02_02,       0xDEDEDEDE00020002 },
+        {  TestCert::kPDCID01,         0 },
     };
     // clang-format on
     for (const auto & testCase : sTestCases)
     {
         uint64_t chipId;
 
-        err = certSet.Init(certData, 1);
+        err = DecodeTestCert(certData, testCase.Cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = LoadTestCert(certSet, testCase.Cert, sNullLoadFlag, sNullDecodeFlag);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-        err = certSet.GetCertSet()->mSubjectDN.GetCertChipId(chipId);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-        NL_TEST_ASSERT(inSuite, chipId == testCase.ExpectedCertId);
-        certSet.Release();
+        err = certData.mSubjectDN.GetCertChipId(chipId);
+        if (testCase.ExpectedCertId != 0)
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, chipId == testCase.ExpectedCertId);
+        }
+        else
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_CERT_DN);
+        }
     }
 }
 
@@ -2052,6 +2051,7 @@ static void TestChipCert_ExtractSubjectDNFromChipCert(nlTestSuite * inSuite, voi
         {  TestCert::kICA02,     expectedSubjectDN_ICA02     },
         {  TestCert::kNode01_01, expectedSubjectDN_Node01_01 },
         {  TestCert::kNode02_03, expectedSubjectDN_Node02_03 },
+        {  TestCert::kPDCID01,   {}                          },
     };
     // clang-format on
 
@@ -2065,7 +2065,11 @@ static void TestChipCert_ExtractSubjectDNFromChipCert(nlTestSuite * inSuite, voi
         ChipDN subjectDN;
         err = ExtractSubjectDNFromChipCert(cert, subjectDN);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, subjectDN.IsEqual(testCase.ExpectedSubjectDN));
+
+        if (!testCase.ExpectedSubjectDN.IsEmpty())
+        {
+            NL_TEST_ASSERT(inSuite, subjectDN.IsEqual(testCase.ExpectedSubjectDN));
+        }
     }
 
     // Test extraction from the X509 ByteSpan form.
@@ -2078,7 +2082,11 @@ static void TestChipCert_ExtractSubjectDNFromChipCert(nlTestSuite * inSuite, voi
         ChipDN subjectDN;
         err = ExtractSubjectDNFromX509Cert(cert, subjectDN);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, subjectDN.IsEqual(testCase.ExpectedSubjectDN));
+
+        if (!testCase.ExpectedSubjectDN.IsEmpty())
+        {
+            NL_TEST_ASSERT(inSuite, subjectDN.IsEqual(testCase.ExpectedSubjectDN));
+        }
     }
 }
 
@@ -2110,6 +2118,7 @@ static void TestChipCert_ExtractPublicKeyAndSKID(nlTestSuite * inSuite, void * i
         {  TestCert::kNode02_06, sTestCert_Node02_06_PublicKey, sTestCert_Node02_06_SubjectKeyId },
         {  TestCert::kNode02_07, sTestCert_Node02_07_PublicKey, sTestCert_Node02_07_SubjectKeyId },
         {  TestCert::kNode02_08, sTestCert_Node02_08_PublicKey, sTestCert_Node02_08_SubjectKeyId },
+        {  TestCert::kPDCID01,   sTestCert_PDCID01_PublicKey,   ByteSpan() },
     };
     // clang-format on
 
@@ -2126,9 +2135,60 @@ static void TestChipCert_ExtractPublicKeyAndSKID(nlTestSuite * inSuite, void * i
 
         CertificateKeyId skid;
         err = ExtractSKIDFromChipCert(cert, skid);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, skid.data_equal(testCase.ExpectedSKID));
+        if (!testCase.ExpectedSKID.empty())
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, skid.data_equal(testCase.ExpectedSKID));
+        }
+        else
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
+        }
     }
+}
+
+static void TestChipCert_PDCIdentityValidation(nlTestSuite * inSuite, void * inContext)
+{
+    CertificateKeyIdStorage keyId;
+
+    // Test with both the full and compact TLV representations
+    for (auto && cert : { sTestCert_PDCID01_Chip, sTestCert_PDCID01_ChipCompact })
+    {
+        // Validate only
+        NL_TEST_ASSERT(inSuite, ValidateChipNetworkIdentity(cert) == CHIP_NO_ERROR);
+
+        // Validate and calculate identifier
+        keyId.fill(0xaa);
+        NL_TEST_ASSERT(inSuite, ValidateChipNetworkIdentity(cert, keyId) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, CertificateKeyId(keyId).data_equal(sTestCert_PDCID01_KeyId));
+
+        // Extract identifier only
+        keyId.fill(0xaa);
+        NL_TEST_ASSERT(inSuite, ExtractIdentifierFromChipNetworkIdentity(cert, keyId) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, CertificateKeyId(keyId).data_equal(sTestCert_PDCID01_KeyId));
+    }
+}
+
+static void TestChipCert_PDCIdentityGeneration(nlTestSuite * inSuite, void * inContext)
+{
+    // Generate a new keypair
+    P256Keypair keypair;
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
+
+    // Generate an identity certificate based on the keypair
+    uint8_t buffer[kMaxCHIPCompactNetworkIdentityLength];
+    MutableByteSpan cert(buffer);
+    NL_TEST_ASSERT(inSuite, NewChipNetworkIdentity(keypair, cert) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ValidateChipNetworkIdentity(cert) == CHIP_NO_ERROR);
+
+    // It should round-trip to X.509 DER and back, and remain valid.
+    uint8_t derBuffer[kMaxDERCertLength];
+    MutableByteSpan derCert(derBuffer);
+    NL_TEST_ASSERT(inSuite, ConvertChipCertToX509Cert(cert, derCert) == CHIP_NO_ERROR);
+    uint8_t tlvBuffer[kMaxCHIPCertLength];
+    MutableByteSpan tlvCert(tlvBuffer); // won't be compact after round-tripping
+    NL_TEST_ASSERT(inSuite, ConvertX509CertToChipCert(derCert, tlvCert) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ValidateChipNetworkIdentity(tlvCert) == CHIP_NO_ERROR);
 }
 
 /**
@@ -2189,6 +2249,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test extracting and validating CASE Authenticated Tags from NOC", TestChipCert_ExtractAndValidateCATsFromOpCert),
     NL_TEST_DEF("Test extracting Subject DN from chip certificate", TestChipCert_ExtractSubjectDNFromChipCert),
     NL_TEST_DEF("Test extracting PublicKey and SKID from chip certificate", TestChipCert_ExtractPublicKeyAndSKID),
+    NL_TEST_DEF("Test PDC Identity Validation", TestChipCert_PDCIdentityValidation),
+    NL_TEST_DEF("Test PDC Identity Generation", TestChipCert_PDCIdentityGeneration),
     NL_TEST_SENTINEL()
 };
 // clang-format on

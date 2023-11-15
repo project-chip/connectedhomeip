@@ -73,9 +73,8 @@ Davis, CA 95616, USA
       <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="SetupPIN" type="string">
-        <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="minLength" value="11"/>
+        <constraint type="desc"/>
       </field>
     </command>
     <command id="0x02" name="Login" response="Y">

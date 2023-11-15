@@ -81,18 +81,22 @@ class QpgBuilder(GnBuilder):
                  runner,
                  app: QpgApp = QpgApp.LIGHT,
                  board: QpgBoard = QpgBoard.QPG6105,
-                 enable_rpcs: bool = False):
+                 enable_rpcs: bool = False,
+                 update_image: bool = False):
         super(QpgBuilder, self).__init__(
             root=app.BuildRoot(root),
             runner=runner)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs
+        self.update_image = update_image
 
     def GnBuildArgs(self):
         args = ['qpg_target_ic=\"%s\"' % self.board.GnArgName()]
         if self.enable_rpcs:
             args.append('import("//with_pw_rpc.gni")')
+        if self.update_image:
+            args.append('matter_device_software_version_string=\"1.1_OTA_TEST\" matter_device_software_version=4')
         return args
 
     def build_outputs(self):

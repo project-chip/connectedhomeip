@@ -224,9 +224,21 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
     case TxtFieldKey::kTcpSupported:
         return CopyTextRecordValue(buffer, bufferLen, params.GetTcpSupported());
     case TxtFieldKey::kSessionIdleInterval:
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // A ICD operating as a LIT should not advertise its slow polling interval
+        if (params.GetICDOperatingAsLIT().HasValue() && params.GetICDOperatingAsLIT().Value())
+        {
+            // returning WELL_UNINITIALIZED ensures that the SII string isn't added by the AddTxtRecord
+            // without erroring out the action.
+            return CHIP_ERROR_WELL_UNINITIALIZED;
+        }
+        FALLTHROUGH;
+#endif
     case TxtFieldKey::kSessionActiveInterval:
     case TxtFieldKey::kSessionActiveThreshold:
         return CopyTextRecordValue(buffer, bufferLen, params.GetLocalMRPConfig(), key);
+    case TxtFieldKey::kLongIdleTimeICD:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetICDOperatingAsLIT());
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -569,6 +581,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     ADD_TXT_RECORD(SessionActiveInterval);
     ADD_TXT_RECORD(SessionActiveThreshold);
     ADD_TXT_RECORD(TcpSupported);
+    ADD_TXT_RECORD(LongIdleTimeICD); // Optional, will not be added if related 'params' doesn't have a value
 
     ADD_PTR_RECORD(CompressedFabricId);
 
@@ -588,6 +601,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     ADD_TXT_RECORD(SessionActiveInterval);
     ADD_TXT_RECORD(SessionActiveThreshold);
     ADD_TXT_RECORD(TcpSupported);
+    ADD_TXT_RECORD(LongIdleTimeICD); // Optional, will not be added if related 'params' doesn't have a value
 
     ADD_PTR_RECORD(VendorId);
     ADD_PTR_RECORD(DeviceType);

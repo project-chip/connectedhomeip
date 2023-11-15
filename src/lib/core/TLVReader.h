@@ -167,56 +167,57 @@ public:
      * Advances the TLVReader object to the next TLV element to be read, asserting the tag of
      * the new element.
      *
-     * The Next(Tag expectedTag) method is a convenience method that has the
-     * same behavior as Next(), but also verifies that the tag of the new TLV element matches
-     * the supplied argument.
+     * This is a convenience method that combines the behavior of Next() and Expect(...).
      *
-     * @param[in] expectedTag               The expected tag for the next element.
+     * Note that if this method returns an error, the reader may or may not have been advanced already.
+     * In use cases where this is important, separate calls to Next() and Expect(...) should be made.
      *
-     * @retval #CHIP_NO_ERROR              If the reader was successfully positioned on a new element.
-     * @retval #CHIP_END_OF_TLV            If no further elements are available.
+     * @retval #CHIP_NO_ERROR              If the reader was successfully positioned on a new element
+     *                                     matching the expected parameters.
+     * @retval other                       See return values of Next() and Expect().
+     */
+    CHIP_ERROR Next(Tag expectedTag);
+
+    /**
+     * Checks that the TLV reader is positioned at an element with the expected tag.
+     *
+     * @retval #CHIP_NO_ERROR              If the reader is positioned on the expected element.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the reader is not positioned on an element.
      * @retval #CHIP_ERROR_UNEXPECTED_TLV_ELEMENT
      *                                      If the tag associated with the new element does not match the
      *                                      value of the @p expectedTag argument.
-     * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
-     * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
-     *                                      If the reader encountered an invalid or unsupported TLV
-     *                                      element type.
-     * @retval #CHIP_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
-     * @retval other                        Other CHIP or platform error codes returned by the configured
-     *                                      TLVBackingStore.
-     *
      */
-    CHIP_ERROR Next(Tag expectedTag);
+    CHIP_ERROR Expect(Tag expectedTag);
 
     /**
      * Advances the TLVReader object to the next TLV element to be read, asserting the type and tag of
      * the new element.
      *
-     * The Next(TLVType expectedType, Tag expectedTag) method is a convenience method that has the
-     * same behavior as Next(), but also verifies that the type and tag of the new TLV element match
-     * the supplied arguments.
+     * This is a convenience method that combines the behavior of Next() and Expect(...).
+     *
+     * Note that if this method returns an error, the reader may or may not have been advanced already.
+     * In use cases where this is important, separate calls to Next() and Expect(...) should be made.
+     *
+     * @retval #CHIP_NO_ERROR              If the reader was successfully positioned on a new element
+     *                                     matching the expected parameters.
+     * @retval other                       See return values of Next() and Expect().
+     */
+    CHIP_ERROR Next(TLVType expectedType, Tag expectedTag);
+
+    /**
+     * Checks that the TLV reader is positioned at an element with the expected type and tag.
      *
      * @param[in] expectedType              The expected data type for the next element.
      * @param[in] expectedTag               The expected tag for the next element.
      *
-     * @retval #CHIP_NO_ERROR              If the reader was successfully positioned on a new element.
-     * @retval #CHIP_END_OF_TLV            If no further elements are available.
+     * @retval #CHIP_NO_ERROR              If the reader is positioned on the expected element.
      * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the type of the new element does not match the value
      *                                      of the @p expectedType argument.
      * @retval #CHIP_ERROR_UNEXPECTED_TLV_ELEMENT
      *                                      If the tag associated with the new element does not match the
      *                                      value of the @p expectedTag argument.
-     * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
-     * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
-     *                                      If the reader encountered an invalid or unsupported TLV
-     *                                      element type.
-     * @retval #CHIP_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
-     * @retval other                        Other CHIP or platform error codes returned by the configured
-     *                                      TLVBackingStore.
-     *
      */
-    CHIP_ERROR Next(TLVType expectedType, Tag expectedTag);
+    CHIP_ERROR Expect(TLVType expectedType, Tag expectedTag);
 
     /**
      * Returns the type of the current TLV element.

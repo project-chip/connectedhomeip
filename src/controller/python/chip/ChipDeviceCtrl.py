@@ -251,6 +251,7 @@ class ChipDeviceControllerBase():
         self.devCtrl = devCtrl
         self.name = name
         self.fabricCheckNodeId = -1
+        self._isActive = False
 
         self._Cluster = ChipClusters(builtins.chipStack)
         self._Cluster.InitLib(self._dmLib)
@@ -375,16 +376,18 @@ class ChipDeviceControllerBase():
         ''' Shuts down this controller and reclaims any used resources, including the bound
             C++ constructor instance in the SDK.
         '''
-        if (self._isActive):
-            if self.devCtrl is not None:
-                self._ChipStack.Call(
-                    lambda: self._dmLib.pychip_DeviceController_DeleteDeviceController(
-                        self.devCtrl)
-                ).raise_on_error()
-                self.devCtrl = None
+        if not self._isActive:
+            return
 
-            ChipDeviceController.activeList.remove(self)
-            self._isActive = False
+        if self.devCtrl is not None:
+            self._ChipStack.Call(
+                lambda: self._dmLib.pychip_DeviceController_DeleteDeviceController(
+                    self.devCtrl)
+            ).raise_on_error()
+            self.devCtrl = None
+
+        ChipDeviceController.activeList.remove(self)
+        self._isActive = False
 
     def ShutdownAll():
         ''' Shut down all active controllers and reclaim any used resources.
@@ -684,6 +687,19 @@ class ChipDeviceControllerBase():
 
     def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int,
                                 discriminator: int, option: int) -> CommissioningParameters:
+        ''' Opens a commissioning window on the device with the given nodeid.
+            nodeid:        Node id of the device
+            timeout:       Command timeout
+            iteration:     The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
+                           PAKE passcode verifier to be used for this commissioning. Valid range: 1000 - 100000
+                           Ignored if option == 0
+            discriminator: The long discriminator for the DNS-SD advertisement. Valid range: 0-4095
+                           Ignored if option == 0
+            option:        0 = kOriginalSetupCode
+                           1 = kTokenWithRandomPIN
+
+            Returns CommissioningParameters
+        '''
         self.CheckIsActive()
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
@@ -825,6 +841,11 @@ class ChipDeviceControllerBase():
         timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
         interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
+
+        Returns:
+            - command respone. The type of the response is defined by the command.
+        Raises:
+            - InteractionModelError on error
         '''
         self.CheckIsActive()
 
@@ -845,6 +866,10 @@ class ChipDeviceControllerBase():
         '''
         Send a group cluster-object encapsulated command to a group_id and get returned a future
         that can be awaited upon to get confirmation command was sent.
+        Returns:
+            - None: responses are not sent to group commands
+        Raises:
+            - InteractionModelError on error
         '''
         self.CheckIsActive()
 
@@ -870,6 +895,9 @@ class ChipDeviceControllerBase():
         E.g
             (1, Clusters.UnitTesting.Attributes.XYZAttribute('hello')) -- Write 'hello'
             to the XYZ attribute on the test cluster to endpoint 1
+
+        Returns:
+            - [PyChipError] (list - one for each pth)
         '''
         self.CheckIsActive()
 
@@ -1091,6 +1119,13 @@ class ChipDeviceControllerBase():
 
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
+
+        Returns:
+            - AsyncReadTransaction.ReadResponse. Please see ReadAttribute and ReadEvent for examples of how to access data.
+
+        Raises:
+            - InteractionModelError (chip.interaction_model) on error
+
         '''
         self.CheckIsActive()
 
@@ -1153,6 +1188,26 @@ class ChipDeviceControllerBase():
 
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
+
+        Returns:
+            - subscription request: ClusterAttribute.SubscriptionTransaction
+                                    To get notified on attribute change use SetAttributeUpdateCallback on the returned
+                                    SubscriptionTransaction. This is used to set a callback function, which is a callable of
+                                    type Callable[[TypedAttributePath, SubscriptionTransaction], None]
+                                    Get the attribute value from the change path using GetAttribute on the SubscriptionTransasction
+                                    You can await changes in the main loop using a trigger mechanism from the callback.
+                                    ex. queue.SimpleQueue
+
+            - read request: AsyncReadTransation.ReadResponse.attributes.
+                            This is of type AttributeCache.attributeCache (Attribute.py),
+                            which is a dict mapping endpoints to a list of Cluster (ClusterObjects.py) classes
+                            (dict[int, List[Cluster]])
+                            Access as ret[endpoint_id][<Cluster class>][<Attribute class>]
+                            Ex. To access the OnTime attribute from the OnOff cluster on EP 1
+                            ret[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
+
+        Raises:
+            - InteractionModelError (chip.interaction_model) on error
         '''
         res = await self.Read(nodeid,
                               attributes=attributes,
@@ -1209,6 +1264,19 @@ class ChipDeviceControllerBase():
         eventNumberFilter: Optional minimum event number filter.
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
+
+        Returns:
+            - subscription request: ClusterAttribute.SubscriptionTransaction
+                                    To get notified on event subscriptions, use the SetEventUpdateCallback function on the
+                                    returned  SubscriptionTransaction. This is a callable of type
+                                    Callable[[EventReadResult, SubscriptionTransaction], None]
+                                    You can await events using a trigger mechanism in the callback. ex. queue.SimpleQueue
+
+            - read request: AsyncReadTransation.ReadResponse.events.
+                            This is a List[ClusterEvent].
+
+        Raises:
+            - InteractionModelError (chip.interaction_model) on error
         '''
         res = await self.Read(nodeid=nodeid, events=events, eventNumberFilter=eventNumberFilter,
                               fabricFiltered=fabricFiltered, reportInterval=reportInterval, keepSubscriptions=keepSubscriptions,
@@ -1219,6 +1287,9 @@ class ChipDeviceControllerBase():
             return res.events
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
+        ''' Wrapper over SendCommand that catches the exceptions
+            Returns a tuple of (errorCode, CommandResponse)
+        '''
         self.CheckIsActive()
 
         req = None
@@ -1235,6 +1306,9 @@ class ChipDeviceControllerBase():
             return (int(ex.status), None)
 
     def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
+        ''' Wrapper over ReadAttribute for a single attribute
+            Returns an AttributeReadResult
+        '''
         self.CheckIsActive()
 
         clusterType = getattr(GeneratedObjects, cluster)
@@ -1253,6 +1327,9 @@ class ChipDeviceControllerBase():
                                       status=0, value=result[endpoint][clusterType][attributeType], dataVersion=result[endpoint][clusterType][ClusterAttribute.DataVersion])
 
     def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, dataVersion=0, blocking=True):
+        ''' Wrapper over WriteAttribute for a single attribute
+            return PyChipError
+        '''
         req = None
         try:
             req = eval(
@@ -1263,6 +1340,9 @@ class ChipDeviceControllerBase():
         return asyncio.run(self.WriteAttribute(nodeid, [(endpoint, req, dataVersion)]))
 
     def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True):
+        ''' Wrapper over ReadAttribute for a single attribute
+            Returns a SubscriptionTransaction. See ReadAttribute for more information.
+        '''
         self.CheckIsActive()
 
         req = None
@@ -1627,12 +1707,13 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return self.ConnectBLE(discriminator, setupPinCode, nodeId)
 
     def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str) -> PyChipError:
-        ''' Commissions a WiFi device over BLE
+        ''' Commissions a Wi-Fi device over BLE.
         '''
         self.SetWiFiCredentials(ssid, credentials)
         return self.ConnectBLE(discriminator, setupPinCode, nodeId)
 
     def SetWiFiCredentials(self, ssid: str, credentials: str):
+        ''' Set the Wi-Fi credentials to set during commissioning.'''
         self.CheckIsActive()
 
         self._ChipStack.Call(
@@ -1641,6 +1722,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def SetThreadOperationalDataset(self, threadOperationalDataset):
+        ''' Set the Thread operational dataset to set during commissioning.'''
         self.CheckIsActive()
 
         self._ChipStack.Call(
@@ -1649,42 +1731,49 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def ResetCommissioningParameters(self):
+        ''' Sets the commissioning parameters back to the default values.'''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_ResetCommissioningParameters()
         ).raise_on_error()
 
     def SetTimeZone(self, offset: int, validAt: int):
+        ''' Set the time zone to set during commissioning. Currently only one time zone entry is supported'''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetTimeZone(offset, validAt)
         ).raise_on_error()
 
     def SetDSTOffset(self, offset: int, validStarting: int, validUntil: int):
+        ''' Set the DST offset to set during commissioning. Currently only one DST entry is supported'''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetDSTOffset(offset, validStarting, validUntil)
         ).raise_on_error()
 
     def SetDefaultNTP(self, defaultNTP: str):
+        ''' Set the DefaultNTP to set during commissioning'''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetDefaultNtp(defaultNTP.encode("utf-8"))
         ).raise_on_error()
 
     def SetTrustedTimeSource(self, nodeId: int, endpoint: int):
+        ''' Set the trusetd time source nodeId to set during commissioning. This must be a node on the commissioner fabric.'''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetTrustedTimeSource(nodeId, endpoint)
         ).raise_on_error()
 
     def SetCheckMatchingFabric(self, check: bool):
+        ''' Instructs the auto-commissioner to perform a matching fabric check before commissioning.'''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetCheckMatchingFabric(check)
         ).raise_on_error()
 
     def GetFabricCheckResult(self) -> int:
+        ''' Returns the fabric check result if SetCheckMatchingFabric was used.'''
         return self.fabricCheckNodeId
 
     def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
@@ -1727,6 +1816,9 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return self._ChipStack.commissioningEventRes
 
     def CommissionWithCode(self, setupPayload: str, nodeid: int) -> PyChipError:
+        ''' Commission with the given nodeid from the setupPayload.
+            setupPayload may be a QR or manual code.
+        '''
         self.CheckIsActive()
 
         setupPayload = setupPayload.encode() + b'\0'

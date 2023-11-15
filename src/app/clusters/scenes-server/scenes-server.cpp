@@ -80,17 +80,20 @@ template <typename ResponseType>
 CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
 {
     Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
+    EmberAfStatus status                 = EMBER_ZCL_STATUS_SUCCESS;
+
     if (AuthMode::kCase == descriptor.authMode)
     {
-        ReturnErrorOnFailure(
-            AddResponseOnError(ctx, resp, Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject)));
+        status = Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
     }
     else
     {
-        ReturnErrorOnFailure(AddResponseOnError(ctx, resp, Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId)));
+        status = Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
     }
 
-    return CHIP_NO_ERROR;
+    // LastConfiguredBy is optional, so we don't want to fail the command if it fails to update
+    VerifyOrReturnValue(!(EMBER_ZCL_STATUS_SUCCESS == status || EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status), CHIP_NO_ERROR);
+    return AddResponseOnError(ctx, resp, status);
 }
 
 ScenesServer ScenesServer::mInstance;
@@ -112,44 +115,6 @@ CHIP_ERROR ScenesServer::Init()
 
     SceneTable * sceneTable = scenes::GetSceneTableImpl();
     ReturnErrorOnFailure(sceneTable->Init(&chip::Server::GetInstance().GetPersistentStorage()));
-
-    for (auto endpoint : EnabledEndpointsWithServerCluster(Id))
-    {
-        uint32_t featureMap  = 0;
-        EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
-        if (EMBER_ZCL_STATUS_SUCCESS == status)
-        {
-            // Setting NameSupport attribute value to 0x80 if the feature bit is set
-            //  The bit of 7 (0x80) the NameSupport attribute indicates whether or not scene names are supported
-            //
-            //  According to spec, bit 7 (Scene Names) MUST match feature bit 0 (Scene Names)
-            uint8_t nameSupport =
-                (featureMap & to_underlying(Feature::kSceneNames)) ? static_cast<uint8_t>(0x80) : static_cast<uint8_t>(0x00);
-            status = Attributes::NameSupport::Set(endpoint, nameSupport);
-            if (EMBER_ZCL_STATUS_SUCCESS != status)
-            {
-                ChipLogDetail(Zcl, "ERR: setting NameSupport on Endpoint %hu Status: %x", endpoint, status);
-            }
-        }
-        else
-        {
-            ChipLogDetail(Zcl, "ERR: getting the scenes FeatureMap on Endpoint %hu Status: %x", endpoint, status);
-        }
-
-        // Explicit AttributeValuePairs and TableSize features are mandatory for matter so we force-set them here
-        featureMap |= (to_underlying(Feature::kExplicit) | to_underlying(Feature::kTableSize));
-        status = Attributes::FeatureMap::Set(endpoint, featureMap);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            ChipLogDetail(Zcl, "ERR: setting the scenes FeatureMap on Endpoint %hu Status: %x", endpoint, status);
-        }
-
-        status = Attributes::LastConfiguredBy::SetNull(endpoint);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, status);
-        }
-    }
 
     mIsInitialized = true;
     return CHIP_NO_ERROR;
@@ -851,7 +816,7 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
                                        sceneTable->GetRemainingCapacity(ctx.mCommandHandler.GetAccessingFabricIndex(), capacity)));
 
     // Checks if we copy a single scene or all of them
-    if (req.mode.GetField(app::Clusters::Scenes::ScenesCopyMode::kCopyAllScenes))
+    if (req.mode.GetField(app::Clusters::Scenes::CopyModeBitmap::kCopyAllScenes))
     {
         // Scene Table interface data
         SceneId scenesInGroup[scenes::kMaxScenesPerFabric];
@@ -917,6 +882,56 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+using namespace chip;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Scenes;
+
+void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
+{
+    uint32_t featureMap  = 0;
+    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
+    if (EMBER_ZCL_STATUS_SUCCESS == status)
+    {
+        // According to spec, bit 7 MUST match feature bit 0 (SceneNames)
+        BitMask<NameSupportBitmap> nameSupport = (featureMap & to_underlying(Feature::kSceneNames))
+            ? BitMask<NameSupportBitmap>(NameSupportBitmap::kSceneNames)
+            : BitMask<NameSupportBitmap>();
+        status                                 = Attributes::NameSupport::Set(endpoint, nameSupport);
+        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        {
+            ChipLogDetail(Zcl, "ERR: setting NameSupport on Endpoint %hu Status: %x", endpoint, status);
+        }
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "ERR: getting the scenes FeatureMap on Endpoint %hu Status: %x", endpoint, status);
+    }
+
+    // Explicit AttributeValuePairs and TableSize features are mandatory for matter so we force-set them here
+    featureMap |= (to_underlying(Feature::kExplicit) | to_underlying(Feature::kTableSize));
+    status = Attributes::FeatureMap::Set(endpoint, featureMap);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogDetail(Zcl, "ERR: setting the scenes FeatureMap on Endpoint %hu Status: %x", endpoint, status);
+    }
+
+    status = Attributes::LastConfiguredBy::SetNull(endpoint);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, status);
+    }
+}
+
+void MatterScenesClusterServerShutdownCallback(EndpointId endpoint)
+{
+    uint16_t endpointTableSize = 0;
+    ReturnOnFailure(Attributes::SceneTableSize::Get(endpoint, &endpointTableSize));
+
+    // Get Scene Table Instance
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(endpoint, endpointTableSize);
+    sceneTable->RemoveEndpoint();
+}
 
 void MatterScenesPluginServerInitCallback()
 {
