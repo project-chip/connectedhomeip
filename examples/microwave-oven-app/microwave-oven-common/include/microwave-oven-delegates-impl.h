@@ -29,54 +29,55 @@ namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
 
-// This is an application level delegate to handle operational state and microwave oven control commands according to the specific business logic.
-class MicrowaveOvenDelegates : public MicrowaveOvenControl::Delegate , public OperationalState::Delegate
+// This is an application level delegate to handle operational state and microwave oven control commands according to the specific
+// business logic.
+class MicrowaveOvenDelegates : public MicrowaveOvenControl::Delegate, public OperationalState::Delegate
 {
 
 public:
-
-    //Microwave Oven Control Cluster delegate
+    // Microwave Oven Control Cluster delegate
     /**
      * Handle Command Callback in application: set-cooking-parameters
      */
-    Protocols::InteractionModel::Status  HandleSetCookingParametersCallback(Optional<uint8_t> cookMode,Optional<uint32_t> cookTime,Optional<uint8_t> powerSetting) override;
+    Protocols::InteractionModel::Status HandleSetCookingParametersCallback(Optional<uint8_t> cookMode, Optional<uint32_t> cookTime,
+                                                                           Optional<uint8_t> powerSetting) override;
 
     /**
      * Handle Command Callback in application: add-more-time
      */
-    Protocols::InteractionModel::Status  HandleAddMoreTimeCallback(uint32_t timeToAdd) override;
+    Protocols::InteractionModel::Status HandleAddMoreTimeCallback(uint32_t timeToAdd) override;
 
     /**
      * Get the value of MinPower.
      */
-    uint8_t GetMinPower() override {return mMinPower;}
+    uint8_t GetMinPower() override { return mMinPower; }
 
     /**
      * Set the value of MinPower.
      */
-    void SetMinPower(uint8_t minPower) override {return;}
+    void SetMinPower(uint8_t minPower) override { return; }
 
     /**
      * Get the value of MaxPower.
      */
-    uint8_t GetMaxPower() override {return mMaxPower;}
+    uint8_t GetMaxPower() override { return mMaxPower; }
 
     /**
      * Set the value of MaxPower.
      */
-    void SetMaxPower(uint8_t maxPower) override {return;}
+    void SetMaxPower(uint8_t maxPower) override { return; }
 
     /**
      * Get the value of PowerStep.
      */
-    uint8_t GetPowerStep() override {return mPowerStep;}
+    uint8_t GetPowerStep() override { return mPowerStep; }
 
     /**
      * Set the value of PowerStep.
      */
-    void SetPowerStep(uint8_t powerStep) override {return;}
+    void SetPowerStep(uint8_t powerStep) override { return; }
 
-    //Operational State Cluster delegate
+    // Operational State Cluster delegate
     /**
      * Get the countdown time.
      * @return The current countdown time.
@@ -125,9 +126,7 @@ public:
      */
     void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override;
 
-
 private:
-
     const OperationalState::GenericOperationalState rvcOpStateList[4] = {
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
@@ -135,15 +134,16 @@ private:
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)),
     };
 
-    app::DataModel::List<const OperationalState::GenericOperationalState> mOperationalStateList = Span<const OperationalState::GenericOperationalState>(rvcOpStateList);
+    app::DataModel::List<const OperationalState::GenericOperationalState> mOperationalStateList =
+        Span<const OperationalState::GenericOperationalState>(rvcOpStateList);
 
     const OperationalState::GenericOperationalPhase opPhaseList[1] = {
         // Phase List is null
         OperationalState::GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
     };
 
-    Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList = Span<const OperationalState::GenericOperationalPhase>(opPhaseList);
-
+    Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList =
+        Span<const OperationalState::GenericOperationalPhase>(opPhaseList);
 
     /** @brief Check if the given cook time is in range
      *  @param cookTime    cookTime that given by user
@@ -160,9 +160,7 @@ private:
 
 void Shutdown();
 
-
-
-} // namespace OperationalState
+} // namespace MicrowaveOvenControl
 } // namespace Clusters
 } // namespace app
 } // namespace chip

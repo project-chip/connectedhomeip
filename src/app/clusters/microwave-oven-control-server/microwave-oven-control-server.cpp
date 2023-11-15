@@ -28,7 +28,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::MicrowaveOvenControl;
 using namespace chip::app::Clusters::MicrowaveOvenControl::Attributes;
-using Status               = Protocols::InteractionModel::Status;
+using Status = Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -72,7 +72,6 @@ uint8_t Instance::GetPowerSetting()
     return this->mPowerSettng;
 }
 
-
 void Instance::SetCookTime(uint32_t cookTime)
 {
     this->mCookTime = cookTime;
@@ -112,11 +111,9 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetPowerStep()));
     }
     break;
-
     }
     return CHIP_NO_ERROR;
 }
-
 
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
@@ -136,7 +133,6 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         CommandHandlerInterface::HandleCommand<Commands::AddMoreTime::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleAddMoreTime(ctx, req); });
         break;
-
     }
 }
 
@@ -144,7 +140,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
 {
     ChipLogDetail(Zcl, "MicrowaveOvenControl:  HandleSetCookingParameters");
     Status status;
-    status = mDelegate->HandleSetCookingParametersCallback(req.cookMode,req.cookTime,req.powerSetting);
+    status = mDelegate->HandleSetCookingParametersCallback(req.cookMode, req.cookTime, req.powerSetting);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
@@ -160,7 +156,6 @@ void Instance::HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTi
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
 
 /** @brief Microwave Oven Control Cluster Server Init
  *
