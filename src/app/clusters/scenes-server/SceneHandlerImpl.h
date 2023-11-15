@@ -135,8 +135,8 @@ public:
         EndpointStatePair<ValueType> mStatePairBuffer[MaxEndpointCount];
     };
 
-    /// @brief Struct meant to allow to save context for a cluster that needs to apply a scene after a transition time but does not
-    /// own a time property in its commands
+    /// @brief Helper struct that allows clusters that do not have an existing mechanism for doing
+    //         asynchronous work to perform scene transitions over some period of time.
     /// @tparam MaxEndpointCount
     template <size_t MaxEndpointCount, size_t FixedEndpointCount>
     struct TransitionTimeInterface
