@@ -68,6 +68,7 @@ assert(chip_build_tests)
 
 #
 template("chip_test_suite") {
+  print("----------------------------------------")
   _suite_name = target_name
 
   # Ensures that the common library has sources containing both common
@@ -92,6 +93,11 @@ template("chip_test_suite") {
 
     if (!defined(invoker.public_deps)) {
       public_deps = []
+    }
+
+    deps = [ dir_pw_unit_test ]
+    if (chip_link_tests) {
+      sources = []
     }
 
     if (current_os != "zephyr" && current_os != "mbed") {
@@ -131,7 +137,6 @@ template("chip_test_suite") {
                                    "cflags",
                                    "configs",
                                  ])
-          public_deps += [ ":${_suite_name}.lib" ]
           test_main = ""
           sources = [
             "${_test}.cpp",
