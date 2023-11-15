@@ -17,6 +17,7 @@
 
 import logging
 from typing import TextIO
+
 from termcolor import colored
 
 import config

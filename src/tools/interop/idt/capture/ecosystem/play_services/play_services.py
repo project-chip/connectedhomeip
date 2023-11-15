@@ -18,7 +18,7 @@
 import asyncio
 import json
 import os
-from typing import Dict, IO
+from typing import IO, Dict
 
 from capture.base import EcosystemCapture, UnsupportedCapturePlatformException
 from capture.platform.android import Android

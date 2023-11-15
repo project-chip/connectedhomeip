@@ -26,7 +26,7 @@ from dataclasses import dataclass
 import capture
 from capture.base import EcosystemCapture, PlatformLogStreamer, UnsupportedCapturePlatformException
 from utils.artifact import create_standard_log_name, log, safe_mkdir
-from utils.log import border_print, add_border
+from utils.log import add_border, border_print
 
 from . import config
 
