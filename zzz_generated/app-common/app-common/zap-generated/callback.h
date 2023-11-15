@@ -361,6 +361,14 @@ void emberAfBooleanStateClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfIcdManagementClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Timer Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTimerClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Mode Select Cluster Init
  *
  * Cluster Init
@@ -3993,6 +4001,84 @@ void emberAfIcdManagementClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfIcdManagementClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Timer Cluster
+//
+
+/** @brief Timer Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTimerClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Timer Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterTimerClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Timer Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTimerClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Timer Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterTimerClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Timer Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterTimerClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                    EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Timer Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterTimerClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                    EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Timer Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTimerClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Timer Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTimerClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Mode Select Cluster
@@ -8997,6 +9083,28 @@ bool emberAfIcdManagementClusterUnregisterClientCallback(
 bool emberAfIcdManagementClusterStayActiveRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::IcdManagement::Commands::StayActiveRequest::DecodableType & commandData);
+/**
+ * @brief Timer Cluster SetTimer Command callback (from client)
+ */
+bool emberAfTimerClusterSetTimerCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                         const chip::app::Clusters::Timer::Commands::SetTimer::DecodableType & commandData);
+/**
+ * @brief Timer Cluster ResetTimer Command callback (from client)
+ */
+bool emberAfTimerClusterResetTimerCallback(chip::app::CommandHandler * commandObj,
+                                           const chip::app::ConcreteCommandPath & commandPath,
+                                           const chip::app::Clusters::Timer::Commands::ResetTimer::DecodableType & commandData);
+/**
+ * @brief Timer Cluster AddTime Command callback (from client)
+ */
+bool emberAfTimerClusterAddTimeCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                        const chip::app::Clusters::Timer::Commands::AddTime::DecodableType & commandData);
+/**
+ * @brief Timer Cluster ReduceTime Command callback (from client)
+ */
+bool emberAfTimerClusterReduceTimeCallback(chip::app::CommandHandler * commandObj,
+                                           const chip::app::ConcreteCommandPath & commandPath,
+                                           const chip::app::Clusters::Timer::Commands::ReduceTime::DecodableType & commandData);
 /**
  * @brief Mode Select Cluster ChangeToMode Command callback (from client)
  */

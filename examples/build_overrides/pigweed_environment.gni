@@ -20,20 +20,71 @@ _bootstrap_root = "//third_party/connectedhomeip"
 import("${_bootstrap_root}/build_overrides/pigweed_environment.gni")
 
 # Rebase paths to our root.
+#
+# If out of tree, the paths will look like:
+#
+# pw_env_setup_CIPD_PIGWEED = "//../home/vscode/pigweed/env/cipd/packages/pigweed"
+#
+# and these paths are used by things like protoc since
+# https://github.com/google/pigweed/commit/ddbc9fc7f5c601ab417db37e02cbe5294f21ad6d
+#
+# See https://github.com/project-chip/connectedhomeip/issues/30475
+#
+# Existing logic:
+#   - this file is imported from `examples/common/pigweed` or similar
+#   - we transform paths from "//../" into "//../../../"
+#
+# TODO: need a better expansion here. This replacement logic seems very brittle and
+#       it is unclear how we know exactly 3 levels of indirections are correct
+#
 if (defined(pw_env_setup_CIPD_ARM)) {
-  pw_env_setup_CIPD_ARM =
-      get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_ARM}", "abspath")
+  _split_arm = string_split(pw_env_setup_CIPD_ARM, "//../")
+  if (_split_arm[0] == "") {
+    pw_env_setup_CIPD_ARM = get_path_info(
+            string_replace(pw_env_setup_CIPD_ARM, "//../", "//../../../"),
+            "abspath")
+  } else {
+    pw_env_setup_CIPD_ARM =
+        get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_ARM}", "abspath")
+  }
 }
 if (defined(pw_env_setup_CIPD_PIGWEED)) {
-  pw_env_setup_CIPD_PIGWEED =
-      get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_PIGWEED}",
-                    "abspath")
+  _split_pigweed = string_split(pw_env_setup_CIPD_PIGWEED, "//../")
+  if (_split_pigweed[0] == "") {
+    pw_env_setup_CIPD_PIGWEED =
+        get_path_info(
+            string_replace(pw_env_setup_CIPD_PIGWEED, "//../", "//../../../"),
+            "abspath")
+  } else {
+    pw_env_setup_CIPD_PIGWEED =
+        get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_PIGWEED}",
+                      "abspath")
+  }
 }
+
 if (defined(pw_env_setup_CIPD_PYTHON)) {
-  pw_env_setup_CIPD_PYTHON =
-      get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_PYTHON}", "abspath")
+  _split_python = string_split(pw_env_setup_CIPD_PYTHON, "//../")
+  if (_split_python[0] == "") {
+    pw_env_setup_CIPD_PYTHON =
+        get_path_info(
+            string_replace(pw_env_setup_CIPD_PYTHON, "//../", "//../../../"),
+            "abspath")
+  } else {
+    pw_env_setup_CIPD_PYTHON =
+        get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_PYTHON}",
+                      "abspath")
+  }
 }
 if (defined(pw_env_setup_VIRTUAL_ENV)) {
-  pw_env_setup_VIRTUAL_ENV =
-      get_path_info("${_bootstrap_root}/${pw_env_setup_VIRTUAL_ENV}", "abspath")
+  _split_env = string_split(pw_env_setup_VIRTUAL_ENV, "//../")
+  if (_split_env[0] == "") {
+    pw_env_setup_VIRTUAL_ENV =
+        get_path_info(
+            string_replace(pw_env_setup_VIRTUAL_ENV, "//../", "//../../../"),
+            "abspath")
+  } else {
+    pw_env_setup_VIRTUAL_ENV =
+        get_path_info("${_bootstrap_root}/${pw_env_setup_VIRTUAL_ENV}",
+                      "abspath")
+  }
 }

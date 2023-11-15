@@ -14365,6 +14365,256 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace IcdManagement
+namespace Timer {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace SetTimer {
+struct Type;
+struct DecodableType;
+} // namespace SetTimer
+
+namespace ResetTimer {
+struct Type;
+struct DecodableType;
+} // namespace ResetTimer
+
+namespace AddTime {
+struct Type;
+struct DecodableType;
+} // namespace AddTime
+
+namespace ReduceTime {
+struct Type;
+struct DecodableType;
+} // namespace ReduceTime
+
+} // namespace Commands
+
+namespace Commands {
+namespace SetTimer {
+enum class Fields : uint8_t
+{
+    kNewTime = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetTimer::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+
+    uint32_t newTime = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetTimer::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+
+    uint32_t newTime = static_cast<uint32_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetTimer
+namespace ResetTimer {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ResetTimer::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ResetTimer::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetTimer
+namespace AddTime {
+enum class Fields : uint8_t
+{
+    kAdditionalTime = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::AddTime::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+
+    uint32_t additionalTime = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::AddTime::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+
+    uint32_t additionalTime = static_cast<uint32_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddTime
+namespace ReduceTime {
+enum class Fields : uint8_t
+{
+    kTimeReduction = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ReduceTime::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+
+    uint32_t timeReduction = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ReduceTime::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+
+    uint32_t timeReduction = static_cast<uint32_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ReduceTime
+} // namespace Commands
+
+namespace Attributes {
+
+namespace SetTime {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SetTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SetTime
+namespace TimeRemaining {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TimeRemaining::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TimeRemaining
+namespace TimerState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::Timer::TimerStatusEnum;
+    using DecodableType    = chip::app::Clusters::Timer::TimerStatusEnum;
+    using DecodableArgType = chip::app::Clusters::Timer::TimerStatusEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TimerState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TimerState
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::Timer::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::SetTime::TypeInfo::DecodableType setTime             = static_cast<uint32_t>(0);
+        Attributes::TimeRemaining::TypeInfo::DecodableType timeRemaining = static_cast<uint32_t>(0);
+        Attributes::TimerState::TypeInfo::DecodableType timerState = static_cast<chip::app::Clusters::Timer::TimerStatusEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace Timer
 namespace ModeSelect {
 namespace Structs {
 namespace SemanticTagStruct {

@@ -286,6 +286,12 @@
 #define CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER
 #endif
 
+#if defined(ZCL_USING_TIMER_CLUSTER_SERVER) || defined(ZCL_USING_TIMER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TIMER_CLUSTER { chip::app::Clusters::Timer::Id, "Timer" },
+#else
+#define CHIP_PRINTCLUSTER_TIMER_CLUSTER
+#endif
+
 #if defined(ZCL_USING_MODE_SELECT_CLUSTER_SERVER) || defined(ZCL_USING_MODE_SELECT_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER { chip::app::Clusters::ModeSelect::Id, "Mode Select" },
 #else
@@ -720,6 +726,7 @@
     CHIP_PRINTCLUSTER_PROXY_VALID_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER                                                                                       \
+    CHIP_PRINTCLUSTER_TIMER_CLUSTER                                                                                                \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_LAUNDRY_WASHER_MODE_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER                                                 \

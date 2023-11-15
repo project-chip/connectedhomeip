@@ -257,7 +257,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
 // ICD Init needs to be after data model init
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mReportScheduler, mSessionKeystore);
+    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore);
+    // Register the ICDStateObservers. All observers are released at mICDManager.Shutdown()
+    // They can be released individually with ReleaseObserver
+    mICDManager.RegisterObserver(mReportScheduler);
+    mICDManager.RegisterObserver(&app::DnssdServer::Instance());
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #if defined(CHIP_APP_USE_ECHO)

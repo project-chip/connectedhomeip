@@ -693,7 +693,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             ReturnErrorOnFailure(data.GetDataVersion(&version));
             attributePath.mDataVersion.SetValue(version);
 
-            if (mReadPrepareParams.mpDataVersionFilterList != nullptr && mReadPrepareParams.mDataVersionFilterListSize != 0)
+            if (mReadPrepareParams.mpDataVersionFilterList != nullptr)
             {
                 UpdateDataVersionFilters(attributePath);
             }
