@@ -235,6 +235,13 @@ static_library("app") {
     ]
   }
 
+  if (chip_persist_subscriptions) {
+    sources += [
+      "SubscriptionResumptionHelper.cpp",
+      "SubscriptionResumptionHelper.h",
+    ]
+  }
+
   if (chip_enable_read_client) {
     sources += [
       "BufferedReadCallback.cpp",

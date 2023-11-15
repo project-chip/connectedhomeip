@@ -38,6 +38,7 @@
 #include <app/MessageDef/EventPathIBs.h>
 #include <app/ObjectList.h>
 #include <app/OperationalSessionSetup.h>
+#include <app/SubscriptionResumptionHelper.h>
 #include <app/SubscriptionResumptionStorage.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
@@ -305,13 +306,11 @@ private:
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
      *
-     *  @brief Resume a persisted subscription
+     *  @brief Initialize a ReadHandler for a resumed subsciption
      *
-     *  Used after ReadHandler(ManagementCallback & apCallback). This will start a CASE session
-     *  with the subscriber if one doesn't already exist, and send full priming report when connected.
+     *  Used after the SubscriptionResumptionHelper establishs the CASE session
      */
-    void ResumeSubscription(CASESessionManager & caseSessionManager,
-                            SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo);
+    void OnSubscriptionResumed(const SessionHandle & sessionHandle, SubscriptionResumptionHelper & helper);
 #endif
 
     /**
@@ -429,6 +428,7 @@ private:
     //
     friend class chip::app::reporting::Engine;
     friend class chip::app::InteractionModelEngine;
+    friend class chip::app::SubscriptionResumptionHelper;
 
     // The report scheduler needs to be able to access StateFlag private functions ShouldStartReporting(), CanStartReporting(),
     // ForceDirtyState() and IsDirty() to know when to schedule a run so it is declared as a friend class.
@@ -484,11 +484,6 @@ private:
     /// generation.
     /// @param aFlag Flag to clear
     void ClearStateFlag(ReadHandlerFlags aFlag);
-
-    // Helpers for continuing the subscription resumption
-    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                      const SessionHandle & sessionHandle);
-    static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
 
@@ -571,12 +566,6 @@ private:
 
     // TODO (#27675): Merge all observers into one and that one will dispatch the callbacks to the right place.
     Observer * mObserver = nullptr;
-
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    // Callbacks to handle server-initiated session success/failure
-    chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
-    chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
-#endif
 };
 } // namespace app
 } // namespace chip

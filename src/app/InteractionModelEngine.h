@@ -29,6 +29,7 @@
 #include <app/AppConfig.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
+#include <app/SubscriptionResumptionHelper.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -377,6 +378,7 @@ private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
     friend class TestInteractionModelEngine;
+    friend class SubscriptionResumptionHelper;
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandHandler & apCommandObj) override;
