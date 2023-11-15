@@ -126,6 +126,14 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Groups::N
 /***************************** Bitmap Converter FIXME**************/
 
 template <>
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Scenes::CopyModeBitmap>& value)
+{
+    using namespace chip::app::Clusters::Scenes;
+    nlohmann::json obj;
+    obj["CopyAllScenes"] = static_cast<bool>(value.GetField(CopyModeBitmap::kCopyAllScenes));
+    return obj;
+}
+template <>
 nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Scenes::Feature>& value)
 {
     using namespace chip::app::Clusters::Scenes;
@@ -137,11 +145,11 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Scenes::F
     return obj;
 }
 template <>
-nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Scenes::ScenesCopyMode>& value)
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Scenes::NameSupportBitmap>& value)
 {
     using namespace chip::app::Clusters::Scenes;
     nlohmann::json obj;
-    obj["CopyAllScenes"] = static_cast<bool>(value.GetField(ScenesCopyMode::kCopyAllScenes));
+    obj["SceneNames"] = static_cast<bool>(value.GetField(NameSupportBitmap::kSceneNames));
     return obj;
 }
 
@@ -154,6 +162,7 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::OnOff::Fe
     nlohmann::json obj;
     obj["Lighting"] = static_cast<bool>(value.GetField(Feature::kLighting));
     obj["DeadFrontBehavior"] = static_cast<bool>(value.GetField(Feature::kDeadFrontBehavior));
+    obj["OffOnly"] = static_cast<bool>(value.GetField(Feature::kOffOnly));
     return obj;
 }
 template <>
@@ -232,36 +241,36 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::LevelCont
     return obj;
 }
 template <>
-nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions>& value)
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap>& value)
 {
     using namespace chip::app::Clusters::LevelControl;
     nlohmann::json obj;
-    obj["ExecuteIfOff"] = static_cast<bool>(value.GetField(LevelControlOptions::kExecuteIfOff));
-    obj["CoupleColorTempToLevel"] = static_cast<bool>(value.GetField(LevelControlOptions::kCoupleColorTempToLevel));
+    obj["ExecuteIfOff"] = static_cast<bool>(value.GetField(OptionsBitmap::kExecuteIfOff));
+    obj["CoupleColorTempToLevel"] = static_cast<bool>(value.GetField(OptionsBitmap::kCoupleColorTempToLevel));
     return obj;
 }
 
 template <>
-nlohmann::json inline to_json(const chip::app::Clusters::LevelControl::MoveMode& value)
+nlohmann::json inline to_json(const chip::app::Clusters::LevelControl::MoveModeEnum& value)
 {
     using namespace chip::app::Clusters::LevelControl;
     switch (value) {
-    case MoveMode::kUp:
+    case MoveModeEnum::kUp:
         return "Up";
-    case MoveMode::kDown:
+    case MoveModeEnum::kDown:
         return "Down";
     default:
         return "{}";
     }
 }
 template <>
-nlohmann::json inline to_json(const chip::app::Clusters::LevelControl::StepMode& value)
+nlohmann::json inline to_json(const chip::app::Clusters::LevelControl::StepModeEnum& value)
 {
     using namespace chip::app::Clusters::LevelControl;
     switch (value) {
-    case StepMode::kUp:
+    case StepModeEnum::kUp:
         return "Up";
-    case StepMode::kDown:
+    case StepModeEnum::kDown:
         return "Down";
     default:
         return "{}";
@@ -1144,10 +1153,10 @@ nlohmann::json inline to_json(const chip::app::Clusters::FanControl::FanModeSequ
         return "Off/Low/Med/High/Auto";
     case FanModeSequenceEnum::kOffLowHighAuto:
         return "Off/Low/High/Auto";
-    case FanModeSequenceEnum::kOffOnAuto:
-        return "Off/On/Auto";
-    case FanModeSequenceEnum::kOffOn:
-        return "Off/On";
+    case FanModeSequenceEnum::kOffHighAuto:
+        return "Off/High/Auto";
+    case FanModeSequenceEnum::kOffHigh:
+        return "Off/High";
     default:
         return "{}";
     }
@@ -1167,6 +1176,54 @@ nlohmann::json inline to_json(const chip::app::Clusters::FanControl::StepDirecti
 }
 /***************************** Bitmap Converter FIXME**************/
 
+template <>
+nlohmann::json inline to_json(const chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum& value)
+{
+    using namespace chip::app::Clusters::ThermostatUserInterfaceConfiguration;
+    switch (value) {
+    case KeypadLockoutEnum::kNoLockout:
+        return "NoLockout";
+    case KeypadLockoutEnum::kLockout1:
+        return "Lockout1";
+    case KeypadLockoutEnum::kLockout2:
+        return "Lockout2";
+    case KeypadLockoutEnum::kLockout3:
+        return "Lockout3";
+    case KeypadLockoutEnum::kLockout4:
+        return "Lockout4";
+    case KeypadLockoutEnum::kLockout5:
+        return "Lockout5";
+    default:
+        return "{}";
+    }
+}
+template <>
+nlohmann::json inline to_json(
+    const chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum& value)
+{
+    using namespace chip::app::Clusters::ThermostatUserInterfaceConfiguration;
+    switch (value) {
+    case ScheduleProgrammingVisibilityEnum::kScheduleProgrammingPermitted:
+        return "ScheduleProgrammingPermitted";
+    case ScheduleProgrammingVisibilityEnum::kScheduleProgrammingDenied:
+        return "ScheduleProgrammingDenied";
+    default:
+        return "{}";
+    }
+}
+template <>
+nlohmann::json inline to_json(const chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum& value)
+{
+    using namespace chip::app::Clusters::ThermostatUserInterfaceConfiguration;
+    switch (value) {
+    case TemperatureDisplayModeEnum::kCelsius:
+        return "Celsius";
+    case TemperatureDisplayModeEnum::kFahrenheit:
+        return "Fahrenheit";
+    default:
+        return "{}";
+    }
+}
 /***************************** Bitmap Converter FIXME**************/
 
 template <>

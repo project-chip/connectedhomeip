@@ -362,7 +362,7 @@ ScenesAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeVal
             }
             break;
         }
-        case MN::NameSupport::Id: { // type is bitmap8
+        case MN::NameSupport::Id: { // type is NameSupportBitmap
             MN::NameSupport::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -530,7 +530,7 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint* ep, const s
         }
         break;
     }
-        // type is bitmap8
+        // type is NameSupportBitmap
     case MN::NameSupport::Id: {
         using T = MN::NameSupport::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -857,7 +857,7 @@ LevelControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attrib
             }
             break;
         }
-        case MN::Options::Id: { // type is LevelControlOptions
+        case MN::Options::Id: { // type is OptionsBitmap
             MN::Options::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -1130,7 +1130,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
         }
         break;
     }
-        // type is LevelControlOptions
+        // type is OptionsBitmap
     case MN::Options::Id: {
         using T = MN::Options::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3869,13 +3869,7 @@ CHIP_ERROR FanControlAttributeAccess::Write(const ConcreteDataAttributePath& aPa
         jsn["FanMode"] = to_json(value);
         break;
     }
-    case Attributes::FanModeSequence::Id: {
-
-        Attributes::FanModeSequence::TypeInfo::DecodableType value;
-        aDecoder.Decode(value);
-        jsn["FanModeSequence"] = to_json(value);
-        break;
-    }
+        // FanModeSequence is not supported by UCL
         // PercentCurrent is not supported by UCL
         // SpeedMax is not supported by UCL
         // SpeedCurrent is not supported by UCL
@@ -3971,21 +3965,21 @@ ThermostatUserInterfaceConfigurationAttributeAccess::Read(const ConcreteReadAttr
 
     try {
         switch (aPath.mAttributeId) {
-        case MN::TemperatureDisplayMode::Id: { // type is enum8
+        case MN::TemperatureDisplayMode::Id: { // type is TemperatureDisplayModeEnum
             MN::TemperatureDisplayMode::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::KeypadLockout::Id: { // type is enum8
+        case MN::KeypadLockout::Id: { // type is KeypadLockoutEnum
             MN::KeypadLockout::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::ScheduleProgrammingVisibility::Id: { // type is enum8
+        case MN::ScheduleProgrammingVisibility::Id: { // type is ScheduleProgrammingVisibilityEnum
             MN::ScheduleProgrammingVisibility::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -4099,7 +4093,7 @@ void ThermostatUserInterfaceConfigurationAttributeAccess::reported_updated(const
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, attribute_id.value());
     switch (attribute_id.value()) {
-    // type is enum8
+    // type is TemperatureDisplayModeEnum
     case MN::TemperatureDisplayMode::Id: {
         using T = MN::TemperatureDisplayMode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -4112,7 +4106,7 @@ void ThermostatUserInterfaceConfigurationAttributeAccess::reported_updated(const
         }
         break;
     }
-        // type is enum8
+        // type is KeypadLockoutEnum
     case MN::KeypadLockout::Id: {
         using T = MN::KeypadLockout::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -4125,7 +4119,7 @@ void ThermostatUserInterfaceConfigurationAttributeAccess::reported_updated(const
         }
         break;
     }
-        // type is enum8
+        // type is ScheduleProgrammingVisibilityEnum
     case MN::ScheduleProgrammingVisibility::Id: {
         using T = MN::ScheduleProgrammingVisibility::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -5613,21 +5607,21 @@ TemperatureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPa
 
     try {
         switch (aPath.mAttributeId) {
-        case MN::MeasuredValue::Id: { // type is int16s
+        case MN::MeasuredValue::Id: { // type is temperature
             MN::MeasuredValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::MinMeasuredValue::Id: { // type is int16s
+        case MN::MinMeasuredValue::Id: { // type is temperature
             MN::MinMeasuredValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::MaxMeasuredValue::Id: { // type is int16s
+        case MN::MaxMeasuredValue::Id: { // type is temperature
             MN::MaxMeasuredValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -5729,7 +5723,7 @@ void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpo
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::TemperatureMeasurement::Id, attribute_id.value());
     switch (attribute_id.value()) {
-    // type is int16s
+    // type is temperature
     case MN::MeasuredValue::Id: {
         using T = MN::MeasuredValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -5742,7 +5736,7 @@ void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpo
         }
         break;
     }
-        // type is int16s
+        // type is temperature
     case MN::MinMeasuredValue::Id: {
         using T = MN::MinMeasuredValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -5755,7 +5749,7 @@ void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpo
         }
         break;
     }
-        // type is int16s
+        // type is temperature
     case MN::MaxMeasuredValue::Id: {
         using T = MN::MaxMeasuredValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);

@@ -74,6 +74,7 @@ namespace app {
             { "ProxyValid", ProxyValid::Id },
             { "BooleanState", BooleanState::Id },
             { "IcdManagement", IcdManagement::Id },
+            { "Timer", Timer::Id },
             { "ModeSelect", ModeSelect::Id },
             { "LaundryWasherMode", LaundryWasherMode::Id },
             { "RefrigeratorAndTemperatureControlledCabinetMode", RefrigeratorAndTemperatureControlledCabinetMode::Id },
@@ -86,10 +87,13 @@ namespace app {
             { "AirQuality", AirQuality::Id },
             { "SmokeCoAlarm", SmokeCoAlarm::Id },
             { "DishwasherAlarm", DishwasherAlarm::Id },
+            { "MicrowaveOvenMode", MicrowaveOvenMode::Id },
+            { "MicrowaveOvenControl", MicrowaveOvenControl::Id },
             { "OperationalState", OperationalState::Id },
             { "RvcOperationalState", RvcOperationalState::Id },
             { "HepaFilterMonitoring", HepaFilterMonitoring::Id },
             { "ActivatedCarbonFilterMonitoring", ActivatedCarbonFilterMonitoring::Id },
+            { "DemandResponseLoadControl", DemandResponseLoadControl::Id },
             { "DoorLock", DoorLock::Id },
             { "WindowCovering", WindowCovering::Id },
             { "BarrierControl", BarrierControl::Id },
@@ -896,8 +900,8 @@ namespace app {
         namespace IcdManagement {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
-                    { "IdleModeInterval", IdleModeInterval::Id },
-                    { "ActiveModeInterval", ActiveModeInterval::Id },
+                    { "IdleModeDuration", IdleModeDuration::Id },
+                    { "ActiveModeDuration", ActiveModeDuration::Id },
                     { "ActiveModeThreshold", ActiveModeThreshold::Id },
                     { "RegisteredClients", RegisteredClients::Id },
                     { "ICDCounter", ICDCounter::Id },
@@ -911,6 +915,11 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace IcdManagement
+        namespace Timer {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace Timer
         namespace ModeSelect {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
@@ -982,7 +991,6 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "SupportedModes", SupportedModes::Id },
                     { "CurrentMode", CurrentMode::Id },
-                    { "StartUpMode", StartUpMode::Id },
                     { "OnMode", OnMode::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
@@ -998,7 +1006,6 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "SupportedModes", SupportedModes::Id },
                     { "CurrentMode", CurrentMode::Id },
-                    { "StartUpMode", StartUpMode::Id },
                     { "OnMode", OnMode::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
@@ -1112,6 +1119,16 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace DishwasherAlarm
+        namespace MicrowaveOvenMode {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace MicrowaveOvenMode
+        namespace MicrowaveOvenControl {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace MicrowaveOvenControl
         namespace OperationalState {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
@@ -1184,6 +1201,11 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace ActivatedCarbonFilterMonitoring
+        namespace DemandResponseLoadControl {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace DemandResponseLoadControl
         namespace DoorLock {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
@@ -2321,6 +2343,7 @@ namespace app {
             { "ProxyValid", ProxyValid::Attributes::matter_attribute_id_cluster_map },
             { "BooleanState", BooleanState::Attributes::matter_attribute_id_cluster_map },
             { "IcdManagement", IcdManagement::Attributes::matter_attribute_id_cluster_map },
+            { "Timer", Timer::Attributes::matter_attribute_id_cluster_map },
             { "ModeSelect", ModeSelect::Attributes::matter_attribute_id_cluster_map },
             { "LaundryWasherMode", LaundryWasherMode::Attributes::matter_attribute_id_cluster_map },
             { "RefrigeratorAndTemperatureControlledCabinetMode", RefrigeratorAndTemperatureControlledCabinetMode::Attributes::matter_attribute_id_cluster_map },
@@ -2333,10 +2356,13 @@ namespace app {
             { "AirQuality", AirQuality::Attributes::matter_attribute_id_cluster_map },
             { "SmokeCoAlarm", SmokeCoAlarm::Attributes::matter_attribute_id_cluster_map },
             { "DishwasherAlarm", DishwasherAlarm::Attributes::matter_attribute_id_cluster_map },
+            { "MicrowaveOvenMode", MicrowaveOvenMode::Attributes::matter_attribute_id_cluster_map },
+            { "MicrowaveOvenControl", MicrowaveOvenControl::Attributes::matter_attribute_id_cluster_map },
             { "OperationalState", OperationalState::Attributes::matter_attribute_id_cluster_map },
             { "RvcOperationalState", RvcOperationalState::Attributes::matter_attribute_id_cluster_map },
             { "HepaFilterMonitoring", HepaFilterMonitoring::Attributes::matter_attribute_id_cluster_map },
             { "ActivatedCarbonFilterMonitoring", ActivatedCarbonFilterMonitoring::Attributes::matter_attribute_id_cluster_map },
+            { "DemandResponseLoadControl", DemandResponseLoadControl::Attributes::matter_attribute_id_cluster_map },
             { "DoorLock", DoorLock::Attributes::matter_attribute_id_cluster_map },
             { "WindowCovering", WindowCovering::Attributes::matter_attribute_id_cluster_map },
             { "BarrierControl", BarrierControl::Attributes::matter_attribute_id_cluster_map },
@@ -2579,7 +2605,7 @@ namespace app {
                     { "NetworkConfigResponse", NetworkConfigResponse::Id },
                     { "ConnectNetwork", ConnectNetwork::Id },
                     { "ConnectNetworkResponse", ConnectNetworkResponse::Id },
-                    { "ReorderNetwork", ReorderNetwork::Id }
+                    { "ReorderNetwork", ReorderNetwork::Id },
                 };
             } // namespace Commands
         } // namespace NetworkCommissioning
@@ -2594,7 +2620,7 @@ namespace app {
         namespace GeneralDiagnostics {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "TestEventTrigger", TestEventTrigger::Id }
+                    { "TestEventTrigger", TestEventTrigger::Id },
                 };
             } // namespace Commands
         } // namespace GeneralDiagnostics
@@ -2727,6 +2753,11 @@ namespace app {
                 };
             } // namespace Commands
         } // namespace IcdManagement
+        namespace Timer {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace Timer
         namespace ModeSelect {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
@@ -2811,6 +2842,16 @@ namespace app {
                 };
             } // namespace Commands
         } // namespace DishwasherAlarm
+        namespace MicrowaveOvenMode {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace MicrowaveOvenMode
+        namespace MicrowaveOvenControl {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace MicrowaveOvenControl
         namespace OperationalState {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
@@ -2847,6 +2888,11 @@ namespace app {
                 };
             } // namespace Commands
         } // namespace ActivatedCarbonFilterMonitoring
+        namespace DemandResponseLoadControl {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace DemandResponseLoadControl
         namespace DoorLock {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
@@ -3252,6 +3298,7 @@ namespace app {
             { "ProxyValid", ProxyValid::Commands::matter_command_id_cluster_map },
             { "BooleanState", BooleanState::Commands::matter_command_id_cluster_map },
             { "IcdManagement", IcdManagement::Commands::matter_command_id_cluster_map },
+            { "Timer", Timer::Commands::matter_command_id_cluster_map },
             { "ModeSelect", ModeSelect::Commands::matter_command_id_cluster_map },
             { "LaundryWasherMode", LaundryWasherMode::Commands::matter_command_id_cluster_map },
             { "RefrigeratorAndTemperatureControlledCabinetMode", RefrigeratorAndTemperatureControlledCabinetMode::Commands::matter_command_id_cluster_map },
@@ -3264,10 +3311,13 @@ namespace app {
             { "AirQuality", AirQuality::Commands::matter_command_id_cluster_map },
             { "SmokeCoAlarm", SmokeCoAlarm::Commands::matter_command_id_cluster_map },
             { "DishwasherAlarm", DishwasherAlarm::Commands::matter_command_id_cluster_map },
+            { "MicrowaveOvenMode", MicrowaveOvenMode::Commands::matter_command_id_cluster_map },
+            { "MicrowaveOvenControl", MicrowaveOvenControl::Commands::matter_command_id_cluster_map },
             { "OperationalState", OperationalState::Commands::matter_command_id_cluster_map },
             { "RvcOperationalState", RvcOperationalState::Commands::matter_command_id_cluster_map },
             { "HepaFilterMonitoring", HepaFilterMonitoring::Commands::matter_command_id_cluster_map },
             { "ActivatedCarbonFilterMonitoring", ActivatedCarbonFilterMonitoring::Commands::matter_command_id_cluster_map },
+            { "DemandResponseLoadControl", DemandResponseLoadControl::Commands::matter_command_id_cluster_map },
             { "DoorLock", DoorLock::Commands::matter_command_id_cluster_map },
             { "WindowCovering", WindowCovering::Commands::matter_command_id_cluster_map },
             { "BarrierControl", BarrierControl::Commands::matter_command_id_cluster_map },

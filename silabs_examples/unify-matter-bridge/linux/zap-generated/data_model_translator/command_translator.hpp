@@ -34,7 +34,7 @@ public:
     IdentifyClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::Identify::Id, "Identify", unify_mqtt,
-            group_translator_m)
+              group_translator_m)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -151,7 +151,7 @@ public:
     LevelControlClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::LevelControl::Id, "Level", unify_mqtt,
-            group_translator_m)
+              group_translator_m)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -184,7 +184,7 @@ public:
     DoorLockClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::DoorLock::Id, "DoorLock", unify_mqtt,
-            group_translator_m)
+              group_translator_m)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -291,7 +291,7 @@ public:
     BarrierControlClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::BarrierControl::Id, "BarrierControl", unify_mqtt,
-            group_translator_m)
+              group_translator_m)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -317,7 +317,7 @@ public:
     ThermostatClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::Thermostat::Id, "Thermostat", unify_mqtt,
-            group_translator_m)
+              group_translator_m)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -345,7 +345,7 @@ public:
     FanControlClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::FanControl::Id, "FanControl", unify_mqtt,
-            group_translator_m)
+              group_translator_m)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -380,7 +380,7 @@ public:
     ThermostatUserInterfaceConfigurationClusterCommandHandler(const matter_node_state_monitor& node_state_monitor,
         UnifyMqtt& unify_mqtt, group_translator& group_translator_m)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::ThermostatUserInterfaceConfiguration::Id,
-            "ThermostatUserInterfaceConfiguration", unify_mqtt, group_translator_m)
+              "ThermostatUserInterfaceConfiguration", unify_mqtt, group_translator_m)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -403,7 +403,7 @@ public:
     ColorControlClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::ColorControl::Id, "ColorControl", unify_mqtt,
-            group_translator_m)
+              group_translator_m)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -446,7 +446,7 @@ public:
     IlluminanceMeasurementClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::IlluminanceMeasurement::Id, "IlluminanceMeasurement",
-            unify_mqtt, group_translator_m)
+              unify_mqtt, group_translator_m)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -469,7 +469,7 @@ public:
     TemperatureMeasurementClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::TemperatureMeasurement::Id, "TemperatureMeasurement",
-            unify_mqtt, group_translator_m)
+              unify_mqtt, group_translator_m)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -492,7 +492,7 @@ public:
     PressureMeasurementClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::PressureMeasurement::Id, "PressureMeasurement",
-            unify_mqtt, group_translator_m)
+              unify_mqtt, group_translator_m)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -515,7 +515,7 @@ public:
     FlowMeasurementClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::FlowMeasurement::Id, "FlowMeasurement", unify_mqtt,
-            group_translator_m)
+              group_translator_m)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -538,7 +538,7 @@ public:
     RelativeHumidityMeasurementClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::RelativeHumidityMeasurement::Id, "RelativityHumidity",
-            unify_mqtt, group_translator_m)
+              unify_mqtt, group_translator_m)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -561,7 +561,7 @@ public:
     OccupancySensingClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::OccupancySensing::Id, "OccupancySensing", unify_mqtt,
-            group_translator_m)
+              group_translator_m)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -584,7 +584,7 @@ public:
     ElectricalMeasurementClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::ElectricalMeasurement::Id, "ElectricalMeasurement",
-            unify_mqtt, group_translator_m)
+              unify_mqtt, group_translator_m)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;

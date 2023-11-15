@@ -41,7 +41,7 @@ public:
     IdentifyAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::Identify::Id,
-            "attr_translator_Identify")
+              "attr_translator_Identify")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -75,7 +75,7 @@ public:
     GroupsAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::Groups::Id,
-            "attr_translator_Groups")
+              "attr_translator_Groups")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -111,7 +111,7 @@ public:
     ScenesAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::Scenes::Id,
-            "attr_translator_Scenes")
+              "attr_translator_Scenes")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -145,7 +145,7 @@ public:
     OnOffAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::OnOff::Id,
-            "attr_translator_OnOff")
+              "attr_translator_OnOff")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -180,7 +180,7 @@ public:
     LevelControlAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::LevelControl::Id,
-            "attr_translator_LevelControl")
+              "attr_translator_LevelControl")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -232,6 +232,7 @@ private:
 // Skipping Proxy Valid
 // Skipping Boolean State
 // Skipping ICD Management
+// Skipping Timer
 // Skipping Mode Select
 // Skipping Laundry Washer Mode
 // Skipping Refrigerator And Temperature Controlled Cabinet Mode
@@ -244,10 +245,13 @@ private:
 // Skipping Air Quality
 // Skipping Smoke CO Alarm
 // Skipping Dishwasher Alarm
+// Skipping Microwave Oven Mode
+// Skipping Microwave Oven Control
 // Skipping Operational State
 // Skipping RVC Operational State
 // Skipping HEPA Filter Monitoring
 // Skipping Activated Carbon Filter Monitoring
+// Skipping Demand Response Load Control
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attribute Handler for the Door Lock cluster
@@ -269,7 +273,7 @@ public:
     DoorLockAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::DoorLock::Id,
-            "attr_translator_DoorLock")
+              "attr_translator_DoorLock")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -304,7 +308,7 @@ public:
     BarrierControlAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::BarrierControl::Id,
-            "attr_translator_BarrierControl")
+              "attr_translator_BarrierControl")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -339,7 +343,7 @@ public:
     ThermostatAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::Thermostat::Id,
-            "attr_translator_Thermostat")
+              "attr_translator_Thermostat")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -383,7 +387,7 @@ public:
     FanControlAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::FanControl::Id,
-            "attr_translator_FanControl")
+              "attr_translator_FanControl")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -417,8 +421,8 @@ public:
     ThermostatUserInterfaceConfigurationAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator,
-            chip::app::Clusters::ThermostatUserInterfaceConfiguration::Id,
-            "attr_translator_ThermostatUserInterfaceConfiguration")
+              chip::app::Clusters::ThermostatUserInterfaceConfiguration::Id,
+              "attr_translator_ThermostatUserInterfaceConfiguration")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -455,7 +459,7 @@ public:
     ColorControlAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::ColorControl::Id,
-            "attr_translator_ColorControl")
+              "attr_translator_ColorControl")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -490,7 +494,7 @@ public:
     IlluminanceMeasurementAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator,
-            chip::app::Clusters::IlluminanceMeasurement::Id, "attr_translator_IlluminanceMeasurement")
+              chip::app::Clusters::IlluminanceMeasurement::Id, "attr_translator_IlluminanceMeasurement")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -527,7 +531,7 @@ public:
     TemperatureMeasurementAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator,
-            chip::app::Clusters::TemperatureMeasurement::Id, "attr_translator_TemperatureMeasurement")
+              chip::app::Clusters::TemperatureMeasurement::Id, "attr_translator_TemperatureMeasurement")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -564,7 +568,7 @@ public:
     PressureMeasurementAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::PressureMeasurement::Id,
-            "attr_translator_PressureMeasurement")
+              "attr_translator_PressureMeasurement")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -598,7 +602,7 @@ public:
     FlowMeasurementAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::FlowMeasurement::Id,
-            "attr_translator_FlowMeasurement")
+              "attr_translator_FlowMeasurement")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -632,8 +636,8 @@ public:
     RelativeHumidityMeasurementAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator,
-            chip::app::Clusters::RelativeHumidityMeasurement::Id,
-            "attr_translator_RelativeHumidityMeasurement")
+              chip::app::Clusters::RelativeHumidityMeasurement::Id,
+              "attr_translator_RelativeHumidityMeasurement")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -667,7 +671,7 @@ public:
     OccupancySensingAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::OccupancySensing::Id,
-            "attr_translator_OccupancySensing")
+              "attr_translator_OccupancySensing")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {
@@ -725,7 +729,7 @@ public:
     ElectricalMeasurementAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         device_translator& dev_translator)
         : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator,
-            chip::app::Clusters::ElectricalMeasurement::Id, "attr_translator_ElectricalMeasurement")
+              chip::app::Clusters::ElectricalMeasurement::Id, "attr_translator_ElectricalMeasurement")
         , m_unify_mqtt(unify_mqtt)
         , m_dev_translator(dev_translator)
     {

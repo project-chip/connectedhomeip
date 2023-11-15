@@ -203,8 +203,8 @@ static sl_status_t mpc_level_cluster_move_to_level_command(const dotdot_unid_t u
     SendableCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type> cmd;
     cmd.Data().level = static_cast<uint8_t>(level);
     cmd.Data().transitionTime = static_cast<DataModel::Nullable<uint16_t>>(transition_time);
-    cmd.Data().optionsMask = static_cast<chip::BitMask<LevelControlOptions>>(options_mask);
-    cmd.Data().optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(options_override);
+    cmd.Data().optionsMask = static_cast<chip::BitMask<OptionsBitmap>>(options_mask);
+    cmd.Data().optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(options_override);
 
     if (UIC_MQTT_DOTDOT_CALLBACK_TYPE_SUPPORT_CHECK == callback_type)
         return check_cluster_support_for_node(unid, endpoint, chip::app::Clusters::LevelControl::Id,
@@ -218,7 +218,7 @@ static sl_status_t mpc_level_cluster_move_to_level_command(const dotdot_unid_t u
 }
 
 static sl_status_t mpc_level_cluster_move_command(const dotdot_unid_t unid, dotdot_endpoint_id_t endpoint,
-    uic_mqtt_dotdot_callback_call_type_t callback_type, MoveStepMode move_mode,
+    uic_mqtt_dotdot_callback_call_type_t callback_type, uint8_t move_mode,
 
     uint8_t rate,
 
@@ -229,10 +229,10 @@ static sl_status_t mpc_level_cluster_move_command(const dotdot_unid_t unid, dotd
     chip::EndpointId endpointId;
     chip::NodeId nodeId;
     SendableCommand<chip::app::Clusters::LevelControl::Commands::Move::Type> cmd;
-    cmd.Data().moveMode = static_cast<MoveMode>(move_mode);
+    cmd.Data().moveMode = static_cast<MoveModeEnum>(move_mode);
     cmd.Data().rate = static_cast<DataModel::Nullable<uint8_t>>(rate);
-    cmd.Data().optionsMask = static_cast<chip::BitMask<LevelControlOptions>>(options_mask);
-    cmd.Data().optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(options_override);
+    cmd.Data().optionsMask = static_cast<chip::BitMask<OptionsBitmap>>(options_mask);
+    cmd.Data().optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(options_override);
 
     if (UIC_MQTT_DOTDOT_CALLBACK_TYPE_SUPPORT_CHECK == callback_type)
         return check_cluster_support_for_node(unid, endpoint, chip::app::Clusters::LevelControl::Id,
@@ -246,7 +246,7 @@ static sl_status_t mpc_level_cluster_move_command(const dotdot_unid_t unid, dotd
 }
 
 static sl_status_t mpc_level_cluster_step_command(const dotdot_unid_t unid, dotdot_endpoint_id_t endpoint,
-    uic_mqtt_dotdot_callback_call_type_t callback_type, MoveStepMode step_mode,
+    uic_mqtt_dotdot_callback_call_type_t callback_type, uint8_t step_mode,
 
     uint8_t step_size,
 
@@ -259,11 +259,11 @@ static sl_status_t mpc_level_cluster_step_command(const dotdot_unid_t unid, dotd
     chip::EndpointId endpointId;
     chip::NodeId nodeId;
     SendableCommand<chip::app::Clusters::LevelControl::Commands::Step::Type> cmd;
-    cmd.Data().stepMode = static_cast<StepMode>(step_mode);
+    cmd.Data().stepMode = static_cast<StepModeEnum>(step_mode);
     cmd.Data().stepSize = static_cast<uint8_t>(step_size);
     cmd.Data().transitionTime = static_cast<DataModel::Nullable<uint16_t>>(transition_time);
-    cmd.Data().optionsMask = static_cast<chip::BitMask<LevelControlOptions>>(options_mask);
-    cmd.Data().optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(options_override);
+    cmd.Data().optionsMask = static_cast<chip::BitMask<OptionsBitmap>>(options_mask);
+    cmd.Data().optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(options_override);
 
     if (UIC_MQTT_DOTDOT_CALLBACK_TYPE_SUPPORT_CHECK == callback_type)
         return check_cluster_support_for_node(unid, endpoint, chip::app::Clusters::LevelControl::Id,
@@ -284,8 +284,8 @@ static sl_status_t mpc_level_cluster_stop_command(const dotdot_unid_t unid, dotd
     chip::EndpointId endpointId;
     chip::NodeId nodeId;
     SendableCommand<chip::app::Clusters::LevelControl::Commands::Stop::Type> cmd;
-    cmd.Data().optionsMask = static_cast<chip::BitMask<LevelControlOptions>>(options_mask);
-    cmd.Data().optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(options_override);
+    cmd.Data().optionsMask = static_cast<chip::BitMask<OptionsBitmap>>(options_mask);
+    cmd.Data().optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(options_override);
 
     if (UIC_MQTT_DOTDOT_CALLBACK_TYPE_SUPPORT_CHECK == callback_type)
         return check_cluster_support_for_node(unid, endpoint, chip::app::Clusters::LevelControl::Id,
@@ -313,8 +313,8 @@ static sl_status_t mpc_level_cluster_move_to_level_with_on_off_command(const dot
     SendableCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type> cmd;
     cmd.Data().level = static_cast<uint8_t>(level);
     cmd.Data().transitionTime = static_cast<DataModel::Nullable<uint16_t>>(transition_time);
-    cmd.Data().optionsMask = static_cast<chip::BitMask<LevelControlOptions>>(options_mask);
-    cmd.Data().optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(options_override);
+    cmd.Data().optionsMask = static_cast<chip::BitMask<OptionsBitmap>>(options_mask);
+    cmd.Data().optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(options_override);
 
     if (UIC_MQTT_DOTDOT_CALLBACK_TYPE_SUPPORT_CHECK == callback_type)
         return check_cluster_support_for_node(unid, endpoint, chip::app::Clusters::LevelControl::Id,
@@ -328,8 +328,7 @@ static sl_status_t mpc_level_cluster_move_to_level_with_on_off_command(const dot
 }
 
 static sl_status_t mpc_level_cluster_move_with_on_off_command(const dotdot_unid_t unid, dotdot_endpoint_id_t endpoint,
-    uic_mqtt_dotdot_callback_call_type_t callback_type,
-    MoveStepMode move_mode,
+    uic_mqtt_dotdot_callback_call_type_t callback_type, uint8_t move_mode,
 
     uint8_t rate,
 
@@ -340,10 +339,10 @@ static sl_status_t mpc_level_cluster_move_with_on_off_command(const dotdot_unid_
     chip::EndpointId endpointId;
     chip::NodeId nodeId;
     SendableCommand<chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type> cmd;
-    cmd.Data().moveMode = static_cast<MoveMode>(move_mode);
+    cmd.Data().moveMode = static_cast<MoveModeEnum>(move_mode);
     cmd.Data().rate = static_cast<DataModel::Nullable<uint8_t>>(rate);
-    cmd.Data().optionsMask = static_cast<chip::BitMask<LevelControlOptions>>(options_mask);
-    cmd.Data().optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(options_override);
+    cmd.Data().optionsMask = static_cast<chip::BitMask<OptionsBitmap>>(options_mask);
+    cmd.Data().optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(options_override);
 
     if (UIC_MQTT_DOTDOT_CALLBACK_TYPE_SUPPORT_CHECK == callback_type)
         return check_cluster_support_for_node(unid, endpoint, chip::app::Clusters::LevelControl::Id,
@@ -357,8 +356,7 @@ static sl_status_t mpc_level_cluster_move_with_on_off_command(const dotdot_unid_
 }
 
 static sl_status_t mpc_level_cluster_step_with_on_off_command(const dotdot_unid_t unid, dotdot_endpoint_id_t endpoint,
-    uic_mqtt_dotdot_callback_call_type_t callback_type,
-    MoveStepMode step_mode,
+    uic_mqtt_dotdot_callback_call_type_t callback_type, uint8_t step_mode,
 
     uint8_t step_size,
 
@@ -371,11 +369,11 @@ static sl_status_t mpc_level_cluster_step_with_on_off_command(const dotdot_unid_
     chip::EndpointId endpointId;
     chip::NodeId nodeId;
     SendableCommand<chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type> cmd;
-    cmd.Data().stepMode = static_cast<StepMode>(step_mode);
+    cmd.Data().stepMode = static_cast<StepModeEnum>(step_mode);
     cmd.Data().stepSize = static_cast<uint8_t>(step_size);
     cmd.Data().transitionTime = static_cast<DataModel::Nullable<uint16_t>>(transition_time);
-    cmd.Data().optionsMask = static_cast<chip::BitMask<LevelControlOptions>>(options_mask);
-    cmd.Data().optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(options_override);
+    cmd.Data().optionsMask = static_cast<chip::BitMask<OptionsBitmap>>(options_mask);
+    cmd.Data().optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(options_override);
 
     if (UIC_MQTT_DOTDOT_CALLBACK_TYPE_SUPPORT_CHECK == callback_type)
         return check_cluster_support_for_node(unid, endpoint, chip::app::Clusters::LevelControl::Id,
@@ -397,8 +395,8 @@ static sl_status_t mpc_level_cluster_stop_with_on_off_command(const dotdot_unid_
     chip::EndpointId endpointId;
     chip::NodeId nodeId;
     SendableCommand<chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type> cmd;
-    cmd.Data().optionsMask = static_cast<chip::BitMask<LevelControlOptions>>(options_mask);
-    cmd.Data().optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(options_override);
+    cmd.Data().optionsMask = static_cast<chip::BitMask<OptionsBitmap>>(options_mask);
+    cmd.Data().optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(options_override);
 
     if (UIC_MQTT_DOTDOT_CALLBACK_TYPE_SUPPORT_CHECK == callback_type)
         return check_cluster_support_for_node(unid, endpoint, chip::app::Clusters::LevelControl::Id,

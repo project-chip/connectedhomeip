@@ -111,6 +111,13 @@ inline std::optional<chip::BitMask<Groups::NameSupportBitmap>> from_json(const n
 
 /***************************** Bitmap Converters **************/
 template <>
+inline std::optional<chip::BitMask<Scenes::CopyModeBitmap>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Scenes::CopyModeBitmap> r;
+    r.SetField(Scenes::CopyModeBitmap::kCopyAllScenes, obj.value("CopyAllScenes", false));
+    return r;
+}
+template <>
 inline std::optional<chip::BitMask<Scenes::Feature>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<Scenes::Feature> r;
@@ -121,10 +128,10 @@ inline std::optional<chip::BitMask<Scenes::Feature>> from_json(const nlohmann::j
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<Scenes::ScenesCopyMode>> from_json(const nlohmann::json& obj)
+inline std::optional<chip::BitMask<Scenes::NameSupportBitmap>> from_json(const nlohmann::json& obj)
 {
-    chip::BitMask<Scenes::ScenesCopyMode> r;
-    r.SetField(Scenes::ScenesCopyMode::kCopyAllScenes, obj.value("CopyAllScenes", false));
+    chip::BitMask<Scenes::NameSupportBitmap> r;
+    r.SetField(Scenes::NameSupportBitmap::kSceneNames, obj.value("SceneNames", false));
     return r;
 }
 
@@ -135,6 +142,7 @@ inline std::optional<chip::BitMask<OnOff::Feature>> from_json(const nlohmann::js
     chip::BitMask<OnOff::Feature> r;
     r.SetField(OnOff::Feature::kLighting, obj.value("Lighting", false));
     r.SetField(OnOff::Feature::kDeadFrontBehavior, obj.value("DeadFrontBehavior", false));
+    r.SetField(OnOff::Feature::kOffOnly, obj.value("OffOnly", false));
     return r;
 }
 template <>
@@ -217,20 +225,20 @@ inline std::optional<chip::BitMask<LevelControl::Feature>> from_json(const nlohm
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<LevelControl::LevelControlOptions>> from_json(const nlohmann::json& obj)
+inline std::optional<chip::BitMask<LevelControl::OptionsBitmap>> from_json(const nlohmann::json& obj)
 {
-    chip::BitMask<LevelControl::LevelControlOptions> r;
-    r.SetField(LevelControl::LevelControlOptions::kExecuteIfOff, obj.value("ExecuteIfOff", false));
-    r.SetField(LevelControl::LevelControlOptions::kCoupleColorTempToLevel, obj.value("CoupleColorTempToLevel", false));
+    chip::BitMask<LevelControl::OptionsBitmap> r;
+    r.SetField(LevelControl::OptionsBitmap::kExecuteIfOff, obj.value("ExecuteIfOff", false));
+    r.SetField(LevelControl::OptionsBitmap::kCoupleColorTempToLevel, obj.value("CoupleColorTempToLevel", false));
     return r;
 }
 
 template <>
-inline std::optional<LevelControl::MoveMode> from_json(const nlohmann::json& value)
+inline std::optional<LevelControl::MoveModeEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, LevelControl::MoveMode> table = {
-        { "Up", LevelControl::MoveMode::kUp },
-        { "Down", LevelControl::MoveMode::kDown },
+    const std::map<std::string, LevelControl::MoveModeEnum> table = {
+        { "Up", LevelControl::MoveModeEnum::kUp },
+        { "Down", LevelControl::MoveModeEnum::kDown },
     };
 
     auto i = table.find(value);
@@ -241,11 +249,11 @@ inline std::optional<LevelControl::MoveMode> from_json(const nlohmann::json& val
     }
 }
 template <>
-inline std::optional<LevelControl::StepMode> from_json(const nlohmann::json& value)
+inline std::optional<LevelControl::StepModeEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, LevelControl::StepMode> table = {
-        { "Up", LevelControl::StepMode::kUp },
-        { "Down", LevelControl::StepMode::kDown },
+    const std::map<std::string, LevelControl::StepModeEnum> table = {
+        { "Up", LevelControl::StepModeEnum::kUp },
+        { "Down", LevelControl::StepModeEnum::kDown },
     };
 
     auto i = table.find(value);
@@ -1046,8 +1054,8 @@ inline std::optional<FanControl::FanModeSequenceEnum> from_json(const nlohmann::
         { "Off/Low/High", FanControl::FanModeSequenceEnum::kOffLowHigh },
         { "Off/Low/Med/High/Auto", FanControl::FanModeSequenceEnum::kOffLowMedHighAuto },
         { "Off/Low/High/Auto", FanControl::FanModeSequenceEnum::kOffLowHighAuto },
-        { "Off/On/Auto", FanControl::FanModeSequenceEnum::kOffOnAuto },
-        { "Off/On", FanControl::FanModeSequenceEnum::kOffOn },
+        { "Off/High/Auto", FanControl::FanModeSequenceEnum::kOffHighAuto },
+        { "Off/High", FanControl::FanModeSequenceEnum::kOffHigh },
     };
 
     auto i = table.find(value);
@@ -1074,6 +1082,58 @@ inline std::optional<FanControl::StepDirectionEnum> from_json(const nlohmann::js
 }
 /***************************** Bitmap Converters **************/
 
+template <>
+inline std::optional<ThermostatUserInterfaceConfiguration::KeypadLockoutEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, ThermostatUserInterfaceConfiguration::KeypadLockoutEnum> table = {
+        { "NoLockout", ThermostatUserInterfaceConfiguration::KeypadLockoutEnum::kNoLockout },
+        { "Lockout1", ThermostatUserInterfaceConfiguration::KeypadLockoutEnum::kLockout1 },
+        { "Lockout2", ThermostatUserInterfaceConfiguration::KeypadLockoutEnum::kLockout2 },
+        { "Lockout3", ThermostatUserInterfaceConfiguration::KeypadLockoutEnum::kLockout3 },
+        { "Lockout4", ThermostatUserInterfaceConfiguration::KeypadLockoutEnum::kLockout4 },
+        { "Lockout5", ThermostatUserInterfaceConfiguration::KeypadLockoutEnum::kLockout5 },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum>
+from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum> table = {
+        { "ScheduleProgrammingPermitted",
+            ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum::kScheduleProgrammingPermitted },
+        { "ScheduleProgrammingDenied",
+            ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum::kScheduleProgrammingDenied },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum> table = {
+        { "Celsius", ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum::kCelsius },
+        { "Fahrenheit", ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum::kFahrenheit },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
 /***************************** Bitmap Converters **************/
 template <>
 inline std::optional<chip::BitMask<ColorControl::ColorCapabilities>> from_json(const nlohmann::json& obj)
