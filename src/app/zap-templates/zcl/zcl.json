@@ -325,6 +325,7 @@
             "FeatureMap"
         ],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Microwave Oven Control": ["CookTime", "PowerSetting", "MinPower", "MaxPower", "PowerStep", "FeatureMap"],
         "Laundry Washer Mode": [
             "SupportedModes",
             "CurrentMode",

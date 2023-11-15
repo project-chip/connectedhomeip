@@ -17,7 +17,6 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
 #include <app/util/attribute-storage.h>
@@ -26,65 +25,135 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::MicrowaveOvenControl;
 using namespace chip::app::Clusters::MicrowaveOvenControl::Attributes;
-using OperationalStateEnum = OperationalState::OperationalStateEnum;
 using Status               = Protocols::InteractionModel::Status;
-
-namespace {
-
-constexpr uint32_t kMaxCookTime     = 65535;
-constexpr uint32_t kMinCookTime     = 1;
-constexpr uint8_t kDefaultCookTime  = 30;
-constexpr uint8_t kDefaultCookPower = 100;
-
-constexpr size_t kMicrowaveOvenControlInstanceTableSize =
-    EMBER_AF_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
-static_assert(kMicrowaveOvenControlInstanceTableSize <= kEmberInvalidEndpointIndex,
-              "Microwave Oven Control Instance table size error");
-
-OperationalState::Instance * gInstanceTable[kMicrowaveOvenControlInstanceTableSize] = { nullptr };
-
-} // anonymous namespace
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
 
-/**
- * Get operational state instance
- */
-OperationalState::Instance * GetOPInstance(EndpointId aEndpoint)
+Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId) :
+    CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId), AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(aEndpoint, MicrowaveOvenControl::Id,
-                                                       EMBER_AF_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kMicrowaveOvenControlInstanceTableSize ? nullptr : gInstanceTable[ep]);
+    mDelegate->SetInstance(this);
 }
 
-/**
- * Set operational state instance
- */
-void SetOPInstance(EndpointId aEndpoint, OperationalState::Instance * aInstance)
+Instance::~Instance()
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(aEndpoint, MicrowaveOvenControl::Id,
-                                                       EMBER_AF_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    // if endpoint is found
-    if (ep < kMicrowaveOvenControlInstanceTableSize)
+    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+    unregisterAttributeAccessOverride(this);
+}
+
+CHIP_ERROR Instance::Init()
+{
+    // Check if the cluster has been selected in zap
+    if (!emberAfContainsServer(mEndpointId, mClusterId))
     {
-        gInstanceTable[ep] = aInstance;
+        ChipLogError(Zcl, "Microwave Oven Control: The cluster with ID %lu was not enabled in zap.", long(mClusterId));
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    return CHIP_NO_ERROR;
+}
+
+uint32_t Instance::GetCookTime()
+{
+    return this->mCookTime;
+}
+
+uint8_t Instance::GetPowerSetting()
+{
+    return this->mPowerSettng;
+}
+
+
+void Instance::SetCookTime(uint32_t cookTime)
+{
+    this->mCookTime = cookTime;
+}
+
+void Instance::SetPowerSetting(uint8_t powerSetting)
+{
+    this->mPowerSettng = powerSetting;
+}
+
+CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    ChipLogError(Zcl, "OperationalState: Reading");
+    switch (aPath.mAttributeId)
+    {
+    case MicrowaveOvenControl::Attributes::CookTime::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(GetCookTime()));
+    }
+    break;
+
+    case MicrowaveOvenControl::Attributes::PowerSetting::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(GetPowerSetting()));
+    }
+    break;
+
+    case MicrowaveOvenControl::Attributes::MinPower::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetMinPower()));
+    }
+    break;
+
+    case MicrowaveOvenControl::Attributes::MaxPower::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetMaxPower()));
+    }
+    break;
+
+    case MicrowaveOvenControl::Attributes::PowerStep::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetPowerStep()));
+    }
+    break;
+
+    }
+    return CHIP_NO_ERROR;
+}
+
+
+void Instance::InvokeCommand(HandlerContext & handlerContext)
+{
+    ChipLogDetail(Zcl, "MicrowaveOvenControl: InvokeCommand");
+    switch (handlerContext.mRequestPath.mCommandId)
+    {
+    case Commands::SetCookingParameters::Id:
+        ChipLogDetail(Zcl, "MicrowaveOvenControl:  Entering SetCookingParameters");
+
+        CommandHandlerInterface::HandleCommand<Commands::SetCookingParameters::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSetCookingParameters(ctx, req); });
+        break;
+
+    case Commands::AddMoreTime::Id:
+        ChipLogDetail(Zcl, "MicrowaveOvenControl:  Entering AddMoreTime");
+
+        CommandHandlerInterface::HandleCommand<Commands::AddMoreTime::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleAddMoreTime(ctx, req); });
+        break;
+
     }
 }
 
-bool CheckCookTimeIsInRange(uint32_t cookTime)
+void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::SetCookingParameters::DecodableType & req)
 {
-    return (cookTime < kMinCookTime || cookTime > kMaxCookTime) ? false : true;
+    ChipLogDetail(Zcl, "MicrowaveOvenControl:  HandleSetCookingParameters");
+    Status status;
+    status = mDelegate->HandleSetCookingParametersCallback(req.cookMode,req.cookTime,req.powerSetting);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-bool CheckPowerSettingIsInRange(uint8_t powerSetting, uint8_t minCookPower, uint8_t maxCookPower)
+void Instance::HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTime::DecodableType & req)
 {
-    return (powerSetting < minCookPower || powerSetting > maxCookPower) ? false : true;
+    ChipLogDetail(Zcl, "MicrowaveOvenControl:  HandleAddMoreTime");
+    Status status;
+    status = mDelegate->HandleAddMoreTimeCallback(req.timeToAdd);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 } // namespace MicrowaveOvenControl
@@ -92,205 +161,6 @@ bool CheckPowerSettingIsInRange(uint8_t powerSetting, uint8_t minCookPower, uint
 } // namespace app
 } // namespace chip
 
-/**********************************************************
- * Callbacks Implementation
- *********************************************************/
-/**
- * @brief Microwave Oven Control Cluster SetCookingParameters Command callback (from client)
- */
-bool emberAfMicrowaveOvenControlClusterSetCookingParametersCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MicrowaveOvenControl::Commands::SetCookingParameters::DecodableType & commandData)
-{
-    uint8_t opState;
-    EndpointId endpointId                                  = commandPath.mEndpointId;
-    EmberAfStatus emberAfStatus                            = EMBER_ZCL_STATUS_SUCCESS;
-    Status status                                          = Status::Success;
-    OperationalState::Instance * gOperationalStateInstance = nullptr;
-    auto & CookMode                                        = commandData.cookMode;
-    auto & CookTime                                        = commandData.cookTime;
-    auto & PowerSetting                                    = commandData.powerSetting;
-    uint8_t kMinCookPower;
-    uint8_t kMaxCookPower;
-
-    // get Operational State instance and current state
-    gOperationalStateInstance = GetOPInstance(endpointId);
-    if (gOperationalStateInstance == nullptr)
-    {
-        status = Status::InvalidInState;
-        ChipLogProgress(Zcl, "Server didn't create instance of Operational State");
-        goto exit;
-    }
-
-    if (CookTime.HasValue() && (!CheckCookTimeIsInRange(CookTime.Value())))
-    {
-        status = Status::InvalidCommand;
-        ChipLogError(Zcl, "Failed to set cookTime, cookTime value is out of range");
-        goto exit;
-    }
-
-    emberAfStatus = MinPower::Get(endpointId, &kMinCookPower);
-    if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        status = app::ToInteractionModelStatus(emberAfStatus);
-        ChipLogError(Zcl, "Failed to get MinPower");
-        goto exit;
-    }
-
-    emberAfStatus = MaxPower::Get(endpointId, &kMaxCookPower);
-    if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        status = app::ToInteractionModelStatus(emberAfStatus);
-        ChipLogError(Zcl, "Failed to get MaxPower");
-        goto exit;
-    }
-
-    if (PowerSetting.HasValue() && (!CheckPowerSettingIsInRange(PowerSetting.Value(), kMinCookPower, kMaxCookPower)))
-    {
-        status = Status::InvalidCommand;
-        ChipLogError(Zcl, "Failed to set cookPower, cookPower value is out of range");
-        goto exit;
-    }
-
-    opState = gOperationalStateInstance->GetCurrentOperationalState();
-    if (opState == to_underlying(OperationalStateEnum::kStopped))
-    {
-
-        if (CookMode.HasValue())
-        {
-            // TODO: set Microwave Oven cooking mode by CookMode.Value().
-        }
-        else
-        {
-            // TODO: set Microwave Oven cooking mode to normal mode.
-        }
-
-        if (CookTime.HasValue())
-        {
-            // set Microwave Oven cooking time by getting input value.
-            emberAfStatus = CookTime::Set(endpointId, CookTime.Value());
-            ChipLogError(Zcl, "emberAfStatus value = %d", emberAfStatus);
-            if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
-            {
-                status = Status::InvalidCommand;
-                ChipLogError(Zcl, "Failed to set cookTime");
-                goto exit;
-            }
-        }
-        else
-        {
-            // set Microwave Oven cooking time to 30 seconds(default).
-            emberAfStatus = CookTime::Set(endpointId, kDefaultCookTime);
-            if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
-            {
-                status = Status::InvalidCommand;
-                ChipLogError(Zcl, "Failed to set cookTime");
-                goto exit;
-            }
-        }
-
-        if (PowerSetting.HasValue())
-        {
-            // set Microwave Oven cooking power by getting input value.
-            emberAfStatus = PowerSetting::Set(endpointId, PowerSetting.Value());
-            ChipLogError(Zcl, "emberAfStatus value = %d", emberAfStatus);
-            if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
-            {
-                status = Status::InvalidCommand;
-                ChipLogError(Zcl, "Failed to set cooking power");
-                goto exit;
-            }
-        }
-        else
-        {
-            // set Microwave Oven cooking power to max power(default).
-            emberAfStatus = PowerSetting::Set(endpointId, kDefaultCookPower);
-            if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
-            {
-                status = Status::InvalidCommand;
-                ChipLogError(Zcl, "Failed to set cooking power");
-                goto exit;
-            }
-        }
-    }
-    else
-    {
-        status = Status::InvalidInState;
-        goto exit;
-    }
-
-exit:
-    commandObj->AddStatus(commandPath, status);
-    return true;
-}
-/**
- * @brief Microwave Oven Control Cluster AddMoreTime Command callback (from client)
- */
-bool emberAfMicrowaveOvenControlClusterAddMoreTimeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MicrowaveOvenControl::Commands::AddMoreTime::DecodableType & commandData)
-{
-    uint8_t opState;
-    EndpointId endpointId                                  = commandPath.mEndpointId;
-    EmberAfStatus emberAfStatus                            = EMBER_ZCL_STATUS_SUCCESS;
-    Status status                                          = Status::Success;
-    OperationalState::Instance * gOperationalStateInstance = nullptr;
-
-    // get Operational State instance and current state
-    gOperationalStateInstance = GetOPInstance(endpointId);
-    if (gOperationalStateInstance == nullptr)
-    {
-        ChipLogProgress(Zcl, "Server didn't create instance of Operational State");
-        status = Status::InvalidInState;
-        goto exit;
-    }
-
-    opState = gOperationalStateInstance->GetCurrentOperationalState();
-    if (opState == to_underlying(OperationalStateEnum::kStopped) || opState == to_underlying(OperationalStateEnum::kRunning) ||
-        opState == to_underlying(OperationalStateEnum::kPaused))
-    {
-        // add cooking time by TimeToAdd command
-        auto & TimeToAdd = commandData.timeToAdd;
-        uint32_t currentCookTime;
-        uint32_t addedCookTime;
-        emberAfStatus = CookTime::Get(endpointId, &currentCookTime);
-        if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            status = app::ToInteractionModelStatus(emberAfStatus);
-            ChipLogError(Zcl, "Failed to get cuurent cooking time");
-            goto exit;
-        }
-
-        addedCookTime = currentCookTime + TimeToAdd;
-        // if the added cooking time is greater than the max cooking time, the cooking time stay unchanged.
-        if (addedCookTime < kMaxCookTime)
-        {
-            emberAfStatus = CookTime::Set(endpointId, addedCookTime);
-            if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
-            {
-                status = Status::InvalidInState;
-                ChipLogError(Zcl, "Failed to set cookTime");
-                goto exit;
-            }
-        }
-        else
-        {
-            status = Status::ConstraintError;
-            ChipLogError(Zcl, "Failed to set cookTime");
-            goto exit;
-        }
-    }
-    else // operational state is in error
-    {
-        status = Status::InvalidInState;
-        goto exit;
-    }
-
-exit:
-
-    commandObj->AddStatus(commandPath, status);
-    return true;
-}
 
 /** @brief Microwave Oven Control Cluster Server Init
  *

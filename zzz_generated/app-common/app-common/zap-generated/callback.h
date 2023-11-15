@@ -9028,18 +9028,6 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
 /**
- * @brief Microwave Oven Control Cluster SetCookingParameters Command callback (from client)
- */
-bool emberAfMicrowaveOvenControlClusterSetCookingParametersCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MicrowaveOvenControl::Commands::SetCookingParameters::DecodableType & commandData);
-/**
- * @brief Microwave Oven Control Cluster AddMoreTime Command callback (from client)
- */
-bool emberAfMicrowaveOvenControlClusterAddMoreTimeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MicrowaveOvenControl::Commands::AddMoreTime::DecodableType & commandData);
-/**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */
 bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,

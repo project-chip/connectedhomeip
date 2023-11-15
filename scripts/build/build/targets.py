@@ -133,6 +133,7 @@ def BuildHostTarget():
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
         TargetPart('contact-sensor', app=HostApp.CONTACT_SENSOR),
         TargetPart('dishwasher', app=HostApp.DISHWASHER),
+        TargetPart('microwave-oven', app=HostApp.MICROWAVE_OVEN),
         TargetPart('refrigerator', app=HostApp.REFRIGERATOR),
         TargetPart('rvc', app=HostApp.RVC),
         TargetPart('air-purifier', app=HostApp.AIR_PURIFIER),

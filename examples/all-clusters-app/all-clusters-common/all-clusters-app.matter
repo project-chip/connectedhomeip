@@ -6110,11 +6110,11 @@ endpoint 1 {
   }
 
   server cluster MicrowaveOvenControl {
-    ram      attribute cookTime default = 30;
-    ram      attribute powerSetting default = 100;
-    ram      attribute minPower default = 10;
-    ram      attribute maxPower default = 100;
-    ram      attribute powerStep default = 10;
+    callback attribute cookTime default = 30;
+    callback attribute powerSetting default = 100;
+    callback attribute minPower default = 10;
+    callback attribute maxPower default = 100;
+    callback attribute powerStep default = 10;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
