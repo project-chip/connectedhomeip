@@ -1612,6 +1612,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #if CHIP_CONFIG_MAX_PATHS_PER_INVOKE < 1 || CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 65535
 #error "CHIP_CONFIG_MAX_PATHS_PER_INVOKE is not allowed to be a number less than 1 or greater than 65535"
 #endif
+
 /**
  * @def CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
  *
