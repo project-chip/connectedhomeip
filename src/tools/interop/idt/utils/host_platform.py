@@ -82,8 +82,8 @@ def verify_py_version() -> None:
     py_version_minor = sys.version_info[1]
     have = f"{py_version_major}.{py_version_minor}"
     need = f"{config.py_major_version}.{config.py_minor_version}"
-    if not (int(py_version_major) == int(config.py_major_version)
-            and int(py_version_minor) >= int(config.py_minor_version)):
+    if not (py_version_major == config.py_major_version
+            and py_version_minor >= config.py_minor_version):
         logger.critical(
             f"IDT requires python >= {need} but you have {have}")
         logger.critical("Please install the correct version, delete idt/venv, and re-run!")
