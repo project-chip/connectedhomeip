@@ -19,7 +19,6 @@
  * is meant to be included at the end of cluster-enums.h, after all the normal
  * enum definitions are available.
  */
-
 #pragma once
 
 namespace chip {
