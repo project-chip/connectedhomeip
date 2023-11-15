@@ -536,9 +536,9 @@ static BOOL CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(Attr
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInDemandReponseLoadControlCluster(AttributeId aAttributeId)
+static BOOL CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::DemandReponseLoadControl;
+    using namespace Clusters::DemandResponseLoadControl;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1116,8 +1116,8 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(commandID);
     }
-    case Clusters::DemandReponseLoadControl::Id: {
-        return CommandNeedsTimedInvokeInDemandReponseLoadControlCluster(commandID);
+    case Clusters::DemandResponseLoadControl::Id: {
+        return CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(commandID);
     }
     case Clusters::DoorLock::Id: {
         return CommandNeedsTimedInvokeInDoorLockCluster(commandID);

@@ -2163,7 +2163,7 @@ void ComplexArgumentParser::Finalize(
 
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::DemandReponseLoadControl::Structs::HeatingSourceControlStruct::Type & request,
+                             chip::app::Clusters::DemandResponseLoadControl::Structs::HeatingSourceControlStruct::Type & request,
                              Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2183,14 +2183,14 @@ ComplexArgumentParser::Setup(const char * label,
 }
 
 void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::DemandReponseLoadControl::Structs::HeatingSourceControlStruct::Type & request)
+    chip::app::Clusters::DemandResponseLoadControl::Structs::HeatingSourceControlStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.heatingSource);
 }
 
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::DemandReponseLoadControl::Structs::PowerSavingsControlStruct::Type & request,
+                             chip::app::Clusters::DemandResponseLoadControl::Structs::PowerSavingsControlStruct::Type & request,
                              Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2210,14 +2210,14 @@ ComplexArgumentParser::Setup(const char * label,
 }
 
 void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::DemandReponseLoadControl::Structs::PowerSavingsControlStruct::Type & request)
+    chip::app::Clusters::DemandResponseLoadControl::Structs::PowerSavingsControlStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.powerSavings);
 }
 
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::DemandReponseLoadControl::Structs::DutyCycleControlStruct::Type & request,
+                             chip::app::Clusters::DemandResponseLoadControl::Structs::DutyCycleControlStruct::Type & request,
                              Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2236,14 +2236,15 @@ ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::DemandReponseLoadControl::Structs::DutyCycleControlStruct::Type & request)
+void ComplexArgumentParser::Finalize(
+    chip::app::Clusters::DemandResponseLoadControl::Structs::DutyCycleControlStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.dutyCycle);
 }
 
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::DemandReponseLoadControl::Structs::AverageLoadControlStruct::Type & request,
+                             chip::app::Clusters::DemandResponseLoadControl::Structs::AverageLoadControlStruct::Type & request,
                              Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2263,14 +2264,14 @@ ComplexArgumentParser::Setup(const char * label,
 }
 
 void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::DemandReponseLoadControl::Structs::AverageLoadControlStruct::Type & request)
+    chip::app::Clusters::DemandResponseLoadControl::Structs::AverageLoadControlStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.loadAdjustment);
 }
 
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::DemandReponseLoadControl::Structs::TemperatureControlStruct::Type & request,
+                             chip::app::Clusters::DemandResponseLoadControl::Structs::TemperatureControlStruct::Type & request,
                              Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2278,46 +2279,52 @@ ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TemperatureControlStruct.coolingTempOffset", "coolingTempOffset",
-                                                                  value.isMember("coolingTempOffset")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TemperatureControlStruct.heatTempOffset", "heatTempOffset",
-                                                                  value.isMember("heatTempOffset")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TemperatureControlStruct.coolingTempSetpoint",
-                                                                  "coolingTempSetpoint", value.isMember("coolingTempSetpoint")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TemperatureControlStruct.heatingTempSetpoint",
-                                                                  "heatingTempSetpoint", value.isMember("heatingTempSetpoint")));
-
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "coolingTempOffset");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.coolingTempOffset, value["coolingTempOffset"]));
+    if (value.isMember("coolingTempOffset"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "coolingTempOffset");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.coolingTempOffset, value["coolingTempOffset"]));
+    }
     valueCopy.removeMember("coolingTempOffset");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatTempOffset");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.heatTempOffset, value["heatTempOffset"]));
-    valueCopy.removeMember("heatTempOffset");
+    if (value.isMember("heatingtTempOffset"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatingtTempOffset");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.heatingtTempOffset, value["heatingtTempOffset"]));
+    }
+    valueCopy.removeMember("heatingtTempOffset");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "coolingTempSetpoint");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.coolingTempSetpoint, value["coolingTempSetpoint"]));
+    if (value.isMember("coolingTempSetpoint"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "coolingTempSetpoint");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.coolingTempSetpoint, value["coolingTempSetpoint"]));
+    }
     valueCopy.removeMember("coolingTempSetpoint");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatingTempSetpoint");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.heatingTempSetpoint, value["heatingTempSetpoint"]));
+    if (value.isMember("heatingTempSetpoint"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatingTempSetpoint");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.heatingTempSetpoint, value["heatingTempSetpoint"]));
+    }
     valueCopy.removeMember("heatingTempSetpoint");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
 void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::DemandReponseLoadControl::Structs::TemperatureControlStruct::Type & request)
+    chip::app::Clusters::DemandResponseLoadControl::Structs::TemperatureControlStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.coolingTempOffset);
-    ComplexArgumentParser::Finalize(request.heatTempOffset);
+    ComplexArgumentParser::Finalize(request.heatingtTempOffset);
     ComplexArgumentParser::Finalize(request.coolingTempSetpoint);
     ComplexArgumentParser::Finalize(request.heatingTempSetpoint);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(
-    const char * label, chip::app::Clusters::DemandReponseLoadControl::Structs::LoadControlEventTransitionStruct::Type & request,
+    const char * label, chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlEventTransitionStruct::Type & request,
     Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2329,16 +2336,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(
                                                                   value.isMember("duration")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("LoadControlEventTransitionStruct.control", "control", value.isMember("control")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LoadControlEventTransitionStruct.temperatureControl",
-                                                                  "temperatureControl", value.isMember("temperatureControl")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LoadControlEventTransitionStruct.averageLoadControl",
-                                                                  "averageLoadControl", value.isMember("averageLoadControl")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LoadControlEventTransitionStruct.dutyCycleControl",
-                                                                  "dutyCycleControl", value.isMember("dutyCycleControl")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LoadControlEventTransitionStruct.powerSavingsControl",
-                                                                  "powerSavingsControl", value.isMember("powerSavingsControl")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LoadControlEventTransitionStruct.heatingSourceControl",
-                                                                  "heatingSourceControl", value.isMember("heatingSourceControl")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "duration");
@@ -2349,32 +2346,50 @@ CHIP_ERROR ComplexArgumentParser::Setup(
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.control, value["control"]));
     valueCopy.removeMember("control");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "temperatureControl");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.temperatureControl, value["temperatureControl"]));
+    if (value.isMember("temperatureControl"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "temperatureControl");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.temperatureControl, value["temperatureControl"]));
+    }
     valueCopy.removeMember("temperatureControl");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "averageLoadControl");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.averageLoadControl, value["averageLoadControl"]));
+    if (value.isMember("averageLoadControl"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "averageLoadControl");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.averageLoadControl, value["averageLoadControl"]));
+    }
     valueCopy.removeMember("averageLoadControl");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dutyCycleControl");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.dutyCycleControl, value["dutyCycleControl"]));
+    if (value.isMember("dutyCycleControl"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dutyCycleControl");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.dutyCycleControl, value["dutyCycleControl"]));
+    }
     valueCopy.removeMember("dutyCycleControl");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "powerSavingsControl");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.powerSavingsControl, value["powerSavingsControl"]));
+    if (value.isMember("powerSavingsControl"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "powerSavingsControl");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.powerSavingsControl, value["powerSavingsControl"]));
+    }
     valueCopy.removeMember("powerSavingsControl");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatingSourceControl");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.heatingSourceControl, value["heatingSourceControl"]));
+    if (value.isMember("heatingSourceControl"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatingSourceControl");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.heatingSourceControl, value["heatingSourceControl"]));
+    }
     valueCopy.removeMember("heatingSourceControl");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
 void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::DemandReponseLoadControl::Structs::LoadControlEventTransitionStruct::Type & request)
+    chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlEventTransitionStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.duration);
     ComplexArgumentParser::Finalize(request.control);
@@ -2387,91 +2402,7 @@ void ComplexArgumentParser::Finalize(
 
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::DemandReponseLoadControl::Structs::ScopedLoadControlEventStruct::Type & request,
-                             Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ScopedLoadControlEventStruct.eventID", "eventID", value.isMember("eventID")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScopedLoadControlEventStruct.programControl", "programControl",
-                                                                  value.isMember("programControl")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ScopedLoadControlEventStruct.control", "control", value.isMember("control")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScopedLoadControlEventStruct.deviceClass", "deviceClass",
-                                                                  value.isMember("deviceClass")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScopedLoadControlEventStruct.enrollmentGroup", "enrollmentGroup",
-                                                                  value.isMember("enrollmentGroup")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScopedLoadControlEventStruct.criticality", "criticality",
-                                                                  value.isMember("criticality")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScopedLoadControlEventStruct.startTime", "startTime",
-                                                                  value.isMember("startTime")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScopedLoadControlEventStruct.transitions", "transitions",
-                                                                  value.isMember("transitions")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "eventID");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.eventID, value["eventID"]));
-    valueCopy.removeMember("eventID");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "programControl");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.programControl, value["programControl"]));
-    valueCopy.removeMember("programControl");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "control");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.control, value["control"]));
-    valueCopy.removeMember("control");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "deviceClass");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.deviceClass, value["deviceClass"]));
-    valueCopy.removeMember("deviceClass");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "enrollmentGroup");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.enrollmentGroup, value["enrollmentGroup"]));
-    valueCopy.removeMember("enrollmentGroup");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "criticality");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.criticality, value["criticality"]));
-    valueCopy.removeMember("criticality");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "startTime");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.startTime, value["startTime"]));
-    valueCopy.removeMember("startTime");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transitions");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transitions, value["transitions"]));
-    valueCopy.removeMember("transitions");
-
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
-    valueCopy.removeMember("fabricIndex");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::DemandReponseLoadControl::Structs::ScopedLoadControlEventStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.eventID);
-    ComplexArgumentParser::Finalize(request.programControl);
-    ComplexArgumentParser::Finalize(request.control);
-    ComplexArgumentParser::Finalize(request.deviceClass);
-    ComplexArgumentParser::Finalize(request.enrollmentGroup);
-    ComplexArgumentParser::Finalize(request.criticality);
-    ComplexArgumentParser::Finalize(request.startTime);
-    ComplexArgumentParser::Finalize(request.transitions);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
-}
-
-CHIP_ERROR
-ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::DemandReponseLoadControl::Structs::LoadControlEventStruct::Type & request,
+                             chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlEventStruct::Type & request,
                              Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2481,14 +2412,12 @@ ComplexArgumentParser::Setup(const char * label,
 
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("LoadControlEventStruct.eventID", "eventID", value.isMember("eventID")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LoadControlEventStruct.programControl", "programControl",
-                                                                  value.isMember("programControl")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("LoadControlEventStruct.programID", "programID", value.isMember("programID")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("LoadControlEventStruct.control", "control", value.isMember("control")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LoadControlEventStruct.deviceClass", "deviceClass",
                                                                   value.isMember("deviceClass")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LoadControlEventStruct.enrollmentGroup", "enrollmentGroup",
-                                                                  value.isMember("enrollmentGroup")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LoadControlEventStruct.criticality", "criticality",
                                                                   value.isMember("criticality")));
     ReturnErrorOnFailure(
@@ -2501,9 +2430,9 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.eventID, value["eventID"]));
     valueCopy.removeMember("eventID");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "programControl");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.programControl, value["programControl"]));
-    valueCopy.removeMember("programControl");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "programID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.programID, value["programID"]));
+    valueCopy.removeMember("programID");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "control");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.control, value["control"]));
@@ -2513,8 +2442,11 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.deviceClass, value["deviceClass"]));
     valueCopy.removeMember("deviceClass");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "enrollmentGroup");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.enrollmentGroup, value["enrollmentGroup"]));
+    if (value.isMember("enrollmentGroup"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "enrollmentGroup");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.enrollmentGroup, value["enrollmentGroup"]));
+    }
     valueCopy.removeMember("enrollmentGroup");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "criticality");
@@ -2532,10 +2464,11 @@ ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::DemandReponseLoadControl::Structs::LoadControlEventStruct::Type & request)
+void ComplexArgumentParser::Finalize(
+    chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlEventStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.eventID);
-    ComplexArgumentParser::Finalize(request.programControl);
+    ComplexArgumentParser::Finalize(request.programID);
     ComplexArgumentParser::Finalize(request.control);
     ComplexArgumentParser::Finalize(request.deviceClass);
     ComplexArgumentParser::Finalize(request.enrollmentGroup);
@@ -2546,7 +2479,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::DemandReponseLoadContr
 
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::DemandReponseLoadControl::Structs::LoadControlProgramStruct::Type & request,
+                             chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlProgramStruct::Type & request,
                              Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2590,77 +2523,13 @@ ComplexArgumentParser::Setup(const char * label,
 }
 
 void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::DemandReponseLoadControl::Structs::LoadControlProgramStruct::Type & request)
+    chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlProgramStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.programID);
     ComplexArgumentParser::Finalize(request.name);
     ComplexArgumentParser::Finalize(request.enrollmentGroup);
     ComplexArgumentParser::Finalize(request.randomStartMinutes);
     ComplexArgumentParser::Finalize(request.randomDurationMinutes);
-}
-
-CHIP_ERROR
-ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::DemandReponseLoadControl::Structs::ScopedLoadControlProgramStruct::Type & request,
-                             Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScopedLoadControlProgramStruct.programID", "programID",
-                                                                  value.isMember("programID")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ScopedLoadControlProgramStruct.name", "name", value.isMember("name")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScopedLoadControlProgramStruct.enrollmentGroup",
-                                                                  "enrollmentGroup", value.isMember("enrollmentGroup")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScopedLoadControlProgramStruct.randomStartMinutes",
-                                                                  "randomStartMinutes", value.isMember("randomStartMinutes")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "ScopedLoadControlProgramStruct.randomDurationMinutes", "randomDurationMinutes", value.isMember("randomDurationMinutes")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "programID");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.programID, value["programID"]));
-    valueCopy.removeMember("programID");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
-    valueCopy.removeMember("name");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "enrollmentGroup");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.enrollmentGroup, value["enrollmentGroup"]));
-    valueCopy.removeMember("enrollmentGroup");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "randomStartMinutes");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.randomStartMinutes, value["randomStartMinutes"]));
-    valueCopy.removeMember("randomStartMinutes");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "randomDurationMinutes");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.randomDurationMinutes, value["randomDurationMinutes"]));
-    valueCopy.removeMember("randomDurationMinutes");
-
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
-    valueCopy.removeMember("fabricIndex");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::DemandReponseLoadControl::Structs::ScopedLoadControlProgramStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.programID);
-    ComplexArgumentParser::Finalize(request.name);
-    ComplexArgumentParser::Finalize(request.enrollmentGroup);
-    ComplexArgumentParser::Finalize(request.randomStartMinutes);
-    ComplexArgumentParser::Finalize(request.randomDurationMinutes);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

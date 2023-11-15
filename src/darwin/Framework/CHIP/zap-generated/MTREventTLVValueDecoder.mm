@@ -2237,9 +2237,9 @@ static id _Nullable DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForDemandReponseLoadControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForDemandResponseLoadControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::DemandReponseLoadControl;
+    using namespace Clusters::DemandResponseLoadControl;
     switch (aEventId) {
     case Events::LoadControlEventStatusChange::Id: {
         Events::LoadControlEventStatusChange::DecodableType cppValue;
@@ -2248,7 +2248,7 @@ static id _Nullable DecodeEventPayloadForDemandReponseLoadControlCluster(EventId
             return nil;
         }
 
-        __auto_type * value = [MTRDemandReponseLoadControlClusterLoadControlEventStatusChangeEvent new];
+        __auto_type * value = [MTRDemandResponseLoadControlClusterLoadControlEventStatusChangeEvent new];
 
         do {
             NSData * _Nonnull memberValue;
@@ -2280,58 +2280,109 @@ static id _Nullable DecodeEventPayloadForDemandReponseLoadControlCluster(EventId
             value.control = memberValue;
         } while (0);
         do {
-            MTRDemandReponseLoadControlClusterTemperatureControlStruct * _Nonnull memberValue;
-            memberValue = [MTRDemandReponseLoadControlClusterTemperatureControlStruct new];
-            if (cppValue.temperatureControl.coolingTempOffset.IsNull()) {
-                memberValue.coolingTempOffset = nil;
+            MTRDemandResponseLoadControlClusterTemperatureControlStruct * _Nullable memberValue;
+            if (cppValue.temperatureControl.HasValue()) {
+                if (cppValue.temperatureControl.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [MTRDemandResponseLoadControlClusterTemperatureControlStruct new];
+                    if (cppValue.temperatureControl.Value().Value().coolingTempOffset.HasValue()) {
+                        if (cppValue.temperatureControl.Value().Value().coolingTempOffset.Value().IsNull()) {
+                            memberValue.coolingTempOffset = nil;
+                        } else {
+                            memberValue.coolingTempOffset = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.Value().Value().coolingTempOffset.Value().Value()];
+                        }
+                    } else {
+                        memberValue.coolingTempOffset = nil;
+                    }
+                    if (cppValue.temperatureControl.Value().Value().heatingtTempOffset.HasValue()) {
+                        if (cppValue.temperatureControl.Value().Value().heatingtTempOffset.Value().IsNull()) {
+                            memberValue.heatingtTempOffset = nil;
+                        } else {
+                            memberValue.heatingtTempOffset = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.Value().Value().heatingtTempOffset.Value().Value()];
+                        }
+                    } else {
+                        memberValue.heatingtTempOffset = nil;
+                    }
+                    if (cppValue.temperatureControl.Value().Value().coolingTempSetpoint.HasValue()) {
+                        if (cppValue.temperatureControl.Value().Value().coolingTempSetpoint.Value().IsNull()) {
+                            memberValue.coolingTempSetpoint = nil;
+                        } else {
+                            memberValue.coolingTempSetpoint = [NSNumber numberWithShort:cppValue.temperatureControl.Value().Value().coolingTempSetpoint.Value().Value()];
+                        }
+                    } else {
+                        memberValue.coolingTempSetpoint = nil;
+                    }
+                    if (cppValue.temperatureControl.Value().Value().heatingTempSetpoint.HasValue()) {
+                        if (cppValue.temperatureControl.Value().Value().heatingTempSetpoint.Value().IsNull()) {
+                            memberValue.heatingTempSetpoint = nil;
+                        } else {
+                            memberValue.heatingTempSetpoint = [NSNumber numberWithShort:cppValue.temperatureControl.Value().Value().heatingTempSetpoint.Value().Value()];
+                        }
+                    } else {
+                        memberValue.heatingTempSetpoint = nil;
+                    }
+                }
             } else {
-                memberValue.coolingTempOffset = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.coolingTempOffset.Value()];
-            }
-            if (cppValue.temperatureControl.heatTempOffset.IsNull()) {
-                memberValue.heatTempOffset = nil;
-            } else {
-                memberValue.heatTempOffset = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.heatTempOffset.Value()];
-            }
-            if (cppValue.temperatureControl.coolingTempSetpoint.IsNull()) {
-                memberValue.coolingTempSetpoint = nil;
-            } else {
-                memberValue.coolingTempSetpoint = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.coolingTempSetpoint.Value()];
-            }
-            if (cppValue.temperatureControl.heatingTempSetpoint.IsNull()) {
-                memberValue.heatingTempSetpoint = nil;
-            } else {
-                memberValue.heatingTempSetpoint = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.heatingTempSetpoint.Value()];
+                memberValue = nil;
             }
             value.temperatureControl = memberValue;
         } while (0);
         do {
-            MTRDemandReponseLoadControlClusterAverageLoadControlStruct * _Nonnull memberValue;
-            memberValue = [MTRDemandReponseLoadControlClusterAverageLoadControlStruct new];
-            memberValue.loadAdjustment = [NSNumber numberWithChar:cppValue.averageLoadControl.loadAdjustment];
+            MTRDemandResponseLoadControlClusterAverageLoadControlStruct * _Nullable memberValue;
+            if (cppValue.averageLoadControl.HasValue()) {
+                if (cppValue.averageLoadControl.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [MTRDemandResponseLoadControlClusterAverageLoadControlStruct new];
+                    memberValue.loadAdjustment = [NSNumber numberWithChar:cppValue.averageLoadControl.Value().Value().loadAdjustment];
+                }
+            } else {
+                memberValue = nil;
+            }
             value.averageLoadControl = memberValue;
         } while (0);
         do {
-            MTRDemandReponseLoadControlClusterDutyCycleControlStruct * _Nonnull memberValue;
-            memberValue = [MTRDemandReponseLoadControlClusterDutyCycleControlStruct new];
-            memberValue.dutyCycle = [NSNumber numberWithUnsignedChar:cppValue.dutyCycleControl.dutyCycle];
+            MTRDemandResponseLoadControlClusterDutyCycleControlStruct * _Nullable memberValue;
+            if (cppValue.dutyCycleControl.HasValue()) {
+                if (cppValue.dutyCycleControl.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [MTRDemandResponseLoadControlClusterDutyCycleControlStruct new];
+                    memberValue.dutyCycle = [NSNumber numberWithUnsignedChar:cppValue.dutyCycleControl.Value().Value().dutyCycle];
+                }
+            } else {
+                memberValue = nil;
+            }
             value.dutyCycleControl = memberValue;
         } while (0);
         do {
-            MTRDemandReponseLoadControlClusterPowerSavingsControlStruct * _Nonnull memberValue;
-            memberValue = [MTRDemandReponseLoadControlClusterPowerSavingsControlStruct new];
-            memberValue.powerSavings = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.powerSavingsControl.powerSavings)];
+            MTRDemandResponseLoadControlClusterPowerSavingsControlStruct * _Nullable memberValue;
+            if (cppValue.powerSavingsControl.HasValue()) {
+                if (cppValue.powerSavingsControl.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [MTRDemandResponseLoadControlClusterPowerSavingsControlStruct new];
+                    memberValue.powerSavings = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.powerSavingsControl.Value().Value().powerSavings)];
+                }
+            } else {
+                memberValue = nil;
+            }
             value.powerSavingsControl = memberValue;
         } while (0);
         do {
-            MTRDemandReponseLoadControlClusterHeatingSourceControlStruct * _Nonnull memberValue;
-            memberValue = [MTRDemandReponseLoadControlClusterHeatingSourceControlStruct new];
-            memberValue.heatingSource = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.heatingSourceControl.heatingSource)];
+            MTRDemandResponseLoadControlClusterHeatingSourceControlStruct * _Nullable memberValue;
+            if (cppValue.heatingSourceControl.HasValue()) {
+                if (cppValue.heatingSourceControl.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [MTRDemandResponseLoadControlClusterHeatingSourceControlStruct new];
+                    memberValue.heatingSource = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.heatingSourceControl.Value().Value().heatingSource)];
+                }
+            } else {
+                memberValue = nil;
+            }
             value.heatingSourceControl = memberValue;
-        } while (0);
-        do {
-            NSData * _Nonnull memberValue;
-            memberValue = AsData(cppValue.signature);
-            value.signature = memberValue;
         } while (0);
 
         return value;
@@ -3558,8 +3609,8 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::DemandReponseLoadControl::Id: {
-        return DecodeEventPayloadForDemandReponseLoadControlCluster(aPath.mEventId, aReader, aError);
+    case Clusters::DemandResponseLoadControl::Id: {
+        return DecodeEventPayloadForDemandResponseLoadControlCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);

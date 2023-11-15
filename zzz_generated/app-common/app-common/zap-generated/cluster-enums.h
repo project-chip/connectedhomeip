@@ -2047,12 +2047,12 @@ enum class Feature : uint32_t
 };
 } // namespace ActivatedCarbonFilterMonitoring
 
-namespace DemandReponseLoadControl {
+namespace DemandResponseLoadControl {
 
 // Enum for CriticalityLevelEnum
 enum class CriticalityLevelEnum : uint8_t
 {
-    kInvalid           = 0x00,
+    kUnknown           = 0x00,
     kGreen             = 0x01,
     kLevel1            = 0x02,
     kLevel2            = 0x03,
@@ -2072,9 +2072,9 @@ enum class CriticalityLevelEnum : uint8_t
 // Enum for HeatingSourceEnum
 enum class HeatingSourceEnum : uint8_t
 {
-    kAny        = 0x00,
-    kElectric   = 0x01,
-    kNaturalGas = 0x02,
+    kAny         = 0x00,
+    kElectric    = 0x01,
+    kNonElectric = 0x02,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -2097,7 +2097,7 @@ enum class LoadControlEventChangeSourceEnum : uint8_t
 // Enum for LoadControlEventStatusEnum
 enum class LoadControlEventStatusEnum : uint8_t
 {
-    kInvalid         = 0x00,
+    kUnknown         = 0x00,
     kReceived        = 0x01,
     kInProgress      = 0x02,
     kCompleted       = 0x03,
@@ -2139,23 +2139,23 @@ enum class CancelControlBitmap : uint16_t
 // Bitmap for DeviceClassBitmap
 enum class DeviceClassBitmap : uint32_t
 {
-    kHVACCompressorOrFurnace = 0x1,
-    kStripHeatBaseboardHeat  = 0x2,
-    kWaterHeater             = 0x4,
-    kPoolPumpSpaJacuzzi      = 0x8,
-    kSmartAppliances         = 0x10,
-    kIrrigationPump          = 0x20,
-    kManagedCAndILoads       = 0x40,
-    kSimpleMiscLoads         = 0x80,
-    kExteriorLighting        = 0x100,
-    kInteriorLighting        = 0x200,
-    kElectricVehicle         = 0x400,
-    kGenerationSystems       = 0x800,
-    kSmartInverter           = 0x1000,
-    kEvse                    = 0x2000,
-    kResu                    = 0x4000,
-    kEnergyManagementSytem   = 0x8000,
-    kSmartEnergyModule       = 0x10000,
+    kHvac             = 0x1,
+    kStripHeater      = 0x2,
+    kWaterHeater      = 0x4,
+    kPoolPump         = 0x8,
+    kSmartAppliance   = 0x10,
+    kIrrigationPump   = 0x20,
+    kCommercialLoad   = 0x40,
+    kResidentialLoad  = 0x80,
+    kExteriorLighting = 0x100,
+    kInteriorLighting = 0x200,
+    kEv               = 0x400,
+    kGenerationSystem = 0x800,
+    kSmartInverter    = 0x1000,
+    kEvse             = 0x2000,
+    kResu             = 0x4000,
+    kEms              = 0x8000,
+    kSem              = 0x10000,
 };
 
 // Bitmap for EventControlBitmap
@@ -2182,7 +2182,7 @@ enum class Feature : uint32_t
     kPowerSavings        = 0x20,
     kHeatingSource       = 0x40,
 };
-} // namespace DemandReponseLoadControl
+} // namespace DemandResponseLoadControl
 
 namespace DoorLock {
 

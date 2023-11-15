@@ -14,25 +14,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package matter.devicecontroller.cluster.structs
+package chip.devicecontroller.cluster.structs
 
-import java.util.Optional
-import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import chip.devicecontroller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DemandReponseLoadControlClusterLoadControlProgramStruct(
+class DemandResponseLoadControlClusterLoadControlProgramStruct(
   val programID: ByteArray,
   val name: String,
-  val enrollmentGroup: UByte?,
-  val randomStartMinutes: UByte?,
-  val randomDurationMinutes: UByte?
+  val enrollmentGroup: UInt?,
+  val randomStartMinutes: UInt?,
+  val randomDurationMinutes: UInt?
 ) {
   override fun toString(): String = buildString {
-    append("DemandReponseLoadControlClusterLoadControlProgramStruct {\n")
+    append("DemandResponseLoadControlClusterLoadControlProgramStruct {\n")
     append("\tprogramID : $programID\n")
     append("\tname : $name\n")
     append("\tenrollmentGroup : $enrollmentGroup\n")
@@ -72,32 +70,44 @@ class DemandReponseLoadControlClusterLoadControlProgramStruct(
     private const val TAG_RANDOM_START_MINUTES = 3
     private const val TAG_RANDOM_DURATION_MINUTES = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DemandReponseLoadControlClusterLoadControlProgramStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): DemandResponseLoadControlClusterLoadControlProgramStruct {
       tlvReader.enterStructure(tlvTag)
       val programID = tlvReader.getByteArray(ContextSpecificTag(TAG_PROGRAM_I_D))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      val enrollmentGroup = if (!tlvReader.isNull()) {
-      tlvReader.getUByte(ContextSpecificTag(TAG_ENROLLMENT_GROUP))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_ENROLLMENT_GROUP))
-      null
-    }
-      val randomStartMinutes = if (!tlvReader.isNull()) {
-      tlvReader.getUByte(ContextSpecificTag(TAG_RANDOM_START_MINUTES))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_RANDOM_START_MINUTES))
-      null
-    }
-      val randomDurationMinutes = if (!tlvReader.isNull()) {
-      tlvReader.getUByte(ContextSpecificTag(TAG_RANDOM_DURATION_MINUTES))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_RANDOM_DURATION_MINUTES))
-      null
-    }
-      
+      val enrollmentGroup =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_ENROLLMENT_GROUP))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_ENROLLMENT_GROUP))
+          null
+        }
+      val randomStartMinutes =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_RANDOM_START_MINUTES))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_RANDOM_START_MINUTES))
+          null
+        }
+      val randomDurationMinutes =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_RANDOM_DURATION_MINUTES))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_RANDOM_DURATION_MINUTES))
+          null
+        }
+
       tlvReader.exitContainer()
 
-      return DemandReponseLoadControlClusterLoadControlProgramStruct(programID, name, enrollmentGroup, randomStartMinutes, randomDurationMinutes)
+      return DemandResponseLoadControlClusterLoadControlProgramStruct(
+        programID,
+        name,
+        enrollmentGroup,
+        randomStartMinutes,
+        randomDurationMinutes
+      )
     }
   }
 }

@@ -16,41 +16,40 @@
  */
 package matter.devicecontroller.cluster.structs
 
-import java.util.Optional
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DemandReponseLoadControlClusterPowerSavingsControlStruct(
-  val powerSavings: UInt
-) {
+class DemandResponseLoadControlClusterAverageLoadControlStruct(val loadAdjustment: Byte) {
   override fun toString(): String = buildString {
-    append("DemandReponseLoadControlClusterPowerSavingsControlStruct {\n")
-    append("\tpowerSavings : $powerSavings\n")
+    append("DemandResponseLoadControlClusterAverageLoadControlStruct {\n")
+    append("\tloadAdjustment : $loadAdjustment\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_POWER_SAVINGS), powerSavings)
+      put(ContextSpecificTag(TAG_LOAD_ADJUSTMENT), loadAdjustment)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_POWER_SAVINGS = 0
+    private const val TAG_LOAD_ADJUSTMENT = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DemandReponseLoadControlClusterPowerSavingsControlStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): DemandResponseLoadControlClusterAverageLoadControlStruct {
       tlvReader.enterStructure(tlvTag)
-      val powerSavings = tlvReader.getUInt(ContextSpecificTag(TAG_POWER_SAVINGS))
-      
+      val loadAdjustment = tlvReader.getByte(ContextSpecificTag(TAG_LOAD_ADJUSTMENT))
+
       tlvReader.exitContainer()
 
-      return DemandReponseLoadControlClusterPowerSavingsControlStruct(powerSavings)
+      return DemandResponseLoadControlClusterAverageLoadControlStruct(loadAdjustment)
     }
   }
 }

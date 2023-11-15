@@ -404,7 +404,7 @@
 
 #if defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                     \
-    { chip::app::Clusters::DemandReponseLoadControl::Id, "Demand Reponse Load Control" },
+    { chip::app::Clusters::DemandResponseLoadControl::Id, "Demand Response Load Control" },
 #else
 #define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER
 #endif

@@ -16,30 +16,26 @@
  */
 package matter.devicecontroller.cluster.structs
 
-import java.util.Optional
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DemandReponseLoadControlClusterScopedLoadControlProgramStruct(
+class DemandResponseLoadControlClusterLoadControlProgramStruct(
   val programID: ByteArray,
   val name: String,
   val enrollmentGroup: UByte?,
   val randomStartMinutes: UByte?,
-  val randomDurationMinutes: UByte?,
-  val fabricIndex: UByte
+  val randomDurationMinutes: UByte?
 ) {
   override fun toString(): String = buildString {
-    append("DemandReponseLoadControlClusterScopedLoadControlProgramStruct {\n")
+    append("DemandResponseLoadControlClusterLoadControlProgramStruct {\n")
     append("\tprogramID : $programID\n")
     append("\tname : $name\n")
     append("\tenrollmentGroup : $enrollmentGroup\n")
     append("\trandomStartMinutes : $randomStartMinutes\n")
     append("\trandomDurationMinutes : $randomDurationMinutes\n")
-    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -63,7 +59,6 @@ class DemandReponseLoadControlClusterScopedLoadControlProgramStruct(
       } else {
         putNull(ContextSpecificTag(TAG_RANDOM_DURATION_MINUTES))
       }
-      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -74,35 +69,45 @@ class DemandReponseLoadControlClusterScopedLoadControlProgramStruct(
     private const val TAG_ENROLLMENT_GROUP = 2
     private const val TAG_RANDOM_START_MINUTES = 3
     private const val TAG_RANDOM_DURATION_MINUTES = 4
-    private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DemandReponseLoadControlClusterScopedLoadControlProgramStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): DemandResponseLoadControlClusterLoadControlProgramStruct {
       tlvReader.enterStructure(tlvTag)
       val programID = tlvReader.getByteArray(ContextSpecificTag(TAG_PROGRAM_I_D))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      val enrollmentGroup = if (!tlvReader.isNull()) {
-      tlvReader.getUByte(ContextSpecificTag(TAG_ENROLLMENT_GROUP))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_ENROLLMENT_GROUP))
-      null
-    }
-      val randomStartMinutes = if (!tlvReader.isNull()) {
-      tlvReader.getUByte(ContextSpecificTag(TAG_RANDOM_START_MINUTES))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_RANDOM_START_MINUTES))
-      null
-    }
-      val randomDurationMinutes = if (!tlvReader.isNull()) {
-      tlvReader.getUByte(ContextSpecificTag(TAG_RANDOM_DURATION_MINUTES))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_RANDOM_DURATION_MINUTES))
-      null
-    }
-      val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+      val enrollmentGroup =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUByte(ContextSpecificTag(TAG_ENROLLMENT_GROUP))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_ENROLLMENT_GROUP))
+          null
+        }
+      val randomStartMinutes =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUByte(ContextSpecificTag(TAG_RANDOM_START_MINUTES))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_RANDOM_START_MINUTES))
+          null
+        }
+      val randomDurationMinutes =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUByte(ContextSpecificTag(TAG_RANDOM_DURATION_MINUTES))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_RANDOM_DURATION_MINUTES))
+          null
+        }
+
       tlvReader.exitContainer()
 
-      return DemandReponseLoadControlClusterScopedLoadControlProgramStruct(programID, name, enrollmentGroup, randomStartMinutes, randomDurationMinutes, fabricIndex)
+      return DemandResponseLoadControlClusterLoadControlProgramStruct(
+        programID,
+        name,
+        enrollmentGroup,
+        randomStartMinutes,
+        randomDurationMinutes
+      )
     }
   }
 }

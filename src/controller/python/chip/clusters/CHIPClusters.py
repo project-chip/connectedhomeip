@@ -5796,8 +5796,8 @@ class ChipClusters:
             },
         },
     }
-    _DEMAND_REPONSE_LOAD_CONTROL_CLUSTER_INFO = {
-        "clusterName": "DemandReponseLoadControl",
+    _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO = {
+        "clusterName": "DemandResponseLoadControl",
         "clusterId": 0x00000096,
         "commands": {
             0x00000000: {
@@ -5862,28 +5862,36 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "NumberOfEventsPerProgram",
+                "attributeName": "ActiveEvents",
                 "attributeId": 0x00000004,
-                "type": "int",
+                "type": "",
                 "reportable": True,
             },
             0x00000005: {
-                "attributeName": "NumberOfTransistions",
+                "attributeName": "NumberOfEventsPerProgram",
                 "attributeId": 0x00000005,
                 "type": "int",
                 "reportable": True,
             },
             0x00000006: {
-                "attributeName": "DefaultRandomStart",
+                "attributeName": "NumberOfTransistions",
                 "attributeId": 0x00000006,
                 "type": "int",
                 "reportable": True,
             },
             0x00000007: {
-                "attributeName": "DefaultRandomDuration",
+                "attributeName": "DefaultRandomStart",
                 "attributeId": 0x00000007,
                 "type": "int",
                 "reportable": True,
+                "writable": True,
+            },
+            0x00000008: {
+                "attributeName": "DefaultRandomDuration",
+                "attributeId": 0x00000008,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -12535,7 +12543,7 @@ class ChipClusters:
         0x00000061: _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000071: _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         0x00000072: _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
-        0x00000096: _DEMAND_REPONSE_LOAD_CONTROL_CLUSTER_INFO,
+        0x00000096: _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
         0x00000101: _DOOR_LOCK_CLUSTER_INFO,
         0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
         0x00000103: _BARRIER_CONTROL_CLUSTER_INFO,
@@ -12639,7 +12647,7 @@ class ChipClusters:
         "RvcOperationalState": _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         "HepaFilterMonitoring": _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         "ActivatedCarbonFilterMonitoring": _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
-        "DemandReponseLoadControl": _DEMAND_REPONSE_LOAD_CONTROL_CLUSTER_INFO,
+        "DemandResponseLoadControl": _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,
         "BarrierControl": _BARRIER_CONTROL_CLUSTER_INFO,

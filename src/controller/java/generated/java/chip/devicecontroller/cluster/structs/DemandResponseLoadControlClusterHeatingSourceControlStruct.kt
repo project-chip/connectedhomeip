@@ -14,43 +14,42 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package matter.devicecontroller.cluster.structs
+package chip.devicecontroller.cluster.structs
 
-import java.util.Optional
-import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import chip.devicecontroller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DemandReponseLoadControlClusterAverageLoadControlStruct(
-  val loadAdjustment: Byte
-) {
+class DemandResponseLoadControlClusterHeatingSourceControlStruct(val heatingSource: UInt) {
   override fun toString(): String = buildString {
-    append("DemandReponseLoadControlClusterAverageLoadControlStruct {\n")
-    append("\tloadAdjustment : $loadAdjustment\n")
+    append("DemandResponseLoadControlClusterHeatingSourceControlStruct {\n")
+    append("\theatingSource : $heatingSource\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_LOAD_ADJUSTMENT), loadAdjustment)
+      put(ContextSpecificTag(TAG_HEATING_SOURCE), heatingSource)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_LOAD_ADJUSTMENT = 0
+    private const val TAG_HEATING_SOURCE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DemandReponseLoadControlClusterAverageLoadControlStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): DemandResponseLoadControlClusterHeatingSourceControlStruct {
       tlvReader.enterStructure(tlvTag)
-      val loadAdjustment = tlvReader.getByte(ContextSpecificTag(TAG_LOAD_ADJUSTMENT))
-      
+      val heatingSource = tlvReader.getUInt(ContextSpecificTag(TAG_HEATING_SOURCE))
+
       tlvReader.exitContainer()
 
-      return DemandReponseLoadControlClusterAverageLoadControlStruct(loadAdjustment)
+      return DemandResponseLoadControlClusterHeatingSourceControlStruct(heatingSource)
     }
   }
 }

@@ -16,41 +16,40 @@
  */
 package matter.devicecontroller.cluster.structs
 
-import java.util.Optional
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DemandReponseLoadControlClusterDutyCycleControlStruct(
-  val dutyCycle: UByte
-) {
+class DemandResponseLoadControlClusterHeatingSourceControlStruct(val heatingSource: UInt) {
   override fun toString(): String = buildString {
-    append("DemandReponseLoadControlClusterDutyCycleControlStruct {\n")
-    append("\tdutyCycle : $dutyCycle\n")
+    append("DemandResponseLoadControlClusterHeatingSourceControlStruct {\n")
+    append("\theatingSource : $heatingSource\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_DUTY_CYCLE), dutyCycle)
+      put(ContextSpecificTag(TAG_HEATING_SOURCE), heatingSource)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_DUTY_CYCLE = 0
+    private const val TAG_HEATING_SOURCE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DemandReponseLoadControlClusterDutyCycleControlStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): DemandResponseLoadControlClusterHeatingSourceControlStruct {
       tlvReader.enterStructure(tlvTag)
-      val dutyCycle = tlvReader.getUByte(ContextSpecificTag(TAG_DUTY_CYCLE))
-      
+      val heatingSource = tlvReader.getUInt(ContextSpecificTag(TAG_HEATING_SOURCE))
+
       tlvReader.exitContainer()
 
-      return DemandReponseLoadControlClusterDutyCycleControlStruct(dutyCycle)
+      return DemandResponseLoadControlClusterHeatingSourceControlStruct(heatingSource)
     }
   }
 }

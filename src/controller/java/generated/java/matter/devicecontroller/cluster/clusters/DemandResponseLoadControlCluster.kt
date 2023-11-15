@@ -20,69 +20,79 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class DemandReponseLoadControlCluster(private val controller: MatterController, private val endpointId: UShort) {
+class DemandResponseLoadControlCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class LoadControlProgramsAttribute(
-    val value: List<DemandReponseLoadControlClusterScopedLoadControlProgramStruct>
+    val value: List<DemandResponseLoadControlClusterLoadControlProgramStruct>
   )
 
-  class EventsAttribute(
-    val value: List<DemandReponseLoadControlClusterScopedLoadControlEventStruct>
+  class EventsAttribute(val value: List<DemandResponseLoadControlClusterLoadControlEventStruct>)
+
+  class ActiveEventsAttribute(
+    val value: List<DemandResponseLoadControlClusterLoadControlEventStruct>
   )
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun registerLoadControlProgramRequest(loadControlProgram: DemandReponseLoadControlClusterLoadControlProgramStruct, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun registerLoadControlProgramRequest(
+    loadControlProgram: DemandResponseLoadControlClusterLoadControlProgramStruct,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 0L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun unregisterLoadControlProgramRequest(loadControlProgramID: ByteArray, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun unregisterLoadControlProgramRequest(
+    loadControlProgramID: ByteArray,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 1L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun addLoadControlEventRequest(event: DemandReponseLoadControlClusterLoadControlEventStruct, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun addLoadControlEventRequest(
+    event: DemandResponseLoadControlClusterLoadControlEventStruct,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 2L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun removeLoadControlEventRequest(eventID: ByteArray, cancelControl: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun removeLoadControlEventRequest(
+    eventID: ByteArray,
+    cancelControl: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 3L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun clearLoadControlEventsRequest(timedInvokeTimeoutMs: Int? = null) {
@@ -92,30 +102,20 @@ class DemandReponseLoadControlCluster(private val controller: MatterController, 
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun readDeviceClassAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDeviceClassAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeDeviceClassAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
   suspend fun readLoadControlProgramsAttribute(): LoadControlProgramsAttribute {
     // Implementation needs to be added here
   }
-
-  suspend fun readLoadControlProgramsAttributeWithFabricFilter(
-    isFabricFiltered: Boolean
-  ): LoadControlProgramsAttribute {
-    // Implementation needs to be added here
-  }
-
 
   suspend fun subscribeLoadControlProgramsAttribute(
     minInterval: Int,
@@ -139,17 +139,18 @@ class DemandReponseLoadControlCluster(private val controller: MatterController, 
     // Implementation needs to be added here
   }
 
-  suspend fun readEventsAttributeWithFabricFilter(
-    isFabricFiltered: Boolean
-  ): EventsAttribute {
+  suspend fun subscribeEventsAttribute(minInterval: Int, maxInterval: Int): EventsAttribute {
     // Implementation needs to be added here
   }
 
+  suspend fun readActiveEventsAttribute(): ActiveEventsAttribute {
+    // Implementation needs to be added here
+  }
 
-  suspend fun subscribeEventsAttribute(
+  suspend fun subscribeActiveEventsAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): EventsAttribute {
+  ): ActiveEventsAttribute {
     // Implementation needs to be added here
   }
 
@@ -168,10 +169,7 @@ class DemandReponseLoadControlCluster(private val controller: MatterController, 
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNumberOfTransistionsAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeNumberOfTransistionsAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -179,10 +177,15 @@ class DemandReponseLoadControlCluster(private val controller: MatterController, 
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDefaultRandomStartAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun writeDefaultRandomStartAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeDefaultRandomStartAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -190,10 +193,15 @@ class DemandReponseLoadControlCluster(private val controller: MatterController, 
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDefaultRandomDurationAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun writeDefaultRandomDurationAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeDefaultRandomDurationAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -223,10 +231,7 @@ class DemandReponseLoadControlCluster(private val controller: MatterController, 
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -245,10 +250,7 @@ class DemandReponseLoadControlCluster(private val controller: MatterController, 
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -256,10 +258,7 @@ class DemandReponseLoadControlCluster(private val controller: MatterController, 
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

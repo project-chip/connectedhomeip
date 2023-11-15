@@ -847,7 +847,7 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace ActivatedCarbonFilterMonitoring
 
-namespace DemandReponseLoadControl {
+namespace DemandResponseLoadControl {
 namespace Commands {
 
 namespace RegisterLoadControlProgramRequest {
@@ -871,7 +871,7 @@ static constexpr CommandId Id = 0x00000004;
 } // namespace ClearLoadControlEventsRequest
 
 } // namespace Commands
-} // namespace DemandReponseLoadControl
+} // namespace DemandResponseLoadControl
 
 namespace DoorLock {
 namespace Commands {

@@ -20,75 +20,77 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class LevelControlCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class CurrentLevelAttribute(
-    val value: UByte?
-  )
+class LevelControlCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
+  class CurrentLevelAttribute(val value: UByte?)
 
-  class OnLevelAttribute(
-    val value: UByte?
-  )
+  class OnLevelAttribute(val value: UByte?)
 
-  class OnTransitionTimeAttribute(
-    val value: UShort?
-  )
+  class OnTransitionTimeAttribute(val value: UShort?)
 
-  class OffTransitionTimeAttribute(
-    val value: UShort?
-  )
+  class OffTransitionTimeAttribute(val value: UShort?)
 
-  class DefaultMoveRateAttribute(
-    val value: UByte?
-  )
+  class DefaultMoveRateAttribute(val value: UByte?)
 
-  class StartUpCurrentLevelAttribute(
-    val value: UByte?
-  )
+  class StartUpCurrentLevelAttribute(val value: UByte?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun moveToLevel(level: UByte, transitionTime: UShort?, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun moveToLevel(
+    level: UByte,
+    transitionTime: UShort?,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 0L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun move(moveMode: UInt, rate: UByte?, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun move(
+    moveMode: UInt,
+    rate: UByte?,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 1L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun step(stepMode: UInt, stepSize: UByte, transitionTime: UShort?, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun step(
+    stepMode: UInt,
+    stepSize: UByte,
+    transitionTime: UShort?,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 2L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun stop(optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {
@@ -98,47 +100,70 @@ class LevelControlCluster(private val controller: MatterController, private val 
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun moveToLevelWithOnOff(level: UByte, transitionTime: UShort?, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun moveToLevelWithOnOff(
+    level: UByte,
+    transitionTime: UShort?,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 4L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun moveWithOnOff(moveMode: UInt, rate: UByte?, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun moveWithOnOff(
+    moveMode: UInt,
+    rate: UByte?,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 5L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun stepWithOnOff(stepMode: UInt, stepSize: UByte, transitionTime: UShort?, optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun stepWithOnOff(
+    stepMode: UInt,
+    stepSize: UByte,
+    transitionTime: UShort?,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 6L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun stopWithOnOff(optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun stopWithOnOff(
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 7L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun moveToClosestFrequency(frequency: UShort, timedInvokeTimeoutMs: Int? = null) {
@@ -148,7 +173,7 @@ class LevelControlCluster(private val controller: MatterController, private val 
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun readCurrentLevelAttribute(): CurrentLevelAttribute {
@@ -166,10 +191,7 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRemainingTimeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeRemainingTimeAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -177,10 +199,7 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMinLevelAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeMinLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -188,10 +207,7 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxLevelAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeMaxLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -199,10 +215,7 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentFrequencyAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeCurrentFrequencyAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -210,10 +223,7 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMinFrequencyAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeMinFrequencyAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -221,10 +231,7 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxFrequencyAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeMaxFrequencyAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -232,21 +239,15 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun writeOptionsAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int? = null    
-  ) {
+  suspend fun writeOptionsAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
-  suspend fun subscribeOptionsAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeOptionsAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -254,21 +255,15 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun writeOnOffTransitionTimeAttribute(
-    value: UShort,
-    timedWriteTimeoutMs: Int? = null    
-  ) {
+  suspend fun writeOnOffTransitionTimeAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
-  suspend fun subscribeOnOffTransitionTimeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeOnOffTransitionTimeAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -276,21 +271,15 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun writeOnLevelAttribute(
-    value: UByte,
-    timedWriteTimeoutMs: Int? = null    
-  ) {
+  suspend fun writeOnLevelAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
-  suspend fun subscribeOnLevelAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): OnLevelAttribute {
+  suspend fun subscribeOnLevelAttribute(minInterval: Int, maxInterval: Int): OnLevelAttribute {
     // Implementation needs to be added here
   }
 
@@ -298,15 +287,12 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun writeOnTransitionTimeAttribute(
-    value: UShort,
-    timedWriteTimeoutMs: Int? = null    
-  ) {
+  suspend fun writeOnTransitionTimeAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
   suspend fun subscribeOnTransitionTimeAttribute(
@@ -320,15 +306,12 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun writeOffTransitionTimeAttribute(
-    value: UShort,
-    timedWriteTimeoutMs: Int? = null    
-  ) {
+  suspend fun writeOffTransitionTimeAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
   suspend fun subscribeOffTransitionTimeAttribute(
@@ -342,15 +325,12 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun writeDefaultMoveRateAttribute(
-    value: UByte,
-    timedWriteTimeoutMs: Int? = null    
-  ) {
+  suspend fun writeDefaultMoveRateAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
   suspend fun subscribeDefaultMoveRateAttribute(
@@ -364,15 +344,12 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun writeStartUpCurrentLevelAttribute(
-    value: UByte,
-    timedWriteTimeoutMs: Int? = null    
-  ) {
+  suspend fun writeStartUpCurrentLevelAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
   suspend fun subscribeStartUpCurrentLevelAttribute(
@@ -408,10 +385,7 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -430,10 +404,7 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -441,10 +412,7 @@ class LevelControlCluster(private val controller: MatterController, private val 
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

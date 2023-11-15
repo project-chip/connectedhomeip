@@ -14431,12 +14431,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRDemandReponseLoadControlClusterRegisterLoadControlProgramRequestParams
+@implementation MTRDemandResponseLoadControlClusterRegisterLoadControlProgramRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _loadControlProgram = [MTRDemandReponseLoadControlClusterLoadControlProgramStruct new];
+        _loadControlProgram = [MTRDemandResponseLoadControlClusterLoadControlProgramStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -14445,7 +14445,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRDemandReponseLoadControlClusterRegisterLoadControlProgramRequestParams alloc] init];
+    auto other = [[MTRDemandResponseLoadControlClusterRegisterLoadControlProgramRequestParams alloc] init];
 
     other.loadControlProgram = self.loadControlProgram;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -14462,11 +14462,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDemandReponseLoadControlClusterRegisterLoadControlProgramRequestParams (InternalMethods)
+@implementation MTRDemandResponseLoadControlClusterRegisterLoadControlProgramRequestParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::DemandReponseLoadControl::Commands::RegisterLoadControlProgramRequest::Type encodableStruct;
+    chip::app::Clusters::DemandResponseLoadControl::Commands::RegisterLoadControlProgramRequest::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.loadControlProgram.programID = AsByteSpan(self.loadControlProgram.programID);
@@ -14529,7 +14529,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRDemandReponseLoadControlClusterUnregisterLoadControlProgramRequestParams
+@implementation MTRDemandResponseLoadControlClusterUnregisterLoadControlProgramRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -14543,7 +14543,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRDemandReponseLoadControlClusterUnregisterLoadControlProgramRequestParams alloc] init];
+    auto other = [[MTRDemandResponseLoadControlClusterUnregisterLoadControlProgramRequestParams alloc] init];
 
     other.loadControlProgramID = self.loadControlProgramID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -14560,11 +14560,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDemandReponseLoadControlClusterUnregisterLoadControlProgramRequestParams (InternalMethods)
+@implementation MTRDemandResponseLoadControlClusterUnregisterLoadControlProgramRequestParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::DemandReponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Type encodableStruct;
+    chip::app::Clusters::DemandResponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.loadControlProgramID = AsByteSpan(self.loadControlProgramID);
@@ -14608,12 +14608,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRDemandReponseLoadControlClusterAddLoadControlEventRequestParams
+@implementation MTRDemandResponseLoadControlClusterAddLoadControlEventRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _event = [MTRDemandReponseLoadControlClusterLoadControlEventStruct new];
+        _event = [MTRDemandResponseLoadControlClusterLoadControlEventStruct new];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -14622,7 +14622,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRDemandReponseLoadControlClusterAddLoadControlEventRequestParams alloc] init];
+    auto other = [[MTRDemandResponseLoadControlClusterAddLoadControlEventRequestParams alloc] init];
 
     other.event = self.event;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -14639,22 +14639,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDemandReponseLoadControlClusterAddLoadControlEventRequestParams (InternalMethods)
+@implementation MTRDemandResponseLoadControlClusterAddLoadControlEventRequestParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::DemandReponseLoadControl::Commands::AddLoadControlEventRequest::Type encodableStruct;
+    chip::app::Clusters::DemandResponseLoadControl::Commands::AddLoadControlEventRequest::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.event.eventID = AsByteSpan(self.event.eventID);
-        encodableStruct.event.programControl = AsByteSpan(self.event.programControl);
+        if (self.event.programID == nil) {
+            encodableStruct.event.programID.SetNull();
+        } else {
+            auto & nonNullValue_1 = encodableStruct.event.programID.SetNonNull();
+            nonNullValue_1 = AsByteSpan(self.event.programID);
+        }
         encodableStruct.event.control = static_cast<std::remove_reference_t<decltype(encodableStruct.event.control)>>(self.event.control.unsignedShortValue);
         encodableStruct.event.deviceClass = static_cast<std::remove_reference_t<decltype(encodableStruct.event.deviceClass)>>(self.event.deviceClass.unsignedIntValue);
-        if (self.event.enrollmentGroup == nil) {
-            encodableStruct.event.enrollmentGroup.SetNull();
-        } else {
-            auto & nonNullValue_1 = encodableStruct.event.enrollmentGroup.SetNonNull();
-            nonNullValue_1 = self.event.enrollmentGroup.unsignedCharValue;
+        if (self.event.enrollmentGroup != nil) {
+            auto & definedValue_1 = encodableStruct.event.enrollmentGroup.Emplace();
+            definedValue_1 = self.event.enrollmentGroup.unsignedCharValue;
         }
         encodableStruct.event.criticality = static_cast<std::remove_reference_t<decltype(encodableStruct.event.criticality)>>(self.event.criticality.unsignedCharValue);
         if (self.event.startTime == nil) {
@@ -14673,65 +14676,67 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_1);
                 for (size_t i_1 = 0; i_1 < self.event.transitions.count; ++i_1) {
-                    if (![self.event.transitions[i_1] isKindOfClass:[MTRDemandReponseLoadControlClusterLoadControlEventTransitionStruct class]]) {
+                    if (![self.event.transitions[i_1] isKindOfClass:[MTRDemandResponseLoadControlClusterLoadControlEventTransitionStruct class]]) {
                         // Wrong kind of value.
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_1 = (MTRDemandReponseLoadControlClusterLoadControlEventTransitionStruct *) self.event.transitions[i_1];
+                    auto element_1 = (MTRDemandResponseLoadControlClusterLoadControlEventTransitionStruct *) self.event.transitions[i_1];
                     listHolder_1->mList[i_1].duration = element_1.duration.unsignedShortValue;
                     listHolder_1->mList[i_1].control = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].control)>>(element_1.control.unsignedShortValue);
-                    if (element_1.temperatureControl == nil) {
-                        listHolder_1->mList[i_1].temperatureControl.SetNull();
-                    } else {
-                        auto & nonNullValue_3 = listHolder_1->mList[i_1].temperatureControl.SetNonNull();
-                        if (element_1.temperatureControl.coolingTempOffset == nil) {
-                            nonNullValue_3.coolingTempOffset.SetNull();
-                        } else {
-                            auto & nonNullValue_5 = nonNullValue_3.coolingTempOffset.SetNonNull();
-                            nonNullValue_5 = element_1.temperatureControl.coolingTempOffset.unsignedShortValue;
+                    if (element_1.temperatureControl != nil) {
+                        auto & definedValue_3 = listHolder_1->mList[i_1].temperatureControl.Emplace();
+                        if (element_1.temperatureControl.coolingTempOffset != nil) {
+                            auto & definedValue_5 = definedValue_3.coolingTempOffset.Emplace();
+                            if (element_1.temperatureControl.coolingTempOffset == nil) {
+                                definedValue_5.SetNull();
+                            } else {
+                                auto & nonNullValue_6 = definedValue_5.SetNonNull();
+                                nonNullValue_6 = element_1.temperatureControl.coolingTempOffset.unsignedShortValue;
+                            }
                         }
-                        if (element_1.temperatureControl.heatTempOffset == nil) {
-                            nonNullValue_3.heatTempOffset.SetNull();
-                        } else {
-                            auto & nonNullValue_5 = nonNullValue_3.heatTempOffset.SetNonNull();
-                            nonNullValue_5 = element_1.temperatureControl.heatTempOffset.unsignedShortValue;
+                        if (element_1.temperatureControl.heatingtTempOffset != nil) {
+                            auto & definedValue_5 = definedValue_3.heatingtTempOffset.Emplace();
+                            if (element_1.temperatureControl.heatingtTempOffset == nil) {
+                                definedValue_5.SetNull();
+                            } else {
+                                auto & nonNullValue_6 = definedValue_5.SetNonNull();
+                                nonNullValue_6 = element_1.temperatureControl.heatingtTempOffset.unsignedShortValue;
+                            }
                         }
-                        if (element_1.temperatureControl.coolingTempSetpoint == nil) {
-                            nonNullValue_3.coolingTempSetpoint.SetNull();
-                        } else {
-                            auto & nonNullValue_5 = nonNullValue_3.coolingTempSetpoint.SetNonNull();
-                            nonNullValue_5 = element_1.temperatureControl.coolingTempSetpoint.unsignedShortValue;
+                        if (element_1.temperatureControl.coolingTempSetpoint != nil) {
+                            auto & definedValue_5 = definedValue_3.coolingTempSetpoint.Emplace();
+                            if (element_1.temperatureControl.coolingTempSetpoint == nil) {
+                                definedValue_5.SetNull();
+                            } else {
+                                auto & nonNullValue_6 = definedValue_5.SetNonNull();
+                                nonNullValue_6 = element_1.temperatureControl.coolingTempSetpoint.shortValue;
+                            }
                         }
-                        if (element_1.temperatureControl.heatingTempSetpoint == nil) {
-                            nonNullValue_3.heatingTempSetpoint.SetNull();
-                        } else {
-                            auto & nonNullValue_5 = nonNullValue_3.heatingTempSetpoint.SetNonNull();
-                            nonNullValue_5 = element_1.temperatureControl.heatingTempSetpoint.unsignedShortValue;
+                        if (element_1.temperatureControl.heatingTempSetpoint != nil) {
+                            auto & definedValue_5 = definedValue_3.heatingTempSetpoint.Emplace();
+                            if (element_1.temperatureControl.heatingTempSetpoint == nil) {
+                                definedValue_5.SetNull();
+                            } else {
+                                auto & nonNullValue_6 = definedValue_5.SetNonNull();
+                                nonNullValue_6 = element_1.temperatureControl.heatingTempSetpoint.shortValue;
+                            }
                         }
                     }
-                    if (element_1.averageLoadControl == nil) {
-                        listHolder_1->mList[i_1].averageLoadControl.SetNull();
-                    } else {
-                        auto & nonNullValue_3 = listHolder_1->mList[i_1].averageLoadControl.SetNonNull();
-                        nonNullValue_3.loadAdjustment = element_1.averageLoadControl.loadAdjustment.charValue;
+                    if (element_1.averageLoadControl != nil) {
+                        auto & definedValue_3 = listHolder_1->mList[i_1].averageLoadControl.Emplace();
+                        definedValue_3.loadAdjustment = element_1.averageLoadControl.loadAdjustment.charValue;
                     }
-                    if (element_1.dutyCycleControl == nil) {
-                        listHolder_1->mList[i_1].dutyCycleControl.SetNull();
-                    } else {
-                        auto & nonNullValue_3 = listHolder_1->mList[i_1].dutyCycleControl.SetNonNull();
-                        nonNullValue_3.dutyCycle = element_1.dutyCycleControl.dutyCycle.unsignedCharValue;
+                    if (element_1.dutyCycleControl != nil) {
+                        auto & definedValue_3 = listHolder_1->mList[i_1].dutyCycleControl.Emplace();
+                        definedValue_3.dutyCycle = element_1.dutyCycleControl.dutyCycle.unsignedCharValue;
                     }
-                    if (element_1.powerSavingsControl == nil) {
-                        listHolder_1->mList[i_1].powerSavingsControl.SetNull();
-                    } else {
-                        auto & nonNullValue_3 = listHolder_1->mList[i_1].powerSavingsControl.SetNonNull();
-                        nonNullValue_3.powerSavings = static_cast<std::remove_reference_t<decltype(nonNullValue_3.powerSavings)>>(element_1.powerSavingsControl.powerSavings.unsignedCharValue);
+                    if (element_1.powerSavingsControl != nil) {
+                        auto & definedValue_3 = listHolder_1->mList[i_1].powerSavingsControl.Emplace();
+                        definedValue_3.powerSavings = static_cast<std::remove_reference_t<decltype(definedValue_3.powerSavings)>>(element_1.powerSavingsControl.powerSavings.unsignedCharValue);
                     }
-                    if (element_1.heatingSourceControl == nil) {
-                        listHolder_1->mList[i_1].heatingSourceControl.SetNull();
-                    } else {
-                        auto & nonNullValue_3 = listHolder_1->mList[i_1].heatingSourceControl.SetNonNull();
-                        nonNullValue_3.heatingSource = static_cast<std::remove_reference_t<decltype(nonNullValue_3.heatingSource)>>(element_1.heatingSourceControl.heatingSource.unsignedCharValue);
+                    if (element_1.heatingSourceControl != nil) {
+                        auto & definedValue_3 = listHolder_1->mList[i_1].heatingSourceControl.Emplace();
+                        definedValue_3.heatingSource = static_cast<std::remove_reference_t<decltype(definedValue_3.heatingSource)>>(element_1.heatingSourceControl.heatingSource.unsignedCharValue);
                     }
                 }
                 encodableStruct.event.transitions = ListType_1(listHolder_1->mList, self.event.transitions.count);
@@ -14779,7 +14784,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRDemandReponseLoadControlClusterRemoveLoadControlEventRequestParams
+@implementation MTRDemandResponseLoadControlClusterRemoveLoadControlEventRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -14795,7 +14800,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRDemandReponseLoadControlClusterRemoveLoadControlEventRequestParams alloc] init];
+    auto other = [[MTRDemandResponseLoadControlClusterRemoveLoadControlEventRequestParams alloc] init];
 
     other.eventID = self.eventID;
     other.cancelControl = self.cancelControl;
@@ -14813,11 +14818,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDemandReponseLoadControlClusterRemoveLoadControlEventRequestParams (InternalMethods)
+@implementation MTRDemandResponseLoadControlClusterRemoveLoadControlEventRequestParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::DemandReponseLoadControl::Commands::RemoveLoadControlEventRequest::Type encodableStruct;
+    chip::app::Clusters::DemandResponseLoadControl::Commands::RemoveLoadControlEventRequest::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.eventID = AsByteSpan(self.eventID);
@@ -14864,7 +14869,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRDemandReponseLoadControlClusterClearLoadControlEventsRequestParams
+@implementation MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -14876,7 +14881,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRDemandReponseLoadControlClusterClearLoadControlEventsRequestParams alloc] init];
+    auto other = [[MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -14892,11 +14897,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDemandReponseLoadControlClusterClearLoadControlEventsRequestParams (InternalMethods)
+@implementation MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::DemandReponseLoadControl::Commands::ClearLoadControlEventsRequest::Type encodableStruct;
+    chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Type encodableStruct;
     ListFreer listFreer;
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);

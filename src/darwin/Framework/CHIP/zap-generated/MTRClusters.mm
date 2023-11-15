@@ -8431,12 +8431,12 @@ using chip::System::Clock::Timeout;
 
 @end
 
-@implementation MTRClusterDemandReponseLoadControl
+@implementation MTRClusterDemandResponseLoadControl
 
-- (void)registerLoadControlProgramRequestWithParams:(MTRDemandReponseLoadControlClusterRegisterLoadControlProgramRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)registerLoadControlProgramRequestWithParams:(MTRDemandResponseLoadControlClusterRegisterLoadControlProgramRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRDemandReponseLoadControlClusterRegisterLoadControlProgramRequestParams
+        params = [[MTRDemandResponseLoadControlClusterRegisterLoadControlProgramRequestParams
             alloc] init];
     }
 
@@ -8446,7 +8446,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = DemandReponseLoadControl::Commands::RegisterLoadControlProgramRequest::Type;
+    using RequestType = DemandResponseLoadControl::Commands::RegisterLoadControlProgramRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8460,10 +8460,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)unregisterLoadControlProgramRequestWithParams:(MTRDemandReponseLoadControlClusterUnregisterLoadControlProgramRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)unregisterLoadControlProgramRequestWithParams:(MTRDemandResponseLoadControlClusterUnregisterLoadControlProgramRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRDemandReponseLoadControlClusterUnregisterLoadControlProgramRequestParams
+        params = [[MTRDemandResponseLoadControlClusterUnregisterLoadControlProgramRequestParams
             alloc] init];
     }
 
@@ -8473,7 +8473,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = DemandReponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Type;
+    using RequestType = DemandResponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8487,10 +8487,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)addLoadControlEventRequestWithParams:(MTRDemandReponseLoadControlClusterAddLoadControlEventRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)addLoadControlEventRequestWithParams:(MTRDemandResponseLoadControlClusterAddLoadControlEventRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRDemandReponseLoadControlClusterAddLoadControlEventRequestParams
+        params = [[MTRDemandResponseLoadControlClusterAddLoadControlEventRequestParams
             alloc] init];
     }
 
@@ -8500,7 +8500,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = DemandReponseLoadControl::Commands::AddLoadControlEventRequest::Type;
+    using RequestType = DemandResponseLoadControl::Commands::AddLoadControlEventRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8514,10 +8514,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)removeLoadControlEventRequestWithParams:(MTRDemandReponseLoadControlClusterRemoveLoadControlEventRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)removeLoadControlEventRequestWithParams:(MTRDemandResponseLoadControlClusterRemoveLoadControlEventRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRDemandReponseLoadControlClusterRemoveLoadControlEventRequestParams
+        params = [[MTRDemandResponseLoadControlClusterRemoveLoadControlEventRequestParams
             alloc] init];
     }
 
@@ -8527,7 +8527,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = DemandReponseLoadControl::Commands::RemoveLoadControlEventRequest::Type;
+    using RequestType = DemandResponseLoadControl::Commands::RemoveLoadControlEventRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8545,10 +8545,10 @@ using chip::System::Clock::Timeout;
 {
     [self clearLoadControlEventsRequestWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
-- (void)clearLoadControlEventsRequestWithParams:(MTRDemandReponseLoadControlClusterClearLoadControlEventsRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)clearLoadControlEventsRequestWithParams:(MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRDemandReponseLoadControlClusterClearLoadControlEventsRequestParams
+        params = [[MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams
             alloc] init];
     }
 
@@ -8558,7 +8558,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = DemandReponseLoadControl::Commands::ClearLoadControlEventsRequest::Type;
+    using RequestType = DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8574,72 +8574,99 @@ using chip::System::Clock::Timeout;
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeDeviceClassWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandReponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandReponseLoadControlAttributeDeviceClassID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDeviceClassID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeLoadControlProgramsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandReponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandReponseLoadControlAttributeLoadControlProgramsID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeLoadControlProgramsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfLoadControlProgramsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandReponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandReponseLoadControlAttributeNumberOfLoadControlProgramsID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfLoadControlProgramsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeEventsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandReponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandReponseLoadControlAttributeEventsID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeEventsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActiveEventsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeActiveEventsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfEventsPerProgramWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandReponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandReponseLoadControlAttributeNumberOfEventsPerProgramID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfEventsPerProgramID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfTransistionsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandReponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandReponseLoadControlAttributeNumberOfTransistionsID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfTransistionsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeDefaultRandomStartWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandReponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandReponseLoadControlAttributeDefaultRandomStartID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomStartID) params:params];
+}
+
+- (void)writeAttributeDefaultRandomStartWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeDefaultRandomStartWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeDefaultRandomStartWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomStartID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeDefaultRandomDurationWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandReponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandReponseLoadControlAttributeDefaultRandomDurationID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomDurationID) params:params];
+}
+
+- (void)writeAttributeDefaultRandomDurationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeDefaultRandomDurationWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeDefaultRandomDurationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomDurationID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandReponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandReponseLoadControlAttributeGeneratedCommandListID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeGeneratedCommandListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandReponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandReponseLoadControlAttributeAcceptedCommandListID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeAcceptedCommandListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandReponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandReponseLoadControlAttributeEventListID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandReponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandReponseLoadControlAttributeAttributeListID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeAttributeListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandReponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandReponseLoadControlAttributeFeatureMapID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeFeatureMapID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandReponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandReponseLoadControlAttributeClusterRevisionID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeClusterRevisionID) params:params];
 }
 
 @end

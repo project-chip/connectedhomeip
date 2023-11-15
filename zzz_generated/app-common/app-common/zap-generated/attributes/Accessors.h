@@ -1720,13 +1720,14 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace ActivatedCarbonFilterMonitoring
 
-namespace DemandReponseLoadControl {
+namespace DemandResponseLoadControl {
 namespace Attributes {
 
 namespace DeviceClass {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::BitMask<chip::app::Clusters::DemandReponseLoadControl::DeviceClassBitmap> * value); // DeviceClassBitmap
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DemandReponseLoadControl::DeviceClassBitmap> value);
+                  chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap> * value); // DeviceClassBitmap
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap> value);
 } // namespace DeviceClass
 
 namespace NumberOfLoadControlPrograms {
@@ -1765,7 +1766,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace DemandReponseLoadControl
+} // namespace DemandResponseLoadControl
 
 namespace DoorLock {
 namespace Attributes {

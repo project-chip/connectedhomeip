@@ -66,20 +66,22 @@ class GroupKeyManagementClusterGroupInfoMapStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GroupKeyManagementClusterGroupInfoMapStruct {
       tlvReader.enterStructure(tlvTag)
       val groupId = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_ID))
-      val endpoints = buildList<UShort> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_ENDPOINTS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getUShort(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      val groupName = if (tlvReader.isNextTag(ContextSpecificTag(TAG_GROUP_NAME))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_GROUP_NAME)))
-    } else {
-      Optional.empty()
-    }
+      val endpoints =
+        buildList<UShort> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_ENDPOINTS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUShort(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      val groupName =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_GROUP_NAME))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_GROUP_NAME)))
+        } else {
+          Optional.empty()
+        }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
       return GroupKeyManagementClusterGroupInfoMapStruct(groupId, endpoints, groupName, fabricIndex)

@@ -922,31 +922,31 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRDemandReponseLoadControlClusterRegisterLoadControlProgramRequestParams (InternalMethods)
+@interface MTRDemandResponseLoadControlClusterRegisterLoadControlProgramRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRDemandReponseLoadControlClusterUnregisterLoadControlProgramRequestParams (InternalMethods)
+@interface MTRDemandResponseLoadControlClusterUnregisterLoadControlProgramRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRDemandReponseLoadControlClusterAddLoadControlEventRequestParams (InternalMethods)
+@interface MTRDemandResponseLoadControlClusterAddLoadControlEventRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRDemandReponseLoadControlClusterRemoveLoadControlEventRequestParams (InternalMethods)
+@interface MTRDemandResponseLoadControlClusterRemoveLoadControlEventRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRDemandReponseLoadControlClusterClearLoadControlEventsRequestParams (InternalMethods)
+@interface MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

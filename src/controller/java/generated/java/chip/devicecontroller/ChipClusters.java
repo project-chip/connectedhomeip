@@ -25911,17 +25911,18 @@ public class ChipClusters {
     }
   }
 
-  public static class DemandReponseLoadControlCluster extends BaseChipCluster {
+  public static class DemandResponseLoadControlCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 150L;
 
     private static final long DEVICE_CLASS_ATTRIBUTE_ID = 0L;
     private static final long LOAD_CONTROL_PROGRAMS_ATTRIBUTE_ID = 1L;
     private static final long NUMBER_OF_LOAD_CONTROL_PROGRAMS_ATTRIBUTE_ID = 2L;
     private static final long EVENTS_ATTRIBUTE_ID = 3L;
-    private static final long NUMBER_OF_EVENTS_PER_PROGRAM_ATTRIBUTE_ID = 4L;
-    private static final long NUMBER_OF_TRANSISTIONS_ATTRIBUTE_ID = 5L;
-    private static final long DEFAULT_RANDOM_START_ATTRIBUTE_ID = 6L;
-    private static final long DEFAULT_RANDOM_DURATION_ATTRIBUTE_ID = 7L;
+    private static final long ACTIVE_EVENTS_ATTRIBUTE_ID = 4L;
+    private static final long NUMBER_OF_EVENTS_PER_PROGRAM_ATTRIBUTE_ID = 5L;
+    private static final long NUMBER_OF_TRANSISTIONS_ATTRIBUTE_ID = 6L;
+    private static final long DEFAULT_RANDOM_START_ATTRIBUTE_ID = 7L;
+    private static final long DEFAULT_RANDOM_DURATION_ATTRIBUTE_ID = 8L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -25929,7 +25930,7 @@ public class ChipClusters {
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
 
-    public DemandReponseLoadControlCluster(long devicePtr, int endpointId) {
+    public DemandResponseLoadControlCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId, CLUSTER_ID);
     }
 
@@ -25939,11 +25940,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void registerLoadControlProgramRequest(DefaultClusterCallback callback, ChipStructs.DemandReponseLoadControlClusterLoadControlProgramStruct loadControlProgram) {
+    public void registerLoadControlProgramRequest(DefaultClusterCallback callback, ChipStructs.DemandResponseLoadControlClusterLoadControlProgramStruct loadControlProgram) {
       registerLoadControlProgramRequest(callback, loadControlProgram, 0);
     }
 
-    public void registerLoadControlProgramRequest(DefaultClusterCallback callback, ChipStructs.DemandReponseLoadControlClusterLoadControlProgramStruct loadControlProgram, int timedInvokeTimeoutMs) {
+    public void registerLoadControlProgramRequest(DefaultClusterCallback callback, ChipStructs.DemandResponseLoadControlClusterLoadControlProgramStruct loadControlProgram, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -25979,11 +25980,11 @@ public class ChipClusters {
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
-    public void addLoadControlEventRequest(DefaultClusterCallback callback, ChipStructs.DemandReponseLoadControlClusterLoadControlEventStruct event) {
+    public void addLoadControlEventRequest(DefaultClusterCallback callback, ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct event) {
       addLoadControlEventRequest(callback, event, 0);
     }
 
-    public void addLoadControlEventRequest(DefaultClusterCallback callback, ChipStructs.DemandReponseLoadControlClusterLoadControlEventStruct event, int timedInvokeTimeoutMs) {
+    public void addLoadControlEventRequest(DefaultClusterCallback callback, ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct event, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -26040,11 +26041,15 @@ public class ChipClusters {
     }
 
     public interface LoadControlProgramsAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<ChipStructs.DemandReponseLoadControlClusterScopedLoadControlProgramStruct> value);
+      void onSuccess(List<ChipStructs.DemandResponseLoadControlClusterLoadControlProgramStruct> value);
     }
 
     public interface EventsAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<ChipStructs.DemandReponseLoadControlClusterScopedLoadControlEventStruct> value);
+      void onSuccess(List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct> value);
+    }
+
+    public interface ActiveEventsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -26090,20 +26095,15 @@ public class ChipClusters {
 
     public void readLoadControlProgramsAttribute(
         LoadControlProgramsAttributeCallback callback) {
-      readLoadControlProgramsAttributeWithFabricFilter(callback, true);
-    }
-
-    public void readLoadControlProgramsAttributeWithFabricFilter(
-        LoadControlProgramsAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LOAD_CONTROL_PROGRAMS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.DemandReponseLoadControlClusterScopedLoadControlProgramStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.DemandResponseLoadControlClusterLoadControlProgramStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, LOAD_CONTROL_PROGRAMS_ATTRIBUTE_ID, isFabricFiltered);
+        }, LOAD_CONTROL_PROGRAMS_ATTRIBUTE_ID, true);
     }
 
     public void subscribeLoadControlProgramsAttribute(
@@ -26113,7 +26113,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.DemandReponseLoadControlClusterScopedLoadControlProgramStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.DemandResponseLoadControlClusterLoadControlProgramStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, LOAD_CONTROL_PROGRAMS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
@@ -26145,20 +26145,15 @@ public class ChipClusters {
 
     public void readEventsAttribute(
         EventsAttributeCallback callback) {
-      readEventsAttributeWithFabricFilter(callback, true);
-    }
-
-    public void readEventsAttributeWithFabricFilter(
-        EventsAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EVENTS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.DemandReponseLoadControlClusterScopedLoadControlEventStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, EVENTS_ATTRIBUTE_ID, isFabricFiltered);
+        }, EVENTS_ATTRIBUTE_ID, true);
     }
 
     public void subscribeEventsAttribute(
@@ -26168,9 +26163,34 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.DemandReponseLoadControlClusterScopedLoadControlEventStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, EVENTS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readActiveEventsAttribute(
+        ActiveEventsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_EVENTS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ACTIVE_EVENTS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeActiveEventsAttribute(
+        ActiveEventsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACTIVE_EVENTS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+          }
+        }, ACTIVE_EVENTS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readNumberOfEventsPerProgramAttribute(
@@ -26236,6 +26256,15 @@ public class ChipClusters {
         }, DEFAULT_RANDOM_START_ATTRIBUTE_ID, true);
     }
 
+    public void writeDefaultRandomStartAttribute(DefaultClusterCallback callback, Integer value) {
+      writeDefaultRandomStartAttribute(callback, value, 0);
+    }
+
+    public void writeDefaultRandomStartAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), DEFAULT_RANDOM_START_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
     public void subscribeDefaultRandomStartAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEFAULT_RANDOM_START_ATTRIBUTE_ID);
@@ -26259,6 +26288,15 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, DEFAULT_RANDOM_DURATION_ATTRIBUTE_ID, true);
+    }
+
+    public void writeDefaultRandomDurationAttribute(DefaultClusterCallback callback, Integer value) {
+      writeDefaultRandomDurationAttribute(callback, value, 0);
+    }
+
+    public void writeDefaultRandomDurationAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), DEFAULT_RANDOM_DURATION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeDefaultRandomDurationAttribute(

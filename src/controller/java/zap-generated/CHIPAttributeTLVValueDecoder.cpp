@@ -17641,8 +17641,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
         break;
     }
-    case app::Clusters::DemandReponseLoadControl::Id: {
-        using namespace app::Clusters::DemandReponseLoadControl;
+    case app::Clusters::DemandResponseLoadControl::Id: {
+        using namespace app::Clusters::DemandResponseLoadControl;
         switch (aPath.mAttributeId)
         {
         case Attributes::DeviceClass::Id: {
@@ -17727,39 +17727,29 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         newElement_0_randomDurationMinutesCtorSignature.c_str(), jninewElement_0_randomDurationMinutes,
                         newElement_0_randomDurationMinutes);
                 }
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_fabricIndexClassName.c_str(),
-                                                                           newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                           jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
-                jclass scopedLoadControlProgramStructStructClass_1;
+                jclass loadControlProgramStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$DemandReponseLoadControlClusterScopedLoadControlProgramStruct",
-                    scopedLoadControlProgramStructStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterLoadControlProgramStruct",
+                    loadControlProgramStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl,
-                                 "Could not find class ChipStructs$DemandReponseLoadControlClusterScopedLoadControlProgramStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterLoadControlProgramStruct");
                     return nullptr;
                 }
-                jmethodID scopedLoadControlProgramStructStructCtor_1 = env->GetMethodID(
-                    scopedLoadControlProgramStructStructClass_1, "<init>",
-                    "([BLjava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-                if (scopedLoadControlProgramStructStructCtor_1 == nullptr)
+                jmethodID loadControlProgramStructStructCtor_1 =
+                    env->GetMethodID(loadControlProgramStructStructClass_1, "<init>",
+                                     "([BLjava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                if (loadControlProgramStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(
-                        Zcl,
-                        "Could not find ChipStructs$DemandReponseLoadControlClusterScopedLoadControlProgramStruct constructor");
+                    ChipLogError(Zcl,
+                                 "Could not find ChipStructs$DemandResponseLoadControlClusterLoadControlProgramStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 =
-                    env->NewObject(scopedLoadControlProgramStructStructClass_1, scopedLoadControlProgramStructStructCtor_1,
-                                   newElement_0_programID, newElement_0_name, newElement_0_enrollmentGroup,
-                                   newElement_0_randomStartMinutes, newElement_0_randomDurationMinutes, newElement_0_fabricIndex);
+                newElement_0 = env->NewObject(loadControlProgramStructStructClass_1, loadControlProgramStructStructCtor_1,
+                                              newElement_0_programID, newElement_0_name, newElement_0_enrollmentGroup,
+                                              newElement_0_randomStartMinutes, newElement_0_randomDurationMinutes);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -17801,12 +17791,20 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 env->SetByteArrayRegion(newElement_0_eventIDByteArray, 0, static_cast<jsize>(entry_0.eventID.size()),
                                         reinterpret_cast<const jbyte *>(entry_0.eventID.data()));
                 newElement_0_eventID = newElement_0_eventIDByteArray;
-                jobject newElement_0_programControl;
-                jbyteArray newElement_0_programControlByteArray =
-                    env->NewByteArray(static_cast<jsize>(entry_0.programControl.size()));
-                env->SetByteArrayRegion(newElement_0_programControlByteArray, 0, static_cast<jsize>(entry_0.programControl.size()),
-                                        reinterpret_cast<const jbyte *>(entry_0.programControl.data()));
-                newElement_0_programControl = newElement_0_programControlByteArray;
+                jobject newElement_0_programID;
+                if (entry_0.programID.IsNull())
+                {
+                    newElement_0_programID = nullptr;
+                }
+                else
+                {
+                    jbyteArray newElement_0_programIDByteArray =
+                        env->NewByteArray(static_cast<jsize>(entry_0.programID.Value().size()));
+                    env->SetByteArrayRegion(newElement_0_programIDByteArray, 0,
+                                            static_cast<jsize>(entry_0.programID.Value().size()),
+                                            reinterpret_cast<const jbyte *>(entry_0.programID.Value().data()));
+                    newElement_0_programID = newElement_0_programIDByteArray;
+                }
                 jobject newElement_0_control;
                 std::string newElement_0_controlClassName     = "java/lang/Integer";
                 std::string newElement_0_controlCtorSignature = "(I)V";
@@ -17822,18 +17820,22 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                             newElement_0_deviceClassCtorSignature.c_str(),
                                                                             jninewElement_0_deviceClass, newElement_0_deviceClass);
                 jobject newElement_0_enrollmentGroup;
-                if (entry_0.enrollmentGroup.IsNull())
+                if (!entry_0.enrollmentGroup.HasValue())
                 {
-                    newElement_0_enrollmentGroup = nullptr;
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_enrollmentGroup);
                 }
                 else
                 {
-                    std::string newElement_0_enrollmentGroupClassName     = "java/lang/Integer";
-                    std::string newElement_0_enrollmentGroupCtorSignature = "(I)V";
-                    jint jninewElement_0_enrollmentGroup                  = static_cast<jint>(entry_0.enrollmentGroup.Value());
+                    jobject newElement_0_enrollmentGroupInsideOptional;
+                    std::string newElement_0_enrollmentGroupInsideOptionalClassName     = "java/lang/Integer";
+                    std::string newElement_0_enrollmentGroupInsideOptionalCtorSignature = "(I)V";
+                    jint jninewElement_0_enrollmentGroupInsideOptional = static_cast<jint>(entry_0.enrollmentGroup.Value());
                     chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                        newElement_0_enrollmentGroupClassName.c_str(), newElement_0_enrollmentGroupCtorSignature.c_str(),
-                        jninewElement_0_enrollmentGroup, newElement_0_enrollmentGroup);
+                        newElement_0_enrollmentGroupInsideOptionalClassName.c_str(),
+                        newElement_0_enrollmentGroupInsideOptionalCtorSignature.c_str(),
+                        jninewElement_0_enrollmentGroupInsideOptional, newElement_0_enrollmentGroupInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_enrollmentGroupInsideOptional,
+                                                                      newElement_0_enrollmentGroup);
                 }
                 jobject newElement_0_criticality;
                 std::string newElement_0_criticalityClassName     = "java/lang/Integer";
@@ -17879,132 +17881,208 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                newElement_2_controlCtorSignature.c_str(),
                                                                                jninewElement_2_control, newElement_2_control);
                     jobject newElement_2_temperatureControl;
-                    if (entry_2.temperatureControl.IsNull())
+                    if (!entry_2.temperatureControl.HasValue())
                     {
-                        newElement_2_temperatureControl = nullptr;
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_temperatureControl);
                     }
                     else
                     {
-                        jobject newElement_2_temperatureControl_coolingTempOffset;
-                        if (entry_2.temperatureControl.Value().coolingTempOffset.IsNull())
+                        jobject newElement_2_temperatureControlInsideOptional;
+                        jobject newElement_2_temperatureControlInsideOptional_coolingTempOffset;
+                        if (!entry_2.temperatureControl.Value().coolingTempOffset.HasValue())
                         {
-                            newElement_2_temperatureControl_coolingTempOffset = nullptr;
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                nullptr, newElement_2_temperatureControlInsideOptional_coolingTempOffset);
                         }
                         else
                         {
-                            std::string newElement_2_temperatureControl_coolingTempOffsetClassName     = "java/lang/Integer";
-                            std::string newElement_2_temperatureControl_coolingTempOffsetCtorSignature = "(I)V";
-                            jint jninewElement_2_temperatureControl_coolingTempOffset =
-                                static_cast<jint>(entry_2.temperatureControl.Value().coolingTempOffset.Value());
-                            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                                newElement_2_temperatureControl_coolingTempOffsetClassName.c_str(),
-                                newElement_2_temperatureControl_coolingTempOffsetCtorSignature.c_str(),
-                                jninewElement_2_temperatureControl_coolingTempOffset,
-                                newElement_2_temperatureControl_coolingTempOffset);
+                            jobject newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptional;
+                            if (entry_2.temperatureControl.Value().coolingTempOffset.Value().IsNull())
+                            {
+                                newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptional = nullptr;
+                            }
+                            else
+                            {
+                                std::string newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptionalClassName =
+                                    "java/lang/Integer";
+                                std::string
+                                    newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptionalCtorSignature =
+                                        "(I)V";
+                                jint jninewElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptional =
+                                    static_cast<jint>(entry_2.temperatureControl.Value().coolingTempOffset.Value().Value());
+                                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                    newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptionalClassName.c_str(),
+                                    newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptionalCtorSignature
+                                        .c_str(),
+                                    jninewElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptional,
+                                    newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptional);
+                            }
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptional,
+                                newElement_2_temperatureControlInsideOptional_coolingTempOffset);
                         }
-                        jobject newElement_2_temperatureControl_heatTempOffset;
-                        if (entry_2.temperatureControl.Value().heatTempOffset.IsNull())
+                        jobject newElement_2_temperatureControlInsideOptional_heatingtTempOffset;
+                        if (!entry_2.temperatureControl.Value().heatingtTempOffset.HasValue())
                         {
-                            newElement_2_temperatureControl_heatTempOffset = nullptr;
-                        }
-                        else
-                        {
-                            std::string newElement_2_temperatureControl_heatTempOffsetClassName     = "java/lang/Integer";
-                            std::string newElement_2_temperatureControl_heatTempOffsetCtorSignature = "(I)V";
-                            jint jninewElement_2_temperatureControl_heatTempOffset =
-                                static_cast<jint>(entry_2.temperatureControl.Value().heatTempOffset.Value());
-                            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                                newElement_2_temperatureControl_heatTempOffsetClassName.c_str(),
-                                newElement_2_temperatureControl_heatTempOffsetCtorSignature.c_str(),
-                                jninewElement_2_temperatureControl_heatTempOffset, newElement_2_temperatureControl_heatTempOffset);
-                        }
-                        jobject newElement_2_temperatureControl_coolingTempSetpoint;
-                        if (entry_2.temperatureControl.Value().coolingTempSetpoint.IsNull())
-                        {
-                            newElement_2_temperatureControl_coolingTempSetpoint = nullptr;
-                        }
-                        else
-                        {
-                            std::string newElement_2_temperatureControl_coolingTempSetpointClassName     = "java/lang/Integer";
-                            std::string newElement_2_temperatureControl_coolingTempSetpointCtorSignature = "(I)V";
-                            jint jninewElement_2_temperatureControl_coolingTempSetpoint =
-                                static_cast<jint>(entry_2.temperatureControl.Value().coolingTempSetpoint.Value());
-                            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                                newElement_2_temperatureControl_coolingTempSetpointClassName.c_str(),
-                                newElement_2_temperatureControl_coolingTempSetpointCtorSignature.c_str(),
-                                jninewElement_2_temperatureControl_coolingTempSetpoint,
-                                newElement_2_temperatureControl_coolingTempSetpoint);
-                        }
-                        jobject newElement_2_temperatureControl_heatingTempSetpoint;
-                        if (entry_2.temperatureControl.Value().heatingTempSetpoint.IsNull())
-                        {
-                            newElement_2_temperatureControl_heatingTempSetpoint = nullptr;
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                nullptr, newElement_2_temperatureControlInsideOptional_heatingtTempOffset);
                         }
                         else
                         {
-                            std::string newElement_2_temperatureControl_heatingTempSetpointClassName     = "java/lang/Integer";
-                            std::string newElement_2_temperatureControl_heatingTempSetpointCtorSignature = "(I)V";
-                            jint jninewElement_2_temperatureControl_heatingTempSetpoint =
-                                static_cast<jint>(entry_2.temperatureControl.Value().heatingTempSetpoint.Value());
-                            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                                newElement_2_temperatureControl_heatingTempSetpointClassName.c_str(),
-                                newElement_2_temperatureControl_heatingTempSetpointCtorSignature.c_str(),
-                                jninewElement_2_temperatureControl_heatingTempSetpoint,
-                                newElement_2_temperatureControl_heatingTempSetpoint);
+                            jobject newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional;
+                            if (entry_2.temperatureControl.Value().heatingtTempOffset.Value().IsNull())
+                            {
+                                newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional = nullptr;
+                            }
+                            else
+                            {
+                                std::string
+                                    newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptionalClassName =
+                                        "java/lang/Integer";
+                                std::string
+                                    newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptionalCtorSignature =
+                                        "(I)V";
+                                jint jninewElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional =
+                                    static_cast<jint>(entry_2.temperatureControl.Value().heatingtTempOffset.Value().Value());
+                                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                    newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptionalClassName.c_str(),
+                                    newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptionalCtorSignature
+                                        .c_str(),
+                                    jninewElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional,
+                                    newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional);
+                            }
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional,
+                                newElement_2_temperatureControlInsideOptional_heatingtTempOffset);
+                        }
+                        jobject newElement_2_temperatureControlInsideOptional_coolingTempSetpoint;
+                        if (!entry_2.temperatureControl.Value().coolingTempSetpoint.HasValue())
+                        {
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                nullptr, newElement_2_temperatureControlInsideOptional_coolingTempSetpoint);
+                        }
+                        else
+                        {
+                            jobject newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptional;
+                            if (entry_2.temperatureControl.Value().coolingTempSetpoint.Value().IsNull())
+                            {
+                                newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptional = nullptr;
+                            }
+                            else
+                            {
+                                std::string
+                                    newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptionalClassName =
+                                        "java/lang/Integer";
+                                std::string
+                                    newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptionalCtorSignature =
+                                        "(I)V";
+                                jint jninewElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptional =
+                                    static_cast<jint>(entry_2.temperatureControl.Value().coolingTempSetpoint.Value().Value());
+                                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                    newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptionalClassName
+                                        .c_str(),
+                                    newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptionalCtorSignature
+                                        .c_str(),
+                                    jninewElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptional,
+                                    newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptional);
+                            }
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptional,
+                                newElement_2_temperatureControlInsideOptional_coolingTempSetpoint);
+                        }
+                        jobject newElement_2_temperatureControlInsideOptional_heatingTempSetpoint;
+                        if (!entry_2.temperatureControl.Value().heatingTempSetpoint.HasValue())
+                        {
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                nullptr, newElement_2_temperatureControlInsideOptional_heatingTempSetpoint);
+                        }
+                        else
+                        {
+                            jobject newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptional;
+                            if (entry_2.temperatureControl.Value().heatingTempSetpoint.Value().IsNull())
+                            {
+                                newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptional = nullptr;
+                            }
+                            else
+                            {
+                                std::string
+                                    newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptionalClassName =
+                                        "java/lang/Integer";
+                                std::string
+                                    newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptionalCtorSignature =
+                                        "(I)V";
+                                jint jninewElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptional =
+                                    static_cast<jint>(entry_2.temperatureControl.Value().heatingTempSetpoint.Value().Value());
+                                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                    newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptionalClassName
+                                        .c_str(),
+                                    newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptionalCtorSignature
+                                        .c_str(),
+                                    jninewElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptional,
+                                    newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptional);
+                            }
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptional,
+                                newElement_2_temperatureControlInsideOptional_heatingTempSetpoint);
                         }
 
                         jclass temperatureControlStructStructClass_5;
                         err = chip::JniReferences::GetInstance().GetClassRef(
-                            env, "chip/devicecontroller/ChipStructs$DemandReponseLoadControlClusterTemperatureControlStruct",
+                            env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterTemperatureControlStruct",
                             temperatureControlStructStructClass_5);
                         if (err != CHIP_NO_ERROR)
                         {
                             ChipLogError(
-                                Zcl, "Could not find class ChipStructs$DemandReponseLoadControlClusterTemperatureControlStruct");
+                                Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterTemperatureControlStruct");
                             return nullptr;
                         }
                         jmethodID temperatureControlStructStructCtor_5 =
                             env->GetMethodID(temperatureControlStructStructClass_5, "<init>",
-                                             "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                                             "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
                         if (temperatureControlStructStructCtor_5 == nullptr)
                         {
                             ChipLogError(
                                 Zcl,
-                                "Could not find ChipStructs$DemandReponseLoadControlClusterTemperatureControlStruct constructor");
+                                "Could not find ChipStructs$DemandResponseLoadControlClusterTemperatureControlStruct constructor");
                             return nullptr;
                         }
 
-                        newElement_2_temperatureControl = env->NewObject(
-                            temperatureControlStructStructClass_5, temperatureControlStructStructCtor_5,
-                            newElement_2_temperatureControl_coolingTempOffset, newElement_2_temperatureControl_heatTempOffset,
-                            newElement_2_temperatureControl_coolingTempSetpoint,
-                            newElement_2_temperatureControl_heatingTempSetpoint);
+                        newElement_2_temperatureControlInsideOptional =
+                            env->NewObject(temperatureControlStructStructClass_5, temperatureControlStructStructCtor_5,
+                                           newElement_2_temperatureControlInsideOptional_coolingTempOffset,
+                                           newElement_2_temperatureControlInsideOptional_heatingtTempOffset,
+                                           newElement_2_temperatureControlInsideOptional_coolingTempSetpoint,
+                                           newElement_2_temperatureControlInsideOptional_heatingTempSetpoint);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_temperatureControlInsideOptional,
+                                                                          newElement_2_temperatureControl);
                     }
                     jobject newElement_2_averageLoadControl;
-                    if (entry_2.averageLoadControl.IsNull())
+                    if (!entry_2.averageLoadControl.HasValue())
                     {
-                        newElement_2_averageLoadControl = nullptr;
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_averageLoadControl);
                     }
                     else
                     {
-                        jobject newElement_2_averageLoadControl_loadAdjustment;
-                        std::string newElement_2_averageLoadControl_loadAdjustmentClassName     = "java/lang/Integer";
-                        std::string newElement_2_averageLoadControl_loadAdjustmentCtorSignature = "(I)V";
-                        jint jninewElement_2_averageLoadControl_loadAdjustment =
+                        jobject newElement_2_averageLoadControlInsideOptional;
+                        jobject newElement_2_averageLoadControlInsideOptional_loadAdjustment;
+                        std::string newElement_2_averageLoadControlInsideOptional_loadAdjustmentClassName     = "java/lang/Integer";
+                        std::string newElement_2_averageLoadControlInsideOptional_loadAdjustmentCtorSignature = "(I)V";
+                        jint jninewElement_2_averageLoadControlInsideOptional_loadAdjustment =
                             static_cast<jint>(entry_2.averageLoadControl.Value().loadAdjustment);
                         chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            newElement_2_averageLoadControl_loadAdjustmentClassName.c_str(),
-                            newElement_2_averageLoadControl_loadAdjustmentCtorSignature.c_str(),
-                            jninewElement_2_averageLoadControl_loadAdjustment, newElement_2_averageLoadControl_loadAdjustment);
+                            newElement_2_averageLoadControlInsideOptional_loadAdjustmentClassName.c_str(),
+                            newElement_2_averageLoadControlInsideOptional_loadAdjustmentCtorSignature.c_str(),
+                            jninewElement_2_averageLoadControlInsideOptional_loadAdjustment,
+                            newElement_2_averageLoadControlInsideOptional_loadAdjustment);
 
                         jclass averageLoadControlStructStructClass_5;
                         err = chip::JniReferences::GetInstance().GetClassRef(
-                            env, "chip/devicecontroller/ChipStructs$DemandReponseLoadControlClusterAverageLoadControlStruct",
+                            env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterAverageLoadControlStruct",
                             averageLoadControlStructStructClass_5);
                         if (err != CHIP_NO_ERROR)
                         {
                             ChipLogError(
-                                Zcl, "Could not find class ChipStructs$DemandReponseLoadControlClusterAverageLoadControlStruct");
+                                Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterAverageLoadControlStruct");
                             return nullptr;
                         }
                         jmethodID averageLoadControlStructStructCtor_5 =
@@ -18013,39 +18091,43 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         {
                             ChipLogError(
                                 Zcl,
-                                "Could not find ChipStructs$DemandReponseLoadControlClusterAverageLoadControlStruct constructor");
+                                "Could not find ChipStructs$DemandResponseLoadControlClusterAverageLoadControlStruct constructor");
                             return nullptr;
                         }
 
-                        newElement_2_averageLoadControl =
+                        newElement_2_averageLoadControlInsideOptional =
                             env->NewObject(averageLoadControlStructStructClass_5, averageLoadControlStructStructCtor_5,
-                                           newElement_2_averageLoadControl_loadAdjustment);
+                                           newElement_2_averageLoadControlInsideOptional_loadAdjustment);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_averageLoadControlInsideOptional,
+                                                                          newElement_2_averageLoadControl);
                     }
                     jobject newElement_2_dutyCycleControl;
-                    if (entry_2.dutyCycleControl.IsNull())
+                    if (!entry_2.dutyCycleControl.HasValue())
                     {
-                        newElement_2_dutyCycleControl = nullptr;
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_dutyCycleControl);
                     }
                     else
                     {
-                        jobject newElement_2_dutyCycleControl_dutyCycle;
-                        std::string newElement_2_dutyCycleControl_dutyCycleClassName     = "java/lang/Integer";
-                        std::string newElement_2_dutyCycleControl_dutyCycleCtorSignature = "(I)V";
-                        jint jninewElement_2_dutyCycleControl_dutyCycle =
+                        jobject newElement_2_dutyCycleControlInsideOptional;
+                        jobject newElement_2_dutyCycleControlInsideOptional_dutyCycle;
+                        std::string newElement_2_dutyCycleControlInsideOptional_dutyCycleClassName     = "java/lang/Integer";
+                        std::string newElement_2_dutyCycleControlInsideOptional_dutyCycleCtorSignature = "(I)V";
+                        jint jninewElement_2_dutyCycleControlInsideOptional_dutyCycle =
                             static_cast<jint>(entry_2.dutyCycleControl.Value().dutyCycle);
                         chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            newElement_2_dutyCycleControl_dutyCycleClassName.c_str(),
-                            newElement_2_dutyCycleControl_dutyCycleCtorSignature.c_str(),
-                            jninewElement_2_dutyCycleControl_dutyCycle, newElement_2_dutyCycleControl_dutyCycle);
+                            newElement_2_dutyCycleControlInsideOptional_dutyCycleClassName.c_str(),
+                            newElement_2_dutyCycleControlInsideOptional_dutyCycleCtorSignature.c_str(),
+                            jninewElement_2_dutyCycleControlInsideOptional_dutyCycle,
+                            newElement_2_dutyCycleControlInsideOptional_dutyCycle);
 
                         jclass dutyCycleControlStructStructClass_5;
                         err = chip::JniReferences::GetInstance().GetClassRef(
-                            env, "chip/devicecontroller/ChipStructs$DemandReponseLoadControlClusterDutyCycleControlStruct",
+                            env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterDutyCycleControlStruct",
                             dutyCycleControlStructStructClass_5);
                         if (err != CHIP_NO_ERROR)
                         {
                             ChipLogError(Zcl,
-                                         "Could not find class ChipStructs$DemandReponseLoadControlClusterDutyCycleControlStruct");
+                                         "Could not find class ChipStructs$DemandResponseLoadControlClusterDutyCycleControlStruct");
                             return nullptr;
                         }
                         jmethodID dutyCycleControlStructStructCtor_5 =
@@ -18054,39 +18136,43 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         {
                             ChipLogError(
                                 Zcl,
-                                "Could not find ChipStructs$DemandReponseLoadControlClusterDutyCycleControlStruct constructor");
+                                "Could not find ChipStructs$DemandResponseLoadControlClusterDutyCycleControlStruct constructor");
                             return nullptr;
                         }
 
-                        newElement_2_dutyCycleControl =
+                        newElement_2_dutyCycleControlInsideOptional =
                             env->NewObject(dutyCycleControlStructStructClass_5, dutyCycleControlStructStructCtor_5,
-                                           newElement_2_dutyCycleControl_dutyCycle);
+                                           newElement_2_dutyCycleControlInsideOptional_dutyCycle);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_dutyCycleControlInsideOptional,
+                                                                          newElement_2_dutyCycleControl);
                     }
                     jobject newElement_2_powerSavingsControl;
-                    if (entry_2.powerSavingsControl.IsNull())
+                    if (!entry_2.powerSavingsControl.HasValue())
                     {
-                        newElement_2_powerSavingsControl = nullptr;
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_powerSavingsControl);
                     }
                     else
                     {
-                        jobject newElement_2_powerSavingsControl_powerSavings;
-                        std::string newElement_2_powerSavingsControl_powerSavingsClassName     = "java/lang/Integer";
-                        std::string newElement_2_powerSavingsControl_powerSavingsCtorSignature = "(I)V";
-                        jint jninewElement_2_powerSavingsControl_powerSavings =
+                        jobject newElement_2_powerSavingsControlInsideOptional;
+                        jobject newElement_2_powerSavingsControlInsideOptional_powerSavings;
+                        std::string newElement_2_powerSavingsControlInsideOptional_powerSavingsClassName     = "java/lang/Integer";
+                        std::string newElement_2_powerSavingsControlInsideOptional_powerSavingsCtorSignature = "(I)V";
+                        jint jninewElement_2_powerSavingsControlInsideOptional_powerSavings =
                             static_cast<jint>(entry_2.powerSavingsControl.Value().powerSavings);
                         chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            newElement_2_powerSavingsControl_powerSavingsClassName.c_str(),
-                            newElement_2_powerSavingsControl_powerSavingsCtorSignature.c_str(),
-                            jninewElement_2_powerSavingsControl_powerSavings, newElement_2_powerSavingsControl_powerSavings);
+                            newElement_2_powerSavingsControlInsideOptional_powerSavingsClassName.c_str(),
+                            newElement_2_powerSavingsControlInsideOptional_powerSavingsCtorSignature.c_str(),
+                            jninewElement_2_powerSavingsControlInsideOptional_powerSavings,
+                            newElement_2_powerSavingsControlInsideOptional_powerSavings);
 
                         jclass powerSavingsControlStructStructClass_5;
                         err = chip::JniReferences::GetInstance().GetClassRef(
-                            env, "chip/devicecontroller/ChipStructs$DemandReponseLoadControlClusterPowerSavingsControlStruct",
+                            env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterPowerSavingsControlStruct",
                             powerSavingsControlStructStructClass_5);
                         if (err != CHIP_NO_ERROR)
                         {
                             ChipLogError(
-                                Zcl, "Could not find class ChipStructs$DemandReponseLoadControlClusterPowerSavingsControlStruct");
+                                Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterPowerSavingsControlStruct");
                             return nullptr;
                         }
                         jmethodID powerSavingsControlStructStructCtor_5 =
@@ -18095,79 +18181,81 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         {
                             ChipLogError(
                                 Zcl,
-                                "Could not find ChipStructs$DemandReponseLoadControlClusterPowerSavingsControlStruct constructor");
+                                "Could not find ChipStructs$DemandResponseLoadControlClusterPowerSavingsControlStruct constructor");
                             return nullptr;
                         }
 
-                        newElement_2_powerSavingsControl =
+                        newElement_2_powerSavingsControlInsideOptional =
                             env->NewObject(powerSavingsControlStructStructClass_5, powerSavingsControlStructStructCtor_5,
-                                           newElement_2_powerSavingsControl_powerSavings);
+                                           newElement_2_powerSavingsControlInsideOptional_powerSavings);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_powerSavingsControlInsideOptional,
+                                                                          newElement_2_powerSavingsControl);
                     }
                     jobject newElement_2_heatingSourceControl;
-                    if (entry_2.heatingSourceControl.IsNull())
+                    if (!entry_2.heatingSourceControl.HasValue())
                     {
-                        newElement_2_heatingSourceControl = nullptr;
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_heatingSourceControl);
                     }
                     else
                     {
-                        jobject newElement_2_heatingSourceControl_heatingSource;
-                        std::string newElement_2_heatingSourceControl_heatingSourceClassName     = "java/lang/Integer";
-                        std::string newElement_2_heatingSourceControl_heatingSourceCtorSignature = "(I)V";
-                        jint jninewElement_2_heatingSourceControl_heatingSource =
+                        jobject newElement_2_heatingSourceControlInsideOptional;
+                        jobject newElement_2_heatingSourceControlInsideOptional_heatingSource;
+                        std::string newElement_2_heatingSourceControlInsideOptional_heatingSourceClassName = "java/lang/Integer";
+                        std::string newElement_2_heatingSourceControlInsideOptional_heatingSourceCtorSignature = "(I)V";
+                        jint jninewElement_2_heatingSourceControlInsideOptional_heatingSource =
                             static_cast<jint>(entry_2.heatingSourceControl.Value().heatingSource);
                         chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            newElement_2_heatingSourceControl_heatingSourceClassName.c_str(),
-                            newElement_2_heatingSourceControl_heatingSourceCtorSignature.c_str(),
-                            jninewElement_2_heatingSourceControl_heatingSource, newElement_2_heatingSourceControl_heatingSource);
+                            newElement_2_heatingSourceControlInsideOptional_heatingSourceClassName.c_str(),
+                            newElement_2_heatingSourceControlInsideOptional_heatingSourceCtorSignature.c_str(),
+                            jninewElement_2_heatingSourceControlInsideOptional_heatingSource,
+                            newElement_2_heatingSourceControlInsideOptional_heatingSource);
 
                         jclass heatingSourceControlStructStructClass_5;
                         err = chip::JniReferences::GetInstance().GetClassRef(
-                            env, "chip/devicecontroller/ChipStructs$DemandReponseLoadControlClusterHeatingSourceControlStruct",
+                            env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterHeatingSourceControlStruct",
                             heatingSourceControlStructStructClass_5);
                         if (err != CHIP_NO_ERROR)
                         {
                             ChipLogError(
-                                Zcl, "Could not find class ChipStructs$DemandReponseLoadControlClusterHeatingSourceControlStruct");
+                                Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterHeatingSourceControlStruct");
                             return nullptr;
                         }
                         jmethodID heatingSourceControlStructStructCtor_5 =
                             env->GetMethodID(heatingSourceControlStructStructClass_5, "<init>", "(Ljava/lang/Integer;)V");
                         if (heatingSourceControlStructStructCtor_5 == nullptr)
                         {
-                            ChipLogError(
-                                Zcl,
-                                "Could not find ChipStructs$DemandReponseLoadControlClusterHeatingSourceControlStruct constructor");
+                            ChipLogError(Zcl,
+                                         "Could not find ChipStructs$DemandResponseLoadControlClusterHeatingSourceControlStruct "
+                                         "constructor");
                             return nullptr;
                         }
 
-                        newElement_2_heatingSourceControl =
+                        newElement_2_heatingSourceControlInsideOptional =
                             env->NewObject(heatingSourceControlStructStructClass_5, heatingSourceControlStructStructCtor_5,
-                                           newElement_2_heatingSourceControl_heatingSource);
+                                           newElement_2_heatingSourceControlInsideOptional_heatingSource);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_heatingSourceControlInsideOptional,
+                                                                          newElement_2_heatingSourceControl);
                     }
 
                     jclass loadControlEventTransitionStructStructClass_3;
                     err = chip::JniReferences::GetInstance().GetClassRef(
-                        env, "chip/devicecontroller/ChipStructs$DemandReponseLoadControlClusterLoadControlEventTransitionStruct",
+                        env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterLoadControlEventTransitionStruct",
                         loadControlEventTransitionStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
                         ChipLogError(
                             Zcl,
-                            "Could not find class ChipStructs$DemandReponseLoadControlClusterLoadControlEventTransitionStruct");
+                            "Could not find class ChipStructs$DemandResponseLoadControlClusterLoadControlEventTransitionStruct");
                         return nullptr;
                     }
-                    jmethodID loadControlEventTransitionStructStructCtor_3 = env->GetMethodID(
-                        loadControlEventTransitionStructStructClass_3, "<init>",
-                        "(Ljava/lang/Integer;Ljava/lang/Integer;Lchip/devicecontroller/"
-                        "ChipStructs$DemandReponseLoadControlClusterTemperatureControlStruct;Lchip/devicecontroller/"
-                        "ChipStructs$DemandReponseLoadControlClusterAverageLoadControlStruct;Lchip/devicecontroller/"
-                        "ChipStructs$DemandReponseLoadControlClusterDutyCycleControlStruct;Lchip/devicecontroller/"
-                        "ChipStructs$DemandReponseLoadControlClusterPowerSavingsControlStruct;Lchip/devicecontroller/"
-                        "ChipStructs$DemandReponseLoadControlClusterHeatingSourceControlStruct;)V");
+                    jmethodID loadControlEventTransitionStructStructCtor_3 =
+                        env->GetMethodID(loadControlEventTransitionStructStructClass_3, "<init>",
+                                         "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/"
+                                         "util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
                     if (loadControlEventTransitionStructStructCtor_3 == nullptr)
                     {
                         ChipLogError(Zcl,
-                                     "Could not find ChipStructs$DemandReponseLoadControlClusterLoadControlEventTransitionStruct "
+                                     "Could not find ChipStructs$DemandResponseLoadControlClusterLoadControlEventTransitionStruct "
                                      "constructor");
                         return nullptr;
                     }
@@ -18179,39 +18267,557 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                        newElement_2_powerSavingsControl, newElement_2_heatingSourceControl);
                     chip::JniReferences::GetInstance().AddToList(newElement_0_transitions, newElement_2);
                 }
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_fabricIndexClassName.c_str(),
-                                                                           newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                           jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
-                jclass scopedLoadControlEventStructStructClass_1;
+                jclass loadControlEventStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$DemandReponseLoadControlClusterScopedLoadControlEventStruct",
-                    scopedLoadControlEventStructStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterLoadControlEventStruct",
+                    loadControlEventStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl,
-                                 "Could not find class ChipStructs$DemandReponseLoadControlClusterScopedLoadControlEventStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterLoadControlEventStruct");
                     return nullptr;
                 }
-                jmethodID scopedLoadControlEventStructStructCtor_1 =
-                    env->GetMethodID(scopedLoadControlEventStructStructClass_1, "<init>",
-                                     "([B[BLjava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
-                                     "Long;Ljava/util/ArrayList;Ljava/lang/Integer;)V");
-                if (scopedLoadControlEventStructStructCtor_1 == nullptr)
+                jmethodID loadControlEventStructStructCtor_1 =
+                    env->GetMethodID(loadControlEventStructStructClass_1, "<init>",
+                                     "([B[BLjava/lang/Integer;Ljava/lang/Long;Ljava/util/Optional;Ljava/lang/Integer;Ljava/lang/"
+                                     "Long;Ljava/util/ArrayList;)V");
+                if (loadControlEventStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(
-                        Zcl, "Could not find ChipStructs$DemandReponseLoadControlClusterScopedLoadControlEventStruct constructor");
+                    ChipLogError(Zcl,
+                                 "Could not find ChipStructs$DemandResponseLoadControlClusterLoadControlEventStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(scopedLoadControlEventStructStructClass_1, scopedLoadControlEventStructStructCtor_1,
-                                              newElement_0_eventID, newElement_0_programControl, newElement_0_control,
+                newElement_0 = env->NewObject(loadControlEventStructStructClass_1, loadControlEventStructStructCtor_1,
+                                              newElement_0_eventID, newElement_0_programID, newElement_0_control,
                                               newElement_0_deviceClass, newElement_0_enrollmentGroup, newElement_0_criticality,
-                                              newElement_0_startTime, newElement_0_transitions, newElement_0_fabricIndex);
+                                              newElement_0_startTime, newElement_0_transitions);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::ActiveEvents::Id: {
+            using TypeInfo = Attributes::ActiveEvents::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_eventID;
+                jbyteArray newElement_0_eventIDByteArray = env->NewByteArray(static_cast<jsize>(entry_0.eventID.size()));
+                env->SetByteArrayRegion(newElement_0_eventIDByteArray, 0, static_cast<jsize>(entry_0.eventID.size()),
+                                        reinterpret_cast<const jbyte *>(entry_0.eventID.data()));
+                newElement_0_eventID = newElement_0_eventIDByteArray;
+                jobject newElement_0_programID;
+                if (entry_0.programID.IsNull())
+                {
+                    newElement_0_programID = nullptr;
+                }
+                else
+                {
+                    jbyteArray newElement_0_programIDByteArray =
+                        env->NewByteArray(static_cast<jsize>(entry_0.programID.Value().size()));
+                    env->SetByteArrayRegion(newElement_0_programIDByteArray, 0,
+                                            static_cast<jsize>(entry_0.programID.Value().size()),
+                                            reinterpret_cast<const jbyte *>(entry_0.programID.Value().data()));
+                    newElement_0_programID = newElement_0_programIDByteArray;
+                }
+                jobject newElement_0_control;
+                std::string newElement_0_controlClassName     = "java/lang/Integer";
+                std::string newElement_0_controlCtorSignature = "(I)V";
+                jint jninewElement_0_control                  = static_cast<jint>(entry_0.control.Raw());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_controlClassName.c_str(),
+                                                                           newElement_0_controlCtorSignature.c_str(),
+                                                                           jninewElement_0_control, newElement_0_control);
+                jobject newElement_0_deviceClass;
+                std::string newElement_0_deviceClassClassName     = "java/lang/Long";
+                std::string newElement_0_deviceClassCtorSignature = "(J)V";
+                jlong jninewElement_0_deviceClass                 = static_cast<jlong>(entry_0.deviceClass.Raw());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_deviceClassClassName.c_str(),
+                                                                            newElement_0_deviceClassCtorSignature.c_str(),
+                                                                            jninewElement_0_deviceClass, newElement_0_deviceClass);
+                jobject newElement_0_enrollmentGroup;
+                if (!entry_0.enrollmentGroup.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_enrollmentGroup);
+                }
+                else
+                {
+                    jobject newElement_0_enrollmentGroupInsideOptional;
+                    std::string newElement_0_enrollmentGroupInsideOptionalClassName     = "java/lang/Integer";
+                    std::string newElement_0_enrollmentGroupInsideOptionalCtorSignature = "(I)V";
+                    jint jninewElement_0_enrollmentGroupInsideOptional = static_cast<jint>(entry_0.enrollmentGroup.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_0_enrollmentGroupInsideOptionalClassName.c_str(),
+                        newElement_0_enrollmentGroupInsideOptionalCtorSignature.c_str(),
+                        jninewElement_0_enrollmentGroupInsideOptional, newElement_0_enrollmentGroupInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_enrollmentGroupInsideOptional,
+                                                                      newElement_0_enrollmentGroup);
+                }
+                jobject newElement_0_criticality;
+                std::string newElement_0_criticalityClassName     = "java/lang/Integer";
+                std::string newElement_0_criticalityCtorSignature = "(I)V";
+                jint jninewElement_0_criticality                  = static_cast<jint>(entry_0.criticality);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_criticalityClassName.c_str(),
+                                                                           newElement_0_criticalityCtorSignature.c_str(),
+                                                                           jninewElement_0_criticality, newElement_0_criticality);
+                jobject newElement_0_startTime;
+                if (entry_0.startTime.IsNull())
+                {
+                    newElement_0_startTime = nullptr;
+                }
+                else
+                {
+                    std::string newElement_0_startTimeClassName     = "java/lang/Long";
+                    std::string newElement_0_startTimeCtorSignature = "(J)V";
+                    jlong jninewElement_0_startTime                 = static_cast<jlong>(entry_0.startTime.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_startTimeClassName.c_str(),
+                                                                                newElement_0_startTimeCtorSignature.c_str(),
+                                                                                jninewElement_0_startTime, newElement_0_startTime);
+                }
+                jobject newElement_0_transitions;
+                chip::JniReferences::GetInstance().CreateArrayList(newElement_0_transitions);
+
+                auto iter_newElement_0_transitions_2 = entry_0.transitions.begin();
+                while (iter_newElement_0_transitions_2.Next())
+                {
+                    auto & entry_2 = iter_newElement_0_transitions_2.GetValue();
+                    jobject newElement_2;
+                    jobject newElement_2_duration;
+                    std::string newElement_2_durationClassName     = "java/lang/Integer";
+                    std::string newElement_2_durationCtorSignature = "(I)V";
+                    jint jninewElement_2_duration                  = static_cast<jint>(entry_2.duration);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_2_durationClassName.c_str(),
+                                                                               newElement_2_durationCtorSignature.c_str(),
+                                                                               jninewElement_2_duration, newElement_2_duration);
+                    jobject newElement_2_control;
+                    std::string newElement_2_controlClassName     = "java/lang/Integer";
+                    std::string newElement_2_controlCtorSignature = "(I)V";
+                    jint jninewElement_2_control                  = static_cast<jint>(entry_2.control.Raw());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_2_controlClassName.c_str(),
+                                                                               newElement_2_controlCtorSignature.c_str(),
+                                                                               jninewElement_2_control, newElement_2_control);
+                    jobject newElement_2_temperatureControl;
+                    if (!entry_2.temperatureControl.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_temperatureControl);
+                    }
+                    else
+                    {
+                        jobject newElement_2_temperatureControlInsideOptional;
+                        jobject newElement_2_temperatureControlInsideOptional_coolingTempOffset;
+                        if (!entry_2.temperatureControl.Value().coolingTempOffset.HasValue())
+                        {
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                nullptr, newElement_2_temperatureControlInsideOptional_coolingTempOffset);
+                        }
+                        else
+                        {
+                            jobject newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptional;
+                            if (entry_2.temperatureControl.Value().coolingTempOffset.Value().IsNull())
+                            {
+                                newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptional = nullptr;
+                            }
+                            else
+                            {
+                                std::string newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptionalClassName =
+                                    "java/lang/Integer";
+                                std::string
+                                    newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptionalCtorSignature =
+                                        "(I)V";
+                                jint jninewElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptional =
+                                    static_cast<jint>(entry_2.temperatureControl.Value().coolingTempOffset.Value().Value());
+                                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                    newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptionalClassName.c_str(),
+                                    newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptionalCtorSignature
+                                        .c_str(),
+                                    jninewElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptional,
+                                    newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptional);
+                            }
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                newElement_2_temperatureControlInsideOptional_coolingTempOffsetInsideOptional,
+                                newElement_2_temperatureControlInsideOptional_coolingTempOffset);
+                        }
+                        jobject newElement_2_temperatureControlInsideOptional_heatingtTempOffset;
+                        if (!entry_2.temperatureControl.Value().heatingtTempOffset.HasValue())
+                        {
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                nullptr, newElement_2_temperatureControlInsideOptional_heatingtTempOffset);
+                        }
+                        else
+                        {
+                            jobject newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional;
+                            if (entry_2.temperatureControl.Value().heatingtTempOffset.Value().IsNull())
+                            {
+                                newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional = nullptr;
+                            }
+                            else
+                            {
+                                std::string
+                                    newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptionalClassName =
+                                        "java/lang/Integer";
+                                std::string
+                                    newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptionalCtorSignature =
+                                        "(I)V";
+                                jint jninewElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional =
+                                    static_cast<jint>(entry_2.temperatureControl.Value().heatingtTempOffset.Value().Value());
+                                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                    newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptionalClassName.c_str(),
+                                    newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptionalCtorSignature
+                                        .c_str(),
+                                    jninewElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional,
+                                    newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional);
+                            }
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                newElement_2_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional,
+                                newElement_2_temperatureControlInsideOptional_heatingtTempOffset);
+                        }
+                        jobject newElement_2_temperatureControlInsideOptional_coolingTempSetpoint;
+                        if (!entry_2.temperatureControl.Value().coolingTempSetpoint.HasValue())
+                        {
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                nullptr, newElement_2_temperatureControlInsideOptional_coolingTempSetpoint);
+                        }
+                        else
+                        {
+                            jobject newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptional;
+                            if (entry_2.temperatureControl.Value().coolingTempSetpoint.Value().IsNull())
+                            {
+                                newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptional = nullptr;
+                            }
+                            else
+                            {
+                                std::string
+                                    newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptionalClassName =
+                                        "java/lang/Integer";
+                                std::string
+                                    newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptionalCtorSignature =
+                                        "(I)V";
+                                jint jninewElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptional =
+                                    static_cast<jint>(entry_2.temperatureControl.Value().coolingTempSetpoint.Value().Value());
+                                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                    newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptionalClassName
+                                        .c_str(),
+                                    newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptionalCtorSignature
+                                        .c_str(),
+                                    jninewElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptional,
+                                    newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptional);
+                            }
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                newElement_2_temperatureControlInsideOptional_coolingTempSetpointInsideOptional,
+                                newElement_2_temperatureControlInsideOptional_coolingTempSetpoint);
+                        }
+                        jobject newElement_2_temperatureControlInsideOptional_heatingTempSetpoint;
+                        if (!entry_2.temperatureControl.Value().heatingTempSetpoint.HasValue())
+                        {
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                nullptr, newElement_2_temperatureControlInsideOptional_heatingTempSetpoint);
+                        }
+                        else
+                        {
+                            jobject newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptional;
+                            if (entry_2.temperatureControl.Value().heatingTempSetpoint.Value().IsNull())
+                            {
+                                newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptional = nullptr;
+                            }
+                            else
+                            {
+                                std::string
+                                    newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptionalClassName =
+                                        "java/lang/Integer";
+                                std::string
+                                    newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptionalCtorSignature =
+                                        "(I)V";
+                                jint jninewElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptional =
+                                    static_cast<jint>(entry_2.temperatureControl.Value().heatingTempSetpoint.Value().Value());
+                                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                    newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptionalClassName
+                                        .c_str(),
+                                    newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptionalCtorSignature
+                                        .c_str(),
+                                    jninewElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptional,
+                                    newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptional);
+                            }
+                            chip::JniReferences::GetInstance().CreateOptional(
+                                newElement_2_temperatureControlInsideOptional_heatingTempSetpointInsideOptional,
+                                newElement_2_temperatureControlInsideOptional_heatingTempSetpoint);
+                        }
+
+                        jclass temperatureControlStructStructClass_5;
+                        err = chip::JniReferences::GetInstance().GetClassRef(
+                            env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterTemperatureControlStruct",
+                            temperatureControlStructStructClass_5);
+                        if (err != CHIP_NO_ERROR)
+                        {
+                            ChipLogError(
+                                Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterTemperatureControlStruct");
+                            return nullptr;
+                        }
+                        jmethodID temperatureControlStructStructCtor_5 =
+                            env->GetMethodID(temperatureControlStructStructClass_5, "<init>",
+                                             "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
+                        if (temperatureControlStructStructCtor_5 == nullptr)
+                        {
+                            ChipLogError(
+                                Zcl,
+                                "Could not find ChipStructs$DemandResponseLoadControlClusterTemperatureControlStruct constructor");
+                            return nullptr;
+                        }
+
+                        newElement_2_temperatureControlInsideOptional =
+                            env->NewObject(temperatureControlStructStructClass_5, temperatureControlStructStructCtor_5,
+                                           newElement_2_temperatureControlInsideOptional_coolingTempOffset,
+                                           newElement_2_temperatureControlInsideOptional_heatingtTempOffset,
+                                           newElement_2_temperatureControlInsideOptional_coolingTempSetpoint,
+                                           newElement_2_temperatureControlInsideOptional_heatingTempSetpoint);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_temperatureControlInsideOptional,
+                                                                          newElement_2_temperatureControl);
+                    }
+                    jobject newElement_2_averageLoadControl;
+                    if (!entry_2.averageLoadControl.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_averageLoadControl);
+                    }
+                    else
+                    {
+                        jobject newElement_2_averageLoadControlInsideOptional;
+                        jobject newElement_2_averageLoadControlInsideOptional_loadAdjustment;
+                        std::string newElement_2_averageLoadControlInsideOptional_loadAdjustmentClassName     = "java/lang/Integer";
+                        std::string newElement_2_averageLoadControlInsideOptional_loadAdjustmentCtorSignature = "(I)V";
+                        jint jninewElement_2_averageLoadControlInsideOptional_loadAdjustment =
+                            static_cast<jint>(entry_2.averageLoadControl.Value().loadAdjustment);
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            newElement_2_averageLoadControlInsideOptional_loadAdjustmentClassName.c_str(),
+                            newElement_2_averageLoadControlInsideOptional_loadAdjustmentCtorSignature.c_str(),
+                            jninewElement_2_averageLoadControlInsideOptional_loadAdjustment,
+                            newElement_2_averageLoadControlInsideOptional_loadAdjustment);
+
+                        jclass averageLoadControlStructStructClass_5;
+                        err = chip::JniReferences::GetInstance().GetClassRef(
+                            env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterAverageLoadControlStruct",
+                            averageLoadControlStructStructClass_5);
+                        if (err != CHIP_NO_ERROR)
+                        {
+                            ChipLogError(
+                                Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterAverageLoadControlStruct");
+                            return nullptr;
+                        }
+                        jmethodID averageLoadControlStructStructCtor_5 =
+                            env->GetMethodID(averageLoadControlStructStructClass_5, "<init>", "(Ljava/lang/Integer;)V");
+                        if (averageLoadControlStructStructCtor_5 == nullptr)
+                        {
+                            ChipLogError(
+                                Zcl,
+                                "Could not find ChipStructs$DemandResponseLoadControlClusterAverageLoadControlStruct constructor");
+                            return nullptr;
+                        }
+
+                        newElement_2_averageLoadControlInsideOptional =
+                            env->NewObject(averageLoadControlStructStructClass_5, averageLoadControlStructStructCtor_5,
+                                           newElement_2_averageLoadControlInsideOptional_loadAdjustment);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_averageLoadControlInsideOptional,
+                                                                          newElement_2_averageLoadControl);
+                    }
+                    jobject newElement_2_dutyCycleControl;
+                    if (!entry_2.dutyCycleControl.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_dutyCycleControl);
+                    }
+                    else
+                    {
+                        jobject newElement_2_dutyCycleControlInsideOptional;
+                        jobject newElement_2_dutyCycleControlInsideOptional_dutyCycle;
+                        std::string newElement_2_dutyCycleControlInsideOptional_dutyCycleClassName     = "java/lang/Integer";
+                        std::string newElement_2_dutyCycleControlInsideOptional_dutyCycleCtorSignature = "(I)V";
+                        jint jninewElement_2_dutyCycleControlInsideOptional_dutyCycle =
+                            static_cast<jint>(entry_2.dutyCycleControl.Value().dutyCycle);
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            newElement_2_dutyCycleControlInsideOptional_dutyCycleClassName.c_str(),
+                            newElement_2_dutyCycleControlInsideOptional_dutyCycleCtorSignature.c_str(),
+                            jninewElement_2_dutyCycleControlInsideOptional_dutyCycle,
+                            newElement_2_dutyCycleControlInsideOptional_dutyCycle);
+
+                        jclass dutyCycleControlStructStructClass_5;
+                        err = chip::JniReferences::GetInstance().GetClassRef(
+                            env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterDutyCycleControlStruct",
+                            dutyCycleControlStructStructClass_5);
+                        if (err != CHIP_NO_ERROR)
+                        {
+                            ChipLogError(Zcl,
+                                         "Could not find class ChipStructs$DemandResponseLoadControlClusterDutyCycleControlStruct");
+                            return nullptr;
+                        }
+                        jmethodID dutyCycleControlStructStructCtor_5 =
+                            env->GetMethodID(dutyCycleControlStructStructClass_5, "<init>", "(Ljava/lang/Integer;)V");
+                        if (dutyCycleControlStructStructCtor_5 == nullptr)
+                        {
+                            ChipLogError(
+                                Zcl,
+                                "Could not find ChipStructs$DemandResponseLoadControlClusterDutyCycleControlStruct constructor");
+                            return nullptr;
+                        }
+
+                        newElement_2_dutyCycleControlInsideOptional =
+                            env->NewObject(dutyCycleControlStructStructClass_5, dutyCycleControlStructStructCtor_5,
+                                           newElement_2_dutyCycleControlInsideOptional_dutyCycle);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_dutyCycleControlInsideOptional,
+                                                                          newElement_2_dutyCycleControl);
+                    }
+                    jobject newElement_2_powerSavingsControl;
+                    if (!entry_2.powerSavingsControl.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_powerSavingsControl);
+                    }
+                    else
+                    {
+                        jobject newElement_2_powerSavingsControlInsideOptional;
+                        jobject newElement_2_powerSavingsControlInsideOptional_powerSavings;
+                        std::string newElement_2_powerSavingsControlInsideOptional_powerSavingsClassName     = "java/lang/Integer";
+                        std::string newElement_2_powerSavingsControlInsideOptional_powerSavingsCtorSignature = "(I)V";
+                        jint jninewElement_2_powerSavingsControlInsideOptional_powerSavings =
+                            static_cast<jint>(entry_2.powerSavingsControl.Value().powerSavings);
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            newElement_2_powerSavingsControlInsideOptional_powerSavingsClassName.c_str(),
+                            newElement_2_powerSavingsControlInsideOptional_powerSavingsCtorSignature.c_str(),
+                            jninewElement_2_powerSavingsControlInsideOptional_powerSavings,
+                            newElement_2_powerSavingsControlInsideOptional_powerSavings);
+
+                        jclass powerSavingsControlStructStructClass_5;
+                        err = chip::JniReferences::GetInstance().GetClassRef(
+                            env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterPowerSavingsControlStruct",
+                            powerSavingsControlStructStructClass_5);
+                        if (err != CHIP_NO_ERROR)
+                        {
+                            ChipLogError(
+                                Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterPowerSavingsControlStruct");
+                            return nullptr;
+                        }
+                        jmethodID powerSavingsControlStructStructCtor_5 =
+                            env->GetMethodID(powerSavingsControlStructStructClass_5, "<init>", "(Ljava/lang/Integer;)V");
+                        if (powerSavingsControlStructStructCtor_5 == nullptr)
+                        {
+                            ChipLogError(
+                                Zcl,
+                                "Could not find ChipStructs$DemandResponseLoadControlClusterPowerSavingsControlStruct constructor");
+                            return nullptr;
+                        }
+
+                        newElement_2_powerSavingsControlInsideOptional =
+                            env->NewObject(powerSavingsControlStructStructClass_5, powerSavingsControlStructStructCtor_5,
+                                           newElement_2_powerSavingsControlInsideOptional_powerSavings);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_powerSavingsControlInsideOptional,
+                                                                          newElement_2_powerSavingsControl);
+                    }
+                    jobject newElement_2_heatingSourceControl;
+                    if (!entry_2.heatingSourceControl.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_heatingSourceControl);
+                    }
+                    else
+                    {
+                        jobject newElement_2_heatingSourceControlInsideOptional;
+                        jobject newElement_2_heatingSourceControlInsideOptional_heatingSource;
+                        std::string newElement_2_heatingSourceControlInsideOptional_heatingSourceClassName = "java/lang/Integer";
+                        std::string newElement_2_heatingSourceControlInsideOptional_heatingSourceCtorSignature = "(I)V";
+                        jint jninewElement_2_heatingSourceControlInsideOptional_heatingSource =
+                            static_cast<jint>(entry_2.heatingSourceControl.Value().heatingSource);
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            newElement_2_heatingSourceControlInsideOptional_heatingSourceClassName.c_str(),
+                            newElement_2_heatingSourceControlInsideOptional_heatingSourceCtorSignature.c_str(),
+                            jninewElement_2_heatingSourceControlInsideOptional_heatingSource,
+                            newElement_2_heatingSourceControlInsideOptional_heatingSource);
+
+                        jclass heatingSourceControlStructStructClass_5;
+                        err = chip::JniReferences::GetInstance().GetClassRef(
+                            env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterHeatingSourceControlStruct",
+                            heatingSourceControlStructStructClass_5);
+                        if (err != CHIP_NO_ERROR)
+                        {
+                            ChipLogError(
+                                Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterHeatingSourceControlStruct");
+                            return nullptr;
+                        }
+                        jmethodID heatingSourceControlStructStructCtor_5 =
+                            env->GetMethodID(heatingSourceControlStructStructClass_5, "<init>", "(Ljava/lang/Integer;)V");
+                        if (heatingSourceControlStructStructCtor_5 == nullptr)
+                        {
+                            ChipLogError(Zcl,
+                                         "Could not find ChipStructs$DemandResponseLoadControlClusterHeatingSourceControlStruct "
+                                         "constructor");
+                            return nullptr;
+                        }
+
+                        newElement_2_heatingSourceControlInsideOptional =
+                            env->NewObject(heatingSourceControlStructStructClass_5, heatingSourceControlStructStructCtor_5,
+                                           newElement_2_heatingSourceControlInsideOptional_heatingSource);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_heatingSourceControlInsideOptional,
+                                                                          newElement_2_heatingSourceControl);
+                    }
+
+                    jclass loadControlEventTransitionStructStructClass_3;
+                    err = chip::JniReferences::GetInstance().GetClassRef(
+                        env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterLoadControlEventTransitionStruct",
+                        loadControlEventTransitionStructStructClass_3);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(
+                            Zcl,
+                            "Could not find class ChipStructs$DemandResponseLoadControlClusterLoadControlEventTransitionStruct");
+                        return nullptr;
+                    }
+                    jmethodID loadControlEventTransitionStructStructCtor_3 =
+                        env->GetMethodID(loadControlEventTransitionStructStructClass_3, "<init>",
+                                         "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/"
+                                         "util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
+                    if (loadControlEventTransitionStructStructCtor_3 == nullptr)
+                    {
+                        ChipLogError(Zcl,
+                                     "Could not find ChipStructs$DemandResponseLoadControlClusterLoadControlEventTransitionStruct "
+                                     "constructor");
+                        return nullptr;
+                    }
+
+                    newElement_2 =
+                        env->NewObject(loadControlEventTransitionStructStructClass_3, loadControlEventTransitionStructStructCtor_3,
+                                       newElement_2_duration, newElement_2_control, newElement_2_temperatureControl,
+                                       newElement_2_averageLoadControl, newElement_2_dutyCycleControl,
+                                       newElement_2_powerSavingsControl, newElement_2_heatingSourceControl);
+                    chip::JniReferences::GetInstance().AddToList(newElement_0_transitions, newElement_2);
+                }
+
+                jclass loadControlEventStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterLoadControlEventStruct",
+                    loadControlEventStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterLoadControlEventStruct");
+                    return nullptr;
+                }
+                jmethodID loadControlEventStructStructCtor_1 =
+                    env->GetMethodID(loadControlEventStructStructClass_1, "<init>",
+                                     "([B[BLjava/lang/Integer;Ljava/lang/Long;Ljava/util/Optional;Ljava/lang/Integer;Ljava/lang/"
+                                     "Long;Ljava/util/ArrayList;)V");
+                if (loadControlEventStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(Zcl,
+                                 "Could not find ChipStructs$DemandResponseLoadControlClusterLoadControlEventStruct constructor");
+                    return nullptr;
+                }
+
+                newElement_0 = env->NewObject(loadControlEventStructStructClass_1, loadControlEventStructStructCtor_1,
+                                              newElement_0_eventID, newElement_0_programID, newElement_0_control,
+                                              newElement_0_deviceClass, newElement_0_enrollmentGroup, newElement_0_criticality,
+                                              newElement_0_startTime, newElement_0_transitions);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;

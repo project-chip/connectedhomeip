@@ -14,29 +14,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package chip.devicecontroller.cluster.structs
+package matter.devicecontroller.cluster.structs
 
-import chip.devicecontroller.cluster.*
+import matter.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class DemandReponseLoadControlClusterLoadControlEventStruct (
-    val eventID: ByteArray,
-    val programControl: ByteArray,
-    val control: UInt,
-    val deviceClass: ULong,
-    val enrollmentGroup: UInt?,
-    val criticality: UInt,
-    val startTime: ULong?,
-    val transitions: List<DemandReponseLoadControlClusterLoadControlEventTransitionStruct>) {
-  override fun toString(): String  = buildString {
-    append("DemandReponseLoadControlClusterLoadControlEventStruct {\n")
+class DemandResponseLoadControlClusterScopedLoadControlEventStruct(
+  val eventID: ByteArray,
+  val programControl: ByteArray,
+  val control: UInt,
+  val deviceClass: ULong,
+  val enrollmentGroup: UByte?,
+  val criticality: UInt,
+  val startTime: UInt?,
+  val transitions: List<DemandResponseLoadControlClusterLoadControlEventTransitionStruct>,
+  val fabricIndex: UByte
+) {
+  override fun toString(): String = buildString {
+    append("DemandResponseLoadControlClusterScopedLoadControlEventStruct {\n")
     append("\teventID : $eventID\n")
     append("\tprogramControl : $programControl\n")
     append("\tcontrol : $control\n")
@@ -45,6 +44,7 @@ class DemandReponseLoadControlClusterLoadControlEventStruct (
     append("\tcriticality : $criticality\n")
     append("\tstartTime : $startTime\n")
     append("\ttransitions : $transitions\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -56,21 +56,22 @@ class DemandReponseLoadControlClusterLoadControlEventStruct (
       put(ContextSpecificTag(TAG_CONTROL), control)
       put(ContextSpecificTag(TAG_DEVICE_CLASS), deviceClass)
       if (enrollmentGroup != null) {
-      put(ContextSpecificTag(TAG_ENROLLMENT_GROUP), enrollmentGroup)
-    } else {
-      putNull(ContextSpecificTag(TAG_ENROLLMENT_GROUP))
-    }
+        put(ContextSpecificTag(TAG_ENROLLMENT_GROUP), enrollmentGroup)
+      } else {
+        putNull(ContextSpecificTag(TAG_ENROLLMENT_GROUP))
+      }
       put(ContextSpecificTag(TAG_CRITICALITY), criticality)
       if (startTime != null) {
-      put(ContextSpecificTag(TAG_START_TIME), startTime)
-    } else {
-      putNull(ContextSpecificTag(TAG_START_TIME))
-    }
+        put(ContextSpecificTag(TAG_START_TIME), startTime)
+      } else {
+        putNull(ContextSpecificTag(TAG_START_TIME))
+      }
       startArray(ContextSpecificTag(TAG_TRANSITIONS))
       for (item in transitions.iterator()) {
         item.toTlv(AnonymousTag, this)
       }
       endArray()
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -84,37 +85,60 @@ class DemandReponseLoadControlClusterLoadControlEventStruct (
     private const val TAG_CRITICALITY = 5
     private const val TAG_START_TIME = 6
     private const val TAG_TRANSITIONS = 7
+    private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DemandReponseLoadControlClusterLoadControlEventStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): DemandResponseLoadControlClusterScopedLoadControlEventStruct {
       tlvReader.enterStructure(tlvTag)
       val eventID = tlvReader.getByteArray(ContextSpecificTag(TAG_EVENT_I_D))
       val programControl = tlvReader.getByteArray(ContextSpecificTag(TAG_PROGRAM_CONTROL))
       val control = tlvReader.getUInt(ContextSpecificTag(TAG_CONTROL))
       val deviceClass = tlvReader.getULong(ContextSpecificTag(TAG_DEVICE_CLASS))
-      val enrollmentGroup = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_ENROLLMENT_GROUP))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_ENROLLMENT_GROUP))
-      null
-    }
+      val enrollmentGroup =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUByte(ContextSpecificTag(TAG_ENROLLMENT_GROUP))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_ENROLLMENT_GROUP))
+          null
+        }
       val criticality = tlvReader.getUInt(ContextSpecificTag(TAG_CRITICALITY))
-      val startTime = if (!tlvReader.isNull()) {
-      tlvReader.getULong(ContextSpecificTag(TAG_START_TIME))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_START_TIME))
-      null
-    }
-      val transitions = buildList<DemandReponseLoadControlClusterLoadControlEventTransitionStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_TRANSITIONS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(DemandReponseLoadControlClusterLoadControlEventTransitionStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val startTime =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_START_TIME))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_START_TIME))
+          null
+        }
+      val transitions =
+        buildList<DemandResponseLoadControlClusterLoadControlEventTransitionStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_TRANSITIONS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(
+              DemandResponseLoadControlClusterLoadControlEventTransitionStruct.fromTlv(
+                AnonymousTag,
+                tlvReader
+              )
+            )
+          }
+          tlvReader.exitContainer()
+        }
+      val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
+
       tlvReader.exitContainer()
 
-      return DemandReponseLoadControlClusterLoadControlEventStruct(eventID, programControl, control, deviceClass, enrollmentGroup, criticality, startTime, transitions)
+      return DemandResponseLoadControlClusterScopedLoadControlEventStruct(
+        eventID,
+        programControl,
+        control,
+        deviceClass,
+        enrollmentGroup,
+        criticality,
+        startTime,
+        transitions,
+        fabricIndex
+      )
     }
   }
 }

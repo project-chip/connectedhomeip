@@ -14,44 +14,42 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package chip.devicecontroller.cluster.structs
+package matter.devicecontroller.cluster.structs
 
-import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import matter.devicecontroller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class DemandReponseLoadControlClusterHeatingSourceControlStruct (
-    val heatingSource: UInt) {
-  override fun toString(): String  = buildString {
-    append("DemandReponseLoadControlClusterHeatingSourceControlStruct {\n")
-    append("\theatingSource : $heatingSource\n")
+class DemandResponseLoadControlClusterPowerSavingsControlStruct(val powerSavings: UInt) {
+  override fun toString(): String = buildString {
+    append("DemandResponseLoadControlClusterPowerSavingsControlStruct {\n")
+    append("\tpowerSavings : $powerSavings\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_HEATING_SOURCE), heatingSource)
+      put(ContextSpecificTag(TAG_POWER_SAVINGS), powerSavings)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_HEATING_SOURCE = 0
+    private const val TAG_POWER_SAVINGS = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DemandReponseLoadControlClusterHeatingSourceControlStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): DemandResponseLoadControlClusterPowerSavingsControlStruct {
       tlvReader.enterStructure(tlvTag)
-      val heatingSource = tlvReader.getUInt(ContextSpecificTag(TAG_HEATING_SOURCE))
-      
+      val powerSavings = tlvReader.getUInt(ContextSpecificTag(TAG_POWER_SAVINGS))
+
       tlvReader.exitContainer()
 
-      return DemandReponseLoadControlClusterHeatingSourceControlStruct(heatingSource)
+      return DemandResponseLoadControlClusterPowerSavingsControlStruct(powerSavings)
     }
   }
 }

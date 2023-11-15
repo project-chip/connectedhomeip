@@ -6564,43 +6564,43 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 /**
- * Cluster Demand Reponse Load Control
+ * Cluster Demand Response Load Control
  *
  * This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control.
  */
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRBaseClusterDemandReponseLoadControl : MTRGenericBaseCluster
+@interface MTRBaseClusterDemandResponseLoadControl : MTRGenericBaseCluster
 
 /**
  * Command RegisterLoadControlProgramRequest
  *
  * Upon receipt, this SHALL insert a new LoadControlProgramStruct into LoadControlPrograms, or if the ProgramID matches an existing LoadControlProgramStruct, then the provider SHALL be updated with the provided values.
  */
-- (void)registerLoadControlProgramRequestWithParams:(MTRDemandReponseLoadControlClusterRegisterLoadControlProgramRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)registerLoadControlProgramRequestWithParams:(MTRDemandResponseLoadControlClusterRegisterLoadControlProgramRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command UnregisterLoadControlProgramRequest
  *
  * Upon receipt, this SHALL remove a the LoadControlProgramStruct from LoadControlPrograms with the matching ProgramID.
  */
-- (void)unregisterLoadControlProgramRequestWithParams:(MTRDemandReponseLoadControlClusterUnregisterLoadControlProgramRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)unregisterLoadControlProgramRequestWithParams:(MTRDemandResponseLoadControlClusterUnregisterLoadControlProgramRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command AddLoadControlEventRequest
  *
- * On receipt of the AddLoadControlEventsRequest command, the server SHALL add a load control event:
+ * On receipt of the AddLoadControlEventsRequest command, the server SHALL add a load control event.
  */
-- (void)addLoadControlEventRequestWithParams:(MTRDemandReponseLoadControlClusterAddLoadControlEventRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)addLoadControlEventRequestWithParams:(MTRDemandResponseLoadControlClusterAddLoadControlEventRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command RemoveLoadControlEventRequest
  *
- * Upon receipt, this SHALL remove a the LoadControlEventStruct from LoadEventPrograms with the matching EventID.
+ * Upon receipt, this SHALL remove the LoadControlEventStruct with the matching EventID from LoadEventPrograms.
  */
-- (void)removeLoadControlEventRequestWithParams:(MTRDemandReponseLoadControlClusterRemoveLoadControlEventRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)removeLoadControlEventRequestWithParams:(MTRDemandResponseLoadControlClusterRemoveLoadControlEventRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command ClearLoadControlEventsRequest
  *
  * Upon receipt, this SHALL clear all the load control events.
  */
-- (void)clearLoadControlEventsRequestWithParams:(MTRDemandReponseLoadControlClusterClearLoadControlEventsRequestParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)clearLoadControlEventsRequestWithParams:(MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)clearLoadControlEventsRequestWithCompletion:(MTRStatusCompletion)completion
     MTR_PROVISIONALLY_AVAILABLE;
 
@@ -6610,7 +6610,7 @@ MTR_PROVISIONALLY_AVAILABLE
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeDeviceClassWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeLoadControlProgramsWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeLoadControlProgramsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeLoadControlProgramsWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
@@ -6622,11 +6622,17 @@ MTR_PROVISIONALLY_AVAILABLE
                                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeNumberOfLoadControlProgramsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeEventsWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeEventsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeEventsWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeEventsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeActiveEventsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeActiveEventsWithParams:(MTRSubscribeParams *)params
+                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                   reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeActiveEventsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeNumberOfEventsPerProgramWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeNumberOfEventsPerProgramWithParams:(MTRSubscribeParams *)params
@@ -6641,12 +6647,16 @@ MTR_PROVISIONALLY_AVAILABLE
 + (void)readAttributeNumberOfTransistionsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeDefaultRandomStartWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeDefaultRandomStartWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeDefaultRandomStartWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeDefaultRandomStartWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeDefaultRandomStartWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeDefaultRandomDurationWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeDefaultRandomDurationWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeDefaultRandomDurationWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeDefaultRandomDurationWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
@@ -6693,7 +6703,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @end
 
-@interface MTRBaseClusterDemandReponseLoadControl (Availability)
+@interface MTRBaseClusterDemandResponseLoadControl (Availability)
 
 /**
  * For all instance methods (reads, writes, commands) that take a completion,
@@ -15271,93 +15281,93 @@ typedef NS_OPTIONS(uint32_t, MTRActivatedCarbonFilterMonitoringFeature) {
     MTRActivatedCarbonFilterMonitoringFeatureReplacementProductList MTR_PROVISIONALLY_AVAILABLE = 0x4,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRDemandReponseLoadControlCriticalityLevel) {
-    MTRDemandReponseLoadControlCriticalityLevelInvalid MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRDemandReponseLoadControlCriticalityLevelGreen MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRDemandReponseLoadControlCriticalityLevelLevel1 MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRDemandReponseLoadControlCriticalityLevelLevel2 MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRDemandReponseLoadControlCriticalityLevelLevel3 MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTRDemandReponseLoadControlCriticalityLevelLevel4 MTR_PROVISIONALLY_AVAILABLE = 0x05,
-    MTRDemandReponseLoadControlCriticalityLevelLevel5 MTR_PROVISIONALLY_AVAILABLE = 0x06,
-    MTRDemandReponseLoadControlCriticalityLevelEmergency MTR_PROVISIONALLY_AVAILABLE = 0x07,
-    MTRDemandReponseLoadControlCriticalityLevelPlannedOutage MTR_PROVISIONALLY_AVAILABLE = 0x08,
-    MTRDemandReponseLoadControlCriticalityLevelServiceDisconnect MTR_PROVISIONALLY_AVAILABLE = 0x09,
+typedef NS_ENUM(uint8_t, MTRDemandResponseLoadControlCriticalityLevel) {
+    MTRDemandResponseLoadControlCriticalityLevelUnknown MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDemandResponseLoadControlCriticalityLevelGreen MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDemandResponseLoadControlCriticalityLevelLevel1 MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDemandResponseLoadControlCriticalityLevelLevel2 MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDemandResponseLoadControlCriticalityLevelLevel3 MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDemandResponseLoadControlCriticalityLevelLevel4 MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDemandResponseLoadControlCriticalityLevelLevel5 MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDemandResponseLoadControlCriticalityLevelEmergency MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDemandResponseLoadControlCriticalityLevelPlannedOutage MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDemandResponseLoadControlCriticalityLevelServiceDisconnect MTR_PROVISIONALLY_AVAILABLE = 0x09,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRDemandReponseLoadControlHeatingSource) {
-    MTRDemandReponseLoadControlHeatingSourceAny MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRDemandReponseLoadControlHeatingSourceElectric MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRDemandReponseLoadControlHeatingSourceNaturalGas MTR_PROVISIONALLY_AVAILABLE = 0x02,
+typedef NS_ENUM(uint8_t, MTRDemandResponseLoadControlHeatingSource) {
+    MTRDemandResponseLoadControlHeatingSourceAny MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDemandResponseLoadControlHeatingSourceElectric MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDemandResponseLoadControlHeatingSourceNonElectric MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRDemandReponseLoadControlLoadControlEventChangeSource) {
-    MTRDemandReponseLoadControlLoadControlEventChangeSourceAutomatic MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRDemandReponseLoadControlLoadControlEventChangeSourceUserAction MTR_PROVISIONALLY_AVAILABLE = 0x01,
+typedef NS_ENUM(uint8_t, MTRDemandResponseLoadControlLoadControlEventChangeSource) {
+    MTRDemandResponseLoadControlLoadControlEventChangeSourceAutomatic MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDemandResponseLoadControlLoadControlEventChangeSourceUserAction MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRDemandReponseLoadControlLoadControlEventStatus) {
-    MTRDemandReponseLoadControlLoadControlEventStatusInvalid MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRDemandReponseLoadControlLoadControlEventStatusReceived MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRDemandReponseLoadControlLoadControlEventStatusInProgress MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRDemandReponseLoadControlLoadControlEventStatusCompleted MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRDemandReponseLoadControlLoadControlEventStatusOptedOut MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTRDemandReponseLoadControlLoadControlEventStatusOptedIn MTR_PROVISIONALLY_AVAILABLE = 0x05,
-    MTRDemandReponseLoadControlLoadControlEventStatusCanceled MTR_PROVISIONALLY_AVAILABLE = 0x06,
-    MTRDemandReponseLoadControlLoadControlEventStatusSuperseded MTR_PROVISIONALLY_AVAILABLE = 0x07,
-    MTRDemandReponseLoadControlLoadControlEventStatusPartialOptedOut MTR_PROVISIONALLY_AVAILABLE = 0x08,
-    MTRDemandReponseLoadControlLoadControlEventStatusPartialOptedIn MTR_PROVISIONALLY_AVAILABLE = 0x09,
-    MTRDemandReponseLoadControlLoadControlEventStatusNoParticipation MTR_PROVISIONALLY_AVAILABLE = 0x0A,
-    MTRDemandReponseLoadControlLoadControlEventStatusUnavailable MTR_PROVISIONALLY_AVAILABLE = 0x0B,
-    MTRDemandReponseLoadControlLoadControlEventStatusFailed MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+typedef NS_ENUM(uint8_t, MTRDemandResponseLoadControlLoadControlEventStatus) {
+    MTRDemandResponseLoadControlLoadControlEventStatusUnknown MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDemandResponseLoadControlLoadControlEventStatusReceived MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDemandResponseLoadControlLoadControlEventStatusInProgress MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDemandResponseLoadControlLoadControlEventStatusCompleted MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDemandResponseLoadControlLoadControlEventStatusOptedOut MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDemandResponseLoadControlLoadControlEventStatusOptedIn MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDemandResponseLoadControlLoadControlEventStatusCanceled MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRDemandResponseLoadControlLoadControlEventStatusSuperseded MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRDemandResponseLoadControlLoadControlEventStatusPartialOptedOut MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRDemandResponseLoadControlLoadControlEventStatusPartialOptedIn MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRDemandResponseLoadControlLoadControlEventStatusNoParticipation MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRDemandResponseLoadControlLoadControlEventStatusUnavailable MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDemandResponseLoadControlLoadControlEventStatusFailed MTR_PROVISIONALLY_AVAILABLE = 0x0C,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRDemandReponseLoadControlPowerSavings) {
-    MTRDemandReponseLoadControlPowerSavingsLow MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRDemandReponseLoadControlPowerSavingsMedium MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRDemandReponseLoadControlPowerSavingsHigh MTR_PROVISIONALLY_AVAILABLE = 0x02,
+typedef NS_ENUM(uint8_t, MTRDemandResponseLoadControlPowerSavings) {
+    MTRDemandResponseLoadControlPowerSavingsLow MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDemandResponseLoadControlPowerSavingsMedium MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDemandResponseLoadControlPowerSavingsHigh MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint16_t, MTRDemandReponseLoadControlCancelControlBitmap) {
-    MTRDemandReponseLoadControlCancelControlBitmapRandomEnd MTR_PROVISIONALLY_AVAILABLE = 0x1,
+typedef NS_OPTIONS(uint16_t, MTRDemandResponseLoadControlCancelControlBitmap) {
+    MTRDemandResponseLoadControlCancelControlBitmapRandomEnd MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRDemandReponseLoadControlDeviceClassBitmap) {
-    MTRDemandReponseLoadControlDeviceClassBitmapHVACCompressorOrFurnace MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRDemandReponseLoadControlDeviceClassBitmapStripHeatBaseboardHeat MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRDemandReponseLoadControlDeviceClassBitmapWaterHeater MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRDemandReponseLoadControlDeviceClassBitmapPoolPumpSpaJacuzzi MTR_PROVISIONALLY_AVAILABLE = 0x8,
-    MTRDemandReponseLoadControlDeviceClassBitmapSmartAppliances MTR_PROVISIONALLY_AVAILABLE = 0x10,
-    MTRDemandReponseLoadControlDeviceClassBitmapIrrigationPump MTR_PROVISIONALLY_AVAILABLE = 0x20,
-    MTRDemandReponseLoadControlDeviceClassBitmapManagedCAndILoads MTR_PROVISIONALLY_AVAILABLE = 0x40,
-    MTRDemandReponseLoadControlDeviceClassBitmapSimpleMiscLoads MTR_PROVISIONALLY_AVAILABLE = 0x80,
-    MTRDemandReponseLoadControlDeviceClassBitmapExteriorLighting MTR_PROVISIONALLY_AVAILABLE = 0x100,
-    MTRDemandReponseLoadControlDeviceClassBitmapInteriorLighting MTR_PROVISIONALLY_AVAILABLE = 0x200,
-    MTRDemandReponseLoadControlDeviceClassBitmapElectricVehicle MTR_PROVISIONALLY_AVAILABLE = 0x400,
-    MTRDemandReponseLoadControlDeviceClassBitmapGenerationSystems MTR_PROVISIONALLY_AVAILABLE = 0x800,
-    MTRDemandReponseLoadControlDeviceClassBitmapSmartInverter MTR_PROVISIONALLY_AVAILABLE = 0x1000,
-    MTRDemandReponseLoadControlDeviceClassBitmapEVSE MTR_PROVISIONALLY_AVAILABLE = 0x2000,
-    MTRDemandReponseLoadControlDeviceClassBitmapRESU MTR_PROVISIONALLY_AVAILABLE = 0x4000,
-    MTRDemandReponseLoadControlDeviceClassBitmapEnergyManagementSytem MTR_PROVISIONALLY_AVAILABLE = 0x8000,
-    MTRDemandReponseLoadControlDeviceClassBitmapSmartEnergyModule MTR_PROVISIONALLY_AVAILABLE = 0x10000,
+typedef NS_OPTIONS(uint32_t, MTRDemandResponseLoadControlDeviceClassBitmap) {
+    MTRDemandResponseLoadControlDeviceClassBitmapHVAC MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRDemandResponseLoadControlDeviceClassBitmapStripHeater MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRDemandResponseLoadControlDeviceClassBitmapWaterHeater MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRDemandResponseLoadControlDeviceClassBitmapPoolPump MTR_PROVISIONALLY_AVAILABLE = 0x8,
+    MTRDemandResponseLoadControlDeviceClassBitmapSmartAppliance MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDemandResponseLoadControlDeviceClassBitmapIrrigationPump MTR_PROVISIONALLY_AVAILABLE = 0x20,
+    MTRDemandResponseLoadControlDeviceClassBitmapCommercialLoad MTR_PROVISIONALLY_AVAILABLE = 0x40,
+    MTRDemandResponseLoadControlDeviceClassBitmapResidentialLoad MTR_PROVISIONALLY_AVAILABLE = 0x80,
+    MTRDemandResponseLoadControlDeviceClassBitmapExteriorLighting MTR_PROVISIONALLY_AVAILABLE = 0x100,
+    MTRDemandResponseLoadControlDeviceClassBitmapInteriorLighting MTR_PROVISIONALLY_AVAILABLE = 0x200,
+    MTRDemandResponseLoadControlDeviceClassBitmapEV MTR_PROVISIONALLY_AVAILABLE = 0x400,
+    MTRDemandResponseLoadControlDeviceClassBitmapGenerationSystem MTR_PROVISIONALLY_AVAILABLE = 0x800,
+    MTRDemandResponseLoadControlDeviceClassBitmapSmartInverter MTR_PROVISIONALLY_AVAILABLE = 0x1000,
+    MTRDemandResponseLoadControlDeviceClassBitmapEVSE MTR_PROVISIONALLY_AVAILABLE = 0x2000,
+    MTRDemandResponseLoadControlDeviceClassBitmapRESU MTR_PROVISIONALLY_AVAILABLE = 0x4000,
+    MTRDemandResponseLoadControlDeviceClassBitmapEMS MTR_PROVISIONALLY_AVAILABLE = 0x8000,
+    MTRDemandResponseLoadControlDeviceClassBitmapSEM MTR_PROVISIONALLY_AVAILABLE = 0x10000,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint16_t, MTRDemandReponseLoadControlEventControlBitmap) {
-    MTRDemandReponseLoadControlEventControlBitmapRandomStart MTR_PROVISIONALLY_AVAILABLE = 0x1,
+typedef NS_OPTIONS(uint16_t, MTRDemandResponseLoadControlEventControlBitmap) {
+    MTRDemandResponseLoadControlEventControlBitmapRandomStart MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint16_t, MTRDemandReponseLoadControlEventTransitionControlBitmap) {
-    MTRDemandReponseLoadControlEventTransitionControlBitmapRandomDuration MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRDemandReponseLoadControlEventTransitionControlBitmapIgnoreOptOut MTR_PROVISIONALLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint16_t, MTRDemandResponseLoadControlEventTransitionControlBitmap) {
+    MTRDemandResponseLoadControlEventTransitionControlBitmapRandomDuration MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRDemandResponseLoadControlEventTransitionControlBitmapIgnoreOptOut MTR_PROVISIONALLY_AVAILABLE = 0x2,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRDemandReponseLoadControlFeature) {
-    MTRDemandReponseLoadControlFeatureEnrollmentGroups MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRDemandReponseLoadControlFeatureTemperatureOffset MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRDemandReponseLoadControlFeatureTemperatureSetpoint MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRDemandReponseLoadControlFeatureLoadAdjustment MTR_PROVISIONALLY_AVAILABLE = 0x8,
-    MTRDemandReponseLoadControlFeatureDutyCycle MTR_PROVISIONALLY_AVAILABLE = 0x10,
-    MTRDemandReponseLoadControlFeaturePowerSavings MTR_PROVISIONALLY_AVAILABLE = 0x20,
-    MTRDemandReponseLoadControlFeatureHeatingSource MTR_PROVISIONALLY_AVAILABLE = 0x40,
+typedef NS_OPTIONS(uint32_t, MTRDemandResponseLoadControlFeature) {
+    MTRDemandResponseLoadControlFeatureEnrollmentGroups MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRDemandResponseLoadControlFeatureTemperatureOffset MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRDemandResponseLoadControlFeatureTemperatureSetpoint MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRDemandResponseLoadControlFeatureLoadAdjustment MTR_PROVISIONALLY_AVAILABLE = 0x8,
+    MTRDemandResponseLoadControlFeatureDutyCycle MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDemandResponseLoadControlFeaturePowerSavings MTR_PROVISIONALLY_AVAILABLE = 0x20,
+    MTRDemandResponseLoadControlFeatureHeatingSource MTR_PROVISIONALLY_AVAILABLE = 0x40,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDoorLockAlarmCode) {

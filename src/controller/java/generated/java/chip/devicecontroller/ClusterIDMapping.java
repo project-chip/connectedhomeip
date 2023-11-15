@@ -205,8 +205,8 @@ public class ClusterIDMapping {
         if (clusterId == ActivatedCarbonFilterMonitoring.ID) {
             return new ActivatedCarbonFilterMonitoring();
         }
-        if (clusterId == DemandReponseLoadControl.ID) {
-            return new DemandReponseLoadControl();
+        if (clusterId == DemandResponseLoadControl.ID) {
+            return new DemandResponseLoadControl();
         }
         if (clusterId == DoorLock.ID) {
             return new DoorLock();
@@ -8239,7 +8239,7 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
-    public static class DemandReponseLoadControl implements BaseCluster {
+    public static class DemandResponseLoadControl implements BaseCluster {
         public static final long ID = 150L;
         public long getID() {
             return ID;
@@ -8250,10 +8250,11 @@ public class ClusterIDMapping {
             LoadControlPrograms(1L),
             NumberOfLoadControlPrograms(2L),
             Events(3L),
-            NumberOfEventsPerProgram(4L),
-            NumberOfTransistions(5L),
-            DefaultRandomStart(6L),
-            DefaultRandomDuration(7L),
+            ActiveEvents(4L),
+            NumberOfEventsPerProgram(5L),
+            NumberOfTransistions(6L),
+            DefaultRandomStart(7L),
+            DefaultRandomDuration(8L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

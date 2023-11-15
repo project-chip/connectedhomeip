@@ -14,43 +14,42 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package matter.devicecontroller.cluster.structs
+package chip.devicecontroller.cluster.structs
 
-import java.util.Optional
-import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import chip.devicecontroller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DemandReponseLoadControlClusterHeatingSourceControlStruct(
-  val heatingSource: UInt
-) {
+class DemandResponseLoadControlClusterDutyCycleControlStruct(val dutyCycle: UInt) {
   override fun toString(): String = buildString {
-    append("DemandReponseLoadControlClusterHeatingSourceControlStruct {\n")
-    append("\theatingSource : $heatingSource\n")
+    append("DemandResponseLoadControlClusterDutyCycleControlStruct {\n")
+    append("\tdutyCycle : $dutyCycle\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_HEATING_SOURCE), heatingSource)
+      put(ContextSpecificTag(TAG_DUTY_CYCLE), dutyCycle)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_HEATING_SOURCE = 0
+    private const val TAG_DUTY_CYCLE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DemandReponseLoadControlClusterHeatingSourceControlStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): DemandResponseLoadControlClusterDutyCycleControlStruct {
       tlvReader.enterStructure(tlvTag)
-      val heatingSource = tlvReader.getUInt(ContextSpecificTag(TAG_HEATING_SOURCE))
-      
+      val dutyCycle = tlvReader.getUInt(ContextSpecificTag(TAG_DUTY_CYCLE))
+
       tlvReader.exitContainer()
 
-      return DemandReponseLoadControlClusterHeatingSourceControlStruct(heatingSource)
+      return DemandResponseLoadControlClusterDutyCycleControlStruct(dutyCycle)
     }
   }
 }

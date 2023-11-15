@@ -5277,9 +5277,9 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRDemandReponseLoadControlClusterRegisterLoadControlProgramRequestParams : NSObject <NSCopying>
+@interface MTRDemandResponseLoadControlClusterRegisterLoadControlProgramRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRDemandReponseLoadControlClusterLoadControlProgramStruct * _Nonnull loadControlProgram MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDemandResponseLoadControlClusterLoadControlProgramStruct * _Nonnull loadControlProgram MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5307,7 +5307,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRDemandReponseLoadControlClusterUnregisterLoadControlProgramRequestParams : NSObject <NSCopying>
+@interface MTRDemandResponseLoadControlClusterUnregisterLoadControlProgramRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSData * _Nonnull loadControlProgramID MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -5337,9 +5337,9 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRDemandReponseLoadControlClusterAddLoadControlEventRequestParams : NSObject <NSCopying>
+@interface MTRDemandResponseLoadControlClusterAddLoadControlEventRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRDemandReponseLoadControlClusterLoadControlEventStruct * _Nonnull event MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDemandResponseLoadControlClusterLoadControlEventStruct * _Nonnull event MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5367,7 +5367,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRDemandReponseLoadControlClusterRemoveLoadControlEventRequestParams : NSObject <NSCopying>
+@interface MTRDemandResponseLoadControlClusterRemoveLoadControlEventRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSData * _Nonnull eventID MTR_PROVISIONALLY_AVAILABLE;
 
@@ -5399,7 +5399,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRDemandReponseLoadControlClusterClearLoadControlEventsRequestParams : NSObject <NSCopying>
+@interface MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

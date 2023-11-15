@@ -2660,9 +2660,9 @@ static BOOL AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(Attribu
     }
     }
 }
-static BOOL AttributeIsSpecifiedInDemandReponseLoadControlCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::DemandReponseLoadControl;
+    using namespace Clusters::DemandResponseLoadControl;
     switch (aAttributeId) {
     case Attributes::DeviceClass::Id: {
         return YES;
@@ -2674,6 +2674,9 @@ static BOOL AttributeIsSpecifiedInDemandReponseLoadControlCluster(AttributeId aA
         return YES;
     }
     case Attributes::Events::Id: {
+        return YES;
+    }
+    case Attributes::ActiveEvents::Id: {
         return YES;
     }
     case Attributes::NumberOfEventsPerProgram::Id: {
@@ -5793,8 +5796,8 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(aAttributeId);
     }
-    case Clusters::DemandReponseLoadControl::Id: {
-        return AttributeIsSpecifiedInDemandReponseLoadControlCluster(aAttributeId);
+    case Clusters::DemandResponseLoadControl::Id: {
+        return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);
     }
     case Clusters::DoorLock::Id: {
         return AttributeIsSpecifiedInDoorLockCluster(aAttributeId);

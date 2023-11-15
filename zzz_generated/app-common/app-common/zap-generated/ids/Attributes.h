@@ -3325,7 +3325,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ActivatedCarbonFilterMonitoring
 
-namespace DemandReponseLoadControl {
+namespace DemandResponseLoadControl {
 namespace Attributes {
 
 namespace DeviceClass {
@@ -3344,20 +3344,24 @@ namespace Events {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Events
 
-namespace NumberOfEventsPerProgram {
+namespace ActiveEvents {
 static constexpr AttributeId Id = 0x00000004;
+} // namespace ActiveEvents
+
+namespace NumberOfEventsPerProgram {
+static constexpr AttributeId Id = 0x00000005;
 } // namespace NumberOfEventsPerProgram
 
 namespace NumberOfTransistions {
-static constexpr AttributeId Id = 0x00000005;
+static constexpr AttributeId Id = 0x00000006;
 } // namespace NumberOfTransistions
 
 namespace DefaultRandomStart {
-static constexpr AttributeId Id = 0x00000006;
+static constexpr AttributeId Id = 0x00000007;
 } // namespace DefaultRandomStart
 
 namespace DefaultRandomDuration {
-static constexpr AttributeId Id = 0x00000007;
+static constexpr AttributeId Id = 0x00000008;
 } // namespace DefaultRandomDuration
 
 namespace GeneratedCommandList {
@@ -3385,7 +3389,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace DemandReponseLoadControl
+} // namespace DemandResponseLoadControl
 
 namespace DoorLock {
 namespace Attributes {

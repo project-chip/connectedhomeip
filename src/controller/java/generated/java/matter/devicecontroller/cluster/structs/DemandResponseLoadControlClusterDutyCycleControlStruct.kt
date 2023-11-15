@@ -14,22 +14,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package chip.devicecontroller.cluster.structs
+package matter.devicecontroller.cluster.structs
 
-import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import matter.devicecontroller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class DemandReponseLoadControlClusterDutyCycleControlStruct (
-    val dutyCycle: UInt) {
-  override fun toString(): String  = buildString {
-    append("DemandReponseLoadControlClusterDutyCycleControlStruct {\n")
+class DemandResponseLoadControlClusterDutyCycleControlStruct(val dutyCycle: UByte) {
+  override fun toString(): String = buildString {
+    append("DemandResponseLoadControlClusterDutyCycleControlStruct {\n")
     append("\tdutyCycle : $dutyCycle\n")
     append("}\n")
   }
@@ -45,13 +40,16 @@ class DemandReponseLoadControlClusterDutyCycleControlStruct (
   companion object {
     private const val TAG_DUTY_CYCLE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DemandReponseLoadControlClusterDutyCycleControlStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): DemandResponseLoadControlClusterDutyCycleControlStruct {
       tlvReader.enterStructure(tlvTag)
-      val dutyCycle = tlvReader.getUInt(ContextSpecificTag(TAG_DUTY_CYCLE))
-      
+      val dutyCycle = tlvReader.getUByte(ContextSpecificTag(TAG_DUTY_CYCLE))
+
       tlvReader.exitContainer()
 
-      return DemandReponseLoadControlClusterDutyCycleControlStruct(dutyCycle)
+      return DemandResponseLoadControlClusterDutyCycleControlStruct(dutyCycle)
     }
   }
 }

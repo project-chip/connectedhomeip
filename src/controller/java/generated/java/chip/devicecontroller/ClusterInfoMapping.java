@@ -9037,7 +9037,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedDemandReponseLoadControlClusterLoadControlProgramsAttributeCallback implements ChipClusters.DemandReponseLoadControlCluster.LoadControlProgramsAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedDemandResponseLoadControlClusterLoadControlProgramsAttributeCallback implements ChipClusters.DemandResponseLoadControlCluster.LoadControlProgramsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -9045,9 +9045,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.DemandReponseLoadControlClusterScopedLoadControlProgramStruct> valueList) {
+    public void onSuccess(List<ChipStructs.DemandResponseLoadControlClusterLoadControlProgramStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DemandReponseLoadControlClusterScopedLoadControlProgramStruct>");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DemandResponseLoadControlClusterLoadControlProgramStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -9058,7 +9058,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedDemandReponseLoadControlClusterEventsAttributeCallback implements ChipClusters.DemandReponseLoadControlCluster.EventsAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedDemandResponseLoadControlClusterEventsAttributeCallback implements ChipClusters.DemandResponseLoadControlCluster.EventsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -9066,9 +9066,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.DemandReponseLoadControlClusterScopedLoadControlEventStruct> valueList) {
+    public void onSuccess(List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DemandReponseLoadControlClusterScopedLoadControlEventStruct>");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -9079,7 +9079,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedDemandReponseLoadControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.DemandReponseLoadControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedDemandResponseLoadControlClusterActiveEventsAttributeCallback implements ChipClusters.DemandResponseLoadControlCluster.ActiveEventsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -9087,9 +9087,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Long> valueList) {
+    public void onSuccess(List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -9100,28 +9100,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedDemandReponseLoadControlClusterAcceptedCommandListAttributeCallback implements ChipClusters.DemandReponseLoadControlCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedDemandReponseLoadControlClusterEventListAttributeCallback implements ChipClusters.DemandReponseLoadControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedDemandResponseLoadControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.DemandResponseLoadControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -9142,7 +9121,49 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedDemandReponseLoadControlClusterAttributeListAttributeCallback implements ChipClusters.DemandReponseLoadControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedDemandResponseLoadControlClusterAcceptedCommandListAttributeCallback implements ChipClusters.DemandResponseLoadControlCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedDemandResponseLoadControlClusterEventListAttributeCallback implements ChipClusters.DemandResponseLoadControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedDemandResponseLoadControlClusterAttributeListAttributeCallback implements ChipClusters.DemandResponseLoadControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -17432,9 +17453,9 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ActivatedCarbonFilterMonitoringCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("activatedCarbonFilterMonitoring", activatedCarbonFilterMonitoringClusterInfo);
 
-    ClusterInfo demandReponseLoadControlClusterInfo = new ClusterInfo(
-      (ptr, endpointId) -> new ChipClusters.DemandReponseLoadControlCluster(ptr, endpointId), new HashMap<>());
-    clusterMap.put("demandReponseLoadControl", demandReponseLoadControlClusterInfo);
+    ClusterInfo demandResponseLoadControlClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.DemandResponseLoadControlCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("demandResponseLoadControl", demandResponseLoadControlClusterInfo);
 
     ClusterInfo doorLockClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.DoorLockCluster(ptr, endpointId), new HashMap<>());
@@ -17663,7 +17684,7 @@ public class ClusterInfoMapping {
     destination.get("rvcOperationalState").combineCommands(source.get("rvcOperationalState"));
     destination.get("hepaFilterMonitoring").combineCommands(source.get("hepaFilterMonitoring"));
     destination.get("activatedCarbonFilterMonitoring").combineCommands(source.get("activatedCarbonFilterMonitoring"));
-    destination.get("demandReponseLoadControl").combineCommands(source.get("demandReponseLoadControl"));
+    destination.get("demandResponseLoadControl").combineCommands(source.get("demandResponseLoadControl"));
     destination.get("doorLock").combineCommands(source.get("doorLock"));
     destination.get("windowCovering").combineCommands(source.get("windowCovering"));
     destination.get("barrierControl").combineCommands(source.get("barrierControl"));
@@ -20365,65 +20386,65 @@ public class ClusterInfoMapping {
 
     commandMap.put("activatedCarbonFilterMonitoring", activatedCarbonFilterMonitoringClusterInteractionInfoMap);
 
-    Map<String, InteractionInfo> demandReponseLoadControlClusterInteractionInfoMap = new LinkedHashMap<>();
+    Map<String, InteractionInfo> demandResponseLoadControlClusterInteractionInfoMap = new LinkedHashMap<>();
 
-    Map<String, CommandParameterInfo> demandReponseLoadControlregisterLoadControlProgramRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> demandResponseLoadControlregisterLoadControlProgramRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    InteractionInfo demandReponseLoadControlregisterLoadControlProgramRequestInteractionInfo = new InteractionInfo(
+    InteractionInfo demandResponseLoadControlregisterLoadControlProgramRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.DemandReponseLoadControlCluster) cluster)
+        ((ChipClusters.DemandResponseLoadControlCluster) cluster)
         .registerLoadControlProgramRequest((DefaultClusterCallback) callback
-        , (ChipStructs.DemandReponseLoadControlClusterLoadControlProgramStruct)
+        , (ChipStructs.DemandResponseLoadControlClusterLoadControlProgramStruct)
         commandArguments.get("loadControlProgram")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        demandReponseLoadControlregisterLoadControlProgramRequestCommandParams
+        demandResponseLoadControlregisterLoadControlProgramRequestCommandParams
     );
-    demandReponseLoadControlClusterInteractionInfoMap.put("registerLoadControlProgramRequest", demandReponseLoadControlregisterLoadControlProgramRequestInteractionInfo);
+    demandResponseLoadControlClusterInteractionInfoMap.put("registerLoadControlProgramRequest", demandResponseLoadControlregisterLoadControlProgramRequestInteractionInfo);
 
-    Map<String, CommandParameterInfo> demandReponseLoadControlunregisterLoadControlProgramRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> demandResponseLoadControlunregisterLoadControlProgramRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo demandReponseLoadControlunregisterLoadControlProgramRequestloadControlProgramIDCommandParameterInfo = new CommandParameterInfo("loadControlProgramID", byte[].class, byte[].class);
-    demandReponseLoadControlunregisterLoadControlProgramRequestCommandParams.put("loadControlProgramID",demandReponseLoadControlunregisterLoadControlProgramRequestloadControlProgramIDCommandParameterInfo);
-    InteractionInfo demandReponseLoadControlunregisterLoadControlProgramRequestInteractionInfo = new InteractionInfo(
+    CommandParameterInfo demandResponseLoadControlunregisterLoadControlProgramRequestloadControlProgramIDCommandParameterInfo = new CommandParameterInfo("loadControlProgramID", byte[].class, byte[].class);
+    demandResponseLoadControlunregisterLoadControlProgramRequestCommandParams.put("loadControlProgramID",demandResponseLoadControlunregisterLoadControlProgramRequestloadControlProgramIDCommandParameterInfo);
+    InteractionInfo demandResponseLoadControlunregisterLoadControlProgramRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.DemandReponseLoadControlCluster) cluster)
+        ((ChipClusters.DemandResponseLoadControlCluster) cluster)
         .unregisterLoadControlProgramRequest((DefaultClusterCallback) callback
         , (byte[])
         commandArguments.get("loadControlProgramID")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        demandReponseLoadControlunregisterLoadControlProgramRequestCommandParams
+        demandResponseLoadControlunregisterLoadControlProgramRequestCommandParams
     );
-    demandReponseLoadControlClusterInteractionInfoMap.put("unregisterLoadControlProgramRequest", demandReponseLoadControlunregisterLoadControlProgramRequestInteractionInfo);
+    demandResponseLoadControlClusterInteractionInfoMap.put("unregisterLoadControlProgramRequest", demandResponseLoadControlunregisterLoadControlProgramRequestInteractionInfo);
 
-    Map<String, CommandParameterInfo> demandReponseLoadControladdLoadControlEventRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> demandResponseLoadControladdLoadControlEventRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    InteractionInfo demandReponseLoadControladdLoadControlEventRequestInteractionInfo = new InteractionInfo(
+    InteractionInfo demandResponseLoadControladdLoadControlEventRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.DemandReponseLoadControlCluster) cluster)
+        ((ChipClusters.DemandResponseLoadControlCluster) cluster)
         .addLoadControlEventRequest((DefaultClusterCallback) callback
-        , (ChipStructs.DemandReponseLoadControlClusterLoadControlEventStruct)
+        , (ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct)
         commandArguments.get("event")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        demandReponseLoadControladdLoadControlEventRequestCommandParams
+        demandResponseLoadControladdLoadControlEventRequestCommandParams
     );
-    demandReponseLoadControlClusterInteractionInfoMap.put("addLoadControlEventRequest", demandReponseLoadControladdLoadControlEventRequestInteractionInfo);
+    demandResponseLoadControlClusterInteractionInfoMap.put("addLoadControlEventRequest", demandResponseLoadControladdLoadControlEventRequestInteractionInfo);
 
-    Map<String, CommandParameterInfo> demandReponseLoadControlremoveLoadControlEventRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> demandResponseLoadControlremoveLoadControlEventRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo demandReponseLoadControlremoveLoadControlEventRequesteventIDCommandParameterInfo = new CommandParameterInfo("eventID", byte[].class, byte[].class);
-    demandReponseLoadControlremoveLoadControlEventRequestCommandParams.put("eventID",demandReponseLoadControlremoveLoadControlEventRequesteventIDCommandParameterInfo);
+    CommandParameterInfo demandResponseLoadControlremoveLoadControlEventRequesteventIDCommandParameterInfo = new CommandParameterInfo("eventID", byte[].class, byte[].class);
+    demandResponseLoadControlremoveLoadControlEventRequestCommandParams.put("eventID",demandResponseLoadControlremoveLoadControlEventRequesteventIDCommandParameterInfo);
 
-    CommandParameterInfo demandReponseLoadControlremoveLoadControlEventRequestcancelControlCommandParameterInfo = new CommandParameterInfo("cancelControl", Integer.class, Integer.class);
-    demandReponseLoadControlremoveLoadControlEventRequestCommandParams.put("cancelControl",demandReponseLoadControlremoveLoadControlEventRequestcancelControlCommandParameterInfo);
-    InteractionInfo demandReponseLoadControlremoveLoadControlEventRequestInteractionInfo = new InteractionInfo(
+    CommandParameterInfo demandResponseLoadControlremoveLoadControlEventRequestcancelControlCommandParameterInfo = new CommandParameterInfo("cancelControl", Integer.class, Integer.class);
+    demandResponseLoadControlremoveLoadControlEventRequestCommandParams.put("cancelControl",demandResponseLoadControlremoveLoadControlEventRequestcancelControlCommandParameterInfo);
+    InteractionInfo demandResponseLoadControlremoveLoadControlEventRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.DemandReponseLoadControlCluster) cluster)
+        ((ChipClusters.DemandResponseLoadControlCluster) cluster)
         .removeLoadControlEventRequest((DefaultClusterCallback) callback
         , (byte[])
         commandArguments.get("eventID")
@@ -20432,23 +20453,23 @@ public class ClusterInfoMapping {
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        demandReponseLoadControlremoveLoadControlEventRequestCommandParams
+        demandResponseLoadControlremoveLoadControlEventRequestCommandParams
     );
-    demandReponseLoadControlClusterInteractionInfoMap.put("removeLoadControlEventRequest", demandReponseLoadControlremoveLoadControlEventRequestInteractionInfo);
+    demandResponseLoadControlClusterInteractionInfoMap.put("removeLoadControlEventRequest", demandResponseLoadControlremoveLoadControlEventRequestInteractionInfo);
 
-    Map<String, CommandParameterInfo> demandReponseLoadControlclearLoadControlEventsRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo demandReponseLoadControlclearLoadControlEventsRequestInteractionInfo = new InteractionInfo(
+    Map<String, CommandParameterInfo> demandResponseLoadControlclearLoadControlEventsRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo demandResponseLoadControlclearLoadControlEventsRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.DemandReponseLoadControlCluster) cluster)
+        ((ChipClusters.DemandResponseLoadControlCluster) cluster)
         .clearLoadControlEventsRequest((DefaultClusterCallback) callback
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        demandReponseLoadControlclearLoadControlEventsRequestCommandParams
+        demandResponseLoadControlclearLoadControlEventsRequestCommandParams
     );
-    demandReponseLoadControlClusterInteractionInfoMap.put("clearLoadControlEventsRequest", demandReponseLoadControlclearLoadControlEventsRequestInteractionInfo);
+    demandResponseLoadControlClusterInteractionInfoMap.put("clearLoadControlEventsRequest", demandResponseLoadControlclearLoadControlEventsRequestInteractionInfo);
 
-    commandMap.put("demandReponseLoadControl", demandReponseLoadControlClusterInteractionInfoMap);
+    commandMap.put("demandResponseLoadControl", demandResponseLoadControlClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> doorLockClusterInteractionInfoMap = new LinkedHashMap<>();
 

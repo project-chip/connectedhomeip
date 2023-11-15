@@ -20,30 +20,23 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ActivatedCarbonFilterMonitoringCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class LastChangedTimeAttribute(
-    val value: UInt?
-  )
+class ActivatedCarbonFilterMonitoringCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
+  class LastChangedTimeAttribute(val value: UInt?)
 
   class ReplacementProductListAttribute(
     val value: List<ActivatedCarbonFilterMonitoringClusterReplacementProductStruct>?
   )
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun resetCondition(timedInvokeTimeoutMs: Int? = null) {
     val commandId = 0L
@@ -52,17 +45,14 @@ class ActivatedCarbonFilterMonitoringCluster(private val controller: MatterContr
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun readConditionAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeConditionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeConditionAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -70,10 +60,7 @@ class ActivatedCarbonFilterMonitoringCluster(private val controller: MatterContr
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDegradationDirectionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeDegradationDirectionAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -81,10 +68,7 @@ class ActivatedCarbonFilterMonitoringCluster(private val controller: MatterContr
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeChangeIndicationAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeChangeIndicationAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -92,10 +76,7 @@ class ActivatedCarbonFilterMonitoringCluster(private val controller: MatterContr
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInPlaceIndicatorAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Boolean {
+  suspend fun subscribeInPlaceIndicatorAttribute(minInterval: Int, maxInterval: Int): Boolean {
     // Implementation needs to be added here
   }
 
@@ -103,15 +84,12 @@ class ActivatedCarbonFilterMonitoringCluster(private val controller: MatterContr
     // Implementation needs to be added here
   }
 
-  suspend fun writeLastChangedTimeAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int? = null    
-  ) {
+  suspend fun writeLastChangedTimeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
   suspend fun subscribeLastChangedTimeAttribute(
@@ -158,10 +136,7 @@ class ActivatedCarbonFilterMonitoringCluster(private val controller: MatterContr
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -180,10 +155,7 @@ class ActivatedCarbonFilterMonitoringCluster(private val controller: MatterContr
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -191,10 +163,7 @@ class ActivatedCarbonFilterMonitoringCluster(private val controller: MatterContr
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

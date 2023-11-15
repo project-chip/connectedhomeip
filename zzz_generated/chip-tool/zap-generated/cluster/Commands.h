@@ -93,7 +93,7 @@
 | RvcOperationalState                                                 | 0x0061 |
 | HepaFilterMonitoring                                                | 0x0071 |
 | ActivatedCarbonFilterMonitoring                                     | 0x0072 |
-| DemandReponseLoadControl                                            | 0x0096 |
+| DemandResponseLoadControl                                           | 0x0096 |
 | DoorLock                                                            | 0x0101 |
 | WindowCovering                                                      | 0x0102 |
 | BarrierControl                                                      | 0x0103 |
@@ -5940,7 +5940,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster DemandReponseLoadControl                                    | 0x0096 |
+| Cluster DemandResponseLoadControl                                   | 0x0096 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * RegisterLoadControlProgramRequest                                 |   0x00 |
@@ -5954,10 +5954,11 @@ private:
 | * LoadControlPrograms                                               | 0x0001 |
 | * NumberOfLoadControlPrograms                                       | 0x0002 |
 | * Events                                                            | 0x0003 |
-| * NumberOfEventsPerProgram                                          | 0x0004 |
-| * NumberOfTransistions                                              | 0x0005 |
-| * DefaultRandomStart                                                | 0x0006 |
-| * DefaultRandomDuration                                             | 0x0007 |
+| * ActiveEvents                                                      | 0x0004 |
+| * NumberOfEventsPerProgram                                          | 0x0005 |
+| * NumberOfTransistions                                              | 0x0006 |
+| * DefaultRandomStart                                                | 0x0007 |
+| * DefaultRandomDuration                                             | 0x0008 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -5972,10 +5973,10 @@ private:
 /*
  * Command RegisterLoadControlProgramRequest
  */
-class DemandReponseLoadControlRegisterLoadControlProgramRequest : public ClusterCommand
+class DemandResponseLoadControlRegisterLoadControlProgramRequest : public ClusterCommand
 {
 public:
-    DemandReponseLoadControlRegisterLoadControlProgramRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    DemandResponseLoadControlRegisterLoadControlProgramRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("register-load-control-program-request", credsIssuerConfig),
         mComplex_LoadControlProgram(&mRequest.loadControlProgram)
     {
@@ -5985,9 +5986,9 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandReponseLoadControl::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandResponseLoadControl::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::DemandReponseLoadControl::Commands::RegisterLoadControlProgramRequest::Id;
+            chip::app::Clusters::DemandResponseLoadControl::Commands::RegisterLoadControlProgramRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -5996,9 +5997,9 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandReponseLoadControl::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandResponseLoadControl::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::DemandReponseLoadControl::Commands::RegisterLoadControlProgramRequest::Id;
+            chip::app::Clusters::DemandResponseLoadControl::Commands::RegisterLoadControlProgramRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -6007,18 +6008,18 @@ public:
     }
 
 private:
-    chip::app::Clusters::DemandReponseLoadControl::Commands::RegisterLoadControlProgramRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::DemandReponseLoadControl::Structs::LoadControlProgramStruct::Type>
+    chip::app::Clusters::DemandResponseLoadControl::Commands::RegisterLoadControlProgramRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlProgramStruct::Type>
         mComplex_LoadControlProgram;
 };
 
 /*
  * Command UnregisterLoadControlProgramRequest
  */
-class DemandReponseLoadControlUnregisterLoadControlProgramRequest : public ClusterCommand
+class DemandResponseLoadControlUnregisterLoadControlProgramRequest : public ClusterCommand
 {
 public:
-    DemandReponseLoadControlUnregisterLoadControlProgramRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    DemandResponseLoadControlUnregisterLoadControlProgramRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("unregister-load-control-program-request", credsIssuerConfig)
     {
         AddArgument("LoadControlProgramID", &mRequest.loadControlProgramID);
@@ -6027,9 +6028,9 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandReponseLoadControl::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandResponseLoadControl::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::DemandReponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Id;
+            chip::app::Clusters::DemandResponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -6038,9 +6039,9 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandReponseLoadControl::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandResponseLoadControl::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::DemandReponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Id;
+            chip::app::Clusters::DemandResponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -6049,16 +6050,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::DemandReponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Type mRequest;
+    chip::app::Clusters::DemandResponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Type mRequest;
 };
 
 /*
  * Command AddLoadControlEventRequest
  */
-class DemandReponseLoadControlAddLoadControlEventRequest : public ClusterCommand
+class DemandResponseLoadControlAddLoadControlEventRequest : public ClusterCommand
 {
 public:
-    DemandReponseLoadControlAddLoadControlEventRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    DemandResponseLoadControlAddLoadControlEventRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("add-load-control-event-request", credsIssuerConfig), mComplex_Event(&mRequest.event)
     {
         AddArgument("Event", &mComplex_Event);
@@ -6067,9 +6068,9 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandReponseLoadControl::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandResponseLoadControl::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::DemandReponseLoadControl::Commands::AddLoadControlEventRequest::Id;
+            chip::app::Clusters::DemandResponseLoadControl::Commands::AddLoadControlEventRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -6078,9 +6079,9 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandReponseLoadControl::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandResponseLoadControl::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::DemandReponseLoadControl::Commands::AddLoadControlEventRequest::Id;
+            chip::app::Clusters::DemandResponseLoadControl::Commands::AddLoadControlEventRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -6089,17 +6090,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::DemandReponseLoadControl::Commands::AddLoadControlEventRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::DemandReponseLoadControl::Structs::LoadControlEventStruct::Type> mComplex_Event;
+    chip::app::Clusters::DemandResponseLoadControl::Commands::AddLoadControlEventRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlEventStruct::Type> mComplex_Event;
 };
 
 /*
  * Command RemoveLoadControlEventRequest
  */
-class DemandReponseLoadControlRemoveLoadControlEventRequest : public ClusterCommand
+class DemandResponseLoadControlRemoveLoadControlEventRequest : public ClusterCommand
 {
 public:
-    DemandReponseLoadControlRemoveLoadControlEventRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    DemandResponseLoadControlRemoveLoadControlEventRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("remove-load-control-event-request", credsIssuerConfig)
     {
         AddArgument("EventID", &mRequest.eventID);
@@ -6109,9 +6110,9 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandReponseLoadControl::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandResponseLoadControl::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::DemandReponseLoadControl::Commands::RemoveLoadControlEventRequest::Id;
+            chip::app::Clusters::DemandResponseLoadControl::Commands::RemoveLoadControlEventRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -6120,9 +6121,9 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandReponseLoadControl::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandResponseLoadControl::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::DemandReponseLoadControl::Commands::RemoveLoadControlEventRequest::Id;
+            chip::app::Clusters::DemandResponseLoadControl::Commands::RemoveLoadControlEventRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -6131,16 +6132,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::DemandReponseLoadControl::Commands::RemoveLoadControlEventRequest::Type mRequest;
+    chip::app::Clusters::DemandResponseLoadControl::Commands::RemoveLoadControlEventRequest::Type mRequest;
 };
 
 /*
  * Command ClearLoadControlEventsRequest
  */
-class DemandReponseLoadControlClearLoadControlEventsRequest : public ClusterCommand
+class DemandResponseLoadControlClearLoadControlEventsRequest : public ClusterCommand
 {
 public:
-    DemandReponseLoadControlClearLoadControlEventsRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    DemandResponseLoadControlClearLoadControlEventsRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("clear-load-control-events-request", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
@@ -6148,9 +6149,9 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandReponseLoadControl::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandResponseLoadControl::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::DemandReponseLoadControl::Commands::ClearLoadControlEventsRequest::Id;
+            chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -6159,9 +6160,9 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandReponseLoadControl::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandResponseLoadControl::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::DemandReponseLoadControl::Commands::ClearLoadControlEventsRequest::Id;
+            chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -6170,7 +6171,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::DemandReponseLoadControl::Commands::ClearLoadControlEventsRequest::Type mRequest;
+    chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -16855,22 +16856,22 @@ void registerClusterActivatedCarbonFilterMonitoring(Commands & commands, Credent
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
-void registerClusterDemandReponseLoadControl(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterDemandResponseLoadControl(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::DemandReponseLoadControl;
+    using namespace chip::app::Clusters::DemandResponseLoadControl;
 
-    const char * clusterName = "DemandReponseLoadControl";
+    const char * clusterName = "DemandResponseLoadControl";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                          //
-        make_unique<DemandReponseLoadControlRegisterLoadControlProgramRequest>(credsIssuerConfig),   //
-        make_unique<DemandReponseLoadControlUnregisterLoadControlProgramRequest>(credsIssuerConfig), //
-        make_unique<DemandReponseLoadControlAddLoadControlEventRequest>(credsIssuerConfig),          //
-        make_unique<DemandReponseLoadControlRemoveLoadControlEventRequest>(credsIssuerConfig),       //
-        make_unique<DemandReponseLoadControlClearLoadControlEventsRequest>(credsIssuerConfig),       //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                           //
+        make_unique<DemandResponseLoadControlRegisterLoadControlProgramRequest>(credsIssuerConfig),   //
+        make_unique<DemandResponseLoadControlUnregisterLoadControlProgramRequest>(credsIssuerConfig), //
+        make_unique<DemandResponseLoadControlAddLoadControlEventRequest>(credsIssuerConfig),          //
+        make_unique<DemandResponseLoadControlRemoveLoadControlEventRequest>(credsIssuerConfig),       //
+        make_unique<DemandResponseLoadControlClearLoadControlEventsRequest>(credsIssuerConfig),       //
         //
         // Attributes
         //
@@ -16878,8 +16879,9 @@ void registerClusterDemandReponseLoadControl(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "device-class", Attributes::DeviceClass::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "load-control-programs", Attributes::LoadControlPrograms::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "number-of-load-control-programs", Attributes::NumberOfLoadControlPrograms::Id,
-                                   credsIssuerConfig),                                       //
-        make_unique<ReadAttribute>(Id, "events", Attributes::Events::Id, credsIssuerConfig), //
+                                   credsIssuerConfig),                                                    //
+        make_unique<ReadAttribute>(Id, "events", Attributes::Events::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "active-events", Attributes::ActiveEvents::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "number-of-events-per-program", Attributes::NumberOfEventsPerProgram::Id,
                                    credsIssuerConfig),                                                                       //
         make_unique<ReadAttribute>(Id, "number-of-transistions", Attributes::NumberOfTransistions::Id, credsIssuerConfig),   //
@@ -16892,26 +16894,29 @@ void registerClusterDemandReponseLoadControl(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::DemandReponseLoadControl::DeviceClassBitmap>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap>>>(
             Id, "device-class", 0, UINT32_MAX, Attributes::DeviceClass::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
-            const chip::app::Clusters::DemandReponseLoadControl::Structs::ScopedLoadControlProgramStruct::Type>>>(
+            const chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlProgramStruct::Type>>>(
             Id, "load-control-programs", Attributes::LoadControlPrograms::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "number-of-load-control-programs", 0, UINT8_MAX,
                                              Attributes::NumberOfLoadControlPrograms::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
-            const chip::app::Clusters::DemandReponseLoadControl::Structs::ScopedLoadControlEventStruct::Type>>>(
+            const chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlEventStruct::Type>>>(
             Id, "events", Attributes::Events::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlEventStruct::Type>>>(
+            Id, "active-events", Attributes::ActiveEvents::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "number-of-events-per-program", 0, UINT8_MAX,
                                              Attributes::NumberOfEventsPerProgram::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "number-of-transistions", 0, UINT8_MAX, Attributes::NumberOfTransistions::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "default-random-start", 0, UINT8_MAX, Attributes::DefaultRandomStart::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+                                             WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "default-random-duration", 0, UINT8_MAX, Attributes::DefaultRandomDuration::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+                                             WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -16929,8 +16934,9 @@ void registerClusterDemandReponseLoadControl(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "device-class", Attributes::DeviceClass::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "load-control-programs", Attributes::LoadControlPrograms::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "number-of-load-control-programs", Attributes::NumberOfLoadControlPrograms::Id,
-                                        credsIssuerConfig),                                       //
-        make_unique<SubscribeAttribute>(Id, "events", Attributes::Events::Id, credsIssuerConfig), //
+                                        credsIssuerConfig),                                                    //
+        make_unique<SubscribeAttribute>(Id, "events", Attributes::Events::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "active-events", Attributes::ActiveEvents::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "number-of-events-per-program", Attributes::NumberOfEventsPerProgram::Id,
                                         credsIssuerConfig),                                                                       //
         make_unique<SubscribeAttribute>(Id, "number-of-transistions", Attributes::NumberOfTransistions::Id, credsIssuerConfig),   //
@@ -22297,7 +22303,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterRvcOperationalState(commands, credsIssuerConfig);
     registerClusterHepaFilterMonitoring(commands, credsIssuerConfig);
     registerClusterActivatedCarbonFilterMonitoring(commands, credsIssuerConfig);
-    registerClusterDemandReponseLoadControl(commands, credsIssuerConfig);
+    registerClusterDemandResponseLoadControl(commands, credsIssuerConfig);
     registerClusterDoorLock(commands, credsIssuerConfig);
     registerClusterWindowCovering(commands, credsIssuerConfig);
     registerClusterBarrierControl(commands, credsIssuerConfig);
