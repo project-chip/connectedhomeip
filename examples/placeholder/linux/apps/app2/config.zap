@@ -12780,7 +12780,7 @@
               "code": 15,
               "mfgCode": null,
               "side": "server",
-              "type": "LevelControlOptions",
+              "type": "OptionsBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
