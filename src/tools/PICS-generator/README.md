@@ -12,8 +12,8 @@ Note: The tool does relay on what the the device is able to express and for now
 there are areas which the tool can not cover:
 
 - PICS in base.xml
-- Only mandatory events are marked as supported, since the EventList is
-provisional
+- Only mandatory events are marked as supported, since the global attribute
+with list of events is provisional
 
 # Setup
 
