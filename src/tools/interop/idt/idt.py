@@ -195,8 +195,8 @@ class InteropDebuggingTool:
             safe_mkdir(self.pcap_artifact_dir)
             pcap_runner.start_pcap()
         asyncio.run(controller.init_ecosystems(args.platform,
-                                                     args.ecosystem,
-                                                     self.artifact_dir))
+                                               args.ecosystem,
+                                               self.artifact_dir))
         asyncio.run(controller.start())
         asyncio.run(controller.run_analyzers())
         if pcap:
