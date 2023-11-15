@@ -66,6 +66,38 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
     return err;
 }
 
+/// @brief Generate and add a response to a command handler context depending on an EmberAfStatus
+/// @tparam ResponseType Type of response, depends on the command
+/// @param ctx Command Handler context where to add reponse
+/// @param resp Response to add in ctx
+/// @param status Status to verify
+/// @return EmberAfStatus -> CHIP_ERROR
+template <typename ResponseType>
+CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, ResponseType & resp, EmberAfStatus status)
+{
+    return AddResponseOnError(ctx, resp, StatusIB(ToInteractionModelStatus(status)).ToChipError());
+}
+
+template <typename ResponseType>
+CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
+{
+    Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
+    EmberAfStatus status                 = EMBER_ZCL_STATUS_SUCCESS;
+
+    if (AuthMode::kCase == descriptor.authMode)
+    {
+        status = Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
+    }
+    else
+    {
+        status = Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
+    }
+
+    // LastConfiguredBy is optional, so we don't want to fail the command if it fails to update
+    VerifyOrReturnValue(!(EMBER_ZCL_STATUS_SUCCESS == status || EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status), CHIP_NO_ERROR);
+    return AddResponseOnError(ctx, resp, status);
+}
+
 /// @brief Helper function to update the FabricSceneInfo attribute for a given Endpoint and fabric
 /// @param endpoint Endpoint to update
 /// @param fabric Fabric to update
@@ -124,38 +156,6 @@ CHIP_ERROR UpdateFabricSceneInfo(EndpointId endpoint, FabricIndex fabric, Option
 }
 
 } // namespace
-
-/// @brief Generate and add a response to a command handler context depending on an EmberAfStatus
-/// @tparam ResponseType Type of response, depends on the command
-/// @param ctx Command Handler context where to add reponse
-/// @param resp Response to add in ctx
-/// @param status Status to verify
-/// @return EmberAfStatus -> CHIP_ERROR
-template <typename ResponseType>
-CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, ResponseType & resp, EmberAfStatus status)
-{
-    return AddResponseOnError(ctx, resp, StatusIB(ToInteractionModelStatus(status)).ToChipError());
-}
-
-template <typename ResponseType>
-CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
-{
-    Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
-    EmberAfStatus status                 = EMBER_ZCL_STATUS_SUCCESS;
-
-    if (AuthMode::kCase == descriptor.authMode)
-    {
-        status = Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
-    }
-    else
-    {
-        status = Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
-    }
-
-    // LastConfiguredBy is optional, so we don't want to fail the command if it fails to update
-    VerifyOrReturnValue(!(EMBER_ZCL_STATUS_SUCCESS == status || EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status), CHIP_NO_ERROR);
-    return AddResponseOnError(ctx, resp, status);
-}
 
 /// @brief Gets the SceneInfoStruct array associated to an endpoint
 /// @param endpoint target endpoint
