@@ -1601,5 +1601,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
+ *
+ * @brief Defines the entry iterator delegate pool size of the ICDObserver object pool in ICDManager.h.
+ *        Two are used in the default implementation. Users can increase it to register more observers.
+ */
+#ifndef CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
+#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 2
+#endif
+
+/**
  * @}
  */

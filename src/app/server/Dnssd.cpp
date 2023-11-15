@@ -489,5 +489,12 @@ CHIP_ERROR DnssdServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[
 }
 #endif
 
+void DnssdServer::OnICDModeChange()
+{
+    // ICDMode changed, restart DNS-SD advertising, because SII and ICD key are affected by this change.
+    // StartServer will take care of setting the operational and commissionable advertissements
+    StartServer();
+}
+
 } // namespace app
 } // namespace chip

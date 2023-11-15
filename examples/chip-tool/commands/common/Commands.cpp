@@ -182,7 +182,7 @@ exit:
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-int Commands::RunInteractive(const char * command, const chip::Optional<char *> & storageDirectory)
+int Commands::RunInteractive(const char * command, const chip::Optional<char *> & storageDirectory, bool advertiseOperational)
 {
     std::vector<std::string> arguments;
     VerifyOrReturnValue(DecodeArgumentsFromInteractiveMode(command, arguments), EXIT_FAILURE);
@@ -207,7 +207,7 @@ int Commands::RunInteractive(const char * command, const chip::Optional<char *> 
     }
 
     ChipLogProgress(chipTool, "Command: %s", commandStr.c_str());
-    auto err = RunCommand(argc, argv, true, storageDirectory);
+    auto err = RunCommand(argc, argv, true, storageDirectory, advertiseOperational);
 
     // Do not delete arg[0]
     for (auto i = 1; i < argc; i++)
@@ -219,7 +219,7 @@ int Commands::RunInteractive(const char * command, const chip::Optional<char *> 
 }
 
 CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
-                                const chip::Optional<char *> & interactiveStorageDirectory)
+                                const chip::Optional<char *> & interactiveStorageDirectory, bool interactiveAdvertiseOperational)
 {
     Command * command = nullptr;
 
@@ -307,7 +307,7 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
 
     if (interactive)
     {
-        return command->RunAsInteractive(interactiveStorageDirectory);
+        return command->RunAsInteractive(interactiveStorageDirectory, interactiveAdvertiseOperational);
     }
 
     // Now that the command is initialized, get our storage from it as needed

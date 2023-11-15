@@ -465,6 +465,7 @@ android_library("java") {
     "src/chip/devicecontroller/model/ChipEventPath.java",
     "src/chip/devicecontroller/model/ChipPathId.java",
     "src/chip/devicecontroller/model/ClusterState.java",
+    "src/chip/devicecontroller/model/DataVersionFilter.java",
     "src/chip/devicecontroller/model/EndpointState.java",
     "src/chip/devicecontroller/model/EventState.java",
     "src/chip/devicecontroller/model/InvokeElement.java",

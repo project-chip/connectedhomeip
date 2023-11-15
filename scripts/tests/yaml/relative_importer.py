@@ -24,6 +24,11 @@ EXAMPLES_PATH = os.path.join(DEFAULT_CHIP_ROOT, 'examples')
 REPL_PATH = os.path.join(DEFAULT_CHIP_ROOT, 'src', 'controller', 'python')
 
 try:
+    import chiptest  # noqa: F401
+except ModuleNotFoundError:
+    sys.path.append(os.path.join(SCRIPT_PATH, 'tests'))
+
+try:
     import matter_idl  # noqa: F401
 except ModuleNotFoundError:
     sys.path.append(os.path.join(SCRIPT_PATH, 'py_matter_idl'))
