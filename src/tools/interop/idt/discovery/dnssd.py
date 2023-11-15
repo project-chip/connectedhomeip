@@ -101,7 +101,7 @@ class MatterTxtRecordParser:
                                MatterTxtRecordParser.parse_ph),  # Decode
             "PI": RecordParser("Pairing instructions",
                                dedent("\
-                               Used in combination with the Pairing hint. If the Pairing hint mentions N, this is the \
+                               Used with the Pairing hint. If the Pairing hint mentions N, this is the \n\
                                value of N."),
                                MatterTxtRecordParser.parse_pass_through),  # None
             # General records
