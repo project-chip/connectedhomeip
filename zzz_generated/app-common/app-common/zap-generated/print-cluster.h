@@ -286,6 +286,12 @@
 #define CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER
 #endif
 
+#if defined(ZCL_USING_TIMER_CLUSTER_SERVER) || defined(ZCL_USING_TIMER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TIMER_CLUSTER { chip::app::Clusters::Timer::Id, "Timer" },
+#else
+#define CHIP_PRINTCLUSTER_TIMER_CLUSTER
+#endif
+
 #if defined(ZCL_USING_MODE_SELECT_CLUSTER_SERVER) || defined(ZCL_USING_MODE_SELECT_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER { chip::app::Clusters::ModeSelect::Id, "Mode Select" },
 #else
@@ -400,6 +406,13 @@
     { chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id, "Activated Carbon Filter Monitoring" },
 #else
 #define CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER
+#endif
+
+#if defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                     \
+    { chip::app::Clusters::DemandResponseLoadControl::Id, "Demand Response Load Control" },
+#else
+#define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER
 #endif
 
 #if defined(ZCL_USING_DOOR_LOCK_CLUSTER_SERVER) || defined(ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT)
@@ -720,6 +733,7 @@
     CHIP_PRINTCLUSTER_PROXY_VALID_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER                                                                                       \
+    CHIP_PRINTCLUSTER_TIMER_CLUSTER                                                                                                \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_LAUNDRY_WASHER_MODE_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER                                                 \
@@ -738,6 +752,7 @@
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER                                                                   \
+    CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                         \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER                                                                                      \
