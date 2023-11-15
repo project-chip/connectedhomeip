@@ -21,6 +21,7 @@ RUN apt-get update && \
     adb \
     aircrack-ng \
     apt-utils \
+    bison \
     byacc \
     dnsutils \
     flex \
