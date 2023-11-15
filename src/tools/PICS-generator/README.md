@@ -11,8 +11,8 @@ The tool outputs the PICS for all endpoints and outputs these in a single folder
 Note: The tool does relay on what the the device is able to express and for now
 there are areas which the tool can not cover:
 
-- PICS in base.xml
-- Only mandatory events are marked as supported, since the global attribute
+-   PICS in base.xml
+-   Only mandatory events are marked as supported, since the global attribute
 with list of events is provisional
 
 # Setup
