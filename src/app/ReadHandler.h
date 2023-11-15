@@ -402,7 +402,8 @@ private:
         {
             return session->GetFabricIndex();
         }
-        return IsType(InteractionType::Subscribe) && mIsResumingSubscription ? mResumingSubscriptionFabricIndex : kUndefinedFabricIndex;
+        return IsType(InteractionType::Subscribe) && mIsResumingSubscription ? mResumingSubscriptionFabricIndex
+                                                                             : kUndefinedFabricIndex;
     }
 
     Transport::SecureSession * GetSession() const;
@@ -547,8 +548,8 @@ private:
     // When we close the read handler after it fails to resume subscription beacuse the session is not established,
     // we should use these values to delete the subscription storage.
     FabricIndex mResumingSubscriptionFabricIndex = kUndefinedFabricIndex;
-    NodeId mResumingSubscriptionNodeId = kUndefinedNodeId;
-    bool mIsResumingSubscription = false;
+    NodeId mResumingSubscriptionNodeId           = kUndefinedNodeId;
+    bool mIsResumingSubscription                 = false;
 
     EventNumber mEventMin = 0;
 
