@@ -1184,9 +1184,8 @@ void DeviceCommissioner::OnFailedToExtendedArmFailSafeDeviceAttestation(void * c
     commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
 }
 
-void DeviceCommissioner::OnICDSymmetricKeyGenerationCompleted(void * context, CHIP_ERROR error, NodeId controllerNodeId,
-                                                              uint64_t subjectId, ICDRegistrationDelegate::ICDKey key,
-                                                              Optional<ICDRegistrationDelegate::ICDKey> verificationKey)
+void DeviceCommissioner::OnICDSymmetricKeyGenerationCompleted(void * context, CHIP_ERROR error, NodeId checkInNodeId,
+                                                              uint64_t subjectId, ICDRegistrationDelegate::ICDKey key)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
@@ -1203,13 +1202,12 @@ void DeviceCommissioner::OnICDSymmetricKeyGenerationCompleted(void * context, CH
         return;
     }
     CommissioningDelegate::CommissioningReport report;
-    ICDSymmetricKeyInfo info = ICDSymmetricKeyInfo{
-        .controllerNodeId = controllerNodeId,
-        .subjectId        = subjectId,
-        .key              = key,
-        .verificationKey  = verificationKey,
+    ICDRegistrationInfo info = ICDRegistrationInfo{
+        .checkInNodeId = checkInNodeId,
+        .subjectId     = subjectId,
+        .key           = key,
     };
-    report.Set<ICDSymmetricKeyInfo>(info);
+    report.Set<ICDRegistrationInfo>(info);
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
@@ -1219,9 +1217,9 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     CommissioningDelegate::CommissioningReport report;
-    ICDRegistrationInfo info;
+    ICDRegistrationResponseInfo info;
     info.icdCounter = data.ICDCounter;
-    report.Set<ICDRegistrationInfo>(info);
+    report.Set<ICDRegistrationResponseInfo>(info);
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
@@ -1768,7 +1766,7 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
             auto optionalIcdCounter = mCommissioningDelegate->GetCommissioningParameters().GetICDCounter();
             if (optionalIcdCounter.HasValue())
             {
-                mICDRegistrationDelegate->ReadyForSubscription(GetNodeId(), optionalIcdCounter.Value());
+                mICDRegistrationDelegate->ICDRegistrationComplete(GetNodeId(), optionalIcdCounter.Value());
             }
         }
     }
@@ -3031,7 +3029,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kICDRegistration: {
         IcdManagement::Commands::RegisterClient::Type request;
 
-        if (!(params.GetICDControllerNodeId().HasValue() && params.GetICDSubjectId().HasValue() &&
+        if (!(params.GetICDCheckInNodeId().HasValue() && params.GetICDMonitoredSubject().HasValue() &&
               params.GetICDSymmetricKey().HasValue()))
         {
             ChipLogError(Controller, "No ICD Registration Information provided!");
@@ -3039,13 +3037,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             return;
         }
 
-        request.checkInNodeID    = params.GetICDControllerNodeId().Value();
-        request.monitoredSubject = params.GetICDSubjectId().Value();
+        request.checkInNodeID    = params.GetICDCheckInNodeId().Value();
+        request.monitoredSubject = params.GetICDMonitoredSubject().Value();
         request.key              = params.GetICDSymmetricKey().Value();
-        if (params.GetICDVerificationKey().HasValue())
-        {
-            request.verificationKey = MakeOptional<ByteSpan>(params.GetICDVerificationKey().Value());
-        }
 
         CHIP_ERROR err = SendCommand(proxy, request, OnICDManagementRegisterClientResponse, OnBasicFailure, endpoint, timeout);
         if (err != CHIP_NO_ERROR)

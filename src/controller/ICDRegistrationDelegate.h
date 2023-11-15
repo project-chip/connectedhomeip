@@ -16,18 +16,11 @@
  *    limitations under the License.
  */
 
-/**
- *  @file
- *    This file contains definitions for DeviceProxy for a device that's undergoing
- *    commissioning process. The objects of this will be used by Controller applications
- *    to interact with the device. The class provides mechanism to construct, send and receive
- *    messages to and from the corresponding CHIP devices.
- */
-
 #pragma once
 
 #include <cinttypes>
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -44,12 +37,12 @@ namespace Controller {
 class ICDRegistrationDelegate
 {
 public:
-    static constexpr size_t KeySize = 16;
-    using ICDKey                    = FixedByteSpan<KeySize>;
+    static constexpr size_t kKeySize = Crypto::kAES_CCM128_Key_Length;
+    using ICDKey                     = FixedByteSpan<kKeySize>;
 
     /// The type of callback function that is called when symmetric key generation is completed.
-    typedef void (*OnSymmetricKeyGenerationCompleted)(void * context, CHIP_ERROR error, NodeId controllerNodeId, uint64_t subjectId,
-                                                      ICDKey key, Optional<ICDKey> verificationKey);
+    typedef void (*OnSymmetricKeyGenerationCompleted)(void * context, CHIP_ERROR error, NodeId checkInNodeId, uint64_t subjectId,
+                                                      ICDKey key);
 
     virtual ~ICDRegistrationDelegate() = default;
 
@@ -61,19 +54,20 @@ public:
      *   This delegate supports Commissioner Self-Registration and External Controller Registration flow.
      *
      * @param[in] device       The node id of the device.
-     * @param[in] onCompletion The callback object to be called when symmetric key generation is completed.
+     * @param[in] onCompletion The callback object to be called when symmetric key generation is completed. The
+     *                         `onCompletion` is expected to be valid through the key generation process.
      */
     virtual void GenerateSymmetricKey(NodeId device, Callback::Callback<OnSymmetricKeyGenerationCompleted> * onCompletion) = 0;
 
     /**
      * @bried
-     *   Called when the ICD is ready for subscription. The callback is expected to trigger an async operation
-     * which subscription on the commissioner or external controllers.
+     *   Called when the registration flow for the ICD completes and the device is ready for accept subscriptions.
+     * The callback is expected to trigger an async operation which subscription on the commissioner or external controllers.
      *
      * @param[in] device       The node id of the device.
      * @param[in] icdCounter   The ICD Counter received from the device.
      */
-    virtual void ReadyForSubscription(NodeId device, uint32_t icdCounter) = 0;
+    virtual void ICDRegistrationComplete(NodeId device, uint32_t icdCounter) = 0;
 };
 
 } // namespace Controller

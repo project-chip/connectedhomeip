@@ -874,9 +874,8 @@ private:
         void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnFailedToExtendedArmFailSafeDeviceAttestation(void * context, CHIP_ERROR error);
 
-    static void OnICDSymmetricKeyGenerationCompleted(void * context, CHIP_ERROR error, NodeId controllerNodeId, uint64_t subjectId,
-                                                     ICDRegistrationDelegate::ICDKey key,
-                                                     Optional<ICDRegistrationDelegate::ICDKey> verificationKey);
+    static void OnICDSymmetricKeyGenerationCompleted(void * context, CHIP_ERROR error, NodeId checkInNodeId, uint64_t subjectId,
+                                                     ICDRegistrationDelegate::ICDKey key);
     static void OnICDManagementRegisterClientResponse(
         void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data);
 

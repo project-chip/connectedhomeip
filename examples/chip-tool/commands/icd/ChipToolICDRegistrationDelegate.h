@@ -25,17 +25,17 @@
 #include <commands/common/CredentialIssuerCommands.h>
 #include <lib/support/Span.h>
 
-class FakeIcdRegistrationDelegate : public chip::Controller::ICDRegistrationDelegate
+class ChipToolICDRegistrationDelegate : public chip::Controller::ICDRegistrationDelegate
 {
 public:
-    FakeIcdRegistrationDelegate() : mControllerNodeId(chip::kUndefinedNodeId){};
+    ChipToolICDRegistrationDelegate() : mControllerNodeId(chip::kUndefinedNodeId){};
 
-    void SetControllerNodeId(chip::NodeId controllerNodeId);
+    void SetControllerNodeId(chip::NodeId checkInNodeId);
 
     void GenerateSymmetricKey(chip::NodeId device,
                               chip::Callback::Callback<OnSymmetricKeyGenerationCompleted> * onCompletion) override;
 
-    void ReadyForSubscription(chip::NodeId device, uint32_t icdCounter) override;
+    void ICDRegistrationComplete(chip::NodeId device, uint32_t icdCounter) override;
 
 private:
     chip::NodeId mControllerNodeId;

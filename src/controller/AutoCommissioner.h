@@ -138,8 +138,7 @@ private:
     uint16_t mAttestationSignatureLen = 0;
     uint8_t mAttestationSignature[Crypto::kMax_ECDSA_Signature_Length];
 
-    uint8_t mICDSymmetricKey[16];
-    uint8_t mICDVerificationKey[16];
+    uint8_t mICDSymmetricKey[ICDRegistrationDelegate::kKeySize];
 };
 } // namespace Controller
 } // namespace chip

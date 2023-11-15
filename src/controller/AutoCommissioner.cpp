@@ -771,22 +771,15 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             return NOCChainGenerated(report.Get<NocChain>().noc, report.Get<NocChain>().icac, report.Get<NocChain>().rcac,
                                      report.Get<NocChain>().ipk, report.Get<NocChain>().adminSubject);
         case CommissioningStage::kICDSymmetricKeyGeneration: {
-            ICDSymmetricKeyInfo symmetricKeyInfo = report.Get<ICDSymmetricKeyInfo>();
-            mParams.SetICDControllerNodeId(symmetricKeyInfo.controllerNodeId);
-            mParams.SetICDSubjectId(symmetricKeyInfo.subjectId);
-            memcpy(mICDSymmetricKey, symmetricKeyInfo.key.data(), symmetricKeyInfo.key.size());
+            ICDRegistrationInfo registrationInfo = report.Get<ICDRegistrationInfo>();
+            mParams.SetICDCheckInNodeId(registrationInfo.checkInNodeId);
+            mParams.SetICDMonitoredSubject(registrationInfo.subjectId);
+            memcpy(mICDSymmetricKey, registrationInfo.key.data(), registrationInfo.key.size());
             mParams.SetICDSymmetricKey(ICDRegistrationDelegate::ICDKey(mICDSymmetricKey));
-
-            if (symmetricKeyInfo.verificationKey.HasValue())
-            {
-                ICDRegistrationDelegate::ICDKey verificationKey = symmetricKeyInfo.verificationKey.Value();
-                memcpy(mICDVerificationKey, verificationKey.data(), verificationKey.size());
-                mParams.SetICDVerificationKey(ICDRegistrationDelegate::ICDKey(mICDVerificationKey));
-            }
         }
         break;
         case CommissioningStage::kICDRegistration: {
-            ICDRegistrationInfo registrationInfo = report.Get<ICDRegistrationInfo>();
+            ICDRegistrationResponseInfo registrationInfo = report.Get<ICDRegistrationResponseInfo>();
             mParams.SetICDCounter(registrationInfo.icdCounter);
         }
         break;

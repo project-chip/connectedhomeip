@@ -510,17 +510,17 @@ public:
         return *this;
     }
 
-    Optional<NodeId> GetICDControllerNodeId() const { return mICDControllerNodeId; }
-    CommissioningParameters & SetICDControllerNodeId(NodeId icdControllerNodeId)
+    Optional<NodeId> GetICDCheckInNodeId() const { return mICDCheckInNodeId; }
+    CommissioningParameters & SetICDCheckInNodeId(NodeId icdCheckInNodeId)
     {
-        mICDControllerNodeId = MakeOptional(icdControllerNodeId);
+        mICDCheckInNodeId = MakeOptional(icdCheckInNodeId);
         return *this;
     }
 
-    Optional<uint64_t> GetICDSubjectId() const { return mICDSubjectId; }
-    CommissioningParameters & SetICDSubjectId(uint64_t icdSubjectId)
+    Optional<uint64_t> GetICDMonitoredSubject() const { return mICDMonitoredSubject; }
+    CommissioningParameters & SetICDMonitoredSubject(uint64_t icdMonitoredSubject)
     {
-        mICDSubjectId = MakeOptional(icdSubjectId);
+        mICDMonitoredSubject = MakeOptional(icdMonitoredSubject);
         return *this;
     }
 
@@ -528,13 +528,6 @@ public:
     CommissioningParameters & SetICDSymmetricKey(ICDRegistrationDelegate::ICDKey icdSymmetricKey)
     {
         mICDSymmetricKey = MakeOptional(icdSymmetricKey);
-        return *this;
-    }
-
-    Optional<ICDRegistrationDelegate::ICDKey> GetICDVerificationKey() const { return mICDVerificationKey; }
-    CommissioningParameters & SetICDVerificationKey(ICDRegistrationDelegate::ICDKey icdVerificationKey)
-    {
-        mICDVerificationKey = MakeOptional(icdVerificationKey);
         return *this;
     }
 
@@ -565,10 +558,9 @@ public:
         mDAC.ClearValue();
         mTimeZone.ClearValue();
         mDSTOffsets.ClearValue();
-        mICDControllerNodeId.ClearValue();
-        mICDSubjectId.ClearValue();
+        mICDCheckInNodeId.ClearValue();
+        mICDMonitoredSubject.ClearValue();
         mICDSymmetricKey.ClearValue();
-        mICDVerificationKey.ClearValue();
     }
 
 private:
@@ -609,10 +601,9 @@ private:
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
 
-    Optional<NodeId> mICDControllerNodeId;
-    Optional<uint64_t> mICDSubjectId;
+    Optional<NodeId> mICDCheckInNodeId;
+    Optional<uint64_t> mICDMonitoredSubject;
     Optional<ICDRegistrationDelegate::ICDKey> mICDSymmetricKey;
-    Optional<ICDRegistrationDelegate::ICDKey> mICDVerificationKey;
     Optional<uint32_t> mICDCounter;
 
     ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
@@ -711,15 +702,14 @@ struct TimeZoneResponseInfo
     bool requiresDSTOffsets;
 };
 
-struct ICDSymmetricKeyInfo
+struct ICDRegistrationInfo
 {
-    NodeId controllerNodeId = kUndefinedNodeId;
-    uint64_t subjectId      = 0;
+    NodeId checkInNodeId = kUndefinedNodeId;
+    uint64_t subjectId   = 0;
     ICDRegistrationDelegate::ICDKey key;
-    Optional<ICDRegistrationDelegate::ICDKey> verificationKey;
 };
 
-struct ICDRegistrationInfo
+struct ICDRegistrationResponseInfo
 {
     uint32_t icdCounter = 0;
 };
@@ -777,7 +767,7 @@ public:
     struct CommissioningReport
         : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
                   ReadCommissioningInfo2, AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo,
-                  TimeZoneResponseInfo, ICDSymmetricKeyInfo, ICDRegistrationInfo>
+                  TimeZoneResponseInfo, ICDRegistrationInfo, ICDRegistrationResponseInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
