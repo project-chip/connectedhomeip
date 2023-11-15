@@ -30,5 +30,5 @@
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>
 
-#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 117 // 0x0075 = 117 = Matter Microwave Oven
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 121 // 0x0079 = 121 = Matter Microwave Oven
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test Microwave Oven"
