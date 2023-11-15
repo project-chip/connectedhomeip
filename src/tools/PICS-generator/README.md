@@ -13,7 +13,7 @@ there are areas which the tool can not cover:
 
 -   PICS in base.xml
 -   Only mandatory events are marked as supported, since the global attribute
-with list of events is provisional
+    with list of events is provisional
 
 # Setup
 
