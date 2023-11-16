@@ -293,15 +293,13 @@ void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
                 emAfPluginBarrierControlServerIncrementEvents(endpoint, false, false);
             }
         }
-        emAfPluginBarrierControlServerSetBarrierPosition(
-            endpoint,
-            (emAfPluginBarrierControlServerIsPartialBarrierSupported(endpoint)
-                 ? state.currentPosition
-                 : static_cast<uint8_t>(BarrierControl::Position::kUnknown)));
-        setMovingState(
-            endpoint,
-            (state.increasing ? BarrierControl::MovingState::kOpening : BarrierControl::MovingState::kClosing));
-        
+        emAfPluginBarrierControlServerSetBarrierPosition(endpoint,
+                                                         (emAfPluginBarrierControlServerIsPartialBarrierSupported(endpoint)
+                                                              ? state.currentPosition
+                                                              : static_cast<uint8_t>(BarrierControl::Position::kUnknown)));
+        setMovingState(endpoint,
+                       (state.increasing ? BarrierControl::MovingState::kOpening : BarrierControl::MovingState::kClosing));
+
         scheduleTimerCallbackMs(endpoint, state.delayMs);
     }
 }
@@ -331,8 +329,7 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
     }
     else if (percentOpen > 100 // "100" means "100%", so greater than that is invalid
              || (!emAfPluginBarrierControlServerIsPartialBarrierSupported(endpoint) &&
-                 percentOpen != BarrierControl::Position::kClosed &&
-                 percentOpen != BarrierControl::Position::kOpen))
+                 percentOpen != BarrierControl::Position::kClosed && percentOpen != BarrierControl::Position::kOpen))
     {
         status = Status::ConstraintError;
     }
