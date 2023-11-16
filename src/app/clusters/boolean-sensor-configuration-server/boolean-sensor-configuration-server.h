@@ -21,8 +21,6 @@
 
 #pragma once
 
-// #include <app/util/af-types.h>
-// #include <app/util/config.h>
 #include "boolean-sensor-configuration-delegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -51,6 +49,7 @@ CHIP_ERROR SetAlarmsActive(EndpointId ep, chip::BitMask<AlarmModeBitmap> alarms)
 CHIP_ERROR ClearAllAlarms(EndpointId ep);
 CHIP_ERROR SuppressAlarms(EndpointId ep, chip::BitMask<BooleanSensorConfiguration::AlarmModeBitmap> alarms);
 CHIP_ERROR SetSensitivityLevel(EndpointId ep, BooleanSensorConfiguration::SensitivityEnum level);
+bool EmitSensorFault(EndpointId ep);
 
 inline bool HasFeature(EndpointId ep, Feature feature)
 {

@@ -19,8 +19,6 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
-// #include <app/util/af.h>
-
 #include <lib/core/CHIPError.h>
 
 namespace chip {
@@ -37,7 +35,6 @@ public:
     Delegate(){};
 
     virtual CHIP_ERROR HandleSuppressRequest(BooleanSensorConfiguration::AlarmModeBitmap alarmToSuppress) = 0;
-    virtual CHIP_ERROR HandleAlarmsEnabled(BooleanSensorConfiguration::AlarmModeBitmap alarms) = 0;
 
     virtual ~Delegate() = default;
 };

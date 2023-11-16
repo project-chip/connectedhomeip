@@ -17,22 +17,17 @@
  */
 
 #include "boolean-sensor-configuration-server.h"
-// #include "boolean-sensor-configuration-delegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-// #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/EventLogging.h>
-#include <app/data-model/Encode.h>
-// #include <app/util/af-enums.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-// #include <app/util/af.h>
+#include <app/EventLogging.h>
+#include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
-// #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -139,9 +134,21 @@ Delegate * GetDefaultDelegate(EndpointId endpoint)
 
 CHIP_ERROR SetAlarmsActive(EndpointId ep, chip::BitMask<BooleanSensorConfiguration::AlarmModeBitmap> alarms)
 {
+    if (HasFeature(ep, BooleanSensorConfiguration::Feature::kVisual) ||
+        HasFeature(ep, BooleanSensorConfiguration::Feature::kAudible))
+    {
+        chip::BitMask<BooleanSensorConfiguration::AlarmModeBitmap, uint8_t> alarmsEnabled;
+        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsEnabled::Get(ep, &alarmsEnabled),
+                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+        if (!alarmsEnabled.Has(alarms))
+        {
+            return CHIP_NO_ERROR;
+        }
+    }
+
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Set(ep, alarms), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     emitAlarmsStateChangedEvent(ep);
-    emitSensorFaultEvent(ep); // TODO remove
+
     return CHIP_NO_ERROR;
 }
 
@@ -169,7 +176,7 @@ CHIP_ERROR ClearAllAlarms(EndpointId ep)
 CHIP_ERROR SuppressAlarms(EndpointId ep, chip::BitMask<BooleanSensorConfiguration::AlarmModeBitmap> alarm)
 {
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    // EmberAfStatus no_error     = EMBER_ZCL_STATUS_SUCCESS;
+
     if (!HasFeature(ep, BooleanSensorConfiguration::Feature::kAlarmSuppress))
     {
         return attribute_error;
@@ -209,7 +216,16 @@ CHIP_ERROR SuppressAlarms(EndpointId ep, chip::BitMask<BooleanSensorConfiguratio
     return CHIP_NO_ERROR;
 }
 
-// CHIP_ERROR SetSensitivityLevel(EndpointId ep, BooleanSensorConfiguration::SensitivityEnum level);
+CHIP_ERROR SetSensitivityLevel(EndpointId ep, BooleanSensorConfiguration::SensitivityEnum level)
+{
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == SensitivityLevel::Set(ep, level), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    return CHIP_NO_ERROR;
+}
+
+bool EmitSensorFault(EndpointId ep)
+{
+    return emitSensorFaultEvent(ep);
+}
 
 } // namespace BooleanSensorConfiguration
 } // namespace Clusters
