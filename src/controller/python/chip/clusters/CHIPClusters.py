@@ -1423,6 +1423,18 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x00000015: {
+                "attributeName": "SpecificationVersion",
+                "attributeId": 0x00000015,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000016: {
+                "attributeName": "MaxPathsPerInvoke",
+                "attributeId": 0x00000016,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,

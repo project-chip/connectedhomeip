@@ -4099,6 +4099,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, capabilityMinima);
     case Attributes::ProductAppearance::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, productAppearance);
+    case Attributes::SpecificationVersion::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, specificationVersion);
+    case Attributes::MaxPathsPerInvoke::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maxPathsPerInvoke);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
