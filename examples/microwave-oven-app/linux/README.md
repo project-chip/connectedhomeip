@@ -1,9 +1,9 @@
 # Matter Linux Microwave Oven Example
 
-An example showing the use of Matter on the Linux. The document will describe how
-to build and run Matter Linux Microwave Oven Example on Raspberry Pi. This doc is tested
-on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
-Raspberry Pi Desktop 20.10 (aarch64)**
+An example showing the use of Matter on the Linux. The document will describe
+how to build and run Matter Linux Microwave Oven Example on Raspberry Pi. This
+doc is tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and
+**Ubuntu for Raspberry Pi Desktop 20.10 (aarch64)**
 
 <hr>
 
