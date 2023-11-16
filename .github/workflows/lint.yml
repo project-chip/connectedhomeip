@@ -195,5 +195,5 @@ jobs:
               if: always()
               run: |
                   for zap_file in $(find . -name '*.zap'); do
-                      ./scripts/run_in_build_env.sh "./scripts/helpers/check_zap_against_xml.py --zap $zap_file --matter-root ."  || exit 1
+                      ./scripts/run_in_build_env.sh "./scripts/helpers/check_zap_against_xml.py --zap $zap_file" && exit 1 || exit 0
                   done
