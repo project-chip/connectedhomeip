@@ -43,10 +43,10 @@ namespace Clusters {
 namespace ColorControl {
 
 namespace EnhancedColorMode {
-constexpr uint8_t kCurrentHueAndCurrentSaturation         = 0;
-constexpr uint8_t kCurrentXAndCurrentY                    = 1;
-constexpr uint8_t kColorTemperature                       = 2;
-constexpr uint8_t kEnhancedCurrentHueAndCurrentSaturation = 3;
+constexpr uint8_t kCurrentHueAndCurrentSaturation         = ColorControlServer::EnhancedColorMode::kCurrentHueAndCurrentSaturation;
+constexpr uint8_t kCurrentXAndCurrentY                    = ColorControlServer::EnhancedColorMode::kCurrentXAndCurrentY;
+constexpr uint8_t kColorTemperature                       = ColorControlServer::EnhancedColorMode::kColorTemperature;
+constexpr uint8_t kEnhancedCurrentHueAndCurrentSaturation = ColorControlServer::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation;
 } // namespace EnhancedColorMode
 
 namespace Options {
