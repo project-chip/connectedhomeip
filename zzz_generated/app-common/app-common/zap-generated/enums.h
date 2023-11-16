@@ -24,22 +24,6 @@
 
 // ZCL enums
 
-// Enum for BarrierControlBarrierPosition
-enum EmberAfBarrierControlBarrierPosition : uint8_t
-{
-    EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_CLOSED  = 0,
-    EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_OPEN    = 100,
-    EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_UNKNOWN = 255,
-};
-
-// Enum for BarrierControlMovingState
-enum EmberAfBarrierControlMovingState : uint8_t
-{
-    EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_STOPPED = 0,
-    EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_CLOSING = 1,
-    EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_OPENING = 2,
-};
-
 // Enum for ColorControlOptions
 enum EmberAfColorControlOptions : uint8_t
 {
