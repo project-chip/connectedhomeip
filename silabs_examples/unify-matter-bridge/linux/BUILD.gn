@@ -73,11 +73,19 @@ static_library("unify-matter-bridge-lib") {
     "zap-generated/data_model_translator/command_translator.cpp",
   ]
 
-  public_deps = [
-    "${chip_root}/examples/platform/linux:app-main",
-    "//../unify-matter-bridge-common",
-    ":get_chip_version"
-  ]
+  if (chip_build_tests) {
+    public_deps = [
+      "${chip_root}/examples/platform/linux:app-main",
+      "//src/tests/unify-matter-bridge-ut",
+      ":get_chip_version"
+    ]
+  } else {
+    public_deps = [
+      "${chip_root}/examples/platform/linux:app-main",
+      "//../unify-matter-bridge-common",
+      ":get_chip_version"
+    ]
+  }
 
   output_dir = root_out_dir
 
