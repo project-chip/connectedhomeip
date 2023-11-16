@@ -1,17 +1,13 @@
-# CHIP Linux Lighting Example
+# Matter Linux Microwave Oven Example
 
-An example showing the use of CHIP on the Linux. The document will describe how
-to build and run CHIP Linux Lighting Example on Raspberry Pi. This doc is tested
+An example showing the use of Matter on the Linux. The document will describe how
+to build and run Matter Linux Microwave Oven Example on Raspberry Pi. This doc is tested
 on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
 Raspberry Pi Desktop 20.10 (aarch64)**
 
-To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
-**EVK**, see the associated
-[README document](../../../docs/guides/nxp_imx8m_linux_examples.md) for details.
-
 <hr>
 
--   [CHIP Linux Lighting Example](#chip-linux-lighting-example)
+-   [Matter Linux Microwave Oven Example](#matter-linux-microwave-oven-example)
     -   [Building](#building)
     -   [Commandline Arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)

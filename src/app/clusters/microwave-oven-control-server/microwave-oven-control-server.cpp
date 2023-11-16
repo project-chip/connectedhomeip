@@ -62,25 +62,25 @@ CHIP_ERROR Instance::Init()
     return CHIP_NO_ERROR;
 }
 
-uint32_t Instance::GetCookTime()
+uint32_t Instance::GetCookTime() const
 {
-    return this->mCookTime;
+    return mCookTime;
 }
 
-uint8_t Instance::GetPowerSetting()
+uint8_t Instance::GetPowerSetting() const
 {
-    return this->mPowerSettng;
+    return mPowerSettng;
 }
 
 
 void Instance::SetCookTime(uint32_t cookTime)
 {
-    this->mCookTime = cookTime;
+    mCookTime = cookTime;
 }
 
 void Instance::SetPowerSetting(uint8_t powerSetting)
 {
-    this->mPowerSettng = powerSetting;
+    mPowerSettng = powerSetting;
 }
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)

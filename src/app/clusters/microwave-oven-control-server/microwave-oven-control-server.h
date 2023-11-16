@@ -63,10 +63,10 @@ public:
     /**
      * @brief defined the get/set api for the mandatory attributes
      */
-    uint32_t GetCookTime();
+    uint32_t GetCookTime() const;
     void SetCookTime(uint32_t cookTime);
 
-    uint8_t GetPowerSetting();
+    uint8_t GetPowerSetting() const;
     void SetPowerSetting(uint8_t powerSetting);
 
 
@@ -130,19 +130,19 @@ public:
     /**
      *   @brief defined the get/set interface for MinPower
      */
-    virtual uint8_t GetMinPower() = 0;
+    virtual uint8_t GetMinPower() const = 0;
     virtual void SetMinPower(uint8_t minPower) = 0;
 
     /**
      *   @brief defined the get/set interface for MaxPower
      */
-    virtual uint8_t GetMaxPower() = 0;
+    virtual uint8_t GetMaxPower() const = 0;
     virtual void SetMaxPower(uint8_t maxPower) = 0;
 
     /**
      *   @brief defined the get/set interface for PowerStep
      */
-    virtual uint8_t GetPowerStep() = 0;
+    virtual uint8_t GetPowerStep() const = 0;
     virtual void SetPowerStep(uint8_t powerStep) = 0;
 
     

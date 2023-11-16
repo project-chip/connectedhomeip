@@ -49,7 +49,7 @@ public:
     /**
      * Get the value of MinPower.
      */
-    uint8_t GetMinPower() override {return mMinPower;}
+    uint8_t GetMinPower() const override {return mMinPower;}
 
     /**
      * Set the value of MinPower.
@@ -59,7 +59,7 @@ public:
     /**
      * Get the value of MaxPower.
      */
-    uint8_t GetMaxPower() override {return mMaxPower;}
+    uint8_t GetMaxPower() const override {return mMaxPower;}
 
     /**
      * Set the value of MaxPower.
@@ -69,7 +69,7 @@ public:
     /**
      * Get the value of PowerStep.
      */
-    uint8_t GetPowerStep() override {return mPowerStep;}
+    uint8_t GetPowerStep() const override {return mPowerStep;}
 
     /**
      * Set the value of PowerStep.
