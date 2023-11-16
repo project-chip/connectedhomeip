@@ -332,9 +332,9 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000007: {
-                "attributeName": "RemainingCapacity",
+                "attributeName": "FabricSceneInfo",
                 "attributeId": 0x00000007,
-                "type": "int",
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
