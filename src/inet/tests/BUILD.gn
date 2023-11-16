@@ -91,6 +91,7 @@ chip_test_suite_using_nltest("tests") {
       chip_device_platform != "ameba") {
     # TODO: This test does not seem executed
     sources += [ "TestLwIPDNS.cpp" ]
+    tests = [ "TestLwIPDNS" ]
   }
 
   cflags = [ "-Wconversion" ]

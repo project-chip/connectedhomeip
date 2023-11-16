@@ -51,31 +51,10 @@ using namespace chip::Inet;
 
 #define TOOL_NAME "TestLwIPDNS"
 
-static bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[]);
-
-// Globals
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 static uint8_t sNumIpAddrs = DNS_MAX_ADDRS_PER_NAME;
 static ip_addr_t sIpAddrs[DNS_MAX_ADDRS_PER_NAME];
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-static const char * sHostname      = nullptr;
-static const char * sDNSServerAddr = nullptr;
-
-// clang-format off
-static ArgParser::HelpOptions gHelpOptions(TOOL_NAME,
-                                           "Usage: " TOOL_NAME " [<options...>] <hostname> <dns-server-address>\n",
-                                           CHIP_VERSION_STRING "\n" CHIP_TOOL_COPYRIGHT);
-
-static ArgParser::OptionSet * gToolOptionSets[] =
-{
-    &gNetworkOptions,
-    &gFaultInjectionOptions,
-    &gHelpOptions,
-    nullptr
-};
-// clang-format on
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 static void found_multi(const char * aName, ip_addr_t * aIpAddrs, uint8_t aNumIpAddrs, void * callback_arg)
@@ -96,7 +75,7 @@ static void found_multi(const char * aName, ip_addr_t * aIpAddrs, uint8_t aNumIp
     Done = true;
 }
 
-static void TestLwIPDNS(void)
+static void TestLwIPDNS(const char *sDNSServerAddr)
 {
     uint8_t numdns = 1;
     ip_addr_t dnsserver[1];
@@ -207,54 +186,3 @@ static void TestLwIPDNS(void)
     }
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-int main(int argc, char * argv[])
-{
-    SetSIGUSR1Handler();
-
-    if (argc == 1)
-    {
-        gHelpOptions.PrintBriefUsage(stderr);
-        exit(EXIT_FAILURE);
-    }
-
-    if (!ParseArgs(TOOL_NAME, argc, argv, gToolOptionSets, HandleNonOptionArgs))
-    {
-        exit(EXIT_FAILURE);
-    }
-
-    InitSystemLayer();
-
-    InitNetwork();
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    TestLwIPDNS();
-#else
-    fprintf(stderr, "Please assert CHIP_SYSTEM_CONFIG_USE_LWIP to use this test.\n");
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-    ShutdownNetwork();
-
-    ShutdownSystemLayer();
-
-    return (EXIT_SUCCESS);
-}
-
-static bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
-{
-    if (argc < 2)
-    {
-        printf("TestDNS: Missing %s argument\n", argc == 0 ? "<hostname>" : "<dns-server-address>");
-        return false;
-    }
-
-    if (argc > 2)
-    {
-        printf("Unexpected argument: %s\n", argv[1]);
-    }
-
-    sHostname      = argv[0];
-    sDNSServerAddr = argv[1];
-
-    return true;
-}

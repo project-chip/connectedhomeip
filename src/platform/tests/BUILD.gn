@@ -80,9 +80,10 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
       sources = [
         "TestCHIPoBLEStackMgr.cpp",
         "TestCHIPoBLEStackMgr.h",
-        "TestCHIPoBLEStackMgrDriver.cpp",
       ]
-      tests = [ "TestCHIPoBLEStackMgr" ]
+      tests = [
+        "TestCHIPoBLEStackMgr",
+      ]
     }
 
     if (current_os == "zephyr" || current_os == "android" ||
