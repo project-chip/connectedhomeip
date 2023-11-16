@@ -2257,4 +2257,18 @@ limitations under the License.
             </include>
         </clusters>
     </deviceType>
+    <deviceType>
+        <name>Cooktop</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Cooktop Device Type</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0078</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="On/Off" client="true" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>ON_OFF</requireAttribute>
+                <requireCommand>Off</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
 </configurator>
