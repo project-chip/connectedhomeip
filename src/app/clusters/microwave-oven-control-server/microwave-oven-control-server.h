@@ -19,21 +19,21 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af-enums.h>
-#include <protocols/interaction_model/StatusCode.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/util/af-enums.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
 
-inline constexpr uint32_t kDefaultCookTime              = 30;
-inline constexpr uint8_t kDefaultPowerSetting           = 100;
-inline constexpr uint8_t kDefaultMinPower               = 10;
-inline constexpr uint8_t kDefaultMaxPower               = 100;
-inline constexpr uint8_t kDefaultPowerStep              = 10;
+inline constexpr uint32_t kDefaultCookTime    = 30;
+inline constexpr uint8_t kDefaultPowerSetting = 100;
+inline constexpr uint8_t kDefaultMinPower     = 10;
+inline constexpr uint8_t kDefaultMaxPower     = 100;
+inline constexpr uint8_t kDefaultPowerStep    = 10;
 
 class Delegate;
 
@@ -69,7 +69,6 @@ public:
     uint8_t GetPowerSetting() const;
     void SetPowerSetting(uint8_t powerSetting);
 
-
 private:
     Delegate * mDelegate;
     EndpointId mEndpointId;
@@ -78,8 +77,8 @@ private:
     /**
      * set default values
      */
-    uint32_t mCookTime               = kDefaultCookTime;
-    uint8_t mPowerSettng             = kDefaultPowerSetting;
+    uint32_t mCookTime   = kDefaultCookTime;
+    uint8_t mPowerSettng = kDefaultPowerSetting;
 
     /**
      * IM-level implementation of read
@@ -101,7 +100,6 @@ private:
      * @brief Handle Command: AddMoreTime.
      */
     void HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTime::DecodableType & req);
-
 };
 
 /** @brief
@@ -110,7 +108,6 @@ private:
 class Delegate
 {
 public:
-
     Delegate() = default;
 
     virtual ~Delegate() = default;
@@ -119,7 +116,8 @@ public:
      *   @brief Handle Command Callback in application: SetCookingParameters
      *   @return Returns the Interaction Model status code which was user determined in the business logic
      */
-    virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(Optional<uint8_t> cookMode,Optional<uint32_t> cookTime,Optional<uint8_t> powerSetting)  = 0;
+    virtual Protocols::InteractionModel::Status
+    HandleSetCookingParametersCallback(Optional<uint8_t> cookMode, Optional<uint32_t> cookTime, Optional<uint8_t> powerSetting) = 0;
 
     /**
      *   @brief Handle Command Callback in application: AddMoreTime
@@ -130,22 +128,20 @@ public:
     /**
      *   @brief defined the get/set interface for MinPower
      */
-    virtual uint8_t GetMinPower() const = 0;
+    virtual uint8_t GetMinPower() const        = 0;
     virtual void SetMinPower(uint8_t minPower) = 0;
 
     /**
      *   @brief defined the get/set interface for MaxPower
      */
-    virtual uint8_t GetMaxPower() const = 0;
+    virtual uint8_t GetMaxPower() const        = 0;
     virtual void SetMaxPower(uint8_t maxPower) = 0;
 
     /**
      *   @brief defined the get/set interface for PowerStep
      */
-    virtual uint8_t GetPowerStep() const = 0;
+    virtual uint8_t GetPowerStep() const         = 0;
     virtual void SetPowerStep(uint8_t powerStep) = 0;
-
-
 
 private:
     friend class Instance;
@@ -164,11 +160,10 @@ protected:
     /**
      * set default values
      */
-    uint8_t mMinPower     = kDefaultMinPower;
-    uint8_t mMaxPower     = kDefaultMaxPower;
-    uint8_t mPowerStep    = kDefaultPowerStep;
+    uint8_t mMinPower  = kDefaultMinPower;
+    uint8_t mMaxPower  = kDefaultMaxPower;
+    uint8_t mPowerStep = kDefaultPowerStep;
 };
-
 
 } // namespace MicrowaveOvenControl
 } // namespace Clusters
