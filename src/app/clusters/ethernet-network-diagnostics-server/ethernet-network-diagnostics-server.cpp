@@ -79,7 +79,8 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadPHYRate(AttributeValueEncoder & aEn
     if (DeviceLayer::GetDiagnosticDataProvider().GetEthPHYRate(value) == CHIP_NO_ERROR)
     {
         pHYRate.SetNonNull(value);
-        ChipLogProgress(Zcl, "The current nominal, usable speed at the top of the physical layer of the Node: %d", chip::to_underlying(value));
+        ChipLogProgress(Zcl, "The current nominal, usable speed at the top of the physical layer of the Node: %d",
+                        chip::to_underlying(value));
     }
     else
     {
