@@ -131,7 +131,7 @@ $ echo '{"Name":"AirQuality","NewValue":3}' > /tmp/chip_air_quality_fifo_<PID>
 Generate event `TemperatureMeasurement`, to change the temperate value.
 
 ```
-$ echo '{"Name":"TemperatureMeasurement","NewValue":18}' > /tmp/chip_air_quality_fifo_<PID>
+$ echo '{"Name":"TemperatureMeasurement","NewValue":1800}' > /tmp/chip_air_quality_fifo_<PID>
 ```
 
 ### Trigger Humidity change event

@@ -897,7 +897,7 @@ class ChipDeviceControllerBase():
             to the XYZ attribute on the test cluster to endpoint 1
 
         Returns:
-            - PyChipError
+            - [PyChipError] (list - one for each pth)
         '''
         self.CheckIsActive()
 
@@ -1201,10 +1201,10 @@ class ChipDeviceControllerBase():
             - read request: AsyncReadTransation.ReadResponse.attributes.
                             This is of type AttributeCache.attributeCache (Attribute.py),
                             which is a dict mapping endpoints to a list of Cluster (ClusterObjects.py) classes
-                            (dict[int], List[Cluster])
+                            (dict[int, List[Cluster]])
                             Access as ret[endpoint_id][<Cluster class>][<Attribute class>]
-                            Ex. To access the OnTime attribute from the OnOff cluster on EP 0
-                            ret[0][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
+                            Ex. To access the OnTime attribute from the OnOff cluster on EP 1
+                            ret[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
 
         Raises:
             - InteractionModelError (chip.interaction_model) on error

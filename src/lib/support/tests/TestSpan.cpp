@@ -345,6 +345,15 @@ static void TestConversionConstructors(nlTestSuite * inSuite, void * inContext)
     ([](FixedSpan<const Foo, 3> f) {})(constArray);
     ([](Span<const Foo> f) {})(constArray);
 
+    NL_TEST_ASSERT(inSuite, span10.data_equal(span10));
+    NL_TEST_ASSERT(inSuite, span10.data_equal(span9));
+    NL_TEST_ASSERT(inSuite, span10.data_equal(array));
+    NL_TEST_ASSERT(inSuite, span10.data_equal(constArray));
+    NL_TEST_ASSERT(inSuite, span9.data_equal(span9));
+    NL_TEST_ASSERT(inSuite, span9.data_equal(span10));
+    NL_TEST_ASSERT(inSuite, span9.data_equal(array));
+    NL_TEST_ASSERT(inSuite, span9.data_equal(constArray));
+
     // The following should not compile
     // Span<const Foo> error1 = std::array<Foo, 3>(); // Span would point into a temporary value
 }

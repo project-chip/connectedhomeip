@@ -466,6 +466,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         commissionerParams.controllerICAC               = icacSpan;
         commissionerParams.controllerNOC                = nocSpan;
         commissionerParams.permitMultiControllerFabrics = true;
+        commissionerParams.enableServerInteractions     = NeedsOperationalAdvertising();
     }
 
     // TODO: Initialize IPK epoch key in ExampleOperationalCredentials issuer rather than relying on DefaultIpkValue
