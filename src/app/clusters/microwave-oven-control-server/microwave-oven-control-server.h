@@ -145,7 +145,7 @@ public:
     virtual uint8_t GetPowerStep() const = 0;
     virtual void SetPowerStep(uint8_t powerStep) = 0;
 
-    
+
 
 private:
     friend class Instance;
