@@ -683,6 +683,8 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     memset(buffer, 0, buff_span.size());
 };
 
+void TestHandlerHelpers(nlTestSuite * aSuite, void * aContext) {}
+
 void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
 {
     SceneTable * sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);
