@@ -41,6 +41,8 @@ alias idt_vars="idt_go && source idt/scripts/vars.sh"
 alias idt_clean_artifacts="idt_go && source idt/scripts/clean_artifacts.sh"
 alias idt_clean_all="idt_go && source idt/scripts/clean_all.sh"
 alias idt_create_vars="idt_go && source idt/scripts/create_vars.sh"
+alias idt_check_child="idt_go && source idt/scripts/check_child.sh"
+alias idt_clean_child="idt_go && source idt/scripts/clean_child.sh"
 
 alias idt="idt_go && \
 if [ -z $PYTHONPYCACHEPREFIX ]; then export PYTHONPYCACHEPREFIX=$IDT_SRC_PARENT/idt/pycache; fi && \
