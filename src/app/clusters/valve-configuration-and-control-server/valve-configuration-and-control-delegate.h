@@ -24,22 +24,22 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace BooleanSensorConfiguration {
+namespace ValveConfigurationAndControl {
 
 /** @brief
- *    Defines methods for implementing application-specific logic for the Boolean Sensor Configuration Cluster.
+ *    Defines methods for implementing application-specific logic for the Valve Configuration and Control Cluster.
  */
 class Delegate
 {
 public:
     Delegate(){};
 
-    virtual CHIP_ERROR HandleSuppressRequest(BooleanSensorConfiguration::AlarmModeBitmap alarmToSuppress) = 0;
+    virtual CHIP_ERROR HandleOpenValve(uint32_t openDuration) = 0;
 
     virtual ~Delegate() = default;
 };
 
-} // namespace BooleanSensorConfiguration
+} // namespace ValveConfigurationAndControl
 } // namespace Clusters
 } // namespace app
 } // namespace chip

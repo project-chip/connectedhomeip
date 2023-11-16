@@ -281,9 +281,6 @@ CHIP_ERROR BooleanSensorConfigurationAttrAccess::ReadSensitivityLevel(AttributeV
 }
 } // namespace
 
-/**
- * @brief Boolean Sensor Configuration Cluster SuppressRequest Command callback (from client)
- */
 bool emberAfBooleanSensorConfigurationClusterSuppressRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const BooleanSensorConfiguration::Commands::SuppressRequest::DecodableType & commandData)
@@ -293,12 +290,14 @@ bool emberAfBooleanSensorConfigurationClusterSuppressRequestCallback(
     if (err == CHIP_IM_GLOBAL_STATUS(InvalidInState))
     {
         commandObj->AddStatus(commandPath, Status::InvalidInState);
+        return true;
     }
     else if (err == CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute))
     {
         return false;
     }
 
+    commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }
 
