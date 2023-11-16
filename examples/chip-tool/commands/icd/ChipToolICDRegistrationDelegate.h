@@ -35,7 +35,7 @@ public:
     void GenerateSymmetricKey(chip::NodeId device,
                               chip::Callback::Callback<OnSymmetricKeyGenerationCompleted> * onCompletion) override;
 
-    void ICDRegistrationComplete(chip::NodeId device, uint32_t icdCounter) override;
+    void OnRegistrationComplete(chip::NodeId device, uint32_t icdCounter) override;
 
 private:
     chip::NodeId mCheckInNodeId;

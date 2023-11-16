@@ -46,7 +46,7 @@ void ChipToolICDRegistrationDelegate::GenerateSymmetricKey(
     });
 }
 
-void ChipToolICDRegistrationDelegate::ICDRegistrationComplete(chip::NodeId device, uint32_t icdCounter)
+void ChipToolICDRegistrationDelegate::OnRegistrationComplete(chip::NodeId device, uint32_t icdCounter)
 {
     // TODO: We may want to trigger real subscription in this function.
     ChipLogProgress(chipTool, "Node ID " ChipLogFormatX64 " completes ICD Registration with start ICDCounter = %" PRIu32,

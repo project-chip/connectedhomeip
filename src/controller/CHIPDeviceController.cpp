@@ -1223,7 +1223,7 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
     if (commissioner->mICDRegistrationDelegate != nullptr)
     {
-        commissioner->mICDRegistrationDelegate->ICDRegistrationComplete(commissioner->GetNodeId(), data.ICDCounter);
+        commissioner->mICDRegistrationDelegate->OnRegistrationComplete(commissioner->GetNodeId(), data.ICDCounter);
     }
 }
 

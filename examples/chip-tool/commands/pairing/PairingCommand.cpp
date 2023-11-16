@@ -132,7 +132,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         params.SetDSTOffsets(mDSTOffsetList);
     }
 
-    if (!mIgnoreIcd)
+    if (!mIgnoreIcd.ValueOr(false))
     {
         params.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
     }

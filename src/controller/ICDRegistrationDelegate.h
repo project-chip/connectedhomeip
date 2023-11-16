@@ -67,7 +67,7 @@ public:
      * @param[in] device       The node id of the device.
      * @param[in] icdCounter   The ICD Counter received from the device.
      */
-    virtual void ICDRegistrationComplete(NodeId device, uint32_t icdCounter) = 0;
+    virtual void OnRegistrationComplete(NodeId device, uint32_t icdCounter) = 0;
 };
 
 } // namespace Controller
