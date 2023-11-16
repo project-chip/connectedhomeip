@@ -71,9 +71,9 @@ public:
     SecureSession(SecureSessionTable & table, Type secureSessionType, uint16_t localSessionId, NodeId localNodeId,
                   NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
                   const ReliableMessageProtocolConfig & config) :
-        mTable(table), mState(State::kEstablishing), mSecureSessionType(secureSessionType), mLocalNodeId(localNodeId),
-        mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
-        mRemoteSessionParams(config)
+        mTable(table),
+        mState(State::kEstablishing), mSecureSessionType(secureSessionType), mLocalNodeId(localNodeId), mPeerNodeId(peerNodeId),
+        mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mRemoteSessionParams(config)
     {
         MoveToState(State::kActive);
         Retain(); // Put the test session in Active state. This ref is released inside MarkForEviction
