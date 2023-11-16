@@ -41,14 +41,13 @@ limitations under the License.
 
     <attribute side="server" code="0x0000" define="GROUP_NAME_SUPPORT" type="NameSupportBitmap" min="0x00" max="0x80" writable="false" optional="false">NameSupport</attribute>
 
-    <!-- NAME_SUPPORT -->
     <command source="client" code="0x00" name="AddGroup" response="AddGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups add">
       <description>
         Command description for AddGroup
       </description>
       <access op="invoke" role="manage"/>
       <arg name="GroupID" type="group_id"/>
-      <arg name="GroupName" type="char_string"/>
+      <arg name="GroupName" type="char_string" length="16"/>
     </command>
 
     <command source="client" code="0x01" name="ViewGroup" response="ViewGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups view">
@@ -86,7 +85,7 @@ limitations under the License.
       </description>
       <access op="invoke" role="manage"/>
       <arg name="GroupID" type="group_id"/>
-      <arg name="GroupName" type="char_string"/>
+      <arg name="GroupName" length="16" type="char_string"/>
     </command>
 
     <command source="server" code="0x00" name="AddGroupResponse" optional="false" disableDefaultResponse="true">
@@ -103,7 +102,7 @@ limitations under the License.
       </description>
       <arg name="Status" type="enum8"/>
       <arg name="GroupID" type="group_id"/>
-      <arg name="GroupName" type="char_string"/>
+      <arg name="GroupName" length="16" type="char_string"/>
     </command>
 
     <command source="server" code="0x02" name="GetGroupMembershipResponse" optional="false" disableDefaultResponse="true">

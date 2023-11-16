@@ -286,6 +286,12 @@
 #define CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER
 #endif
 
+#if defined(ZCL_USING_TIMER_CLUSTER_SERVER) || defined(ZCL_USING_TIMER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TIMER_CLUSTER { chip::app::Clusters::Timer::Id, "Timer" },
+#else
+#define CHIP_PRINTCLUSTER_TIMER_CLUSTER
+#endif
+
 #if defined(ZCL_USING_MODE_SELECT_CLUSTER_SERVER) || defined(ZCL_USING_MODE_SELECT_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER { chip::app::Clusters::ModeSelect::Id, "Mode Select" },
 #else
@@ -362,6 +368,19 @@
 #define CHIP_PRINTCLUSTER_DISHWASHER_ALARM_CLUSTER
 #endif
 
+#if defined(ZCL_USING_MICROWAVE_OVEN_MODE_CLUSTER_SERVER) || defined(ZCL_USING_MICROWAVE_OVEN_MODE_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_MICROWAVE_OVEN_MODE_CLUSTER { chip::app::Clusters::MicrowaveOvenMode::Id, "Microwave Oven Mode" },
+#else
+#define CHIP_PRINTCLUSTER_MICROWAVE_OVEN_MODE_CLUSTER
+#endif
+
+#if defined(ZCL_USING_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_MICROWAVE_OVEN_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_MICROWAVE_OVEN_CONTROL_CLUSTER                                                                           \
+    { chip::app::Clusters::MicrowaveOvenControl::Id, "Microwave Oven Control" },
+#else
+#define CHIP_PRINTCLUSTER_MICROWAVE_OVEN_CONTROL_CLUSTER
+#endif
+
 #if defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER { chip::app::Clusters::OperationalState::Id, "Operational State" },
 #else
@@ -387,6 +406,28 @@
     { chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id, "Activated Carbon Filter Monitoring" },
 #else
 #define CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER
+#endif
+
+#if defined(ZCL_USING_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_SERVER) || defined(ZCL_USING_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER                                                                     \
+    { chip::app::Clusters::BooleanSensorConfiguration::Id, "Boolean Sensor Configuration" },
+#else
+#define CHIP_PRINTCLUSTER_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER
+#endif
+
+#if defined(ZCL_USING_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER) ||                                                           \
+    defined(ZCL_USING_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER                                                                  \
+    { chip::app::Clusters::ValveConfigurationAndControl::Id, "Valve Configuration and Control" },
+#else
+#define CHIP_PRINTCLUSTER_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER
+#endif
+
+#if defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                     \
+    { chip::app::Clusters::DemandResponseLoadControl::Id, "Demand Response Load Control" },
+#else
+#define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER
 #endif
 
 #if defined(ZCL_USING_DOOR_LOCK_CLUSTER_SERVER) || defined(ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT)
@@ -707,6 +748,7 @@
     CHIP_PRINTCLUSTER_PROXY_VALID_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER                                                                                       \
+    CHIP_PRINTCLUSTER_TIMER_CLUSTER                                                                                                \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_LAUNDRY_WASHER_MODE_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER                                                 \
@@ -719,10 +761,15 @@
     CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_DISHWASHER_ALARM_CLUSTER                                                                                     \
+    CHIP_PRINTCLUSTER_MICROWAVE_OVEN_MODE_CLUSTER                                                                                  \
+    CHIP_PRINTCLUSTER_MICROWAVE_OVEN_CONTROL_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER                                                                   \
+    CHIP_PRINTCLUSTER_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER                                                                      \
+    CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                         \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER                                                                                      \

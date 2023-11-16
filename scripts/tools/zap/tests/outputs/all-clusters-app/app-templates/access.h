@@ -88,6 +88,7 @@
     /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
+    0x0000050D, /* Cluster: Application Basic, Attribute: AllowedVendorList, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
@@ -151,6 +152,7 @@
     /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
+    0x00000007, /* Cluster: Application Basic, Attribute: AllowedVendorList, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
@@ -214,6 +216,7 @@
     /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Application Basic, Attribute: AllowedVendorList, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -222,11 +225,15 @@
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
     0x00000006, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
     0x00000008, /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: manage */ \
+    0x0000001E, /* Cluster: Binding, Attribute: Binding, Privilege: manage */ \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     0x00000028, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
     0x00000028, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x00000028, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    0x0000002B, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
+    0x0000002C, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
+    0x0000002C, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
     0x0000002D, /* Cluster: Unit Localization, Attribute: TemperatureUnit, Privilege: manage */ \
     0x00000030, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
@@ -277,11 +284,15 @@
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
     0x00004003, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
     0x00004000, /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: manage */ \
+    0x00000000, /* Cluster: Binding, Attribute: Binding, Privilege: manage */ \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     0x00000005, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
     0x00000006, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x00000010, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    0x00000000, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
+    0x00000000, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
+    0x00000001, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
     0x00000000, /* Cluster: Unit Localization, Attribute: TemperatureUnit, Privilege: manage */ \
     0x00000000, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000004, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
@@ -332,11 +343,15 @@
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
     kMatterAccessPrivilegeManage, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Binding, Attribute: Binding, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Unit Localization, Attribute: TemperatureUnit, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
@@ -407,6 +422,9 @@
     0x00000031, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     0x00000033, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
+    0x00000034, /* Cluster: Software Diagnostics, Command: ResetWatermarks, Privilege: manage */ \
+    0x00000035, /* Cluster: Thread Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
+    0x00000037, /* Cluster: Ethernet Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
     0x0000003C, /* Cluster: Administrator Commissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
     0x0000003C, /* Cluster: Administrator Commissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     0x0000003C, /* Cluster: Administrator Commissioning, Command: RevokeCommissioning, Privilege: administer */ \
@@ -433,6 +451,7 @@
     0x00000101, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     0x00000101, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     0x00000101, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    0x00000507, /* Cluster: Media Input, Command: RenameInput, Privilege: manage */ \
     0xFFF1FC06, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     0xFFF1FC06, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -459,6 +478,9 @@
     0x00000006, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
     0x00000008, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     0x00000000, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
+    0x00000000, /* Cluster: Software Diagnostics, Command: ResetWatermarks, Privilege: manage */ \
+    0x00000000, /* Cluster: Thread Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
+    0x00000000, /* Cluster: Ethernet Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
     0x00000000, /* Cluster: Administrator Commissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
     0x00000001, /* Cluster: Administrator Commissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     0x00000002, /* Cluster: Administrator Commissioning, Command: RevokeCommissioning, Privilege: administer */ \
@@ -485,6 +507,7 @@
     0x00000022, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     0x00000024, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     0x00000026, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    0x00000003, /* Cluster: Media Input, Command: RenameInput, Privilege: manage */ \
     0x00000000, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     0x00000001, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -511,6 +534,9 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Software Diagnostics, Command: ResetWatermarks, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thread Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Ethernet Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Administrator Commissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Administrator Commissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Administrator Commissioning, Command: RevokeCommissioning, Privilege: administer */ \
@@ -537,6 +563,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Media Input, Command: RenameInput, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }

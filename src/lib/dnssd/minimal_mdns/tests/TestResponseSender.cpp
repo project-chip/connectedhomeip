@@ -312,36 +312,36 @@ void PtrSrvTxtMultipleRespondersToInstance(nlTestSuite * inSuite, void * inConte
 
 void PtrSrvTxtMultipleRespondersToServiceListing(nlTestSuite * inSuite, void * inContext)
 {
-    CommonTestElements common1(inSuite, "test1");
-    CommonTestElements common2(inSuite, "test2");
-
+    auto common1 = std::make_unique<CommonTestElements>(inSuite, "test1");
+    auto common2 = std::make_unique<CommonTestElements>(inSuite, "test2");
     // Just use the server from common1.
-    ResponseSender responseSender(&common1.server);
+    ResponseSender responseSender(&common1->server);
 
-    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&common1.queryResponder) == CHIP_NO_ERROR);
-    common1.queryResponder.AddResponder(&common1.ptrResponder).SetReportInServiceListing(true);
-    common1.queryResponder.AddResponder(&common1.srvResponder);
-    common1.queryResponder.AddResponder(&common1.txtResponder);
+    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&common1->queryResponder) == CHIP_NO_ERROR);
+    common1->queryResponder.AddResponder(&common1->ptrResponder).SetReportInServiceListing(true);
+    common1->queryResponder.AddResponder(&common1->srvResponder);
+    common1->queryResponder.AddResponder(&common1->txtResponder);
 
-    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&common2.queryResponder) == CHIP_NO_ERROR);
-    common2.queryResponder.AddResponder(&common2.ptrResponder).SetReportInServiceListing(true);
-    common2.queryResponder.AddResponder(&common2.srvResponder);
-    common2.queryResponder.AddResponder(&common2.txtResponder);
+    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&common2->queryResponder) == CHIP_NO_ERROR);
+    common2->queryResponder.AddResponder(&common2->ptrResponder).SetReportInServiceListing(true);
+    common2->queryResponder.AddResponder(&common2->srvResponder);
+    common2->queryResponder.AddResponder(&common2->txtResponder);
 
     // Build a query for the instance
-    common1.recordWriter.WriteQName(common1.dnsSd);
-    QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common1.requestNameStart, common1.requestBytesRange);
+    common1->recordWriter.WriteQName(common1->dnsSd);
+    QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common1->requestNameStart, common1->requestBytesRange);
 
     // Should get service listing from both.
-    PtrResourceRecord serviceRecord1 = PtrResourceRecord(common1.dnsSd, common1.ptrRecord.GetName());
-    common1.server.AddExpectedRecord(&serviceRecord1);
-    PtrResourceRecord serviceRecord2 = PtrResourceRecord(common2.dnsSd, common2.ptrRecord.GetName());
-    common1.server.AddExpectedRecord(&serviceRecord2);
+    PtrResourceRecord serviceRecord1 = PtrResourceRecord(common1->dnsSd, common1->ptrRecord.GetName());
+    common1->server.AddExpectedRecord(&serviceRecord1);
+    PtrResourceRecord serviceRecord2 = PtrResourceRecord(common2->dnsSd, common2->ptrRecord.GetName());
+    common1->server.AddExpectedRecord(&serviceRecord2);
 
-    responseSender.Respond(1, queryData, &common1.packetInfo, ResponseConfiguration());
+    responseSender.Respond(1, queryData, &common1->packetInfo, ResponseConfiguration());
 
-    NL_TEST_ASSERT(inSuite, common1.server.GetSendCalled());
-    NL_TEST_ASSERT(inSuite, common1.server.GetHeaderFound());
+    NL_TEST_ASSERT(inSuite, common1->server.GetSendCalled());
+
+    NL_TEST_ASSERT(inSuite, common1->server.GetHeaderFound());
 }
 
 const nlTest sTests[] = {

@@ -46,6 +46,7 @@ style:
             - "**/src/controller/java/tests/matter/tlv/TlvReaderTest.kt"
             - "**/src/controller/java/tests/matter/tlv/TlvReadWriteTest.kt"
             - "**/src/controller/java/tests/matter/tlv/TlvWriterTest.kt"
+            - "**/src/controller/java/generated/java/**/*"
     WildcardImport:
         excludes:
             - "**/examples/android/CHIPTest/app/src/androidTest/java/com/tcl/chip/chiptest/ExampleInstrumentedTest.kt"
@@ -155,6 +156,7 @@ style:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/EnterNetworkFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/MatterCommand.kt"
             - "**/src/controller/java/src/matter/onboardingpayload/Base38.kt"
+            - "**/src/controller/java/generated/java/**/*"
     ForbiddenComment:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/MultiAdminClientFragment.kt"
@@ -245,6 +247,9 @@ naming:
     ConstructorParameterNaming:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/HistoryCommandAdapter.kt"
+            - "**/src/controller/java/generated/java/**/*"
+    FunctionParameterNaming:
+        excludes:
             - "**/src/controller/java/generated/java/**/*"
     TopLevelPropertyNaming:
         excludes:

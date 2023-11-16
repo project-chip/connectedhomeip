@@ -14,8 +14,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from .matter_ble import MatterBleScanner
-from .matter_dnssd import MatterDnssdListener
+from .ble import MatterBleScanner
+from .dnssd import MatterDnssdListener
 
 __all__ = [
     'MatterBleScanner',

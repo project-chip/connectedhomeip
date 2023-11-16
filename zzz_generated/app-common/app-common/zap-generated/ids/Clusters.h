@@ -148,6 +148,9 @@ static constexpr ClusterId Id = 0x00000045;
 namespace IcdManagement {
 static constexpr ClusterId Id = 0x00000046;
 } // namespace IcdManagement
+namespace Timer {
+static constexpr ClusterId Id = 0x00000047;
+} // namespace Timer
 namespace ModeSelect {
 static constexpr ClusterId Id = 0x00000050;
 } // namespace ModeSelect
@@ -184,6 +187,12 @@ static constexpr ClusterId Id = 0x0000005C;
 namespace DishwasherAlarm {
 static constexpr ClusterId Id = 0x0000005D;
 } // namespace DishwasherAlarm
+namespace MicrowaveOvenMode {
+static constexpr ClusterId Id = 0x0000005E;
+} // namespace MicrowaveOvenMode
+namespace MicrowaveOvenControl {
+static constexpr ClusterId Id = 0x0000005F;
+} // namespace MicrowaveOvenControl
 namespace OperationalState {
 static constexpr ClusterId Id = 0x00000060;
 } // namespace OperationalState
@@ -196,6 +205,15 @@ static constexpr ClusterId Id = 0x00000071;
 namespace ActivatedCarbonFilterMonitoring {
 static constexpr ClusterId Id = 0x00000072;
 } // namespace ActivatedCarbonFilterMonitoring
+namespace BooleanSensorConfiguration {
+static constexpr ClusterId Id = 0x00000080;
+} // namespace BooleanSensorConfiguration
+namespace ValveConfigurationAndControl {
+static constexpr ClusterId Id = 0x00000081;
+} // namespace ValveConfigurationAndControl
+namespace DemandResponseLoadControl {
+static constexpr ClusterId Id = 0x00000096;
+} // namespace DemandResponseLoadControl
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock

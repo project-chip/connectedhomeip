@@ -253,7 +253,7 @@ LaunchResponseType ContentAppCommandDelegate::FormatContentLauncherResponse(Json
     }
     else
     {
-        launchResponse.status = static_cast<app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(value[statusFieldId].asInt());
+        launchResponse.status = static_cast<app::Clusters::ContentLauncher::StatusEnum>(value[statusFieldId].asInt());
         std::string dataFieldId =
             std::to_string(to_underlying(app::Clusters::ContentLauncher::Commands::LauncherResponse::Fields::kData));
         if (!value[dataFieldId].empty())
@@ -277,8 +277,7 @@ NavigateTargetResponseType ContentAppCommandDelegate::FormatNavigateTargetRespon
     }
     else
     {
-        navigateTargetResponse.status =
-            static_cast<app::Clusters::TargetNavigator::TargetNavigatorStatusEnum>(value[statusFieldId].asInt());
+        navigateTargetResponse.status = static_cast<app::Clusters::TargetNavigator::StatusEnum>(value[statusFieldId].asInt());
         std::string dataFieldId =
             std::to_string(to_underlying(app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Fields::kData));
         if (!value[dataFieldId].empty())
@@ -302,7 +301,7 @@ PlaybackResponseType ContentAppCommandDelegate::FormatMediaPlaybackResponse(Json
     }
     else
     {
-        playbackResponse.status = static_cast<app::Clusters::MediaPlayback::MediaPlaybackStatusEnum>(value[statusFieldId].asInt());
+        playbackResponse.status = static_cast<app::Clusters::MediaPlayback::StatusEnum>(value[statusFieldId].asInt());
         std::string dataFieldId =
             std::to_string(to_underlying(app::Clusters::MediaPlayback::Commands::PlaybackResponse::Fields::kData));
         if (!value[dataFieldId].empty())

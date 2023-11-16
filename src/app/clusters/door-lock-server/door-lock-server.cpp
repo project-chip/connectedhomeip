@@ -211,7 +211,7 @@ void DoorLockServer::HandleLocalLockOperationError(chip::EndpointId endpointId, 
 
     HandleWrongCodeEntry(endpointId);
 
-    ChipLogProgress(Zcl, "Handling a local Lock Operation Error: [endpoint=%d, user=%d]", endpointId, userId.Value());
+    ChipLogProgress(Zcl, "Handling a local Lock Operation Error: [endpoint=%d]", endpointId);
 }
 
 bool DoorLockServer::HandleWrongCodeEntry(chip::EndpointId endpointId)
@@ -1827,7 +1827,7 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
         return static_cast<EmberAfStatus>(DlStatus::kOccupied);
     }
 
-    const auto & newUserName                = !userName.IsNull() ? userName.Value() : chip::CharSpan::fromCharString("");
+    const auto & newUserName                = !userName.IsNull() ? userName.Value() : ""_span;
     auto newUserUniqueId                    = userUniqueId.IsNull() ? 0xFFFFFFFF : userUniqueId.Value();
     auto newUserStatus                      = userStatus.IsNull() ? UserStatusEnum::kOccupiedEnabled : userStatus.Value();
     auto newUserType                        = userType.IsNull() ? UserTypeEnum::kUnrestrictedUser : userType.Value();
@@ -1985,7 +1985,7 @@ Status DoorLockServer::clearUser(chip::EndpointId endpointId, chip::FabricIndex 
     }
 
     // Remove the user entry
-    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, chip::CharSpan(""), 0,
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, ""_span, 0,
                                       UserStatusEnum::kAvailable, UserTypeEnum::kUnrestrictedUser, CredentialRuleEnum::kSingle,
                                       nullptr, 0))
     {

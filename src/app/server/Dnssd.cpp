@@ -17,8 +17,8 @@
 
 #include <app/server/Dnssd.h>
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <inttypes.h>
-
 #include <lib/core/Optional.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/ServiceNaming.h>
@@ -145,6 +145,19 @@ CHIP_ERROR DnssdServer::SetEphemeralDiscriminator(Optional<uint16_t> discriminat
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+template <class AdvertisingParams>
+void DnssdServer::AddICDKeyToAdvertisement(AdvertisingParams & advParams)
+{
+    // Only advertise the ICD key if the device can operate as a LIT
+    if (Server::GetInstance().GetICDManager().SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
+    {
+        advParams.SetICDOperatingAsLIT(
+            Optional<bool>(Server::GetInstance().GetICDManager().GetICDMode() == ICDManager::ICDMode::LIT));
+    }
+}
+#endif
+
 /// Set MDNS operational advertisement
 CHIP_ERROR DnssdServer::AdvertiseOperational()
 {
@@ -165,14 +178,18 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
             Crypto::DRBG_get_bytes(macBuffer, sizeof(macBuffer));
         }
 
-        const auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
-                                             .SetPeerId(fabricInfo.GetPeerId())
-                                             .SetMac(mac)
-                                             .SetPort(GetSecuredPort())
-                                             .SetInterfaceId(GetInterfaceId())
-                                             .SetLocalMRPConfig(GetLocalMRPConfig())
-                                             .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
-                                             .EnableIpV4(true);
+        auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
+                                       .SetPeerId(fabricInfo.GetPeerId())
+                                       .SetMac(mac)
+                                       .SetPort(GetSecuredPort())
+                                       .SetInterfaceId(GetInterfaceId())
+                                       .SetLocalMRPConfig(GetLocalMRPConfig())
+                                       .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
+                                       .EnableIpV4(true);
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        AddICDKeyToAdvertisement(advertiseParameters);
+#endif
 
         auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
@@ -242,6 +259,10 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     }
 
     advertiseParameters.SetLocalMRPConfig(GetLocalMRPConfig()).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    AddICDKeyToAdvertisement(advertiseParameters);
+#endif
 
     if (commissionableNode)
     {
@@ -467,6 +488,13 @@ CHIP_ERROR DnssdServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[
         additionalDataPayloadParams, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize, rotatingDeviceIdValueOutputSize);
 }
 #endif
+
+void DnssdServer::OnICDModeChange()
+{
+    // ICDMode changed, restart DNS-SD advertising, because SII and ICD key are affected by this change.
+    // StartServer will take care of setting the operational and commissionable advertissements
+    StartServer();
+}
 
 } // namespace app
 } // namespace chip

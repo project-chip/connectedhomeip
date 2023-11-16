@@ -1444,6 +1444,20 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @ def CHIP_CONFIG_MAX_SCENES_TABLE_SIZE
+ *
+ * @brief This defines how many scenes a single endpoint is allowed to allocate in flash memory. This value MUST at least 16
+ * per spec and MUST be increased to allow for configuring a greater scene table size from Zap.
+ */
+#ifndef CHIP_CONFIG_MAX_SCENES_TABLE_SIZE
+#if CHIP_CONFIG_TEST
+#define CHIP_CONFIG_MAX_SCENES_TABLE_SIZE 24
+#else
+#define CHIP_CONFIG_MAX_SCENES_TABLE_SIZE 16
+#endif // CHIP_CONFIG_TEST
+#endif // CHIP_CONFIG_MAX_SCENES_TABLE_SIZE
+
+/**
  * @def CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE
  *
  * Defines the size of the time zone list
@@ -1484,21 +1498,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC
+ * @def CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
  *
- * @brief Default value for the ICD Management cluster IdleModeInterval attribute, in seconds
+ * @brief Default value for the ICD Management cluster IdleModeDuration attribute, in seconds
  */
-#ifndef CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC
-#define CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC 2
+#ifndef CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
+#define CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC 300
 #endif
 
 /**
- * @def CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS
+ * @def CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS
  *
- * @brief Default value for the ICD Management cluster ActiveModeInterval attribute, in milliseconds
+ * @brief Default value for the ICD Management cluster ActiveModeDuration attribute, in milliseconds
  */
-#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS
-#define CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS 300
+#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS 300
 #endif
 
 /**
@@ -1584,6 +1598,29 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
 #define CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED 0
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_PATHS_PER_INVOKE
+ *
+ * @brief The maximum number of elements in the InvokeRequests list that the Node is able to process.
+ */
+#ifndef CHIP_CONFIG_MAX_PATHS_PER_INVOKE
+#define CHIP_CONFIG_MAX_PATHS_PER_INVOKE 1
+#endif
+
+#if CHIP_CONFIG_MAX_PATHS_PER_INVOKE < 1 || CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 65535
+#error "CHIP_CONFIG_MAX_PATHS_PER_INVOKE is not allowed to be a number less than 1 or greater than 65535"
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
+ *
+ * @brief Defines the entry iterator delegate pool size of the ICDObserver object pool in ICDManager.h.
+ *        Two are used in the default implementation. Users can increase it to register more observers.
+ */
+#ifndef CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
+#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 2
 #endif
 
 /**

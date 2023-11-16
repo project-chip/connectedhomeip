@@ -15,7 +15,7 @@
 import logging
 import os
 
-from .types import IdlFileType, InputIdlFile
+from .type_definitions import IdlFileType, InputIdlFile
 
 CODEGEN_PY_PATH = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '..', 'codegen.py'))

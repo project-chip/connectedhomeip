@@ -92,9 +92,6 @@ template("asr_sdk_sources") {
       "../../components/freertos/Source/portable/MemMang/heap_4.c",
       "../../components/freertos/Source/portable/GCC/ARM_CM4F/port.c",
 
-      #matter
-      "matter/asr_factory_config.c",
-
       #elog
       "common/easylogger/elog_async.c",
       "common/easylogger/elog_buf.c",

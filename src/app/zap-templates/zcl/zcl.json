@@ -23,6 +23,7 @@
         "barrier-control-cluster.xml",
         "basic-information-cluster.xml",
         "binding-cluster.xml",
+        "boolean-sensor-configuration-cluster.xml",
         "boolean-state-cluster.xml",
         "actions-cluster.xml",
         "bridged-device-basic-information.xml",
@@ -36,7 +37,9 @@
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
+        "microwave-oven-mode-cluster.xml",
         "door-lock-cluster.xml",
+        "drlc-cluster.xml",
         "electrical-measurement-cluster.xml",
         "ethernet-network-diagnostics-cluster.xml",
         "fan-control-cluster.xml",
@@ -89,6 +92,7 @@
         "switch-cluster.xml",
         "target-navigator-cluster.xml",
         "temperature-control-cluster.xml",
+        "microwave-oven-control-cluster.xml",
         "temperature-measurement-cluster.xml",
         "test-cluster.xml",
         "thermostat-cluster.xml",
@@ -96,8 +100,10 @@
         "thread-network-diagnostics-cluster.xml",
         "time-format-localization-cluster.xml",
         "time-synchronization-cluster.xml",
+        "timer-cluster.xml",
         "user-label-cluster.xml",
         "unit-localization-cluster.xml",
+        "valve-configuration-and-control-cluster.xml",
         "wake-on-lan-cluster.xml",
         "washer-controls-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
@@ -185,8 +191,7 @@
             "RebootCount",
             "UpTime",
             "TotalOperationalHours",
-            "BootReason",
-            "AverageWearCount"
+            "BootReason"
         ],
         "Group Key Management": [
             "ClusterRevision",
@@ -195,12 +200,14 @@
             "FeatureMap"
         ],
         "ICD Management": [
-            "IdleModeInterval",
-            "ActiveModeInterval",
+            "IdleModeDuration",
+            "ActiveModeDuration",
             "ActiveModeThreshold",
             "RegisteredClients",
             "ICDCounter",
-            "ClientsSupportedPerFabric"
+            "ClientsSupportedPerFabric",
+            "UserActiveModeTriggerHint",
+            "UserActiveModeTriggerInstruction"
         ],
         "Operational Credentials": [
             "SupportedFabrics",
@@ -321,6 +328,7 @@
             "OnMode",
             "FeatureMap"
         ],
+        "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Laundry Washer Mode": [
             "SupportedModes",
             "CurrentMode",
@@ -338,14 +346,12 @@
         "RVC Clean Mode": [
             "SupportedModes",
             "CurrentMode",
-            "StartUpMode",
             "OnMode",
             "FeatureMap"
         ],
         "RVC Run Mode": [
             "SupportedModes",
             "CurrentMode",
-            "StartUpMode",
             "OnMode",
             "FeatureMap"
         ],
