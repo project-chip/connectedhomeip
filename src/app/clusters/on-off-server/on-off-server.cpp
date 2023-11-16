@@ -103,7 +103,7 @@ static bool LevelControlWithOnOffFeaturePresent(EndpointId endpoint)
 static constexpr size_t kOnOffMaxEnpointCount =
     EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 static void sceneOnOffCallback(EndpointId endpoint);
 using OnOffEndPointPair = scenes::DefaultSceneHandlerImpl::EndpointStatePair<bool>;
 using OnOffTransitionTimeInterface =
@@ -300,7 +300,7 @@ OnOffServer & OnOffServer::Instance()
 chip::scenes::SceneHandler * OnOffServer::GetSceneHandler()
 {
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     return &sOnOffSceneHandler;
 #else
     return nullptr;
@@ -499,7 +499,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
             status = setOnOffValue(endpoint, onOffValueForStartUp, true);
         }
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
         // Registers Scene handlers for the On/Off cluster on the server
         app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(endpoint, OnOffServer::Instance().GetSceneHandler());
 #endif
