@@ -266,8 +266,8 @@ static sl_status_t wfx_rsi_init(void)
     }
 #endif
 
-    sl_wifi_version_string_t version  = { 0 };
-    status = sl_wifi_get_firmware_version(&version);
+    sl_wifi_version_string_t version = { 0 };
+    status                           = sl_wifi_get_firmware_version(&version);
     if (status != SL_STATUS_OK)
     {
         SILABS_LOG("Get fw version failed: %s", version.version);
