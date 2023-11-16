@@ -37,7 +37,7 @@ void ChipToolICDRegistrationDelegate::GenerateSymmetricKey(
         uint8_t mockIcdKey[kKeySize];
         char mockIcdKeyHex[kKeySize * 2 + 1];
         chip::Crypto::DRBG_get_bytes(mockIcdKey, sizeof(mockIcdKey));
-        onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, mControllerNodeId, mockMonitoredSubject, ICDKey(mockIcdKey));
+        onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, mCheckInNodeId, mockMonitoredSubject, ICDKey(mockIcdKey));
         chip::Encoding::BytesToHex(mockIcdKey, sizeof(mockIcdKey), mockIcdKeyHex, sizeof(mockIcdKeyHex),
                                    chip::Encoding::HexFlags::kNullTerminate);
         ChipLogProgress(chipTool, "Generated Symmetric Key for Node ID " ChipLogFormatX64 ": %s", ChipLogValueX64(device),

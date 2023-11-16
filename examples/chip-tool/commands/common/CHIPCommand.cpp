@@ -347,7 +347,7 @@ CHIP_ERROR CHIPCommand::GetIdentityNodeId(std::string identity, chip::NodeId * n
 
     *nodeId = mCommissionerStorage.GetLocalNodeId();
 
-    sICDRegistrationDelegate.SetControllerNodeId(*nodeId);
+    sICDRegistrationDelegate.SetCheckInNodeId(*nodeId);
 
     return CHIP_NO_ERROR;
 }
