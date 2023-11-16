@@ -71,14 +71,6 @@ public:
     using HueDirection = chip::app::Clusters::ColorControl::HueDirection;
     using Feature      = chip::app::Clusters::ColorControl::Feature;
 
-    enum ColorMode
-    {
-        COLOR_MODE_HSV         = 0x00,
-        COLOR_MODE_CIE_XY      = 0x01,
-        COLOR_MODE_TEMPERATURE = 0x02,
-        COLOR_MODE_EHSV        = 0x03
-    };
-
     enum Conversion
     {
         HSV_TO_HSV                 = 0x00,
