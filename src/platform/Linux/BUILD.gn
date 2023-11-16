@@ -109,6 +109,8 @@ static_library("Linux") {
     "${chip_root}/third_party/inipp",
   ]
 
+  public_configs = []
+
   if (chip_mdns == "platform") {
     sources += [
       "DnssdImpl.cpp",
