@@ -40,29 +40,6 @@ enum EmberAfBarrierControlMovingState : uint8_t
     EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_OPENING = 2,
 };
 
-// Enum for ColorControlOptions
-enum EmberAfColorControlOptions : uint8_t
-{
-    EMBER_ZCL_COLOR_CONTROL_OPTIONS_EXECUTE_IF_OFF = 1,
-};
-
-// Enum for ColorMode
-enum EmberAfColorMode : uint8_t
-{
-    EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION = 0,
-    EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y            = 1,
-    EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE                  = 2,
-};
-
-// Enum for EnhancedColorMode
-enum EmberAfEnhancedColorMode : uint8_t
-{
-    EMBER_ZCL_ENHANCED_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION          = 0,
-    EMBER_ZCL_ENHANCED_COLOR_MODE_CURRENT_X_AND_CURRENT_Y                     = 1,
-    EMBER_ZCL_ENHANCED_COLOR_MODE_COLOR_TEMPERATURE                           = 2,
-    EMBER_ZCL_ENHANCED_COLOR_MODE_ENHANCED_CURRENT_HUE_AND_CURRENT_SATURATION = 3,
-};
-
 // Enum for PHYRateEnum
 enum EmberAfPHYRateEnum : uint8_t
 {
