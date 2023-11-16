@@ -10,9 +10,6 @@ WeakEnums:
     # The goal is to drive this down to 0.
     - BarrierControlBarrierPosition
     - BarrierControlMovingState
-    - ColorControlOptions
-    - ColorMode
-    - EnhancedColorMode
     - PHYRateEnum
 
 EnumsNotUsedAsTypeInXML:
