@@ -55,7 +55,8 @@ public:
      *
      * @param[in] device       The node id of the device.
      * @param[in] onCompletion The callback object to be called when symmetric key generation is completed. The
-     *                         `onCompletion` is expected to be valid through the key generation process.
+     *                         `onCompletion` is expected to be valid through the key generation process. Implementations
+     *                         should drop the reference of `onCompletion` after it is called.
      */
     virtual void GenerateSymmetricKey(NodeId device, Callback::Callback<OnSymmetricKeyGenerationCompleted> * onCompletion) = 0;
 
