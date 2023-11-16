@@ -247,9 +247,8 @@ static uint8_t getCurrentPosition(EndpointId endpoint)
     // way of knowing the position of the barrier. Let's guess that the barrier is
     // open so that we don't leave the barrier open when it should be closed.
     uint8_t currentPositionFromAttribute = emAfPluginBarrierControlServerGetBarrierPosition(endpoint);
-    return ((currentPositionFromAttribute == BarrierControl::Position::kUnknown)
-                ? static_cast<uint8_t>(BarrierControl::Position::kOpen)
-                : currentPositionFromAttribute);
+    return ((currentPositionFromAttribute == BarrierControl::Position::kUnknown) ? BarrierControl::Position::kOpen
+                                                                                 : currentPositionFromAttribute);
 }
 
 static uint32_t calculateDelayMs(EndpointId endpoint, uint8_t targetPosition, bool * opening)
@@ -300,7 +299,7 @@ void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
         emAfPluginBarrierControlServerSetBarrierPosition(endpoint,
                                                          (emAfPluginBarrierControlServerIsPartialBarrierSupported(endpoint)
                                                               ? state.currentPosition
-                                                              : static_cast<uint8_t>(BarrierControl::Position::kUnknown)));
+                                                              : BarrierControl::Position::kUnknown));
         setMovingState(endpoint,
                        (state.increasing ? BarrierControl::MovingState::kOpening : BarrierControl::MovingState::kClosing));
 
