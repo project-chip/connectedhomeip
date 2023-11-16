@@ -157,8 +157,8 @@ void Light::Render()
     const char * mode = // based on ColorMode attribute: spec 3.2.7.9
         (mColorMode == kColorModeCurrentHueAndCurrentSaturation) ? "Hue/Saturation"
         : (mColorMode == kColorModeCurrentXAndCurrentY)          ? "X/Y"
-        : (mColorMode == kColorModeColorTemperature)                ? "Temperature/Mireds"
-                                                                                : "UNKNOWN";
+        : (mColorMode == kColorModeColorTemperature)             ? "Temperature/Mireds"
+                                                                 : "UNKNOWN";
 
     ImGui::Text("Mode: %s", mode);
 

@@ -35,13 +35,13 @@ namespace Windows {
  */
 class Light : public Window
 {
-  public:
+public:
     Light(chip::EndpointId endpointId) : mEndpointId(endpointId) {}
 
     void UpdateState() override;
     void Render() override;
 
-  private:
+private:
     const chip::EndpointId mEndpointId;
 
     static constexpr uint8_t kColorModeCurrentHueAndCurrentSaturation         = 0;
