@@ -272,7 +272,7 @@ static sl_status_t wfx_rsi_init(void)
     {
         SILABS_LOG("Get fw version failed: %s", version.version);
         return status;
-    }   
+    }
     SILABS_LOG("Get current fw version: %s", version.version);
 
     status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, (sl_mac_address_t *) &wfx_rsi.sta_mac.octet[0]);
