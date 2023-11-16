@@ -3975,6 +3975,113 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRBooleanSensorConfigurationClusterAlarmsStateChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _alarmsActive = @(0);
+
+        _alarmsSuppressed = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRBooleanSensorConfigurationClusterAlarmsStateChangedEvent alloc] init];
+
+    other.alarmsActive = self.alarmsActive;
+    other.alarmsSuppressed = self.alarmsSuppressed;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: alarmsActive:%@; alarmsSuppressed:%@; >", NSStringFromClass([self class]), _alarmsActive, _alarmsSuppressed];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRBooleanSensorConfigurationClusterSensorFaultEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRBooleanSensorConfigurationClusterSensorFaultEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRValveConfigurationAndControlClusterValveStateChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _valveState = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRValveConfigurationAndControlClusterValveStateChangedEvent alloc] init];
+
+    other.valveState = self.valveState;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: valveState:%@; >", NSStringFromClass([self class]), _valveState];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRValveConfigurationAndControlClusterValveFaultEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _valveFault = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRValveConfigurationAndControlClusterValveFaultEvent alloc] init];
+
+    other.valveFault = self.valveFault;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: valveFault:%@; >", NSStringFromClass([self class]), _valveFault];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDemandResponseLoadControlClusterHeatingSourceControlStruct
 - (instancetype)init
 {

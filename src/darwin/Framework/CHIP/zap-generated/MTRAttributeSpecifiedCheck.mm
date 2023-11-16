@@ -2696,6 +2696,102 @@ static BOOL AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(Attribu
     }
     }
 }
+static BOOL AttributeIsSpecifiedInBooleanSensorConfigurationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::BooleanSensorConfiguration;
+    switch (aAttributeId) {
+    case Attributes::SensitivityLevel::Id: {
+        return YES;
+    }
+    case Attributes::AlarmsActive::Id: {
+        return YES;
+    }
+    case Attributes::AlarmsSuppressed::Id: {
+        return YES;
+    }
+    case Attributes::AlarmsEnabled::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ValveConfigurationAndControl;
+    switch (aAttributeId) {
+    case Attributes::OpenDuration::Id: {
+        return YES;
+    }
+    case Attributes::AutoCloseTime::Id: {
+        return YES;
+    }
+    case Attributes::RemainingDuration::Id: {
+        return YES;
+    }
+    case Attributes::CurrentState::Id: {
+        return YES;
+    }
+    case Attributes::TargetState::Id: {
+        return YES;
+    }
+    case Attributes::StartUpState::Id: {
+        return YES;
+    }
+    case Attributes::CurrentLevel::Id: {
+        return YES;
+    }
+    case Attributes::TargetLevel::Id: {
+        return YES;
+    }
+    case Attributes::OpenLevel::Id: {
+        return YES;
+    }
+    case Attributes::ValveFault::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DemandResponseLoadControl;
@@ -5834,6 +5930,12 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(aAttributeId);
+    }
+    case Clusters::BooleanSensorConfiguration::Id: {
+        return AttributeIsSpecifiedInBooleanSensorConfigurationCluster(aAttributeId);
+    }
+    case Clusters::ValveConfigurationAndControl::Id: {
+        return AttributeIsSpecifiedInValveConfigurationAndControlCluster(aAttributeId);
     }
     case Clusters::DemandResponseLoadControl::Id: {
         return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);
