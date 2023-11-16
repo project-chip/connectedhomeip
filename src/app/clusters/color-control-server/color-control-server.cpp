@@ -53,10 +53,10 @@ namespace Options {
 constexpr uint8_t kExecuteIfOff = 1;
 } // namespace Options
 
-}  // ColorControl
-}  // Clusters
-}  // app
-}  // chip
+} // namespace ColorControl
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 #ifdef EMBER_AF_PLUGIN_SCENES
 class DefaultColorControlSceneHandler : public scenes::DefaultSceneHandlerImpl
@@ -278,7 +278,8 @@ public:
                 }
                 break;
             case Attributes::EnhancedColorMode::Id:
-                if (decodePair.attributeValue <= static_cast<uint8_t>(ColorControl::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation))
+                if (decodePair.attributeValue <=
+                    static_cast<uint8_t>(ColorControl::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation))
                 {
                     targetColorMode = static_cast<uint8_t>(decodePair.attributeValue);
                 }
@@ -572,7 +573,8 @@ void ColorControlServer::handleModeSwitch(EndpointId endpoint, uint8_t newColorM
     Attributes::EnhancedColorMode::Set(endpoint, newColorMode);
     if (newColorMode == ColorControl::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation)
     {
-        // Transpose COLOR_MODE_EHSV to ColorControl::EnhancedColorMode::kCurrentHueAndCurrentSaturation after setting EnhancedColorMode
+        // Transpose COLOR_MODE_EHSV to ColorControl::EnhancedColorMode::kCurrentHueAndCurrentSaturation after setting
+        // EnhancedColorMode
         newColorMode = ColorControl::EnhancedColorMode::kCurrentHueAndCurrentSaturation;
     }
     Attributes::ColorMode::Set(endpoint, newColorMode);
