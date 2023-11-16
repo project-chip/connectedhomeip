@@ -23,12 +23,12 @@
 using chip::app::CommandResponseHelper;
 using KeypadInputDelegate = chip::app::Clusters::KeypadInput::Delegate;
 using SendKeyResponseType = chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type;
-using CecKeyCodeEnumType  = chip::app::Clusters::KeypadInput::CecKeyCodeEnum;
+using CecKeyCodeType  = chip::app::Clusters::KeypadInput::CecKeyCodeEnum;
 
 class KeypadInputManager : public KeypadInputDelegate
 {
 public:
-    void HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CecKeyCodeEnumType & keyCode) override;
+    void HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CecKeyCodeType & keyCode) override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
 
