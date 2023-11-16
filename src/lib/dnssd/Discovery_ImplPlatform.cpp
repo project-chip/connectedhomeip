@@ -39,11 +39,11 @@ namespace {
 
 static void HandleNodeResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & addresses, CHIP_ERROR error)
 {
-    ResolverDelegateProxy * proxy = static_cast<ResolverDelegateProxy *>(context);
+    DiscoveryDelegate * delegate = static_cast<DiscoveryDelegate *>(context);
 
-    if (CHIP_NO_ERROR != error)
+    if (error != CHIP_NO_ERROR)
     {
-        proxy->Release();
+        delegate->Release();
         return;
     }
 
@@ -51,31 +51,24 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
     result->ToDiscoveredNodeData(addresses, nodeData);
 
     nodeData.LogDetail();
-    proxy->OnNodeDiscovered(nodeData);
-    proxy->Release();
+    delegate->OnNodeDiscovered(nodeData);
+    delegate->Release();
 }
 
 static void HandleNodeBrowse(void * context, DnssdService * services, size_t servicesSize, bool finalBrowse, CHIP_ERROR error)
 {
-    ResolverDelegateProxy * proxy = static_cast<ResolverDelegateProxy *>(context);
+    DiscoveryDelegate * delegate = static_cast<DiscoveryDelegate *>(context);
 
     if (error != CHIP_NO_ERROR)
     {
-        // We don't have access to the ResolverProxy here to clear out its
-        // mDiscoveryContext.  The underlying implementation of
-        // ChipDnssdStopBrowse needs to handle a possibly-stale reference
-        // safely, so this won't lead to crashes, but it can lead to
-        // mis-behavior if a stale mDiscoveryContext happens to match a newer
-        // browse operation.
-        //
-        // TODO: Have a way to clear that state here.
-        proxy->Release();
+        delegate->ClearBrowseIdentifier();
+        delegate->Release();
         return;
     }
 
     for (size_t i = 0; i < servicesSize; ++i)
     {
-        proxy->Retain();
+        delegate->Retain();
         // For some platforms browsed services are already resolved, so verify if resolve is really needed or call resolve callback
 
         // Check if SRV, TXT and AAAA records were received in DNS responses
@@ -92,15 +85,8 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
 
     if (finalBrowse)
     {
-        // We don't have access to the ResolverProxy here to clear out its
-        // mDiscoveryContext.  The underlying implementation of
-        // ChipDnssdStopBrowse needs to handle a possibly-stale reference
-        // safely, so this won't lead to crashes, but it can lead to
-        // mis-behavior if a stale mDiscoveryContext happens to match a newer
-        // browse operation.
-        //
-        // TODO: Have a way to clear that state here.
-        proxy->Release();
+        delegate->ClearBrowseIdentifier();
+        delegate->Release();
     }
 }
 
@@ -398,7 +384,6 @@ CHIP_ERROR DiscoveryImplPlatform::InitImpl()
 void DiscoveryImplPlatform::Shutdown()
 {
     VerifyOrReturn(mState != State::kUninitialized);
-    mResolverProxy.Shutdown();
     ChipDnssdShutdown();
     mState = State::kUninitialized;
 }
@@ -410,20 +395,6 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
     if (initError == CHIP_NO_ERROR)
     {
         publisher->mState = State::kInitialized;
-
-        // TODO: this is wrong, however we need resolverproxy initialized
-        // otherwise DiscoveryImplPlatform is not usable.
-        //
-        // We rely on the fact that resolverproxy does not use the endpoint
-        // nor does DiscoveryImplPlatform use it (since init will be called
-        // twice now)
-        //
-        // The problem is that:
-        //   - DiscoveryImplPlatform contains a ResolverProxy
-        //   - ResolverProxy::Init calls Dnssd::Resolver::Instance().Init
-        // which results in a recursive dependency (proxy initializes the
-        // class that it is contained in).
-        publisher->mResolverProxy.Init(nullptr);
 
         // Post an event that will start advertising
         DeviceLayer::ChipDeviceEvent event;
@@ -671,28 +642,115 @@ void DiscoveryImplPlatform::NodeIdResolutionNoLongerNeeded(const PeerId & peerId
     ChipDnssdResolveNoLongerNeeded(name);
 }
 
-CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter filter)
+CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryDelegate & delegate)
 {
     ReturnErrorOnFailure(InitImpl());
-    return mResolverProxy.DiscoverCommissionableNodes(filter);
+    StopDiscovery(delegate);
+
+    if (filter.type == DiscoveryFilterType::kInstanceName)
+    {
+        // When we have the instance name, no need to browse, only need to resolve.
+        DnssdService service;
+
+        ReturnErrorOnFailure(MakeServiceSubtype(service.mName, sizeof(service.mName), filter));
+        Platform::CopyString(service.mType, kCommissionableServiceName);
+        service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolUdp;
+        service.mAddressType = Inet::IPAddressType::kAny;
+
+        // Increase the delegate's reference count to keep it alive until HandleNodeResolve is called back.
+        CHIP_ERROR error = ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeResolve, delegate.Retain());
+
+        if (error != CHIP_NO_ERROR)
+        {
+            delegate.Release();
+        }
+
+        return error;
+    }
+
+    char serviceName[kMaxCommissionableServiceNameSize];
+    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
+
+    // Increase the delegate's reference count to keep it alive until HandleNodeBrowse is called back.
+    intptr_t browseIdentifier;
+    CHIP_ERROR error = ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
+                                       Inet::InterfaceId::Null(), HandleNodeBrowse, delegate.Retain(), &browseIdentifier);
+
+    if (error == CHIP_NO_ERROR)
+    {
+        delegate.SetBrowseIdentifier(browseIdentifier);
+    }
+    else
+    {
+        delegate.Release();
+    }
+
+    return error;
 }
 
-CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissioners(DiscoveryFilter filter)
+CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissioners(DiscoveryFilter filter, DiscoveryDelegate & delegate)
 {
     ReturnErrorOnFailure(InitImpl());
-    return mResolverProxy.DiscoverCommissioners(filter);
+    StopDiscovery(delegate);
+
+    if (filter.type == DiscoveryFilterType::kInstanceName)
+    {
+        // When we have the instance name, no need to browse, only need to resolve.
+        DnssdService service;
+
+        ReturnErrorOnFailure(MakeServiceSubtype(service.mName, sizeof(service.mName), filter));
+        Platform::CopyString(service.mType, kCommissionerServiceName);
+        service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolUdp;
+        service.mAddressType = Inet::IPAddressType::kAny;
+
+        // Increase the delegate's reference count to keep it alive until HandleNodeResolve is called back.
+        CHIP_ERROR error = ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeResolve, delegate.Retain());
+
+        if (error != CHIP_NO_ERROR)
+        {
+            delegate.Release();
+        }
+    }
+
+    char serviceName[kMaxCommissionerServiceNameSize];
+    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));
+
+    // Increase the delegate's reference count to keep it alive until HandleNodeBrowse is called back.
+    intptr_t browseIdentifier;
+    CHIP_ERROR error = ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
+                                       Inet::InterfaceId::Null(), HandleNodeBrowse, delegate.Retain(), &browseIdentifier);
+
+    if (error == CHIP_NO_ERROR)
+    {
+        delegate.SetBrowseIdentifier(browseIdentifier);
+    }
+    else
+    {
+        delegate.Release();
+    }
+
+    return error;
 }
 
-CHIP_ERROR DiscoveryImplPlatform::StopDiscovery()
+CHIP_ERROR DiscoveryImplPlatform::StopDiscovery(DiscoveryDelegate & delegate)
 {
-    ReturnErrorOnFailure(InitImpl());
-    return mResolverProxy.StopDiscovery();
+    if (!delegate.GetBrowseIdentifier().HasValue())
+    {
+        // No discovery going on.
+        return CHIP_NO_ERROR;
+    }
+
+    const auto browseIdentifier = delegate.GetBrowseIdentifier().Value();
+    delegate.ClearBrowseIdentifier();
+
+    return ChipDnssdStopBrowse(browseIdentifier);
 }
 
 CHIP_ERROR DiscoveryImplPlatform::ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId)
 {
     ReturnErrorOnFailure(InitImpl());
-    return mResolverProxy.ReconfirmRecord(hostname, address, interfaceId);
+
+    return ChipDnssdReconfirmRecord(hostname, address, interfaceId);
 }
 
 DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
@@ -708,87 +766,6 @@ ServiceAdvertiser & chip::Dnssd::ServiceAdvertiser::Instance()
 Resolver & chip::Dnssd::Resolver::Instance()
 {
     return DiscoveryImplPlatform::GetInstance();
-}
-
-ResolverProxy::~ResolverProxy()
-{
-    Shutdown();
-}
-
-CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
-{
-    StopDiscovery();
-
-    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mDelegate->Retain();
-
-    if (filter.type == DiscoveryFilterType::kInstanceName)
-    {
-        // when we have the instance name, no need to browse, only need to resolve
-        DnssdService service;
-
-        ReturnErrorOnFailure(MakeServiceSubtype(service.mName, sizeof(service.mName), filter));
-        Platform::CopyString(service.mType, kCommissionableServiceName);
-        service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolUdp;
-        service.mAddressType = Inet::IPAddressType::kAny;
-        return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeResolve, mDelegate);
-    }
-
-    char serviceName[kMaxCommissionableServiceNameSize];
-    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
-
-    intptr_t browseIdentifier;
-    ReturnErrorOnFailure(ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
-                                         Inet::InterfaceId::Null(), HandleNodeBrowse, mDelegate, &browseIdentifier));
-    mDiscoveryContext.Emplace(browseIdentifier);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ResolverProxy::DiscoverCommissioners(DiscoveryFilter filter)
-{
-    StopDiscovery();
-
-    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mDelegate->Retain();
-
-    if (filter.type == DiscoveryFilterType::kInstanceName)
-    {
-        // when we have the instance name, no need to browse, only need to resolve
-        DnssdService service;
-
-        ReturnErrorOnFailure(MakeServiceSubtype(service.mName, sizeof(service.mName), filter));
-        Platform::CopyString(service.mType, kCommissionerServiceName);
-        service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolUdp;
-        service.mAddressType = Inet::IPAddressType::kAny;
-        return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeResolve, mDelegate);
-    }
-
-    char serviceName[kMaxCommissionerServiceNameSize];
-    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));
-
-    intptr_t browseIdentifier;
-    ReturnErrorOnFailure(ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
-                                         Inet::InterfaceId::Null(), HandleNodeBrowse, mDelegate, &browseIdentifier));
-    mDiscoveryContext.Emplace(browseIdentifier);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ResolverProxy::StopDiscovery()
-{
-    if (!mDiscoveryContext.HasValue())
-    {
-        // No discovery going on.
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR err = ChipDnssdStopBrowse(mDiscoveryContext.Value());
-    mDiscoveryContext.ClearValue();
-    return err;
-}
-
-CHIP_ERROR ResolverProxy::ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId)
-{
-    return ChipDnssdReconfirmRecord(hostname, address, interfaceId);
 }
 
 } // namespace Dnssd

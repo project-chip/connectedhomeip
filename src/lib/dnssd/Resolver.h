@@ -28,6 +28,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
+#include <lib/core/ReferenceCounted.h>
 #include <lib/dnssd/Constants.h>
 #include <lib/support/BytesToHex.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -352,6 +353,33 @@ public:
     virtual void OnNodeDiscovered(const DiscoveredNodeData & nodeData) = 0;
 };
 
+class DiscoveryDelegate : public ReferenceCounted<DiscoveryDelegate>, public CommissioningResolveDelegate
+{
+public:
+    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) { mCommissioningDelegate = delegate; }
+
+    void SetBrowseIdentifier(intptr_t identifier) { mBrowseIdentifier.Emplace(identifier); }
+    void ClearBrowseIdentifier() { mBrowseIdentifier.ClearValue(); }
+    const Optional<intptr_t> & GetBrowseIdentifier() const { return mBrowseIdentifier; }
+
+    // CommissioningResolveDelegate
+    void OnNodeDiscovered(const DiscoveredNodeData & nodeData) override
+    {
+        if (mCommissioningDelegate != nullptr)
+        {
+            mCommissioningDelegate->OnNodeDiscovered(nodeData);
+        }
+        else
+        {
+            ChipLogError(Discovery, "Missing commissioning delegate. Data discarded");
+        }
+    }
+
+private:
+    CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
+    Optional<intptr_t> mBrowseIdentifier;
+};
+
 /**
  * Interface for resolving CHIP DNS-SD services
  */
@@ -384,11 +412,6 @@ public:
      * If nullptr is passed, the previously registered delegate is unregistered.
      */
     virtual void SetOperationalDelegate(OperationalResolveDelegate * delegate) = 0;
-
-    /**
-     * If nullptr is passed, the previously registered delegate is unregistered.
-     */
-    virtual void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) = 0;
 
     /**
      * Requests resolution of the given operational node service.
@@ -431,18 +454,22 @@ public:
     /**
      * Finds all commissionable nodes matching the given filter.
      *
-     * Whenever a new matching node is found and a resolver delegate has been registered,
-     * the node information is passed to the delegate's `OnNodeDiscoveryComplete` method.
+     * Whenever a new matching node is found, the node information is passed to
+     * the delegate's `OnNodeDiscoveryComplete` method. The method is expected
+     * to increase the delegate's reference count for as long as it takes to
+     * complete the request.
      */
-    virtual CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) = 0;
+    virtual CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryDelegate & delegate) = 0;
 
     /**
      * Finds all commissioner nodes matching the given filter.
      *
-     * Whenever a new matching node is found and a resolver delegate has been registered,
-     * the node information is passed to the delegate's `OnNodeDiscoveryComplete` method.
+     * Whenever a new matching node is found, the node information is passed to
+     * the delegate's `OnNodeDiscoveryComplete` method. The method is expected
+     * to increase the delegate's reference count for as long as it takes to
+     * complete the request.
      */
-    virtual CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) = 0;
+    virtual CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryDelegate & delegate) = 0;
 
     /**
      * Stop discovery (of commissionable or commissioner nodes).
@@ -450,7 +477,7 @@ public:
      * Some back ends may not support stopping discovery, so consumers should
      * not assume they will stop getting callbacks after calling this.
      */
-    virtual CHIP_ERROR StopDiscovery() = 0;
+    virtual CHIP_ERROR StopDiscovery(DiscoveryDelegate & delegate) = 0;
 
     /**
      * Verify the validity of an address that appears to be out of date (for example

@@ -23,7 +23,6 @@
 #include <lib/dnssd/ActiveResolveAttempts.h>
 #include <lib/dnssd/IncrementalResolve.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
-#include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/minimal_mdns/Logging.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
@@ -274,6 +273,7 @@ public:
     {
         GlobalMinimalMdnsServer::Instance().SetResponseDelegate(this);
     }
+    ~MinMdnsResolver() { SetDiscoveryDelegate(nullptr); }
 
     //// MdnsPacketDelegate implementation
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
@@ -283,21 +283,21 @@ public:
     bool IsInitialized() override;
     void Shutdown() override;
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
-    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override { mCommissioningDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
-    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
-    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
-    CHIP_ERROR StopDiscovery() override;
+    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryDelegate & delegate) override;
+    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryDelegate & delegate) override;
+    CHIP_ERROR StopDiscovery(DiscoveryDelegate & delegate) override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
 
 private:
-    OperationalResolveDelegate * mOperationalDelegate     = nullptr;
-    CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
-    System::Layer * mSystemLayer                          = nullptr;
+    OperationalResolveDelegate * mOperationalDelegate = nullptr;
+    DiscoveryDelegate * mDiscoveryDelegate            = nullptr;
+    System::Layer * mSystemLayer                      = nullptr;
     ActiveResolveAttempts mActiveResolves;
     PacketParser mPacketParser;
 
+    void SetDiscoveryDelegate(DiscoveryDelegate * delegate);
     void ScheduleIpAddressResolve(SerializedQNameIterator hostName);
 
     CHIP_ERROR SendAllPendingQueries();
@@ -331,6 +331,21 @@ private:
     static constexpr int kMaxQnameSize = 100;
     char qnameStorage[kMaxQnameSize];
 };
+
+void MinMdnsResolver::SetDiscoveryDelegate(DiscoveryDelegate * delegate)
+{
+    if (mDiscoveryDelegate != nullptr)
+    {
+        mDiscoveryDelegate->Release();
+    }
+
+    if (delegate != nullptr)
+    {
+        delegate->Retain();
+    }
+
+    mDiscoveryDelegate = delegate;
+}
 
 void MinMdnsResolver::ScheduleIpAddressResolve(SerializedQNameIterator hostName)
 {
@@ -409,9 +424,9 @@ void MinMdnsResolver::AdvancePendingResolverStates()
 
             if (discoveredNodeIsRelevant)
             {
-                if (mCommissioningDelegate != nullptr)
+                if (mDiscoveryDelegate != nullptr)
                 {
-                    mCommissioningDelegate->OnNodeDiscovered(nodeData);
+                    mDiscoveryDelegate->OnNodeDiscovered(nodeData);
                 }
                 else
                 {
@@ -670,18 +685,24 @@ void MinMdnsResolver::ExpireIncrementalResolvers()
     }
 }
 
-CHIP_ERROR MinMdnsResolver::DiscoverCommissionableNodes(DiscoveryFilter filter)
+CHIP_ERROR MinMdnsResolver::DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryDelegate & delegate)
 {
+    SetDiscoveryDelegate(&delegate);
+
     return BrowseNodes(DiscoveryType::kCommissionableNode, filter);
 }
 
-CHIP_ERROR MinMdnsResolver::DiscoverCommissioners(DiscoveryFilter filter)
+CHIP_ERROR MinMdnsResolver::DiscoverCommissioners(DiscoveryFilter filter, DiscoveryDelegate & delegate)
 {
+    SetDiscoveryDelegate(&delegate);
+
     return BrowseNodes(DiscoveryType::kCommissionerNode, filter);
 }
 
-CHIP_ERROR MinMdnsResolver::StopDiscovery()
+CHIP_ERROR MinMdnsResolver::StopDiscovery(DiscoveryDelegate & delegate)
 {
+    SetDiscoveryDelegate(nullptr);
+
     return mActiveResolves.CompleteAllBrowses();
 }
 
@@ -738,38 +759,6 @@ MinMdnsResolver gResolver;
 Resolver & chip::Dnssd::Resolver::Instance()
 {
     return gResolver;
-}
-
-ResolverProxy::~ResolverProxy()
-{
-    // TODO: this is a hack: resolver proxies used for commissionable discovery
-    //       and they don't interact well with each other.
-    gResolver.SetCommissioningDelegate(nullptr);
-    Shutdown();
-}
-
-CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
-{
-    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    chip::Dnssd::Resolver::Instance().SetCommissioningDelegate(mDelegate);
-    return chip::Dnssd::Resolver::Instance().DiscoverCommissionableNodes(filter);
-}
-
-CHIP_ERROR ResolverProxy::DiscoverCommissioners(DiscoveryFilter filter)
-{
-    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    chip::Dnssd::Resolver::Instance().SetCommissioningDelegate(mDelegate);
-    return chip::Dnssd::Resolver::Instance().DiscoverCommissioners(filter);
-}
-
-CHIP_ERROR ResolverProxy::StopDiscovery()
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ResolverProxy::ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace Dnssd
