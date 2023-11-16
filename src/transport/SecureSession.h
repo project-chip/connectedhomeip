@@ -314,7 +314,6 @@ private:
     /// Timestamp of last rx. @see ActiveTimestamp in the spec
     System::Clock::Timestamp mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
 
-    // ReliableMessageProtocolConfig mRemoteMRPConfig = GetDefaultMRPConfig();
     SessionParameters mRemoteSessionParams;
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;
