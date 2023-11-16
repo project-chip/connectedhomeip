@@ -39,11 +39,15 @@ using namespace chip::app::Clusters::BarrierControl;
 using chip::Protocols::InteractionModel::Status;
 
 // this is NOT in any spec (CHIP spec does not currently have BarrierControl)
-// and XMLs do not attach these enums to clusters. SO set some constants here
+// and XMLs do not attach these enums to clusters.
+//
+// This directly defines some constants. These could be replaced with real
+// constants if we ever have some BarrierControl in the matter specification.
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace BarrierControl {
+
 namespace Position {
 static constexpr uint8_t kClosed  = 0;
 static constexpr uint8_t kOpen    = 100;
