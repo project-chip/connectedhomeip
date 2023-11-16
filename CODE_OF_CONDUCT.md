@@ -43,8 +43,8 @@ Examples of unacceptable behavior include:
     without their explicit permission
 -   Other conduct which could reasonably be considered inappropriate in a
     professional setting
--   Disclosing private information, unreleased products
--   Disclosing of unreleased specification information outside of Connectivity
+-   Disclosure of private information, unreleased products
+-   Disclosure of unreleased specification information outside of Connectivity
     Standards Alliance approved forums
 
 ## Enforcement Responsibilities
