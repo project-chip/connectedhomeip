@@ -3717,6 +3717,113 @@ client cluster ActivatedCarbonFilterMonitoring = 114 {
   command ResetCondition(): DefaultSuccess = 0;
 }
 
+/** This cluster is used to configure a boolean sensor. */
+provisional client cluster BooleanSensorConfiguration = 128 {
+  enum SensitivityEnum : enum8 {
+    kHigh = 0;
+    kStandard = 1;
+    kLow = 2;
+  }
+
+  bitmap AlarmModeBitmap : bitmap8 {
+    kVisual = 0x1;
+    kAudible = 0x2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kVisual = 0x1;
+    kAudible = 0x2;
+    kAlarmSuppress = 0x4;
+    kSensitivityLevel = 0x8;
+  }
+
+  info event AlarmsStateChanged = 0 {
+    AlarmModeBitmap alarmsActive = 0;
+    optional AlarmModeBitmap alarmsSuppressed = 1;
+  }
+
+  info event SensorFault = 1 {
+  }
+
+  attribute optional SensitivityEnum sensitivityLevel = 0;
+  readonly attribute optional AlarmModeBitmap alarmsActive = 1;
+  readonly attribute optional AlarmModeBitmap alarmsSuppressed = 2;
+  attribute optional AlarmModeBitmap alarmsEnabled = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SuppressRequestRequest {
+    AlarmModeBitmap alarmsToSuppress = 0;
+  }
+
+  /** This command is used to suppress the specified alarm. */
+  command SuppressRequest(SuppressRequestRequest): DefaultSuccess = 0;
+}
+
+/** This cluster is used to configure a valve. */
+provisional client cluster ValveConfigurationAndControl = 129 {
+  enum ValveStateEnum : enum8 {
+    kOpen = 0;
+    kClosed = 1;
+  }
+
+  bitmap Feature : bitmap32 {
+    kTimeSync = 0x1;
+    kLevel = 0x2;
+  }
+
+  bitmap ValveFaultBitmap : bitmap16 {
+    kGeneralFault = 0x1;
+    kBlocked = 0x2;
+    kLeaking = 0x4;
+  }
+
+  info event ValveStateChanged = 0 {
+    ValveStateEnum valveState = 0;
+  }
+
+  info event ValveFault = 1 {
+    ValveFaultBitmap valveFault = 0;
+  }
+
+  attribute access(write: manage) nullable elapsed_s openDuration = 0;
+  readonly attribute optional nullable epoch_us autoCloseTime = 1;
+  readonly attribute optional nullable elapsed_s remainingDuration = 2;
+  readonly attribute nullable ValveStateEnum currentState = 3;
+  readonly attribute nullable ValveStateEnum targetState = 4;
+  attribute access(write: manage) optional ValveStateEnum startUpState = 5;
+  readonly attribute optional nullable percent currentLevel = 6;
+  readonly attribute optional nullable percent targetLevel = 7;
+  attribute access(write: manage) optional nullable percent openLevel = 8;
+  readonly attribute optional ValveFaultBitmap valveFault = 9;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct OpenRequest {
+    optional elapsed_s openDuration = 0;
+  }
+
+  request struct SetLevelRequest {
+    percent level = 0;
+    optional elapsed_s openDuration = 1;
+  }
+
+  /** This command is used to set the valve to its fully open position. */
+  command Open(OpenRequest): DefaultSuccess = 0;
+  /** This command is used to set the valve to its fully closed position. */
+  command Close(): DefaultSuccess = 1;
+  /** This command is used to set the valve to a specific level. */
+  command SetLevel(SetLevelRequest): DefaultSuccess = 2;
+}
+
 /** This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control. */
 client cluster DemandResponseLoadControl = 150 {
   enum CriticalityLevelEnum : enum8 {

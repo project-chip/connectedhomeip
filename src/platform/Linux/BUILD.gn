@@ -109,7 +109,8 @@ static_library("Linux") {
     "${chip_root}/third_party/inipp",
   ]
 
-  public_configs = []
+  public_configs =
+      [ "${chip_root}/src/lib/address_resolve:default_address_resolve_config" ]
 
   if (chip_mdns == "platform") {
     sources += [

@@ -16,6 +16,8 @@
 #
 
 from idt import InteropDebuggingTool
+from utils.host_platform import verify_py_version
 
 if __name__ == "__main__":
+    verify_py_version()
     InteropDebuggingTool()

@@ -408,6 +408,21 @@
 #define CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER
 #endif
 
+#if defined(ZCL_USING_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_SERVER) || defined(ZCL_USING_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER                                                                     \
+    { chip::app::Clusters::BooleanSensorConfiguration::Id, "Boolean Sensor Configuration" },
+#else
+#define CHIP_PRINTCLUSTER_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER
+#endif
+
+#if defined(ZCL_USING_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER) ||                                                           \
+    defined(ZCL_USING_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER                                                                  \
+    { chip::app::Clusters::ValveConfigurationAndControl::Id, "Valve Configuration and Control" },
+#else
+#define CHIP_PRINTCLUSTER_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER
+#endif
+
 #if defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                     \
     { chip::app::Clusters::DemandResponseLoadControl::Id, "Demand Response Load Control" },
@@ -752,6 +767,8 @@
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER                                                                   \
+    CHIP_PRINTCLUSTER_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER                                                                      \
     CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                         \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
