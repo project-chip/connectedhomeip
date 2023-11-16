@@ -20,8 +20,8 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/color-control-server/color-control-server.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/Tizen/NetworkCommissioningDriver.h>
 
 #include <LedManager.h>
@@ -123,8 +123,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 void emberAfColorControlClusterInitCallback(EndpointId endpoint)
 {
     // Set the color mode to color temperature.
-    Clusters::ColorControl::Attributes::ColorMode::Set(
-        endpoint, ColorControlServer::EnhancedColorMode::kColorTemperature);
+    Clusters::ColorControl::Attributes::ColorMode::Set(endpoint, ColorControlServer::EnhancedColorMode::kColorTemperature);
     // Preserve the state of the color temperature attribute across reboots.
     Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::SetNull(endpoint);
 }
