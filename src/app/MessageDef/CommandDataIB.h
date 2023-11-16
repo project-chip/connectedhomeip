@@ -93,7 +93,7 @@ public:
     /**
      *  @brief Inject Command Ref into the TLV stream.
      *
-     *  @param [in] aEndpointId refer to the ID of the endpoint as described in the descriptor cluster.
+     *  @param [in] aRef refer to the CommandRef to set in CommandDataIB.
      *
      *  TODO What are some more errors
      *  @return #CHIP_NO_ERROR on success
