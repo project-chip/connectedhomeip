@@ -14673,11 +14673,13 @@ typedef NS_ENUM(uint8_t, MTRTimeFormatLocalizationCalendarType) {
     MTRTimeFormatLocalizationCalendarTypeKorean MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x09,
     MTRTimeFormatLocalizationCalendarTypePersian MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0A,
     MTRTimeFormatLocalizationCalendarTypeTaiwanese MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0B,
+    MTRTimeFormatLocalizationCalendarTypeUseActiveLocale MTR_PROVISIONALLY_AVAILABLE = 0xFF,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRTimeFormatLocalizationHourFormat) {
     MTRTimeFormatLocalizationHourFormat12hr MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRTimeFormatLocalizationHourFormat24hr MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
+    MTRTimeFormatLocalizationHourFormatUseActiveLocale MTR_PROVISIONALLY_AVAILABLE = 0xFF,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRTimeFormatLocalizationFeature) {

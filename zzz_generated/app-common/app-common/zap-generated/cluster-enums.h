@@ -508,18 +508,19 @@ namespace TimeFormatLocalization {
 // Enum for CalendarTypeEnum
 enum class CalendarTypeEnum : uint8_t
 {
-    kBuddhist  = 0x00,
-    kChinese   = 0x01,
-    kCoptic    = 0x02,
-    kEthiopian = 0x03,
-    kGregorian = 0x04,
-    kHebrew    = 0x05,
-    kIndian    = 0x06,
-    kIslamic   = 0x07,
-    kJapanese  = 0x08,
-    kKorean    = 0x09,
-    kPersian   = 0x0A,
-    kTaiwanese = 0x0B,
+    kBuddhist        = 0x00,
+    kChinese         = 0x01,
+    kCoptic          = 0x02,
+    kEthiopian       = 0x03,
+    kGregorian       = 0x04,
+    kHebrew          = 0x05,
+    kIndian          = 0x06,
+    kIslamic         = 0x07,
+    kJapanese        = 0x08,
+    kKorean          = 0x09,
+    kPersian         = 0x0A,
+    kTaiwanese       = 0x0B,
+    kUseActiveLocale = 0xFF,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -530,8 +531,9 @@ enum class CalendarTypeEnum : uint8_t
 // Enum for HourFormatEnum
 enum class HourFormatEnum : uint8_t
 {
-    k12hr = 0x00,
-    k24hr = 0x01,
+    k12hr            = 0x00,
+    k24hr            = 0x01,
+    kUseActiveLocale = 0xFF,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown

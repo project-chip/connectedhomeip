@@ -5585,6 +5585,7 @@ class TimeFormatLocalization(Cluster):
             kKorean = 0x09
             kPersian = 0x0A
             kTaiwanese = 0x0B
+            kUseActiveLocale = 0xFF
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
@@ -5594,6 +5595,7 @@ class TimeFormatLocalization(Cluster):
         class HourFormatEnum(MatterIntEnum):
             k12hr = 0x00
             k24hr = 0x01
+            kUseActiveLocale = 0xFF
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown

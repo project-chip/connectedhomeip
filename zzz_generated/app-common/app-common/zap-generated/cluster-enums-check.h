@@ -397,6 +397,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization:
     case EnumType::kKorean:
     case EnumType::kPersian:
     case EnumType::kTaiwanese:
+    case EnumType::kUseActiveLocale:
         return val;
     default:
         return static_cast<EnumType>(12);
@@ -409,6 +410,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization:
     {
     case EnumType::k12hr:
     case EnumType::k24hr:
+    case EnumType::kUseActiveLocale:
         return val;
     default:
         return static_cast<EnumType>(2);
