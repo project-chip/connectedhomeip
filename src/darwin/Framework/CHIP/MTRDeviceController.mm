@@ -51,7 +51,7 @@
 #import "MTRDeviceAttestationDelegateBridge.h"
 #import "MTRDeviceConnectionBridge.h"
 
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/List.h>
