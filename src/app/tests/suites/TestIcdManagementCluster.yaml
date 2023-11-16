@@ -90,7 +90,7 @@ tests:
       command: "readAttribute"
       attribute: "RegisteredClients"
       response:
-          value: [{ CheckInNodeID: 112233, MonitoredSubject: 1 }]
+          value: [{ CheckInNodeID: 112233, MonitoredSubject: 112233 }]
 
     - label: "Unregister Client Registered During Commissioning"
       command: "UnregisterClient"

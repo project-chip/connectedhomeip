@@ -31,17 +31,18 @@ void ChipToolICDRegistrationDelegate::SetCheckInNodeId(chip::NodeId checkInNodeI
 void ChipToolICDRegistrationDelegate::GenerateSymmetricKey(
     chip::NodeId device, chip::Callback::Callback<OnSymmetricKeyGenerationCompleted> * onCompletion)
 {
-    chip::DeviceLayer::SystemLayer().ScheduleLambda([this, device, onCompletion] {
+    ChipLogProgress(chipTool, "Generate symmetric Key for Node ID " ChipLogFormatX64, ChipLogValueX64(device));
+    chip::DeviceLayer::SystemLayer().ScheduleLambda([this, onCompletion] {
         // TODO: We need to persist the generated key.
-        uint32_t mockMonitoredSubject = 1;
+        uint64_t mockMonitoredSubject = mCheckInNodeId;
         uint8_t mockIcdKey[kKeySize];
         char mockIcdKeyHex[kKeySize * 2 + 1];
         chip::Crypto::DRBG_get_bytes(mockIcdKey, sizeof(mockIcdKey));
         onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, mCheckInNodeId, mockMonitoredSubject, ICDKey(mockIcdKey));
         chip::Encoding::BytesToHex(mockIcdKey, sizeof(mockIcdKey), mockIcdKeyHex, sizeof(mockIcdKeyHex),
                                    chip::Encoding::HexFlags::kNullTerminate);
-        ChipLogProgress(chipTool, "Generated Symmetric Key for Node ID " ChipLogFormatX64 ": %s", ChipLogValueX64(device),
-                        mockIcdKeyHex);
+
+        ChipLogProgress(chipTool, "Generated Symmetric Key: %s", mockIcdKeyHex);
     });
 }
 
