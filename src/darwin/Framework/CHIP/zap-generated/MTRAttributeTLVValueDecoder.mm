@@ -1564,6 +1564,28 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
         }
         return value;
     }
+    case Attributes::SpecificationVersion::Id: {
+        using TypeInfo = Attributes::SpecificationVersion::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
+    case Attributes::MaxPathsPerInvoke::Id: {
+        using TypeInfo = Attributes::MaxPathsPerInvoke::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
     default: {
         break;
     }

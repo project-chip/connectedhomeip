@@ -722,6 +722,14 @@ namespace ProductAppearance {
 static constexpr AttributeId Id = 0x00000014;
 } // namespace ProductAppearance
 
+namespace SpecificationVersion {
+static constexpr AttributeId Id = 0x00000015;
+} // namespace SpecificationVersion
+
+namespace MaxPathsPerInvoke {
+static constexpr AttributeId Id = 0x00000016;
+} // namespace MaxPathsPerInvoke
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
