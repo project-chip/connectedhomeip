@@ -24,8 +24,6 @@ class UnitLocalizationCluster(
   private val controller: MatterController,
   private val endpointId: UShort
 ) {
-  class TemperatureUnitAttribute(val value: UInt?)
-
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   class AcceptedCommandListAttribute(val value: List<UInt>)
@@ -34,7 +32,7 @@ class UnitLocalizationCluster(
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun readTemperatureUnitAttribute(): TemperatureUnitAttribute {
+  suspend fun readTemperatureUnitAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -46,10 +44,7 @@ class UnitLocalizationCluster(
     }
   }
 
-  suspend fun subscribeTemperatureUnitAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): TemperatureUnitAttribute {
+  suspend fun subscribeTemperatureUnitAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 

@@ -1018,7 +1018,7 @@ client cluster UnitLocalization = 45 {
     kTemperatureUnit = 0x1;
   }
 
-  attribute access(write: manage) optional nullable TempUnitEnum temperatureUnit = 0;
+  attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1042,7 +1042,7 @@ server cluster UnitLocalization = 45 {
     kTemperatureUnit = 0x1;
   }
 
-  attribute access(write: manage) nullable TempUnitEnum temperatureUnit = 0;
+  attribute access(write: manage) TempUnitEnum temperatureUnit = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

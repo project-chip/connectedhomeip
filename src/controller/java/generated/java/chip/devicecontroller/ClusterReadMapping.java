@@ -2133,10 +2133,10 @@ public class ClusterReadMapping {
         InteractionInfo readUnitLocalizationTemperatureUnitAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.UnitLocalizationCluster) cluster).readTemperatureUnitAttribute(
-              (ChipClusters.UnitLocalizationCluster.TemperatureUnitAttributeCallback) callback
+              (ChipClusters.IntegerAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedUnitLocalizationClusterTemperatureUnitAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
           readUnitLocalizationTemperatureUnitCommandParams
         );
         result.put("readTemperatureUnitAttribute", readUnitLocalizationTemperatureUnitAttributeInteractionInfo);

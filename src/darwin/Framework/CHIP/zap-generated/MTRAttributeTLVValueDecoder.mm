@@ -1792,12 +1792,8 @@ static id _Nullable DecodeAttributeValueForUnitLocalizationCluster(AttributeId a
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
-        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     default: {
