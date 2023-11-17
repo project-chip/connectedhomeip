@@ -58,10 +58,16 @@ public:
     using Iterator = DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator;
 
     AutoReleaseIterator(Iterator * value) : mIterator(value) {}
-    ~AutoReleaseIterator() { mIterator->Release(); }
+    ~AutoReleaseIterator()
+    {
+        if (mIterator != nullptr)
+        {
+            mIterator->Release();
+        }
+    }
 
     bool IsValid() const { return mIterator != nullptr; }
-    bool Next(CalendarTypeEnum & value) { return mIterator->Next(value); }
+    bool Next(CalendarTypeEnum & value) { return (mIterator == nullptr) ? false : mIterator->Next(value); }
 
 private:
     Iterator * mIterator;
