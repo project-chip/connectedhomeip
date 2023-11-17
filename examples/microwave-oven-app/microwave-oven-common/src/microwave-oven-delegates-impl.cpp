@@ -138,7 +138,7 @@ Protocols::InteractionModel::Status MicrowaveOvenDelegates::HandleSetCookingPara
 Protocols::InteractionModel::Status MicrowaveOvenDelegates::HandleAddMoreTimeCallback(uint32_t addedCookTime)
 {
     VerifyOrDie(gMicrowaveOvenControlInstance != nullptr);
-    
+
     gMicrowaveOvenControlInstance->SetCookTime(addedCookTime);
     return Status::Success;
 }
@@ -156,7 +156,7 @@ void MicrowaveOvenControl::Shutdown()
         delete gMicrowaveOvenControlInstance;
         gMicrowaveOvenControlInstance = nullptr;
     }
-    
+
     if (gMicrowaveOvenDelegates != nullptr)
     {
         delete gMicrowaveOvenDelegates;
@@ -173,7 +173,7 @@ void emberAfMicrowaveOvenControlClusterInitCallback(chip::EndpointId endpointId)
     EndpointId aEndpoint = 0x01;
     gOperationalStateInstance         = new OperationalState::Instance(gMicrowaveOvenDelegates, aEndpoint, Clusters::OperationalState::Id);
     gMicrowaveOvenControlInstance     = new MicrowaveOvenControl::Instance(gMicrowaveOvenDelegates, aEndpoint, Clusters::MicrowaveOvenControl::Id);
-    
+
     //Initialize instance of Operational state cluster
     gOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     gOperationalStateInstance->Init();

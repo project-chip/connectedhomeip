@@ -50,7 +50,7 @@ public:
      * Get the value of MinPower.
      */
     uint8_t GetMinPower() const override {return mMinPower;}
-    
+
     /**
      * Get the value of MaxPower.
      */

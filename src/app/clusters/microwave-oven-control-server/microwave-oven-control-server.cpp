@@ -202,7 +202,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
     if (opState == to_underlying(OperationalStateEnum::kStopped))
     {
         uint8_t reqCookMode     = 0;
-        uint32_t reqCookTime    = 0; 
+        uint32_t reqCookTime    = 0;
         uint8_t reqPowerSetting = 0;
         if (CookMode.HasValue())
         {
@@ -240,7 +240,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         status = Status::InvalidInState;
         goto exit;
     }
-    
+
 exit:
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }

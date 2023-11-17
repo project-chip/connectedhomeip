@@ -77,7 +77,7 @@ private:
     Delegate * mDelegate;
     EndpointId mEndpointId;
     ClusterId mClusterId;
-    
+
 
     /**
      * set default values
@@ -148,7 +148,7 @@ public:
      */
     virtual uint8_t GetPowerStep() const = 0;
 
-    
+
 
 private:
     friend class Instance;
@@ -194,7 +194,7 @@ void SetOPInstance(EndpointId aEndpoint, OperationalState::Instance * aInstance)
 
 
 /**
- *  @brief Get Operational State Cluster instance by endpoint id. 
+ *  @brief Get Operational State Cluster instance by endpoint id.
  */
 OperationalState::Instance * GetOPInstance(EndpointId aEndpoint);
 
