@@ -15732,8 +15732,8 @@ class LaundryDryerControls(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="supportedDrynessLevels", Tag=0x00000000, Type=typing.Optional[typing.List[LaundryDryerControls.Enums.DrynessLevelEnum]]),
-                ClusterObjectFieldDescriptor(Label="selectedDrynessLevel", Tag=0x00000001, Type=typing.Union[None, Nullable, LaundryDryerControls.Enums.DrynessLevelEnum]),
+                ClusterObjectFieldDescriptor(Label="supportedDrynessLevels", Tag=0x00000000, Type=typing.List[LaundryDryerControls.Enums.DrynessLevelEnum]),
+                ClusterObjectFieldDescriptor(Label="selectedDrynessLevel", Tag=0x00000001, Type=typing.Union[Nullable, LaundryDryerControls.Enums.DrynessLevelEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -15742,8 +15742,8 @@ class LaundryDryerControls(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    supportedDrynessLevels: 'typing.Optional[typing.List[LaundryDryerControls.Enums.DrynessLevelEnum]]' = None
-    selectedDrynessLevel: 'typing.Union[None, Nullable, LaundryDryerControls.Enums.DrynessLevelEnum]' = None
+    supportedDrynessLevels: 'typing.List[LaundryDryerControls.Enums.DrynessLevelEnum]' = None
+    selectedDrynessLevel: 'typing.Union[Nullable, LaundryDryerControls.Enums.DrynessLevelEnum]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -15776,9 +15776,9 @@ class LaundryDryerControls(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[LaundryDryerControls.Enums.DrynessLevelEnum]])
+                return ClusterObjectFieldDescriptor(Type=typing.List[LaundryDryerControls.Enums.DrynessLevelEnum])
 
-            value: 'typing.Optional[typing.List[LaundryDryerControls.Enums.DrynessLevelEnum]]' = None
+            value: 'typing.List[LaundryDryerControls.Enums.DrynessLevelEnum]' = field(default_factory=lambda: [])
 
         @dataclass
         class SelectedDrynessLevel(ClusterAttributeDescriptor):
@@ -15792,9 +15792,9 @@ class LaundryDryerControls(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, LaundryDryerControls.Enums.DrynessLevelEnum])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, LaundryDryerControls.Enums.DrynessLevelEnum])
 
-            value: 'typing.Union[None, Nullable, LaundryDryerControls.Enums.DrynessLevelEnum]' = None
+            value: 'typing.Union[Nullable, LaundryDryerControls.Enums.DrynessLevelEnum]' = NullValue
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
