@@ -100,7 +100,7 @@ def main(zap, matter_root, log_level):
                                 if value_in_xml == value_in_zap:
                                     logging.info(f'   ✅ ClusterRevision: XML:{value_in_xml} == ZAP:{value_in_zap}')
                                 else:
-                                    logging.fatal(f'   ❌ ClusterRevision: XML:{value_in_xml} != ZAP:{value_in_zap}')
+                                    logging.fatal(f'   ❌ {cluster["side"]} cluster {cluster["name"]} ClusterRevision: XML:{value_in_xml} != ZAP:{value_in_zap}')
                                     all_checks_successful = False
                             except KeyError:
                                 logging.warning(f'   ⚠️ No ClusterRevision found for cluster >{cluster["name"]}< {cluster["code"]}')
