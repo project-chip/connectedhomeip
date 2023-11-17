@@ -1444,7 +1444,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @ def CHIP_CONFIG_MAX_SCENES_TABLE_SIZE
+ * @def CHIP_CONFIG_MAX_SCENES_TABLE_SIZE
  *
  * @brief This defines how many scenes a single endpoint is allowed to allocate in flash memory. This value MUST at least 16
  * per spec and MUST be increased to allow for configuring a greater scene table size from Zap.
@@ -1456,6 +1456,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_MAX_SCENES_TABLE_SIZE 16
 #endif // CHIP_CONFIG_TEST
 #endif // CHIP_CONFIG_MAX_SCENES_TABLE_SIZE
+
+/**
+ * @def CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+ *
+ * @brief This define enables the automatic registration of the default scene handlers in the scene table for each sceneable
+ * cluster. If a user wants to use their own scene handlers, they can disable this flag and implement their own handlers. They can
+ * use ScenesServer::Instance().RegisterSceneHandler() to have their handlers called when a scene is recalled or stored.
+ */
+#ifndef CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#define CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS 1
+#endif // CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
 /**
  * @def CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE

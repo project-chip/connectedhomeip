@@ -44,6 +44,11 @@ public:
 private:
     const chip::EndpointId mEndpointId;
 
+    static constexpr uint8_t kColorModeCurrentHueAndCurrentSaturation         = 0;
+    static constexpr uint8_t kColorModeCurrentXAndCurrentY                    = 1;
+    static constexpr uint8_t kColorModeColorTemperature                       = 2;
+    static constexpr uint8_t kColorModeEnhancedCurrentHueAndCurrentSaturation = 3;
+
     // OnOff
     bool mLightIsOn = false;
     chip::Optional<bool> mTargetLightIsOn; // allow UI control of this
@@ -57,7 +62,7 @@ private:
     uint16_t mLevelRemainingTime10sOfSec = 0;
 
     // Color control
-    uint8_t mColorMode               = EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION;
+    uint8_t mColorMode               = kColorModeCurrentHueAndCurrentSaturation;
     uint8_t mColorHue                = 0;
     uint8_t mColorSaturation         = 0;
     uint16_t mColorX                 = 0;
