@@ -114,11 +114,7 @@ CHIP_ERROR TimeFormatLocalizationAttrAccess::Read(const ConcreteReadAttributePat
 bool IsSupportedCalendarType(CalendarTypeEnum newType, CalendarTypeEnum & validType)
 {
     // Reset valid type if no supported calendar types found.
-    validType = CalendarTypeEnum::kUseActiveLocale;
-    if (newType == CalendarTypeEnum::kUseActiveLocale)
-    {
-        return true;
-    }
+    validType = CalendarTypeEnum::kBuddhist;
 
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
     VerifyOrReturnValue(provider != nullptr, false);
