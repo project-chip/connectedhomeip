@@ -37,6 +37,11 @@ using namespace chip::DeviceLayer::PersistedStorage;
 
 uint64_t totalBytesWrittenNvs = 0;
 
+#define MATTER_OTA_HEADER_MAGIC_NUMBER_LENGTH 4
+#define MATTER_OTA_HEADER_IMG_LENGTH_BYTES 4
+#define MATTER_OTA_HEADER_PADDING 4
+#define MATTER_OTA_HEADER_LENGTH_BYTES 4
+
 namespace chip {
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
@@ -329,7 +334,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
      */
     if (imageProcessor->mFixedOtaHeader.headerSize > 0)
     {
-        ssize_t offset = imageProcessor->mParams.downloadedBytes - imageProcessor->mFixedOtaHeader.headerSize;
+        ssize_t offset = imageProcessor->mParams.downloadedBytes - (imageProcessor->mFixedOtaHeader.headerSize + MATTER_OTA_HEADER_MAGIC_NUMBER_LENGTH + MATTER_OTA_HEADER_IMG_LENGTH_BYTES + MATTER_OTA_HEADER_PADDING + MATTER_OTA_HEADER_LENGTH_BYTES);
         ChipLogDetail(SoftwareUpdate, "Write block %d, %d", (size_t) imageProcessor->mParams.downloadedBytes,
                       imageProcessor->mBlock.size());
         if (!writeExtFlashImgPages(imageProcessor->mNvsHandle, offset, imageProcessor->mBlock))
