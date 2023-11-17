@@ -6681,7 +6681,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -20347,7 +20347,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -21723,7 +21723,6 @@
       "endpointId": 65534,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }
-
-
