@@ -33,7 +33,6 @@ namespace app {
 // Used in unit tests
 class TestICDManager;
 
-
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
