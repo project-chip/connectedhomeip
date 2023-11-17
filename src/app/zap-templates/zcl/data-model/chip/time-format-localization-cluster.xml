@@ -56,7 +56,7 @@ limitations under the License.
       or audibly convey time information need a mechanism by which they can be configured to use a
       user’s preferred format.</description>
     <!-- Base data types -->
-    <attribute side="server" code="0x00" define="HOUR_FORMAT" type="HourFormatEnum" min="0x00" max="0xFF" writable="true" optional="false">
+    <attribute side="server" code="0x00" define="HOUR_FORMAT" type="HourFormatEnum" min="0x00" max="0x02" writable="true" optional="false">
         <description>HourFormat</description>
         <access op="write" role="manage" />
     </attribute>
