@@ -20012,18 +20012,6 @@ public:
 
 namespace Attributes {
 
-namespace DeviceClass {
-struct TypeInfo
-{
-    using Type             = chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap>;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::DemandResponseLoadControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DeviceClass::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DeviceClass
 namespace LoadControlPrograms {
 struct TypeInfo
 {
@@ -20093,7 +20081,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumberOfEventsPerProgram
-namespace NumberOfTransistions {
+namespace NumberOfTransitions {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -20101,10 +20089,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DemandResponseLoadControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfTransistions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfTransitions::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace NumberOfTransistions
+} // namespace NumberOfTransitions
 namespace DefaultRandomStart {
 struct TypeInfo
 {
@@ -20174,14 +20162,12 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::DeviceClass::TypeInfo::DecodableType deviceClass =
-            static_cast<chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap>>(0);
         Attributes::LoadControlPrograms::TypeInfo::DecodableType loadControlPrograms;
         Attributes::NumberOfLoadControlPrograms::TypeInfo::DecodableType numberOfLoadControlPrograms = static_cast<uint8_t>(0);
         Attributes::Events::TypeInfo::DecodableType events;
         Attributes::ActiveEvents::TypeInfo::DecodableType activeEvents;
         Attributes::NumberOfEventsPerProgram::TypeInfo::DecodableType numberOfEventsPerProgram = static_cast<uint8_t>(0);
-        Attributes::NumberOfTransistions::TypeInfo::DecodableType numberOfTransistions         = static_cast<uint8_t>(0);
+        Attributes::NumberOfTransitions::TypeInfo::DecodableType numberOfTransitions           = static_cast<uint8_t>(0);
         Attributes::DefaultRandomStart::TypeInfo::DecodableType defaultRandomStart             = static_cast<uint8_t>(0);
         Attributes::DefaultRandomDuration::TypeInfo::DecodableType defaultRandomDuration       = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;

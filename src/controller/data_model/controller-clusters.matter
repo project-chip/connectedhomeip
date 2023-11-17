@@ -3888,7 +3888,7 @@ provisional client cluster ValveConfigurationAndControl = 129 {
 }
 
 /** This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control. */
-client cluster DemandResponseLoadControl = 150 {
+provisional client cluster DemandResponseLoadControl = 150 {
   enum CriticalityLevelEnum : enum8 {
     kUnknown = 0;
     kGreen = 1;
@@ -4043,15 +4043,14 @@ client cluster DemandResponseLoadControl = 150 {
     optional nullable HeatingSourceControlStruct heatingSourceControl = 9;
   }
 
-  readonly attribute DeviceClassBitmap deviceClass = 0;
-  readonly attribute LoadControlProgramStruct loadControlPrograms[] = 1;
-  readonly attribute int8u numberOfLoadControlPrograms = 2;
-  readonly attribute LoadControlEventStruct events[] = 3;
-  readonly attribute LoadControlEventStruct activeEvents[] = 4;
-  readonly attribute int8u numberOfEventsPerProgram = 5;
-  readonly attribute int8u numberOfTransistions = 6;
-  attribute access(write: manage) int8u defaultRandomStart = 7;
-  attribute access(write: manage) int8u defaultRandomDuration = 8;
+  readonly attribute LoadControlProgramStruct loadControlPrograms[] = 0;
+  readonly attribute int8u numberOfLoadControlPrograms = 1;
+  readonly attribute LoadControlEventStruct events[] = 2;
+  readonly attribute LoadControlEventStruct activeEvents[] = 3;
+  readonly attribute int8u numberOfEventsPerProgram = 4;
+  readonly attribute int8u numberOfTransitions = 5;
+  attribute access(write: manage) int8u defaultRandomStart = 6;
+  attribute access(write: manage) int8u defaultRandomDuration = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
