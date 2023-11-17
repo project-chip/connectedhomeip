@@ -115,13 +115,13 @@ Davis, CA 95616, USA
       <field id="1" name="Active" type="AlarmMap" default="0">
         <mandatoryConform/>
       </field>
-      <field id="1" name="Inactive" type="AlarmMap" default="0">
+      <field id="2" name="Inactive" type="AlarmMap" default="0">
         <mandatoryConform/>
       </field>
-      <field id="2" name="State" type="AlarmMap" default="0">
+      <field id="3" name="State" type="AlarmMap" default="0">
         <mandatoryConform/>
       </field>
-      <field id="3" name="Mask" type="AlarmMap" default="0">
+      <field id="4" name="Mask" type="AlarmMap" default="0">
         <mandatoryConform/>
       </field>
     </event>

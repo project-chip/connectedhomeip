@@ -53,7 +53,7 @@ CHIP_ERROR ClusterPathIB::Parser::PrettyPrint() const
             {
                 NodeId node;
                 reader.Get(node);
-                PRETTY_PRINT("\tNode = 0x%" PRIx64 ",", node);
+                PRETTY_PRINT("\tNode = 0x" ChipLogFormatX64 ",", ChipLogValueX64(node));
             }
 #endif // CHIP_DETAIL_LOGGING
             break;

@@ -210,6 +210,8 @@ public:
     void InitNullWriter(void);
     size_t GetLengthWritten(void) const;
 
+    bool IsNullWriter() const { return mBuf == nullptr; }
+
     CHIP_ERROR PutInteger(int64_t val);
     CHIP_ERROR PutBoolean(bool val);
     CHIP_ERROR PutObjectId(const uint8_t * val, uint16_t valLen);

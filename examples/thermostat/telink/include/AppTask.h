@@ -19,13 +19,12 @@
 #pragma once
 
 #include "AppTaskCommon.h"
-#include "SensorManager.h"
+#include "SensorManagerCommon.h"
 #include "TemperatureManager.h"
 
 class AppTask : public AppTaskCommon
 {
 public:
-    void UpdateClusterState(void);
     void UpdateThermoStatUI(void);
 
 private:
@@ -33,6 +32,9 @@ private:
     friend class AppTaskCommon;
 
     CHIP_ERROR Init(void);
+
+    static void ThermostatUpdateTimerTimeoutCallback(k_timer * timer);
+    static void ThermostatUpdateTimerEventHandler(AppEvent * aEvent);
 
     static AppTask sAppTask;
 };

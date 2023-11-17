@@ -21,7 +21,7 @@
 #include "ListBuilder.h"
 #include "ListParser.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>

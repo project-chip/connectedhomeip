@@ -64,7 +64,7 @@ config INIT_STACKS
     default y
 
 config IDLE_STACK_SIZE
-    default 387 if PM
+    default 512 if PM
 
 config ISR_STACK_SIZE
     default 502 if PM
@@ -73,7 +73,7 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
     default 616 if PM
 
 config HEAP_MEM_POOL_SIZE
-    default 128 if PM
+    default 256
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE 
     default 12288
@@ -97,6 +97,9 @@ config NET_BUF_RX_COUNT
 config NET_BUF_TX_COUNT
     default 16 if PM
     default 32
+
+config GPIO
+    default y
 
 # Bluetooth Low Energy configs
 
@@ -153,6 +156,24 @@ config B9X_BLE_CTRL_RF_POWER
 choice B9X_BLE_CTRL_MAC_TYPE
     default B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
 endchoice
+
+# Board retention config
+if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
+config BOARD_TLSR9X_NON_RETENTION_RAM_CODE
+    default y if PM
+
+config TELINK_B9x_MATTER_RETENTION_LAYOUT
+    default y if PM
+
+config PWM
+    default n
+endif
+
+# Board non-retention config
+if BOARD_TLSR9528A || BOARD_TLSR9518ADK80D
+config PWM
+    default y
+endif
 
 # Config dynamic interrupts to have posibility to switch between BLE/Thread radio drivers
 config DYNAMIC_INTERRUPTS

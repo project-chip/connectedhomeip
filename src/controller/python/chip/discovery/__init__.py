@@ -85,7 +85,9 @@ class CommissionableNode():
     pairingHint: int = None
     mrpRetryIntervalIdle: int = None
     mrpRetryIntervalActive: int = None
+    mrpRetryActiveThreshold: int = None
     supportsTcp: bool = None
+    isICDOperatingAsLIT: bool = None
     addresses: List[str] = None
     rotatingId: Optional[str] = None
 

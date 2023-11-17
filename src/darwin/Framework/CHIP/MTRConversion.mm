@@ -63,18 +63,18 @@ NSSet<NSNumber *> * CATValuesToSet(const chip::CATValues & values)
 
 bool DateToMatterEpochSeconds(NSDate * date, uint32_t & matterEpochSeconds)
 {
-    NSCalendar * calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-    NSDateComponents * components = [calendar componentsInTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0] fromDate:date];
-
-    if (!chip::CanCastTo<uint16_t>(components.year)) {
+    auto timeSinceUnixEpoch = date.timeIntervalSince1970;
+    if (timeSinceUnixEpoch < static_cast<NSTimeInterval>(chip::kChipEpochSecondsSinceUnixEpoch)) {
+        // This is a pre-Matter-epoch time, and cannot be represented in epoch-s.
         return false;
     }
 
-    uint16_t year = static_cast<uint16_t>([components year]);
-    uint8_t month = static_cast<uint8_t>([components month]);
-    uint8_t day = static_cast<uint8_t>([components day]);
-    uint8_t hour = static_cast<uint8_t>([components hour]);
-    uint8_t minute = static_cast<uint8_t>([components minute]);
-    uint8_t second = static_cast<uint8_t>([components second]);
-    return chip::CalendarToChipEpochTime(year, month, day, hour, minute, second, matterEpochSeconds);
+    auto timeSinceMatterEpoch = timeSinceUnixEpoch - chip::kChipEpochSecondsSinceUnixEpoch;
+    if (timeSinceMatterEpoch > UINT32_MAX) {
+        // Too far into the future.
+        return false;
+    }
+
+    matterEpochSeconds = static_cast<uint32_t>(timeSinceMatterEpoch);
+    return true;
 }

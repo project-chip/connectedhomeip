@@ -59,10 +59,10 @@ gboolean BluezIsCharOnService(BluezGattCharacteristic1 * aChar, BluezGattService
 
 } // namespace
 
-BluezConnection::BluezConnection(BluezEndpoint * apEndpoint, BluezDevice1 * apDevice) :
-    mpEndpoint(apEndpoint), mpDevice(BLUEZ_DEVICE1(g_object_ref(apDevice)))
+BluezConnection::BluezConnection(const BluezEndpoint & aEndpoint, BluezDevice1 * apDevice) :
+    mpDevice(BLUEZ_DEVICE1(g_object_ref(apDevice)))
 {
-    Init();
+    Init(aEndpoint);
 }
 
 BluezConnection::~BluezConnection()
@@ -93,21 +93,21 @@ BluezConnection::ConnectionDataBundle::ConnectionDataBundle(const BluezConnectio
     mData(g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, aBuf->Start(), aBuf->DataLength(), sizeof(uint8_t)))
 {}
 
-CHIP_ERROR BluezConnection::Init()
+CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 {
     // populate the service and the characteristics
     GList * objects = nullptr;
     GList * l;
 
-    if (!mpEndpoint->mIsCentral)
+    if (!aEndpoint.mIsCentral)
     {
-        mpService = BLUEZ_GATT_SERVICE1(g_object_ref(mpEndpoint->mpService));
-        mpC1      = BLUEZ_GATT_CHARACTERISTIC1(g_object_ref(mpEndpoint->mpC1));
-        mpC2      = BLUEZ_GATT_CHARACTERISTIC1(g_object_ref(mpEndpoint->mpC2));
+        mpService = BLUEZ_GATT_SERVICE1(g_object_ref(aEndpoint.mpService));
+        mpC1      = BLUEZ_GATT_CHARACTERISTIC1(g_object_ref(aEndpoint.mpC1));
+        mpC2      = BLUEZ_GATT_CHARACTERISTIC1(g_object_ref(aEndpoint.mpC2));
     }
     else
     {
-        objects = g_dbus_object_manager_get_objects(mpEndpoint->mpObjMgr);
+        objects = g_dbus_object_manager_get_objects(aEndpoint.mpObjMgr);
 
         for (l = objects; l != nullptr; l = l->next)
         {

@@ -347,6 +347,15 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+ *
+ * Enable support for WiFi Per-Device Credentials
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC 0
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL
  *
  * The interval at which the chip platform will attempt to reconnect to the configured WiFi

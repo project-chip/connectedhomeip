@@ -18,7 +18,7 @@
 
 #include <commands/common/CHIPCommand.h>
 
-#include <core/CHIPBuildConfig.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>

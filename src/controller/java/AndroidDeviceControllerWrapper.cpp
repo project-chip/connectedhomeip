@@ -509,6 +509,53 @@ exit:
     return err;
 }
 
+CHIP_ERROR AndroidDeviceControllerWrapper::StartOTAProvider(jobject otaProviderDelegate)
+{
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    OTAProviderDelegateBridge * otaProviderBridge = new OTAProviderDelegateBridge();
+    auto systemState                              = DeviceControllerFactory::GetInstance().GetSystemState();
+
+    VerifyOrExit(otaProviderBridge != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    err = otaProviderBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr(), otaProviderDelegate);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(Controller, "OTA Provider Initialize Error : %" CHIP_ERROR_FORMAT, err.Format()));
+
+    mOtaProviderBridge = otaProviderBridge;
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        if (otaProviderBridge != nullptr)
+        {
+            delete otaProviderBridge;
+            otaProviderBridge = nullptr;
+        }
+    }
+    return err;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::FinishOTAProvider()
+{
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    if (mOtaProviderBridge != nullptr)
+    {
+        mOtaProviderBridge->Shutdown();
+        delete mOtaProviderBridge;
+
+        mOtaProviderBridge = nullptr;
+    }
+
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
+}
+
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
     chip::DeviceLayer::StackUnlock unlock;

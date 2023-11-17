@@ -44,17 +44,24 @@ uint8_t ICDManager::OpenExchangeContextCount = 0;
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::OpenExchangeContextCount cannot hold count for the max exchange count");
 
-void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver,
-                      Crypto::SymmetricKeystore * symmetricKeystore)
+void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore)
 {
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
-    VerifyOrDie(stateObserver != nullptr);
     VerifyOrDie(symmetricKeystore != nullptr);
 
-    mStorage       = storage;
-    mFabricTable   = fabricTable;
-    mStateObserver = stateObserver;
+    bool supportLIT = SupportsFeature(Feature::kLongIdleTimeSupport);
+    VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kCheckInProtocolSupport), AppServer,
+                       "The CheckIn protocol feature is required for LIT support");
+    VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kUserActiveModeTrigger), AppServer,
+                       "The user ActiveMode trigger feature is required for LIT support");
+
+    // Disabling check until LIT support is compelte
+    // VerifyOrDieWithMsg((supportLIT == false) && (GetSlowPollingInterval() <= GetSITPollingThreshold()) , AppServer,
+    //                    "LIT support is required for slow polling intervals superior to 15 seconds");
+
+    mStorage     = storage;
+    mFabricTable = fabricTable;
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
     mSymmetricKeystore = symmetricKeystore;
 
@@ -80,17 +87,20 @@ void ICDManager::Shutdown()
     mOperationalState = OperationalState::IdleMode;
     mStorage          = nullptr;
     mFabricTable      = nullptr;
+    mStateObserverPool.ReleaseAll();
 }
 
-bool ICDManager::SupportsCheckInProtocol()
+bool ICDManager::SupportsFeature(Feature feature)
 {
-    bool success        = false;
-    uint32_t featureMap = 0;
     // Can't use attribute accessors/Attributes::FeatureMap::Get in unit tests
-#ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    success = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
-#endif
-    return success ? ((featureMap & to_underlying(Feature::kCheckInProtocolSupport)) != 0) : false;
+#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    uint32_t featureMap = 0;
+    bool success        = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+    return success ? ((featureMap & to_underlying(feature)) != 0) : false;
+#else
+
+    return ((mFeatureMap & to_underlying(feature)) != 0);
+#endif // !CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
 void ICDManager::UpdateICDMode()
@@ -99,9 +109,8 @@ void ICDManager::UpdateICDMode()
 
     ICDMode tempMode = ICDMode::SIT;
 
-    // The Check In Protocol Feature is required and the slow polling interval shall also be greater than 15 seconds
-    // to run an ICD in LIT mode.
-    if (GetSlowPollingInterval() > GetSITPollingThreshold() && SupportsCheckInProtocol())
+    // Device can only switch to the LIT operating mode if LIT support is present
+    if (SupportsFeature(Feature::kLongIdleTimeSupport))
     {
         VerifyOrDie(mStorage != nullptr);
         VerifyOrDie(mFabricTable != nullptr);
@@ -117,7 +126,12 @@ void ICDManager::UpdateICDMode()
             }
         }
     }
-    mICDMode = tempMode;
+
+    if (mICDMode != tempMode)
+    {
+        mICDMode = tempMode;
+        postObserverEvent(ObserverEventType::ICDModeChange);
+    }
 
     // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
     if (mICDMode == ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
@@ -190,7 +204,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
                 ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
             }
 
-            mStateObserver->OnEnterActiveMode();
+            postObserverEvent(ObserverEventType::EnterActiveMode);
         }
         else
         {
@@ -252,7 +266,7 @@ void ICDManager::OnTransitionToIdle(System::Layer * aLayer, void * appState)
     // OnTransitionToIdle will trigger a report message if reporting is needed, which should extend the active mode until the
     // ack for the report is received.
     pICDManager->mTransitionToIdleCalled = true;
-    pICDManager->mStateObserver->OnTransitionToIdle();
+    pICDManager->postObserverEvent(ObserverEventType::TransitionToIdle);
 }
 
 /* ICDListener functions. */
@@ -308,6 +322,79 @@ void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
 void ICDManager::OnNetworkActivity()
 {
     this->UpdateOperationState(OperationalState::ActiveMode);
+}
+
+void ICDManager::OnICDManagementServerEvent(ICDManagementEvents event)
+{
+    switch (event)
+    {
+    case ICDManagementEvents::kTableUpdated:
+        this->UpdateICDMode();
+        break;
+
+    case ICDManagementEvents::kStayActiveRequestReceived:
+        // TODO : Implement the StayActiveRequest
+        // https://github.com/project-chip/connectedhomeip/issues/24259
+        break;
+    default:
+        break;
+    }
+}
+
+System::Clock::Milliseconds32 ICDManager::GetSlowPollingInterval()
+{
+#if ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
+    // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
+    // This is important for ICD device configured for LIT operation but currently operating as a SIT
+    // due to a lack of client registration
+    if (mICDMode == ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
+    {
+        return GetSITPollingThreshold();
+    }
+#endif
+    return kSlowPollingInterval;
+}
+
+ICDManager::ObserverPointer * ICDManager::RegisterObserver(ICDStateObserver * observer)
+{
+    return mStateObserverPool.CreateObject(observer);
+}
+
+void ICDManager::ReleaseObserver(ICDStateObserver * observer)
+{
+    mStateObserverPool.ForEachActiveObject([this, observer](ObserverPointer * obs) {
+        if (obs->mObserver == observer)
+        {
+            mStateObserverPool.ReleaseObject(obs);
+            return Loop::Break;
+        }
+        return Loop::Continue;
+    });
+}
+
+void ICDManager::postObserverEvent(ObserverEventType event)
+{
+    mStateObserverPool.ForEachActiveObject([event](ObserverPointer * obs) {
+        switch (event)
+        {
+        case ObserverEventType::EnterActiveMode: {
+            obs->mObserver->OnEnterActiveMode();
+            return Loop::Continue;
+        }
+        case ObserverEventType::TransitionToIdle: {
+            obs->mObserver->OnTransitionToIdle();
+            return Loop::Continue;
+        }
+        case ObserverEventType::ICDModeChange: {
+            obs->mObserver->OnICDModeChange();
+            return Loop::Continue;
+        }
+        default: {
+            ChipLogError(DeviceLayer, "Invalid ICD Observer event type");
+            return Loop::Break;
+        }
+        }
+    });
 }
 } // namespace app
 } // namespace chip

@@ -433,6 +433,11 @@ def getCodegenTemplates():
         idl_path="src/controller/data_model/controller-clusters.matter",
         output_directory="src/controller/java/generated"))
 
+    targets.append(JinjaCodegenTarget(
+        generator="kotlin-class",
+        idl_path="src/controller/data_model/controller-clusters.matter",
+        output_directory="src/controller/java/generated"))
+
     return targets
 
 

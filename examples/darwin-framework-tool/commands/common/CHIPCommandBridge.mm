@@ -21,7 +21,7 @@
 #import "CHIPToolKeypair.h"
 #import <Matter/Matter.h>
 
-#include <core/CHIPBuildConfig.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 
 #include "MTRError_Utils.h"

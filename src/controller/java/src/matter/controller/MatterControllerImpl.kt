@@ -604,7 +604,7 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
 
     // im interaction time out value, it would override the default value in c++ im
     // layer if this value is non-zero.
-    private const val CHIP_IM_TIMEOUT_MS = 0
+    private const val CHIP_IM_TIMEOUT_MS = 3000
 
     // CHIP error values, lift from ChipError.h in the Matter SDK.
     private const val CHIP_ERROR_UNEXPECTED_EVENT: UInt = 0xc0u

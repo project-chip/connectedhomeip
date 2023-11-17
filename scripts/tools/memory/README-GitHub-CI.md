@@ -1,3 +1,7 @@
+---
+orphan: true
+---
+
 # Scripts for GitHub CI
 
 A set of `gh_*.py` scripts work together to produce size comparisons for PRs.

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/icd/ICDStateObserver.h>
 #include <app/server/CommissioningModeProvider.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
@@ -29,7 +30,7 @@
 namespace chip {
 namespace app {
 
-class DLL_EXPORT DnssdServer
+class DLL_EXPORT DnssdServer : public ICDStateObserver
 {
 public:
     static constexpr System::Clock::Timestamp kTimeoutCleared = System::Clock::kZero;
@@ -85,6 +86,10 @@ public:
     void OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    template <class AdvertisingParams>
+    void AddICDKeyToAdvertisement(AdvertisingParams & advParams);
+#endif
     /// Start operational advertising
     CHIP_ERROR AdvertiseOperational();
 
@@ -114,6 +119,12 @@ public:
      * @return CHIP_NO_ERROR on success or CHIP_ERROR_INVALID_ARGUMENT on invalid value
      */
     CHIP_ERROR SetEphemeralDiscriminator(Optional<uint16_t> discriminator);
+
+    // ICDStateObserver
+    // No action is needed by the DnssdServer on active or idle state entries
+    void OnEnterActiveMode() override{};
+    void OnTransitionToIdle() override{};
+    void OnICDModeChange() override;
 
 private:
     /// Overloaded utility method for commissioner and commissionable advertisement

@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "system/SystemConfig.h"
+
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 #include <sys/select.h>
 #endif

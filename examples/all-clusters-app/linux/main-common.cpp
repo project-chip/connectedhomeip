@@ -27,6 +27,7 @@
 #include "resource-monitoring-delegates.h"
 #include "rvc-modes.h"
 #include "tcc-mode.h"
+#include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/att-storage.h>
@@ -45,10 +46,6 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
-
-#include <app/icd/ICDManagementServer.h>
-
-#include <Options.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -216,11 +213,6 @@ void ApplicationInit()
     MatterDishwasherAlarmServerInit();
 #endif
     Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
-
-    // Issue 29397
-    // Somehow All-cluster-app test the ICDManagementServer cluster without having
-    // CHIP_CONFIG_ENABLE_ICD_SERVER set to 1.
-    ICDManagementServer::GetInstance().SetSymmetricKeystore(Server::GetInstance().GetSessionKeystore());
 
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));

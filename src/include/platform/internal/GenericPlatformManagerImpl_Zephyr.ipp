@@ -34,6 +34,7 @@
 
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
+#include <system/SystemStats.h>
 
 #include <zephyr/sys/reboot.h>
 
@@ -139,6 +140,8 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDe
         return System::MapErrorZephyr(status);
     }
 
+    SYSTEM_STATS_INCREMENT(System::Stats::kPlatformMgr_NumEvents);
+
     // Wake CHIP thread to process the event. If the function is called from ISR, such as a Zephyr
     // timer handler, do not signal the thread directly because that involves taking a mutex, which
     // is forbidden in ISRs. Instead, submit a task to the system work queue to do the singalling.
@@ -159,7 +162,10 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::ProcessDeviceEvents()
     ChipDeviceEvent event;
 
     while (k_msgq_get(&mChipEventQueue, &event, K_NO_WAIT) == 0)
+    {
+        SYSTEM_STATS_DECREMENT(System::Stats::kPlatformMgr_NumEvents);
         Impl()->DispatchEvent(&event);
+    }
 }
 
 template <class ImplClass>

@@ -34,6 +34,10 @@ using OTADownloadProtocol  = DownloadProtocolEnum;
 using OTAQueryStatus       = StatusEnum;
 } // namespace OtaSoftwareUpdateProvider
 
+namespace MediaPlayback {
+using MediaPlaybackStatusEnum = StatusEnum;
+}
+
 namespace OtaSoftwareUpdateRequestor {
 // https://github.com/project-chip/connectedhomeip/pull/29459 renamed these
 // enums to follow the spec names.
@@ -41,6 +45,39 @@ using OTAAnnouncementReason = AnnouncementReasonEnum;
 using OTAChangeReasonEnum   = ChangeReasonEnum;
 using OTAUpdateStateEnum    = UpdateStateEnum;
 } // namespace OtaSoftwareUpdateRequestor
+
+namespace ContentLauncher {
+// https://github.com/project-chip/connectedhomeip/pull/30176 renamed these
+// enums to follow the spec names.
+using SupportedStreamingProtocol = SupportedProtocolsBitmap;
+using ContentLaunchStatusEnum    = StatusEnum;
+} // namespace ContentLauncher
+
+namespace ApplicationLauncher {
+// https://github.com/project-chip/connectedhomeip/pull/30134 renamed this
+using ApplicationLauncherStatusEnum = StatusEnum;
+} // namespace ApplicationLauncher
+
+namespace KeypadInput {
+// https://github.com/project-chip/connectedhomeip/pull/30316 renamed this
+using KeypadInputStatusEnum = StatusEnum;
+} // namespace KeypadInput
+
+namespace Channel {
+using ChannelStatusEnum = StatusEnum;
+} // namespace Channel
+
+namespace TargetNavigator {
+// https://github.com/project-chip/connectedhomeip/pull/30322 renamed this
+using TargetNavigatorStatusEnum = StatusEnum;
+} // namespace TargetNavigator
+
+namespace LevelControl {
+// https://github.com/project-chip/connectedhomeip/pull/30417 renamed/updated these
+using MoveMode            = MoveModeEnum;
+using StepMode            = StepModeEnum;
+using LevelControlOptions = OptionsBitmap;
+} // namespace LevelControl
 
 } // namespace Clusters
 } // namespace app

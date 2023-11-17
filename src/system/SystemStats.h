@@ -68,6 +68,7 @@ enum
 #endif
     kExchangeMgr_NumContexts,
     kExchangeMgr_NumUMHandlers,
+    kPlatformMgr_NumEvents,
     kNumEntries
 };
 
