@@ -41,7 +41,6 @@
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/DevicePairingDelegate.h>
-#include <controller/ICDRegistrationDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
 #include <credentials/FabricTable.h>
@@ -94,7 +93,6 @@ struct ControllerInitParams
     DeviceControllerSystemState * systemState                       = nullptr;
     DeviceDiscoveryDelegate * deviceDiscoveryDelegate               = nullptr;
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
-    ICDRegistrationDelegate * icdRegistrationDelegate               = nullptr;
 
     /* The following keypair must correspond to the public key used for generating
        controllerNOC. It's used by controller to establish CASE sessions with devices */
@@ -148,10 +146,8 @@ struct ControllerInitParams
 
 struct CommissionerInitParams : public ControllerInitParams
 {
-    DevicePairingDelegate * pairingDelegate           = nullptr;
-    CommissioningDelegate * defaultCommissioner       = nullptr;
-    ICDRegistrationDelegate * icdRegistrationDelegate = nullptr;
-
+    DevicePairingDelegate * pairingDelegate     = nullptr;
+    CommissioningDelegate * defaultCommissioner = nullptr;
     // Device attestation verifier instance for the commissioning.
     // If null, the globally set attestation verifier (e.g. from GetDeviceAttestationVerifier()
     // singleton) will be used.
@@ -874,8 +870,6 @@ private:
         void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnFailedToExtendedArmFailSafeDeviceAttestation(void * context, CHIP_ERROR error);
 
-    static void OnICDSymmetricKeyGenerationCompleted(void * context, CHIP_ERROR error, NodeId checkInNodeId, uint64_t subjectId,
-                                                     ICDRegistrationDelegate::ICDKey key);
     static void OnICDManagementRegisterClientResponse(
         void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data);
 
@@ -982,16 +976,12 @@ private:
         mDeviceAttestationInformationVerificationCallback;
 
     chip::Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
-    chip::Callback::Callback<ICDRegistrationDelegate::OnSymmetricKeyGenerationCompleted>
-        mICDRegistrationOnSymmetricKeyGenerationCompletedCallback;
-
     SetUpCodePairer mSetUpCodePairer;
     AutoCommissioner mAutoCommissioner;
     CommissioningDelegate * mDefaultCommissioner =
         nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
     CommissioningDelegate * mCommissioningDelegate =
         nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
-    ICDRegistrationDelegate * mICDRegistrationDelegate = nullptr;
     CompletionStatus commissioningCompletionStatus;
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT

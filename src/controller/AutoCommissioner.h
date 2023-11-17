@@ -18,7 +18,6 @@
 #pragma once
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
-#include <controller/ICDRegistrationDelegate.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 
@@ -79,7 +78,7 @@ private:
     // kThreadNetworkSetup or kCleanup, depending whether network information has
     // been provided that matches the thread/wifi endpoint of the target.
     CommissioningStage GetNextCommissioningStageNetworkSetup(CommissioningStage currentStage, CHIP_ERROR & lastErr);
-    // Helper function to determine whether next stage should be kICDSymmetricKeyGeneration,
+    // Helper function to determine whether next stage should be kICDRegistration,
     // or kFindOperational, depending on whether the device is an ICD.
     CommissioningStage GetNextStateAfterNetworkCommissioning();
 
@@ -138,7 +137,7 @@ private:
     uint16_t mAttestationSignatureLen = 0;
     uint8_t mAttestationSignature[Crypto::kMax_ECDSA_Signature_Length];
 
-    uint8_t mICDSymmetricKey[ICDRegistrationDelegate::kKeySize];
+    uint8_t mICDSymmetricKey[Crypto::kAES_CCM128_Key_Length];
 };
 } // namespace Controller
 } // namespace chip

@@ -114,6 +114,15 @@ public:
      * in order to resume the commissioning process.
      */
     virtual void OnScanNetworksFailure(CHIP_ERROR error) {}
+
+    /**
+     * @bried
+     *   Called when the registration flow for the ICD completes.
+     *
+     * @param[in] icdNodeId    The node id of the ICD.
+     * @param[in] icdCounter   The ICD Counter received from the device.
+     */
+    virtual void OnICDRegistrationComplete(NodeId icdNodeId, uint32_t icdCounter) {}
 };
 
 } // namespace Controller

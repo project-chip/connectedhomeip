@@ -65,7 +65,13 @@ public:
                     "Bypass the attestation verifier. If not provided or false, the attestation verifier is not bypassed."
                     " If true, the commissioning will continue in case of attestation verification failure.");
         AddArgument("case-auth-tags", 1, UINT32_MAX, &mCASEAuthTags, "The CATs to be encoded in the NOC sent to the commissionee");
-        AddArgument("ignore-icd", 0, 1, &mIgnoreIcd, "Whether to ignore ICD during commissioning.");
+        AddArgument("skip-icd-registration", 0, 1, &mSkipICDRegistration,
+                    "Skip ICD registration for ICDs during commissioning. Default: false");
+        AddArgument("icd-check-in-nodeid", 0, UINT64_MAX, &mICDCheckInNodeId,
+                    "The check-in node id for the ICD, default: node id of the commissioner.");
+        AddArgument("icd-monitored-subject", 0, UINT64_MAX, &mICDMonitoredSubject,
+                    "The monitored subject of the ICD, default: The node id used for icd-check-in-nodeid.");
+        AddArgument("icd-symmetric-key", &mICDSymmetricKey, "The 16 bytes ICD symmetric key, default: random generated.");
 
         switch (networkType)
         {
@@ -189,6 +195,7 @@ public:
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
+    void OnICDRegistrationComplete(NodeId deviceId, uint32_t icdCounter) override;
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
@@ -223,7 +230,10 @@ private:
     chip::Optional<bool> mBypassAttestationVerifier;
     chip::Optional<std::vector<uint32_t>> mCASEAuthTags;
     chip::Optional<char *> mCountryCode;
-    chip::Optional<bool> mIgnoreIcd;
+    chip::Optional<bool> mSkipICDRegistration;
+    chip::Optional<NodeId> mICDCheckInNodeId;
+    chip::Optional<chip::ByteSpan> mICDSymmetricKey;
+    chip::Optional<uint64_t> mICDMonitoredSubject;
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>
         mComplex_TimeZones;
@@ -241,6 +251,8 @@ private:
     char * mOnboardingPayload;
     uint64_t mDiscoveryFilterCode;
     char * mDiscoveryFilterInstanceName;
+
+    uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     // For unpair
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;

@@ -89,7 +89,8 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
          IsUnsafeSpan(params.GetAttestationSignature(), mParams.GetAttestationSignature()) ||
          IsUnsafeSpan(params.GetPAI(), mParams.GetPAI()) || IsUnsafeSpan(params.GetDAC(), mParams.GetDAC()) ||
          IsUnsafeSpan(params.GetTimeZone(), mParams.GetTimeZone()) ||
-         IsUnsafeSpan(params.GetDSTOffsets(), mParams.GetDSTOffsets()));
+         IsUnsafeSpan(params.GetDSTOffsets(), mParams.GetDSTOffsets())) ||
+        IsUnsafeSpan(params.GetICDSymmetricKey(), mParams.GetICDSymmetricKey());
 
     mParams = params;
 
@@ -207,6 +208,34 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         mParams.SetTimeZone(list);
     }
 
+    if (params.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
+    {
+        ChipLogProgress(Controller, "Checking ICD registration parameters");
+        if (!params.GetICDSymmetricKey().HasValue())
+        {
+            ChipLogError(Controller, "Unexpected ICD symmetric key!");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        VerifyOrReturnError(params.GetICDSymmetricKey().Value().size() == sizeof(mICDSymmetricKey), CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(mICDSymmetricKey, params.GetICDSymmetricKey().Value().data(), params.GetICDSymmetricKey().Value().size());
+
+        if (!params.GetICDCheckInNodeId().HasValue())
+        {
+            ChipLogError(Controller, "Missing ICD check-in node id!");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        if (!params.GetICDMonitoredSubject().HasValue())
+        {
+            ChipLogError(Controller, "Missing ICD monitored subject!");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        // The above values are valid now.
+        mParams.SetICDSymmetricKey(ByteSpan(mICDSymmetricKey, sizeof(mICDSymmetricKey)));
+        mParams.SetICDCheckInNodeId(params.GetICDCheckInNodeId().Value());
+        mParams.SetICDMonitoredSubject(params.GetICDMonitoredSubject().Value());
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -256,7 +285,7 @@ CommissioningStage AutoCommissioner::GetNextStateAfterNetworkCommissioning()
 {
     if (mNeedIcdRegistraion)
     {
-        return CommissioningStage::kICDSymmetricKeyGeneration;
+        return CommissioningStage::kICDRegistration;
     }
     return CommissioningStage::kFindOperational;
 }
@@ -429,8 +458,6 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             return CommissioningStage::kCleanup;
         }
         return GetNextStateAfterNetworkCommissioning();
-    case CommissioningStage::kICDSymmetricKeyGeneration:
-        return CommissioningStage::kICDRegistration;
     case CommissioningStage::kICDRegistration:
         return CommissioningStage::kFindOperational;
     case CommissioningStage::kFindOperational:
@@ -770,17 +797,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // storing the returned certs, so just return here without triggering the next stage.
             return NOCChainGenerated(report.Get<NocChain>().noc, report.Get<NocChain>().icac, report.Get<NocChain>().rcac,
                                      report.Get<NocChain>().ipk, report.Get<NocChain>().adminSubject);
-        case CommissioningStage::kICDSymmetricKeyGeneration: {
-            ICDRegistrationInfo registrationInfo = report.Get<ICDRegistrationInfo>();
-            mParams.SetICDCheckInNodeId(registrationInfo.checkInNodeId);
-            mParams.SetICDMonitoredSubject(registrationInfo.subjectId);
-            memcpy(mICDSymmetricKey, registrationInfo.key.data(), registrationInfo.key.size());
-            mParams.SetICDSymmetricKey(ICDRegistrationDelegate::ICDKey(mICDSymmetricKey));
-        }
-        break;
         case CommissioningStage::kICDRegistration: {
-            ICDRegistrationResponseInfo registrationInfo = report.Get<ICDRegistrationResponseInfo>();
-            mParams.SetICDCounter(registrationInfo.icdCounter);
+            break;
         }
         break;
         case CommissioningStage::kFindOperational:

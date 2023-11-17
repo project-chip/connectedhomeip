@@ -31,7 +31,6 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
-#include <controller/ICDRegistrationDelegate.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/OperationalCertificateStore.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -44,7 +43,6 @@ namespace Controller {
 struct SetupParams
 {
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
-    ICDRegistrationDelegate * icdRegistrationDelegate               = nullptr;
 
     /* The following keypair must correspond to the public key used for generating
     controllerNOC. It's used by controller to establish CASE sessions with devices */
@@ -125,7 +123,6 @@ struct FactoryInitParams
     OperationalKeystore * operationalKeystore                          = nullptr;
     Credentials::OperationalCertificateStore * opCertStore             = nullptr;
     SessionResumptionStorage * sessionResumptionStorage                = nullptr;
-    ICDRegistrationDelegate * icdRegistrationDelegate                  = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif

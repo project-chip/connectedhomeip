@@ -27,8 +27,6 @@
 #include <lib/support/TestGroupData.h>
 #include <platform/LockTracker.h>
 
-#include <commands/icd/ChipToolICDRegistrationDelegate.h>
-
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceDecoder.h"
 #include "TraceHandlers.h"
@@ -49,7 +47,6 @@ constexpr const char * kCDTrustStorePathVariable  = "CHIPTOOL_CD_TRUST_STORE_PAT
 
 const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = nullptr;
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
-ChipToolICDRegistrationDelegate sICDRegistrationDelegate;
 
 namespace {
 
@@ -110,7 +107,6 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.opCertStore              = &mOpCertStore;
     factoryInitParams.enableServerInteractions = NeedsOperationalAdvertising();
     factoryInitParams.sessionKeystore          = &mSessionKeystore;
-    factoryInitParams.icdRegistrationDelegate  = &sICDRegistrationDelegate;
 
     // Init group data provider that will be used for all group keys and IPKs for the
     // chip-tool-configured fabrics. This is OK to do once since the fabric tables
@@ -347,8 +343,6 @@ CHIP_ERROR CHIPCommand::GetIdentityNodeId(std::string identity, chip::NodeId * n
 
     *nodeId = mCommissionerStorage.GetLocalNodeId();
 
-    sICDRegistrationDelegate.SetCheckInNodeId(*nodeId);
-
     return CHIP_NO_ERROR;
 }
 
@@ -471,7 +465,6 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
     // TODO: Initialize IPK epoch key in ExampleOperationalCredentials issuer rather than relying on DefaultIpkValue
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
     commissionerParams.controllerVendorId             = mCommissionerVendorId.ValueOr(chip::VendorId::TestVendor1);
-    commissionerParams.icdRegistrationDelegate        = &sICDRegistrationDelegate;
 
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *(commissioner.get())));
 
