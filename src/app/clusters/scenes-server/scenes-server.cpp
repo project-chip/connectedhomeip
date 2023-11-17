@@ -164,14 +164,14 @@ CHIP_ERROR UpdateFabricSceneInfo(EndpointId endpoint, FabricIndex fabric, Option
 Span<Structs::SceneInfoStruct::Type> ScenesServer::FabricSceneInfo::GetFabricSceneInfo(EndpointId endpoint)
 {
     size_t endpointIndex = 0;
-    Span<Structs::SceneInfoStruct::Type> FabricSceneInfoSpan;
+    Span<Structs::SceneInfoStruct::Type> fabricSceneInfoSpan;
     CHIP_ERROR status = FindFabricSceneInfoIndex(endpoint, endpointIndex);
     if (CHIP_NO_ERROR == status)
     {
-        FabricSceneInfoSpan =
+        fabricSceneInfoSpan =
             Span<Structs::SceneInfoStruct::Type>(&mSceneInfoStructs[endpointIndex][0], mSceneInfoStructsCount[endpointIndex]);
     }
-    return FabricSceneInfoSpan;
+    return fabricSceneInfoSpan;
 }
 
 /// @brief Gets the SceneInfoStruct for a specific fabric for a specific endpoint
@@ -273,8 +273,10 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
 /// @param[in] fabric target fabric index
 /// @param[in] endpointIndex index of the corresponding FabricSceneInfo for an endpoint, corresponds to a row in the
 /// mSceneInfoStructs array
-/// @param[out] index index of the corresponding SceneInfoStruct if found, mFabricSceneInfo[endpoint] out of bounds index otherwise
-/// @return CHIP_NO_ERROR or CHIP_ERROR_NOT_FOUND, CHIP_ERROR_INVALID_ARGUMENT if invalid fabric or endpoint
+/// @param[out] index index of the corresponding SceneInfoStruct if found, otherwise the index value will be invalid and
+/// should not be used. This is safe to store in a uint8_t because the index is guaranteed to be smaller than
+/// CHIP_CONFIG_MAX_FABRICS.
+/// @return CHIP_NO_ERROR or CHIP_ERROR_NOT_FOUND, CHIP_ERROR_INVALID_ARGUMENT if invalid fabric or endpointIndex are provided
 CHIP_ERROR ScenesServer::FabricSceneInfo::FindSceneInfoStructIndex(FabricIndex fabric, size_t endpointIndex, uint8_t & index)
 {
     VerifyOrReturnError(endpointIndex < ArraySize(mSceneInfoStructs), CHIP_ERROR_INVALID_ARGUMENT);
@@ -541,7 +543,7 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
 CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & endpointID, const GroupId & groupID,
                            const SceneId & sceneID, GroupDataProvider * groupProvider)
 {
-    // Make current fabric's SceneValid false before store scenes
+    // Make the current fabric's SceneValid false before storing a scene
     ScenesServer::Instance().MakeSceneInvalid(endpointID, fabricIdx);
 
     uint16_t endpointTableSize = 0;
@@ -602,7 +604,7 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
                             const SceneId & sceneID, const Optional<DataModel::Nullable<uint16_t>> & transitionTime,
                             GroupDataProvider * groupProvider)
 {
-    // Make SceneValid false for all fabrics before recall scenes
+    // Make SceneValid false for all fabrics before recalling a scene
     ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpointID);
 
     uint16_t endpointTableSize = 0;
@@ -699,8 +701,8 @@ CHIP_ERROR ScenesServer::Read(const ConcreteReadAttributePath & aPath, Attribute
     {
     case Attributes::FabricSceneInfo::Id: {
         return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-            Span<Structs::SceneInfoStruct::Type> FabricSceneInfoSpan = mFabricSceneInfo.GetFabricSceneInfo(aPath.mEndpointId);
-            for (auto & info : FabricSceneInfoSpan)
+            Span<Structs::SceneInfoStruct::Type> fabricSceneInfoSpan = mFabricSceneInfo.GetFabricSceneInfo(aPath.mEndpointId);
+            for (auto & info : fabricSceneInfoSpan)
             {
                 ReturnErrorOnFailure(encoder.Encode(info));
             }
@@ -1163,7 +1165,7 @@ void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
         ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, status);
     }
 
-    // Initialize the FabricSceneInfo list from data in Flash
+    // Initialize the FabricSceneInfo by getting the number of scenes and the remaining capacity for storing fabric scene data
     for (auto & info : chip::Server::GetInstance().GetFabricTable())
     {
         auto fabric = info.GetFabricIndex();

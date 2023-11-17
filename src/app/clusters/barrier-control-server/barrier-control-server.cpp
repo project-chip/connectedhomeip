@@ -38,6 +38,33 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BarrierControl;
 using chip::Protocols::InteractionModel::Status;
 
+// this is NOT in any spec (CHIP spec does not currently have BarrierControl)
+// and XMLs do not attach these enums to clusters.
+//
+// This directly defines some constants. These could be replaced with real
+// constants if we ever have some BarrierControl in the matter specification.
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace BarrierControl {
+
+namespace Position {
+static constexpr uint8_t kClosed  = 0;
+static constexpr uint8_t kOpen    = 100;
+static constexpr uint8_t kUnknown = 255;
+} // namespace Position
+
+namespace MovingState {
+static constexpr uint8_t kStopped = 0;
+static constexpr uint8_t kClosing = 1;
+static constexpr uint8_t kOpening = 2;
+} // namespace MovingState
+
+} // namespace BarrierControl
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 typedef struct
 {
     uint8_t currentPosition;
@@ -220,9 +247,8 @@ static uint8_t getCurrentPosition(EndpointId endpoint)
     // way of knowing the position of the barrier. Let's guess that the barrier is
     // open so that we don't leave the barrier open when it should be closed.
     uint8_t currentPositionFromAttribute = emAfPluginBarrierControlServerGetBarrierPosition(endpoint);
-    return ((currentPositionFromAttribute == EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_UNKNOWN)
-                ? static_cast<uint8_t>(EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_OPEN)
-                : currentPositionFromAttribute);
+    return ((currentPositionFromAttribute == BarrierControl::Position::kUnknown) ? BarrierControl::Position::kOpen
+                                                                                 : currentPositionFromAttribute);
 }
 
 static uint32_t calculateDelayMs(EndpointId endpoint, uint8_t targetPosition, bool * opening)
@@ -249,7 +275,7 @@ void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
     if (state.currentPosition == state.targetPosition)
     {
         emAfPluginBarrierControlServerSetBarrierPosition(endpoint, state.currentPosition);
-        setMovingState(endpoint, EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_STOPPED);
+        setMovingState(endpoint, BarrierControl::MovingState::kStopped);
         cancelEndpointTimerCallback(endpoint);
     }
     else
@@ -270,14 +296,13 @@ void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
                 emAfPluginBarrierControlServerIncrementEvents(endpoint, false, false);
             }
         }
-        emAfPluginBarrierControlServerSetBarrierPosition(
-            endpoint,
-            (emAfPluginBarrierControlServerIsPartialBarrierSupported(endpoint)
-                 ? state.currentPosition
-                 : static_cast<uint8_t>(EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_UNKNOWN)));
-        setMovingState(
-            endpoint,
-            (state.increasing ? EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_OPENING : EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_CLOSING));
+        emAfPluginBarrierControlServerSetBarrierPosition(endpoint,
+                                                         (emAfPluginBarrierControlServerIsPartialBarrierSupported(endpoint)
+                                                              ? state.currentPosition
+                                                              : BarrierControl::Position::kUnknown));
+        setMovingState(endpoint,
+                       (state.increasing ? BarrierControl::MovingState::kOpening : BarrierControl::MovingState::kClosing));
+
         scheduleTimerCallbackMs(endpoint, state.delayMs);
     }
 }
@@ -307,8 +332,7 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
     }
     else if (percentOpen > 100 // "100" means "100%", so greater than that is invalid
              || (!emAfPluginBarrierControlServerIsPartialBarrierSupported(endpoint) &&
-                 percentOpen != EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_CLOSED &&
-                 percentOpen != EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_OPEN))
+                 percentOpen != BarrierControl::Position::kClosed && percentOpen != BarrierControl::Position::kOpen))
     {
         status = Status::ConstraintError;
     }
@@ -342,7 +366,7 @@ bool emberAfBarrierControlClusterBarrierControlStopCallback(app::CommandHandler 
 {
     EndpointId endpoint = commandPath.mEndpointId;
     cancelEndpointTimerCallback(endpoint);
-    setMovingState(endpoint, EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_STOPPED);
+    setMovingState(endpoint, BarrierControl::MovingState::kStopped);
     sendDefaultResponse(commandObj, commandPath, Status::Success);
     return true;
 }

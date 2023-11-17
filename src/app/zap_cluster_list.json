@@ -69,6 +69,7 @@
         "OTA_BOOTLOAD_CLUSTER": [],
         "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER": [],
         "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER": [],
+        "OVEN_MODE_CLUSTER": [],
         "OZONE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "PM10_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "PM1_CONCENTRATION_MEASUREMENT_CLUSTER": [],
@@ -205,6 +206,7 @@
         "OTA_BOOTLOAD_CLUSTER": [],
         "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER": ["ota-provider"],
         "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER": ["ota-requestor"],
+        "OVEN_MODE_CLUSTER": ["mode-base-server"],
         "OZONE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],

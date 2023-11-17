@@ -494,6 +494,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPOvenModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPOvenModeClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPOvenModeClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPOvenModeClusterChangeToModeResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::OvenMode::Commands::ChangeToModeResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPLaundryWasherModeClusterChangeToModeResponseCallback
     : public Callback::Callback<CHIPLaundryWasherModeClusterChangeToModeResponseCallbackType>
 {

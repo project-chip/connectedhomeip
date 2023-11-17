@@ -17,7 +17,7 @@
 
 #include <jni.h>
 #include <lib/core/NodeId.h>
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 
