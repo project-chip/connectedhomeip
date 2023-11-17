@@ -21,7 +21,6 @@
  *          statistics(extracted from /proc/net/wireless) on Linux platforms.
  */
 
-#include <app-common/zap-generated/enums.h>
 #include <platform/Linux/ConnectivityUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 

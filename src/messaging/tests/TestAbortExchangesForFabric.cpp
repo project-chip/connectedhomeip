@@ -163,10 +163,10 @@ void CommonCheckAbortAllButOneExchange(nlTestSuite * inSuite, TestContext & ctx,
     const auto & sessionHandle1 = session1.Get();
     const auto & sessionHandle2 = session2.Get();
 
-    session1->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+    session1->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig(
         Test::MessagingContext::kResponsiveIdleRetransTimeout, Test::MessagingContext::kResponsiveActiveRetransTimeout));
 
-    session1Reply->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+    session1Reply->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig(
         Test::MessagingContext::kResponsiveIdleRetransTimeout, Test::MessagingContext::kResponsiveActiveRetransTimeout));
 
     NL_TEST_ASSERT(inSuite, session1);
