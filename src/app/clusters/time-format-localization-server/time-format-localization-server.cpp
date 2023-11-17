@@ -181,8 +181,21 @@ Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPre
 
         return emberAfPluginTimeFormatLocalizationOnCalendarTypeChange(attributePath.mEndpointId, calendarType);
     }
+    case HourFormat::Id: {
+        VerifyOrReturnValue(sizeof(uint8_t) == size, Protocols::InteractionModel::Status::InvalidValue);
+
+        HourFormatEnum hourFormat = static_cast<HourFormatEnum>(*value);
+
+        // Valid range is from 0 to unknown. This relies that unknown value is
+        // the first unused value and values increase over time
+        VerifyOrReturnValue(((hourFormat == HourFormatEnum::kUseActiveLocale) ||
+                             (to_underlying(hourFormat) < to_underlying(HourFormatEnum::kUnknownEnumValue))),
+                            Protocols::InteractionModel::Status::ConstraintError);
+
+        return Protocols::InteractionModel::Status::Success;
+    }
     default:
-        return emberAfPluginTimeFormatLocalizationOnUnhandledAttributeChange(attributePath.mEndpointId, attributeType, size, value);
+        return Protocols::InteractionModel::Status::Success;
     }
 }
 
