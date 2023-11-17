@@ -20,7 +20,6 @@
 #include <app/util/af.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/enums.h>
 
 #include "occupancy-hal.h"
 

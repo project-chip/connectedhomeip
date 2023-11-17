@@ -94,8 +94,8 @@ void DBusInterface::SetCurrentLevel(uint8_t value)
 void DBusInterface::SetColorMode(chip::app::Clusters::ColorControl::ColorMode colorMode)
 {
     InternalSetGuard guard(this);
-    if (light_app_color_control_get_color_mode(mIfaceColorControl) != colorMode)
-        light_app_color_control_set_color_mode(mIfaceColorControl, colorMode);
+    if (light_app_color_control_get_color_mode(mIfaceColorControl) != chip::to_underlying(colorMode))
+        light_app_color_control_set_color_mode(mIfaceColorControl, chip::to_underlying(colorMode));
 }
 
 void DBusInterface::SetColorTemperature(uint16_t value)
