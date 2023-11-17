@@ -89,8 +89,8 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
          IsUnsafeSpan(params.GetAttestationSignature(), mParams.GetAttestationSignature()) ||
          IsUnsafeSpan(params.GetPAI(), mParams.GetPAI()) || IsUnsafeSpan(params.GetDAC(), mParams.GetDAC()) ||
          IsUnsafeSpan(params.GetTimeZone(), mParams.GetTimeZone()) ||
-         IsUnsafeSpan(params.GetDSTOffsets(), mParams.GetDSTOffsets())) ||
-         IsUnsafeSpan(params.GetICDSymmetricKey(), mParams.GetICDSymmetricKey());
+         IsUnsafeSpan(params.GetDSTOffsets(), mParams.GetDSTOffsets()) ||
+         IsUnsafeSpan(params.GetICDSymmetricKey(), mParams.GetICDSymmetricKey()));
 
     mParams = params;
 

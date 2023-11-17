@@ -85,7 +85,7 @@ tests:
       response:
           error: NOT_FOUND
 
-    # chip-tool will reigster itself to ICD in the tests.
+    # chip-tool will register itself with the ICD during the tests.
     - label: "Read RegisteredClients For Registration During Commissioning"
       command: "readAttribute"
       attribute: "RegisteredClients"
