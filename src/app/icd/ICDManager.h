@@ -141,7 +141,8 @@ private:
 
     BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
 
-    OperationalState mOperationalState             = OperationalState::IdleMode;
+    // Initialize mOperationalState to ActiveMode so the init sequence at bootup triggers the IdleMode behaviour first.
+    OperationalState mOperationalState             = OperationalState::ActiveMode;
     ICDMode mICDMode                               = ICDMode::SIT;
     PersistentStorageDelegate * mStorage           = nullptr;
     FabricTable * mFabricTable                     = nullptr;
