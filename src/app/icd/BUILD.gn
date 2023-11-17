@@ -55,6 +55,7 @@ source_set("sender") {
 
   public_deps = [
     ":cluster",
+    ":notifier",
     "${chip_root}/src/credentials:credentials",
     "${chip_root}/src/lib/address_resolve:address_resolve",
     "${chip_root}/src/protocols/secure_channel",

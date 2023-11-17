@@ -119,6 +119,7 @@ protected:
 
     static void OnIdleModeDone(System::Layer * aLayer, void * appState);
     static void OnActiveModeDone(System::Layer * aLayer, void * appState);
+
     /**
      * @brief Callback function called shortly before the device enters idle mode to allow checks to be made. This is currently only
      * called once to prevent entering in a loop if some events re-trigger this check (for instance if a check for subscription
@@ -128,6 +129,7 @@ protected:
     static void OnTransitionToIdle(System::Layer * aLayer, void * appState);
 
     static uint8_t OpenExchangeContextCount;
+    static uint8_t CheckInRequestCount;
 
 private:
     // SIT ICDs should have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)
@@ -140,7 +142,7 @@ private:
     static constexpr uint32_t kMinActiveModeDuration  = 300;
     static constexpr uint16_t kMinActiveModeThreshold = 300;
 
-    BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
+    KeepActiveFlags mKeepActiveFlags{ 0 };
 
     OperationalState mOperationalState             = OperationalState::IdleMode;
     ICDMode mICDMode                               = ICDMode::SIT;

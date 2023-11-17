@@ -41,6 +41,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 
 uint8_t ICDManager::OpenExchangeContextCount = 0;
+uint8_t ICDManager::CheckInRequestCount      = 0;
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::OpenExchangeContextCount cannot hold count for the max exchange count");
 
@@ -98,7 +99,6 @@ bool ICDManager::SupportsFeature(Feature feature)
     bool success        = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 #else
-
     return ((mFeatureMap & to_underlying(feature)) != 0);
 #endif // !CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
@@ -171,7 +171,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
         CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(slowPollInterval);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(AppServer, "Failed to set Slow Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
     else if (state == OperationalState::ActiveMode)
@@ -201,7 +201,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
             CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetFastPollingInterval());
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogError(AppServer, "Failed to set Fast Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
             }
 
             postObserverEvent(ObserverEventType::EnterActiveMode);
@@ -274,26 +274,32 @@ void ICDManager::OnKeepActiveRequest(KeepActiveFlags request)
 {
     assertChipStackLockedByCurrentThread();
 
-    if (request == KeepActiveFlags::kExchangeContextOpen)
+    VerifyOrReturn(request < KeepActiveFlagsValues::kInvalidFlag);
+
+    if (request.Has(KeepActiveFlag::kExchangeContextOpen))
     {
         // There can be multiple open exchange contexts at the same time.
         // Keep track of the requests count.
         this->OpenExchangeContextCount++;
-        this->SetKeepActiveModeRequirements(request, true /* state */);
     }
-    else /* !kExchangeContextOpen */
+
+    if (request.Has(KeepActiveFlag::kCheckInInProgress))
     {
-        // Only 1 request per type (kCommissioningWindowOpen, kFailSafeArmed)
-        // set requirement directly
-        this->SetKeepActiveModeRequirements(request, true /* state */);
+        // There can be multiple check-in at the same time.
+        // Keep track of the requests count.
+        this->CheckInRequestCount++;
     }
+
+    this->SetKeepActiveModeRequirements(request, true /* state */);
 }
 
 void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
 {
     assertChipStackLockedByCurrentThread();
 
-    if (request == KeepActiveFlags::kExchangeContextOpen)
+    VerifyOrReturn(request < KeepActiveFlagsValues::kInvalidFlag);
+
+    if (request.Has(KeepActiveFlag::kExchangeContextOpen))
     {
         // There can be multiple open exchange contexts at the same time.
         // Keep track of the requests count.
@@ -308,10 +314,30 @@ void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
 
         if (this->OpenExchangeContextCount == 0)
         {
-            this->SetKeepActiveModeRequirements(request, false /* state */);
+            this->SetKeepActiveModeRequirements(KeepActiveFlag::kExchangeContextOpen, false /* state */);
         }
     }
-    else /* !kExchangeContextOpen */
+
+    if (request.Has(KeepActiveFlag::kCheckInInProgress))
+    {
+        // There can be multiple open exchange contexts at the same time.
+        // Keep track of the requests count.
+        if (this->CheckInRequestCount > 0)
+        {
+            this->CheckInRequestCount--;
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "The ICD Manager did not account for Check-In Sender start");
+        }
+
+        if (this->CheckInRequestCount == 0)
+        {
+            this->SetKeepActiveModeRequirements(KeepActiveFlag::kCheckInInProgress, false /* state */);
+        }
+    }
+
+    if (request.Has(KeepActiveFlag::kCommissioningWindowOpen) || request.Has(KeepActiveFlag::kFailSafeArmed))
     {
         // Only 1 request per type (kCommissioningWindowOpen, kFailSafeArmed)
         // remove requirement directly
