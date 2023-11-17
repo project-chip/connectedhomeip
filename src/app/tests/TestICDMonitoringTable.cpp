@@ -91,7 +91,7 @@ void TestEntryAssignationOverload(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, entry2.checkInNodeID == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, entry2.monitoredSubject == entry.monitoredSubject);
 
-    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(entry2.key.As<Crypto::Aes128KeyByteArray>())));
+    NL_TEST_ASSERT(aSuite, entry2.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
 }
 
 void TestEntryKeyFunctions(nlTestSuite * aSuite, void * aContext)

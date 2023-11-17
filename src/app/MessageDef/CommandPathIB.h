@@ -21,7 +21,7 @@
 #include "ListBuilder.h"
 #include "ListParser.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/CommandPathParams.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/basic-types.h>

@@ -910,7 +910,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     // The level has changed, the scene is no longer valid.
     if (emberAfContainsServer(endpoint, Scenes::Id))
     {
-        Scenes::ScenesServer::Instance().MakeSceneInvalid(endpoint);
+        Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
     }
 #endif // EMBER_AF_PLUGIN_SCENES
 

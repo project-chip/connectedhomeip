@@ -151,14 +151,23 @@ provisional client cluster Scenes = 5 {
     AttributeValuePair attributeValueList[] = 1;
   }
 
-  readonly attribute int8u sceneCount = 0;
-  readonly attribute int8u currentScene = 1;
-  readonly attribute group_id currentGroup = 2;
-  readonly attribute boolean sceneValid = 3;
+  fabric_scoped struct SceneInfoStruct {
+    int8u sceneCount = 0;
+    fabric_sensitive int8u currentScene = 1;
+    fabric_sensitive group_id currentGroup = 2;
+    fabric_sensitive boolean sceneValid = 3;
+    int8u remainingCapacity = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute optional int8u sceneCount = 0;
+  readonly attribute optional int8u currentScene = 1;
+  readonly attribute optional group_id currentGroup = 2;
+  readonly attribute optional boolean sceneValid = 3;
   readonly attribute NameSupportBitmap nameSupport = 4;
   readonly attribute optional nullable node_id lastConfiguredBy = 5;
   readonly attribute int16u sceneTableSize = 6;
-  readonly attribute int8u remainingCapacity = 7;
+  readonly attribute SceneInfoStruct fabricSceneInfo[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -921,6 +930,8 @@ client cluster BasicInformation = 40 {
   readonly attribute optional char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
+  readonly attribute int32u specificationVersion = 21;
+  readonly attribute int16u maxPathsPerInvoke = 22;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1151,7 +1162,7 @@ client cluster UnitLocalization = 45 {
     kTemperatureUnit = 0x1;
   }
 
-  attribute optional TempUnitEnum temperatureUnit = 0;
+  attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2867,6 +2878,60 @@ provisional client cluster Timer = 71 {
   command AddTime(AddTimeRequest): DefaultSuccess = 2;
   /** This command is used to reduce time on the existing timer. */
   command ReduceTime(ReduceTimeRequest): DefaultSuccess = 3;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
+provisional client cluster OvenMode = 73 {
+  enum ModeTag : enum16 {
+    kBake = 16384;
+    kConvection = 16385;
+    kGrill = 16386;
+    kRoast = 16387;
+    kClean = 16388;
+    kConvectionBake = 16389;
+    kConvectionRoast = 16390;
+    kWarming = 16391;
+    kProofing = 16392;
+  }
+
+  bitmap Feature : bitmap32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    int8u newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    enum8 status = 0;
+    optional char_string statusText = 1;
+  }
+
+  /** This command is used to change device modes.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */

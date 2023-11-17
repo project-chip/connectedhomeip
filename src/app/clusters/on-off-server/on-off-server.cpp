@@ -460,7 +460,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
     //  the current scene as described in the attribute table is invalid,
     //  so mark it as invalid (just writes the valid/invalid attribute)
 
-    Scenes::ScenesServer::Instance().MakeSceneInvalid(endpoint);
+    Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
 #endif // EMBER_AF_PLUGIN_SCENES
 
     // The returned status is based solely on the On/Off cluster.  Errors in the

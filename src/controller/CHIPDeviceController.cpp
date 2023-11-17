@@ -35,7 +35,6 @@
 // module header, comes first
 #include <controller/CHIPDeviceController.h>
 
-#include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 
@@ -73,8 +72,6 @@
 #include <ble/BleLayer.h>
 #include <transport/raw/BLE.h>
 #endif
-
-#include <app/util/af-enums.h>
 
 #include <errno.h>
 #include <inttypes.h>

@@ -19,7 +19,7 @@
 #include "EventPathIBs.h"
 #include "MessageBuilder.h"
 #include "MessageParser.h"
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>

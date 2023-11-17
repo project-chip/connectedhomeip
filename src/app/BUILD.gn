@@ -62,6 +62,8 @@ buildconfig_header("app_buildconfig") {
     "ICD_REPORT_ON_ENTER_ACTIVE_MODE=${chip_report_on_active_mode}",
     "ICD_MAX_NOTIFICATION_SUBSCRIBERS=${icd_max_notification_subscribers}",
   ]
+
+  visibility = [ ":app_config" ]
 }
 
 source_set("revision_info") {
@@ -75,7 +77,7 @@ source_set("revision_info") {
 source_set("app_config") {
   sources = [ "AppConfig.h" ]
 
-  public_deps = [ ":app_buildconfig" ]
+  deps = [ ":app_buildconfig" ]
 }
 
 static_library("app") {
