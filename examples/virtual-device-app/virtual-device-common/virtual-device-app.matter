@@ -2546,7 +2546,7 @@ endpoint 0 {
     callback attribute clientList;
     callback attribute partsList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster Binding {
@@ -2657,7 +2657,7 @@ endpoint 0 {
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
     ram      attribute featureMap default = 4;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
@@ -2689,7 +2689,7 @@ endpoint 0 {
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0002;
+    ram      attribute clusterRevision default = 2;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
@@ -2855,7 +2855,7 @@ endpoint 0 {
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
     callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
 
     handle command KeySetWrite;
     handle command KeySetRead;
@@ -2885,7 +2885,7 @@ endpoint 1 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 4;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2897,7 +2897,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
 
     handle command AddGroup;
     handle command AddGroupResponse;
@@ -2947,7 +2947,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Off;
     handle command On;
@@ -2963,7 +2963,7 @@ endpoint 1 {
     callback attribute clientList;
     callback attribute partsList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster PowerSource {
@@ -3010,7 +3010,7 @@ endpoint 1 {
     ram      attribute userCodeTemporaryDisableTime default = 10;
     ram      attribute requirePINforRemoteOperation default = 1;
     ram      attribute featureMap default = 0x193;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 7;
 
     handle command LockDoor;
     handle command UnlockDoor;

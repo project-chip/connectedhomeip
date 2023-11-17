@@ -1678,7 +1678,7 @@ endpoint 0 {
     callback attribute clientList;
     callback attribute partsList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster AccessControl {
@@ -1759,7 +1759,7 @@ endpoint 0 {
     callback attribute locationCapability default = 0;
     callback attribute supportsConcurrentConnection default = 1;
     ram      attribute featureMap default = 6;
-    ram      attribute clusterRevision default = 0x0001;
+    ram      attribute clusterRevision default = 1;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -1779,7 +1779,7 @@ endpoint 0 {
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 0x0001;
+    ram      attribute clusterRevision default = 2;
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
@@ -1811,7 +1811,7 @@ endpoint 0 {
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0002;
+    ram      attribute clusterRevision default = 2;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
@@ -1824,7 +1824,7 @@ endpoint 0 {
     callback attribute currentHeapUsed default = 0x0000000000000000;
     callback attribute currentHeapHighWatermark default = 0x0000000000000000;
     callback attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 0x0001;
+    ram      attribute clusterRevision default = 1;
 
     handle command ResetWatermarks;
   }
@@ -1834,7 +1834,7 @@ endpoint 0 {
     callback attribute adminFabricIndex default = 1;
     callback attribute adminVendorId default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0001;
+    ram      attribute clusterRevision default = 1;
 
     handle command OpenCommissioningWindow;
     handle command OpenBasicCommissioningWindow;
@@ -1849,7 +1849,7 @@ endpoint 0 {
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0001;
+    ram      attribute clusterRevision default = 1;
 
     handle command AttestationRequest;
     handle command AttestationResponse;
@@ -1871,7 +1871,7 @@ endpoint 0 {
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
     callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
 
     handle command KeySetWrite;
     handle command KeySetRead;
@@ -1899,7 +1899,7 @@ endpoint 1 {
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 4;
 
     handle command Identify;
   }
@@ -1910,7 +1910,7 @@ endpoint 1 {
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
 
     handle command AddGroup;
     handle command AddGroupResponse;
@@ -1933,7 +1933,7 @@ endpoint 1 {
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster DoorLock {
@@ -1959,7 +1959,7 @@ endpoint 1 {
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0x0181;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 7;
 
     handle command LockDoor;
     handle command UnlockDoor;
