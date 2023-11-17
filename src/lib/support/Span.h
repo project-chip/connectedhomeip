@@ -130,13 +130,10 @@ public:
     reference front() const { return (*this)[0]; }
     reference back() const { return (*this)[size() - 1]; }
 
-    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
-    bool data_equal(const Span<U> & other) const
+    bool data_equal(const Span<const T> & other) const
     {
         return (size() == other.size()) && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
     }
-    template <class U, size_t N, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
-    inline bool data_equal(const FixedSpan<U, N> & other) const;
 
     Span SubSpan(size_t offset, size_t length) const
     {
@@ -329,15 +326,7 @@ public:
     reference front() const { return (*this)[0]; }
     reference back() const { return (*this)[size() - 1]; }
 
-    // Allow data_equal for spans that are over the same type up to const-ness.
-    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
-    bool data_equal(const FixedSpan<U, N> & other) const
-    {
-        return (memcmp(data(), other.data(), N * sizeof(T)) == 0);
-    }
-
-    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
-    bool data_equal(const Span<U> & other) const
+    bool data_equal(const Span<const T> & other) const
     {
         return (N == other.size() && memcmp(data(), other.data(), N * sizeof(T)) == 0);
     }
@@ -358,13 +347,6 @@ template <class T>
 template <class U, size_t N, typename>
 constexpr Span<T>::Span(const FixedSpan<U, N> & other) : mDataBuf(other.data()), mDataLen(other.size())
 {}
-
-template <class T>
-template <class U, size_t N, typename>
-inline bool Span<T>::data_equal(const FixedSpan<U, N> & other) const
-{
-    return other.data_equal(*this);
-}
 
 template <typename T>
 [[deprecated("Use !empty()")]] inline bool IsSpanUsable(const Span<T> & span)

@@ -23,6 +23,7 @@
         "barrier-control-cluster.xml",
         "basic-information-cluster.xml",
         "binding-cluster.xml",
+        "boolean-sensor-configuration-cluster.xml",
         "boolean-state-cluster.xml",
         "actions-cluster.xml",
         "bridged-device-basic-information.xml",
@@ -38,6 +39,7 @@
         "dishwasher-mode-cluster.xml",
         "microwave-oven-mode-cluster.xml",
         "door-lock-cluster.xml",
+        "drlc-cluster.xml",
         "electrical-measurement-cluster.xml",
         "ethernet-network-diagnostics-cluster.xml",
         "fan-control-cluster.xml",
@@ -102,6 +104,7 @@
         "timer-cluster.xml",
         "user-label-cluster.xml",
         "unit-localization-cluster.xml",
+        "valve-configuration-and-control-cluster.xml",
         "wake-on-lan-cluster.xml",
         "washer-controls-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
@@ -160,7 +163,9 @@
             "SerialNumber",
             "UniqueID",
             "CapabilityMinima",
-            "ProductAppearance"
+            "ProductAppearance",
+            "SpecificationVersion",
+            "MaxPathsPerInvoke"
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Descriptor": ["ClusterRevision"],
@@ -219,7 +224,6 @@
             "FeatureMap",
             "ThreadMetrics"
         ],
-        "Scenes": ["SceneCount", "RemainingCapacity"],
         "Unit Testing": [
             "struct_attr",
             "nullable_struct",

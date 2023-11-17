@@ -89,8 +89,8 @@ void Light::UpdateState()
         LevelControl::Commands::MoveToLevel::DecodableType data;
 
         data.level = mTargetLevel.Value();
-        data.optionsMask.Set(LevelControl::LevelControlOptions::kExecuteIfOff);
-        data.optionsOverride.Set(LevelControl::LevelControlOptions::kExecuteIfOff);
+        data.optionsMask.Set(LevelControl::OptionsBitmap::kExecuteIfOff);
+        data.optionsOverride.Set(LevelControl::OptionsBitmap::kExecuteIfOff);
 
         (void) LevelControlServer::MoveToLevel(mEndpointId, data);
 

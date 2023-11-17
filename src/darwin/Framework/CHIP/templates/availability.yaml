@@ -3074,8 +3074,12 @@
               - EffectIdentifierEnum
               - StartUpOnOffEnum
           LevelControl:
-              - MoveMode
-              - StepMode
+              # MoveModeEnum and StepModeEnum were originally named MoveMode and
+              # StepMode, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - MoveModeEnum
+              - StepModeEnum
           AccessControl:
               - AuthMode
               - ChangeTypeEnum
@@ -3326,10 +3330,14 @@
                   - On
                   - TogglePreviousOnOff
           LevelControl:
-              MoveMode:
+              # MoveModeEnum and StepModeEnum were originally named MoveMode and
+              # StepMode, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              MoveModeEnum:
                   - Up
                   - Down
-              StepMode:
+              StepModeEnum:
                   - Up
                   - Down
           AccessControl:
@@ -7456,7 +7464,6 @@
           Scenes:
               # New scenes bits not stable yet.
               - SceneTableSize
-              - RemainingCapacity
           FanControl:
               # New Fan Control bits not stable yet.
               - AirflowDirection
@@ -7729,6 +7736,7 @@
           GeneralDiagnostics:
               # Not in the spec yet.
               - AverageWearCount
+              # New things, not quite finalized.
   renames:
       enums:
           OTASoftwareUpdateProvider:
@@ -7784,6 +7792,8 @@
               - Feature
           ContentLauncher:
               - SupportedProtocolsBitmap
+          LevelControl:
+              - OptionsBitmap
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7803,6 +7813,18 @@
               SupportedProtocolsBitmap:
                   - DASH
                   - HLS
+          LevelControl:
+              OptionsBitmap:
+                  - ExecuteIfOff
+                  - CoupleColorTempToLevel
+      attributes:
+          Scenes:
+              - FabricSceneInfo
+              # Targeting Spring 2024 Matter release
+      structs:
+          Scenes:
+              - SceneInfoStruct
+              # Targeting Spring 2024 Matter release
   deprecated:
       event fields:
           WiFiNetworkDiagnostics:
@@ -7821,6 +7843,8 @@
               - ScenesCopyMode
           ContentLauncher:
               - SupportedStreamingProtocol
+          LevelControl:
+              - LevelControlOptions
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7833,6 +7857,7 @@
           # Targeting Spring 2024 Matter release
           - MicrowaveOvenControl
           - MicrowaveOvenMode
+          - DemandResponseLoadControl
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -7919,6 +7944,8 @@
               CopyModeBitmap: ScenesCopyMode
           ContentLauncher:
               SupportedProtocolsBitmap: SupportedStreamingProtocol
+          LevelControl:
+              OptionsBitmap: LevelControlOptions
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:

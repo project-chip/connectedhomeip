@@ -173,8 +173,8 @@ gboolean DBusInterface::OnCurrentLevelChanged(LightAppLevelControl * levelContro
 
     Clusters::LevelControl::Commands::MoveToLevel::DecodableType data;
     data.level = light_app_level_control_get_current_level(levelControl);
-    data.optionsMask.Set(Clusters::LevelControl::LevelControlOptions::kExecuteIfOff);
-    data.optionsOverride.Set(Clusters::LevelControl::LevelControlOptions::kExecuteIfOff);
+    data.optionsMask.Set(Clusters::LevelControl::OptionsBitmap::kExecuteIfOff);
+    data.optionsOverride.Set(Clusters::LevelControl::OptionsBitmap::kExecuteIfOff);
 
     chip::DeviceLayer::StackLock lock;
     LevelControlServer::MoveToLevel(self->mEndpointId, data);
