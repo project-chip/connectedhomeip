@@ -1522,23 +1522,6 @@ enum class UserActiveModeTriggerBitmap : uint32_t
 };
 } // namespace IcdManagement
 
-namespace LaundryDryerControls {
-
-// Enum for DrynessLevelEnum
-enum class DrynessLevelEnum : uint8_t
-{
-    kLow    = 0x00,
-    kNormal = 0x01,
-    kExtra  = 0x02,
-    kMax    = 0x03,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 4,
-};
-} // namespace LaundryDryerControls
-
 namespace ModeSelect {
 
 // Bitmap for Feature
