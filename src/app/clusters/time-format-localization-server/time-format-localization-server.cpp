@@ -148,7 +148,7 @@ CHIP_ERROR TimeFormatLocalizationAttrAccess::Write(const ConcreteDataAttributePa
             // increase over time
             if (to_underlying(value) >= to_underlying(CalendarTypeEnum::kUnknownEnumValue))
             {
-                return CHIP_ERROR_INVALID_ARGUMENT;
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
             }
         }
 
