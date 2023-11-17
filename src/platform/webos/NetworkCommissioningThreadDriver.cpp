@@ -212,7 +212,8 @@ ThreadCapabilities LinuxThreadDriver::GetSupportedThreadFeatures()
 
 uint16_t LinuxThreadDriver::GetThreadVersion()
 {
-    return otThreadGetVersion();
+    // TODO Needs to be implemented with DBUS io.openthread.BorderRouter Thread API
+    return 0;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD

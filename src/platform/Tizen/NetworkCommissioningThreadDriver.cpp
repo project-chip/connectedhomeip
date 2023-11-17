@@ -179,7 +179,8 @@ ThreadCapabilities TizenThreadDriver::GetSupportedThreadFeatures()
 
 uint16_t TizenThreadDriver::GetThreadVersion()
 {
-    return otThreadGetVersion();
+    // TODO Needs to be implemented with Tizen Thread stack api
+    return 0;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
