@@ -62,6 +62,8 @@
         "Test_TC_FLW_2_1",
         "Test_TC_RH_2_1",
         "Disabled because darwin-framework-tool does not handle substraction in parameters",
-        "Test_TC_S_2_3"
+        "Test_TC_S_2_3",
+        "TestScenesMultiFabric",
+        "TestScenesFabricSceneInfo"
     ]
 }

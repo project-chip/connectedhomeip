@@ -61,6 +61,39 @@ constexpr uint8_t kKeyBuffer3a[] = {
     0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f
 };
 
+void TestEntryAssignationOverload(nlTestSuite * aSuite, void * aContext)
+{
+    TestSessionKeystoreImpl keystore;
+    ICDMonitoringEntry entry(&keystore);
+
+    // Test Setting Key
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1a)));
+
+    entry.fabricIndex = 2;
+
+    NL_TEST_ASSERT(aSuite, !entry.IsValid());
+
+    entry.checkInNodeID    = 34;
+    entry.monitoredSubject = 32;
+
+    // Entry should be valid now
+    NL_TEST_ASSERT(aSuite, entry.IsValid());
+
+    ICDMonitoringEntry entry2;
+
+    NL_TEST_ASSERT(aSuite, !entry2.IsValid());
+
+    entry2 = entry;
+
+    NL_TEST_ASSERT(aSuite, entry2.IsValid());
+
+    NL_TEST_ASSERT(aSuite, entry2.fabricIndex == entry.fabricIndex);
+    NL_TEST_ASSERT(aSuite, entry2.checkInNodeID == entry.checkInNodeID);
+    NL_TEST_ASSERT(aSuite, entry2.monitoredSubject == entry.monitoredSubject);
+
+    NL_TEST_ASSERT(aSuite, entry2.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
+}
+
 void TestEntryKeyFunctions(nlTestSuite * aSuite, void * aContext)
 {
     TestSessionKeystoreImpl keystore;
@@ -393,6 +426,7 @@ int Test_Setup(void * inContext)
 int TestClientMonitoringRegistrationTable()
 {
     static nlTest sTests[] = { NL_TEST_DEF("TestEntryKeyFunctions", TestEntryKeyFunctions),
+                               NL_TEST_DEF("TestEntryAssignationOverload", TestEntryAssignationOverload),
                                NL_TEST_DEF("TestSaveAndLoadRegistrationValue", TestSaveAndLoadRegistrationValue),
                                NL_TEST_DEF("TestSaveAllInvalidRegistrationValues", TestSaveAllInvalidRegistrationValues),
                                NL_TEST_DEF("TestSaveLoadRegistrationValueForMultipleFabrics",

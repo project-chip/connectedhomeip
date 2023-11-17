@@ -30,6 +30,7 @@
 #include <messaging/ExchangeContext.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
+#include <protocols/secure_channel/SessionParameters.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <transport/CryptoContext.h>
 #include <transport/SecureSession.h>
@@ -96,14 +97,14 @@ public:
      */
     virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session) const = 0;
 
-    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteMRPConfig; }
-    void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteMRPConfig = config; }
+    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteSessionParams.GetMRPConfig(); }
+    void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteSessionParams.SetMRPConfig(config); }
 
     /**
-     * Encode the provided MRP parameters using the provided TLV tag.
+     * Encode the Session Parameters using the provided TLV tag.
      */
-    static CHIP_ERROR EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpLocalConfig,
-                                          TLV::TLVWriter & tlvWriter);
+    static CHIP_ERROR EncodeSessionParameters(TLV::Tag tag, const Optional<ReliableMessageProtocolConfig> & mrpLocalConfig,
+                                              TLV::TLVWriter & tlvWriter);
 
 protected:
     /**
@@ -200,7 +201,7 @@ protected:
 
     /**
      * Try to decode the current element (pointed by the TLV reader) as MRP parameters.
-     * If the MRP parameters are found, mRemoteMRPConfig is updated with the devoded values.
+     * If the MRP parameters are found, mRemoteSessionParams is updated with the devoded values.
      *
      * MRP parameters are optional. So, if the TLV reader is not pointing to the MRP parameters,
      * the function is a noop.
@@ -231,9 +232,9 @@ protected:
     SessionEstablishmentDelegate * mDelegate   = nullptr;
 
     // mLocalMRPConfig is our config which is sent to the other end and used by the peer session.
-    // mRemoteMRPConfig is received from other end and set to our session.
+    // mRemoteSessionParams is received from other end and set to our session.
     Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
-    ReliableMessageProtocolConfig mRemoteMRPConfig = GetDefaultMRPConfig();
+    SessionParameters mRemoteSessionParams;
 
 private:
     Optional<uint16_t> mPeerSessionId;

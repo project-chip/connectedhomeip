@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "asr_factory_config.h"
+#include "ASRFactoryDataParser.h"
 #include <string.h>
 
 namespace chip {

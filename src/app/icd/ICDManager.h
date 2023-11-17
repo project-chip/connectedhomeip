@@ -33,12 +33,21 @@ namespace app {
 // Used in unit tests
 class TestICDManager;
 
+// This structure is used for the creation an ObjectPool of ICDStateObserver pointers
+
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
 class ICDManager : public ICDListener
 {
 public:
+    struct ObserverPointer
+    {
+        ObserverPointer(ICDStateObserver * obs) : mObserver(obs) {}
+        ~ObserverPointer() { mObserver = nullptr; }
+        ICDStateObserver * mObserver;
+    };
+
     enum class OperationalState : uint8_t
     {
         IdleMode,
@@ -51,21 +60,48 @@ public:
         LIT, // Long Interval Time ICD
     };
 
+    // This enum class represents to all ICDStateObserver callbacks available from the
+    // mStateObserverPool for the ICDManager.
+    enum class ObserverEventType : uint8_t
+    {
+        EnterActiveMode,
+        TransitionToIdle,
+        ICDModeChange,
+    };
+
     ICDManager() {}
-    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver,
-              Crypto::SymmetricKeystore * symmetricKeyStore);
+    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore);
     void Shutdown();
     void UpdateICDMode();
     void UpdateOperationState(OperationalState state);
     void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
     bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
     bool SupportsFeature(Clusters::IcdManagement::Feature feature);
+
+    /**
+     * @brief Adds the referenced observer in parameters to the mStateObserverPool
+     * A maximum of CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE observers can be concurrently registered
+     *
+     * @return The pointer to the pool object, or null if it could not be added.
+     */
+    ObserverPointer * RegisterObserver(ICDStateObserver * observer);
+
+    /**
+     * @brief Remove the referenced observer in parameters from the mStateObserverPool
+     */
+    void ReleaseObserver(ICDStateObserver * observer);
+
+    /**
+     * @brief Associates the ObserverEventType parameters to the correct
+     *  ICDStateObservers function and calls it for all observers in the mStateObserverPool
+     */
+    void postObserverEvent(ObserverEventType event);
     ICDMode GetICDMode() { return mICDMode; }
     OperationalState GetOperationalState() { return mOperationalState; }
 
     static System::Clock::Milliseconds32 GetSITPollingThreshold() { return kSITPollingThreshold; }
-    static System::Clock::Milliseconds32 GetSlowPollingInterval() { return kSlowPollingInterval; }
     static System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
+    static System::Clock::Milliseconds32 GetSlowPollingInterval();
 
 #ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
     void SetTestFeatureMapValue(uint32_t featureMap) { mFeatureMap = featureMap; };
@@ -110,9 +146,9 @@ private:
     ICDMode mICDMode                               = ICDMode::SIT;
     PersistentStorageDelegate * mStorage           = nullptr;
     FabricTable * mFabricTable                     = nullptr;
-    ICDStateObserver * mStateObserver              = nullptr;
     bool mTransitionToIdleCalled                   = false;
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
+    ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
 
 #ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // feature map that can be changed at runtime for testing purposes
