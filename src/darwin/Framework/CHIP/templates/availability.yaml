@@ -7819,12 +7819,13 @@
                   - CoupleColorTempToLevel
       attributes:
           Scenes:
-              - FabricSceneInfo
               # Targeting Spring 2024 Matter release
+              - FabricSceneInfo
       structs:
           Scenes:
-              - SceneInfoStruct
               # Targeting Spring 2024 Matter release
+              - SceneInfoStruct
+
   deprecated:
       event fields:
           WiFiNetworkDiagnostics:

@@ -49,7 +49,21 @@ public:
         void ClearSceneInfoStruct(EndpointId endpoint, FabricIndex fabric);
 
     private:
+        /// @brief Returns the index of the FabricSceneInfo associated to an endpoint
+        /// @param[in] endpoint target endpoint
+        /// @param[out] endpointIndex index of the corresponding FabricSceneInfo for an endpoint, corresponds to a row in the
+        /// mSceneInfoStructs array,
+        /// @return CHIP_NO_ERROR or CHIP_ERROR_NOT_FOUND, CHIP_ERROR_INVALID_ARGUMENT if invalid endpoint
         CHIP_ERROR FindFabricSceneInfoIndex(EndpointId endpoint, size_t & endpointIndex);
+
+        /// @brief Returns the SceneInfoStruct associated to a fabric
+        /// @param[in] fabric target fabric index
+        /// @param[in] endpointIndex index of the corresponding FabricSceneInfo for an endpoint, corresponds to a row in the
+        /// mSceneInfoStructs array
+        /// @param[out] index index of the corresponding SceneInfoStruct if found, otherwise the index value will be invalid and
+        /// should not be used. This os safe to store in a uint8_t because the index is guaranteed to be smaller than
+        /// CHIP_CONFIG_MAX_FABRICS.
+        /// @return CHIP_NO_ERROR or CHIP_ERROR_NOT_FOUND, CHIP_ERROR_INVALID_ARGUMENT if invalid fabric or endpoint
         CHIP_ERROR FindSceneInfoStructIndex(FabricIndex fabric, size_t endpointIndex, uint8_t & index);
 
         Structs::SceneInfoStruct::Type mSceneInfoStructs[kScenesServerMaxEndpointCount][kScenesServerMaxFabricCount];
