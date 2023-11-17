@@ -354,7 +354,7 @@ private:
     }
 };
 static DefaultColorControlSceneHandler sColorControlSceneHandler;
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
 /**********************************************************
  * Matter timer scheduling glue logic
@@ -412,7 +412,7 @@ chip::scenes::SceneHandler * ColorControlServer::GetSceneHandler()
     return &sColorControlSceneHandler;
 #else
     return nullptr;
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 }
 
 bool ColorControlServer::HasFeature(chip::EndpointId endpoint, Feature feature)
@@ -3061,7 +3061,7 @@ void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
     // Registers Scene handlers for the color control cluster on the server
     app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(endpoint,
                                                                          ColorControlServer::Instance().GetSceneHandler());
-#endif
+#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 }
 
 void MatterColorControlClusterServerShutdownCallback(EndpointId endpoint)

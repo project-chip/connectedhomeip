@@ -232,7 +232,7 @@ static void sceneOnOffCallback(EndpointId endpoint)
     OnOffServer::Instance().setOnOffValue(endpoint, command, false);
     ReturnOnFailure(sOnOffSceneHandler.mSceneEndpointStatePairs.RemovePair(endpoint));
 }
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
 /**********************************************************
  * Attributes Definition
@@ -304,7 +304,7 @@ chip::scenes::SceneHandler * OnOffServer::GetSceneHandler()
     return &sOnOffSceneHandler;
 #else
     return nullptr;
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 }
 
 bool OnOffServer::HasFeature(chip::EndpointId endpoint, Feature feature)
@@ -502,7 +502,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 #if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
         // Registers Scene handlers for the On/Off cluster on the server
         app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(endpoint, OnOffServer::Instance().GetSceneHandler());
-#endif
+#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
 #ifdef EMBER_AF_PLUGIN_MODE_SELECT
         // If OnMode is not a null value, then change the current mode to it.
