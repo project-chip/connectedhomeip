@@ -167,13 +167,24 @@ bool TizenThreadDriver::ThreadNetworkIterator::Next(Network & item)
 ThreadCapabilities TizenThreadDriver::GetSupportedThreadFeatures()
 {
     BitMask<ThreadCapabilities> capabilites = 0;
-    capabilites.SetField(ThreadCapabilities::kIsBorderRouterCapable,
-                         CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER /*OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE*/);
-    capabilites.SetField(ThreadCapabilities::kIsRouterCapable, CHIP_DEVICE_CONFIG_THREAD_FTD);
-    capabilites.SetField(ThreadCapabilities::kIsSleepyEndDeviceCapable, !CHIP_DEVICE_CONFIG_THREAD_FTD);
-    capabilites.SetField(ThreadCapabilities::kIsFullThreadDevice, CHIP_DEVICE_CONFIG_THREAD_FTD);
-    capabilites.SetField(ThreadCapabilities::kIsSynchronizedSleepyEndDeviceCapable,
-                         (!CHIP_DEVICE_CONFIG_THREAD_FTD && CHIP_DEVICE_CONFIG_THREAD_SSED));
+    if (CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER)
+    {
+        capabilites.Set(ThreadCapabilities::kIsBorderRouterCapable);
+    }
+
+    if (CHIP_DEVICE_CONFIG_THREAD_FTD)
+    {
+        capabilites.Set(ThreadCapabilities::kIsRouterCapable);
+        capabilites.Set(ThreadCapabilities::kIsFullThreadDevice);
+    }
+    else
+    {
+        capabilites.Set(ThreadCapabilities::kIsSleepyEndDeviceCapable);
+        if (CHIP_DEVICE_CONFIG_THREAD_SSED)
+        {
+            capabilites.Set(ThreadCapabilities::kIsSynchronizedSleepyEndDeviceCapable);
+        }
+    }
     return capabilites;
 }
 
