@@ -982,9 +982,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnost
     using EnumType = EthernetNetworkDiagnostics::PHYRateEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kRate10M:
     case EnumType::kRate100M:
     case EnumType::kRate1G:
@@ -995,18 +992,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnost
     case EnumType::kRate100G:
     case EnumType::kRate200G:
     case EnumType::kRate400G:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE10_M:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE100_M:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE1_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE2_5_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE5_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE10_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE40_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE100_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE200_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE400_G:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(10);

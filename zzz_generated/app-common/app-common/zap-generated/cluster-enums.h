@@ -1198,9 +1198,6 @@ enum class Feature : uint32_t
 
 namespace EthernetNetworkDiagnostics {
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for PHYRateEnum
 enum class PHYRateEnum : uint8_t
 {
@@ -1220,10 +1217,6 @@ enum class PHYRateEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 10,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using PHYRateEnum                                                        = EmberAfPHYRateEnum;
-static PHYRateEnum __attribute__((unused)) kPHYRateEnumkUnknownEnumValue = static_cast<PHYRateEnum>(10);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for Feature
 enum class Feature : uint32_t

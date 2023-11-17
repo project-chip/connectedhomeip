@@ -13,7 +13,6 @@ WeakEnums:
     - ColorControlOptions
     - ColorMode
     - EnhancedColorMode
-    - PHYRateEnum
 
 EnumsNotUsedAsTypeInXML:
     # List of enums that are not used as a type in XML. By adding an enum
