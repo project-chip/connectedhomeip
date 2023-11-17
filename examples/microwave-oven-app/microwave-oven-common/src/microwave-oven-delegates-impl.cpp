@@ -25,7 +25,6 @@ using namespace chip::app::Clusters::OperationalState;
 using OperationalStateEnum = chip::app::Clusters::OperationalState::OperationalStateEnum;
 using Status               = Protocols::InteractionModel::Status;
 
-
 namespace {
 
 OperationalState::Instance * gOperationalStateInstance         = nullptr;
@@ -34,14 +33,15 @@ MicrowaveOvenDelegates * gMicrowaveOvenDelegates               = nullptr;
 
 } // anonymous namespace
 
-//Operational State command callbacks
+// Operational State command callbacks
 app::DataModel::Nullable<uint32_t> MicrowaveOvenDelegates::GetCountdownTime()
 {
     VerifyOrDie(gMicrowaveOvenControlInstance != nullptr);
     return static_cast<app::DataModel::Nullable<uint32_t>>(gMicrowaveOvenControlInstance->GetCookTime());
 }
 
-CHIP_ERROR MicrowaveOvenDelegates::GetOperationalStateAtIndex(size_t index, OperationalState::GenericOperationalState & operationalState)
+CHIP_ERROR MicrowaveOvenDelegates::GetOperationalStateAtIndex(size_t index,
+                                                              OperationalState::GenericOperationalState & operationalState)
 {
     if (index > mOperationalStateList.size() - 1)
     {
@@ -51,7 +51,8 @@ CHIP_ERROR MicrowaveOvenDelegates::GetOperationalStateAtIndex(size_t index, Oper
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MicrowaveOvenDelegates::GetOperationalPhaseAtIndex(size_t index, OperationalState::GenericOperationalPhase & operationalPhase)
+CHIP_ERROR MicrowaveOvenDelegates::GetOperationalPhaseAtIndex(size_t index,
+                                                              OperationalState::GenericOperationalPhase & operationalPhase)
 {
     if (index > mOperationalPhaseList.size() - 1)
     {
@@ -121,9 +122,9 @@ void MicrowaveOvenDelegates::HandleStopStateCallback(OperationalState::GenericOp
     }
 }
 
-
-//Microwave Oven Control command callbacks
-Protocols::InteractionModel::Status MicrowaveOvenDelegates::HandleSetCookingParametersCallback(uint8_t cookMode,uint32_t cookTime,uint8_t powerSetting)
+// Microwave Oven Control command callbacks
+Protocols::InteractionModel::Status MicrowaveOvenDelegates::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
+                                                                                               uint8_t powerSetting)
 {
     VerifyOrDie(gMicrowaveOvenControlInstance != nullptr);
 
@@ -132,7 +133,6 @@ Protocols::InteractionModel::Status MicrowaveOvenDelegates::HandleSetCookingPara
     gMicrowaveOvenControlInstance->SetCookTime(cookTime);
     gMicrowaveOvenControlInstance->SetPowerSetting(powerSetting);
     return Status::Success;
-
 }
 
 Protocols::InteractionModel::Status MicrowaveOvenDelegates::HandleAddMoreTimeCallback(uint32_t addedCookTime)
@@ -142,7 +142,6 @@ Protocols::InteractionModel::Status MicrowaveOvenDelegates::HandleAddMoreTimeCal
     gMicrowaveOvenControlInstance->SetCookTime(addedCookTime);
     return Status::Success;
 }
-
 
 void MicrowaveOvenControl::Shutdown()
 {
@@ -164,23 +163,24 @@ void MicrowaveOvenControl::Shutdown()
     }
 }
 
-
 void emberAfMicrowaveOvenControlClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gOperationalStateInstance == nullptr && gMicrowaveOvenDelegates  == nullptr && gMicrowaveOvenControlInstance == nullptr);
-    gMicrowaveOvenDelegates           = new MicrowaveOvenDelegates;
-    EndpointId aEndpoint = 0x01;
-    gOperationalStateInstance         = new OperationalState::Instance(gMicrowaveOvenDelegates, aEndpoint, Clusters::OperationalState::Id);
-    gMicrowaveOvenControlInstance     = new MicrowaveOvenControl::Instance(gMicrowaveOvenDelegates, aEndpoint, Clusters::MicrowaveOvenControl::Id);
+    VerifyOrDie(gOperationalStateInstance == nullptr && gMicrowaveOvenDelegates == nullptr &&
+                gMicrowaveOvenControlInstance == nullptr);
+    gMicrowaveOvenDelegates   = new MicrowaveOvenDelegates;
+    EndpointId aEndpoint      = 0x01;
+    gOperationalStateInstance = new OperationalState::Instance(gMicrowaveOvenDelegates, aEndpoint, Clusters::OperationalState::Id);
+    gMicrowaveOvenControlInstance =
+        new MicrowaveOvenControl::Instance(gMicrowaveOvenDelegates, aEndpoint, Clusters::MicrowaveOvenControl::Id);
 
-    //Initialize instance of Operational state cluster
+    // Initialize instance of Operational state cluster
     gOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     gOperationalStateInstance->Init();
 
-    //Initialize instance of Microwave Oven Control cluster
+    // Initialize instance of Microwave Oven Control cluster
     MicrowaveOvenControl::SetOPInstance(aEndpoint, gOperationalStateInstance);
     gMicrowaveOvenControlInstance->Init();
 }
 
-void  emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId){}
+void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId) {}

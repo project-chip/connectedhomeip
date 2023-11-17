@@ -19,24 +19,24 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af-enums.h>
-#include <protocols/interaction_model/StatusCode.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
+#include <app/util/af-enums.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
 
-constexpr uint32_t kDefaultCookTime              = 30;
-constexpr uint8_t kDefaultPowerSetting           = 100;
-constexpr uint8_t kDefaultMinPower               = 10;
-constexpr uint8_t kDefaultMaxPower               = 100;
-constexpr uint8_t kDefaultPowerStep              = 10;
-constexpr uint32_t kMaxCookTime                  = 65535;
-constexpr uint32_t kMinCookTime                  = 1;
+constexpr uint32_t kDefaultCookTime    = 30;
+constexpr uint8_t kDefaultPowerSetting = 100;
+constexpr uint8_t kDefaultMinPower     = 10;
+constexpr uint8_t kDefaultMaxPower     = 100;
+constexpr uint8_t kDefaultPowerStep    = 10;
+constexpr uint32_t kMaxCookTime        = 65535;
+constexpr uint32_t kMinCookTime        = 1;
 
 class Delegate;
 
@@ -72,18 +72,16 @@ public:
     uint8_t GetPowerSetting() const;
     void SetPowerSetting(uint8_t powerSetting);
 
-
 private:
     Delegate * mDelegate;
     EndpointId mEndpointId;
     ClusterId mClusterId;
 
-
     /**
      * set default values
      */
-    uint32_t mCookTime               = kDefaultCookTime;
-    uint8_t mPowerSettng             = kDefaultPowerSetting;
+    uint32_t mCookTime   = kDefaultCookTime;
+    uint8_t mPowerSettng = kDefaultPowerSetting;
 
     /**
      * IM-level implementation of read
@@ -107,7 +105,6 @@ private:
      * This programme will also check if the added time is out of range.
      */
     void HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTime::DecodableType & req);
-
 };
 
 /** @brief
@@ -116,7 +113,6 @@ private:
 class Delegate
 {
 public:
-
     Delegate() = default;
 
     virtual ~Delegate() = default;
@@ -125,7 +121,8 @@ public:
      *   @brief Handle Command Callback in application: SetCookingParameters
      *   @return Returns the Interaction Model status code which was user determined in the business logic
      */
-    virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode,uint32_t cookTime,uint8_t powerSetting)  = 0;
+    virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
+                                                                                   uint8_t powerSetting) = 0;
 
     /**
      *   @brief Handle Command Callback in application: AddMoreTime
@@ -148,8 +145,6 @@ public:
      */
     virtual uint8_t GetPowerStep() const = 0;
 
-
-
 private:
     friend class Instance;
 
@@ -167,9 +162,9 @@ protected:
     /**
      * set default values
      */
-    uint8_t mMinPower     = kDefaultMinPower;
-    uint8_t mMaxPower     = kDefaultMaxPower;
-    uint8_t mPowerStep    = kDefaultPowerStep;
+    uint8_t mMinPower  = kDefaultMinPower;
+    uint8_t mMaxPower  = kDefaultMaxPower;
+    uint8_t mPowerStep = kDefaultPowerStep;
 };
 
 /**
@@ -186,12 +181,10 @@ bool IsCookTimeInRange(uint32_t cookTime);
  */
 bool IsPowerSettingInRange(uint8_t powerSetting, uint8_t minCookPower, uint8_t maxCookPower);
 
-
 /**
  *  @brief Set Operational State Cluster instance by endpoint id.
  */
 void SetOPInstance(EndpointId aEndpoint, OperationalState::Instance * aInstance);
-
 
 /**
  *  @brief Get Operational State Cluster instance by endpoint id.

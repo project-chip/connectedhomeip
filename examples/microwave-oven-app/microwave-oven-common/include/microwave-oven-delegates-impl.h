@@ -29,40 +29,40 @@ namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
 
-// This is an application level delegate to handle operational state and microwave oven control commands according to the specific business logic.
-class MicrowaveOvenDelegates : public MicrowaveOvenControl::Delegate , public OperationalState::Delegate
+// This is an application level delegate to handle operational state and microwave oven control commands according to the specific
+// business logic.
+class MicrowaveOvenDelegates : public MicrowaveOvenControl::Delegate, public OperationalState::Delegate
 {
 
 public:
-
-    //Microwave Oven Control Cluster delegate
+    // Microwave Oven Control Cluster delegate
     /**
      * Handle Command Callback in application: set-cooking-parameters
      */
-    Protocols::InteractionModel::Status  HandleSetCookingParametersCallback(uint8_t cookMode,uint32_t cookTime,uint8_t powerSetting) override;
+    Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
+                                                                           uint8_t powerSetting) override;
 
     /**
      * Handle Command Callback in application: add-more-time
      */
-    Protocols::InteractionModel::Status  HandleAddMoreTimeCallback(uint32_t addedCookTime) override;
+    Protocols::InteractionModel::Status HandleAddMoreTimeCallback(uint32_t addedCookTime) override;
 
     /**
      * Get the value of MinPower.
      */
-    uint8_t GetMinPower() const override {return mMinPower;}
+    uint8_t GetMinPower() const override { return mMinPower; }
 
     /**
      * Get the value of MaxPower.
      */
-    uint8_t GetMaxPower() const override {return mMaxPower;}
+    uint8_t GetMaxPower() const override { return mMaxPower; }
 
     /**
      * Get the value of PowerStep.
      */
-    uint8_t GetPowerStep() const override {return mPowerStep;}
+    uint8_t GetPowerStep() const override { return mPowerStep; }
 
-
-    //Operational State Cluster delegate
+    // Operational State Cluster delegate
     /**
      * Get the countdown time.
      * @return The current countdown time.
@@ -111,9 +111,7 @@ public:
      */
     void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override;
 
-
 private:
-
     const OperationalState::GenericOperationalState rvcOpStateList[4] = {
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
@@ -121,20 +119,19 @@ private:
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)),
     };
 
-    app::DataModel::List<const OperationalState::GenericOperationalState> mOperationalStateList = Span<const OperationalState::GenericOperationalState>(rvcOpStateList);
+    app::DataModel::List<const OperationalState::GenericOperationalState> mOperationalStateList =
+        Span<const OperationalState::GenericOperationalState>(rvcOpStateList);
 
     const OperationalState::GenericOperationalPhase opPhaseList[1] = {
         // Phase List is null
         OperationalState::GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
     };
 
-    Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList = Span<const OperationalState::GenericOperationalPhase>(opPhaseList);
-
+    Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList =
+        Span<const OperationalState::GenericOperationalPhase>(opPhaseList);
 };
 
 void Shutdown();
-
-
 
 } // namespace MicrowaveOvenControl
 } // namespace Clusters

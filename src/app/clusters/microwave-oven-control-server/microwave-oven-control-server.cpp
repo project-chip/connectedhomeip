@@ -19,9 +19,9 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
+#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/error-mapping.h>
-#include <app/reporting/reporting.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -29,7 +29,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::MicrowaveOvenControl;
 using namespace chip::app::Clusters::MicrowaveOvenControl::Attributes;
-using Status               = Protocols::InteractionModel::Status;
+using Status = Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -91,7 +91,7 @@ uint8_t Instance::GetPowerSetting() const
 
 void Instance::SetCookTime(uint32_t cookTime)
 {
-    if(mCookTime != cookTime)
+    if (mCookTime != cookTime)
     {
         MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CookTime::Id));
     }
@@ -100,7 +100,7 @@ void Instance::SetCookTime(uint32_t cookTime)
 
 void Instance::SetPowerSetting(uint8_t powerSetting)
 {
-    if(mPowerSettng != powerSetting)
+    if (mPowerSettng != powerSetting)
     {
         MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::PowerSetting::Id));
     }
@@ -136,11 +136,9 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetPowerStep()));
     }
     break;
-
     }
     return CHIP_NO_ERROR;
 }
-
 
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
@@ -160,7 +158,6 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         CommandHandlerInterface::HandleCommand<Commands::AddMoreTime::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleAddMoreTime(ctx, req); });
         break;
-
     }
 }
 
@@ -169,11 +166,11 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
     ChipLogDetail(Zcl, "MicrowaveOvenControl:  HandleSetCookingParameters");
     Status status;
     uint8_t opState;
-    auto & CookMode                                        = req.cookMode;
-    auto & CookTime                                        = req.cookTime;
-    auto & PowerSetting                                    = req.powerSetting;
+    auto & CookMode     = req.cookMode;
+    auto & CookTime     = req.cookTime;
+    auto & PowerSetting = req.powerSetting;
 
-    //TODO: check if the input cook mode value is invalid
+    // TODO: check if the input cook mode value is invalid
 
     if (CookTime.HasValue() && (!IsCookTimeInRange(CookTime.Value())))
     {
@@ -182,7 +179,8 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         goto exit;
     }
 
-    if (PowerSetting.HasValue() && (!IsPowerSettingInRange(PowerSetting.Value(), mDelegate->GetMinPower(), mDelegate->GetMaxPower())))
+    if (PowerSetting.HasValue() &&
+        (!IsPowerSettingInRange(PowerSetting.Value(), mDelegate->GetMinPower(), mDelegate->GetMaxPower())))
     {
         status = Status::InvalidCommand;
         ChipLogError(Zcl, "Failed to set cookPower, cookPower value is out of range");
@@ -232,7 +230,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
             // set Microwave Oven cooking power to max power(default).
             reqCookTime = mDelegate->GetMaxPower();
         }
-        status = mDelegate->HandleSetCookingParametersCallback(reqCookMode,reqCookTime,reqPowerSetting);
+        status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTime, reqPowerSetting);
         goto exit;
     }
     else
@@ -286,7 +284,6 @@ void Instance::HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTi
         goto exit;
     }
 
-
 exit:
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
@@ -319,12 +316,10 @@ OperationalState::Instance * GetOPInstance(EndpointId aEndpoint)
     return (ep >= kMicrowaveOvenControlInstanceTableSize ? nullptr : gOPInstanceTable[aEndpoint]);
 }
 
-
 } // namespace MicrowaveOvenControl
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
 
 /** @brief Microwave Oven Control Cluster Server Init
  *
