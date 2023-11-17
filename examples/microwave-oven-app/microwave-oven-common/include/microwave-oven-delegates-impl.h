@@ -39,22 +39,17 @@ public:
     /**
      * Handle Command Callback in application: set-cooking-parameters
      */
-    Protocols::InteractionModel::Status  HandleSetCookingParametersCallback(Optional<uint8_t> cookMode,Optional<uint32_t> cookTime,Optional<uint8_t> powerSetting) override;
+    Protocols::InteractionModel::Status  HandleSetCookingParametersCallback(uint8_t cookMode,uint32_t cookTime,uint8_t powerSetting) override;
 
     /**
      * Handle Command Callback in application: add-more-time
      */
-    Protocols::InteractionModel::Status  HandleAddMoreTimeCallback(uint32_t timeToAdd) override;
+    Protocols::InteractionModel::Status  HandleAddMoreTimeCallback(uint32_t addedCookTime) override;
 
     /**
      * Get the value of MinPower.
      */
     uint8_t GetMinPower() const override {return mMinPower;}
-
-    /**
-     * Set the value of MinPower.
-     */
-    void SetMinPower(uint8_t minPower) override {return;}
     
     /**
      * Get the value of MaxPower.
@@ -62,19 +57,10 @@ public:
     uint8_t GetMaxPower() const override {return mMaxPower;}
 
     /**
-     * Set the value of MaxPower.
-     */
-    void SetMaxPower(uint8_t maxPower) override {return;}
-
-    /**
      * Get the value of PowerStep.
      */
     uint8_t GetPowerStep() const override {return mPowerStep;}
 
-    /**
-     * Set the value of PowerStep.
-     */
-    void SetPowerStep(uint8_t powerStep) override {return;}
 
     //Operational State Cluster delegate
     /**
@@ -144,25 +130,13 @@ private:
 
     Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList = Span<const OperationalState::GenericOperationalPhase>(opPhaseList);
 
-
-    /** @brief Check if the given cook time is in range
-     *  @param cookTime    cookTime that given by user
-     */
-    bool IsCookTimeInRange(uint32_t cookTime);
-
-    /** @brief Check if the given cooking power is in range
-     *  @param powerSetting    power setting that given by user
-     *  @param minCookPower    the min power setting that defined via zap configuration
-     *  @param maxCookPower    the max power setting that defined via zap configuration
-     */
-    bool IsPowerSettingInRange(uint8_t powerSetting, uint8_t minCookPower, uint8_t maxCookPower);
 };
 
 void Shutdown();
 
 
 
-} // namespace OperationalState
+} // namespace MicrowaveOvenControl
 } // namespace Clusters
 } // namespace app
 } // namespace chip

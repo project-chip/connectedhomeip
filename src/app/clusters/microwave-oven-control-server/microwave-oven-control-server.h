@@ -23,17 +23,20 @@
 #include <protocols/interaction_model/StatusCode.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/clusters/operational-state-server/operational-state-server.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
 
-inline constexpr uint32_t kDefaultCookTime              = 30;
-inline constexpr uint8_t kDefaultPowerSetting           = 100;
-inline constexpr uint8_t kDefaultMinPower               = 10;
-inline constexpr uint8_t kDefaultMaxPower               = 100;
-inline constexpr uint8_t kDefaultPowerStep              = 10;
+constexpr uint32_t kDefaultCookTime              = 30;
+constexpr uint8_t kDefaultPowerSetting           = 100;
+constexpr uint8_t kDefaultMinPower               = 10;
+constexpr uint8_t kDefaultMaxPower               = 100;
+constexpr uint8_t kDefaultPowerStep              = 10;
+constexpr uint32_t kMaxCookTime                  = 65535;
+constexpr uint32_t kMinCookTime                  = 1;
 
 class Delegate;
 
@@ -61,7 +64,7 @@ public:
     CHIP_ERROR Init();
 
     /**
-     * @brief defined the get/set api for the mandatory attributes
+     * @brief define the get/set api for the mandatory attributes
      */
     uint32_t GetCookTime() const;
     void SetCookTime(uint32_t cookTime);
@@ -74,6 +77,7 @@ private:
     Delegate * mDelegate;
     EndpointId mEndpointId;
     ClusterId mClusterId;
+    
 
     /**
      * set default values
@@ -94,11 +98,13 @@ private:
 
     /**
      * @brief Handle Command: SetCookingParameters.
+     * This programme will also check if the input values is invalid.
      */
     void HandleSetCookingParameters(HandlerContext & ctx, const Commands::SetCookingParameters::DecodableType & req);
 
     /**
      * @brief Handle Command: AddMoreTime.
+     * This programme will also check if the added time is out of range.
      */
     void HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTime::DecodableType & req);
 
@@ -119,31 +125,28 @@ public:
      *   @brief Handle Command Callback in application: SetCookingParameters
      *   @return Returns the Interaction Model status code which was user determined in the business logic
      */
-    virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(Optional<uint8_t> cookMode,Optional<uint32_t> cookTime,Optional<uint8_t> powerSetting)  = 0;
+    virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode,uint32_t cookTime,uint8_t powerSetting)  = 0;
 
     /**
      *   @brief Handle Command Callback in application: AddMoreTime
      *   @return Returns the Interaction Model status code which was user determined in the business logic
      */
-    virtual Protocols::InteractionModel::Status HandleAddMoreTimeCallback(uint32_t timeToAdd) = 0;
+    virtual Protocols::InteractionModel::Status HandleAddMoreTimeCallback(uint32_t addedCookTime) = 0;
 
     /**
-     *   @brief defined the get/set interface for MinPower
+     *   @brief get the MinPower
      */
     virtual uint8_t GetMinPower() const = 0;
-    virtual void SetMinPower(uint8_t minPower) = 0;
 
     /**
-     *   @brief defined the get/set interface for MaxPower
+     *   @brief get the MaxPower
      */
     virtual uint8_t GetMaxPower() const = 0;
-    virtual void SetMaxPower(uint8_t maxPower) = 0;
 
     /**
-     *   @brief defined the get/set interface for PowerStep
+     *   @brief get the PowerStep
      */
     virtual uint8_t GetPowerStep() const = 0;
-    virtual void SetPowerStep(uint8_t powerStep) = 0;
 
     
 
@@ -169,6 +172,31 @@ protected:
     uint8_t mPowerStep    = kDefaultPowerStep;
 };
 
+/**
+ *  @brief Check if the given cook time is in range
+ *  @param cookTime    cookTime that given by user
+ */
+bool IsCookTimeInRange(uint32_t cookTime);
+
+/**
+ *  @brief Check if the given cooking power is in range
+ *  @param powerSetting    power setting that given by user
+ *  @param minCookPower    the min power setting that defined via zap configuration
+ *  @param maxCookPower    the max power setting that defined via zap configuration
+ */
+bool IsPowerSettingInRange(uint8_t powerSetting, uint8_t minCookPower, uint8_t maxCookPower);
+
+
+/**
+ *  @brief Set Operational State Cluster instance by endpoint id.
+ */
+void SetOPInstance(EndpointId aEndpoint, OperationalState::Instance * aInstance);
+
+
+/**
+ *  @brief Get Operational State Cluster instance by endpoint id. 
+ */
+OperationalState::Instance * GetOPInstance(EndpointId aEndpoint);
 
 } // namespace MicrowaveOvenControl
 } // namespace Clusters
