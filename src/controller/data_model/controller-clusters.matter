@@ -2827,6 +2827,10 @@ client cluster IcdManagement = 70 {
     optional octet_string<16> verificationKey = 1;
   }
 
+  response struct StayActiveResponse = 4 {
+    int32u promisedActiveDuration = 0;
+  }
+
   /** Register a client to the end device */
   fabric command access(invoke: manage) RegisterClient(RegisterClientRequest): RegisterClientResponse = 0;
   /** Unregister a client from an end device */
