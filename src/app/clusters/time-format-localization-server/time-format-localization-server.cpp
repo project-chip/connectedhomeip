@@ -47,49 +47,47 @@ public:
     TimeFormatLocalizationAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TimeFormatLocalization::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
     CHIP_ERROR ReadSupportedCalendarTypes(AttributeValueEncoder & aEncoder);
+};
+
+class AutoReleaseIterator
+{
+public:
+    using Iterator = DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator;
+
+    AutoReleaseIterator(Iterator * value) : mIterator(value) {}
+    ~AutoReleaseIterator() { mIterator->Release(); }
+
+    bool IsValid() const { return mIterator != nullptr; }
+    bool Next(CalendarTypeEnum & value) { return mIterator->Next(value); }
+
+private:
+    Iterator * mIterator;
 };
 
 TimeFormatLocalizationAttrAccess gAttrAccess;
 
 CHIP_ERROR TimeFormatLocalizationAttrAccess::ReadSupportedCalendarTypes(AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+    VerifyOrReturnValue(provider != nullptr, aEncoder.EncodeEmptyList());
 
-    if (provider)
-    {
-        DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator * it = provider->IterateSupportedCalendarTypes();
+    AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
+    VerifyOrReturnValue(it.IsValid(), aEncoder.EncodeEmptyList());
 
-        if (it)
+    return aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+        CalendarTypeEnum type;
+
+        while (it.Next(type))
         {
-            err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
-                CalendarTypeEnum type;
-
-                while (it->Next(type))
-                {
-                    ReturnErrorOnFailure(encoder.Encode(type));
-                }
-
-                return CHIP_NO_ERROR;
-            });
-
-            it->Release();
+            ReturnErrorOnFailure(encoder.Encode(type));
         }
-        else
-        {
-            err = aEncoder.EncodeEmptyList();
-        }
-    }
-    else
-    {
-        err = aEncoder.EncodeEmptyList();
-    }
 
-    return err;
+        return CHIP_NO_ERROR;
+    });
 }
 
 CHIP_ERROR TimeFormatLocalizationAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -114,31 +112,52 @@ bool IsSupportedCalendarType(CalendarTypeEnum newType, CalendarTypeEnum & validT
     validType = CalendarTypeEnum::kBuddhist;
 
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+    VerifyOrReturnValue(provider != nullptr, false);
 
-    if (provider)
+    AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
+    VerifyOrReturnValue(it.IsValid(), false);
+
+    while (it.Next(validType))
     {
-        DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator * it = provider->IterateSupportedCalendarTypes();
-
-        if (it)
+        if (validType == newType)
         {
-            CalendarTypeEnum type;
-
-            while (it->Next(type))
-            {
-                validType = type;
-
-                if (validType == newType)
-                {
-                    it->Release();
-                    return true;
-                }
-            }
-
-            it->Release();
+            return true;
         }
     }
 
     return false;
+}
+
+CHIP_ERROR TimeFormatLocalizationAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    VerifyOrDie(aPath.mClusterId == TimeFormatLocalization::Id);
+
+    switch (aPath.mAttributeId)
+    {
+    case ActiveCalendarType::Id:
+        CalendarTypeEnum value;
+        ReturnErrorOnFailure(aDecoder.Decode(value));
+
+        if (value != CalendarTypeEnum::kUseActiveLocale)
+        {
+            // Valid range is from 0 to unknown.
+            // This relies that unknown value is the first unused value and values
+            // increase over time
+            if (to_underlying(value) >= to_underlying(CalendarTypeEnum::kUnknownEnumValue))
+            {
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
+
+        if (ActiveCalendarType::Set(aPath.mEndpointId, value) != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+        break;
+    default:
+        break;
+    }
+    return CHIP_NO_ERROR;
 }
 
 } // anonymous namespace
