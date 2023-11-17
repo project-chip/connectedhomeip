@@ -156,13 +156,6 @@ static Protocols::InteractionModel::Status emberAfPluginTimeFormatLocalizationOn
     return res;
 }
 
-static Protocols::InteractionModel::Status
-emberAfPluginTimeFormatLocalizationOnUnhandledAttributeChange(EndpointId EndpointId, EmberAfAttributeType attrType,
-                                                              uint16_t attrSize, uint8_t * attrValue)
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
 Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback(
     const ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
