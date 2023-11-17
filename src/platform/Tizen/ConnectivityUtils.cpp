@@ -17,7 +17,6 @@
 
 #include "ConnectivityUtils.h"
 
-#include <app-common/zap-generated/enums.h>
 #include <platform/Tizen/ConnectivityUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
