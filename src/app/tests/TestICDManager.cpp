@@ -65,6 +65,7 @@ class TestICDStateObserver : public app::ICDStateObserver
 public:
     void OnEnterActiveMode() {}
     void OnTransitionToIdle() {}
+    void OnICDModeChange() {}
 };
 
 TestICDStateObserver mICDStateObserver;
@@ -89,7 +90,8 @@ public:
         {
             return FAILURE;
         }
-        ctx->mICDManager.Init(&ctx->testStorage, &ctx->GetFabricTable(), &mICDStateObserver, &(ctx->mKeystore));
+        ctx->mICDManager.Init(&ctx->testStorage, &ctx->GetFabricTable(), &(ctx->mKeystore));
+        ctx->mICDManager.RegisterObserver(&mICDStateObserver);
         return SUCCESS;
     }
 

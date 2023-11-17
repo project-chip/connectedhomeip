@@ -197,14 +197,25 @@ void ReportCallback::OnReportBegin()
 
 void ReportCallback::OnDeallocatePaths(app::ReadPrepareParams && aReadPrepareParams)
 {
-    if (aReadPrepareParams.mpAttributePathParamsList != nullptr)
+    if (aReadPrepareParams.mpAttributePathParamsList != nullptr && aReadPrepareParams.mAttributePathParamsListSize != 0)
     {
         delete[] aReadPrepareParams.mpAttributePathParamsList;
+        aReadPrepareParams.mpAttributePathParamsList    = nullptr;
+        aReadPrepareParams.mAttributePathParamsListSize = 0;
     }
 
-    if (aReadPrepareParams.mpEventPathParamsList != nullptr)
+    if (aReadPrepareParams.mpEventPathParamsList != nullptr && aReadPrepareParams.mEventPathParamsListSize != 0)
     {
         delete[] aReadPrepareParams.mpEventPathParamsList;
+        aReadPrepareParams.mpEventPathParamsList    = nullptr;
+        aReadPrepareParams.mEventPathParamsListSize = 0;
+    }
+
+    if (aReadPrepareParams.mpDataVersionFilterList != nullptr && aReadPrepareParams.mDataVersionFilterListSize != 0)
+    {
+        delete[] aReadPrepareParams.mpDataVersionFilterList;
+        aReadPrepareParams.mpDataVersionFilterList    = nullptr;
+        aReadPrepareParams.mDataVersionFilterListSize = 0;
     }
 }
 

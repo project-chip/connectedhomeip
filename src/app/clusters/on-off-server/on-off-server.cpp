@@ -104,101 +104,15 @@ static constexpr size_t kOnOffMaxEnpointCount =
     EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 #ifdef EMBER_AF_PLUGIN_SCENES
-static EmberEventControl sceneHandlerEventControls[kOnOffMaxEnpointCount];
 static void sceneOnOffCallback(EndpointId endpoint);
+using OnOffEndPointPair = scenes::DefaultSceneHandlerImpl::EndpointStatePair<bool>;
+using OnOffTransitionTimeInterface =
+    scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<kOnOffMaxEnpointCount, EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT>;
 
 class DefaultOnOffSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
-    /// @brief Struct to keep track of the desired state of the OnOff attribute between ApplyScene and
-    /// transition time expiration
-    struct EndpointStatePair
-    {
-        EndpointStatePair(EndpointId endpoint = kInvalidEndpointId, bool status = false) : mEndpoint(endpoint), mState(status) {}
-        EndpointId mEndpoint;
-        bool mState;
-    };
-
-    /// @brief Struct holding an array of EndpointStatePair. Handles insertion, get and removal by EndpointID.
-    /// TODO: Implement generic object to handle this boilerplate array manipulation
-    struct StatePairBuffer
-    {
-        bool IsEmpty() const { return (mPairCount == 0); }
-
-        CHIP_ERROR FindPair(const EndpointId endpoint, uint16_t & found_index) const
-        {
-            VerifyOrReturnError(!IsEmpty(), CHIP_ERROR_NOT_FOUND);
-            for (found_index = 0; found_index < mPairCount; found_index++)
-            {
-                if (endpoint == mStatePairBuffer[found_index].mEndpoint)
-                {
-                    return CHIP_NO_ERROR;
-                }
-            }
-
-            return CHIP_ERROR_NOT_FOUND;
-        }
-
-        CHIP_ERROR InsertPair(const EndpointStatePair & status)
-        {
-            uint16_t idx;
-            CHIP_ERROR err = FindPair(status.mEndpoint, idx);
-
-            if (CHIP_NO_ERROR == err)
-            {
-                mStatePairBuffer[idx] = status;
-            }
-            else if (mPairCount < MAX_ENDPOINT_COUNT)
-            {
-                // if not found, insert at the end
-                mStatePairBuffer[mPairCount] = status;
-                mPairCount++;
-            }
-            else
-            {
-                return CHIP_ERROR_NO_MEMORY;
-            }
-
-            return CHIP_NO_ERROR;
-        }
-
-        CHIP_ERROR GetPair(const EndpointId endpoint, EndpointStatePair & status) const
-        {
-            uint16_t idx;
-            ReturnErrorOnFailure(FindPair(endpoint, idx));
-
-            status = mStatePairBuffer[idx];
-            return CHIP_NO_ERROR;
-        }
-
-        /// @brief Removes Pair and decrements Pair count if the endpoint existed in the array
-        /// @param endpoint : endpoint id of the pair
-        CHIP_ERROR RemovePair(const EndpointId endpoint)
-        {
-            uint16_t position;
-            VerifyOrReturnValue(CHIP_NO_ERROR == FindPair(endpoint, position), CHIP_NO_ERROR);
-
-            uint16_t nextPos = static_cast<uint16_t>(position + 1);
-            uint16_t moveNum = static_cast<uint16_t>(mPairCount - nextPos);
-
-            // Compress array after removal, if the removed position is not the last
-            if (moveNum)
-            {
-                memmove(&mStatePairBuffer[position], &mStatePairBuffer[nextPos], sizeof(EndpointStatePair) * moveNum);
-            }
-
-            mPairCount--;
-            // Clear last occupied position
-            mStatePairBuffer[mPairCount].mEndpoint = kInvalidEndpointId;
-
-            return CHIP_NO_ERROR;
-        }
-
-        uint16_t mPairCount;
-        EndpointStatePair mStatePairBuffer[kOnOffMaxEnpointCount];
-    };
-
-    StatePairBuffer mSceneEndpointStatePairs;
+    DefaultSceneHandlerImpl::StatePairBuffer<bool, kOnOffMaxEnpointCount> mSceneEndpointStatePairs;
     // As per spec, 1 attribute is scenable in the on off cluster
     static constexpr uint8_t scenableAttributeCount = 1;
 
@@ -279,7 +193,7 @@ public:
             auto & decodePair = pair_iterator.GetValue();
             VerifyOrReturnError(decodePair.attributeID == Attributes::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorOnFailure(
-                mSceneEndpointStatePairs.InsertPair(EndpointStatePair(endpoint, static_cast<bool>(decodePair.attributeValue))));
+                mSceneEndpointStatePairs.InsertPair(OnOffEndPointPair(endpoint, static_cast<bool>(decodePair.attributeValue))));
         }
         // Verify that the EFS was completely read
         CHIP_ERROR err = pair_iterator.GetStatus();
@@ -299,38 +213,22 @@ public:
               Scenes::ScenesServer::Instance().IsHandlerRegistered(endpoint, LevelControlServer::GetSceneHandler())))
 #endif
         {
-            OnOffServer::Instance().scheduleTimerCallbackMs(sceneEventControl(endpoint), timeMs);
+            OnOffServer::Instance().scheduleTimerCallbackMs(mTransitionTimeInterface.sceneEventControl(endpoint), timeMs);
         }
 
         return CHIP_NO_ERROR;
     }
 
 private:
-    /**
-     * @brief Configures EventControl callback when setting On Off through scenes callback
-     *
-     * @param[in] endpoint endpoint to start timer for
-     * @return EmberEventControl* configured event control
-     */
-    EmberEventControl * sceneEventControl(EndpointId endpoint)
-    {
-        EmberEventControl * controller =
-            OnOffServer::Instance().getEventControl(endpoint, Span<EmberEventControl>(sceneHandlerEventControls));
-        VerifyOrReturnValue(controller != nullptr, nullptr);
-
-        controller->endpoint = endpoint;
-        controller->callback = &sceneOnOffCallback;
-
-        return controller;
-    }
+    OnOffTransitionTimeInterface mTransitionTimeInterface = OnOffTransitionTimeInterface(Attributes::OnOff::Id, sceneOnOffCallback);
 };
 static DefaultOnOffSceneHandler sOnOffSceneHandler;
 
 static void sceneOnOffCallback(EndpointId endpoint)
 {
-    DefaultOnOffSceneHandler::EndpointStatePair savedState;
+    OnOffEndPointPair savedState;
     ReturnOnFailure(sOnOffSceneHandler.mSceneEndpointStatePairs.GetPair(endpoint, savedState));
-    chip::CommandId command = (savedState.mState) ? Commands::On::Id : Commands::Off::Id;
+    CommandId command = (savedState.mValue) ? Commands::On::Id : Commands::Off::Id;
     OnOffServer::Instance().setOnOffValue(endpoint, command, false);
     ReturnOnFailure(sOnOffSceneHandler.mSceneEndpointStatePairs.RemovePair(endpoint));
 }
@@ -562,7 +460,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
     //  the current scene as described in the attribute table is invalid,
     //  so mark it as invalid (just writes the valid/invalid attribute)
 
-    Scenes::ScenesServer::Instance().MakeSceneInvalid(endpoint);
+    Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
 #endif // EMBER_AF_PLUGIN_SCENES
 
     // The returned status is based solely on the On/Off cluster.  Errors in the

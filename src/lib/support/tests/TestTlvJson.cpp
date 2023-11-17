@@ -133,8 +133,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                       "   \"value\" : 1.0\n"
                       "}\n");
 
-    const char charBuf[] = "hello";
-    CharSpan charSpan(charBuf);
+    CharSpan charSpan = "hello"_span;
     EncodeAndValidate(charSpan,
                       "{\n"
                       "   \"value\" : \"hello\"\n"

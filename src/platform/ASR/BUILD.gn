@@ -26,6 +26,8 @@ static_library("ASR") {
     "../SingletonConfigurationManager.cpp",
     "ASRConfig.cpp",
     "ASRConfig.h",
+    "ASRFactoryDataParser.cpp",
+    "ASRFactoryDataParser.h",
     "ASRFactoryDataProvider.cpp",
     "ASRUtils.cpp",
     "ASRUtils.h",

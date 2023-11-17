@@ -13,9 +13,7 @@ WeakEnums:
     - ColorControlOptions
     - ColorMode
     - EnhancedColorMode
-    - MoveMode
     - PHYRateEnum
-    - StepMode
 
 EnumsNotUsedAsTypeInXML:
     # List of enums that are not used as a type in XML. By adding an enum
@@ -64,6 +62,7 @@ ClustersWithInitFunctions:
     - Thermostat
     - Mode Select
     - Sample MEI
+    - Scenes
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic
@@ -80,6 +79,7 @@ ClustersWithShutdownFunctions:
     - Level Control
     - Color Control
     - Sample MEI
+    - Scenes
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
