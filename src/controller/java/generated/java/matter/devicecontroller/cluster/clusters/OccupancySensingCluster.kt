@@ -20,23 +20,31 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class OccupancySensingCluster(
-  private val controller: MatterController,
-  private val endpointId: UShort
-) {
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+class OccupancySensingCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
   suspend fun readOccupancyAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOccupancyAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeOccupancyAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -44,7 +52,10 @@ class OccupancySensingCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOccupancySensorTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeOccupancySensorTypeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -65,13 +76,13 @@ class OccupancySensingCluster(
 
   suspend fun writePIROccupiedToUnoccupiedDelayAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeoutMs: Int? = null    
   ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribePIROccupiedToUnoccupiedDelayAttribute(
@@ -87,13 +98,13 @@ class OccupancySensingCluster(
 
   suspend fun writePIRUnoccupiedToOccupiedDelayAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeoutMs: Int? = null    
   ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribePIRUnoccupiedToOccupiedDelayAttribute(
@@ -109,13 +120,13 @@ class OccupancySensingCluster(
 
   suspend fun writePIRUnoccupiedToOccupiedThresholdAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeoutMs: Int? = null    
   ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribePIRUnoccupiedToOccupiedThresholdAttribute(
@@ -131,13 +142,13 @@ class OccupancySensingCluster(
 
   suspend fun writeUltrasonicOccupiedToUnoccupiedDelayAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeoutMs: Int? = null    
   ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribeUltrasonicOccupiedToUnoccupiedDelayAttribute(
@@ -153,13 +164,13 @@ class OccupancySensingCluster(
 
   suspend fun writeUltrasonicUnoccupiedToOccupiedDelayAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeoutMs: Int? = null    
   ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribeUltrasonicUnoccupiedToOccupiedDelayAttribute(
@@ -175,13 +186,13 @@ class OccupancySensingCluster(
 
   suspend fun writeUltrasonicUnoccupiedToOccupiedThresholdAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeoutMs: Int? = null    
   ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribeUltrasonicUnoccupiedToOccupiedThresholdAttribute(
@@ -197,13 +208,13 @@ class OccupancySensingCluster(
 
   suspend fun writePhysicalContactOccupiedToUnoccupiedDelayAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeoutMs: Int? = null    
   ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribePhysicalContactOccupiedToUnoccupiedDelayAttribute(
@@ -219,13 +230,13 @@ class OccupancySensingCluster(
 
   suspend fun writePhysicalContactUnoccupiedToOccupiedDelayAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeoutMs: Int? = null    
   ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribePhysicalContactUnoccupiedToOccupiedDelayAttribute(
@@ -241,13 +252,13 @@ class OccupancySensingCluster(
 
   suspend fun writePhysicalContactUnoccupiedToOccupiedThresholdAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeoutMs: Int? = null    
   ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribePhysicalContactUnoccupiedToOccupiedThresholdAttribute(
@@ -283,7 +294,10 @@ class OccupancySensingCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -302,7 +316,10 @@ class OccupancySensingCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -310,7 +327,10 @@ class OccupancySensingCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

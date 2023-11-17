@@ -20,40 +20,52 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class GeneralDiagnosticsCluster(
-  private val controller: MatterController,
-  private val endpointId: UShort
-) {
-  class TimeSnapshotResponse(val systemTimeUs: ULong, val UTCTimeUs: ULong?)
+class GeneralDiagnosticsCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class TimeSnapshotResponse(
+    val systemTimeUs: ULong, 
+    val UTCTimeUs: ULong?
+  )
 
-  class NetworkInterfacesAttribute(val value: List<GeneralDiagnosticsClusterNetworkInterface>)
+  class NetworkInterfacesAttribute(
+    val value: List<GeneralDiagnosticsClusterNetworkInterface>
+  )
 
-  class ActiveHardwareFaultsAttribute(val value: List<UInt>?)
+  class ActiveHardwareFaultsAttribute(
+    val value: List<UInt>?
+  )
 
-  class ActiveRadioFaultsAttribute(val value: List<UInt>?)
+  class ActiveRadioFaultsAttribute(
+    val value: List<UInt>?
+  )
 
-  class ActiveNetworkFaultsAttribute(val value: List<UInt>?)
+  class ActiveNetworkFaultsAttribute(
+    val value: List<UInt>?
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
-  suspend fun testEventTrigger(
-    enableKey: ByteArray,
-    eventTrigger: ULong,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun testEventTrigger(enableKey: ByteArray, eventTrigger: ULong, timedInvokeTimeoutMs: Int? = null) {
     val commandId = 0L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
   suspend fun timeSnapshot(timedInvokeTimeoutMs: Int? = null): TimeSnapshotResponse {
@@ -63,7 +75,7 @@ class GeneralDiagnosticsCluster(
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
   suspend fun readNetworkInterfacesAttribute(): NetworkInterfacesAttribute {
@@ -81,7 +93,10 @@ class GeneralDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRebootCountAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeRebootCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -89,7 +104,10 @@ class GeneralDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeUpTimeAttribute(minInterval: Int, maxInterval: Int): ULong {
+  suspend fun subscribeUpTimeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ULong {
     // Implementation needs to be added here
   }
 
@@ -97,7 +115,10 @@ class GeneralDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTotalOperationalHoursAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeTotalOperationalHoursAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -105,7 +126,10 @@ class GeneralDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBootReasonAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeBootReasonAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -179,7 +203,10 @@ class GeneralDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -198,7 +225,10 @@ class GeneralDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -206,7 +236,10 @@ class GeneralDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

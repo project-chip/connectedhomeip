@@ -89,6 +89,7 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x00000850, DeviceTypeClass::Simple, "Matter On/Off Sensor" },
 };
 
+static_assert(ExtractVendorFromMEI(0x00000078) != 0, "Must have class defined for \"Matter Cooktop Device Type\" if it's a standard device type");
 static_assert(ExtractVendorFromMEI(0xFFF10001) != 0, "Must have class defined for \"Matter Orphan Clusters\" if it's a standard device type");
 static_assert(ExtractVendorFromMEI(0xFFF10002) != 0, "Must have class defined for \"Matter Secondary Network Commissioning Device Type\" if it's a standard device type");
 static_assert(ExtractVendorFromMEI(0xFFF10003) != 0, "Must have class defined for \"Matter All-clusters-app Server Example\" if it's a standard device type");
