@@ -131,6 +131,7 @@ using ThreadScanResponseIterator = Iterator<ThreadScanResponse>;
 using Status                     = app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum;
 using WiFiBand                   = app::Clusters::NetworkCommissioning::WiFiBandEnum;
 using WiFiSecurity               = app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
+using ThreadCapabilities         = app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap;
 
 // BaseDriver and WirelessDriver are the common interfaces for a network driver, platform drivers should not implement this
 // directly, instead, users are expected to implement WiFiDriver, ThreadDriver and EthernetDriver.
@@ -350,6 +351,14 @@ public:
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
+    /**
+     *  @brief Provide all the frequency bands supported by the Wi-Fi interface
+     *
+     *  Provide a default implementation that returns the 2.4 Ghz band support.
+     *  Note: WiFi platforms should implement this function in their WiFiDriver to provide their complete device capabilities
+     */
+    virtual WiFiBand GetSupportedWiFiBands(){ return WiFiBand::k2G4 };
+
     ~WiFiDriver() override = default;
 };
 
@@ -388,6 +397,16 @@ public:
      * be called inside ScanNetworks.
      */
     virtual void ScanNetworks(ScanCallback * callback) = 0;
+
+    /**
+     * @brief Provide all of the Thread features supported by the Thread interface
+     */
+    virtual ThreadCapabilities GetSupportedThreadFeatures() = 0;
+
+    /**
+     * @brief Return the Thread version supported by the Thread interface
+     */
+    virtual uint16_t GetThreadVersion() = 0;
 
     ~ThreadDriver() override = default;
 };
