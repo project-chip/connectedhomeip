@@ -357,7 +357,7 @@ public:
      *  Provide a default implementation that returns the 2.4 Ghz band support.
      *  Note: WiFi platforms should implement this function in their WiFiDriver to provide their complete device capabilities
      */
-    virtual WiFiBand GetSupportedWiFiBands(){ return WiFiBand::k2G4 };
+    virtual WiFiBand GetSupportedWiFiBands() { return WiFiBand::k2g4; }
 
     ~WiFiDriver() override = default;
 };
