@@ -109,7 +109,10 @@ CHIP_ERROR TimeFormatLocalizationAttrAccess::Read(const ConcreteReadAttributePat
 bool IsSupportedCalendarType(CalendarTypeEnum newType, CalendarTypeEnum & validType)
 {
     // Reset valid type if no supported calendar types found.
-    validType = CalendarTypeEnum::kBuddhist;
+    validType = CalendarTypeEnum::kUseActiveLocale;
+    if (newType == CalendarTypeEnum::kUseActiveLocale) {
+        return true;
+    }
 
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
     VerifyOrReturnValue(provider != nullptr, false);
@@ -170,7 +173,7 @@ static Protocols::InteractionModel::Status emberAfPluginTimeFormatLocalizationOn
                                                                                                    CalendarTypeEnum newType)
 {
     Protocols::InteractionModel::Status res;
-    CalendarTypeEnum validType = CalendarTypeEnum::kBuddhist;
+    CalendarTypeEnum validType = CalendarTypeEnum::kUseActiveLocale;
 
     if (IsSupportedCalendarType(newType, validType))
     {
