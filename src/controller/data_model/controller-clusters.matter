@@ -2836,7 +2836,7 @@ client cluster IcdManagement = 70 {
   /** Unregister a client from an end device */
   fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
   /** Request the end device to stay in Active Mode for an additional ActiveModeThreshold */
-  command access(invoke: manage) StayActiveRequest(): DefaultSuccess = 3;
+  command access(invoke: manage) StayActiveRequest(): StayActiveResponse = 3;
 }
 
 /** This cluster supports creating a simple timer functionality. */
