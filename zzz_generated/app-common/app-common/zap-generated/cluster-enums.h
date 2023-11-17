@@ -21,8 +21,6 @@
 
 #include <stdint.h>
 
-#include <app-common/zap-generated/enums.h>
-
 namespace chip {
 namespace app {
 namespace Clusters {
