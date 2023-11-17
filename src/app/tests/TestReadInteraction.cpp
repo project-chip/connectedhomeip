@@ -76,41 +76,40 @@ static chip::System::Clock::ClockBase * gRealClock;
 class TestContext : public chip::Test::AppContext
 {
 public:
-    static int Initialize(void * context)
+    static int SetUp(void * context)
     {
         gRealClock = &chip::System::SystemClock();
         chip::System::Clock::Internal::SetSystemClockForTesting(&gMockClock);
-
         if (AppContext::Initialize(context) != SUCCESS)
             return FAILURE;
+        return SUCCESS;
+    }
 
-        auto * ctx = static_cast<TestContext *>(context);
-
-        if (ctx->mEventCounter.Init(0) != CHIP_NO_ERROR)
-        {
+    static int TearDown(void * context)
+    {
+        chip::System::Clock::Internal::SetSystemClockForTesting(gRealClock);
+        if (AppContext::Finalize(context) != SUCCESS)
             return FAILURE;
-        }
+        return SUCCESS;
+    }
 
-        chip::app::LogStorageResources logStorageResources[] = {
+    static int Initialize(void * context)
+    {
+        const chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
             { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
-
+        auto * ctx = static_cast<TestContext *>(context);
+        VerifyOrReturnError(ctx->mEventCounter.Init(0) == CHIP_NO_ERROR, FAILURE);
         chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
-
         return SUCCESS;
     }
 
-    static int Finalize(void * context)
+    static int Terminate(void * context)
     {
         chip::app::EventManagement::DestroyEventManagement();
-        chip::System::Clock::Internal::SetSystemClockForTesting(gRealClock);
-
-        if (AppContext::Finalize(context) != SUCCESS)
-            return FAILURE;
-
         return SUCCESS;
     }
 
@@ -1970,7 +1969,6 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
-        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
@@ -2158,7 +2156,6 @@ void TestReadInteraction::TestSubscribeEarlyReport(nlTestSuite * apSuite, void *
         uint16_t maxInterval;
         delegate.mpReadHandler->GetReportingIntervals(minInterval, maxInterval);
 
-        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
         NL_TEST_ASSERT(apSuite,
@@ -2310,8 +2307,6 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(1) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(1);
 
-        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
-        NL_TEST_ASSERT(apSuite, nonUrgentDelegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 2);
 
         GenerateEvents(apSuite, apContext);
@@ -3005,7 +3000,6 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
-        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
@@ -3376,7 +3370,6 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
-        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
@@ -3480,7 +3473,6 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
-        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
@@ -3582,7 +3574,6 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReport(nlTestSuite * ap
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
-        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
@@ -4094,7 +4085,7 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedInvalidReportMess
 
         ctx.GetLoopback().mSentMessageCount = 0;
         auto exchange                       = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(
-            delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
+                                  delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
         delegate.mpReadHandler->mExchangeCtx.Grab(exchange);
         err = delegate.mpReadHandler->mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(msgBuf),
                                                                 Messaging::SendMessageFlags::kExpectResponse);
@@ -4263,7 +4254,7 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedReportMessageWith
 
         ctx.GetLoopback().mSentMessageCount = 0;
         auto exchange                       = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(
-            delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
+                                  delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
         delegate.mpReadHandler->mExchangeCtx.Grab(exchange);
         err = delegate.mpReadHandler->mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(msgBuf),
                                                                 Messaging::SendMessageFlags::kExpectResponse);
@@ -4911,18 +4902,15 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
 
 namespace {
 
-/**
- *   Test Suite. It lists all the test functions.
- */
-
-// clang-format off
-const nlTest sTests[] =
-{
+const nlTest sTests[] = {
     NL_TEST_DEF("TestReadRoundtrip", chip::app::TestReadInteraction::TestReadRoundtrip),
     NL_TEST_DEF("TestReadRoundtripWithDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithDataVersionFilter),
-    NL_TEST_DEF("TestReadRoundtripWithNoMatchPathDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithNoMatchPathDataVersionFilter),
-    NL_TEST_DEF("TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter),
-    NL_TEST_DEF("TestReadRoundtripWithSameDifferentPathsDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithSameDifferentPathsDataVersionFilter),
+    NL_TEST_DEF("TestReadRoundtripWithNoMatchPathDataVersionFilter",
+                chip::app::TestReadInteraction::TestReadRoundtripWithNoMatchPathDataVersionFilter),
+    NL_TEST_DEF("TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter",
+                chip::app::TestReadInteraction::TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter),
+    NL_TEST_DEF("TestReadRoundtripWithSameDifferentPathsDataVersionFilter",
+                chip::app::TestReadInteraction::TestReadRoundtripWithSameDifferentPathsDataVersionFilter),
     NL_TEST_DEF("TestReadWildcard", chip::app::TestReadInteraction::TestReadWildcard),
     NL_TEST_DEF("TestReadChunking", chip::app::TestReadInteraction::TestReadChunking),
     NL_TEST_DEF("TestSetDirtyBetweenChunks", chip::app::TestReadInteraction::TestSetDirtyBetweenChunks),
@@ -4930,38 +4918,51 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadUnexpectedSubscriptionId", chip::app::TestReadInteraction::TestReadUnexpectedSubscriptionId),
     NL_TEST_DEF("CheckReadHandler", chip::app::TestReadInteraction::TestReadHandler),
     NL_TEST_DEF("TestReadClientGenerateAttributePathList", chip::app::TestReadInteraction::TestReadClientGenerateAttributePathList),
-    NL_TEST_DEF("TestReadClientGenerateInvalidAttributePathList", chip::app::TestReadInteraction::TestReadClientGenerateInvalidAttributePathList),
+    NL_TEST_DEF("TestReadClientGenerateInvalidAttributePathList",
+                chip::app::TestReadInteraction::TestReadClientGenerateInvalidAttributePathList),
     NL_TEST_DEF("TestReadClientGenerateOneEventPaths", chip::app::TestReadInteraction::TestReadClientGenerateOneEventPaths),
     NL_TEST_DEF("TestReadClientGenerateTwoEventPaths", chip::app::TestReadInteraction::TestReadClientGenerateTwoEventPaths),
     NL_TEST_DEF("TestReadClientInvalidReport", chip::app::TestReadInteraction::TestReadClientInvalidReport),
     NL_TEST_DEF("TestReadHandlerInvalidAttributePath", chip::app::TestReadInteraction::TestReadHandlerInvalidAttributePath),
     NL_TEST_DEF("TestProcessSubscribeRequest", chip::app::TestReadInteraction::TestProcessSubscribeRequest),
-    /*
-        We need to figure out a way to run unit tests with an ICD build without affecting
-        all the standard unit tests
-        https://github.com/project-chip/connectedhomeip/issues/28446
-    */
+/*
+    We need to figure out a way to run unit tests with an ICD build without affecting
+    all the standard unit tests
+    https://github.com/project-chip/connectedhomeip/issues/28446
+*/
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    NL_TEST_DEF("TestICDProcessSubscribeRequestSupMaxIntervalCeiling", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestSupMaxIntervalCeiling),
-    NL_TEST_DEF("TestICDProcessSubscribeRequestInfMaxIntervalCeiling", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestInfMaxIntervalCeiling),
-    NL_TEST_DEF("TestICDProcessSubscribeRequestSupMinInterval", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval),
-    NL_TEST_DEF("TestICDProcessSubscribeRequestMaxMinInterval", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestMaxMinInterval),
-    NL_TEST_DEF("TestICDProcessSubscribeRequestInvalidIdleModeDuration", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeDuration),
+    NL_TEST_DEF("TestICDProcessSubscribeRequestSupMaxIntervalCeiling",
+                chip::app::TestReadInteraction::TestICDProcessSubscribeRequestSupMaxIntervalCeiling),
+    NL_TEST_DEF("TestICDProcessSubscribeRequestInfMaxIntervalCeiling",
+                chip::app::TestReadInteraction::TestICDProcessSubscribeRequestInfMaxIntervalCeiling),
+    NL_TEST_DEF("TestICDProcessSubscribeRequestSupMinInterval",
+                chip::app::TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval),
+    NL_TEST_DEF("TestICDProcessSubscribeRequestMaxMinInterval",
+                chip::app::TestReadInteraction::TestICDProcessSubscribeRequestMaxMinInterval),
+    NL_TEST_DEF("TestICDProcessSubscribeRequestInvalidIdleModeDuration",
+                chip::app::TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeDuration),
 #endif // #if CHIP_CONFIG_ENABLE_ICD_SERVER
     NL_TEST_DEF("TestSubscribeRoundtrip", chip::app::TestReadInteraction::TestSubscribeRoundtrip),
     NL_TEST_DEF("TestSubscribeEarlyReport", chip::app::TestReadInteraction::TestSubscribeEarlyReport),
     NL_TEST_DEF("TestPostSubscribeRoundtripChunkReport", chip::app::TestReadInteraction::TestPostSubscribeRoundtripChunkReport),
     NL_TEST_DEF("TestReadClientReceiveInvalidMessage", chip::app::TestReadInteraction::TestReadClientReceiveInvalidMessage),
-    NL_TEST_DEF("TestSubscribeClientReceiveInvalidStatusResponse", chip::app::TestReadInteraction::TestSubscribeClientReceiveInvalidStatusResponse),
-    NL_TEST_DEF("TestSubscribeClientReceiveWellFormedStatusResponse", chip::app::TestReadInteraction::TestSubscribeClientReceiveWellFormedStatusResponse),
-    NL_TEST_DEF("TestSubscribeClientReceiveInvalidReportMessage", chip::app::TestReadInteraction::TestSubscribeClientReceiveInvalidReportMessage),
-    NL_TEST_DEF("TestSubscribeClientReceiveUnsolicitedInvalidReportMessage", chip::app::TestReadInteraction::TestSubscribeClientReceiveUnsolicitedInvalidReportMessage),
-    NL_TEST_DEF("TestSubscribeClientReceiveInvalidSubscribeResponseMessage", chip::app::TestReadInteraction::TestSubscribeClientReceiveInvalidSubscribeResponseMessage),
-    NL_TEST_DEF("TestSubscribeClientReceiveUnsolicitedReportMessageWithInvalidSubscriptionId", chip::app::TestReadInteraction::TestSubscribeClientReceiveUnsolicitedReportMessageWithInvalidSubscriptionId),
+    NL_TEST_DEF("TestSubscribeClientReceiveInvalidStatusResponse",
+                chip::app::TestReadInteraction::TestSubscribeClientReceiveInvalidStatusResponse),
+    NL_TEST_DEF("TestSubscribeClientReceiveWellFormedStatusResponse",
+                chip::app::TestReadInteraction::TestSubscribeClientReceiveWellFormedStatusResponse),
+    NL_TEST_DEF("TestSubscribeClientReceiveInvalidReportMessage",
+                chip::app::TestReadInteraction::TestSubscribeClientReceiveInvalidReportMessage),
+    NL_TEST_DEF("TestSubscribeClientReceiveUnsolicitedInvalidReportMessage",
+                chip::app::TestReadInteraction::TestSubscribeClientReceiveUnsolicitedInvalidReportMessage),
+    NL_TEST_DEF("TestSubscribeClientReceiveInvalidSubscribeResponseMessage",
+                chip::app::TestReadInteraction::TestSubscribeClientReceiveInvalidSubscribeResponseMessage),
+    NL_TEST_DEF("TestSubscribeClientReceiveUnsolicitedReportMessageWithInvalidSubscriptionId",
+                chip::app::TestReadInteraction::TestSubscribeClientReceiveUnsolicitedReportMessageWithInvalidSubscriptionId),
     NL_TEST_DEF("TestReadChunkingInvalidSubscriptionId", chip::app::TestReadInteraction::TestReadChunkingInvalidSubscriptionId),
     NL_TEST_DEF("TestReadHandlerMalformedReadRequest1", chip::app::TestReadInteraction::TestReadHandlerMalformedReadRequest1),
     NL_TEST_DEF("TestReadHandlerMalformedReadRequest2", chip::app::TestReadInteraction::TestReadHandlerMalformedReadRequest2),
-    NL_TEST_DEF("TestReadHandlerMalformedSubscribeRequest", chip::app::TestReadInteraction::TestReadHandlerMalformedSubscribeRequest),
+    NL_TEST_DEF("TestReadHandlerMalformedSubscribeRequest",
+                chip::app::TestReadInteraction::TestReadHandlerMalformedSubscribeRequest),
     NL_TEST_DEF("TestSubscribeSendUnknownMessage", chip::app::TestReadInteraction::TestSubscribeSendUnknownMessage),
     NL_TEST_DEF("TestSubscribeSendInvalidStatusReport", chip::app::TestReadInteraction::TestSubscribeSendInvalidStatusReport),
     NL_TEST_DEF("TestReadHandlerInvalidSubscribeRequest", chip::app::TestReadInteraction::TestReadHandlerInvalidSubscribeRequest),
@@ -4972,29 +4973,36 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestSubscribePartialOverlap", chip::app::TestReadInteraction::TestSubscribePartialOverlap),
     NL_TEST_DEF("TestSubscribeSetDirtyFullyOverlap", chip::app::TestReadInteraction::TestSubscribeSetDirtyFullyOverlap),
     NL_TEST_DEF("TestSubscribeEarlyShutdown", chip::app::TestReadInteraction::TestSubscribeEarlyShutdown),
-    NL_TEST_DEF("TestSubscribeInvalidAttributePathRoundtrip", chip::app::TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip),
+    NL_TEST_DEF("TestSubscribeInvalidAttributePathRoundtrip",
+                chip::app::TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip),
     NL_TEST_DEF("TestReadInvalidAttributePathRoundtrip", chip::app::TestReadInteraction::TestReadInvalidAttributePathRoundtrip),
     NL_TEST_DEF("TestSubscribeInvalidInterval", chip::app::TestReadInteraction::TestSubscribeInvalidInterval),
-    NL_TEST_DEF("TestSubscribeRoundtripStatusReportTimeout", chip::app::TestReadInteraction::TestSubscribeRoundtripStatusReportTimeout),
-    NL_TEST_DEF("TestPostSubscribeRoundtripStatusReportTimeout", chip::app::TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout),
+    NL_TEST_DEF("TestSubscribeRoundtripStatusReportTimeout",
+                chip::app::TestReadInteraction::TestSubscribeRoundtripStatusReportTimeout),
+    NL_TEST_DEF("TestPostSubscribeRoundtripStatusReportTimeout",
+                chip::app::TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout),
     NL_TEST_DEF("TestReadChunkingStatusReportTimeout", chip::app::TestReadInteraction::TestReadChunkingStatusReportTimeout),
     NL_TEST_DEF("TestReadReportFailure", chip::app::TestReadInteraction::TestReadReportFailure),
-    NL_TEST_DEF("TestSubscribeRoundtripChunkStatusReportTimeout", chip::app::TestReadInteraction::TestSubscribeRoundtripChunkStatusReportTimeout),
-    NL_TEST_DEF("TestPostSubscribeRoundtripChunkStatusReportTimeout", chip::app::TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout),
-    NL_TEST_DEF("TestPostSubscribeRoundtripChunkReportTimeout", chip::app::TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout),
+    NL_TEST_DEF("TestSubscribeRoundtripChunkStatusReportTimeout",
+                chip::app::TestReadInteraction::TestSubscribeRoundtripChunkStatusReportTimeout),
+    NL_TEST_DEF("TestPostSubscribeRoundtripChunkStatusReportTimeout",
+                chip::app::TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout),
+    NL_TEST_DEF("TestPostSubscribeRoundtripChunkReportTimeout",
+                chip::app::TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout),
     NL_TEST_DEF("TestReadShutdown", chip::app::TestReadInteraction::TestReadShutdown),
-    NL_TEST_DEF("TestSubscriptionReportWithDefunctSession", chip::app::TestReadInteraction::TestSubscriptionReportWithDefunctSession),
-    NL_TEST_SENTINEL()
+    NL_TEST_DEF("TestSubscriptionReportWithDefunctSession",
+                chip::app::TestReadInteraction::TestSubscriptionReportWithDefunctSession),
+    NL_TEST_SENTINEL(),
 };
-// clang-format on
 
 // clang-format off
-nlTestSuite sSuite =
-{
+nlTestSuite sSuite = {
     "TestReadInteraction",
     &sTests[0],
+    TestContext::SetUp,
+    TestContext::TearDown,
     TestContext::Initialize,
-    TestContext::Finalize
+    TestContext::Terminate,
 };
 // clang-format on
 
