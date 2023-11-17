@@ -41,10 +41,11 @@
 #include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/SessionParameters.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <setup_payload/SetupPayload.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <trace/trace.h>
+#include <tracing/macros.h>
 #include <transport/SessionManager.h>
 
 namespace chip {
@@ -111,6 +112,7 @@ void PASESession::Clear()
 
 CHIP_ERROR PASESession::Init(SessionManager & sessionManager, uint32_t setupCode, SessionEstablishmentDelegate * delegate)
 {
+    VerifyOrReturnError(sessionManager.GetSessionKeystore() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Reset any state maintained by PASESession object (in case it's being reused for pairing)
@@ -133,7 +135,7 @@ CHIP_ERROR PASESession::Init(SessionManager & sessionManager, uint32_t setupCode
 CHIP_ERROR PASESession::GeneratePASEVerifier(Spake2pVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
                                              bool useRandomPIN, uint32_t & setupPINCode)
 {
-    MATTER_TRACE_EVENT_SCOPE("GeneratePASEVerifier", "PASESession");
+    MATTER_TRACE_SCOPE("GeneratePASEVerifier", "PASESession");
 
     if (useRandomPIN)
     {
@@ -148,7 +150,7 @@ CHIP_ERROR PASESession::GeneratePASEVerifier(Spake2pVerifier & verifier, uint32_
 
 CHIP_ERROR PASESession::SetupSpake2p()
 {
-    MATTER_TRACE_EVENT_SCOPE("SetupSpake2p", "PASESession");
+    MATTER_TRACE_SCOPE("SetupSpake2p", "PASESession");
     uint8_t context[kSHA256_Hash_Length] = { 0 };
     MutableByteSpan contextSpan{ context };
 
@@ -209,7 +211,7 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
                              Optional<ReliableMessageProtocolConfig> mrpLocalConfig, Messaging::ExchangeContext * exchangeCtxt,
                              SessionEstablishmentDelegate * delegate)
 {
-    MATTER_TRACE_EVENT_SCOPE("Pair", "PASESession");
+    MATTER_TRACE_SCOPE("Pair", "PASESession");
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     CHIP_ERROR err = Init(sessionManager, peerSetUpPINCode, delegate);
     SuccessOrExit(err);
@@ -257,24 +259,23 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
 CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session) const
 {
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
-    return session.InitFromSecret(ByteSpan(mKe, mKeLen), ByteSpan(nullptr, 0),
+    return session.InitFromSecret(*mSessionManager->GetSessionKeystore(), ByteSpan(mKe, mKeLen), ByteSpan(),
                                   CryptoContext::SessionInfoType::kSessionEstablishment, mRole);
 }
 
 CHIP_ERROR PASESession::SendPBKDFParamRequest()
 {
-    MATTER_TRACE_EVENT_SCOPE("SendPBKDFParamRequest", "PASESession");
+    MATTER_TRACE_SCOPE("SendPBKDFParamRequest", "PASESession");
 
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
-    const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
-    const size_t max_msg_len   = TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize, // initiatorRandom,
-                                                           sizeof(uint16_t),            // initiatorSessionId
-                                                           sizeof(PasscodeId),          // passcodeId,
-                                                           sizeof(uint8_t),             // hasPBKDFParameters
-                                                           mrpParamsSize                // MRP Parameters
+    const size_t max_msg_len = TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize,         // initiatorRandom,
+                                                           sizeof(uint16_t),                    // initiatorSessionId
+                                                           sizeof(PasscodeId),                  // passcodeId,
+                                                           sizeof(uint8_t),                     // hasPBKDFParameters
+                                                           SessionParameters::kEstimatedTLVSize // Session Parameters
     );
 
     System::PacketBufferHandle req = System::PacketBufferHandle::New(max_msg_len);
@@ -289,11 +290,9 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId().Value()));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), kDefaultCommissioningPasscodeId));
     ReturnErrorOnFailure(tlvWriter.PutBoolean(TLV::ContextTag(4), mHavePBKDFParameters));
-    if (mLocalMRPConfig.HasValue())
-    {
-        ChipLogDetail(SecureChannel, "Including MRP parameters in PBKDF param request");
-        ReturnErrorOnFailure(EncodeMRPParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriter));
-    }
+
+    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig, tlvWriter));
+
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&req));
 
@@ -312,7 +311,7 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
 
 CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandlePBKDFParamRequest", "PASESession");
+    MATTER_TRACE_SCOPE("HandlePBKDFParamRequest", "PASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     System::PacketBufferTLVReader tlvReader;
@@ -356,7 +355,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     if (tlvReader.Next() != CHIP_END_OF_TLV)
     {
         SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
-        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig(mRemoteMRPConfig);
+        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig(GetRemoteMRPConfig());
     }
 
     err = SendPBKDFParamResponse(ByteSpan(initiatorRandom), hasPBKDFParameters);
@@ -375,19 +374,18 @@ exit:
 
 CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool initiatorHasPBKDFParams)
 {
-    MATTER_TRACE_EVENT_SCOPE("SendPBKDFParamResponse", "PASESession");
+    MATTER_TRACE_SCOPE("SendPBKDFParamResponse", "PASESession");
 
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
-    const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
     const size_t max_msg_len =
         TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize,                                // initiatorRandom
                                     kPBKDFParamRandomNumberSize,                                // responderRandom
                                     sizeof(uint16_t),                                           // responderSessionId
                                     TLV::EstimateStructOverhead(sizeof(uint32_t), mSaltLength), // pbkdf_parameters
-                                    mrpParamsSize                                               // MRP Parameters
+                                    SessionParameters::kEstimatedTLVSize                        // Session Parameters
         );
 
     System::PacketBufferHandle resp = System::PacketBufferHandle::New(max_msg_len);
@@ -412,11 +410,7 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
         ReturnErrorOnFailure(tlvWriter.EndContainer(pbkdfParamContainer));
     }
 
-    if (mLocalMRPConfig.HasValue())
-    {
-        ChipLogDetail(SecureChannel, "Including MRP parameters in PBKDF param response");
-        ReturnErrorOnFailure(EncodeMRPParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriter));
-    }
+    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig, tlvWriter));
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&resp));
@@ -436,7 +430,7 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
 
 CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandlePBKDFParamResponse", "PASESession");
+    MATTER_TRACE_SCOPE("HandlePBKDFParamResponse", "PASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     System::PacketBufferTLVReader tlvReader;
@@ -480,7 +474,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
         if (tlvReader.Next() != CHIP_END_OF_TLV)
         {
             SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
-            mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig(mRemoteMRPConfig);
+            mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig(GetRemoteMRPConfig());
         }
 
         // TODO - Add a unit test that exercises mHavePBKDFParameters path
@@ -505,7 +499,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
         if (tlvReader.Next() != CHIP_END_OF_TLV)
         {
             SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
-            mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig(mRemoteMRPConfig);
+            mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig(GetRemoteMRPConfig());
         }
     }
 
@@ -532,7 +526,7 @@ exit:
 
 CHIP_ERROR PASESession::SendMsg1()
 {
-    MATTER_TRACE_EVENT_SCOPE("SendMsg1", "PASESession");
+    MATTER_TRACE_SCOPE("SendMsg1", "PASESession");
     const size_t max_msg_len       = TLV::EstimateStructOverhead(kMAX_Point_Length);
     System::PacketBufferHandle msg = System::PacketBufferHandle::New(max_msg_len);
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -565,7 +559,7 @@ CHIP_ERROR PASESession::SendMsg1()
 
 CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && msg1)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleMsg1_and_SendMsg2", "PASESession");
+    MATTER_TRACE_SCOPE("HandleMsg1_and_SendMsg2", "PASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     uint8_t Y[kMAX_Point_Length];
@@ -635,7 +629,7 @@ exit:
 
 CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && msg2)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleMsg2_and_SendMsg3", "PASESession");
+    MATTER_TRACE_SCOPE("HandleMsg2_and_SendMsg3", "PASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     uint8_t verifier[kMAX_Hash_Length];
@@ -711,7 +705,7 @@ exit:
 
 CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleMsg3", "PASESession");
+    MATTER_TRACE_SCOPE("HandleMsg3", "PASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogDetail(SecureChannel, "Received spake2p msg3");
@@ -793,6 +787,13 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
     {
         mExchangeCtxt = exchange;
     }
+
+    if (!mExchangeCtxt->GetSessionHandle()->IsUnauthenticatedSession())
+    {
+        ChipLogError(SecureChannel, "PASESession received PBKDFParamRequest over encrypted session.  Ignoring.");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     mExchangeCtxt->UseSuggestedResponseTimeout(kExpectedHighProcessingTime);
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -821,7 +822,7 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Payl
     if (msgType == MsgType::PBKDFParamRequest || msgType == MsgType::PBKDFParamResponse || msgType == MsgType::PASE_Pake1 ||
         msgType == MsgType::PASE_Pake2 || msgType == MsgType::PASE_Pake3)
     {
-        SuccessOrExit(mExchangeCtxt->FlushAcks());
+        SuccessOrExit(err = mExchangeCtxt->FlushAcks());
     }
 #endif // CHIP_CONFIG_SLOW_CRYPTO
 

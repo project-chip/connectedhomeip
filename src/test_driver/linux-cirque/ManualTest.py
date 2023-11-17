@@ -15,12 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import json
 import logging
 import os
-import time
 import sys
-import json
-from optparse import OptionParser, OptionValueError
+import time
+from optparse import OptionParser
 
 from helper.CHIPTestBase import CHIPVirtualHome
 

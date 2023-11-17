@@ -51,5 +51,5 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
-    GetAppTask().UpdateClusterState();
+    AppTask::Instance().UpdateClusterState();
 }

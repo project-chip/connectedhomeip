@@ -18,7 +18,11 @@
 
 #import <Matter/Matter.h>
 
+#import "logging/logging.h"
+
 #include "commands/common/Commands.h"
+#include "commands/delay/Commands.h"
+#include "commands/discover/Commands.h"
 #include "commands/interactive/Commands.h"
 #include "commands/pairing/Commands.h"
 #include "commands/payload/Commands.h"
@@ -31,8 +35,12 @@
 int main(int argc, const char * argv[])
 {
     @autoreleasepool {
+        dft::logging::Setup();
+
         Commands commands;
         registerCommandsPairing(commands);
+        registerCommandsDelay(commands);
+        registerCommandsDiscover(commands);
         registerCommandsInteractive(commands);
         registerCommandsPayload(commands);
         registerClusterOtaSoftwareUpdateProviderInteractive(commands);

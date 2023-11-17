@@ -17,6 +17,7 @@ public class SelectClusterFragment extends Fragment {
 
   private View.OnClickListener selectContentLauncherButtonClickListener;
   private View.OnClickListener selectMediaPlaybackButtonClickListener;
+  private View.OnClickListener selectCertTestButtonClickListener;
   private View.OnClickListener disconnectButtonClickListener;
 
   public SelectClusterFragment(TvCastingApp tvCastingApp) {
@@ -61,6 +62,14 @@ public class SelectClusterFragment extends Fragment {
           }
         };
 
+    this.selectCertTestButtonClickListener =
+        new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            Log.d(TAG, "handle() called on selectCertTestButtonClickListener");
+            callback.handleCertTestLauncherSelected();
+          }
+        };
     this.disconnectButtonClickListener =
         new View.OnClickListener() {
           @Override
@@ -84,6 +93,9 @@ public class SelectClusterFragment extends Fragment {
     getView()
         .findViewById(R.id.selectMediaPlaybackButton)
         .setOnClickListener(selectMediaPlaybackButtonClickListener);
+    getView()
+        .findViewById(R.id.selectCertTestButton)
+        .setOnClickListener(selectCertTestButtonClickListener);
     getView().findViewById(R.id.disconnectButton).setOnClickListener(disconnectButtonClickListener);
   }
 
@@ -97,5 +109,8 @@ public class SelectClusterFragment extends Fragment {
 
     /** Notifies listener to trigger transition on click of the Disconnect button */
     void handleDisconnect();
+
+    /** Notifies listener to trigger transition on click of the Cert Test button */
+    void handleCertTestLauncherSelected();
   }
 }

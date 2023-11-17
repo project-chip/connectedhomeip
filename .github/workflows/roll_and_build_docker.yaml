@@ -1,0 +1,15 @@
+name: Manually Roll, Build, and Push Docker Images
+on:
+  workflow_dispatch:
+jobs:
+  roll_version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Roll docker versions
+        run: ./scripts/helpers/roll_docker_version.sh --reason="Automated roll by GitHub Action"
+      - uses: EndBug/add-and-commit@v9
+        with:
+          default_author: github_actions
+          message: Rolling Docker Version

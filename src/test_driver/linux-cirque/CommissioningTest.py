@@ -17,8 +17,6 @@ limitations under the License.
 
 import logging
 import os
-import pprint
-import time
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
@@ -45,7 +43,7 @@ MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 DEVICE_CONFIG = {
     'device0': {
         'type': 'MobileDevice',
-        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
@@ -54,7 +52,7 @@ DEVICE_CONFIG = {
     },
     'device1': {
         'type': 'CHIPEndDevice',
-        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['Thread', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
@@ -63,7 +61,7 @@ DEVICE_CONFIG = {
     },
     'device2': {
         'type': 'CHIPEndDevice',
-        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['Thread', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
@@ -99,8 +97,11 @@ class TestCommissioner(CHIPVirtualHome):
         servers[1]['nodeid'] = 2
 
         for server in servers:
-            self.execute_device_cmd(server['id'], "CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex \"set pagination off\" -ex run -ex \"bt 25\" --args {} --thread --discriminator {}".format(
-                os.path.join(CHIP_REPO, "out/debug/standalone/chip-all-clusters-app"), server['discriminator']))
+            self.execute_device_cmd(
+                server['id'],
+                ("CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex \"set pagination off\" "
+                 "-ex run -ex \"bt 25\" --args {} --thread --discriminator {}").format(
+                    os.path.join(CHIP_REPO, "out/debug/standalone/chip-all-clusters-app"), server['discriminator']))
 
         self.reset_thread_devices([server['id'] for server in servers])
 
@@ -113,7 +114,8 @@ class TestCommissioner(CHIPVirtualHome):
         self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_repl-0.0-py3-none-any.whl")))
 
-        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 -a {} --paa-trust-store-path {} --discriminator {} --nodeid {}".format(
+        command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
+                   "{} -t 150 -a {} --paa-trust-store-path {} --discriminator {} --nodeid {}").format(
             os.path.join(
                 CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
             servers[0]['ip'],
@@ -125,7 +127,8 @@ class TestCommissioner(CHIPVirtualHome):
         self.assertEqual(ret['return_code'], '0',
                          "Test failed: non-zero return code")
 
-        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid {}".format(
+        command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
+                   "{} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid {}").format(
             os.path.join(
                 CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),

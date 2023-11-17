@@ -102,6 +102,10 @@ CHIP_ERROR ToChipError(DNSServiceErrorType errorCode)
         return CHIP_NO_ERROR;
     case kDNSServiceErr_NameConflict:
         return CHIP_ERROR_MDNS_COLLISION;
+    case kDNSServiceErr_NoMemory:
+        return CHIP_ERROR_NO_MEMORY;
+    case kDNSServiceErr_NoAuth:
+        return CHIP_ERROR_DNS_SD_UNAUTHORIZED;
     default:
         return CHIP_ERROR_INTERNAL;
     }

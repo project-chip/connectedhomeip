@@ -24,6 +24,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/PlatformManager.h>
 #include <platform/qpg/DiagnosticDataProviderImpl.h>
 
@@ -145,10 +146,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveHardwareFaults(GeneralFaults<kMa
     ChipLogProgress(DeviceLayer, "GetActiveHardwareFaults");
 
 #if CHIP_CONFIG_TEST
-    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
-    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
-    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
-    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
+    using app::Clusters::GeneralDiagnostics::HardwareFaultEnum;
+
+    ReturnErrorOnFailure(hardwareFaults.add(to_underlying(HardwareFaultEnum::kRadio)));
+    ReturnErrorOnFailure(hardwareFaults.add(to_underlying(HardwareFaultEnum::kSensor)));
+    ReturnErrorOnFailure(hardwareFaults.add(to_underlying(HardwareFaultEnum::kPowerSource)));
+    ReturnErrorOnFailure(hardwareFaults.add(to_underlying(HardwareFaultEnum::kUserInterfaceFault)));
 #endif
 
     return CHIP_NO_ERROR;
@@ -158,8 +161,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRa
 {
     ChipLogProgress(DeviceLayer, "GetActiveRadioFaults");
 #if CHIP_CONFIG_TEST
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_BLE_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(to_underlying(RadioFaultEnum::kThreadFault)));
+    ReturnErrorOnFailure(radioFaults.add(to_underlying(RadioFaultEnum::kBLEFault)));
 #endif
 
     return CHIP_NO_ERROR;
@@ -169,11 +172,35 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveNetworkFaults(GeneralFaults<kMax
 {
     ChipLogProgress(DeviceLayer, "GetActiveNetworkFaults");
 #if CHIP_CONFIG_TEST
-    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
-    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
-    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
+    using app::Clusters::GeneralDiagnostics::NetworkFaultEnum;
+
+    ReturnErrorOnFailure(networkFaults.add(to_underlying(NetworkFaultEnum::kHardwareFailure)));
+    ReturnErrorOnFailure(networkFaults.add(to_underlying(NetworkFaultEnum::kNetworkJammed)));
+    ReturnErrorOnFailure(networkFaults.add(to_underlying(NetworkFaultEnum::kConnectionFailed)));
 #endif
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
+{
+    NetworkInterface * ifp = new NetworkInterface();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
+    ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
+    ifp->isOperational             = true;
+    ifp->offPremiseServicesReachableIPv4.SetNull();
+    ifp->offPremiseServicesReachableIPv6.SetNull();
+    ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
+    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
+    ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
+    ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
+#else
+    ifp->isOperational = false;
+    ifp->type          = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kUnspecified;
+#endif
+    *netifpp = ifp;
     return CHIP_NO_ERROR;
 }
 

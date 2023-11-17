@@ -33,7 +33,7 @@ set_property(TARGET CHIPTest APPEND PROPERTY INCLUDE_DIRECTORIES
         ${MATTER_SDK_ROOT}/config/standalone/
         ${MATTER_SDK_ROOT}/third_party/nlassert/repo/include/
         ${MATTER_SDK_ROOT}/third_party/nlio/repo/include/
-        ${MATTER_SDK_ROOT}/third_party/nlfaultinjection/repo/include/
+        ${MATTER_SDK_ROOT}/third_party/nlfaultinjection/include/
         ${MATTER_SDK_ROOT}/third_party/nlunit-test/repo/src/)
 set_target_properties(CHIPTest PROPERTIES COMPILE_DEFINITIONS "CHIP_HAVE_CONFIG_H=1")
 

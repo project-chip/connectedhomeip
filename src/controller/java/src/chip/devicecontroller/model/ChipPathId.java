@@ -21,8 +21,8 @@ import java.util.Objects;
 
 /** Class representing a potentially wildcard identifier for endpoints/clusters/attributes. */
 public class ChipPathId {
-  private long id;
-  private IdType type;
+  private final long id;
+  private final IdType type;
 
   public enum IdType {
     // Enum names are read by JNI code.

@@ -58,7 +58,6 @@ target_sources(app PRIVATE
                main/main.cpp
                main/ZclCallbacks.cpp
                main/WindowCovering.cpp
-               ${GEN_DIR}/window-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/PWMDevice.cpp)
 
@@ -67,10 +66,11 @@ chip_configure_data_model(app
     ZAP_FILE ${WIN_APP_COMMON_DIR}/window-app.zap
 )
 
-if(CONFIG_CHIP_OTA_REQUESTOR OR CONFIG_MCUMGR_SMP_BT)
+if(CONFIG_CHIP_OTA_REQUESTOR OR CONFIG_MCUMGR_TRANSPORT_BT)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/OTAUtil.cpp)
 endif()
 
-if(CONFIG_MCUMGR_SMP_BT)
+if(CONFIG_MCUMGR_TRANSPORT_BT)
+    zephyr_library_link_libraries(MCUBOOT_BOOTUTIL)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
 endif()

@@ -20,19 +20,17 @@ import io
 import logging
 import re
 import sys
-
 from typing import Dict
 
 import fastcore  # type: ignore
-import pandas as pd  # type: ignore
-
 import memdf.report
 import memdf.sizedb
 import memdf.util.config
 import memdf.util.markdown
 import memdf.util.sqlite
-from memdf.util.github import Gh
+import pandas as pd  # type: ignore
 from memdf import Config, ConfigDescription
+from memdf.util.github import Gh
 
 DB_CONFIG: ConfigDescription = {
     Config.group_def('database'): {
@@ -377,7 +375,10 @@ class V1Comment:
                     cols, rows = memdf.util.markdown.read_hierified(body)
                     break
         logging.debug('REC: read %d rows', len(rows))
-        df = df.append(pd.DataFrame(data=rows, columns=cols).astype(df.dtypes))
+        attrs = df.attrs
+        df = pd.concat([df, pd.DataFrame(data=rows, columns=cols).astype(df.dtypes)],
+                       ignore_index=True)
+        df.attrs = attrs
         return df.sort_values(
             by=['platform', 'target', 'config', 'section']).drop_duplicates()
 

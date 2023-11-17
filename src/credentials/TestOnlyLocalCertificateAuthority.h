@@ -52,7 +52,7 @@ public:
 
     // Non-copyable
     TestOnlyLocalCertificateAuthority(TestOnlyLocalCertificateAuthority const &) = delete;
-    void operator=(TestOnlyLocalCertificateAuthority const &) = delete;
+    void operator=(TestOnlyLocalCertificateAuthority const &)                    = delete;
 
     TestOnlyLocalCertificateAuthority & Init()
     {
@@ -74,7 +74,7 @@ public:
         }
         else
         {
-            mRootKeypair->Initialize();
+            mRootKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA);
         }
         mCurrentStatus = GenerateRootCert(*mRootKeypair.get());
         SuccessOrExit(mCurrentStatus);
@@ -101,10 +101,7 @@ public:
     bool IsSuccess() { return mCurrentStatus == CHIP_NO_ERROR; }
 
     ByteSpan GetNoc() const { return ByteSpan{ mLastNoc.Get(), mLastNoc.AllocatedSize() }; }
-    ByteSpan GetIcac() const
-    {
-        return mIncludeIcac ? ByteSpan{ mLastIcac.Get(), mLastIcac.AllocatedSize() } : ByteSpan{ nullptr, 0 };
-    }
+    ByteSpan GetIcac() const { return mIncludeIcac ? ByteSpan{ mLastIcac.Get(), mLastIcac.AllocatedSize() } : ByteSpan{}; }
     ByteSpan GetRcac() const { return ByteSpan{ mLastRcac.Get(), mLastRcac.AllocatedSize() }; }
 
     TestOnlyLocalCertificateAuthority & GenerateNocChain(FabricId fabricId, NodeId nodeId,
@@ -155,7 +152,7 @@ protected:
         ReturnErrorOnFailure(ExtractSubjectDNFromChipCert(ByteSpan{ mLastRcac.Get(), mLastRcac.AllocatedSize() }, rcac_dn));
 
         Crypto::P256Keypair icacKeypair;
-        ReturnErrorOnFailure(icacKeypair.Initialize()); // Maybe we won't use it, but it's OK
+        ReturnErrorOnFailure(icacKeypair.Initialize(Crypto::ECPKeyTarget::ECDSA)); // Maybe we won't use it, but it's OK
 
         Crypto::P256Keypair * nocIssuerKeypair = mRootKeypair.get();
         ChipDN * issuer_dn                     = &rcac_dn;

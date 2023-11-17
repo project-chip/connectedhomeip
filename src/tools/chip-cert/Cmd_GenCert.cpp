@@ -35,6 +35,7 @@ namespace {
 using namespace chip::ArgParser;
 using namespace chip::Credentials;
 using namespace chip::ASN1;
+using namespace chip::literals;
 
 #define CMD_NAME "chip-cert gen-cert"
 
@@ -104,6 +105,7 @@ const char * const gCmdOptionHelp =
     "           c - CA certificate\n"
     "           n - node certificate\n"
     "           f - firmware signing certificate\n"
+    "           p - Wi-Fi PDC identity\n"
     "\n"
     "   -i, --subject-chip-id <hex-digits>\n"
     "\n"
@@ -230,14 +232,16 @@ const char * const gCmdOptionHelp =
     "           validity-wrong                   - Certificate will have validity not-before and not-after values switched,\n"
     "                                              where not-before will have greater value than not-after.\n"
     "           subject-missing                  - Certificate won't have required Subject field.\n"
-    "           subject-node-id-missing          - Subject won't have NodeId attribute.\n"
+    "           subject-matter-id-missing        - Subject won't have Matter Id (Node, ICAC or RCAC identifier) attribute.\n"
     "           subject-node-id-invalid          - Subject will include invalid NodeId value.\n"
-    "           subject-node-id-twice            - Subject will include two NodeId attributes.\n"
+    "           subject-matter-id-twice          - Subject will include two Matter Id (Node, ICAC or RCAC identifier) attributes.\n"
     "           subject-fabric-id-missing        - Subject won't have FabricId attribute.\n"
     "           subject-fabric-id-invalid        - Subject will include invalid FabricId value.\n"
     "           subject-fabric-id-twice          - Subject will include two FabricId attributes.\n"
     "           subject-fabric-id-mismatch       - The FabricId in the subject won't match FabricId in the issuer field.\n"
     "           subject-cat-invalid              - Subject will include invalid CASE Authenticated Tag (CAT) value.\n"
+    "           subject-cat-twice                - Subject will include two valid CAT attributes with same Value component\n"
+    "                                              but different Version components.\n"
     "           sig-curve                        - Use secp256k1 curve to generate certificate signature instead of\n"
     "                                              required secp256r1 (aka prime256v1).\n"
     "           publickey                        - Error will be injected in one of the bytes of the public key value.\n"
@@ -246,8 +250,8 @@ const char * const gCmdOptionHelp =
     "           ext-basic-critical-missing       - Basic Constraint extension won't have critical field.\n"
     "           ext-basic-critical-wrong         - Basic Constraint extension will be marked as non-critical.\n"
     "           ext-basic-ca-missing             - Basic Constraint extension won't have cA field.\n"
-    "           ext-basic-ca-wrong               - Basic Constraint extension cA field will be set to TRUE for DAC\n"
-    "                                              and to FALSE for PAI and PAA.\n"
+    "           ext-basic-ca-wrong               - Basic Constraint extension cA field will be set to TRUE for NOC\n"
+    "                                              and to FALSE for ICAC/RCAC.\n"
     "           ext-basic-pathlen-presence-wrong - Basic Constraint extension will include pathLen field for NOC.\n"
     "           ext-basic-pathlen0               - Basic Constraint extension pathLen field will be set to 0.\n"
     "           ext-basic-pathlen1               - Basic Constraint extension pathLen field will be set to 1.\n"
@@ -261,8 +265,10 @@ const char * const gCmdOptionHelp =
     "                                              and won't be set for ICAC/RCAC.\n"
     "           ext-key-usage-crl-sign           - Key Usage extension cRLSign flag will be set for NOC\n"
     "                                              and won't set for ICAC/RCAC.\n"
-    "           ext-akid-missing                 - Certificate won't have required Authority Key ID extension.\n"
-    "           ext-skid-missing                 - Certificate won't have required Subject Key ID extension.\n"
+    "           ext-akid-missing                 - Certificate won't have required Authority Key ID (AKID) extension.\n"
+    "           ext-akid-len-invalid             - Authority Key ID (AKID) extension length is 19 bytes instead of required 20.\n"
+    "           ext-skid-missing                 - Certificate won't have required Subject Key ID (SKID) extension.\n"
+    "           ext-skid-len-invalid             - Subject Key ID (SKID) extension length is 19 bytes instead of required 20.\n"
     "           ext-extended-key-usage-missing   - Certificate won't have required Extended Key Usage extension.\n"
     "           signature                        - Error will be injected in one of the bytes of the signature value.\n"
    "\n"
@@ -293,7 +299,7 @@ OptionSet *gCmdOptionSets[] =
 // clang-format on
 
 ToolChipDN gSubjectDN;
-uint8_t gCertType                           = kCertType_NotSpecified;
+CertType gCertType                          = CertType::kNotSpecified;
 int gPathLengthConstraint                   = kPathLength_NotSpecified;
 bool gSelfSign                              = false;
 const char * gCACertFileNameOrStr           = nullptr;
@@ -322,24 +328,37 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         {
             if (*arg == 'n')
             {
-                gCertType = kCertType_Node;
+                gCertType = CertType::kNode;
             }
             else if (*arg == 'f')
             {
-                gCertType = kCertType_FirmwareSigning;
+                gCertType = CertType::kFirmwareSigning;
             }
             else if (*arg == 'c')
             {
-                gCertType = kCertType_ICA;
+                gCertType = CertType::kICA;
             }
             else if (*arg == 'r')
             {
-                gCertType = kCertType_Root;
+                gCertType = CertType::kRoot;
                 gSelfSign = true;
+            }
+            else if (*arg == 'p')
+            {
+                gCertType = CertType::kNetworkIdentity;
+                gSelfSign = true;
+                gSubjectDN.AddAttribute_CommonName("*"_span, false);
+                // Not Before Jan 1 00:00:01 2000 GMT
+                gValidFrom         = { 0 };
+                gValidFrom.tm_year = (2000 - 1900);
+                gValidFrom.tm_mday = 1;
+                gValidFrom.tm_sec  = 1;
+                // Not After Dec 31 23:59:59 9999 GMT
+                gValidDays = kCertValidDays_NoWellDefinedExpiration;
             }
         }
 
-        if (gCertType == kCertType_NotSpecified)
+        if (gCertType == CertType::kNotSpecified)
         {
             PrintArgError("%s: Invalid value specified for the certificate type: %s\n", progName, arg);
             return false;
@@ -355,13 +374,13 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
         switch (gCertType)
         {
-        case kCertType_Node:
+        case CertType::kNode:
             if (gCertConfig.IsSubjectNodeIdValid() && !chip::IsOperationalNodeId(chip64bitAttr))
             {
                 PrintArgError("%s: Invalid value specified for chip node-id attribute: %s\n", progName, arg);
                 return false;
             }
-            if (gCertConfig.IsSubjectNodeIdPresent())
+            if (gCertConfig.IsSubjectMatterIdPresent())
             {
                 if (gCertConfig.IsSubjectNodeIdValid())
                 {
@@ -371,20 +390,34 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
                 {
                     err = gSubjectDN.AddAttribute_MatterNodeId(chip::kMaxOperationalNodeId + 10);
                 }
-                if ((err == CHIP_NO_ERROR) && gCertConfig.IsSubjectNodeIdRepeatsTwice())
+                if ((err == CHIP_NO_ERROR) && gCertConfig.IsSubjectMatterIdRepeatsTwice())
                 {
                     err = gSubjectDN.AddAttribute_MatterNodeId(chip64bitAttr + 1);
                 }
             }
             break;
-        case kCertType_FirmwareSigning:
+        case CertType::kFirmwareSigning:
             err = gSubjectDN.AddAttribute_MatterFirmwareSigningId(chip64bitAttr);
             break;
-        case kCertType_ICA:
-            err = gSubjectDN.AddAttribute_MatterICACId(chip64bitAttr);
+        case CertType::kICA:
+            if (gCertConfig.IsSubjectMatterIdPresent())
+            {
+                err = gSubjectDN.AddAttribute_MatterICACId(chip64bitAttr);
+                if ((err == CHIP_NO_ERROR) && gCertConfig.IsSubjectMatterIdRepeatsTwice())
+                {
+                    err = gSubjectDN.AddAttribute_MatterICACId(chip64bitAttr + 1);
+                }
+            }
             break;
-        case kCertType_Root:
-            err = gSubjectDN.AddAttribute_MatterRCACId(chip64bitAttr);
+        case CertType::kRoot:
+            if (gCertConfig.IsSubjectMatterIdPresent())
+            {
+                err = gSubjectDN.AddAttribute_MatterRCACId(chip64bitAttr);
+                if ((err == CHIP_NO_ERROR) && gCertConfig.IsSubjectMatterIdRepeatsTwice())
+                {
+                    err = gSubjectDN.AddAttribute_MatterRCACId(chip64bitAttr + 1);
+                }
+            }
             break;
         default:
             PrintArgError("%s: Certificate type argument should be specified prior to subject attribute: %s\n", progName, arg);
@@ -822,17 +855,17 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         {
             gCertConfig.SetSubjectMissing();
         }
-        else if (strcmp(arg, "subject-node-id-missing") == 0)
+        else if (strcmp(arg, "subject-matter-id-missing") == 0)
         {
-            gCertConfig.SetSubjectNodeIdMissing();
+            gCertConfig.SetSubjectMatterIdMissing();
         }
         else if (strcmp(arg, "subject-node-id-invalid") == 0)
         {
             gCertConfig.SetSubjectNodeIdInvalid();
         }
-        else if (strcmp(arg, "subject-node-id-twice") == 0)
+        else if (strcmp(arg, "subject-matter-id-twice") == 0)
         {
-            gCertConfig.SetSubjectNodeIdTwice();
+            gCertConfig.SetSubjectMatterIdTwice();
         }
         else if (strcmp(arg, "subject-fabric-id-missing") == 0)
         {
@@ -853,6 +886,10 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         else if (strcmp(arg, "subject-cat-invalid") == 0)
         {
             gCertConfig.SetSubjectCATInvalid();
+        }
+        else if (strcmp(arg, "subject-cat-twice") == 0)
+        {
+            gCertConfig.SetSubjectCATTwice();
         }
         else if (strcmp(arg, "sig-curve") == 0)
         {
@@ -926,9 +963,17 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         {
             gCertConfig.SetExtensionAKIDMissing();
         }
+        else if (strcmp(arg, "ext-akid-len-invalid") == 0)
+        {
+            gCertConfig.SetExtensionAKIDLengthInvalid();
+        }
         else if (strcmp(arg, "ext-skid-missing") == 0)
         {
             gCertConfig.SetExtensionSKIDMissing();
+        }
+        else if (strcmp(arg, "ext-skid-len-invalid") == 0)
+        {
+            gCertConfig.SetExtensionSKIDLengthInvalid();
         }
         else if (strcmp(arg, "ext-extended-key-usage-missing") == 0)
         {
@@ -957,12 +1002,12 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
 bool Cmd_GenCert(int argc, char * argv[])
 {
-    CHIP_ERROR err   = CHIP_NO_ERROR;
-    bool res         = true;
-    uint8_t certType = kCertType_NotSpecified;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    bool res          = true;
+    CertType certType = CertType::kNotSpecified;
     std::unique_ptr<X509, void (*)(X509 *)> newCert(X509_new(), &X509_free);
     std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> newKey(EVP_PKEY_new(), &EVP_PKEY_free);
-    std::unique_ptr<X509, void (*)(X509 *)> caCert(X509_new(), &X509_free);
+    std::unique_ptr<X509, void (*)(X509 *)> caCert(nullptr, &X509_free);
     std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> caKey(EVP_PKEY_new(), &EVP_PKEY_free);
     X509 * caCertPtr    = nullptr;
     EVP_PKEY * caKeyPtr = nullptr;
@@ -991,7 +1036,7 @@ bool Cmd_GenCert(int argc, char * argv[])
                 "certificates.\n");
     }
 
-    if (gSubjectDN.IsEmpty())
+    if (gSubjectDN.IsEmpty() && gCertConfig.IsSubjectMatterIdPresent())
     {
         fprintf(stderr, "Please specify the subject DN attributes.\n");
         ExitNow(res = false);
@@ -1012,9 +1057,15 @@ bool Cmd_GenCert(int argc, char * argv[])
         }
     }
 
-    if (!gCertConfig.IsSubjectCATValid())
+    if (!gCertConfig.IsSubjectCATValid() || gCertConfig.IsSubjectCATRepeatsTwice())
     {
-        err = gSubjectDN.AddAttribute_MatterCASEAuthTag(0xABCD0000);
+        uint32_t cat = gCertConfig.IsSubjectCATValid() ? 0xABCD0010 : 0xABCD0000;
+
+        err = gSubjectDN.AddAttribute_MatterCASEAuthTag(cat);
+        if ((err == CHIP_NO_ERROR) && gCertConfig.IsSubjectCATRepeatsTwice())
+        {
+            err = gSubjectDN.AddAttribute_MatterCASEAuthTag(cat + 8);
+        }
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "Failed to add Invalid CAT to the Subject DN: %s\n", chip::ErrorStr(err));
@@ -1073,7 +1124,7 @@ bool Cmd_GenCert(int argc, char * argv[])
     }
 
     if (gPathLengthConstraint != kPathLength_NotSpecified &&
-        (gCertType == kCertType_Node || gCertType == kCertType_FirmwareSigning))
+        (gCertType == CertType::kNode || gCertType == CertType::kFirmwareSigning))
     {
         fprintf(stderr, "Path length constraint shouldn't be specified for the leaf certificate.\n");
         ExitNow(res = false);
@@ -1126,7 +1177,7 @@ bool Cmd_GenCert(int argc, char * argv[])
     }
     else
     {
-        res = ReadCert(gCACertFileNameOrStr, caCert.get());
+        res = ReadCert(gCACertFileNameOrStr, caCert);
         VerifyTrueOrExit(res);
 
         res = ReadKey(gCAKeyFileNameOrStr, caKey);
@@ -1140,13 +1191,15 @@ bool Cmd_GenCert(int argc, char * argv[])
                    gFutureExtensionsCount, newCert.get(), newKey.get(), gCertConfig);
     VerifyTrueOrExit(res);
 
-    if (gCertConfig.IsErrorTestCaseEnabled() && IsChipCertFormat(gOutCertFormat))
+    // Always use MakeCertTLV() instead of the standard WriteCert() / ConvertX509CertToChipCert() for
+    // Network (Client) Identities in CHIP format so that we can write it in the compact-pdc-identity format.
+    if (IsChipCertFormat(gOutCertFormat) && (gCertConfig.IsErrorTestCaseEnabled() || gCertType == CertType::kNetworkIdentity))
     {
         uint32_t chipCertBufLen                = kMaxCHIPCertLength + gCertConfig.GetExtraCertLength();
         std::unique_ptr<uint8_t[]> chipCertBuf = std::unique_ptr<uint8_t[]>(new uint8_t[chipCertBufLen]);
         chip::MutableByteSpan chipCert(chipCertBuf.get(), chipCertBufLen);
-        err = MakeCertChipTLV(gCertType, &gSubjectDN, caCertPtr, caKeyPtr, gValidFrom, gValidDays, gPathLengthConstraint,
-                              gFutureExtensions, gFutureExtensionsCount, newCert.get(), newKey.get(), gCertConfig, chipCert);
+        err = MakeCertTLV(gCertType, &gSubjectDN, caCertPtr, caKeyPtr, gValidFrom, gValidDays, gPathLengthConstraint,
+                          gFutureExtensions, gFutureExtensionsCount, newCert.get(), newKey.get(), gCertConfig, chipCert);
         VerifyTrueOrExit(err == CHIP_NO_ERROR);
 
         res = WriteChipCert(gOutCertFileName, chipCert, gOutCertFormat);

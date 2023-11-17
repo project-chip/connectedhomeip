@@ -56,13 +56,7 @@ void Reboot(SoftwareRebootReason reason)
 {
     const RetainedReason retainedReason = EncodeReason(reason);
 
-    // The parameter passed to sys_reboot() is retained in GPREGRET (general-purpose
-    // retention register) on nRF52 SOC family, but nRF53 ignores the parameter, so
-    // set it manually.
-
-#ifdef CONFIG_SOC_SERIES_NRF53X
     nrf_power_gpregret_set(NRF_POWER, retainedReason);
-#endif
 
     sys_reboot(retainedReason);
 }

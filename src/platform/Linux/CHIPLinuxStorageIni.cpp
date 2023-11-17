@@ -108,7 +108,7 @@ CHIP_ERROR ChipLinuxStorageIni::CommitConfig(const std::string & configFile)
 
         if (rename(tmpPath.c_str(), configFile.c_str()) == 0)
         {
-            ChipLogError(DeviceLayer, "renamed tmp file to file (%s)", configFile.c_str());
+            ChipLogProgress(DeviceLayer, "renamed tmp file to file (%s)", configFile.c_str());
         }
         else
         {

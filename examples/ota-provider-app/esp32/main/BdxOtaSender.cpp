@@ -110,12 +110,12 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         acceptData.StartOffset  = mTransfer.GetStartOffset();
         acceptData.Length       = mTransfer.GetTransferLength();
         VerifyOrReturn(mTransfer.AcceptTransfer(acceptData) == CHIP_NO_ERROR,
-                       ChipLogError(BDX, "%s: %s", __FUNCTION__, chip::ErrorStr(err)));
+                       ChipLogError(BDX, "AcceptTransfter failed error:%" CHIP_ERROR_FORMAT, err.Format()));
 
         // Store the file designator, used during block query
         uint16_t fdl       = 0;
         const uint8_t * fd = mTransfer.GetFileDesignator(fdl);
-        VerifyOrReturn(fdl < sizeof(mFileDesignator), ChipLogError(BDX, "Cannot store file designator with length = %d", fdl));
+        VerifyOrReturn(fdl < sizeof(mFileDesignator), ChipLogError(BDX, "Cannot store file designator with length = %u", fdl));
         memcpy(mFileDesignator, fd, fdl);
         mFileDesignator[fdl] = 0;
 
@@ -157,7 +157,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
 
         if (CHIP_NO_ERROR != mTransfer.PrepareBlock(blockData))
         {
-            ChipLogError(BDX, "%s: PrepareBlock failed: %s", __FUNCTION__, chip::ErrorStr(err));
+            ChipLogError(BDX, "PrepareBlock failed: %" CHIP_ERROR_FORMAT, err.Format());
             mTransfer.AbortTransfer(StatusCode::kUnknown);
         }
         break;
@@ -215,7 +215,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
     case TransferSession::OutputEventType::kBlockReceived:
     default:
         // TransferSession should prevent this case from happening.
-        ChipLogError(BDX, "%s: unsupported event type", __FUNCTION__);
+        ChipLogError(BDX, "unsupported event type");
     }
 }
 

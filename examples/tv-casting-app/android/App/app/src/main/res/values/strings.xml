@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">CHIPTVCastingApp</string>
+    <string name="cert_test_launcher_fragment_title">Certification Test Launcher</string>
+    <string name="cert_test_launcher_command_title">Launch Test</string>
+    <string name="launch_cert_test_button_text">Launch</string>
     <string name="content_launcher_fragment_title">Content Launcher</string>
     <string name="launch_url_command_title">Launch URL</string>
     <string name="launch_url_button_text">Launch URL</string>
@@ -11,6 +14,7 @@
     <string name="select_cluster_text">Select a Cluster</string>
     <string name="select_content_launcher_button_text">Content Launcher</string>
     <string name="select_media_playback_button_text">Media Playback</string>
+    <string name="select_cert_test_button_text">Certification Test</string>
     <string name="media_playback_fragment_title">Media Playback</string>
     <string name="subscribe_to_current_state_command_title">Subscribe to Current State</string>
     <string name="min_interval_text">Minimum interval (in sec)</string>

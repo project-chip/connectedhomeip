@@ -65,7 +65,6 @@ target_sources(${APP_TARGET} PRIVATE
 
 chip_configure_data_model(${APP_TARGET}
     ZAP_FILE ${CHIP_ROOT}/examples/ota-requestor-app/ota-requestor-common/ota-requestor-app.zap
-    GEN_DIR ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated
 )
 
 target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-emac chip)

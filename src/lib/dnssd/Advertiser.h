@@ -63,7 +63,7 @@ public:
         mPort = port;
         return *reinterpret_cast<Derived *>(this);
     }
-    uint64_t GetPort() const { return mPort; }
+    uint16_t GetPort() const { return mPort; }
 
     Derived & SetInterfaceId(Inet::InterfaceId interfaceId)
     {
@@ -101,6 +101,13 @@ public:
     }
     Optional<bool> GetTcpSupported() const { return mTcpSupported; }
 
+    Derived & SetICDOperatingAsLIT(Optional<bool> operatesAsLIT)
+    {
+        mICDOperatesAsLIT = operatesAsLIT;
+        return *reinterpret_cast<Derived *>(this);
+    }
+    Optional<bool> GetICDOperatingAsLIT() const { return mICDOperatesAsLIT; }
+
 private:
     uint16_t mPort                   = CHIP_PORT;
     Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();
@@ -109,6 +116,7 @@ private:
     size_t mMacLength                = 0;
     Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
     Optional<bool> mTcpSupported;
+    Optional<bool> mICDOperatesAsLIT;
 };
 
 /// Defines parameters required for advertising a CHIP node
@@ -298,6 +306,13 @@ public:
      * If the advertiser has already been initialized, the method exits immediately with no error.
      */
     virtual CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) = 0;
+
+    /**
+     * Returns whether the advertiser has completed the initialization.
+     *
+     * Returns true if the advertiser is ready to advertise services.
+     */
+    virtual bool IsInitialized() = 0;
 
     /**
      * Shuts down the advertiser.

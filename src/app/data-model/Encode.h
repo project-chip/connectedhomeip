@@ -20,9 +20,9 @@
 
 #include <app/data-model/FabricScoped.h>
 #include <app/data-model/Nullable.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
+#include <lib/core/TLV.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include <type_traits>
@@ -30,6 +30,18 @@
 namespace chip {
 namespace app {
 namespace DataModel {
+
+namespace detail {
+// A way to detect whether an enum has a kUnknownEnumValue value, for use in enable_if.
+template <typename Enum, Enum value>
+using VoidType = void;
+
+template <typename, typename = void>
+inline constexpr bool HasUnknownValue = false;
+
+template <typename T>
+inline constexpr bool HasUnknownValue<T, VoidType<T, T::kUnknownEnumValue>> = true;
+} // namespace detail
 
 /*
  * @brief
@@ -48,9 +60,22 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
     return writer.Put(tag, x);
 }
 
-template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int> = 0>
+template <typename X, typename std::enable_if_t<std::is_enum<X>::value && !detail::HasUnknownValue<X>, int> = 0>
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
 {
+    return writer.Put(tag, x);
+}
+
+template <typename X, typename std::enable_if_t<std::is_enum<X>::value && detail::HasUnknownValue<X>, int> = 0>
+CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
+{
+#if !CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES
+    if (x == X::kUnknownEnumValue)
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+#endif // !CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES
+
     return writer.Put(tag, x);
 }
 
@@ -163,7 +188,7 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const Nullable<X> & x)
     // CONFIG_BUILD_FOR_HOST_UNIT_TEST is true, so we can test how the other side
     // responds.
 #if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    if (!x.HasValidValue())
+    if (!x.ExistingValueInEncodableRange())
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }

@@ -25,6 +25,7 @@ enum class PairingMode
     None,
     Code,
     Ble,
+    AlreadyDiscoveredByIndex,
 };
 
 enum class PairingNetworkType
@@ -67,7 +68,23 @@ public:
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
             break;
+        case PairingMode::AlreadyDiscoveredByIndex:
+            AddArgument("payload", &mOnboardingPayload);
+            AddArgument("index", 0, UINT16_MAX, &mIndex);
+            break;
         }
+
+        if (mode != PairingMode::None)
+        {
+            AddArgument("country-code", &mCountryCode,
+                        "Country code to use to set the Basic Information cluster's Location attribute");
+        }
+
+        AddArgument("use-device-attestation-delegate", 0, 1, &mUseDeviceAttestationDelegate,
+                    "If true, use a device attestation delegate that always wants to be notified about attestation results.  "
+                    "Defaults to false.");
+        AddArgument("device-attestation-failsafe-time", 0, UINT16_MAX, &mDeviceAttestationFailsafeTime,
+                    "If set, the time to extend the failsafe to before calling the device attestation delegate");
     }
 
     /////////// CHIPCommandBridge Interface /////////
@@ -76,6 +93,7 @@ public:
 
 private:
     void PairWithCode(NSError * __autoreleasing * error);
+    void PairWithIndex(NSError * __autoreleasing * error);
     void PairWithPayload(NSError * __autoreleasing * error);
     void Unpair();
     void SetUpDeviceControllerDelegate();
@@ -88,5 +106,9 @@ private:
     chip::NodeId mNodeId;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
+    uint16_t mIndex;
     char * mOnboardingPayload;
+    chip::Optional<bool> mUseDeviceAttestationDelegate;
+    chip::Optional<uint16_t> mDeviceAttestationFailsafeTime;
+    chip::Optional<char *> mCountryCode;
 };

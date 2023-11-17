@@ -26,10 +26,11 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
+#include <protocols/secure_channel/SessionParameters.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <transport/CryptoContext.h>
 #include <transport/SecureSession.h>
@@ -96,14 +97,14 @@ public:
      */
     virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session) const = 0;
 
-    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteMRPConfig; }
-    void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteMRPConfig = config; }
+    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteSessionParams.GetMRPConfig(); }
+    void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteSessionParams.SetMRPConfig(config); }
 
     /**
-     * Encode the provided MRP parameters using the provided TLV tag.
+     * Encode the Session Parameters using the provided TLV tag.
      */
-    static CHIP_ERROR EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpLocalConfig,
-                                          TLV::TLVWriter & tlvWriter);
+    static CHIP_ERROR EncodeSessionParameters(TLV::Tag tag, const Optional<ReliableMessageProtocolConfig> & mrpLocalConfig,
+                                              TLV::TLVWriter & tlvWriter);
 
 protected:
     /**
@@ -162,26 +163,45 @@ protected:
     CHIP_ERROR HandleStatusReport(System::PacketBufferHandle && msg, bool successExpected)
     {
         Protocols::SecureChannel::StatusReport report;
-        CHIP_ERROR err = report.Parse(std::move(msg));
-        ReturnErrorOnFailure(err);
+        ReturnErrorOnFailure(report.Parse(std::move(msg)));
         VerifyOrReturnError(report.GetProtocolId() == Protocols::SecureChannel::Id, CHIP_ERROR_INVALID_ARGUMENT);
 
         if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kSuccess &&
             report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeSuccess && successExpected)
         {
             OnSuccessStatusReport();
-        }
-        else
-        {
-            err = OnFailureStatusReport(report.GetGeneralCode(), report.GetProtocolCode());
+            return CHIP_NO_ERROR;
         }
 
-        return err;
+        if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kBusy &&
+            report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeBusy)
+        {
+            if (!report.GetProtocolData().IsNull())
+            {
+                Encoding::LittleEndian::Reader reader(report.GetProtocolData()->Start(), report.GetProtocolData()->DataLength());
+
+                uint16_t minimumWaitTime = 0;
+                CHIP_ERROR waitTimeErr   = reader.Read16(&minimumWaitTime).StatusCode();
+                if (waitTimeErr != CHIP_NO_ERROR)
+                {
+                    ChipLogError(SecureChannel, "Failed to read the minimum wait time: %" CHIP_ERROR_FORMAT, waitTimeErr.Format());
+                }
+                else
+                {
+                    // TODO: CASE: Notify minimum wait time to clients on receiving busy status report #28290
+                    ChipLogProgress(SecureChannel, "Received busy status report with minimum wait time: %u ms", minimumWaitTime);
+                }
+            }
+        }
+
+        // It's very important that we propagate the return value from
+        // OnFailureStatusReport out to the caller.  Make sure we return it directly.
+        return OnFailureStatusReport(report.GetGeneralCode(), report.GetProtocolCode());
     }
 
     /**
      * Try to decode the current element (pointed by the TLV reader) as MRP parameters.
-     * If the MRP parameters are found, mRemoteMRPConfig is updated with the devoded values.
+     * If the MRP parameters are found, mRemoteSessionParams is updated with the devoded values.
      *
      * MRP parameters are optional. So, if the TLV reader is not pointing to the MRP parameters,
      * the function is a noop.
@@ -212,9 +232,9 @@ protected:
     SessionEstablishmentDelegate * mDelegate   = nullptr;
 
     // mLocalMRPConfig is our config which is sent to the other end and used by the peer session.
-    // mRemoteMRPConfig is received from other end and set to our session.
+    // mRemoteSessionParams is received from other end and set to our session.
     Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
-    ReliableMessageProtocolConfig mRemoteMRPConfig = GetDefaultMRPConfig();
+    SessionParameters mRemoteSessionParams;
 
 private:
     Optional<uint16_t> mPeerSessionId;

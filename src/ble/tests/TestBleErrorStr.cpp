@@ -37,7 +37,7 @@
 #include <string.h>
 
 #include <ble/BleError.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
@@ -113,7 +113,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestBleErrorStr(void)
+int TestBleErrorStr()
 {
     // clang-format off
     nlTestSuite theSuite =

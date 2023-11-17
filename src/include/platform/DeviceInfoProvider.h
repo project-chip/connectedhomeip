@@ -67,7 +67,7 @@ public:
 
     using FixedLabelType = app::Clusters::FixedLabel::Structs::LabelStruct::Type;
     using UserLabelType  = app::Clusters::UserLabel::Structs::LabelStruct::Type;
-    using CalendarType   = app::Clusters::TimeFormatLocalization::CalendarType;
+    using CalendarType   = app::Clusters::TimeFormatLocalization::CalendarTypeEnum;
 
     using FixedLabelIterator             = Iterator<FixedLabelType>;
     using UserLabelIterator              = Iterator<UserLabelType>;
@@ -79,7 +79,7 @@ public:
     virtual ~DeviceInfoProvider() = default;
 
     // Not copyable
-    DeviceInfoProvider(const DeviceInfoProvider &) = delete;
+    DeviceInfoProvider(const DeviceInfoProvider &)             = delete;
     DeviceInfoProvider & operator=(const DeviceInfoProvider &) = delete;
 
     /**

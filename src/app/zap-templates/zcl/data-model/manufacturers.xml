@@ -680,6 +680,7 @@ Note:
   <mapping code="0x134F" translation="Mediola Connected Living AG"/>
   <mapping code="0x1350" translation="Polynhome"/>
   <mapping code="0x1351" translation="HooRii Technology Co., Ltd."/>
+  <mapping code="0x1352" translation="Häfele SE &amp; Co KG"/>
   <mapping code="0x1353" translation="KIMIN Electronics Co., Ltd."/>
   <mapping code="0x1354" translation="Zyax AB"/>
   <mapping code="0x1355" translation="Baracoda SA"/>
@@ -704,6 +705,199 @@ Note:
   <mapping code="0x1368" translation="mui Lab, Inc."/>
   <mapping code="0x1369" translation="BHtronics S.r.l."/>
   <mapping code="0x136A" translation="Akuvox (Xiamen) Networks Co., Ltd."/>
+  <mapping code="0x136B" translation="nami"/>
+  <mapping code="0x136C" translation="Kee Tat Manufactory Holdings Limited"/>
+  <mapping code="0x136D" translation="Iton Technology Corp."/>
+  <mapping code="0x136E" translation="Ambi Labs Limited"/>
+  <mapping code="0x136F" translation="Corporación Empresarial Altra S.L."/>
+  <mapping code="0x1370" translation="Coway Co., Ltd."/>
+  <mapping code="0x1371" translation="Tridonic GmbH &amp; Co KG"/>
+  <mapping code="0x1372" translation="innovation matters iot GmbH"/>
+  <mapping code="0x1373" translation="MediaTek Inc."/>
+  <mapping code="0x1374" translation="Fresco"/>
+  <mapping code="0x1375" translation="Hangzhou Yaguan Technology Co., Ltd."/>
+  <mapping code="0x1376" translation="Guardian Glass, LLC"/>
+  <mapping code="0x1377" translation="Night Owl SP, LLC"/>
+  <mapping code="0x1378" translation="Je Woo Corporation Ltd."/>
+  <mapping code="0x1379" translation="Earda Technologies Co., Ltd."/>
+  <mapping code="0x137A" translation="Alexa Connect Kit (ACK)"/>
+  <mapping code="0x137B" translation="Amazon Basics"/>
+  <mapping code="0x137C" translation="Morse Micro Inc."/>
+  <mapping code="0x137D" translation="Shanghai Xiaodu Technology Limited"/>
+  <mapping code="0x137E" translation="Nubert electronic GmbH"/>
+  <mapping code="0x137F" translation="Shenzhen NEO Electronics Co. Ltd."/>
+  <mapping code="0x1380" translation="Grimsholm Products AB"/>
+  <mapping code="0x1381" translation="Amazon Prime Video"/>
+  <mapping code="0x1382" translation="ION INDUSTRIES B.V."/>
+  <mapping code="0x1383" translation="Ayla Networks"/>
+  <mapping code="0x1384" translation="Apple Keychain"/>
+  <mapping code="0x1385" translation="Lightning Semiconductor"/>
+  <mapping code="0x1386" translation="Skylux NV"/>
+  <mapping code="0x1387" translation="Shenzhen Qianyan Technology Ltd."/>
+  <mapping code="0x1388" translation="Infineon Technologies AG"/>
+  <mapping code="0x1389" translation="Shenzhen Jingxun Technology Co., Ltd."/>
+  <mapping code="0x138A" translation="Nature Inc."/>
+  <mapping code="0x138B" translation="WiFigarden Inc."/>
+  <mapping code="0x138C" translation="Hisense Group Co. Ltd., USA"/>
+  <mapping code="0x138D" translation="Nanjing Easthouse Electrical Co., Ltd."/>
+  <mapping code="0x138E" translation="Ledworks SRL"/>
+  <mapping code="0x138F" translation="Shina System Co., Ltd."/>
+  <mapping code="0x1390" translation="Qualcomm Technologies Inc."/>
+  <mapping code="0x1391" translation="Kasa (Big Field Global PTE. Ltd.)"/>
+  <mapping code="0x1392" translation="Tapo (Big Field Global PTE. Ltd.)"/>
+  <mapping code="0x1393" translation="Shanghai High-Flying Electronics Technology Co., Ltd."/>
+  <mapping code="0x1394" translation="SigmaStar Technology Ltd."/>
+  <mapping code="0x1395" translation="HOOBS Inc."/>
+  <mapping code="0x1396" translation="AiDot Inc."/>
+  <mapping code="0x1397" translation="Woan Technology (Shenzhen) Co., Ltd."/>
+  <mapping code="0x1398" translation="Meizu Technology Co., Ltd."/>
+  <mapping code="0x1399" translation="Yukai Engineering Inc."/>
+  <mapping code="0x139A" translation="Qrio, Inc."/>
+  <mapping code="0x139B" translation="ITIUS GmbH"/>
+  <mapping code="0x139C" translation="Zemismart Technology Limited"/>
+  <mapping code="0x139D" translation="LED Linear GmbH"/>
+  <mapping code="0x139E" translation="Dyson Technology Limited"/>
+  <mapping code="0x139F" translation="Razer Inc."/>
+  <mapping code="0x1400" translation="Uascent Technology Company Limited"/>
+  <mapping code="0x1401" translation="Bose Corporation"/>
+  <mapping code="0x1402" translation="GOLDTek Technology Co., Ltd."/>
+  <mapping code="0x1403" translation="Arlec Australia Pty. Ltd."/>
+  <mapping code="0x1404" translation="Shenzhen Phaten Technology Co., Ltd."/>
+  <mapping code="0x1405" translation="Ecovacs Robotics Co., Ltd."/>
+  <mapping code="0x1406" translation="Luxshare-ICT Co., Ltd."/>
+  <mapping code="0x1407" translation="Jiangshu Shushi Technology Co., Ltd."/>
+  <mapping code="0x1408" translation="Velux A/S"/>
+  <mapping code="0x1409" translation="Shenzhen Hidin Technology Co., Ltd."/>
+  <mapping code="0x140A" translation="Intertech Services AG"/>
+  <mapping code="0x140B" translation="70mai Co., Ltd."/>
+  <mapping code="0x140C" translation="Beijing ESWIN Computing Technology CO.,Ltd."/>
+  <mapping code="0x140D" translation="Photon Sail Technologies Pte. Ltd."/>
+  <mapping code="0x140E" translation="WiDom SRL"/>
+  <mapping code="0x140F" translation="Sagemcom SAS"/>
+  <mapping code="0x1410" translation="Quectel Wireless Solutions Co., Ltd."/>
+  <mapping code="0x1411" translation="Freedompro S.r.l."/>
+  <mapping code="0x1412" translation="Disign Incorporated"/>
+  <mapping code="0x1413" translation="1Home Solutions GmbH"/>
+  <mapping code="0x1414" translation="StreamUnlimited Engineering GmbH"/>
+  <mapping code="0x1415" translation="Caveman (Nanoleaf)"/>
+  <mapping code="0x1416" translation="Umbra (Nanoleaf)"/>
+  <mapping code="0x1417" translation="Konnected Inc."/>
+  <mapping code="0x1418" translation="KLite (Signify)"/>
+  <mapping code="0x1419" translation="Lorex Technology Inc."/>
+  <mapping code="0x141A" translation="RATOC Systems, Inc"/>
+  <mapping code="0x141B" translation="Rang Dong Light Source &amp; VacuumFlask Joint Stock Company"/>
+  <mapping code="0x141C" translation="Shenzhen Sibo Zhilian Technology Co., Ltd."/>
+  <mapping code="0x141D" translation="Secuyou APS"/>
+  <mapping code="0x141E" translation="TUO Accessories LLC"/>
+  <mapping code="0x141F" translation="DUCTECH Co., Ltd"/>
+  <mapping code="0x1420" translation="EcoFlow Inc."/>
+  <mapping code="0x1421" translation="Kwikset"/>
+  <mapping code="0x1422" translation="Zhuhai HiVi Technology Co., Ltd."/>
+  <mapping code="0x1423" translation="Feit Electric Company, Inc."/>
+  <mapping code="0x1424" translation="Alarm.com Incorporated"/>
+  <mapping code="0x1425" translation="Hangzhou BroadLink Technology Co., Ltd."/>
+  <mapping code="0x1426" translation="ELE (Group) Co., Ltd."/>
+  <mapping code="0x1427" translation="Hama GmbH &amp; Co. KG"/>
+  <mapping code="0x1428" translation="Shenzhen Aimore .Co .,Ltd"/>
+  <mapping code="0x1429" translation="Albrecht Jung GmbH &amp; Co. KG"/>
+  <mapping code="0x142A" translation="Hitachi Global Life Solutions, Inc."/>
+  <mapping code="0x142B" translation="Beijing Renhejia Technology Co., Ltd"/>
+  <mapping code="0x142C" translation="vivo Mobile Communication Co., Ltd."/>
+  <mapping code="0x142D" translation="Zhongshan QIHANG Electronic Technology Co."/>
+  <mapping code="0x142E" translation="Shenzhen Sowye Technology CO.,Ltd"/>
+  <mapping code="0x142F" translation="Shenzhen QIACHIP Wireless Ecommerce Co."/>
+  <mapping code="0x1430" translation="L-TRADE GROUP SP z.o.o."/>
+  <mapping code="0x1431" translation="Daikin Industries, Ltd."/>
+  <mapping code="0x1432" translation="ELKO EP, s.r.o."/>
+  <mapping code="0x1433" translation="MOMAX Technology (Hong Kong) Limited"/>
+  <mapping code="0x1434" translation="Hangzhou Ezviz Network Co., Ltd."/>
+  <mapping code="0x1435" translation="Granite River Labs"/>
+  <mapping code="0x1436" translation="SinuxSoft Inc."/>
+  <mapping code="0x1437" translation="ACCEL LAB Ltd."/>
+  <mapping code="0x1438" translation="Xiamen Topstar Lighting Co.,Ltd"/>
+  <mapping code="0x1439" translation="Vaillant Group"/>
+  <mapping code="0x143A" translation="YoSmart Inc."/>
+  <mapping code="0x143B" translation="Amina Charging AS"/>
+  <mapping code="0x143C" translation="Athom B.V."/>
+  <mapping code="0x143D" translation="Shenzhen Champon Technology Co., Ltd"/>
+  <mapping code="0x143E" translation="Acer Inc."/>
+  <mapping code="0x143F" translation="Vestel Elektronik Sanayi ve Ticaret A.S."/>
+  <mapping code="0x1440" translation="VerLuce"/>
+  <mapping code="0x1441" translation="Shenzhen Snowball Technology Co., Ltd."/>
+  <mapping code="0x1442" translation="REHAU Group"/>
+  <mapping code="0x1443" translation="GoodsiQ"/>
+  <mapping code="0x1444" translation="Last lock Inc."/>
+  <mapping code="0x1445" translation="Finesse Decor"/>
+  <mapping code="0x1446" translation="Take As Global, SL"/>
+  <mapping code="0x1447" translation="Honor Device Co., Ltd."/>
+  <mapping code="0x1448" translation="LivingStyle Enterprises Limited"/>
+  <mapping code="0x1449" translation="ZUTTO TECHNOLOGIES"/>
+  <mapping code="0x144A" translation="Sensibo Ltd."/>
+  <mapping code="0x144B" translation="Kohler Company"/>
+  <mapping code="0x144C" translation="TrustAsia Technologies, Inc."/>
+  <mapping code="0x144D" translation="Atios AG"/>
+  <mapping code="0x144E" translation="Sense Labs, Inc."/>
+  <mapping code="0x144F" translation="Assa Abloy AB"/>
+  <mapping code="0x1450" translation="GM Global Technology Operations LLC"/>
+  <mapping code="0x1451" translation="JetHome"/>
+  <mapping code="0x1452" translation="Big Ass Fans"/>
+  <mapping code="0x1453" translation="Gumax BV"/>
+  <mapping code="0x1454" translation="Yardi Systems Inc."/>
+  <mapping code="0x1455" translation="Deutsche Telekom AG"/>
+  <mapping code="0x1456" translation="Sensirion AG"/>
+  <mapping code="0x1457" translation="Hangzhou Wistar Mechanical &amp; Electric Technology Co., Ltd"/>
+  <mapping code="0x1458" translation="Wilhelm Koch GmbH "/>
+  <mapping code="0x1459" translation="Shenzhen iComm Semiconductor Co., Ltd."/>
+  <mapping code="0x145A" translation="British Telecommunications plc"/>
+  <mapping code="0x145B" translation="Remotec Technology Ltd."/>
+  <mapping code="0x145C" translation="Pin Genie, Inc. DBA Lockly"/>
+  <mapping code="0x145D" translation="Hosiden Corporation"/>
+  <mapping code="0x145E" translation="Deako, Inc."/>
+  <mapping code="0x145F" translation="Good Way Technology Co., Ltd."/>
+  <mapping code="0x1460" translation="Zhuhai Ruran Intelligent Technology Co., LTD (Meizu)"/>
+  <mapping code="0x1461" translation="Xinda Asset Management (Shenzhen) Co.,Ltd."/>
+  <mapping code="0x1462" translation="Chengdu Energy Magic Cube Technology Co., Ltd"/>
+  <mapping code="0x1463" translation="Eberle Controls GmbH"/>
+  <mapping code="0x1464" translation="Opulinks Technology"/>
+  <mapping code="0x1465" translation="Hunter Douglas Group"/>
+  <mapping code="0x1466" translation="Hangzhou Hemos Lighting Company Limited"/>
+  <mapping code="0x1467" translation="OTODO SAS"/>
+  <mapping code="0x1468" translation="Anona Security Technology Limited"/>
+  <mapping code="0x1469" translation="Loxone Electronics GmbH"/>
+  <mapping code="0x146A" translation="Intecular LLC"/>
+  <mapping code="0x146B" translation="Aixlink Ltd."/>
+  <mapping code="0x146C" translation="Shenzhen Jinjie Technology Co.,Ltd."/>
+  <mapping code="0x146D" translation="Polyaire Pty Ltd"/>
+  <mapping code="0x146E" translation="Shenzhen PINXUAN Trading Co."/>
+  <mapping code="0x146F" translation="SmartWing Home LLC"/>
+  <mapping code="0x1470" translation="Shenzhen Hope Microelectronics Co., Ltd."/>
+  <mapping code="0x1471" translation="Commax"/>
+  <mapping code="0x1472" translation="Zhejiang Jiecang Linear Motion Technology Co.,Ltd"/>
+  <mapping code="0x1473" translation="Shenzhen Lelight technology Co.lt"/>
+  <mapping code="0x1474" translation="Shenzhen Ruomu Zhilian Technology Co., Ltd."/>
+  <mapping code="0x1475" translation="Cable Television Laboratories, Inc. dba CableLabs"/>
+  <mapping code="0x1476" translation="Harman International"/>
+  <mapping code="0x1477" translation="Shenzhen Multi IR Technology Co.,Ltd"/>
+  <mapping code="0x1478" translation="APYNOV"/>
+  <mapping code="0x1479" translation="Browan Communications Inc."/>
+  <mapping code="0x147A" translation="Shenzhen Realwe Innovation Technology Co., Ltd."/>
+  <mapping code="0x147B" translation="Lumiflow INC"/>
+  <mapping code="0x147C" translation="SHENZHEN SHENAN YANGGUANG ELECTRONICS CO., LTD."/>
+  <mapping code="0x147D" translation="Wenzhou Morning Electronics Co., Ltd."/>
+  <mapping code="0x147E" translation="MIWA Lock Co., Ltd."/>
+  <mapping code="0x147F" translation="U-tec Group Inc."/>
+  <mapping code="0x1480" translation="Beijing Roborock Technology Co., Ltd."/>
+  <mapping code="0x1481" translation="Shenzhen Xenon Industrial Ltd"/>
+  <mapping code="0x1482" translation="Guangzhou Lingqu Electronic Technology Co., Ltd"/>
+  <mapping code="0x1483" translation="Shenzhen Jijia Intelligent Technology Co., Ltd."/>
+  <mapping code="0x1484" translation="CANDY HOUSE, Inc."/>
+  <mapping code="0x1485" translation="ELIT Scandinavia ApS"/>
+  <mapping code="0x1486" translation="Infibrite Inc"/>
+  <mapping code="0x1487" translation="Whirlpool Corp."/>
+  <mapping code="0x1488" translation="Shortcut Labs (Flic)"/>
+  <mapping code="0x1489" translation="INTEREL BUILDING AUTOMATION"/>
+  <mapping code="0x148A" translation="Occhio GmbH"/>
+  <mapping code="0x148B" translation="Samraj Technologies Limited"/>
   <mapping code="0x1994" translation="Gewiss S.p.A."/>
   <mapping code="0x2794" translation="Climax Technology Co., Ltd."/>
   <mapping code="0x6006" translation="Google LLC"/>

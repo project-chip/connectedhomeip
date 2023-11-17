@@ -50,7 +50,7 @@ PyChipError pychip_DeviceController_IssueNOCChain(chip::Controller::DeviceCommis
 }
 
 void pychip_DeviceController_IssueNOCChainCallback(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                                   const ByteSpan & rcac, Optional<Crypto::AesCcm128KeySpan> ipk,
+                                                   const ByteSpan & rcac, Optional<Crypto::IdentityProtectionKeySpan> ipk,
                                                    Optional<NodeId> adminSubject)
 {
     if (pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct == nullptr)
@@ -64,9 +64,6 @@ void pychip_DeviceController_IssueNOCChainCallback(void * context, CHIP_ERROR st
     MutableByteSpan chipNocSpan;
     MutableByteSpan chipIcacSpan;
     MutableByteSpan chipRcacSpan;
-
-    Crypto::AesCcm128KeySpan ipkData;
-    ipkData = ipk.ValueOr(Crypto::AesCcm128KeySpan());
 
     CHIP_ERROR err = status;
     if (err != CHIP_NO_ERROR)
@@ -91,8 +88,8 @@ exit:
     {
         pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct(
             context, ToPyChipError(err), chipNocSpan.data(), chipNocSpan.size(), chipIcacSpan.data(), chipIcacSpan.size(),
-            chipRcacSpan.data(), chipRcacSpan.size(), ipkData.data(), ipk.HasValue() ? ipkData.size() : 0,
-            adminSubject.ValueOr(kUndefinedNodeId));
+            chipRcacSpan.data(), chipRcacSpan.size(), ipk.HasValue() ? ipk.Value().data() : nullptr,
+            ipk.HasValue() ? ipk.Value().size() : 0, adminSubject.ValueOr(kUndefinedNodeId));
     }
     else
     {

@@ -26,8 +26,8 @@ SCRIPT_ROOT = os.path.dirname(__file__)
 
 def build_expected_output(source: str, root: str, out: str) -> List[str]:
     with open(os.path.join(SCRIPT_ROOT, source), 'rt') as f:
-        for l in f.readlines():
-            yield l.replace("{root}", root).replace("{out}", out)
+        for line in f.readlines():
+            yield line.replace("{root}", root).replace("{out}", out)
 
 
 def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
@@ -47,6 +47,8 @@ def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
         'NXP_K32W0_SDK_ROOT': 'TEST_NXP_K32W0_SDK_ROOT',
         'IMX_SDK_ROOT': 'IMX_SDK_ROOT',
         'TI_SYSCONFIG_ROOT': 'TEST_TI_SYSCONFIG_ROOT',
+        'JAVA_PATH': 'TEST_JAVA_PATH',
+        'GSDK_ROOT': 'TEST_GSDK_ROOT',
     })
 
     retval = subprocess.run([
@@ -57,7 +59,7 @@ def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
         '--out-prefix', out,
     ] + args, stdout=subprocess.PIPE, check=True, encoding='UTF-8', env=runenv)
 
-    result = [l + '\n' for l in retval.stdout.split('\n')]
+    result = [line + '\n' for line in retval.stdout.split('\n')]
 
     # ensure a single terminating newline: easier to edit since autoformat
     # often strips ending double newlines on text files
@@ -73,22 +75,22 @@ class TestBuilder(unittest.TestCase):
         ROOT = '/TEST/BUILD/ROOT'
         OUT = '/OUTPUT/DIR'
 
-        expected = [l for l in build_expected_output(expected_file, ROOT, OUT)]
-        actual = [l for l in build_actual_output(ROOT, OUT, args)]
+        expected = [line for line in build_expected_output(expected_file, ROOT, OUT)]
+        actual = [line for line in build_actual_output(ROOT, OUT, args)]
 
         diffs = [line for line in difflib.unified_diff(expected, actual)]
 
         if diffs:
             reference = os.path.basename(expected_file) + '.actual'
             with open(reference, 'wt') as fo:
-                for l in build_actual_output(ROOT, OUT, args):
-                    fo.write(l.replace(ROOT, '{root}').replace(OUT, '{out}'))
+                for line in build_actual_output(ROOT, OUT, args):
+                    fo.write(line.replace(ROOT, '{root}').replace(OUT, '{out}'))
 
             msg = "DIFFERENCE between expected and generated output in %s\n" % expected_file
             msg += "Expected file can be found in %s" % reference
-            for l in diffs:
-                msg += ("\n   " + l.replace(ROOT,
-                                            '{root}').replace(OUT, '{out}').strip())
+            for line in diffs:
+                msg += ("\n   " + line.replace(ROOT,
+                                               '{root}').replace(OUT, '{out}').strip())
             self.fail(msg)
 
     @unittest.skipUnless(sys.platform == 'linux', 'Build on linux test')
@@ -107,7 +109,9 @@ class TestBuilder(unittest.TestCase):
             'esp32-m5stack-all-clusters-minimal-rpc-ipv6only',
             'android-arm64-chip-tool',
             'nrf-nrf52840dk-pump',
-            'efr32-brd4161a-light-rpc'
+            'efr32-brd4161a-light-rpc-no-version',
+            'openiotsdk-lock-mbedtls',
+            'openiotsdk-shell-mbedtls'
         ]
 
         for target in TARGETS:

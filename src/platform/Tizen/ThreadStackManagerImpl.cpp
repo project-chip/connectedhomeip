@@ -21,17 +21,41 @@
  *          for Tizen platform.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/DeviceNetworkInfo.h>
+/**
+ * Note: ThreadStackManager requires ConnectivityManager to be defined
+ *       beforehand, otherwise we will face circular dependency between them. */
+#include <platform/ConnectivityManager.h>
 
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <platform/PlatformManager.h>
+/**
+ * Note: Use public include for ThreadStackManager which includes our local
+ *       platform/<PLATFORM>/ThreadStackManagerImpl.h after defining interface
+ *       class. */
 #include <platform/ThreadStackManager.h>
-#include <platform/Tizen/NetworkCommissioningDriver.h>
 
-#include "ThreadStackManagerImpl.h"
+#include <endian.h>
+
+#include <cstring>
+
+#include <thread.h>
+
+#include <app/AttributeAccessInterface.h>
+#include <inet/IPAddress.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/dnssd/Constants.h>
 #include <lib/dnssd/platform/Dnssd.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/Span.h>
+#include <lib/support/ThreadOperationalDataset.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <platform/NetworkCommissioning.h>
+#include <platform/PlatformManager.h>
+
+#include <platform/Tizen/ThreadStackManagerImpl.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -288,9 +312,26 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     if (val && !isEnabled)
     {
         threadErr = thread_network_attach(mThreadInstance);
+        DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
+            if (this->mpConnectCallback != nullptr && threadErr != THREAD_ERROR_NONE)
+            {
+                this->mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
+                this->mpConnectCallback = nullptr;
+            }
+        });
+
         VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: attach thread network"));
 
         threadErr = thread_start(mThreadInstance);
+        DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
+            if (this->mpConnectCallback != nullptr)
+            {
+                this->mpConnectCallback->OnResult(threadErr == THREAD_ERROR_NONE ? NetworkCommissioning::Status::kSuccess
+                                                                                 : NetworkCommissioning::Status::kUnknownError,
+                                                  CharSpan(), 0);
+                this->mpConnectCallback = nullptr;
+            }
+        });
         VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: start thread network"));
     }
     else if (!val && isEnabled)
@@ -423,9 +464,8 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
     int threadErr;
 
     threadErr = thread_get_extended_address(mThreadInstance, &extAddr);
-    VerifyOrReturnError(
-        threadErr == THREAD_ERROR_NONE,
-        (ChipLogError(DeviceLayer, "thread_get_extended_address() failed. ret: %d", threadErr), CHIP_ERROR_INTERNAL));
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "thread_get_extended_address() failed. ret: %d", threadErr));
 
     extAddr = htobe64(extAddr);
     memcpy(buf, &extAddr, sizeof(extAddr));
@@ -500,40 +540,81 @@ CHIP_ERROR ThreadStackManagerImpl::_AddSrpService(const char * aInstanceName, co
                                                   const Span<const Dnssd::TextEntry> & aTxtEntries, uint32_t aLeaseInterval,
                                                   uint32_t aKeyLeaseInterval)
 {
-    ChipLogDetail(DeviceLayer, "%s +", __func__);
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int threadErr    = THREAD_ERROR_NONE;
-
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
-    VerifyOrExit(aInstanceName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(aName, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aInstanceName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    threadErr = thread_srp_client_register_service(mThreadInstance, aInstanceName, aName, aPort);
-    VerifyOrExit(threadErr == THREAD_ERROR_NONE || threadErr == THREAD_ERROR_ALREADY_DONE, error = CHIP_ERROR_INTERNAL);
+    int threadErr;
+
+    std::vector<thread_dns_txt_entry_s> entries;
+    entries.reserve(aTxtEntries.size());
+
+    thread_dns_txt_entry_s * ee = entries.data();
+    for (auto & entry : aTxtEntries)
+    {
+        ee->key   = entry.mKey;
+        ee->value = entry.mData;
+        VerifyOrReturnError(chip::CanCastTo<uint8_t>(entry.mDataSize), CHIP_ERROR_INVALID_ARGUMENT);
+        ee->value_len = static_cast<uint8_t>(entry.mDataSize);
+        ee++;
+    }
+
+    VerifyOrReturnError(chip::CanCastTo<uint8_t>(entries.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    threadErr = thread_srp_client_register_service_full(mThreadInstance, aInstanceName, aName, aPort, 0, 0, entries.data(),
+                                                        static_cast<uint8_t>(entries.size()));
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE || threadErr == THREAD_ERROR_ALREADY_DONE, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "thread_srp_client_register_service() failed. ret: %d", threadErr));
+
+    SrpClientService service;
+    Platform::CopyString(service.mInstanceName, aInstanceName);
+    Platform::CopyString(service.mName, aName);
+    service.mPort = aPort;
+    mSrpClientServices.push_back(service);
 
     return CHIP_NO_ERROR;
-
-exit:
-    ChipLogError(DeviceLayer, "FAIL: thread_srp_client_register_service");
-    return error;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_RemoveSrpService(const char * aInstanceName, const char * aName)
 {
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(aInstanceName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    int threadErr;
+
+    threadErr = thread_srp_client_remove_service(mThreadInstance, aInstanceName, aName);
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "thread_srp_client_remove_service() failed. ret: %d", threadErr));
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_InvalidateAllSrpServices()
 {
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    for (auto & service : mSrpClientServices)
+    {
+        service.mValid = false;
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_RemoveInvalidSrpServices()
 {
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    for (auto it = mSrpClientServices.begin(); it != mSrpClientServices.end();)
+    {
+        if (!it->mValid)
+        {
+            auto err = _RemoveSrpService(it->mInstanceName, it->mName);
+            VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+            it = mSrpClientServices.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 void ThreadStackManagerImpl::_ThreadIpAddressCb(int index, char * ipAddr, thread_ipaddr_type_e ipAddrType, void * userData)
@@ -571,8 +652,8 @@ CHIP_ERROR ThreadStackManagerImpl::_SetupSrpHost(const char * aHostName)
 
     /* Get external ip address */
     threadErr = thread_get_ipaddr(mThreadInstance, _ThreadIpAddressCb, THREAD_IPADDR_TYPE_MLEID, nullptr);
-    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE,
-                        (ChipLogError(DeviceLayer, "thread_get_ipaddr() failed. ret: %d", threadErr), CHIP_ERROR_INTERNAL));
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "thread_get_ipaddr() failed. ret: %d", threadErr));
 
     return CHIP_NO_ERROR;
 }

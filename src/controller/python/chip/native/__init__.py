@@ -1,11 +1,12 @@
 import ctypes
+import enum
 import glob
 import os
 import platform
-import construct
-import chip.exceptions
 import typing
-import enum
+
+import chip.exceptions
+import construct
 
 NATIVE_LIBRARY_BASE_NAME = "_ChipDeviceCtrl.so"
 
@@ -102,6 +103,9 @@ class PyChipError(ctypes.Structure):
         GetLibraryHandle().pychip_FormatError(ctypes.pointer(self), buf, 256)
         return buf.value.decode()
 
+    def __bool__(self):
+        return self.is_success
+
     def __eq__(self, other):
         if isinstance(other, int):
             return self.code == other
@@ -193,5 +197,9 @@ def Init(bluetoothAdapter: int = None):
     _GetLibraryHandle(False).pychip_CommonStackInit(ctypes.c_char_p(params))
 
 
-def GetLibraryHandle():
-    return _GetLibraryHandle(True)
+class HandleFlags(enum.Flag):
+    REQUIRE_INITIALIZATION = enum.auto()
+
+
+def GetLibraryHandle(flags=HandleFlags.REQUIRE_INITIALIZATION):
+    return _GetLibraryHandle(HandleFlags.REQUIRE_INITIALIZATION in flags)

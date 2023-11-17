@@ -1,0 +1,100 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test for conditional steps using the runIf keyword
+
+config:
+    nodeId: 0x12344321
+    cluster: "EqualityCommands"
+    endpoint: 1
+    expectedValue:
+        type: int16u
+        defaultValue: 20003
+    unexpectedValue:
+        type: int16u
+        defaultValue: 20004
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Send a command with a vendor_id and enum"
+      cluster: "Unit Testing"
+      command: "TestEnumsRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: expectedValue
+              - name: "arg2"
+                value: 1
+      response:
+          values:
+              - name: "arg1"
+                saveAs: Arg1Value
+                constraints:
+                    anyOf: [expectedValue, unexpectedValue]
+
+    - label:
+          "Compute the result of comparing Arg1Value to 20003 and save the
+          result as a variable for later use"
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: Arg1Value
+              - name: "Value2"
+                value: expectedValue
+      response:
+          - values:
+                - name: "Equals"
+                  value: true
+                  saveAs: IsExpectedValue
+
+    - label:
+          "Compute the result of comparing Arg1Value to 20004 and save the
+          result as a variable for later use"
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: Arg1Value
+              - name: "Value2"
+                value: unexpectedValue
+      response:
+          - values:
+                - name: "Equals"
+                  value: false
+                  saveAs: IsUnexpectedValue
+
+    - label: "Use runIf to skip this step"
+      runIf: IsUnexpectedValue
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: true
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  value: true # 'true' such that if the step is executed it will result in an error.

@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+    <domain name="CHIP"/>
+
+    <enum name="ProductFinishEnum" type="enum8">
+        <cluster code="0x0039"/>
+        <item name="Other" value="0"/>
+        <item name="Matte" value="1"/>
+        <item name="Satin" value="2"/>
+        <item name="Polished" value="3"/>
+        <item name="Rugged" value="4"/>
+        <item name="Fabric" value="5"/>
+    </enum>
+
+    <enum name="ColorEnum" type="enum8">
+        <cluster code="0x0039"/>
+        <item name="Black" value="0"/>
+        <item name="Navy" value="1"/>
+        <item name="Green" value="2"/>
+        <item name="Teal" value="3"/>
+        <item name="Maroon" value="4"/>
+        <item name="Purple" value="5"/>
+        <item name="Olive" value="6"/>
+        <item name="Gray" value="7"/>
+        <item name="Blue" value="8"/>
+        <item name="Lime" value="9"/>
+        <item name="Aqua" value="10"/>
+        <item name="Red" value="11"/>
+        <item name="Fuchsia" value="12"/>
+        <item name="Yellow" value="13"/>
+        <item name="White" value="14"/>
+        <item name="Nickel" value="15"/>
+        <item name="Chrome" value="16"/>
+        <item name="Brass" value="17"/>
+        <item name="Copper" value="18"/>
+        <item name="Silver" value="19"/>
+        <item name="Gold" value="20"/>
+    </enum>
+
+    <struct name="ProductAppearanceStruct">
+        <cluster code="0x0039"/>
+        <item fieldId="0" name="Finish"       type="ProductFinishEnum" isNullable="false"/>
+        <item fieldId="1" name="PrimaryColor" type="ColorEnum"         isNullable="true" />
+    </struct>
+
+    <cluster>
+        <name>Bridged Device Basic Information</name>
+        <domain>CHIP</domain>
+        <description>This Cluster serves two purposes towards a Node communicating with a Bridge: indicate that the functionality on
+          the Endpoint where it is placed (and its Parts) is bridged from a non-CHIP technology; and provide a centralized
+          collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
+          such as the vendor name, the model name, or user-assigned name.</description>
+        <code>0x0039</code>
+        <define>BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER</define>
+        <client tick="false" init="false">true</client>
+        <server tick="false" init="false">true</server>
+        <globalAttribute side="either" code="0xFFFD" value="3"/>
+
+        <attribute side="server" code="1"  define="VENDOR_NAME"               type="char_string"               length="32"                              optional="true">VendorName</attribute>
+        <attribute side="server" code="2"  define="VENDOR_ID"                 type="vendor_id"                                                          optional="true">VendorID</attribute>
+        <attribute side="server" code="3"  define="PRODUCT_NAME"              type="char_string"               length="32"                              optional="true">ProductName</attribute>
+        <attribute side="server" code="5"  define="NODE_LABEL"                type="char_string"               length="32"  default=""  writable="true" optional="true">NodeLabel</attribute>
+        <attribute side="server" code="7"  define="HARDWARE_VERSION"          type="int16u"                                 default="0"                 optional="true">HardwareVersion</attribute>
+        <attribute side="server" code="8"  define="HARDWARE_VERSION_STRING"   type="char_string" minLength="1" length="64"                              optional="true">HardwareVersionString</attribute>
+        <attribute side="server" code="9"  define="SOFTWARE_VERSION"          type="int32u"                                 default="0"                 optional="true">SoftwareVersion</attribute>
+        <attribute side="server" code="10" define="SOFTWARE_VERSION_STRING"   type="char_string" minLength="1" length="64"                              optional="true">SoftwareVersionString</attribute>
+        <attribute side="server" code="11" define="MANUFACTURING_DATE"        type="char_string" minLength="8" length="16"                              optional="true">ManufacturingDate</attribute>
+        <attribute side="server" code="12" define="PART_NUMBER"               type="char_string"               length="32"                              optional="true">PartNumber</attribute>
+        <attribute side="server" code="13" define="PRODUCT_URL"               type="long_char_string"          length="256"                             optional="true">ProductURL</attribute>
+        <attribute side="server" code="14" define="PRODUCT_LABEL"             type="char_string"               length="64"                              optional="true">ProductLabel</attribute>
+        <attribute side="server" code="15" define="SERIAL_NUMBER"             type="char_string"               length="32"                              optional="true">SerialNumber</attribute>
+        <attribute side="server" code="17" define="REACHABLE"                 type="boolean"                                default="1"                 optional="false">Reachable</attribute>
+        <attribute side="server" code="18" define="UNIQUE_ID"                 type="char_string"               length="32"                              optional="true">UniqueID</attribute>
+        <attribute side="server" code="20" define="PRODUCT_APPEARANCE"        type="ProductAppearanceStruct"                                            optional="true">ProductAppearance</attribute>
+
+        <event side="server" code="0x00" name="StartUp" priority="critical" optional="true">
+            <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
+            <field id="0" name="SoftwareVersion" type="int32u"/>
+        </event>
+        <event side="server" code="0x01" name="ShutDown" priority="critical" optional="true">
+            <description>The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence on a best-effort basis.</description>
+        </event>
+        <event side="server" code="0x02" name="Leave" priority="info" optional="true">
+            <description>The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.</description>
+        </event>
+        <event side="server" code="0x03" name="ReachableChanged" priority="info" optional="false">
+            <description>This event SHALL be generated when there is a change in the Reachable attribute.</description>
+            <field id="0" name="ReachableNewValue" type="boolean"/>
+        </event>
+
+    </cluster>
+</configurator>

@@ -16,13 +16,16 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRBaseDevice.h>
+#import <Matter/MTRDevice.h>
 
-#import "MTRBaseDevice.h"
-#import "MTRDevice.h"
+#import "MTRAsyncWorkQueue.h"
 
 #include <app/DeviceProxy.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
+@class MTRAsyncWorkQueue;
 
 typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 
@@ -33,9 +36,37 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 - (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
 
-@property (nonatomic, readonly) MTRDeviceController * deviceController;
-@property (nonatomic, readonly, copy) NSNumber * nodeID;
-@property (nonatomic, readonly) MTRAsyncCallbackWorkQueue * asyncCallbackWorkQueue;
+// called by controller to clean up and shutdown
+- (void)invalidate;
+
+// Called by controller when a new operational advertisement for what we think
+// is this device's identity has been observed.  This could have
+// false-positives, for example due to compressed fabric id collisions.
+- (void)nodeMayBeAdvertisingOperational;
+
+/**
+ * Like the public invokeCommandWithEndpointID but:
+ *
+ * 1) Allows passing through a serverSideProcessingTimeout.
+ * 2) Expects one of the command payload structs as commandPayload
+ * 3) On success, returns an instance of responseClass via the completion (or
+ *    nil if there is no responseClass, which indicates a status-only command).
+ */
+- (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                                commandID:(NSNumber *)commandID
+                           commandPayload:(id)commandPayload
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                       timedInvokeTimeout:(NSNumber * _Nullable)timeout
+              serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                            responseClass:(Class _Nullable)responseClass
+                                    queue:(dispatch_queue_t)queue
+                               completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion;
+
+// Queue used for various internal bookkeeping work.
+@property (nonatomic) dispatch_queue_t queue;
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 
 @end
 

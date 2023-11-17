@@ -30,7 +30,12 @@ CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer, const CAS
 }
 
 void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                                Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+                                                Callback::Callback<OnDeviceConnectionFailure> * onFailure
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                ,
+                                                uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+)
 {
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
                   ChipLogValueX64(peerId.GetNodeId()));
@@ -41,7 +46,7 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
     {
         ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing OperationalSessionSetup instance found");
 
-        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, peerId, this);
+        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, mConfig.clientPool, peerId, this);
 
         if (session == nullptr)
         {
@@ -52,6 +57,14 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
             return;
         }
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    session->UpdateAttemptCount(attemptCount);
+    if (onRetry)
+    {
+        session->AddRetryHandler(onRetry);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
     session->Connect(onConnection, onFailure);
 }
@@ -83,7 +96,7 @@ void CASESessionManager::UpdatePeerAddress(ScopedNodeId peerId)
     {
         ChipLogDetail(CASESessionManager, "UpdatePeerAddress: No existing OperationalSessionSetup instance found");
 
-        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, peerId, this);
+        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, mConfig.clientPool, peerId, this);
         if (session == nullptr)
         {
             ChipLogDetail(CASESessionManager, "UpdatePeerAddress: Failed to allocate OperationalSessionSetup instance");

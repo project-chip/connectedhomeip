@@ -19,6 +19,7 @@
 
 #include <app/clusters/bindings/PendingNotificationMap.h>
 #include <app/util/binding-table.h>
+#include <app/util/config.h>
 
 namespace chip {
 

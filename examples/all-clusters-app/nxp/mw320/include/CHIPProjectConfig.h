@@ -31,7 +31,6 @@
 
 // Security and Authentication enabled for release build.
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 1
 
 #else // development build
 
@@ -41,20 +40,6 @@
 // WARNING: These options make it possible to circumvent basic CHIP security functionality,
 // including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 1
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
- *
- * Enables the use of a hard-coded default CHIP device id and credentials if no device id
- * is found in CHIP NV storage.
- *
- * This option is for testing only and should be disabled in production releases.
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
-
-// Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "CHIPUS"
 
 /**
  * CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
@@ -175,11 +160,11 @@
 #define CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD 1
 
 /**
- * CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
+ * CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
  *
  * Enable recording UTC timestamps.
  */
-#define CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
 
 /**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
@@ -202,3 +187,7 @@
 #endif // BUILD_RELEASE
 
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 1
+
+// All clusters app has 3 group endpoints. This needs to defined here so that
+// CHIP_CONFIG_MAX_GROUPS_PER_FABRIC is properly configured.
+#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 3

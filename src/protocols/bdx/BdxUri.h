@@ -22,7 +22,7 @@
 namespace chip {
 namespace bdx {
 
-constexpr const char kScheme[] = "bdx://";
+inline constexpr const char kScheme[] = "bdx://";
 
 /**
  * Parses the URI into NodeId and File Designator

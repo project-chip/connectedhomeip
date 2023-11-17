@@ -26,8 +26,8 @@ import javax.annotation.Nullable;
 public final class NodeState {
   private Map<Integer, EndpointState> endpoints;
 
-  public NodeState(Map<Integer, EndpointState> endpoints) {
-    this.endpoints = endpoints;
+  public NodeState() {
+    this.endpoints = new HashMap<>();
   }
 
   public Map<Integer, EndpointState> getEndpointStates() {
@@ -35,7 +35,7 @@ public final class NodeState {
   }
 
   // Called from native code only, which ignores access modifiers.
-  private void setDataVersion(int endpointId, long clusterId, int dataVersion) {
+  private void setDataVersion(int endpointId, long clusterId, long dataVersion) {
     EndpointState endpointState = getEndpointState(endpointId);
     ClusterState clusterState = endpointState.getClusterState(clusterId);
 

@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRCluster.h>
+#import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -41,7 +42,8 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  * way
  */
 + (MTRDeviceController *)sharedControllerWithID:(id<NSCopying> _Nullable)controllerID
-                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock MTR_NEWLY_AVAILABLE;
+                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Returns an encoded values object to send over XPC for read, write and command interactions
@@ -75,6 +77,15 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  */
 + (MTRSubscribeParams * _Nullable)decodeXPCSubscribeParams:(NSDictionary<NSString *, id> * _Nullable)params;
 
+/**
+ * Returns an NSXPCInterface configured for MTRDeviceControllerServerProtocol.
+ */
++ (NSXPCInterface *)xpcInterfaceForServerProtocol MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+
+/**
+ * Returns an NSXPCInterface configured for MTRDeviceControllerClientProtocol.
+ */
++ (NSXPCInterface *)xpcInterfaceForClientProtocol MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 @end
 
 /**
@@ -87,7 +98,8 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  * Gets device controller ID corresponding to a specific fabric ID
  */
 - (void)getDeviceControllerWithFabricId:(uint64_t)fabricId
-                             completion:(MTRDeviceControllerGetterHandler)completion MTR_NEWLY_DEPRECATED("This never called.");
+                             completion:(MTRDeviceControllerGetterHandler)completion
+    MTR_DEPRECATED("This never called.", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @required
 /**
@@ -192,7 +204,8 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 
 + (MTRDeviceController *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerID
                                 xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
-    MTR_NEWLY_DEPRECATED("Please use sharedControllerWithID:xpcConnectBlock:");
+    MTR_DEPRECATED("Please use sharedControllerWithID:xpcConnectBlock:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+        tvos(16.1, 16.4));
 
 @end
 

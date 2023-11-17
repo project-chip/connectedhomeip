@@ -1,8 +1,8 @@
 config:
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
     testTwoVariable:
-        type: INT16U
+        type: int16u
         defaultValue: 2
 tests:
     - label: "Examples Test Step 1"

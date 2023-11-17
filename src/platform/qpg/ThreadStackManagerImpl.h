@@ -26,6 +26,8 @@
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>

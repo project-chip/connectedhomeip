@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2022 Project CHIP Authors
+ *   Copyright (c) 2022-2023 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,8 +20,10 @@
 
 #import <Matter/Matter.h>
 
+#include "GetCommissionerNodeIdCommand.h"
 #include "OpenCommissioningWindowCommand.h"
 #include "PairingCommandBridge.h"
+#include "PreWarmCommissioningCommand.h"
 
 class PairCode : public PairingCommandBridge
 {
@@ -53,6 +55,30 @@ public:
     PairBleThread() : PairingCommandBridge("ble-thread", PairingMode::Ble, PairingNetworkType::Thread) {}
 };
 
+class PairAlreadyDiscoveredByIndex : public PairingCommandBridge
+{
+public:
+    PairAlreadyDiscoveredByIndex() :
+        PairingCommandBridge("by-index", PairingMode::AlreadyDiscoveredByIndex, PairingNetworkType::None)
+    {}
+};
+
+class PairAlreadyDiscoveredByIndexWithWiFi : public PairingCommandBridge
+{
+public:
+    PairAlreadyDiscoveredByIndexWithWiFi() :
+        PairingCommandBridge("by-index-with-wifi", PairingMode::AlreadyDiscoveredByIndex, PairingNetworkType::WiFi)
+    {}
+};
+
+class PairAlreadyDiscoveredByIndexWithThread : public PairingCommandBridge
+{
+public:
+    PairAlreadyDiscoveredByIndexWithThread() :
+        PairingCommandBridge("by-index-with-thread", PairingMode::AlreadyDiscoveredByIndex, PairingNetworkType::Thread)
+    {}
+};
+
 class Unpair : public PairingCommandBridge
 {
 public:
@@ -69,9 +95,12 @@ void registerCommandsPairing(Commands & commands)
         make_unique<PairCodeThread>(),
         make_unique<PairBleWiFi>(),
         make_unique<PairBleThread>(),
+        make_unique<PairAlreadyDiscoveredByIndex>(),
         make_unique<Unpair>(),
         make_unique<OpenCommissioningWindowCommand>(),
+        make_unique<PreWarmCommissioningCommand>(),
+        make_unique<GetCommissionerNodeIdCommand>(),
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for commissioning devices.");
 }

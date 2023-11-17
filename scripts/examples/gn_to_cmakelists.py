@@ -33,11 +33,11 @@
 #
 
 
-import itertools
 import functools
+import itertools
 import json
-import posixpath
 import os
+import posixpath
 import string
 import sys
 
@@ -76,8 +76,8 @@ def CMakeTargetEscape(a):
     return ''.join(map(Escape, a))
 
 
-def RemoveByPrefix(l, prefixs):
-    ret = l
+def RemoveByPrefix(list, prefixs):
+    ret = list
     for pre in prefixs:
         ret = [x for x in ret if not x.startswith(pre)]
 
@@ -450,7 +450,7 @@ def WriteCopy(out, target, project, sources, synthetic_dependencies):
 
 def WriteCompilerFlags(out, target, project, sources):
     # Hack, set linker language to c if no c or cxx files present.
-    if not 'c' in sources and not 'cxx' in sources:
+    if 'c' not in sources and 'cxx' not in sources:
         SetCurrentTargetProperty(out, 'LINKER_LANGUAGE', ['C'])
 
     # Mark uncompiled sources as uncompiled.

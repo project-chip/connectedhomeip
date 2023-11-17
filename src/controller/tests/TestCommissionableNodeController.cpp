@@ -33,10 +33,12 @@ class MockResolver : public Resolver
 {
 public:
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override { return InitStatus; }
+    bool IsInitialized() override { return true; }
     void Shutdown() override {}
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override {}
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override { return ResolveNodeIdStatus; }
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId) override { return ResolveNodeIdStatus; }
+    void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override {}
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return DiscoverCommissionersStatus; }
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override
     {

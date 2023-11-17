@@ -35,107 +35,135 @@ tests:
 
     - label: "Create new user"
       command: "SetUser"
+      PICS: DRLK.S.F08 && DRLK.S.F00
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
 
     - label: "Read the user back and verify its fields"
       command: "GetUser"
+      PICS: DRLK.S.F08 && DRLK.S.F00
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
-              - name: "credentials"
-                value: null
-              - name: "creatorFabricIndex"
+              - name: "Credentials"
+                value: []
+              - name: "CreatorFabricIndex"
                 value: 1
-              - name: "lastModifiedFabricIndex"
+              - name: "LastModifiedFabricIndex"
                 value: 1
-              - name: "nextUserIndex"
+              - name: "NextUserIndex"
                 value: null
 
     - label: "Create new PIN credential and lock/unlock user"
       command: "SetCredential"
+      PICS: DRLK.S.F08 && DRLK.S.F00
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "credentialData"
+              - name: "CredentialData"
                 value: "123456"
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: null
-              - name: "userType"
+              - name: "UserType"
                 value: null
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: null
-              - name: "nextCredentialIndex"
+              - name: "NextCredentialIndex"
                 value: 2
 
     - label: "Verify created PIN credential"
+      PICS: DRLK.S.F08 && DRLK.S.F00
       command: "GetCredentialStatus"
       arguments:
           values:
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
       response:
           values:
-              - name: "credentialExists"
+              - name: "CredentialExists"
                 value: true
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "creatorFabricIndex"
+              - name: "CreatorFabricIndex"
                 value: 1
-              - name: "lastModifiedFabricIndex"
+              - name: "LastModifiedFabricIndex"
                 value: 1
-              - name: "nextCredentialIndex"
+              - name: "NextCredentialIndex"
                 value: null
 
-    - label: "TH writes AutoRelockTime attribute value as 60 seconds on the DUT"
-      PICS: DRLK.S.A0023
+    - label:
+          "Step 1a: TH writes AutoRelockTime attribute value as 10 seconds on
+          the DUT"
+      PICS: DRLK.S.M.AutoRelockTimeAttributeWritable && PICS_SDK_CI_ONLY
+      command: "writeAttribute"
+      attribute: "AutoRelockTime"
+      arguments:
+          value: 10
+
+    - label:
+          "Step 1b: TH writes AutoRelockTime attribute value as 60 seconds on
+          the DUT"
+      PICS: DRLK.S.M.AutoRelockTimeAttributeWritable && PICS_SKIP_SAMPLE_APP
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
           value: 60
 
-    - label: "TH writes AutoRelockTime attribute value as 60 seconds on the DUT"
-      PICS: " !DRLK.S.A0023 "
+    - label:
+          "Step 1c: TH writes AutoRelockTime attribute value as 10 seconds on
+          the DUT"
+      PICS: PICS_SDK_CI_ONLY && !DRLK.S.M.AutoRelockTimeAttributeWritable
+      command: "writeAttribute"
+      attribute: "AutoRelockTime"
+      arguments:
+          value: 10
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 1d: TH writes AutoRelockTime attribute value as 60 seconds on
+          the DUT"
+      PICS: PICS_SKIP_SAMPLE_APP && !DRLK.S.M.AutoRelockTimeAttributeWritable
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
@@ -143,8 +171,24 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "TH sends the Unlock with Timeout argument value as 60 seconds"
-      PICS: DRLK.S.C03.Rsp
+    - label:
+          "Step 2a: TH sends the Unlock with Timeout argument value as 10
+          seconds"
+      PICS: DRLK.S.C03.Rsp && PICS_SDK_CI_ONLY
+      command: "UnlockWithTimeout"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "Timeout"
+                value: 10
+              - name: "PINCode"
+                value: "123456"
+
+    - label:
+          "Step 2b: TH sends the Unlock with Timeout argument value as 60
+          seconds"
+      PICS:
+          " DRLK.S.F08 && DRLK.S.F00 && DRLK.S.C03.Rsp && PICS_SKIP_SAMPLE_APP "
       command: "UnlockWithTimeout"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -154,16 +198,39 @@ tests:
               - name: "PINCode"
                 value: "123456"
 
-    - label: "Wait 60s"
-      PICS: DRLK.S.C03.Rsp
+    - label:
+          "Step 2b: TH sends the Unlock with Timeout argument value as 60
+          seconds"
+      PICS:
+          " (!DRLK.S.F08 || !DRLK.S.F00) && DRLK.S.C03.Rsp &&
+          PICS_SKIP_SAMPLE_APP "
+      command: "UnlockWithTimeout"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "Timeout"
+                value: 60
+
+    - label: "Wait for AutoRelockTime Expires"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      PICS: DRLK.S.C03.Rsp && PICS_SDK_CI_ONLY
+      arguments:
+          values:
+              - name: "ms"
+                value: 11000
+
+    #https://github.com/project-chip/connectedhomeip/issues/27421#issuecomment-1603541308
+    - label: "Wait for AutoRelockTime Expires"
+      PICS: DRLK.S.C03.Rsp && PICS_SKIP_SAMPLE_APP
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 60000
+                value: 70000
 
-    - label: "TH reads LockState attribute"
+    - label: "Step 2c: TH reads LockState attribute"
       PICS: DRLK.S.A0000 && DRLK.S.C03.Rsp
       command: "readAttribute"
       attribute: "LockState"
@@ -172,17 +239,18 @@ tests:
 
     - label: "Cleanup the created user"
       command: "ClearUser"
+      PICS: DRLK.S.F08 && DRLK.S.F00
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
 
     - label: "Clean the created credential"
-      PICS: DRLK.S.C26.Rsp
+      PICS: DRLK.S.F08 && DRLK.S.F00 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }

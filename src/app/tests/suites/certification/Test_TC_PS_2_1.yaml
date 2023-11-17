@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,8 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Test Harness Client reads Status attribute from Server DUT"
+    - label:
+          "Step 2: Test Harness Client reads Status attribute from Server DUT"
       PICS: PS.S.A0000
       command: "readAttribute"
       attribute: "Status"
@@ -41,7 +42,7 @@ tests:
               minValue: 0
               maxValue: 3
 
-    - label: "Test Harness Client reads Order attribute from Server DUT"
+    - label: "Step 3: Test Harness Client reads Order attribute from Server DUT"
       PICS: PS.S.A0001
       command: "readAttribute"
       attribute: "Order"
@@ -51,17 +52,20 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "Test Harness Client reads Description attribute from Server DUT"
+    - label:
+          "Step 4: Test Harness Client reads Description attribute from Server
+          DUT"
       PICS: PS.S.A0002
       command: "readAttribute"
       attribute: "Description"
       response:
           constraints:
               type: char_string
+              maxLength: 60
 
     - label:
-          "Test Harness Client reads WiredAssessedInputVoltage attribue from
-          Server DUT"
+          "Step 5: Test Harness Client reads WiredAssessedInputVoltage attribue
+          from Server DUT"
       PICS: PS.S.A0003
       command: "readAttribute"
       attribute: "WiredAssessedInputVoltage"
@@ -72,8 +76,8 @@ tests:
               maxValue: 0xFFFFFFFF
 
     - label:
-          "Test Harness Client reads WiredAssessedInputFrequency attribute from
-          Server DUT"
+          "Step 6: Test Harness Client reads WiredAssessedInputFrequency
+          attribute from Server DUT"
       PICS: PS.S.A0004
       command: "readAttribute"
       attribute: "WiredAssessedInputFrequency"
@@ -84,7 +88,8 @@ tests:
               maxValue: 65535
 
     - label:
-          "Test Harness Client reads WiredCurrentType attribute from Server DUT"
+          "Step 7: Test Harness Client reads WiredCurrentType attribute from
+          Server DUT"
       PICS: PS.S.A0005
       command: "readAttribute"
       attribute: "WiredCurrentType"
@@ -95,8 +100,8 @@ tests:
               maxValue: 1
 
     - label:
-          "Test Harness Client reads WiredAssessedCurrent attribute from Server
-          DUT"
+          "Step 8: Test Harness Client reads WiredAssessedCurrent attribute from
+          Server DUT"
       PICS: PS.S.A0006
       command: "readAttribute"
       attribute: "WiredAssessedCurrent"
@@ -106,7 +111,8 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "Test Harness Client reads WiredNominalVoltage from Server DUT"
+    - label:
+          "Step 9: Test Harness Client reads WiredNominalVoltage from Server DUT"
       PICS: PS.S.A0007
       command: "readAttribute"
       attribute: "WiredNominalVoltage"
@@ -116,7 +122,9 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "Test Harness Client reads WiredMaximumCurrent from Server DUT"
+    - label:
+          "Step 10: Test Harness Client reads WiredMaximumCurrent from Server
+          DUT"
       PICS: PS.S.A0008
       command: "readAttribute"
       attribute: "WiredMaximumCurrent"
@@ -126,7 +134,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "Test Harness Client reads WiredPresent from Server DUT"
+    - label: "Step 11: Test Harness Client reads WiredPresent from Server DUT"
       PICS: PS.S.A0009
       command: "readAttribute"
       attribute: "WiredPresent"
@@ -134,7 +142,8 @@ tests:
           constraints:
               type: boolean
 
-    - label: "Test Harness Client reads ActiveWiredFaults from Server DUT"
+    - label:
+          "Step 12: Test Harness Client reads ActiveWiredFaults from Server DUT"
       PICS: PS.S.A000a
       command: "readAttribute"
       attribute: "ActiveWiredFaults"
@@ -143,7 +152,7 @@ tests:
               type: list
               maxLength: 8
 
-    - label: "Test Harness Client reads BatVoltage from Server DUT"
+    - label: "Step 13: Test Harness Client reads BatVoltage from Server DUT"
       PICS: PS.S.A000b
       command: "readAttribute"
       attribute: "BatVoltage"
@@ -153,7 +162,9 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "Test Harness Client reads BatPercentRemaining from Server DUT"
+    - label:
+          "Step 14: Test Harness Client reads BatPercentRemaining from Server
+          DUT"
       PICS: PS.S.A000c
       command: "readAttribute"
       attribute: "BatPercentRemaining"
@@ -163,7 +174,8 @@ tests:
               minValue: 0
               maxValue: 200
 
-    - label: "Test Harness Client reads BatTimeRemaining from Server DUT"
+    - label:
+          "Step 15: Test Harness Client reads BatTimeRemaining from Server DUT"
       PICS: PS.S.A000d
       command: "readAttribute"
       attribute: "BatTimeRemaining"
@@ -173,7 +185,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "Test Harness Client reads BatChargeLevel from Server DUT"
+    - label: "Step 16: Test Harness Client reads BatChargeLevel from Server DUT"
       PICS: PS.S.A000e
       command: "readAttribute"
       attribute: "BatChargeLevel"
@@ -183,7 +195,9 @@ tests:
               minValue: 0
               maxValue: 2
 
-    - label: "Test Harness Client reads BatReplacementNeeded from Server DUT"
+    - label:
+          "Step 17: Test Harness Client reads BatReplacementNeeded from Server
+          DUT"
       PICS: PS.S.A000f
       command: "readAttribute"
       attribute: "BatReplacementNeeded"
@@ -191,7 +205,8 @@ tests:
           constraints:
               type: boolean
 
-    - label: "Test Harness Client reads BatReplaceability from Server DUT"
+    - label:
+          "Step 18: Test Harness Client reads BatReplaceability from Server DUT"
       PICS: PS.S.A0010
       command: "readAttribute"
       attribute: "BatReplaceability"
@@ -201,7 +216,7 @@ tests:
               minValue: 0
               maxValue: 3
 
-    - label: "Test Harness Client reads BatPresent from Server DUT"
+    - label: "Step 19: Test Harness Client reads BatPresent from Server DUT"
       PICS: PS.S.A0011
       command: "readAttribute"
       attribute: "BatPresent"
@@ -209,7 +224,7 @@ tests:
           constraints:
               type: boolean
 
-    - label: "Test Harness Client readsActiveBatFaults from Server DUT"
+    - label: "Step 20: Test Harness Client readsActiveBatFaults from Server DUT"
       PICS: PS.S.A0012
       command: "readAttribute"
       attribute: "ActiveBatFaults"
@@ -219,7 +234,8 @@ tests:
               maxLength: 8
 
     - label:
-          "Test Harness Client reads BatReplacementDescription from Server DUT"
+          "Step 21: Test Harness Client reads BatReplacementDescription from
+          Server DUT"
       PICS: PS.S.A0013
       command: "readAttribute"
       attribute: "BatReplacementDescription"
@@ -228,17 +244,20 @@ tests:
               type: char_string
               maxLength: 60
 
-    - label: "Test Harness Client reads BatCommonDesignation from Server DUT"
+    - label:
+          "Step 22: Test Harness Client reads BatCommonDesignation from Server
+          DUT"
       PICS: PS.S.A0014
       command: "readAttribute"
       attribute: "BatCommonDesignation"
       response:
           constraints:
-              type: int32u
+              type: enum16
               minValue: 0
               maxValue: 80
 
-    - label: "Test Harness Client reads BatANSIDesignation from Server DUT"
+    - label:
+          "Step 23: Test Harness Client reads BatANSIDesignation from Server DUT"
       PICS: PS.S.A0015
       command: "readAttribute"
       attribute: "BatANSIDesignation"
@@ -247,7 +266,8 @@ tests:
               type: char_string
               maxLength: 20
 
-    - label: "Test Harness Client reads BatIECDesignation from Server DUT"
+    - label:
+          "Step 24: Test Harness Client reads BatIECDesignation from Server DUT"
       PICS: PS.S.A0016
       command: "readAttribute"
       attribute: "BatIECDesignation"
@@ -256,17 +276,19 @@ tests:
               type: char_string
               maxLength: 20
 
-    - label: "Test Harness Client reads BatApprovedChemistry from Server DUT"
+    - label:
+          "Step 25: Test Harness Client reads BatApprovedChemistry from Server
+          DUT"
       PICS: PS.S.A0017
       command: "readAttribute"
       attribute: "BatApprovedChemistry"
       response:
           constraints:
-              type: int32u
+              type: enum16
               minValue: 0
               maxValue: 32
 
-    - label: "Test Harness Client reads BatCapacity from Server DUT"
+    - label: "Step 26: Test Harness Client reads BatCapacity from Server DUT"
       PICS: PS.S.A0018
       command: "readAttribute"
       attribute: "BatCapacity"
@@ -276,7 +298,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "Test Harness Client reads BatQuantity from Server DUT"
+    - label: "Step 27: Test Harness Client reads BatQuantity from Server DUT"
       PICS: PS.S.A0019
       command: "readAttribute"
       attribute: "BatQuantity"
@@ -286,7 +308,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "Test Harness Client reads BatChargeState from Server DUT"
+    - label: "Step 28: Test Harness Client reads BatChargeState from Server DUT"
       PICS: PS.S.A001a
       command: "readAttribute"
       attribute: "BatChargeState"
@@ -296,7 +318,9 @@ tests:
               minValue: 0
               maxValue: 3
 
-    - label: "Test Harness Client reads BatTimeToFullCharge from Server DUT"
+    - label:
+          "Step 29: Test Harness Client reads BatTimeToFullCharge from Server
+          DUT"
       PICS: PS.S.A001b
       command: "readAttribute"
       attribute: "BatTimeToFullCharge"
@@ -307,7 +331,8 @@ tests:
               maxValue: 0xFFFFFFFF
 
     - label:
-          "Test Harness Client reads BatFunctionalWhileCharging from Server DUT"
+          "Step 30: Test Harness Client reads BatFunctionalWhileCharging from
+          Server DUT"
       PICS: PS.S.A001c
       command: "readAttribute"
       attribute: "BatFunctionalWhileCharging"
@@ -315,7 +340,8 @@ tests:
           constraints:
               type: boolean
 
-    - label: "Test Harness Client reads BatChargingCurrent from Server DUT"
+    - label:
+          "Step 31: Test Harness Client reads BatChargingCurrent from Server DUT"
       PICS: PS.S.A001d
       command: "readAttribute"
       attribute: "BatChargingCurrent"
@@ -325,10 +351,21 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFF
 
-    - label: "Test Harness Client reads ActiveBatChargeFaults from Server DUT"
+    - label:
+          "Step 32: Test Harness Client reads ActiveBatChargeFaults from Server
+          DUT"
       PICS: PS.S.A001e
       command: "readAttribute"
       attribute: "ActiveBatChargeFaults"
+      response:
+          constraints:
+              type: list
+              maxLength: 16
+
+    - label: "Step 33: Test Harness Client reads EndpointList from Server DUT"
+      PICS: PS.S.A001f
+      command: "readAttribute"
+      attribute: "EndpointList"
       response:
           constraints:
               type: list

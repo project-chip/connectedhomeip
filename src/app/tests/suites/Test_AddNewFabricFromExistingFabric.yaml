@@ -1,0 +1,243 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test
+
+config:
+    nodeId: 0x12344321
+    endpoint: 0
+    nodeId2:
+        type: node_id
+        defaultValue: 0x43211234
+
+tests:
+    - label: "Wait for the alpha device to be retrieved "
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read the fabrics list from alpha"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "Fabrics"
+      response:
+          value: [{ Label: "", NodeID: nodeId }]
+          constraints:
+              type: list
+
+    - label:
+          "Send ArmFailSafe command to target device with ExpiryLengthSeconds 60
+          seconds"
+      cluster: "General Commissioning"
+      command: "ArmFailSafe"
+      arguments:
+          values:
+              - name: "ExpiryLengthSeconds"
+                value: 60
+              - name: "Breadcrumb"
+                value: 0
+
+    - label: "Send CSRRequest command from alpha"
+      command: "CSRRequest"
+      cluster: "Operational Credentials"
+      arguments:
+          values:
+              - name: CSRNonce
+                value: "\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07"
+      response:
+          values:
+              - name: "NOCSRElements"
+                saveAs: NOCSRElements
+              - name: "AttestationSignature"
+                saveAs: attestationSignature
+
+    - label: "Read the commissioner node ID from the beta fabric"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdBeta
+
+    - label: "Read the commissioner root certificate from the beta fabric"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerRootCertificate"
+      response:
+          values:
+              - name: "RCAC"
+                saveAs: commissionerRCACBeta
+
+    - label:
+          "Create a NOC chain for commissioner beta with the results of the
+          CSRRequest from alpha"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "IssueNocChain"
+      arguments:
+          values:
+              - name: "Elements"
+                value: NOCSRElements
+              - name: "nodeId"
+                value: nodeId2
+      response:
+          values:
+              - name: "NOC"
+                saveAs: noc
+              - name: "ICAC"
+                saveAs: icac
+              - name: "IPK"
+                saveAs: ipk
+
+    - label: "Send AddTrustedRootCertificate command from alpha"
+      command: "AddTrustedRootCertificate"
+      cluster: "Operational Credentials"
+      arguments:
+          values:
+              - name: "RootCACertificate"
+                value: commissionerRCACBeta
+
+    - label: "Send AddNOC command from alpha"
+      command: "AddNOC"
+      cluster: "Operational Credentials"
+      arguments:
+          values:
+              - name: "NOCValue"
+                value: noc
+              - name: "ICACValue"
+                value: icac
+              - name: "IPKValue"
+                value: ipk
+              - name: "CaseAdminSubject"
+                value: commissionerNodeIdBeta
+              - name: "AdminVendorId"
+                value: 0xFFF1
+      response:
+          values:
+              - name: "StatusCode"
+                value: 0
+
+    - label: "Send Commissioning Complete command from beta"
+      nodeId: nodeId2
+      identity: "beta"
+      cluster: "General Commissioning"
+      command: "CommissioningComplete"
+
+    - label: "Read alpha fabric index"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: AlphaFabricIndex
+
+    - label: "Read beta fabric index"
+      identity: "beta"
+      nodeId: nodeId2
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: BetaFabricIndex
+
+    - label: "Read the fabrics list again from alpha"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "Fabrics"
+      response:
+          value: [{ Label: "", NodeID: nodeId }]
+          constraints:
+              type: list
+
+    - label: "Read the fabrics list again from alpha without fabric-filtering"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { Label: "", NodeID: nodeId, FabricIndex: AlphaFabricIndex },
+                  { Label: "", NodeID: nodeId2, FabricIndex: BetaFabricIndex },
+              ]
+          constraints:
+              type: list
+
+    - label:
+          "Read the fabrics list again from alpha without fabric-filtering,
+          checking contains constraint"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          constraints:
+              type: list
+              # Flip the order to test the constraint better.
+              contains:
+                  [
+                      {
+                          Label: "",
+                          NodeID: nodeId2,
+                          FabricIndex: BetaFabricIndex,
+                      },
+                      {
+                          Label: "",
+                          NodeID: nodeId,
+                          FabricIndex: AlphaFabricIndex,
+                      },
+                  ]
+              excludes:
+                  [
+                      {
+                          Label: "",
+                          NodeID: nodeId,
+                          FabricIndex: BetaFabricIndex,
+                      },
+                      {
+                          Label: "",
+                          NodeID: nodeId2,
+                          FabricIndex: AlphaFabricIndex,
+                      },
+                  ]
+
+    - label: "Read the fabrics list from beta this time"
+      identity: "beta"
+      nodeId: nodeId2
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "Fabrics"
+      response:
+          value: [{ Label: "", NodeID: nodeId2 }]
+          constraints:
+              type: list
+
+    - label: "Read the fabrics list from beta without fabric-filtering"
+      identity: "beta"
+      nodeId: nodeId2
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { Label: "", NodeID: nodeId, FabricIndex: AlphaFabricIndex },
+                  { Label: "", NodeID: nodeId2, FabricIndex: BetaFabricIndex },
+              ]
+          constraints:
+              type: list

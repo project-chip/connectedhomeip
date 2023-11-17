@@ -13,13 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import coloredlogs
-import click
 import logging
 import os
 import re
-import sys
 import subprocess
+
+import click
+import coloredlogs
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
@@ -146,7 +146,7 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
                 print("========== TEST OUTPUT END   ============")
 
             logging.info("Image %s PASSED", path)
-        except:
+        except Exception:
             # make sure output is visible in stdout
             print("========== TEST OUTPUT BEGIN ============")
             print(output)

@@ -28,6 +28,15 @@ struct StartFromCacheView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
+            Button("Purge cache", action: {
+                viewModel.purgeAndReReadCache()
+            })
+            .frame(width: 200, height: 30, alignment: .center)
+            .border(Color.black, width: 1)
+            .background(Color.blue)
+            .foregroundColor(Color.white)
+            .padding()
+            
             NavigationLink(
                 destination: CommissionerDiscoveryView(),
                 label: {

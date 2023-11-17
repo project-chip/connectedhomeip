@@ -30,50 +30,50 @@ tests:
 
     - label: "Commit User Label List"
       command: "writeAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       arguments:
           value:
               [
-                  { label: "room", value: "bedroom 1" },
-                  { label: "orientation", value: "South" },
-                  { label: "floor", value: "2" },
-                  { label: "direction", value: "down" },
+                  { Label: "room", Value: "bedroom 1" },
+                  { Label: "orientation", Value: "South" },
+                  { Label: "floor", Value: "2" },
+                  { Label: "direction", Value: "down" },
               ]
 
     - label: "Verify committed User Label List"
       command: "readAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       response:
           value:
               [
-                  { label: "room", value: "bedroom 1" },
-                  { label: "orientation", value: "South" },
-                  { label: "floor", value: "2" },
-                  { label: "direction", value: "down" },
+                  { Label: "room", Value: "bedroom 1" },
+                  { Label: "orientation", Value: "South" },
+                  { Label: "floor", Value: "2" },
+                  { Label: "direction", Value: "down" },
               ]
 
     - label: "Clear User Label List"
       command: "writeAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       arguments:
           value: []
 
     - label: "Read User Label List"
       command: "readAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       response:
           value: []
 
     - label: "Write User Label List"
       command: "writeAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       arguments:
           value:
               [
-                  { label: "room", value: "bedroom 2" },
-                  { label: "orientation", value: "North" },
-                  { label: "floor", value: "5" },
-                  { label: "direction", value: "up" },
+                  { Label: "room", Value: "bedroom 2" },
+                  { Label: "orientation", Value: "North" },
+                  { Label: "floor", Value: "5" },
+                  { Label: "direction", Value: "up" },
               ]
 
     - label: "Reboot target device"
@@ -90,12 +90,12 @@ tests:
 
     - label: "Verify User Label List after reboot"
       command: "readAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       response:
           value:
               [
-                  { label: "room", value: "bedroom 2" },
-                  { label: "orientation", value: "North" },
-                  { label: "floor", value: "5" },
-                  { label: "direction", value: "up" },
+                  { Label: "room", Value: "bedroom 2" },
+                  { Label: "orientation", Value: "North" },
+                  { Label: "floor", Value: "5" },
+                  { Label: "direction", Value: "up" },
               ]

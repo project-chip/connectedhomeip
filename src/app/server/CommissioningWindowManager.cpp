@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app/icd/ICDNotifier.h>
 #include <app/reporting/reporting.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Dnssd.h>
@@ -28,7 +29,7 @@
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
 
-using AdministratorCommissioning::CommissioningWindowStatus;
+using AdministratorCommissioning::CommissioningWindowStatusEnum;
 using chip::app::DataModel::MakeNullable;
 using chip::app::DataModel::Nullable;
 using chip::app::DataModel::NullNullable;
@@ -98,7 +99,7 @@ void CommissioningWindowManager::ResetState()
     mECMIterations    = 0;
     mECMSaltLength    = 0;
 
-    UpdateWindowStatus(CommissioningWindowStatus::kWindowNotOpen);
+    UpdateWindowStatus(CommissioningWindowStatusEnum::kWindowNotOpen);
 
     UpdateOpenerFabricIndex(NullNullable);
     UpdateOpenerVendorId(NullNullable);
@@ -108,6 +109,8 @@ void CommissioningWindowManager::ResetState()
 
     DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
     mCommissioningTimeoutTimerArmed = false;
+
+    DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 }
 
 void CommissioningWindowManager::Cleanup()
@@ -129,11 +132,18 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
 #if CONFIG_NETWORK_LAYER_BLE
     mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
+
+    CHIP_ERROR prevErr = err;
     if (mFailedCommissioningAttempts < kMaxFailedCommissioningAttempts)
     {
         // If the number of commissioning attempts has not exceeded maximum
         // retries, let's start listening for commissioning connections again.
         err = AdvertiseAndListenForPASE();
+    }
+
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnCommissioningSessionEstablishmentError(prevErr);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -154,6 +164,12 @@ void CommissioningWindowManager::OnSessionEstablishmentStarted()
     // As per specifications, section 5.5: Commissioning Flows
     constexpr System::Clock::Timeout kPASESessionEstablishmentTimeout = System::Clock::Seconds16(60);
     DeviceLayer::SystemLayer().StartTimer(kPASESessionEstablishmentTimeout, HandleSessionEstablishmentTimeout, this);
+
+    ChipLogProgress(AppServer, "Commissioning session establishment step started");
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnCommissioningSessionEstablishmentStarted();
+    }
 }
 
 void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & session)
@@ -222,15 +238,8 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
 
     mPairingSession.Clear();
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (!mIsBLE && !mListeningForPASE)
-    {
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(true);
-    }
-#endif
-
     ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
-        Protocols::SecureChannel::MsgType::PBKDFParamRequest, &mPairingSession));
+        Protocols::SecureChannel::MsgType::PBKDFParamRequest, this));
     mListeningForPASE = true;
 
     if (mUseECM)
@@ -359,7 +368,7 @@ void CommissioningWindowManager::CloseCommissioningWindow()
     }
 }
 
-CommissioningWindowStatus CommissioningWindowManager::CommissioningWindowStatusForCluster() const
+CommissioningWindowStatusEnum CommissioningWindowManager::CommissioningWindowStatusForCluster() const
 {
     // If the condition we use to determine whether we were opened via the
     // cluster ever changes, make sure whatever code affects that condition
@@ -368,7 +377,7 @@ CommissioningWindowStatus CommissioningWindowManager::CommissioningWindowStatusF
     if (mOpenerVendorId.IsNull())
     {
         // Not opened via the cluster.
-        return CommissioningWindowStatus::kWindowNotOpen;
+        return CommissioningWindowStatusEnum::kWindowNotOpen;
     }
 
     return mWindowStatus;
@@ -376,7 +385,7 @@ CommissioningWindowStatus CommissioningWindowManager::CommissioningWindowStatusF
 
 bool CommissioningWindowManager::IsCommissioningWindowOpen() const
 {
-    return mWindowStatus != CommissioningWindowStatus::kWindowNotOpen;
+    return mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen;
 }
 
 void CommissioningWindowManager::OnFabricRemoved(FabricIndex removedIndex)
@@ -400,9 +409,9 @@ Dnssd::CommissioningMode CommissioningWindowManager::GetCommissioningMode() cons
 
     switch (mWindowStatus)
     {
-    case CommissioningWindowStatus::kEnhancedWindowOpen:
+    case CommissioningWindowStatusEnum::kEnhancedWindowOpen:
         return Dnssd::CommissioningMode::kEnabledEnhanced;
-    case CommissioningWindowStatus::kBasicWindowOpen:
+    case CommissioningWindowStatusEnum::kBasicWindowOpen:
         return Dnssd::CommissioningMode::kEnabledBasic;
     default:
         return Dnssd::CommissioningMode::kDisabled;
@@ -433,11 +442,11 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
 
     if (mUseECM)
     {
-        UpdateWindowStatus(CommissioningWindowStatus::kEnhancedWindowOpen);
+        UpdateWindowStatus(CommissioningWindowStatusEnum::kEnhancedWindowOpen);
     }
     else
     {
-        UpdateWindowStatus(CommissioningWindowStatus::kBasicWindowOpen);
+        UpdateWindowStatus(CommissioningWindowStatusEnum::kBasicWindowOpen);
     }
 
     if (mAppDelegate != nullptr)
@@ -454,13 +463,6 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
 CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
 {
     RestoreDiscriminator();
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (!mIsBLE && mListeningForPASE)
-    {
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(false);
-    }
-#endif
 
     mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
     mListeningForPASE = false;
@@ -535,10 +537,25 @@ void CommissioningWindowManager::ExpireFailSafeIfArmed()
     }
 }
 
-void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatus aNewStatus)
+void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnum aNewStatus)
 {
-    CommissioningWindowStatus oldClusterStatus = CommissioningWindowStatusForCluster();
-    mWindowStatus                              = aNewStatus;
+    CommissioningWindowStatusEnum oldClusterStatus = CommissioningWindowStatusForCluster();
+    if (mWindowStatus != aNewStatus)
+    {
+        mWindowStatus = aNewStatus;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        app::ICDListener::KeepActiveFlags request = app::ICDListener::KeepActiveFlags::kCommissioningWindowOpen;
+        if (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen)
+        {
+            app::ICDNotifier::GetInstance().BroadcastActiveRequestNotification(request);
+        }
+        else
+        {
+            app::ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(request);
+        }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+    }
+
     if (CommissioningWindowStatusForCluster() != oldClusterStatus)
     {
         // The Administrator Commissioning cluster is always on the root endpoint.
@@ -551,7 +568,7 @@ void CommissioningWindowManager::UpdateOpenerVendorId(Nullable<VendorId> aNewOpe
 {
     // Changing the opener vendor id affects what
     // CommissioningWindowStatusForCluster() returns.
-    CommissioningWindowStatus oldClusterStatus = CommissioningWindowStatusForCluster();
+    CommissioningWindowStatusEnum oldClusterStatus = CommissioningWindowStatusForCluster();
 
     if (mOpenerVendorId != aNewOpenerVendorId)
     {
@@ -580,6 +597,34 @@ void CommissioningWindowManager::UpdateOpenerFabricIndex(Nullable<FabricIndex> a
     }
 
     mOpenerFabricIndex = aNewOpenerFabricIndex;
+}
+
+CHIP_ERROR CommissioningWindowManager::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
+                                                                    Messaging::ExchangeDelegate *& newDelegate)
+{
+    using Protocols::SecureChannel::MsgType;
+
+    // Must be a PBKDFParamRequest message.  Stop listening to new
+    // PBKDFParamRequest messages and hand it off to mPairingSession.  If
+    // mPairingSession's OnMessageReceived fails, it will call our
+    // OnSessionEstablishmentError, and that will either start listening for a
+    // new PBKDFParamRequest or not, depending on how many failures we had seen.
+    //
+    // It's very important that we stop listening here, so that new incoming
+    // PASE establishment attempts don't interrupt our existing establishment.
+    mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(MsgType::PBKDFParamRequest);
+    newDelegate = &mPairingSession;
+    return CHIP_NO_ERROR;
+}
+
+void CommissioningWindowManager::OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate)
+{
+    using Protocols::SecureChannel::MsgType;
+
+    // We couldn't create an exchange, so didn't manage to call
+    // OnMessageReceived on mPairingSession.  Just go back to listening for
+    // PBKDFParamRequest messages.
+    mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(MsgType::PBKDFParamRequest, this);
 }
 
 } // namespace chip

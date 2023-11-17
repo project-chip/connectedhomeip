@@ -37,8 +37,7 @@ CHIP_ERROR DiscoveryCommands::FindCommissionableByShortDiscriminator(
 {
     ReturnErrorOnFailure(SetupDiscoveryCommands());
 
-    uint64_t shortDiscriminator = static_cast<uint64_t>((value.value >> 8) & 0x0F);
-    chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kShortDiscriminator, shortDiscriminator);
+    chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kShortDiscriminator, value.value);
     return mDNSResolver.DiscoverCommissionableNodes(filter);
 }
 
@@ -174,6 +173,16 @@ void DiscoveryCommands::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData &
     if (nodeData.resolutionData.mrpRetryIntervalActive.HasValue())
     {
         data.mrpRetryIntervalActive.SetValue(nodeData.resolutionData.mrpRetryIntervalActive.Value().count());
+    }
+
+    if (nodeData.resolutionData.mrpRetryActiveThreshold.HasValue())
+    {
+        data.mrpRetryActiveThreshold.SetValue(nodeData.resolutionData.mrpRetryActiveThreshold.Value().count());
+    }
+
+    if (nodeData.resolutionData.isICDOperatingAsLIT.HasValue())
+    {
+        data.isICDOperatingAsLIT.SetValue(nodeData.resolutionData.isICDOperatingAsLIT.Value());
     }
 
     chip::app::StatusIB status;

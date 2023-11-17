@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,9 +20,10 @@
 #import <Foundation/Foundation.h>
 #import <Security/Security.h>
 
+#import "MTRDeviceController.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
-#import "MTRNOCChainIssuer.h"
+#import "MTROperationalCertificateIssuer.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
 
@@ -37,10 +38,10 @@ class MTROperationalCredentialsDelegate : public chip::Controller::OperationalCr
 public:
     using ChipP256KeypairPtr = chip::Crypto::P256Keypair *;
 
+    MTROperationalCredentialsDelegate(MTRDeviceController * deviceController);
     ~MTROperationalCredentialsDelegate() {}
 
-    CHIP_ERROR Init(MTRPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner, NSData * ipk, NSData * rootCert,
-        NSData * _Nullable icaCert);
+    CHIP_ERROR Init(ChipP256KeypairPtr nocSigner, NSData * ipk, NSData * rootCert, NSData * _Nullable icaCert);
 
     CHIP_ERROR GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
         const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
@@ -67,21 +68,17 @@ public:
         return mCppCommissioner == nullptr ? chip::NullOptional : mCppCommissioner->GetCommissioningParameters();
     }
 
-    void setChipWorkQueue(dispatch_queue_t chipWorkQueue) { mChipWorkQueue = chipWorkQueue; }
-
-    void SetNocChainIssuer(id<MTRNOCChainIssuer> nocChainIssuer, dispatch_queue_t nocChainIssuerQueue)
+    void SetOperationalCertificateIssuer(
+        id<MTROperationalCertificateIssuer> operationalCertificateIssuer, dispatch_queue_t operationalCertificateIssuerQueue)
     {
-        mNocChainIssuer = nocChainIssuer;
-        mNocChainIssuerQueue = nocChainIssuerQueue;
+        mOperationalCertificateIssuer = operationalCertificateIssuer;
+        mOperationalCertificateIssuerQueue = operationalCertificateIssuerQueue;
     }
-
-    CHIP_ERROR NOCChainGenerated(CHIP_ERROR status, const chip::ByteSpan & noc, const chip::ByteSpan & icac,
-        const chip::ByteSpan & rcac, chip::Optional<chip::Crypto::AesCcm128KeySpan> ipk, chip::Optional<chip::NodeId> adminSubject);
 
     CHIP_ERROR GenerateNOC(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
         const chip::Crypto::P256PublicKey & pubkey, chip::MutableByteSpan & noc);
 
-    const chip::Crypto::AesCcm128KeySpan GetIPK() { return mIPK.Span(); }
+    const chip::Crypto::IdentityProtectionKeySpan GetIPK() { return mIPK.Span(); }
 
     // Get the root/intermediate X.509 DER certs as a ByteSpan.
     chip::ByteSpan RootCertSpan() const;
@@ -94,7 +91,7 @@ public:
     //
     // The outparam must not be null and is set to nil on errors.
     static CHIP_ERROR GenerateRootCertificate(id<MTRKeypair> keypair, NSNumber * _Nullable issuerId, NSNumber * _Nullable fabricId,
-        NSData * _Nullable __autoreleasing * _Nonnull rootCert);
+        NSDateInterval * validityPeriod, NSData * _Nullable __autoreleasing * _Nonnull rootCert);
 
     // Generate an intermediate DER-encoded X.509 certificate for the given root
     // and intermediate public key.  If issuerId is provided, it is used;
@@ -104,38 +101,30 @@ public:
     // The outparam must not be null and is set to nil on errors.
     static CHIP_ERROR GenerateIntermediateCertificate(id<MTRKeypair> rootKeypair, NSData * rootCertificate,
         SecKeyRef intermediatePublicKey, NSNumber * _Nullable issuerId, NSNumber * _Nullable fabricId,
-        NSData * _Nullable __autoreleasing * _Nonnull intermediateCert);
+        NSDateInterval * validityPeriod, NSData * _Nullable __autoreleasing * _Nonnull intermediateCert);
 
     // Generate an operational DER-encoded X.509 certificate for the given
     // signing certificate and operational public key, using the given fabric
     // id, node id, and CATs.
     static CHIP_ERROR GenerateOperationalCertificate(id<MTRKeypair> signingKeypair, NSData * signingCertificate,
-        SecKeyRef operationalPublicKey, NSNumber * fabricId, NSNumber * nodeId,
-        NSArray<NSNumber *> * _Nullable caseAuthenticatedTags, NSData * _Nullable __autoreleasing * _Nonnull operationalCert);
+        SecKeyRef operationalPublicKey, NSNumber * fabricId, NSNumber * nodeId, NSSet<NSNumber *> * _Nullable caseAuthenticatedTags,
+        NSDateInterval * validityPeriod, NSData * _Nullable __autoreleasing * _Nonnull operationalCert);
 
 private:
-    static bool ToChipEpochTime(uint32_t offset, uint32_t & epoch);
+    // notAfter times can represent "forever".
+    static bool ToChipNotAfterEpochTime(NSDate * date, uint32_t & epoch);
+    static bool ToChipEpochTime(NSDate * date, uint32_t & epoch);
 
     static CHIP_ERROR GenerateNOC(chip::Crypto::P256Keypair & signingKeypair, NSData * signingCertificate, chip::NodeId nodeId,
         chip::FabricId fabricId, const chip::CATValues & cats, const chip::Crypto::P256PublicKey & pubkey,
-        chip::MutableByteSpan & noc);
+        NSDateInterval * validityPeriod, chip::MutableByteSpan & noc);
 
-    /**
-     * When a NOCChainIssuer is set, then onNOCChainGenerationNeeded will be called when the NOC CSR needs to be
-     * signed. This allows for custom credentials issuer implementations, for example, when a proprietary cloud API will perform the
-     * CSR signing. The commissioning workflow will stop upon the onNOCChainGenerationNeeded callback and resume once
-     * onNOCChainGenerationComplete is called.
-     *
-     * Caller must pass a non-nil value for the rootCertificate, intermediateCertificate, operationalCertificate
-     * If ipk and adminSubject are non nil, then they will be used in the AddNOC command sent to the commissionee. If they are not
-     * populated, then the values provided in the MTRDeviceController initialization will be used.
-     */
-    void onNOCChainGenerationComplete(NSData * operationalCertificate, NSData * intermediateCertificate, NSData * rootCertificate,
-        NSData * _Nullable ipk, NSNumber * _Nullable adminSubject, NSError * __autoreleasing * error);
+    // Called asynchronously in response to the MTROperationalCertificateIssuer
+    // calling the completion we passed it when asking it to generate a NOC
+    // chain.
+    void ExternalNOCChainGenerated(MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error);
 
-    void setNSError(CHIP_ERROR err, NSError * __autoreleasing * outError);
-
-    CHIP_ERROR CallbackGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
+    CHIP_ERROR ExternalGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
         const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
         const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion);
 
@@ -145,11 +134,7 @@ private:
 
     ChipP256KeypairPtr mIssuerKey;
 
-    chip::Crypto::AesCcm128Key mIPK;
-
-    static const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
-
-    MTRPersistentStorageDelegateBridge * mStorage;
+    chip::Crypto::IdentityProtectionKey mIPK;
 
     chip::NodeId mDeviceBeingPaired = chip::kUndefinedNodeId;
 
@@ -162,11 +147,11 @@ private:
     NSData * _Nullable mRootCert;
     NSData * _Nullable mIntermediateCert;
 
-    chip::Controller::DeviceCommissioner * mCppCommissioner = nullptr;
-    id<MTRNOCChainIssuer> _Nullable mNocChainIssuer;
-    dispatch_queue_t _Nullable mNocChainIssuerQueue;
-    dispatch_queue_t _Nullable mChipWorkQueue;
-    chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * mOnNOCCompletionCallback = nullptr;
+    MTRDeviceController * __weak mWeakController;
+    chip::Controller::DeviceCommissioner * _Nullable mCppCommissioner = nullptr;
+    id<MTROperationalCertificateIssuer> _Nullable mOperationalCertificateIssuer;
+    dispatch_queue_t _Nullable mOperationalCertificateIssuerQueue;
+    chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * _Nullable mOnNOCCompletionCallback = nullptr;
 };
 
 NS_ASSUME_NONNULL_END

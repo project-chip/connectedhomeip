@@ -16,7 +16,7 @@
  */
 #include <DeviceInfoProviderImpl.h>
 
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -317,40 +317,40 @@ bool DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Next(CalendarTy
     switch (mIndex)
     {
     case 0:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kBuddhist;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
         break;
     case 1:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kChinese;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kChinese;
         break;
     case 2:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kCoptic;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kCoptic;
         break;
     case 3:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kEthiopian;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kEthiopian;
         break;
     case 4:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kGregorian;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kGregorian;
         break;
     case 5:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kHebrew;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kHebrew;
         break;
     case 6:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kIndian;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kIndian;
         break;
     case 7:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kJapanese;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kJapanese;
         break;
     case 8:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kKorean;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kKorean;
         break;
     case 9:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kPersian;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kPersian;
         break;
     case 10:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kTaiwanese;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kTaiwanese;
         break;
     case 11:
-        output = app::Clusters::TimeFormatLocalization::CalendarType::kIslamic;
+        output = app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kIslamic;
         break;
     default:
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;

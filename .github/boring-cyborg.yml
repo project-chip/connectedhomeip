@@ -105,7 +105,7 @@ labelPRBasedOnFilePath:
         - src/darwin/*
 
     efr32:
-        - src/platform/EFR32/*
+        - src/platform/efr32/*
 
     esp32:
         - src/platform/ESP32/*

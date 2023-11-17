@@ -22,7 +22,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <lib/core/ReferenceCounted.h>
 #include <messaging/ExchangeMgr.h>
-#include <transport/SessionHandle.h>
+#include <transport/Session.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -64,7 +64,8 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnected;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectFailed;
 
-    static void OnConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr, chip::SessionHandle & sessionHandle);
+    static void OnConnected(
+        void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
     static void OnConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 };
 

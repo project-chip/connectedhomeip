@@ -19,6 +19,7 @@
  *    @file
  *          Contains a class handling creation of linked list of stored persistent data.
  */
+#pragma once
 
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/PersistentData.h>
@@ -26,7 +27,7 @@
 namespace chip {
 namespace CommonPersistentData {
 
-constexpr uint8_t kdefaultUndefinedEntry = 0;
+inline constexpr uint8_t kdefaultUndefinedEntry = 0;
 
 /// @brief Generic class to implement storage of a list persistently
 /// @tparam EntryType : Type of entry depends on the stored data
@@ -73,14 +74,11 @@ struct StoredDataList : public PersistentData<kMaxSerializedSize>
     }
 };
 
-constexpr size_t kPersistentFabricBufferMax = 32;
+inline constexpr size_t kPersistentFabricBufferMax = 32;
 struct FabricList : StoredDataList<FabricIndex, kPersistentFabricBufferMax>
 {
-    CHIP_ERROR UpdateKey(StorageKeyName & key) override
-    {
-        key = DefaultStorageKeyAllocator::FabricList();
-        return CHIP_NO_ERROR;
-    }
+    // Subclasses need to define UpdateKey to be whatever fabric list key they
+    // care about.
 
     void Clear() override
     {

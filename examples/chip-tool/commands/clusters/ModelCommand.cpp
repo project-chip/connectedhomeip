@@ -47,7 +47,7 @@ CHIP_ERROR ModelCommand::RunCommand()
 }
 
 void ModelCommand::OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
-                                       chip::SessionHandle & sessionHandle)
+                                       const chip::SessionHandle & sessionHandle)
 {
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));

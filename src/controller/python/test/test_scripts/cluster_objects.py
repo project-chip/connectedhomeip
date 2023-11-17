@@ -15,17 +15,16 @@
 #    limitations under the License.
 #
 
-import pprint
-import chip.clusters as Clusters
-import chip.exceptions
-import logging
-from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus, ValueDecodeFailure, TypedAttributePath, SubscriptionTransaction, DataVersion
-import chip.interaction_model
 import asyncio
-import time
-import sys
+import logging
+import pprint
 
 import base
+import chip.clusters as Clusters
+import chip.exceptions
+import chip.interaction_model
+from chip.clusters.Attribute import (AttributePath, AttributeStatus, DataVersion, SubscriptionTransaction, TypedAttributePath,
+                                     ValueDecodeFailure)
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -58,7 +57,8 @@ def VerifyDecodeSuccess(values):
                             f"Ignoring attribute decode failure for path {endpoint}/{attribute}")
                     else:
                         raise AssertionError(
-                            f"Cannot decode value for path {endpoint}/{attribute}, got error: '{str(v.Reason)}', raw TLV data: '{v.TLVValue}'")
+                            f"Cannot decode value for path {endpoint}/{attribute}, "
+                            f"got error: '{str(v.Reason)}', raw TLV data: '{v.TLVValue}'")
 
     for endpoint in values:
         for cluster in values[endpoint]:
@@ -105,7 +105,7 @@ class ClusterObjectTests:
         req = Clusters.OnOff.Commands.On()
         try:
             await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=233, payload=req)
-            raise ValueError(f"Failure expected")
+            raise ValueError("Failure expected")
         except chip.interaction_model.InteractionModelError as ex:
             logger.info(f"Recevied {ex} from server.")
             return
@@ -136,16 +136,16 @@ class ClusterObjectTests:
         logger.info("1: Trivial writes (multiple attributes)")
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
-                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                               (0, Clusters.BasicInformation.Attributes.NodeLabel(
                                                    "Test")),
-                                               (0, Clusters.Basic.Attributes.Location(
+                                               (0, Clusters.BasicInformation.Attributes.Location(
                                                    "A loooong string"))
                                            ])
         expectedRes = [
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
-                            AttributeId=5), Status=chip.interaction_model.Status.Success),
+                                               AttributeId=5), Status=chip.interaction_model.Status.Success),
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
-                            AttributeId=6), Status=chip.interaction_model.Status.ConstraintError)
+                                               AttributeId=6), Status=chip.interaction_model.Status.ConstraintError)
         ]
 
         logger.info(f"Received WriteResponse: {res}")
@@ -157,11 +157,16 @@ class ClusterObjectTests:
             raise AssertionError("Write returned unexpected result.")
 
         logger.info("2: Write chunked list")
-        res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
-                                           attributes=[(1, Clusters.UnitTesting.Attributes.ListLongOctetString([b"0123456789abcdef" * 32] * 5))])
+        res = await devCtrl.WriteAttribute(
+            nodeid=NODE_ID,
+            attributes=[
+                (1, Clusters.UnitTesting.Attributes.ListLongOctetString([b"0123456789abcdef" * 32] * 5))
+            ]
+        )
         expectedRes = [
             AttributeStatus(Path=AttributePath(
-                EndpointId=1, Attribute=Clusters.UnitTesting.Attributes.ListLongOctetString), Status=chip.interaction_model.Status.Success),
+                EndpointId=1,
+                Attribute=Clusters.UnitTesting.Attributes.ListLongOctetString), Status=chip.interaction_model.Status.Success),
         ]
 
         logger.info(f"Received WriteResponse: {res}")
@@ -197,17 +202,100 @@ class ClusterObjectTests:
 
     @ classmethod
     @ base.test_case
+    async def TestAttributeCacheAttributeView(cls, devCtrl):
+        logger.info("Test AttributeCache Attribute-View")
+        sub: SubscriptionTransaction = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], returnClusterObject=False, reportInterval=(3, 10))
+
+        event = asyncio.Event()
+
+        def subUpdate(path: TypedAttributePath, transaction: SubscriptionTransaction):
+            event.set()
+
+        sub.SetAttributeUpdateCallback(subUpdate)
+
+        try:
+            data = sub.GetAttributes()
+            req = Clusters.OnOff.Commands.On()
+            await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+
+            await asyncio.wait_for(event.wait(), timeout=11)
+
+            if (data[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnOff] != 1):
+                raise ValueError("Current On/Off state should be 1")
+
+            event.clear()
+
+            req = Clusters.OnOff.Commands.Off()
+            await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+
+            await asyncio.wait_for(event.wait(), timeout=11)
+
+            if (data[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnOff] != 0):
+                raise ValueError("Current On/Off state should be 0")
+
+        except TimeoutError:
+            raise AssertionError("Did not receive updated attribute")
+        finally:
+            sub.Shutdown()
+
+    @ classmethod
+    @ base.test_case
+    async def TestAttributeCacheClusterView(cls, devCtrl):
+        logger.info("Test AttributeCache Cluster-View")
+        sub: SubscriptionTransaction = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], returnClusterObject=True, reportInterval=(3, 10))
+
+        event = asyncio.Event()
+
+        def subUpdate(path: TypedAttributePath, transaction: SubscriptionTransaction):
+            event.set()
+
+        sub.SetAttributeUpdateCallback(subUpdate)
+
+        try:
+            data = sub.GetAttributes()
+
+            req = Clusters.OnOff.Commands.On()
+            await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+
+            await asyncio.wait_for(event.wait(), timeout=11)
+
+            cluster: Clusters.OnOff = data[1][Clusters.OnOff]
+            if (not cluster.onOff):
+                raise ValueError("Current On/Off state should be True")
+
+            event.clear()
+
+            req = Clusters.OnOff.Commands.Off()
+            await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+
+            await asyncio.wait_for(event.wait(), timeout=11)
+
+            cluster: Clusters.OnOff = data[1][Clusters.OnOff]
+            if (cluster.onOff):
+                raise ValueError("Current On/Off state should be False")
+
+        except TimeoutError:
+            raise AssertionError("Did not receive updated attribute")
+        finally:
+            sub.Shutdown()
+
+    @ classmethod
+    @ base.test_case
     async def TestSubscribeZeroMinInterval(cls, devCtrl):
         '''
-        This validates receiving subscription reports for two attributes at a time in quick succession after issuing a command that results in attribute side-effects.
-        Specifically, it relies on the fact that the second attribute is changed in a different execution context than the first. This ensures that we pick-up the first
-        attribute change and generate a notification, and validating that shortly after that, we generate a second report for the second change.
+        This validates receiving subscription reports for two attributes at a time in quick succession after
+        issuing a command that results in attribute side-effects. Specifically, it relies on the fact that the second attribute
+        is changed in a different execution context than the first. This ensures that we pick-up the first
+        attribute change and generate a notification, and validating that shortly after that,
+        we generate a second report for the second change.
 
-        This is done using subscriptions with a min reporting interval of 0 to ensure timely notification of the above. An On() command is sent to the OnOff cluster
+        This is done using subscriptions with a min reporting interval of 0 to ensure timely notification of the above.
+        An On() command is sent to the OnOff cluster
         which should simultaneously set the state to On as well as set the level to 254.
         '''
         logger.info("Test Subscription With MinInterval of 0")
-        sub = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[Clusters.OnOff, Clusters.LevelControl], reportInterval=(0, 60))
+        sub = await devCtrl.ReadAttribute(nodeid=NODE_ID,
+                                          attributes=[Clusters.OnOff, Clusters.LevelControl], reportInterval=(0, 60))
         data = sub.GetAttributes()
 
         logger.info("Sending off command")
@@ -243,12 +331,12 @@ class ClusterObjectTests:
 
         logger.info("1: Reading Ex Cx Ax")
         req = [
-            (0, Clusters.Basic.Attributes.VendorName),
-            (0, Clusters.Basic.Attributes.ProductID),
-            (0, Clusters.Basic.Attributes.HardwareVersion),
+            (0, Clusters.BasicInformation.Attributes.VendorName),
+            (0, Clusters.BasicInformation.Attributes.ProductID),
+            (0, Clusters.BasicInformation.Attributes.HardwareVersion),
         ]
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
-        if ((0 not in res) or (Clusters.Basic not in res[0]) or (len(res[0][Clusters.Basic]) != 4)):
+        if ((0 not in res) or (Clusters.BasicInformation not in res[0]) or (len(res[0][Clusters.BasicInformation]) != 4)):
             # 3 attribute data + DataVersion
             raise AssertionError(
                 f"Got back {len(res)} data items instead of 3")
@@ -256,7 +344,7 @@ class ClusterObjectTests:
 
         logger.info("2: Reading Ex Cx A*")
         req = [
-            (0, Clusters.Basic),
+            (0, Clusters.BasicInformation),
         ]
         VerifyDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
@@ -286,7 +374,7 @@ class ClusterObjectTests:
 
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, returnClusterObject=True)
         logger.info(
-            f"Basic Cluster - Label: {res[0][Clusters.Basic].productLabel}")
+            f"Basic Cluster - Label: {res[0][Clusters.BasicInformation].productLabel}")
         # TestCluster will be ValueDecodeError here, so we comment out the log below.
         # Values are not expected to be ValueDecodeError for real clusters.
         # logger.info(
@@ -298,17 +386,21 @@ class ClusterObjectTests:
         if res[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListLongOctetString] != [b'0123456789abcdef' * 32] * 4:
             raise AssertionError("Unexpected read result")
 
-        logger.info("*: Getting current fabric index")
-        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
-        fabricIndex = res[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
-
         # Note: ListFabricScoped is an empty list for now. We should re-enable this test after we make it return expected data.
+        # logger.info("*: Getting current fabric index")
+        # res = await devCtrl.ReadAttribute(nodeid=NODE_ID,
+        #                                   attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
+        # fabricIndex = res[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        #
         # logger.info("8: Read without fabric filter")
-        # res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.UnitTesting.Attributes.ListFabricScoped)], fabricFiltered=False)
+        # res = await devCtrl.ReadAttribute(nodeid=NODE_ID,
+        #                                   attributes=[(1, Clusters.UnitTesting.Attributes.ListFabricScoped)],
+        #                                                fabricFiltered=False)
         # if len(res[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]) == 1:
         #     raise AssertionError("Expect more elements in the response")
         # logger.info("9: Read with fabric filter")
-        # res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.UnitTesting.Attributes.ListFabricScoped)], fabricFiltered=True)
+        # res = await devCtrl.ReadAttribute(nodeid=NODE_ID,
+        #                                   attributes=[(1, Clusters.UnitTesting.Attributes.ListFabricScoped)], fabricFiltered=True)
         # if len(res[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]) != 1:
         #     raise AssertionError("Expect exact one element in the response")
         # if res[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped][0].fabricIndex != fabricIndex:
@@ -318,9 +410,12 @@ class ClusterObjectTests:
     @ classmethod
     async def _TriggerEvent(cls, devCtrl):
         # We trigger sending an event a couple of times just to be safe.
-        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.UnitTesting.Commands.TestEmitTestEventRequest())
-        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.UnitTesting.Commands.TestEmitTestEventRequest())
-        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.UnitTesting.Commands.TestEmitTestEventRequest())
+        await devCtrl.SendCommand(nodeid=NODE_ID,
+                                  endpoint=1, payload=Clusters.UnitTesting.Commands.TestEmitTestEventRequest())
+        await devCtrl.SendCommand(nodeid=NODE_ID,
+                                  endpoint=1, payload=Clusters.UnitTesting.Commands.TestEmitTestEventRequest())
+        return await devCtrl.SendCommand(nodeid=NODE_ID,
+                                         endpoint=1, payload=Clusters.UnitTesting.Commands.TestEmitTestEventRequest())
 
     @ classmethod
     async def _RetryForContent(cls, request, until, retryCount=10, intervalSeconds=1):
@@ -338,12 +433,44 @@ class ClusterObjectTests:
         await cls._RetryForContent(request=lambda: devCtrl.ReadEvent(nodeid=NODE_ID, events=req), until=lambda res: res != 0)
 
     @ classmethod
+    async def TriggerAndWaitForEventsWithFilter(cls, devCtrl, req):
+        response = await cls._TriggerEvent(devCtrl)
+        current_event_filter = response.value
+
+        def validate_got_expected_event(events):
+            number_of_events = len(events)
+            if number_of_events != 1:
+                return False
+
+            parsed_event_number = events[0].Header.EventNumber
+            if parsed_event_number != current_event_filter:
+                return False
+            return True
+
+        await cls._RetryForContent(request=lambda: devCtrl.ReadEvent(
+            nodeid=NODE_ID,
+            events=req,
+            eventNumberFilter=current_event_filter
+        ), until=validate_got_expected_event)
+
+        def validate_got_no_event(events):
+            return len(events) == 0
+
+        await cls._RetryForContent(request=lambda: devCtrl.ReadEvent(
+            nodeid=NODE_ID,
+            events=req,
+            eventNumberFilter=(current_event_filter + 1)
+        ), until=validate_got_no_event)
+
+    @ classmethod
     @ base.test_case
     async def TestGenerateUndefinedFabricScopedEventRequests(cls, devCtrl):
         logger.info("Running TestGenerateUndefinedFabricScopedEventRequests")
         try:
-            res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.UnitTesting.Commands.TestEmitTestFabricScopedEventRequest(arg1=0))
-            raise ValueError(f"Unexpected Failure")
+            res = await devCtrl.SendCommand(nodeid=NODE_ID,
+                                            endpoint=1,
+                                            payload=Clusters.UnitTesting.Commands.TestEmitTestFabricScopedEventRequest(arg1=0))
+            raise ValueError("Unexpected Failure")
         except chip.interaction_model.InteractionModelError as ex:
             logger.info(f"Recevied {ex} from server.")
         res = await devCtrl.ReadEvent(nodeid=NODE_ID, events=[
@@ -393,6 +520,12 @@ class ClusterObjectTests:
 
         await cls.TriggerAndWaitForEvents(devCtrl, req)
 
+        logger.info("6: Reading Ex Cx Ex, with filter")
+        req = [
+            (1, Clusters.UnitTesting.Events.TestEvent, 0),
+        ]
+        await cls.TriggerAndWaitForEventsWithFilter(devCtrl, req)
+
         # TODO: Add more wildcard test for IM events.
 
     @ classmethod
@@ -416,8 +549,9 @@ class ClusterObjectTests:
             req = Clusters.UnitTesting.Commands.TimedInvokeRequest()
             await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
             raise AssertionError("The command invoke should be rejected.")
-        except ValueError:
-            pass
+        except chip.interaction_model.InteractionModelError as ex:
+            if ex.status != chip.interaction_model.Status.NeedsTimedInteraction:
+                raise AssertionError("The command invoke was expected to error with NeedsTimedInteraction.")
 
         logger.info(
             "4: Writing TestCluster-TimedWriteBoolean without timedRequestTimeoutMs should be rejected")
@@ -428,8 +562,9 @@ class ClusterObjectTests:
                                                  True)),
                                          ])
             raise AssertionError("The write request should be rejected.")
-        except ValueError:
-            pass
+        except chip.interaction_model.InteractionModelError as ex:
+            if ex.status != chip.interaction_model.Status.NeedsTimedInteraction:
+                raise AssertionError("The write attribute was expected to error with NeedsTimedInteraction.")
 
     @ classmethod
     @ base.test_case
@@ -460,18 +595,18 @@ class ClusterObjectTests:
     async def TestReadWriteAttributeRequestsWithVersion(cls, devCtrl):
         logger.info("TestReadWriteAttributeRequestsWithVersion")
         req = [
-            (0, Clusters.Basic.Attributes.VendorName)
+            (0, Clusters.BasicInformation.Attributes.VendorName)
         ]
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
         VerifyDecodeSuccess(res)
-        data_version = res[0][Clusters.Basic][DataVersion]
+        data_version = res[0][Clusters.BasicInformation][DataVersion]
 
         logger.info(res)
         logger.info(data_version)
 
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
-                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                               (0, Clusters.BasicInformation.Attributes.NodeLabel(
                                                    "Test"))
                                            ])
         expectedRes = [
@@ -487,20 +622,22 @@ class ClusterObjectTests:
             raise AssertionError("Write returned unexpected result.")
 
         req = [
-            (0, Clusters.Basic.Attributes.VendorName),
+            (0, Clusters.BasicInformation.Attributes.VendorName),
         ]
-        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, dataVersionFilters=[(0, Clusters.Basic, data_version)])
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID,
+                                          attributes=req, dataVersionFilters=[(0, Clusters.BasicInformation, data_version)])
         VerifyDecodeSuccess(res)
-        new_data_version = res[0][Clusters.Basic][DataVersion]
+        new_data_version = res[0][Clusters.BasicInformation][DataVersion]
         if (data_version + 1) != new_data_version:
             raise AssertionError("Version mistmatch happens.")
 
-        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, dataVersionFilters=[(0, Clusters.Basic, new_data_version)])
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID,
+                                          attributes=req, dataVersionFilters=[(0, Clusters.BasicInformation, new_data_version)])
         VerifyDecodeSuccess(res)
 
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
-                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                               (0, Clusters.BasicInformation.Attributes.NodeLabel(
                                                    "Test"), new_data_version)
                                            ])
 
@@ -518,7 +655,7 @@ class ClusterObjectTests:
 
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
-                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                               (0, Clusters.BasicInformation.Attributes.NodeLabel(
                                                    "Test"), new_data_version)
                                            ])
 
@@ -539,11 +676,11 @@ class ClusterObjectTests:
     async def TestMixedReadAttributeAndEvents(cls, devCtrl):
         def attributePathPossibilities():
             yield ('Ex Cx Ax', [
-                (0, Clusters.Basic.Attributes.VendorName),
-                (0, Clusters.Basic.Attributes.ProductID),
-                (0, Clusters.Basic.Attributes.HardwareVersion),
+                (0, Clusters.BasicInformation.Attributes.VendorName),
+                (0, Clusters.BasicInformation.Attributes.ProductID),
+                (0, Clusters.BasicInformation.Attributes.HardwareVersion),
             ])
-            yield ('Ex Cx A*', [(0, Clusters.Basic)])
+            yield ('Ex Cx A*', [(0, Clusters.BasicInformation)])
             yield ('E* Cx A*', [Clusters.Descriptor.Attributes.ServerList])
             yield ('E* A* A*', ['*'])
 
@@ -561,7 +698,10 @@ class ClusterObjectTests:
                 logging.info(
                     f"{testCount}: Reading mixed Attributes({attributes[0]}) Events({events[0]})")
                 await cls._TriggerEvent(devCtrl)
-                res = await cls._RetryForContent(request=lambda: devCtrl.Read(nodeid=NODE_ID, attributes=attributes[1], events=events[1]), until=lambda res: res != 0)
+                res = await cls._RetryForContent(request=lambda: devCtrl.Read(
+                    nodeid=NODE_ID,
+                    attributes=attributes[1],
+                    events=events[1]), until=lambda res: res != 0)
                 VerifyDecodeSuccess(res.attributes)
 
     @ classmethod
@@ -577,6 +717,8 @@ class ClusterObjectTests:
             await cls.TestReadAttributeRequests(devCtrl)
             await cls.TestSubscribeZeroMinInterval(devCtrl)
             await cls.TestSubscribeAttribute(devCtrl)
+            await cls.TestAttributeCacheAttributeView(devCtrl)
+            await cls.TestAttributeCacheClusterView(devCtrl)
             await cls.TestMixedReadAttributeAndEvents(devCtrl)
             # Note: Write will change some attribute values, always put it after read tests
             await cls.TestWriteRequest(devCtrl)

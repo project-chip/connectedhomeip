@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,17 +18,11 @@
 
 #pragma once
 
-// ---- All Clusters Application example config ----
+// ---- All Clusters Minimal Application example config ----
 
-// Buttons config
-#define BUTTON_PORT DEVICE_DT_GET(DT_NODELABEL(gpioc))
-
-#define BUTTON_PIN_1 2
-#define BUTTON_PIN_3 3
-#define BUTTON_PIN_4 1
-#define BUTTON_PIN_2 0
-
-// LEDs config
-// System led config
-#define SYSTEM_STATE_LED_PORT DEVICE_DT_GET(DT_NODELABEL(gpiob))
-#define SYSTEM_STATE_LED_PIN 7
+#define APP_USE_EXAMPLE_START_BUTTON 0
+#define APP_USE_BLE_START_BUTTON 0
+#define APP_USE_THREAD_START_BUTTON 0
+#define APP_SET_DEVICE_INFO_PROVIDER 0
+#define APP_SET_NETWORK_COMM_ENDPOINT_SEC 1
+#define APP_USE_IDENTIFY_PWM 0

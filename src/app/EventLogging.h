@@ -35,7 +35,7 @@ public:
     EventLogger(const T & aEventData) : mEventData(aEventData){};
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
     {
-        return DataModel::Encode(aWriter, TLV::ContextTag(to_underlying(EventDataIB::Tag::kData)), mEventData);
+        return DataModel::Encode(aWriter, TLV::ContextTag(EventDataIB::Tag::kData), mEventData);
     }
 
 private:

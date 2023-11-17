@@ -39,10 +39,10 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
     {
         chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::TargetNavigator::Id,
                                                    chip::app::Clusters::TargetNavigator::Attributes::TargetList::Id);
-        const char * resStr = mAttributeDelegate->Read(aPath);
-        ChipLogProgress(Zcl, "TargetNavigatorManager::HandleNavigateTarget response %s", resStr);
+        std::string resStr = mAttributeDelegate->Read(aPath);
+        ChipLogProgress(Zcl, "TargetNavigatorManager::HandleNavigateTarget response %s", resStr.c_str());
 
-        if (resStr != nullptr && *resStr != 0)
+        if (resStr.length() != 0)
         {
             Json::Reader reader;
             Json::Value value;
@@ -54,11 +54,11 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
                 if (value[attrId].isArray())
                 {
                     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                        int i                = 0;
-                        std::string targetId = to_string(
-                            static_cast<uint32_t>(chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Fields::kIdentifier));
+                        int i                  = 0;
+                        std::string targetId   = to_string(static_cast<uint32_t>(
+                            chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Fields::kIdentifier));
                         std::string targetName = to_string(
-                            static_cast<uint32_t>(chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Fields::kName));
+                            static_cast<uint32_t>(chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Fields::kName));
                         for (Json::Value & entry : value[attrId])
                         {
                             if (!entry[targetId].isUInt() || !entry[targetName].isString() || entry[targetId].asUInt() > 255)
@@ -68,7 +68,7 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
                                 i++;
                                 continue;
                             }
-                            Structs::TargetInfo::Type outputInfo;
+                            Structs::TargetInfoStruct::Type outputInfo;
                             outputInfo.identifier = static_cast<uint8_t>(entry[targetId].asUInt());
                             outputInfo.name       = CharSpan::fromCharString(entry[targetName].asCString());
                             ReturnErrorOnFailure(encoder.Encode(outputInfo));
@@ -86,7 +86,7 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
         int i = 0;
         for (std::string & entry : mTargets)
         {
-            Structs::TargetInfo::Type outputInfo;
+            Structs::TargetInfoStruct::Type outputInfo;
             outputInfo.identifier = static_cast<uint8_t>(i + 1);
             outputInfo.name       = CharSpan::fromCharString(entry.c_str());
             ReturnErrorOnFailure(encoder.Encode(outputInfo));
@@ -104,10 +104,10 @@ uint8_t TargetNavigatorManager::HandleGetCurrentTarget()
     {
         chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::TargetNavigator::Id,
                                                    chip::app::Clusters::TargetNavigator::Attributes::TargetList::Id);
-        const char * resStr = mAttributeDelegate->Read(aPath);
-        ChipLogProgress(Zcl, "TargetNavigatorManager::HandleGetCurrentTarget response %s", resStr);
+        std::string resStr = mAttributeDelegate->Read(aPath);
+        ChipLogProgress(Zcl, "TargetNavigatorManager::HandleGetCurrentTarget response %s", resStr.c_str());
 
-        if (resStr != nullptr && *resStr != 0)
+        if (resStr.length() != 0)
         {
             Json::Reader reader;
             Json::Value value;
@@ -134,13 +134,13 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
     if (target == kNoCurrentTarget || target > mTargets.size())
     {
         response.data   = chip::MakeOptional(CharSpan::fromCharString("error"));
-        response.status = TargetNavigatorStatusEnum::kTargetNotFound;
+        response.status = StatusEnum::kTargetNotFound;
         helper.Success(response);
         return;
     }
     mCurrentTarget = static_cast<uint8_t>(target);
 
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-    response.status = TargetNavigatorStatusEnum::kSuccess;
+    response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }

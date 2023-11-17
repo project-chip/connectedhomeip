@@ -21,6 +21,9 @@ on:
                 description: Release Tag
                 required: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+    
 jobs:
     esp32:
         name: ESP32
@@ -29,30 +32,20 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.6.06
+            image: ghcr.io/project-chip/chip-build-esp32:26
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v4
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      submodules: true
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-                  ref: "${{ github.event.inputs.releaseTag }}"
+                ref: "${{ github.event.inputs.releaseTag }}"
+            - name: Bootstrap Cache
+              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
-              timeout-minutes: 25
-              run: scripts/build/gn_bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+              uses: ./.github/actions/bootstrap
+            - name: Upload Bootstrap Logs
+              uses: ./.github/actions/upload-bootstrap-logs
+
             - name: Build
               run: scripts/examples/esp_example.sh all-clusters-app
 
@@ -75,31 +68,21 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-efr32:0.6.06
+            image: ghcr.io/project-chip/chip-build-efr32:26
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v4
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      submodules: true
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-                  ref: "${{ github.event.inputs.releaseTag }}"
+                ref: "${{ github.event.inputs.releaseTag }}"
+            - name: Bootstrap Cache
+              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
-              timeout-minutes: 25
-              run: scripts/build/gn_bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+              uses: ./.github/actions/bootstrap
+            - name: Upload Bootstrap Logs
+              uses: ./.github/actions/upload-bootstrap-logs
+
             - name: Build example EFR32 Lock App
-              run: scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/
+              run: scripts/examples/gn_silabs_example.sh examples/lock-app/efr32/
                   out/lock_app_debug $SILABS_BOARD
 
             - name: Upload artifact

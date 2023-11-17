@@ -101,11 +101,11 @@ AttributeDataIB::Builder & AttributeDataIBs::Builder::GetAttributeDataIBBuilder(
     return mAttributeDataIBBuilder;
 }
 
-AttributeDataIBs::Builder & AttributeDataIBs::Builder::EndOfAttributeDataIBs()
+CHIP_ERROR AttributeDataIBs::Builder::EndOfAttributeDataIBs()
 {
     EndOfContainer();
 
-    return *this;
+    return GetError();
 }
 
 }; // namespace app

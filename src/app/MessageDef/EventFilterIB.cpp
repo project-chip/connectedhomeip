@@ -57,7 +57,7 @@ CHIP_ERROR EventFilterIB::Parser::PrettyPrint() const
         {
             NodeId node;
             ReturnErrorOnFailure(reader.Get(node));
-            PRETTY_PRINT("\tNode = 0x%" PRIx64 ",", node);
+            PRETTY_PRINT("\tNode = 0x" ChipLogFormatX64 ",", ChipLogValueX64(node));
         }
 #endif // CHIP_DETAIL_LOGGING
         break;
@@ -66,7 +66,7 @@ CHIP_ERROR EventFilterIB::Parser::PrettyPrint() const
         {
             uint64_t eventMin;
             ReturnErrorOnFailure(reader.Get(eventMin));
-            PRETTY_PRINT("\tEventMin = 0x%" PRIx64 ",", eventMin);
+            PRETTY_PRINT("\tEventMin = 0x" ChipLogFormatX64 ",", ChipLogValueX64(eventMin));
         }
 #endif // CHIP_DETAIL_LOGGING
         break;
@@ -104,7 +104,7 @@ EventFilterIB::Builder & EventFilterIB::Builder::Node(const NodeId aNode)
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kNode)), aNode);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kNode), aNode);
     }
     return *this;
 }
@@ -114,15 +114,15 @@ EventFilterIB::Builder & EventFilterIB::Builder::EventMin(const uint64_t aEventM
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kEventMin)), aEventMin);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kEventMin), aEventMin);
     }
     return *this;
 }
 
-EventFilterIB::Builder & EventFilterIB::Builder::EndOfEventFilterIB()
+CHIP_ERROR EventFilterIB::Builder::EndOfEventFilterIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 }; // namespace app
 }; // namespace chip

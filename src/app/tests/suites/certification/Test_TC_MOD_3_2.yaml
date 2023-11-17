@@ -11,113 +11,106 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 80.3.2. [TC-MOD-3.2] StartUpMode Verification (DUT as Server)
+name: 80.5.2. [TC-MOD-3.2] StartUpMode verification with DUT as Server
 
 PICS:
     - MOD.S.A0004
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Mode Select"
+    endpoint: 1
+    #Configure newmode value
+    NewMode:
+        type: int8u
+        defaultValue: 7
 
 tests:
-    - label: "TH reads the StartUpMode attribute from the DUT"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1: TH reads the StartUpMode attribute from the DUT"
       PICS: MOD.S.A0004
-      verification: |
-          ./chip-tool modeselect read start-up-mode 1 1
+      command: "readAttribute"
+      attribute: "StartUpMode"
+      response:
+          saveAs: startup_mode_dut
 
-          on TH(chip-tool),Verify that the DUT response is the integer. Record this value for usage in step 2.
-
-          [1645777708.406864][4841:4846] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003DataVersion: 3781469721
-          [1645777708.406933][4841:4846] CHIP:TOO:   StartUpMode: 0
-      disabled: true
-
-    - label: "TH reads the CurrentMode attribute from the DUT"
+    - label: "Step 2a: TH reads the CurrentMode attribute from the DUT"
       PICS: MOD.S.A0003
-      verification: |
-          ./chip-tool modeselect read current-mode 1 1
-
-          on TH(chip-tool),Verify that the DUT response is the integer. Record this value for usage in step 2b.
-
-          [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
-          [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 0
-      disabled: true
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          saveAs: old_current_mode_dut
 
     - label:
-          "If the StartUpMode and CurrentMode attributes have the same value,
-          proceed to step 2c, Otherwise proceed to step 3a."
+          "Step 2b: If the StartUpMode and CurrentMode attributes have the same
+          value, proceed to step 2c, Otherwise proceed to step 3a."
       PICS: MOD.S.A0003 && MOD.S.A0004
-      verification: |
-          NOTE:
-          If the StartUpMode and CurrentMode attributes have the same value, proceed to step 2c, Otherwise proceed to step 3a.
-      disabled: true
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: startup_mode_dut
+              - name: "Value2"
+                value: old_current_mode_dut
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
 
-    - label: "TH reads the SupportedModes attribute from the DUT"
+    - label: "Step 2c: TH reads the SupportedModes attribute from the DUT"
+      runIf: IsExpectedValue
       PICS: MOD.S.A0002
-      verification: |
-          ./chip-tool modeselect read supported-modes 1 1
-
-          on TH(chip-tool),Verify that the DUT response provides a list of supported modes
-
-          [1654153500.212649][3409:3414] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 2392545814
-          [1654153500.212776][3409:3414] CHIP:TOO:   SupportedModes: 3 entries
-          [1654153500.212893][3409:3414] CHIP:TOO:     [1]: {
-          [1654153500.212926][3409:3414] CHIP:TOO:       Label: Black
-          [1654153500.212957][3409:3414] CHIP:TOO:       Mode: 0
-          [1654153500.212993][3409:3414] CHIP:TOO:       SemanticTags: 1 entries
-          [1654153500.213034][3409:3414] CHIP:TOO:         [1]: {
-          [1654153500.213066][3409:3414] CHIP:TOO:           MfgCode: 0
-          [1654153500.213097][3409:3414] CHIP:TOO:           Value: 0
-          [1654153500.213128][3409:3414] CHIP:TOO:          }
-          [1654153500.213160][3409:3414] CHIP:TOO:      }
-          [1654153500.213205][3409:3414] CHIP:TOO:     [2]: {
-          [1654153500.213236][3409:3414] CHIP:TOO:       Label: Cappuccino
-          [1654153500.213266][3409:3414] CHIP:TOO:       Mode: 4
-          [1654153500.213300][3409:3414] CHIP:TOO:       SemanticTags: 1 entries
-          [1654153500.213339][3409:3414] CHIP:TOO:         [1]: {
-          [1654153500.213371][3409:3414] CHIP:TOO:           MfgCode: 0
-          [1654153500.213401][3409:3414] CHIP:TOO:           Value: 0
-          [1654153500.213432][3409:3414] CHIP:TOO:          }
-          [1654153500.213463][3409:3414] CHIP:TOO:      }
-          [1654153500.213504][3409:3414] CHIP:TOO:     [3]: {
-          [1654153500.213535][3409:3414] CHIP:TOO:       Label: Espresso
-          [1654153500.213564][3409:3414] CHIP:TOO:       Mode: 7
-          [1654153500.213599][3409:3414] CHIP:TOO:       SemanticTags: 1 entries
-          [1654153500.213637][3409:3414] CHIP:TOO:         [1]: {
-          [1654153500.213669][3409:3414] CHIP:TOO:           MfgCode: 0
-          [1654153500.213700][3409:3414] CHIP:TOO:           Value: 0
-          [1654153500.213730][3409:3414] CHIP:TOO:          }
-          [1654153500.213761][3409:3414] CHIP:TOO:      }
-      disabled: true
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          constraints:
+              type: list
 
     - label:
-          "Select a value from the list in step 2c with a different value than
-          the StartUpMode value read in step 1. TH sends a ChangeToMode command
-          to the DUT with the selected value."
+          "Step 2d: Select a value from the list in step 2c with a different
+          value than the StartUpMode value read in step 1. TH sends a
+          ChangeToMode command to the DUT with the selected value."
+      runIf: IsExpectedValue
       PICS: MOD.S.A0002 && MOD.S.C00.Rsp
-      verification: |
-          ./chip-tool modeselect change-to-mode 4 1 1
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: NewMode
 
-          on TH(chip-tool),Verify that the DUT responds with a successful (value 0x00) status response.
-
-          [1645778189.045030][4888:4893] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x0
-      disabled: true
-
-    - label: "Physically power cycle the device."
+    - label: "Step 3a: Physically power cycle the device."
       verification: |
           Physically power cycle the device.
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads the CurrentMode attribute from the DUT"
-      PICS: MOD.S.A0003
-      verification: |
-          ./chip-tool modeselect read current-mode 1 1
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-          on TH(chip-tool),Verify that the DUT response is the integer recorded in step 1.
-
-          [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
-          [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 0
-      disabled: true
+    - label: "Step 3b: TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003 && MOD.S.F00 && PICS_USER_PROMPT
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: startup_mode_dut

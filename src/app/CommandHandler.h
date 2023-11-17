@@ -33,8 +33,8 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -170,7 +170,20 @@ public:
      */
     void OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                 System::PacketBufferHandle && payload, bool isTimedInvoke);
-    CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus);
+
+    /**
+     * Adds the given command status and returns any failures in adding statuses (e.g. out
+     * of buffer space) to the caller
+     */
+    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
+                                 const char * context = nullptr);
+
+    /**
+     * Adds a status when the caller is unable to handle any failures. Logging is performed
+     * and failure to register the status is checked with VerifyOrDie.
+     */
+    void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
+                   const char * context = nullptr);
 
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 
@@ -182,6 +195,13 @@ public:
     CHIP_ERROR PrepareStatus(const ConcreteCommandPath & aCommandPath);
     CHIP_ERROR FinishStatus();
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
+
+    /**
+     * GetAccessingFabricIndex() may only be called during synchronous command
+     * processing.  Anything that runs async (while holding a
+     * CommandHandler::Handle or equivalent) must not call this method, because
+     * it will not work right if the session we're using was evicted.
+     */
     FabricIndex GetAccessingFabricIndex() const;
 
     /**
@@ -225,13 +245,9 @@ public:
     template <typename CommandData>
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        if (CHIP_NO_ERROR != AddResponseData(aRequestCommandPath, aData))
+        if (AddResponseData(aRequestCommandPath, aData) != CHIP_NO_ERROR)
         {
-            CHIP_ERROR err = AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(DataManagement, "Failed to encode status: %" CHIP_ERROR_FORMAT, err.Format());
-            }
+            AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
         }
     }
 
@@ -272,7 +288,17 @@ public:
         msgContext->FlushAcks();
     }
 
-    Access::SubjectDescriptor GetSubjectDescriptor() const { return mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor(); }
+    /**
+     * GetSubjectDescriptor() may only be called during synchronous command
+     * processing.  Anything that runs async (while holding a
+     * CommandHandler::Handle or equivalent) must not call this method, because
+     * it might not work right if the session we're using was evicted.
+     */
+    Access::SubjectDescriptor GetSubjectDescriptor() const
+    {
+        VerifyOrDie(!mGoneAsync);
+        return mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
+    }
 
 private:
     friend class TestCommandInteraction;
@@ -375,10 +401,20 @@ private:
         ReturnErrorOnFailure(PrepareCommand(path, false));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kFields)), aData));
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
 
         return FinishCommand(/* aEndDataStruct = */ false);
     }
+
+    /**
+     * Check whether the InvokeRequest we are handling is targeted to a group.
+     */
+    bool IsGroupRequest() { return mGroupRequest; }
+
+    /**
+     * Sets the state flag to keep the information that request we are handling is targeted to a group.
+     */
+    void SetGroupRequest(bool isGroupRequest) { mGroupRequest = isGroupRequest; }
 
     Messaging::ExchangeHolder mExchangeCtx;
     Callback * mpCallback = nullptr;
@@ -390,10 +426,15 @@ private:
 
     bool mSentStatusResponse = false;
 
-    State mState = State::Idle;
+    State mState       = State::Idle;
+    bool mGroupRequest = false;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     TLV::TLVWriter mBackupWriter;
     bool mBufferAllocated = false;
+    // If mGoneAsync is true, we have finished out initial processing of the
+    // incoming invoke.  After this point, our session could go away at any
+    // time.
+    bool mGoneAsync = false;
 };
 
 } // namespace app

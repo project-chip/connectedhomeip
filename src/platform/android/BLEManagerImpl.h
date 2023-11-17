@@ -52,6 +52,9 @@ public:
 
     void InitializeWithObject(jobject managerObject);
 
+    void OnConnectSuccess(void * appState, BLE_CONNECTION_OBJECT connObj);
+    void OnConnectFailed(void * appState, CHIP_ERROR err);
+
 private:
     // ===== Members that implement the BLEManager internal interface.
 
@@ -91,6 +94,7 @@ private:
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members for internal use by the following friends.

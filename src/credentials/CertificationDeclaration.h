@@ -28,7 +28,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
@@ -91,6 +91,14 @@ struct CertificationElementsWithoutPIDs
     bool dacOriginVIDandPIDPresent               = false;
     bool authorizedPAAListPresent                = false;
     char certificateId[kCertificateIdLength + 1] = { 0 };
+};
+
+enum class CertificationType : uint8_t
+{
+    kDevelopmentAndTest,
+    kProvisional,
+    kOfficial,
+    kReserved,
 };
 
 class CertificationElementsDecoder

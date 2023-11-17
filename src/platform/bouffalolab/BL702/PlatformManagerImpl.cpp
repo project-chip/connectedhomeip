@@ -15,25 +15,39 @@
  *    limitations under the License.
  */
 
-/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/bouffalolab/BL702/DiagnosticDataProviderImpl.h>
+#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
+#endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/bouffalolab/BL702/wifi_mgmr_portable.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <openthread_port.h>
+#include <utils_list.h>
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#include <platform/bouffalolab/BL702/EthernetInterface.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+
+extern "C" {
 #include <bl_sec.h>
+}
 
 namespace chip {
 namespace DeviceLayer {
 
-extern "C" void bl_rand_stream(unsigned char *, int);
-
-PlatformManagerImpl PlatformManagerImpl::sInstance;
+extern "C" int bl_rand_stream(unsigned char *, int);
 
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
@@ -51,17 +65,21 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     CHIP_ERROR err;
     TaskHandle_t backup_eventLoopTask;
 
-    // Initialize the configuration system.
-    err = Internal::BL702Config::Init();
-    SuccessOrExit(err);
-
-    ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
-
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    otRadio_opt_t opt;
+    opt.bf.isFtd        = true;
+    opt.bf.isCoexEnable = true;
+
+    ot_alarmInit();
+    ot_radioInit(opt);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+    ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
     err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
     SuccessOrExit(err);
@@ -73,6 +91,14 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err                  = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask = backup_eventLoopTask;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    wifi_start_firmware_task();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    ethernetInterface_init();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 
 exit:
     return err;

@@ -1,9 +1,9 @@
 #include <jni.h>
 
+#include <controller/java/zap-generated/CHIPClientCallbacks.h>
 #include <lib/core/CHIPError.h>
-#include <zap-generated/CHIPClientCallbacks.h>
 
-#include "zap-generated/CHIPCallbackTypes.h"
+#include <jni/CHIPCallbackTypes.h>
 
 namespace chip {
 

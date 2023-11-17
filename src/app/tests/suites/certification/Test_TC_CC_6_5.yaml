@@ -1,0 +1,245 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    25.3.18. [TC-CC-6.5] Color Temperature StartUpColorTemperatureMireds
+    functionality with server as DUT
+
+PICS:
+    - CC.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Color Control"
+    endpoint: 1
+    ConfigWait:
+        type: int16u
+        defaultValue: 5000
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 0a: TH writes 0 to the Options attribute"
+      PICS: CC.S.F04 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
+    - label: "Step 0b: TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp && CC.S.F04
+      cluster: "On/Off"
+      command: "On"
+
+    - label: "Step 0c: TH reads ColorTemperatureMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A0007
+      command: "readAttribute"
+      attribute: "ColorTemperatureMireds"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Step 0d: TH reads ColorTempPhysicalMinMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A400b
+      command: "readAttribute"
+      attribute: "ColorTempPhysicalMinMireds"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Step 0e: TH reads ColorTempPhysicalMaxMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A400c
+      command: "readAttribute"
+      attribute: "ColorTempPhysicalMaxMireds"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 1: TH reads from the DUT the StartUpColorTemperatureMireds
+          attribute"
+      PICS: CC.S.A4010 && CC.S.F04
+      command: "readAttribute"
+      attribute: "StartUpColorTemperatureMireds"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 2a: TH writes to StartUpColorTemperatureMireds attribute with
+          value StartUpColorTemperatureMireds"
+      verification: |
+          ./chip-tool colorcontrol write start-up-color-temperature-mireds 32639 1 1
+
+          Verify DUT responds with a successful (value 0x00) status response On TH(chip-tool) Log and below is the sample log provided for the raspi platform
+
+          [1684869285516] [29746:343264] [DMG] WriteResponseMessage =
+          [1684869285516] [29746:343264] [DMG] {
+          [1684869285516] [29746:343264] [DMG]    AttributeStatusIBs =
+          [1684869285516] [29746:343264] [DMG]    [
+          [1684869285516] [29746:343264] [DMG]            AttributeStatusIB =
+          [1684869285516] [29746:343264] [DMG]            {
+          [1684869285516] [29746:343264] [DMG]                    AttributePathIB =
+          [1684869285516] [29746:343264] [DMG]                    {
+          [1684869285516] [29746:343264] [DMG]                            Endpoint = 0x1,
+          [1684869285516] [29746:343264] [DMG]                            Cluster = 0x300,
+          [1684869285516] [29746:343264] [DMG]                            Attribute = 0x0000_4010,
+          [1684869285516] [29746:343264] [DMG]                    }
+          [1684869285516] [29746:343264] [DMG]
+          [1684869285516] [29746:343264] [DMG]                    StatusIB =
+          [1684869285516] [29746:343264] [DMG]                    {
+          [1684869285516] [29746:343264] [DMG]                            status = 0x00 (SUCCESS),
+          [1684869285516] [29746:343264] [DMG]                    },
+          [1684869285516] [29746:343264] [DMG]
+          [1684869285516] [29746:343264] [DMG]            },
+          [1684869285516] [29746:343264] [DMG]
+          [1684869285516] [29746:343264] [DMG]    ],
+          [1684869285516] [29746:343264] [DMG]
+          [1684869285516] [29746:343264] [DMG]    InteractionModelRevision = 1
+          [1684869285516] [29746:343264] [DMG] }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CC.S.A4010 && CC.S.F04
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 2b: TH reads StartUpColorTemperatureMireds attribute from DUT"
+      PICS: CC.S.A4010 && CC.S.F04
+      command: "readAttribute"
+      attribute: "StartUpColorTemperatureMireds"
+      response:
+          saveAs: StartUpColorTemperatureMiredsValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 2b: Verify that the DUT response contains
+          StartUpColorTemperatureMireds that matches the
+          StartUpColorTemperatureMireds set in Step 2a"
+      PICS: CC.S.A4010 && CC.S.F04 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          verify StartUpColorTemperatureMireds matches the StartUpColorTemperatureMireds set in Step 2a, if not fail the step.
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3a: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+
+    - label: "Step 3b: Reboot target device(DUT)"
+      verification: |
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 4a: TH reads from the DUT the StartUpColorTemperatureMireds
+          attribute"
+      PICS: CC.S.F04 && CC.S.A4010
+      command: "readAttribute"
+      attribute: "StartUpColorTemperatureMireds"
+      response:
+          value: StartUpColorTemperatureMiredsValue
+
+    - label: "Step 4b: TH reads ColorTemperatureMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A0007
+      command: "readAttribute"
+      attribute: "ColorTemperatureMireds"
+      response:
+          value: StartUpColorTemperatureMiredsValue
+
+    - label: "Step 5a: TH reads ColorMode attribute from DUT"
+      PICS: CC.S.F04 && CC.S.A0008
+      command: "readAttribute"
+      attribute: "ColorMode"
+      response:
+          value: 2
+          constraints:
+              minValue: 0
+              maxValue: 2
+
+    - label: "Step 5b: TH reads EnhancedColorMode attribute from DUT"
+      PICS: CC.S.F04 && CC.S.A4001
+      command: "readAttribute"
+      attribute: "EnhancedColorMode"
+      response:
+          value: 2
+          constraints:
+              minValue: 0
+              maxValue: 3
+
+    - label: "Turn Off light that we turned on"
+      PICS: OO.S.C00.Rsp
+      cluster: "On/Off"
+      command: "Off"
+
+    - label: "Wait to turn Off light"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigWait
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000
+      response:
+          value: 0

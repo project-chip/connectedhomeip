@@ -36,7 +36,10 @@
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/CASESession.h>
+#include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -44,31 +47,6 @@
 #include <transport/raw/UDP.h>
 
 namespace chip {
-
-struct DeviceProxyInitParams
-{
-    SessionManager * sessionManager                                    = nullptr;
-    SessionResumptionStorage * sessionResumptionStorage                = nullptr;
-    Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
-    Messaging::ExchangeManager * exchangeMgr                           = nullptr;
-    FabricTable * fabricTable                                          = nullptr;
-    CASEClientPoolDelegate * clientPool                                = nullptr;
-    Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
-
-    Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
-
-    CHIP_ERROR Validate() const
-    {
-        ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        // sessionResumptionStorage can be nullptr when resumption is disabled
-        ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(groupDataProvider == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(clientPool == nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-        return CHIP_NO_ERROR;
-    }
-};
 
 class OperationalSessionSetup;
 
@@ -106,8 +84,6 @@ public:
     {}
     OperationalDeviceProxy() {}
 
-    // Recommended to use InteractionModelEngine::ShutdownSubscriptions directly.
-    void ShutdownSubscriptions() override { VerifyOrDie(false); } // Currently not implemented.
     void Disconnect() override
     {
         if (IsSecureConnected())
@@ -140,8 +116,20 @@ private:
  * application code does incorrectly hold onto this information so do not follow those incorrect
  * implementations as an example.
  */
-typedef void (*OnDeviceConnected)(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+typedef void (*OnDeviceConnected)(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+
+/**
+ * Callback prototype when secure session establishment fails.
+ */
 typedef void (*OnDeviceConnectionFailure)(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
+
+/**
+ * Callback prototype when secure session establishement has failed and will be
+ * retried.  retryTimeout indicates how much time will pass before we know
+ * whether the retry has timed out waiting for a response to our Sigma1 message.
+ */
+typedef void (*OnDeviceConnectionRetry)(void * context, const ScopedNodeId & peerId, CHIP_ERROR error,
+                                        System::Clock::Seconds16 retryTimeout);
 
 /**
  * Object used to either establish a connection to peer or performing address lookup to a peer.
@@ -164,27 +152,23 @@ typedef void (*OnDeviceConnectionFailure)(void * context, const ScopedNodeId & p
  * It is possible to determine which of the two purposes the OperationalSessionSetup is for by calling
  * IsForAddressUpdate().
  */
-class DLL_EXPORT OperationalSessionSetup : public SessionDelegate,
-                                           public SessionEstablishmentDelegate,
-                                           public AddressResolve::NodeListener
+class DLL_EXPORT OperationalSessionSetup : public SessionEstablishmentDelegate, public AddressResolve::NodeListener
 {
 public:
     ~OperationalSessionSetup() override;
 
-    OperationalSessionSetup(DeviceProxyInitParams & params, ScopedNodeId peerId,
-                            OperationalSessionReleaseDelegate * releaseDelegate) :
-        mSecureSession(*this)
+    OperationalSessionSetup(const CASEClientInitParams & params, CASEClientPoolDelegate * clientPool, ScopedNodeId peerId,
+                            OperationalSessionReleaseDelegate * releaseDelegate)
     {
         mInitParams = params;
-        if (params.Validate() != CHIP_NO_ERROR || releaseDelegate == nullptr)
+        if (params.Validate() != CHIP_NO_ERROR || clientPool == nullptr || releaseDelegate == nullptr)
         {
             mState = State::Uninitialized;
             return;
         }
 
-        mSystemLayer     = params.exchangeMgr->GetSessionManager()->SystemLayer();
+        mClientPool      = clientPool;
         mPeerId          = peerId;
-        mFabricTable     = params.fabricTable;
         mReleaseDelegate = releaseDelegate;
         mState           = State::NeedsAddress;
         mAddressLookupHandle.SetListener(this);
@@ -213,11 +197,6 @@ public:
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablished(const SessionHandle & session) override;
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
-
-    //////////// SessionDelegate Implementation ///////////////
-
-    // Called when a connection is closing. The object releases all resources associated with the connection.
-    void OnSessionReleased() override;
 
     ScopedNodeId GetPeerId() const { return mPeerId; }
 
@@ -249,8 +228,16 @@ public:
     void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override;
     void OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason) override;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    // Update our remaining attempt count to be at least the given value.
+    void UpdateAttemptCount(uint8_t attemptCount);
+
+    // Add a retry handler for this session setup.
+    void AddRetryHandler(Callback::Callback<OnDeviceConnectionRetry> * onRetry);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
 private:
-    enum class State
+    enum class State : uint8_t
     {
         Uninitialized,    // Error state: OperationalSessionSetup is useless
         NeedsAddress,     // No address known, lookup not started yet.
@@ -258,11 +245,12 @@ private:
         HasAddress,       // Have an address, CASE handshake not started yet.
         Connecting,       // CASE handshake in progress.
         SecureConnected,  // CASE session established.
+        WaitingForRetry,  // No address known, but a retry is pending.  Added at
+                          // end to make logs easier to understand.
     };
 
-    DeviceProxyInitParams mInitParams;
-    FabricTable * mFabricTable = nullptr;
-    System::Layer * mSystemLayer;
+    CASEClientInitParams mInitParams;
+    CASEClientPoolDelegate * mClientPool = nullptr;
 
     // mCASEClient is only non-null if we are in State::Connecting or just
     // allocated it as part of an attempt to enter State::Connecting.
@@ -272,11 +260,7 @@ private:
 
     Transport::PeerAddress mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
-    void MoveToState(State aTargetState);
-
-    State mState = State::Uninitialized;
-
-    SessionHolderWithDelegate mSecureSession;
+    SessionHolder mSecureSession;
 
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;
@@ -286,7 +270,28 @@ private:
     /// This is used when a node address is required.
     chip::AddressResolve::NodeLookupHandle mAddressLookupHandle;
 
+    State mState = State::Uninitialized;
+
     bool mPerformingAddressUpdate = false;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    // When we TryNextResult on the resolver, it will synchronously call back
+    // into our OnNodeAddressResolved when it succeeds.  We need to track
+    // whether the OnNodeAddressResolved is coming from handling a session
+    // establishment error or whether it's happening because we didn't even
+    // manage to start a session establishment at all.  Use this member to keep
+    // track of that.
+    bool mTryingNextResultDueToSessionEstablishmentError = false;
+
+    uint8_t mRemainingAttempts = 0;
+    uint8_t mAttemptsDone      = 0;
+
+    uint8_t mResolveAttemptsAllowed = 0;
+
+    Callback::CallbackDeque mConnectionRetry;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
+    void MoveToState(State aTargetState);
 
     CHIP_ERROR EstablishConnection(const ReliableMessageProtocolConfig & config);
 
@@ -304,6 +309,12 @@ private:
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
+    enum class ReleaseBehavior
+    {
+        Release,
+        DoNotRelease
+    };
+
     /*
      * This dequeues all failure and success callbacks and appropriately
      * invokes either set depending on the value of error.
@@ -311,11 +322,23 @@ private:
      * If error == CHIP_NO_ERROR, only success callbacks are invoked.
      * Otherwise, only failure callbacks are invoked.
      *
-     * This uses mReleaseDelegate to release ourselves (aka `this`). As a
-     * result any caller should return right away without touching `this`.
+     * If releaseBehavior is Release, this uses mReleaseDelegate to release
+     * ourselves (aka `this`). As a result any caller should return right away
+     * without touching `this`.
      *
+     * Setting releaseBehavior to DoNotRelease is meant for use from the destructor
      */
-    void DequeueConnectionCallbacks(CHIP_ERROR error);
+    void DequeueConnectionCallbacks(CHIP_ERROR error, ReleaseBehavior releaseBehavior = ReleaseBehavior::Release);
+
+    /**
+     * Helper for DequeueConnectionCallbacks that handles the actual callback
+     * notifications. This happens after the object has been released, if it's
+     * being released.
+     */
+    static void NotifyConnectionCallbacks(Callback::Cancelable & failureReady, Callback::Cancelable & successReady,
+                                          CHIP_ERROR error, const ScopedNodeId & peerId, bool performingAddressUpdate,
+                                          Messaging::ExchangeManager * exchangeMgr,
+                                          const Optional<SessionHandle> & optionalSessionHandle);
 
     /**
      * Triggers a DNSSD lookup to find a usable peer address.
@@ -326,6 +349,38 @@ private:
      * This function will set new IP address, port and MRP retransmission intervals of the device.
      */
     void UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    /**
+     * Schedule a setup reattempt, if possible.  The outparam indicates how long
+     * it will be before the reattempt happens.
+     */
+    CHIP_ERROR ScheduleSessionSetupReattempt(System::Clock::Seconds16 & timerDelay);
+
+    /**
+     * Cancel a scheduled setup reattempt, if we can (i.e. if we still have
+     * access to the SystemLayer).
+     */
+    void CancelSessionSetupReattempt();
+
+    /**
+     * Helper for our backoff retry timer.
+     */
+    static void TrySetupAgain(System::Layer * systemLayer, void * state);
+
+    /**
+     * Helper to notify our retry callbacks that a setup error occurred and we
+     * will retry.
+     */
+    void NotifyRetryHandlers(CHIP_ERROR error, const ReliableMessageProtocolConfig & remoteMrpConfig,
+                             System::Clock::Seconds16 retryDelay);
+
+    /**
+     * A version of NotifyRetryHandlers that passes in a retry timeout estimate
+     * directly.
+     */
+    void NotifyRetryHandlers(CHIP_ERROR error, System::Clock::Seconds16 timeoutEstimate);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 };
 
 } // namespace chip

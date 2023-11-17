@@ -20,7 +20,7 @@ config:
         type: node_id
         defaultValue: 0xCAFE
     endpoint: 0
-    cluster: "AdministratorCommissioning"
+    cluster: "Administrator Commissioning"
     discriminator:
         type: int16u
         defaultValue: 3840

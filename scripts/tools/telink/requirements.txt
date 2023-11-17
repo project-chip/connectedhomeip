@@ -1,0 +1,6 @@
+cryptography==41.0.4
+cffi==1.15.0
+future==0.18.3
+pycparser==2.21
+pypng==0.0.21
+PyQRCode==1.2.1

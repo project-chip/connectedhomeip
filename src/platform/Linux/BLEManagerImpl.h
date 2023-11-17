@@ -23,11 +23,14 @@
 
 #pragma once
 
+#include <cstdint>
+#include <string>
+
 #include <ble/BleLayer.h>
 #include <platform/internal/BLEManager.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
+#include "bluez/BluezAdvertisement.h"
+#include "bluez/BluezEndpoint.h"
 #include "bluez/ChipDeviceScanner.h"
 #include "bluez/Types.h"
 
@@ -36,21 +39,6 @@ namespace DeviceLayer {
 namespace Internal {
 
 void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
-
-struct BLEAdvConfig
-{
-    char * mpBleName;
-    uint32_t mAdapterId;
-    uint8_t mMajor;
-    uint8_t mMinor;
-    uint16_t mVendorId;
-    uint16_t mProductId;
-    uint64_t mDeviceId;
-    uint8_t mPairingStatus;
-    ChipAdvType mType;
-    uint16_t mDuration;
-    const char * mpAdvertisingUUID;
-};
 
 enum class BleScanState : uint8_t
 {
@@ -91,6 +79,7 @@ class BLEManagerImpl final : public BLEManager,
 
 public:
     CHIP_ERROR ConfigureBle(uint32_t aAdapterId, bool aIsCentral);
+    void OnScanError(CHIP_ERROR error) override;
 
     // Driven by BlueZ IO
     static void HandleNewConnection(BLE_CONNECTION_OBJECT conId);
@@ -104,7 +93,6 @@ public:
     static void HandleTXComplete(BLE_CONNECTION_OBJECT user_data);
 
     static void NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate);
-    static void NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, void * apAppstate);
     static void NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess, void * apAppstate);
     static void NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * apAppstate);
 
@@ -149,10 +137,11 @@ private:
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
-    void OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
     void OnScanComplete() override;
 
     // ===== Members for internal use by the following friends.
@@ -179,13 +168,10 @@ private:
 
     enum
     {
-        kMaxConnections             = 1,  // TODO: right max connection
-        kMaxDeviceNameLength        = 20, // TODO: right-size this
-        kMaxAdvertismentDataSetSize = 31  // TODO: verify this
+        kMaxConnections              = 1,  // TODO: right max connection
+        kMaxDeviceNameLength         = 20, // TODO: right-size this
+        kMaxAdvertisementDataSetSize = 31  // TODO: verify this
     };
-
-    CHIP_ERROR StartBLEAdvertising();
-    CHIP_ERROR StopBLEAdvertising();
 
     void DriveBLEState();
     static void DriveBLEState(intptr_t arg);
@@ -195,13 +181,20 @@ private:
     void CleanScanConfig();
 
     CHIPoBLEServiceMode mServiceMode;
-    BLEAdvConfig mBLEAdvConfig;
-    BLEScanConfig mBLEScanConfig;
     BitFlags<Flags> mFlags;
+
+    uint32_t mAdapterId = 0;
     char mDeviceName[kMaxDeviceNameLength + 1];
-    bool mIsCentral            = false;
-    BluezEndpoint * mpEndpoint = nullptr;
-    std::unique_ptr<ChipDeviceScanner> mDeviceScanner;
+    bool mIsCentral = false;
+    BluezEndpoint mEndpoint;
+
+    BluezAdvertisement mBLEAdvertisement;
+    ChipAdvType mBLEAdvType    = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;
+    uint16_t mBLEAdvDurationMs = 20;
+    const char * mpBLEAdvUUID  = nullptr;
+
+    ChipDeviceScanner mDeviceScanner;
+    BLEScanConfig mBLEScanConfig;
 };
 
 /**
@@ -244,5 +237,3 @@ inline bool BLEManagerImpl::_IsAdvertising()
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

@@ -20,7 +20,6 @@
  * @brief Implementation for the Localization Configuration Server Cluster
  ***************************************************************************/
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -215,7 +214,7 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
     }
 }
 
-void MatterLocalizationConfigurationPluginServerInitCallback(void)
+void MatterLocalizationConfigurationPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

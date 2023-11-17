@@ -60,7 +60,7 @@ static_library("helpers") {
   ]
 }
 
-chip_test_suite("tests") {
+chip_test_suite_using_nltest("tests") {
   output_name = "libInetLayerTests"
 
   public_configs = [ ":tests_config" ]
@@ -74,6 +74,7 @@ chip_test_suite("tests") {
   ]
 
   test_sources = [
+    "TestBasicPacketFilters.cpp",
     "TestInetAddress.cpp",
     "TestInetErrorStr.cpp",
   ]
@@ -91,4 +92,6 @@ chip_test_suite("tests") {
     # TODO: This test does not seem executed
     sources += [ "TestLwIPDNS.cpp" ]
   }
+
+  cflags = [ "-Wconversion" ]
 }

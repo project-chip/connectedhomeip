@@ -29,6 +29,9 @@ CONFIG_ESPTOOLPY_MONITOR_BAUD=115200
 CONFIG_BT_ENABLED=y
 CONFIG_BT_NIMBLE_ENABLED=y
 
+#disable BT connection reattempt
+CONFIG_BT_NIMBLE_ENABLE_CONN_REATTEMPT=n
+
 #enable lwip ipv6 autoconfig
 CONFIG_LWIP_IPV6_AUTOCONFIG=y
 
@@ -49,3 +52,9 @@ CONFIG_ENABLE_CHIP_SHELL=y
 
 # Disable softap support by default
 CONFIG_ESP_WIFI_SOFTAP_SUPPORT=n
+
+# Enable HKDF in mbedtls
+CONFIG_MBEDTLS_HKDF_C=y
+
+# Increase LwIP IPv6 address number
+CONFIG_LWIP_IPV6_NUM_ADDRESSES=6

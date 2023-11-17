@@ -1,0 +1,181 @@
+{%- macro encode_value(source, encodable, depth) -%}
+  {%- if encodable.is_nullable and encodable.is_optional -%}
+    {{encode_value(source, encodable.without_nullable().without_optional(), depth + 1)}}?
+  {%- elif encodable.is_nullable -%}
+    {{encode_value(source, encodable.without_nullable(), depth + 1)}}?
+  {%- elif encodable.is_optional -%}
+    {{encode_value(source, encodable.without_optional(), depth + 1)}}?
+  {%- elif encodable.is_list -%}
+    List<{{encode_value(source, encodable.without_list(), depth + 1)}}>
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    {{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.kotlin_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro encode_value_without_optional(source, encodable, depth) -%}
+  {%- if encodable.is_nullable -%}
+    {{encode_value_without_optional(source, encodable.without_nullable(), depth + 1)}}?
+  {%- elif encodable.is_list -%}
+    List<{{encode_value_without_optional(source, encodable.without_list(), depth + 1)}}>
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    {{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.kotlin_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro encode_value_without_optional_nullable(source, encodable, depth) -%}
+  {%- if encodable.is_list -%}
+    List<{{encode_value_without_optional_nullable(source, encodable.without_list(), depth + 1)}}>
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    {{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.kotlin_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package matter.devicecontroller.cluster.clusters
+
+import matter.controller.MatterController
+import matter.devicecontroller.cluster.structs.*
+{% set typeLookup = idl | createLookupContext(cluster) %}
+class {{cluster.name}}Cluster(private val controller: MatterController, private val endpointId: UShort) {
+
+{%- set already_handled_command = [] -%}
+{%- for command in cluster.commands | sort(attribute='code') -%}
+{%- if command | isCommandNotDefaultCallback() -%}
+{%- set callbackName = command | javaCommandCallbackName() -%}
+{%- if callbackName not in already_handled_command %}
+  class {{callbackName}}(
+{%- for field in (cluster.structs | named(command.output_param)).fields %}
+    val {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}
+{%- if not loop.last %}, {% endif %}
+{%- endfor %}
+  )
+{% if already_handled_command.append(callbackName) -%}
+{%- endif -%}
+{%- endif -%}
+{%- endif -%}
+{%- endfor %}
+
+{%- set already_handled_attribute = [] -%}
+{% for attribute in cluster.attributes | rejectattr('definition', 'is_field_global_name', typeLookup) %}
+{%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
+{%- set interfaceName = attribute | javaAttributeCallbackName(typeLookup) -%}
+{%- if interfaceName not in already_handled_attribute %}
+  class {{interfaceName}}(
+    val value: {{encode_value(cluster, encodable, 0)}}
+  )
+{% if already_handled_attribute.append(interfaceName) -%}
+{#- This block does nothing, it only exists to append to already_handled_attribute. -#}
+{%- endif -%}
+{%- endif -%}
+{% endfor -%}
+
+{% for command in cluster.commands | sort(attribute='code') -%}
+{%- set callbackName = command | javaCommandCallbackName() %}
+  suspend fun {{command.name | lowfirst_except_acronym}}(
+{%- if command.input_param -%}
+{%- for field in (cluster.structs | named(command.input_param)).fields -%}
+  {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}
+{%- if not loop.last -%}, {% endif %}  
+{%- endfor -%}
+{%- if command.is_timed_invoke -%}
+  , timedInvokeTimeoutMs: Int)
+{%- else -%}
+  , timedInvokeTimeoutMs: Int? = null)
+{%- endif -%}
+{%- else -%}
+{%- if command.is_timed_invoke -%}
+  timedInvokeTimeoutMs: Int)
+{%- else -%}
+  timedInvokeTimeoutMs: Int? = null)
+{%- endif -%}
+{%- endif -%}
+{%- if command | hasResponse -%}
+    : {{callbackName}} {
+{%- else %} {
+{%- endif %}
+    val commandId = {{command.code}}L
+{% if command.is_timed_invoke %}
+    // Implementation needs to be added here
+{%- else %}
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }    
+{%- endif %}    
+  }
+{% endfor -%}
+
+{% for attribute in cluster.attributes | sort(attribute='code') %}
+{%- set interfaceName = attribute | javaAttributeCallbackName(typeLookup) %}
+  suspend fun read{{ attribute.definition.name | upfirst }}Attribute(): {{interfaceName}} {
+    // Implementation needs to be added here
+  }
+{% if attribute | isFabricScopedList(typeLookup) %}
+  suspend fun read{{ attribute.definition.name | upfirst }}AttributeWithFabricFilter(
+    isFabricFiltered: Boolean
+  ): {{interfaceName}} {
+    // Implementation needs to be added here
+  }
+
+{% endif -%}
+{%- if attribute.is_writable %}
+{%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
+{%- set encodable2 = attribute.definition | asEncodable(typeLookup) %}
+  suspend fun write{{ attribute.definition.name | upfirst }}Attribute(
+    value: {{ encode_value_without_optional_nullable(cluster, encodable2, 0) }},
+{%- if attribute.requires_timed_write -%}
+    timedWriteTimeoutMs: Int
+{%- else %}
+    timedWriteTimeoutMs: Int? = null
+{%- endif %}    
+  ) {
+{%- if attribute.requires_timed_write %}
+    // Implementation needs to be added here
+{%- else %}
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }    
+{%- endif %}    
+  }
+{% endif %}
+{%- if attribute.is_subscribable %}
+  suspend fun subscribe{{ attribute.definition.name | upfirst }}Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): {{interfaceName}} {
+    // Implementation needs to be added here
+  }
+{% endif -%}
+{%- endfor %}
+  companion object {
+    const val CLUSTER_ID: UInt = {{cluster.code}}u
+  }
+}

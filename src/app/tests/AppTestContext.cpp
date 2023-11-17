@@ -19,8 +19,9 @@
 #include <access/AccessControl.h>
 #include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/InteractionModelEngine.h>
+#include <app/reporting/tests/MockReportScheduler.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 
 namespace {
 
@@ -40,7 +41,9 @@ namespace Test {
 CHIP_ERROR AppContext::Init()
 {
     ReturnErrorOnFailure(Super::Init());
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable()));
+    ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().InitChipStack());
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
+                                                                                app::reporting::GetDefaultReportScheduler()));
 
     Access::SetAccessControl(gPermissiveAccessControl);
     ReturnErrorOnFailure(
@@ -55,6 +58,7 @@ void AppContext::Shutdown()
     Access::ResetAccessControlToDefault();
 
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
     Super::Shutdown();
 }
 

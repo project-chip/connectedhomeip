@@ -24,6 +24,7 @@
 
 #pragma once
 #include "system/SystemClock.h"
+#include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventHeader.h>
@@ -38,7 +39,7 @@
 #include <app/data-model/Decode.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -49,6 +50,7 @@
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
 namespace chip {
 namespace app {
 
@@ -71,6 +73,14 @@ public:
     class Callback
     {
     public:
+        Callback() = default;
+
+        // Callbacks are not expected to be copyable or movable.
+        Callback(const Callback &)             = delete;
+        Callback(Callback &&)                  = delete;
+        Callback & operator=(const Callback &) = delete;
+        Callback & operator=(Callback &&)      = delete;
+
         virtual ~Callback() = default;
 
         /**
@@ -234,6 +244,31 @@ public:
             aEventNumber.ClearValue();
             return CHIP_NO_ERROR;
         }
+
+        /**
+         * OnUnsolicitedMessageFromPublisher will be called for a subscription
+         * ReadClient when any incoming message is received from a matching
+         * node on the fabric.
+         *
+         * This callback will be called:
+         *   - When receiving any unsolicited communication from the node
+         *   - Even for disconnected subscriptions.
+         *
+         * Callee MUST not synchronously destroy ReadClients in this callback.
+         *
+         * @param[in] apReadClient the ReadClient for the subscription.
+         */
+        virtual void OnUnsolicitedMessageFromPublisher(ReadClient * apReadClient) {}
+
+        /**
+         * OnCASESessionEstablished will be called for a subscription ReadClient when
+         * it finishes setting up a CASE session, as part of either automatic
+         * re-subscription or doing an initial subscribe based on ScopedNodeId.
+         *
+         * The callee is allowed to modify the ReadPrepareParams (e.g. to change
+         * things like min/max intervals based on the session parameters).
+         */
+        virtual void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) {}
     };
 
     enum class InteractionType : uint8_t
@@ -252,7 +287,9 @@ public:
      *  this object will cease to function correctly since it depends on the engine for a number of critical functions.
      *
      *  @param[in]    apImEngine       A valid pointer to the IM engine.
-     *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
+     *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object. Allowed to be null
+     *                                 if the version of SendAutoResubscribeRequest that takes a
+     *                                 ScopedNodeId is used.
      *  @param[in]    apCallback       Callback set by application.
      *  @param[in]    aInteractionType Type of interaction (read or subscribe)
      *
@@ -287,6 +324,14 @@ public:
     CHIP_ERROR SendRequest(ReadPrepareParams & aReadPrepareParams);
 
     void OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+
+    void OnUnsolicitedMessageFromPublisher()
+    {
+        TriggerResubscribeIfScheduled("unsolicited message");
+
+        // Then notify callbacks
+        mpCallback.OnUnsolicitedMessageFromPublisher(this);
+    }
 
     auto GetSubscriptionId() const
     {
@@ -329,11 +374,21 @@ public:
      *  OnDeallocatePaths. Note: At a given time in the system, you can either have a single subscription with re-sub enabled that
      *  has mKeepSubscriptions = false, OR, multiple subs with re-sub enabled with mKeepSubscriptions = true. You shall not
      *  have a mix of both simultaneously. If SendAutoResubscribeRequest is called at all, it guarantees that it will call
-     *  OnDeallocatePaths when OnDone is called. SendAutoResubscribeRequest is the only case that calls OnDeallocatePaths, since
-     *  that's the only case when the consumer moved a ReadParams into the client.
+     *  OnDeallocatePaths (either befor returning error, or when OnDone is called). SendAutoResubscribeRequest is the only case
+     *  that calls OnDeallocatePaths, since that's the only case when the consumer moved a ReadParams into the client.
      *
      */
     CHIP_ERROR SendAutoResubscribeRequest(ReadPrepareParams && aReadPrepareParams);
+
+    /**
+     * Like SendAutoResubscribeRequest above, but without a session being
+     * available in the ReadPrepareParams.  When this is used, the ReadClient is
+     * responsible for setting up the CASE session itself.
+     *
+     * When using this version of SendAutoResubscribeRequest, any session to
+     * which ReadPrepareParams has a reference will be ignored.
+     */
+    CHIP_ERROR SendAutoResubscribeRequest(const ScopedNodeId & aPublisherId, ReadPrepareParams && aReadPrepareParams);
 
     /**
      *   This provides a standard re-subscription policy implementation that given a termination cause, does the following:
@@ -392,6 +447,26 @@ public:
      */
     void OverrideLivenessTimeout(System::Clock::Timeout aLivenessTimeout);
 
+    /**
+     * If the ReadClient currently has a resubscription attempt scheduled,
+     * trigger that attempt right now.  This is generally useful when a consumer
+     * has some sort of indication that the server side is currently up and
+     * communicating, so right now is a good time to try to resubscribe.
+     *
+     * The reason string is used for logging if a resubscribe is triggered.
+     */
+    void TriggerResubscribeIfScheduled(const char * reason);
+
+    /**
+     * Returns the timeout after which we consider the subscription to have
+     * dropped, if we have received no messages within that amount of time.
+     *
+     * Returns NullOptional if a subscription has not yet been established (and
+     * hence the MaxInterval is not yet known), or if the subscription session
+     * is gone and hence the relevant MRP parameters can no longer be determined.
+     */
+    Optional<System::Clock::Timeout> GetSubscriptionTimeout();
+
 private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
@@ -402,6 +477,14 @@ private:
         AwaitingInitialReport,     ///< The client is waiting for initial report
         AwaitingSubscribeResponse, ///< The client is waiting for subscribe response
         SubscriptionActive,        ///< The client is maintaining subscription
+    };
+
+    enum class ReportType
+    {
+        // kUnsolicited reports are the first message in an exchange.
+        kUnsolicited,
+        // kContinuingTransaction reports are responses to a message we sent.
+        kContinuingTransaction
     };
 
     bool IsMatchingSubscriptionId(SubscriptionId aSubscriptionId)
@@ -438,11 +521,12 @@ private:
     static void OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState);
     CHIP_ERROR ProcessSubscribeResponse(System::PacketBufferHandle && aPayload);
     CHIP_ERROR RefreshLivenessCheckTimer();
+    CHIP_ERROR ComputeLivenessCheckTimerTimeout(System::Clock::Timeout * aTimeout);
     void CancelLivenessCheckTimer();
     void CancelResubscribeTimer();
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ConcreteDataAttributePath & aClusterInfo);
-    CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload, ReportType aReportType);
     const char * GetStateStr() const;
 
     /*
@@ -480,10 +564,18 @@ private:
     void StopResubscription();
     void ClearActiveSubscriptionState();
 
-    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                      const SessionHandle & sessionHandle);
     static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     CHIP_ERROR GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin);
+
+    /**
+     * Start setting up a CASE session to our peer, if we can locate a
+     * CASESessionManager.  Returns error if we did not even manage to kick off
+     * a CASE attempt.
+     */
+    CHIP_ERROR EstablishSessionToPeer();
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeHolder mExchange;
@@ -501,7 +593,8 @@ private:
     InteractionType mInteractionType = InteractionType::Read;
     Timestamp mEventTimestamp;
 
-    bool mForceCaseOnNextResub = true;
+    bool mForceCaseOnNextResub      = true;
+    bool mIsResubscriptionScheduled = false;
 
     chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
@@ -530,5 +623,6 @@ private:
         kReservedSizeForEndOfContainer + kReservedSizeForIMRevision + kReservedSizeForEndOfContainer;
 };
 
-}; // namespace app
-}; // namespace chip
+};     // namespace app
+};     // namespace chip
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT

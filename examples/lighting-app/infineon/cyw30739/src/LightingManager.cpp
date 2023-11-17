@@ -18,11 +18,8 @@
  */
 
 #include "LightingManager.h"
-#include <app-common/zap-generated/att-storage.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app/att-storage.h>
 #include <app/util/af.h>
 #include <stdio.h>
 

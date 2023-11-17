@@ -52,11 +52,12 @@ public:
     void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
     void UpdateClusterState(void);
     void InitOTARequestor();
+    void lockMgr_Init();
 
 private:
     friend AppTask & GetAppTask(void);
 
-    CHIP_ERROR Init();
+    void Init();
 
     static void ActionInitiated(LockManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(LockManager::Action_t aAction);

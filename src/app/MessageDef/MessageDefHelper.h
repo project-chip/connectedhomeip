@@ -28,13 +28,13 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 // We need CHIPLogging.h to get the right value for CHIP_DETAIL_LOGGING here.
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 
 namespace chip {
 namespace app {

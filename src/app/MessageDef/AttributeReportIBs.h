@@ -27,12 +27,12 @@
 #include "ArrayParser.h"
 #include "AttributeReportIB.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -62,9 +62,9 @@ public:
     /**
      *  @brief Mark the end of this AttributeReportIBs
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    AttributeReportIBs::Builder & EndOfAttributeReportIBs();
+    CHIP_ERROR EndOfAttributeReportIBs();
 
     /**
      * Encode an AttributeReportIB containing an AttributeStatus.

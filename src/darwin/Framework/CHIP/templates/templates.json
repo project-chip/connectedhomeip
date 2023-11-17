@@ -11,19 +11,14 @@
         "darwin/Framework/CHIP/templates/helper.js"
     ],
     "resources": {
-        "pics-metafile": "../../../../app/tests/suites/certification/PICS.yaml",
-        "certification-metadir": "../../../../app/tests/suites/certification",
-        "test-metadir": "../../../../app/tests/suites"
+        "availability-data": "availability.yaml",
+        "config-data": "../../../../app/common/templates/config-data.yaml"
     },
     "override": "../../../../../src/app/zap-templates/common/override.js",
     "partials": [
         {
             "name": "header",
             "path": "../../../../../src/app/zap-templates/partials/header.zapt"
-        },
-        {
-            "name": "MTRCallbackBridge",
-            "path": "partials/MTRCallbackBridge.zapt"
         },
         {
             "name": "encode_value",
@@ -44,23 +39,21 @@
         {
             "name": "attribute_data_callback_name",
             "path": "partials/attribute_data_callback_name.zapt"
+        },
+        {
+            "name": "struct_field_decl",
+            "path": "partials/struct_field_decl.zapt"
+        },
+        {
+            "name": "renamed_struct_field_impl",
+            "path": "partials/renamed_struct_field_impl.zapt"
         }
     ],
     "templates": [
         {
-            "path": "MTRCallbackBridge_internal.zapt",
-            "name": "Objc MTRCallbackBridge Internal header",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCallbackBridge_internal.h"
-        },
-        {
-            "path": "MTRCallbackBridge-src.zapt",
-            "name": "Objc MTRCallbackBridge",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCallbackBridge.mm"
-        },
-        {
-            "path": "MTRBaseClusters_internal.zapt",
+            "path": "MTRBaseClusters_Internal.zapt",
             "name": "Objc ZCL asynchronous API Internal Header",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters_internal.h"
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters_Internal.h"
         },
         {
             "path": "MTRBaseClusters.zapt",
@@ -73,9 +66,9 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.mm"
         },
         {
-            "path": "MTRClusters_internal.zapt",
+            "path": "MTRClusters_Internal.zapt",
             "name": "Objc ZCL synchronous API Internal Header",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters_internal.h"
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters_Internal.h"
         },
         {
             "path": "MTRClusters.zapt",
@@ -104,8 +97,13 @@
         },
         {
             "path": "MTRCommandPayloadsObjc-src.zapt",
-            "name": "Objc reflections of MTR command payloads header",
+            "name": "Objc reflections of MTR command payloads",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloadsObjc.mm"
+        },
+        {
+            "path": "MTRCommandPayloads_Internal.zapt",
+            "name": "Internal methods for objc reflections of MTR command payloads header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloads_Internal.h"
         },
         {
             "path": "MTRAttributeTLVValueDecoder-src.zapt",
@@ -121,6 +119,21 @@
             "path": "MTRClusterConstants.zapt",
             "name": "Constants for cluster IDs",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterConstants.h"
+        },
+        {
+            "path": "MTRAttributeSpecifiedCheck-src.zapt",
+            "name": "Function to check if attribute is specified",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeSpecifiedCheck.mm"
+        },
+        {
+            "path": "MTRCommandTimedCheck-src.zapt",
+            "name": "Function to check if command needs timed invoke",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandTimedCheck.mm"
+        },
+        {
+            "path": "MTRDeviceTypeMetadata-src.zapt",
+            "name": "Functions to ask for information about device types",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRDeviceTypeMetadata.mm"
         }
     ]
 }

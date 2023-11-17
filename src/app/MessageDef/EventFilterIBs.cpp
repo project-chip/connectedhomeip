@@ -69,18 +69,18 @@ EventFilterIB::Builder & EventFilterIBs::Builder::CreateEventFilter()
     return mEventFilter;
 }
 
-EventFilterIBs::Builder & EventFilterIBs::Builder::EndOfEventFilters()
+CHIP_ERROR EventFilterIBs::Builder::EndOfEventFilters()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 
 CHIP_ERROR EventFilterIBs::Builder::GenerateEventFilter(EventNumber aEventNumber)
 {
     EventFilterIB::Builder & eventFilter = CreateEventFilter();
     ReturnErrorOnFailure(GetError());
-    ReturnErrorOnFailure(eventFilter.EventMin(aEventNumber).EndOfEventFilterIB().GetError());
-    ReturnErrorOnFailure(EndOfEventFilters().GetError());
+    ReturnErrorOnFailure(eventFilter.EventMin(aEventNumber).EndOfEventFilterIB());
+    ReturnErrorOnFailure(EndOfEventFilters());
     return CHIP_NO_ERROR;
 }
 

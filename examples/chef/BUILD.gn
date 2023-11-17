@@ -27,7 +27,7 @@ pw_python_package("chef") {
 
   inputs = [
     "sample_app_util/test_files/sample_zap_file.zap",
-    "sample_app_util/test_files/sample_zap_file_hashmeta.yaml",
+    "sample_app_util/test_files/sample_zap_file_meta.yaml",
   ]
 
   sources = [

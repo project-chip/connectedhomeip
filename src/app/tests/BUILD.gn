@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/platform/device.gni")
 
 static_library("helpers") {
@@ -24,6 +25,7 @@ static_library("helpers") {
   output_dir = "${root_out_dir}/lib"
 
   sources = [
+    "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
     "AppTestContext.cpp",
     "AppTestContext.h",
     "integration/RequiredPrivilegeStubs.cpp",
@@ -67,12 +69,63 @@ source_set("ota-requestor-test-srcs") {
   ]
 }
 
-chip_test_suite("tests") {
+source_set("time-sync-data-provider-test-srcs") {
+  sources = [ "${chip_root}/src/app/clusters/time-synchronization-server/TimeSyncDataProvider.cpp" ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+source_set("power-cluster-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/power-source-server/power-source-server.cpp",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+source_set("scenes-table-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSets.h",
+    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
+    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.h",
+    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.cpp",
+    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.h",
+    "${chip_root}/src/app/clusters/scenes-server/SceneTable.h",
+    "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.cpp",
+    "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+source_set("operational-state-test-srcs") {
+  sources = [ "${chip_root}/src/app/clusters/operational-state-server/operational-state-cluster-objects.h" ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+chip_test_suite_using_nltest("tests") {
   output_name = "libAppTests"
 
   test_sources = [
     "TestAclEvent.cpp",
     "TestAttributePathExpandIterator.cpp",
+    "TestAttributePersistenceProvider.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
     "TestBindingTable.cpp",
@@ -82,18 +135,23 @@ chip_test_suite("tests") {
     "TestCommandPathParams.cpp",
     "TestDataModelSerialization.cpp",
     "TestDefaultOTARequestorStorage.cpp",
-    "TestEventLogging.cpp",
+    "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
+    "TestICDManager.cpp",
+    "TestICDMonitoringTable.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
+    "TestOperationalStateClusterObjects.cpp",
     "TestPendingNotificationMap.cpp",
+    "TestPowerSourceCluster.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
+    "TestTimeSyncDataProvider.cpp",
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
   ]
@@ -113,13 +171,35 @@ chip_test_suite("tests") {
     test_sources += [ "TestClusterStateCache.cpp" ]
   }
 
+  # On NRF, Open IoT SDK and fake platforms we do not have a realtime clock available, so
+  # TestEventLogging.cpp would be testing the same thing as
+  # TestEventLoggingNoUTCTime, but it's not set up to deal with the timestamps
+  # being that low.
+  if (chip_device_platform != "nrfconnect" &&
+      chip_device_platform != "openiotsdk" && chip_device_platform != "fake") {
+    test_sources += [ "TestEventLogging.cpp" ]
+  }
+
+  # The platform manager is not properly clearing queues in test teardown, which results in
+  # DrainIO calls not being able to run in expected time (5seconds) if unprocessed reported engine
+  # runs are remaining, causing tests to crash in Open IoT SDK and Zephyr tests since they are
+  # running all tests in one file. We need to figure out how to properly clean the event queues
+  # before enabling this test for these platforms.
+  if (chip_device_platform != "nrfconnect" &&
+      chip_device_platform != "openiotsdk") {
+    test_sources += [ "TestReportScheduler.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     ":binding-test-srcs",
+    ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
+    ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/icd:manager",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
@@ -127,9 +207,27 @@ chip_test_suite("tests") {
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  if (chip_config_network_layer_ble &&
+  if (chip_device_platform != "android") {
+    test_sources += [
+      "TestExtensionFieldSets.cpp",
+      "TestSceneTable.cpp",
+    ]
+    public_deps += [
+      ":power-cluster-test-srcs",
+      ":scenes-table-test-srcs",
+    ]
+  }
+
+  # Do not run TestCommissionManager when running ICD specific unit tests.
+  # ICDManager has a dependency on the Accessors.h file which causes a link error
+  # when building the TestCommissionManager
+  if (!chip_enable_icd_server && chip_config_network_layer_ble &&
       (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
     test_sources += [ "TestCommissionManager.cpp" ]
     public_deps += [ "${chip_root}/src/app/server" ]
+  }
+
+  if (chip_persist_subscriptions) {
+    test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
   }
 }

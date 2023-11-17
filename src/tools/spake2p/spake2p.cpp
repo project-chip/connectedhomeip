@@ -53,7 +53,7 @@ const char * const sHelp =
  * @return Unconditionally returns true.
  *
  */
-bool PrintVersion(void)
+bool PrintVersion()
 {
     printf("chip " CHIP_VERSION_STRING "\n" COPYRIGHT_STRING);
 

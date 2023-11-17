@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read the global attribute: ClusterRevision"
+    - label: "Step 2: Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,7 +39,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Read the global attribute: FeatureMap"
+    - label: "Step 3: Read the global attribute: FeatureMap"
       PICS: " !PRS.S.F00 "
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -48,7 +48,9 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Given PRS.S.F00(EXT) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3: Given PRS.S.F00(EXT) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: PRS.S.F00
@@ -57,7 +59,17 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Read the global mandatory attribute: AttributeList"
+    - label: "Step 4a: Read the global mandatory attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: Read the global mandatory attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -65,7 +77,8 @@ tests:
               type: list
               contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Read the optional attribute(ScaledValue) in AttributeList"
+    - label:
+          "Step 4b: Read the optional attribute(ScaledValue) in AttributeList"
       PICS: PRS.S.A0010
       command: "readAttribute"
       attribute: "AttributeList"
@@ -74,7 +87,8 @@ tests:
               type: list
               contains: [16]
 
-    - label: "Read the optional attribute(MinScaledValue) in AttributeList"
+    - label:
+          "Step 4c: Read the optional attribute(MinScaledValue) in AttributeList"
       PICS: PRS.S.A0011
       command: "readAttribute"
       attribute: "AttributeList"
@@ -83,7 +97,8 @@ tests:
               type: list
               contains: [17]
 
-    - label: "Read the optional attribute(MaxScaledValue) in AttributeList"
+    - label:
+          "Step 4d: Read the optional attribute(MaxScaledValue) in AttributeList"
       PICS: PRS.S.A0012
       command: "readAttribute"
       attribute: "AttributeList"
@@ -92,7 +107,7 @@ tests:
               type: list
               contains: [18]
 
-    - label: "Read the optional attribute(Scale) in AttributeList"
+    - label: "Step 4e: Read the optional attribute(Scale) in AttributeList"
       PICS: PRS.S.A0014
       command: "readAttribute"
       attribute: "AttributeList"
@@ -101,7 +116,7 @@ tests:
               type: list
               contains: [20]
 
-    - label: "Read the optional attribute(Tolerance) in AttributeList"
+    - label: "Step 4f: Read the optional attribute(Tolerance) in AttributeList"
       PICS: PRS.S.A0003
       command: "readAttribute"
       attribute: "AttributeList"
@@ -110,7 +125,9 @@ tests:
               type: list
               contains: [3]
 
-    - label: "Read the optional attribute(ScaledTolerance) in AttributeList"
+    - label:
+          "Step 4g: Read the optional attribute(ScaledTolerance) in
+          AttributeList"
       PICS: PRS.S.A0013
       command: "readAttribute"
       attribute: "AttributeList"
@@ -119,7 +136,16 @@ tests:
               type: list
               contains: [19]
 
-    - label: "Read the global attribute: AcceptedCommandList"
+    - label: "Step 5: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 6: Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -127,25 +153,10 @@ tests:
           constraints:
               type: list
 
-    - label: "Read the global attribute: GeneratedCommandList"
+    - label: "Step 7:  Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
           value: []
           constraints:
               type: list
-    #Commenting out the step EventList attribute which is out of scope for matter V1.0
-    #- label:
-    #      "Read EventList attribute from the DUT and Verify that the DUT
-    #      response provides a list of supported events."
-    #  verification: |
-    #      Not implemented in chip-tool
-    #  cluster: "LogCommands"
-    #  command: "UserPrompt"
-    #  PICS: PICS_USER_PROMPT
-    #  arguments:
-    #      values:
-    #          - name: "message"
-    #            value: "Please enter 'y' for success"
-    #          - name: "expectedValue"
-    #            value: "y"

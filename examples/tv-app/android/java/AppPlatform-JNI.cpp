@@ -87,3 +87,9 @@ JNI_METHOD(void, reportAttributeChange)
     ReportAttributeChange(static_cast<EndpointId>(endpointId), static_cast<chip::ClusterId>(clusterId),
                           static_cast<chip::AttributeId>(attributeId));
 }
+
+JNI_METHOD(void, addSelfVendorAsAdmin)
+(JNIEnv *, jobject, jint endpointId, jint clusterId, jint attributeId)
+{
+    AddSelfVendorAsAdmin();
+}

@@ -22,37 +22,24 @@
 #      BLE Central support for Chip Device Controller via OSX CoreBluetooth APIs.
 #
 
-from __future__ import absolute_import
-from __future__ import print_function
-from ctypes import *
-from Foundation import *
+from __future__ import absolute_import, print_function
 
 import logging
-import objc
 import queue
 import time
+from ctypes import CFUNCTYPE, PYFUNCTYPE, c_int, c_void_p, cast, pointer, pythonapi
 
-from .ChipBleUtility import (
-    BLE_SUBSCRIBE_OPERATION_SUBSCRIBE,
-    BLE_SUBSCRIBE_OPERATION_UNSUBSCRIBE,
-    BLE_ERROR_REMOTE_DEVICE_DISCONNECTED,
-    BleTxEvent,
-    BleDisconnectEvent,
-    BleRxEvent,
-    BleSubscribeEvent,
-    BleTxEventStruct,
-    BleDisconnectEventStruct,
-    BleRxEventStruct,
-    BleSubscribeEventStruct,
-    ParseServiceData,
-)
+import objc
+from Foundation import CBUUID, CBCentralManager, NSDefaultRunLoopMode, NSRunLoop
 
-from .ChipUtility import ChipUtility
 from .ChipBleBase import ChipBleBase
-
+from .ChipBleUtility import (BLE_ERROR_REMOTE_DEVICE_DISCONNECTED, BLE_SUBSCRIBE_OPERATION_SUBSCRIBE,
+                             BLE_SUBSCRIBE_OPERATION_UNSUBSCRIBE, BleDisconnectEvent, BleDisconnectEventStruct, BleRxEvent,
+                             BleRxEventStruct, BleSubscribeEvent, BleSubscribeEventStruct, BleTxEvent, BleTxEventStruct,
+                             ParseServiceData)
+from .ChipUtility import ChipUtility
 
 try:
-
     objc.loadBundle(
         "CoreBluetooth",
         globals(),
@@ -60,7 +47,7 @@ try:
             u"/System/Library/Frameworks/IOBluetooth.framework/Versions/A/Frameworks/CoreBluetooth.framework"
         ),
     )
-except Exception as ex:
+except Exception:
     objc.loadBundle(
         "CoreBluetooth",
         globals(),
@@ -99,7 +86,7 @@ def _VoidPtrToCBUUID(ptr, len):
             + ptr[20:]
         )
         ptr = CBUUID.UUIDWithString_(ptr)
-    except Exception as ex:
+    except Exception:
         print("ERROR: failed to convert void * to CBUUID")
         ptr = None
 

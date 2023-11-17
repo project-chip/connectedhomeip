@@ -24,7 +24,7 @@ config:
     timeout: 200
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -32,26 +32,26 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH writes 0 to the Options attribute"
+    - label: "Step 1a: TH writes 0 to the Options attribute"
       PICS: CC.S.F00 && CC.S.A000f
       command: "writeAttribute"
       attribute: "Options"
       arguments:
           value: 0
 
-    - label: "TH sends On command to DUT"
+    - label: "Step 1b: H sends On command to DUT"
       PICS: OO.S.C01.Rsp
       cluster: "On/Off"
       command: "On"
 
     - label:
-          "TH sends MoveToHue command to DUT with Hue=60, Direction=0x00
-          (shortest distance) and TransitionTime=0 (immediately)"
+          "Step 2a: TH sends MoveToHue command to DUT with Hue=60,
+          Direction=0x00 (shortest distance) and TransitionTime=0 (immediately)"
       PICS: CC.S.F00 && CC.S.C00.Rsp
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 60
               - name: "Direction"
                 value: 0
@@ -63,6 +63,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -71,13 +72,13 @@ tests:
                 value: 100
 
     - label:
-          "TH sends MoveToHue command to DUT with Hue=120, Direction=0x00
-          (shortest distance) and TransitionTime=300 (30s)"
+          "Step 2b: TH sends MoveToHue command to DUT with Hue=120,
+          Direction=0x00 (shortest distance) and TransitionTime=300 (30s)"
       PICS: CC.S.F00 && CC.S.C00.Rsp
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 120
               - name: "Direction"
                 value: 0
@@ -89,6 +90,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -96,7 +98,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentHue attribute from DUT"
+    - label: "Step 2c: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -106,6 +108,7 @@ tests:
               maxValue: 92
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -113,7 +116,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentHue attribute from DUT"
+    - label: "Step 2d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -123,6 +126,7 @@ tests:
               maxValue: 115
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -130,7 +134,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentHue attribute from DUT"
+    - label: "Step 2e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -140,6 +144,7 @@ tests:
               maxValue: 138
 
     - label: "Wait 5s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -147,7 +152,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "TH reads CurrentHue attribute from DUT"
+    - label: "Step 2f: H reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -157,13 +162,13 @@ tests:
               maxValue: 138
 
     - label:
-          "TH sends MoveToHue command to DUT with Hue=60, Direction=0x00
-          (Shortest distance) and TransitionTime=0 (immediately)"
+          "Step 3a: TH sends MoveToHue command to DUT with Hue=60,
+          Direction=0x00 (Shortest distance) and TransitionTime=0 (immediately)"
       PICS: CC.S.F00 && CC.S.C00.Rsp
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 60
               - name: "Direction"
                 value: 0
@@ -175,6 +180,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -183,13 +189,13 @@ tests:
                 value: 100
 
     - label:
-          "TH sends MoveToHue command to DUT with Hue=135, Direction=0x01
-          (longest distance) and TransitionTime=300 (30s)"
+          "Step 3b: TH sends MoveToHue command to DUT with Hue=135,
+          Direction=0x01 (longest distance) and TransitionTime=300 (30s)"
       PICS: CC.S.F00 && CC.S.C00.Rsp
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 135
               - name: "Direction"
                 value: 1
@@ -201,6 +207,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -209,7 +216,7 @@ tests:
                 value: 10000
 
     #https://github.com/CHIP-Specifications/chip-test-scripts/issues/416#issuecomment-1228072461
-    - label: "TH reads CurrentHue attribute from DUT"
+    - label: "Step 3c: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
       verification: |
           ./chip-tool colorcontrol read current-hue 1 1
@@ -228,6 +235,7 @@ tests:
                 value: "y"
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -235,16 +243,27 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              minValue: 166
-              maxValue: 224
+    #https://github.com/CHIP-Specifications/chip-test-scripts/issues/493#issuecomment-1422075950
+    - label: "Step 3d: TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool colorcontrol read current-hue 1 1
+
+          After another 10 seconds , Verify that CurrentHue value as 195 On  TH(chip-tool)  Logs:
+          [1649661821.298198][8292:8297] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274517
+          [1649661821.298271][8292:8297] CHIP:TOO:   current hue: 195 (value can vary)
+          [1649661821.298374][8292:8297] CHIP:EM: Sending Standalone Ack for MessageCounter:13643708 on exchange 28536i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -252,16 +271,27 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              minValue: 115
-              maxValue: 155
+    #https://github.com/CHIP-Specifications/chip-test-scripts/issues/493#issuecomment-1422075950
+    - label: "Step 3e: TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool colorcontrol read current-hue 1 1
+          After another 10 seconds , Verify that CurrentHue value as 135 On  TH(chip-tool)  Logs:
+
+          [1649661821.298198][8292:8297] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274517
+          [1649661821.298271][8292:8297] CHIP:TOO:   current hue: 135
+          [1649661821.298374][8292:8297] CHIP:EM: Sending Standalone Ack for MessageCounter:13643708 on exchange 28536i"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait 5s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -269,7 +299,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "TH reads CurrentHue attribute from DUT"
+    - label: "Step 3f: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -279,13 +309,13 @@ tests:
               maxValue: 155
 
     - label:
-          "TH sends MoveToHue command to DUT with Hue=60, Direction=0x00
-          (shortest distance) and TransitionTime=0 (immediately)."
+          "Step 4a: TH sends MoveToHue command to DUT with Hue=60,
+          Direction=0x00 (shortest distance) and TransitionTime=0 (immediately)."
       PICS: CC.S.F00 && CC.S.C00.Rsp
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 60
               - name: "Direction"
                 value: 0
@@ -297,6 +327,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -305,13 +336,13 @@ tests:
                 value: 100
 
     - label:
-          "TH sends MoveToHue command to DUT with Hue=120, Direction=0x02 (up)
-          and TransitionTime=300 (30s)"
+          "Step 4b: H sends MoveToHue command to DUT with Hue=120,
+          Direction=0x02 (up) and TransitionTime=300 (30s)"
       PICS: CC.S.F00 && CC.S.C00.Rsp
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 120
               - name: "Direction"
                 value: 2
@@ -323,6 +354,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -330,7 +362,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentHue attribute from DUT"
+    - label: "Step 4c: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -340,6 +372,7 @@ tests:
               maxValue: 92
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -347,7 +380,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentHue attribute from DUT"
+    - label: "Step 4d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -357,6 +390,7 @@ tests:
               maxValue: 115
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -364,7 +398,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentHue attribute from DUT"
+    - label: "Step 4e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -374,6 +408,7 @@ tests:
               maxValue: 138
 
     - label: "Wait 5s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -381,7 +416,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "TH reads CurrentHue attribute from DUT"
+    - label: "Step 4f: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -391,13 +426,13 @@ tests:
               maxValue: 138
 
     - label:
-          "TH sends MoveToHue command to DUT with Hue=120, Direction=0x00
-          (shortest distance) and TransitionTime=0 (immediately)"
+          "Step 5a: TH sends MoveToHue command to DUT with Hue=120,
+          Direction=0x00 (shortest distance) and TransitionTime=0 (immediately)"
       PICS: CC.S.F00 && CC.S.C00.Rsp
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 120
               - name: "Direction"
                 value: 0
@@ -409,6 +444,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -417,13 +453,13 @@ tests:
                 value: 100
 
     - label:
-          "TH sends MoveToHue command to DUT with Hue=60, Direction=0x03 (down)
-          and TransitionTime=300 (30s)"
+          "Step 5b: TH sends MoveToHue command to DUT with Hue=60,
+          Direction=0x03 (down) and TransitionTime=300 (30s)"
       PICS: CC.S.F00 && CC.S.C00.Rsp
       command: "MoveToHue"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 60
               - name: "Direction"
                 value: 3
@@ -435,6 +471,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -442,7 +479,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentHue attribute from DUT"
+    - label: "Step 5c: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -452,6 +489,7 @@ tests:
               maxValue: 115
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -459,7 +497,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentHue attribute from DUT"
+    - label: "Step 5d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -469,6 +507,7 @@ tests:
               maxValue: 92
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -476,7 +515,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentHue attribute from DUT"
+    - label: "Step 5e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -486,6 +525,7 @@ tests:
               maxValue: 69
 
     - label: "Wait 5s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -493,7 +533,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "TH reads CurrentHue attribute from DUT"
+    - label: "Step 5f: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -502,7 +542,7 @@ tests:
               minValue: 51
               maxValue: 69
 
-    - label: "TH reads ColorMode attribute from DUT"
+    - label: "Step 6a: TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008
       command: "readAttribute"
       attribute: "ColorMode"
@@ -512,7 +552,7 @@ tests:
               minValue: 0
               maxValue: 2
 
-    - label: "TH reads EnhancedColorMode attribute from DUT"
+    - label: "Step 6b: TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A4001
       command: "readAttribute"
       attribute: "EnhancedColorMode"

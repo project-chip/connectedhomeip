@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    30.1.18. [TC-CADMIN-1.18] Removing Fabrics from DUT and Fabric index
+    4.1.18. [TC-CADMIN-1.18] Removing Fabrics from DUT and Fabric index
     enumeration using BCM [DUT - Commissioner]
 
 PICS:
@@ -23,7 +23,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
@@ -37,7 +37,7 @@ tests:
           Reset Devices to factory defaults
       disabled: true
 
-    - label: "DUT_CR1 starts a commissioning process with TH_CE"
+    - label: "Step 1: DUT_CR1 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
           "1. Provision the device using DUT_CR1 (Chip-tool as DUT controller)
@@ -45,8 +45,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+          "Step 2: DUT_CR1 sends command to TH_CE to open a commissioning window
+          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
+          BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
           On DUT_CR1 (chip tool), open commissioning window using BCM
@@ -63,7 +64,7 @@ tests:
           [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
-    - label: "TH_CR2 starts a commissioning process with TH_CE"
+    - label: "Step 3: TH_CR2 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
           On TH_CR2 using chip tool connect to the accessory
@@ -79,8 +80,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+          "Step 4: DUT_CR1 sends command to TH_CE to open a commissioning window
+          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
+          BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
           On DUT_CR1  (chip tool), open commissioning window using BCM
@@ -98,7 +100,7 @@ tests:
           [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
-    - label: "TH_CR3 starts a commissioning process with TH_CE"
+    - label: "Step 5: TH_CR3 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
           On TH_CR3 using chip tool connect to the accessory
@@ -113,7 +115,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to read the list of Fabrics on TH_CE"
+          "Step 6: DUT_CR1 sends command to TH_CE to read the list of Fabrics on
+          TH_CE"
       PICS: OPCREDS.C.A0001
       verification: |
           On DUT_CR1 , read fabrics list
@@ -217,7 +220,9 @@ tests:
           [1661484795.153752][6993:6993] CHIP:DMG: }
       disabled: true
 
-    - label: "DUT_CR1 sends RemoveFabric with FabricIndex = 2command to TH_CE"
+    - label:
+          "Step 7: DUT_CR1 sends RemoveFabric with FabricIndex = 2 command to
+          TH_CE"
       PICS: OPCREDS.C.C0a.Tx
       verification: |
           on DUT_CR1 ( using chip tool), remove fabric with FabricIndex=2
@@ -238,8 +243,8 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR2 sends command to TH_CE to write and read the Basic Information
-          Clusters NodeLabel mandatory attribute"
+          "Step 8: TH_CR2 sends command to TH_CE to write and read the Basic
+          Information Clusters NodeLabel mandatory attribute"
       PICS: BINFO.C.A0005
       verification: |
           Using TH_CR2 , write attribute and read attribute to and from TH_CE
@@ -248,24 +253,21 @@ tests:
 
           Verify read/write commands fail as expected since the TH_CR2 is no longer on the network on TH_CE (all-clusters-app)
 
-          ./chip-tool basic write node-label te5new 2 0 --commissioner-name beta
+          ./chip-tool  basicinformation write node-label te5new 2 0 --commissioner-name beta
 
-          [1663571657.500021][3463:3463] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
-          [1663571657.500077][3463:3463] CHIP:DL: Inet Layer shutdown
-          [1663571657.500123][3463:3463] CHIP:DL: BLE shutdown
-          [1663571657.500168][3463:3463] CHIP:DL: System Layer shutdown
-          [1663571657.500383][3463:3463] CHIP:TOO: Run command failure: ../../examples/chip-tool/commands/common/CHIPCommand.cpp:454: CHIP Error 0x00000032: Timeout
+          [1678876803.495007][714337:714339] CHIP:SC: Received error (protocol code 1) during pairing process: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1727: CHIP Error 0x000000C9: No shared trusted root
+          [1678876803.495018][714337:714339] CHIP:IN: SecureSession[0x7f2764026220]: Released - Type:2 LSID:16528
+          [1678876803.495040][714337:714339] CHIP:-: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1727: CHIP Error 0x000000C9: No shared trusted root at ../../commands/clusters/ModelCommand.cpp:62
 
-          ./chip-tool basic read node-label 2 0 --commissioner-name beta
+          ./chip-tool  basicinformation read node-label 2 0 --commissioner-name beta
 
-          [1663571960.877702][3488:3488] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
-          [1663571960.877766][3488:3488] CHIP:DL: Inet Layer shutdown
-          [1663571960.877820][3488:3488] CHIP:DL: BLE shutdown
-          [1663571960.877873][3488:3488] CHIP:DL: System Layer shutdown
-          [1663571960.878116][3488:3488] CHIP:TOO: Run command failure: ../../src/lib/address_resolve/AddressResolve_DefaultImpl.cpp:174: CHIP Error 0x00000032: Timeout
+          [1678876803.495007][714337:714339] CHIP:SC: Received error (protocol code 1) during pairing process: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1727: CHIP Error 0x000000C9: No shared trusted root
+          [1678876803.495018][714337:714339] CHIP:IN: SecureSession[0x7f2764026220]: Released - Type:2 LSID:16528
+          [1678876803.495040][714337:714339] CHIP:-: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1727: CHIP Error 0x000000C9: No shared trusted root at ../../commands/clusters/ModelCommand.cpp:62
       disabled: true
 
-    - label: "DUT_CR1 sends command to TH_CE to read the list of Fabrics"
+    - label:
+          "Step 9: DUT_CR1 sends command to TH_CE to read the list of Fabrics"
       PICS: OPCREDS.C.A0001
       verification: |
           On DUT_CR1 , read fabrics list
@@ -337,14 +339,14 @@ tests:
       disabled: true
 
     - label:
-          "Verify TH_CE is now discoverable over DNS-SD with 2 Operational
-          service records (_matter._tcp SRV records)."
+          "Step 10: Verify TH_CE is now discoverable over DNS-SD with 2
+          Operational service records (_matter._tcp SRV records)."
       verification: |
           Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
           Execute the below avahi-browse command in any LInux machine or in TH_CR2.
 
-          grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
+          avahi-browse -rt _matter._tcp
           + wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
           + wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
           = wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
@@ -361,8 +363,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+          "Step 11: DUT_CR1 sends command to TH_CE to open a commissioning
+          window with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds
+          using BCM"
       PICS: CADMIN.C.C01.Tx
       verification: |
           On DUT_CR1 chip tool, open commissioning window using BCM
@@ -380,7 +383,7 @@ tests:
           [1660901022.112474][3045:3045] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
-    - label: "TH_CR2 starts a commissioning process with TH_CE"
+    - label: "Step 12: TH_CR2 starts a commissioning process with TH_CE"
       PICS: CADMIN.C
       verification: |
           On TH_CR2  using chip tool connect to the accessory
@@ -394,7 +397,8 @@ tests:
           Commissioning completed successfully
       disabled: true
 
-    - label: "TH_CR2 sends command to TH_CE to read the list of Fabrics"
+    - label:
+          "Step 13: TH_CR2 sends command to TH_CE to read the list of Fabrics"
       PICS: OPCREDS.C.A0001
       verification: |
           On TH_CR2 , read fabrics list

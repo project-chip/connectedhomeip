@@ -27,7 +27,7 @@ source_set("support") {
   ]
 }
 
-chip_test_suite("tests") {
+chip_test_suite_using_nltest("tests") {
   output_name = "libMinimalMdnsCoreTests"
 
   test_sources = [

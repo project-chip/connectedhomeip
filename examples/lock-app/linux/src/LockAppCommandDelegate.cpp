@@ -17,6 +17,7 @@
  */
 
 #include "LockAppCommandDelegate.h"
+#include <lib/support/BytesToHex.h>
 #include <platform/PlatformManager.h>
 
 #include <LockManager.h>
@@ -36,6 +37,10 @@ public:
     {}
 
 private:
+    // aCommand should be "lock" or "unlock".
+    static CHIP_ERROR ExtractPINFromParams(const char * aCommand, const Json::Value & aParams, Optional<chip::ByteSpan> & aPIN,
+                                           chip::Platform::ScopedMemoryBuffer<uint8_t> & aPINBuffer);
+
     std::string mCommandName;
     Json::Value mCommandParameters;
 };
@@ -84,6 +89,7 @@ void LockAppCommandHandler::HandleCommand(intptr_t context)
     const auto & params = self->mCommandParameters;
     // Determine the endpoint ID from the parameters JSON. If it is missing, use the default endpoint defined in the
     // door-lock-server.h
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     chip::EndpointId endpointId = DOOR_LOCK_SERVER_ENDPOINT;
     if (params.isMember("EndpointId"))
     {
@@ -107,11 +113,11 @@ void LockAppCommandHandler::HandleCommand(intptr_t context)
             ChipLogError(NotSpecified, "Lock App: Unable to execute command to set the door state: invalid type for DoorState"));
 
         auto doorState = params["DoorState"].asUInt();
-        VerifyOrExit(doorState < to_underlying(DlDoorState::kUnknownEnumValue),
+        VerifyOrExit(doorState < to_underlying(DoorStateEnum::kUnknownEnumValue),
                      ChipLogError(NotSpecified,
                                   "Lock App: Unable to execute command to set door state: DoorState is out of range [doorState=%u]",
                                   doorState));
-        LockManager::Instance().SetDoorState(endpointId, static_cast<DlDoorState>(doorState));
+        LockManager::Instance().SetDoorState(endpointId, static_cast<DoorStateEnum>(doorState));
     }
     else if (self->mCommandName == "SendDoorLockAlarm")
     {
@@ -125,11 +131,44 @@ void LockAppCommandHandler::HandleCommand(intptr_t context)
 
         auto alarmCode = params["AlarmCode"].asUInt();
         VerifyOrExit(
-            alarmCode < to_underlying(DlAlarmCode::kUnknownEnumValue),
+            alarmCode < to_underlying(AlarmCodeEnum::kUnknownEnumValue),
             ChipLogError(NotSpecified,
                          "Lock App: Unable to execute command to send lock alarm: AlarmCode is out of range [alarmCode=%u]",
                          alarmCode));
-        LockManager::Instance().SendLockAlarm(endpointId, static_cast<DlAlarmCode>(alarmCode));
+        LockManager::Instance().SendLockAlarm(endpointId, static_cast<AlarmCodeEnum>(alarmCode));
+    }
+    else if (self->mCommandName == "Lock")
+    {
+
+        VerifyOrExit(params["OperationSource"].isUInt(),
+                     ChipLogError(NotSpecified, "Lock App: Unable to execute command to lock: invalid type for OperationSource"));
+
+        auto operationSource = params["OperationSource"].asUInt();
+
+        Optional<chip::ByteSpan> pin;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> pinBuffer;
+        SuccessOrExit(err = ExtractPINFromParams("lock", params, pin, pinBuffer));
+
+        OperationErrorEnum error = OperationErrorEnum::kUnspecified;
+        LockManager::Instance().Lock(endpointId, NullNullable, NullNullable, pin, error, OperationSourceEnum(operationSource));
+        VerifyOrExit(error == OperationErrorEnum::kUnspecified,
+                     ChipLogError(NotSpecified, "Lock App: Lock error received: %u", to_underlying(error)));
+    }
+    else if (self->mCommandName == "Unlock")
+    {
+        VerifyOrExit(params["OperationSource"].isUInt(),
+                     ChipLogError(NotSpecified, "Lock App: Unable to execute command to unlock: invalid type for OperationSource"));
+
+        auto operationSource = params["OperationSource"].asUInt();
+
+        Optional<chip::ByteSpan> pin;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> pinBuffer;
+        SuccessOrExit(err = ExtractPINFromParams("unlock", params, pin, pinBuffer));
+
+        OperationErrorEnum error = OperationErrorEnum::kUnspecified;
+        LockManager::Instance().Unlock(endpointId, NullNullable, NullNullable, pin, error, OperationSourceEnum(operationSource));
+        VerifyOrExit(error == OperationErrorEnum::kUnspecified,
+                     ChipLogError(NotSpecified, "Lock App: Unlock error received: %u", to_underlying(error)));
     }
     else
     {
@@ -137,7 +176,62 @@ void LockAppCommandHandler::HandleCommand(intptr_t context)
     }
 
 exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Lock App: Failed executing command \"%s\": %" CHIP_ERROR_FORMAT, self->mCommandName.c_str(),
+                     err.Format());
+    }
     chip::Platform::Delete(self);
+}
+
+CHIP_ERROR LockAppCommandHandler::ExtractPINFromParams(const char * aCommand, const Json::Value & aParams,
+                                                       Optional<chip::ByteSpan> & aPIN,
+                                                       chip::Platform::ScopedMemoryBuffer<uint8_t> & aPINBuffer)
+{
+    if (aParams.isMember("PINAsHex"))
+    {
+        // Hex-encoded PIN bytes.  So a PIN consisting of the numbers 123 gets encoded as the string "313233"
+        VerifyOrReturnError(
+            aParams["PINAsHex"].isString(), CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(NotSpecified, "Lock App: Unable to execute command to %s: invalid type for PIN", aCommand));
+
+        auto pinAsHex = aParams["PINAsHex"].asString();
+        size_t size   = pinAsHex.length();
+        VerifyOrReturnError(size % 2 == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+
+        size_t bufferSize = size / 2;
+
+        VerifyOrReturnError(aPINBuffer.Calloc(bufferSize), CHIP_ERROR_NO_MEMORY);
+        size_t octetCount = chip::Encoding::HexToBytes(pinAsHex.c_str(), size, aPINBuffer.Get(), bufferSize);
+        VerifyOrReturnError(
+            octetCount != 0 || size == 0, CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(NotSpecified, "Lock app: Unable to execute command to %s: invalid hex value for PIN", aCommand));
+
+        aPIN.Emplace(aPINBuffer.Get(), octetCount);
+        ChipLogProgress(NotSpecified, "Lock App: Received command to %s with hex PIN: %s", aCommand, pinAsHex.c_str());
+    }
+    else if (aParams.isMember("PINAsString"))
+    {
+        // ASCII-encoded PIN bytes.  So a PIN consisting of the numbers 123 gets encoded as the string "123"
+        VerifyOrReturnError(
+            aParams["PINAsString"].isString(), CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(NotSpecified, "Lock App: Unable to execute command to %s: invalid type for PIN", aCommand));
+
+        auto pinAsString  = aParams["PINAsString"].asString();
+        size_t bufferSize = pinAsString.length();
+
+        VerifyOrReturnError(aPINBuffer.Calloc(bufferSize), CHIP_ERROR_NO_MEMORY);
+        memcpy(aPINBuffer.Get(), pinAsString.c_str(), bufferSize);
+        aPIN.Emplace(aPINBuffer.Get(), bufferSize);
+
+        ChipLogProgress(NotSpecified, "Lock App: Received command to %s with string PIN: %s", aCommand, pinAsString.c_str());
+    }
+    else
+    {
+        aPIN.ClearValue();
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 void LockAppCommandDelegate::OnEventCommandReceived(const char * json)

@@ -1,9 +1,12 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 
 android {
     compileSdkVersion 31
+    ndkPath System.getenv("ANDROID_NDK_HOME")
+
+    ndkVersion "23.2.8568313"
 
     defaultConfig {
         applicationId "com.google.chip.chiptool"
@@ -34,9 +37,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        exclude 'META-INF/main.kotlin_module'
+    }
+
+    buildFeatures {
+        viewBinding = true
     }
 
     configurations.all {
@@ -102,7 +114,10 @@ dependencies {
     implementation "androidx.camera:camera-camera2:${camerax_version}"
     implementation "androidx.camera:camera-lifecycle:${camerax_version}"
     implementation "androidx.camera:camera-view:${camerax_version}"
+
+    implementation 'com.google.protobuf:protobuf-java:3.22.0'
 }
+
 repositories {
     mavenCentral()
 }

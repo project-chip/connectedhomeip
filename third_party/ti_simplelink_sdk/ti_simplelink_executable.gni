@@ -47,7 +47,8 @@ template("ti_simplelink_executable") {
   output_base_name = get_path_info(invoker.output_name, "name")
 
   #used for OTA image creator for the cc13xx
-  if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+  if (ti_simplelink_device_family == "cc13x2x7_26x2x7" ||
+      ti_simplelink_device_family == "cc13x4_26x4") {
     objcopy_image_name = output_base_name + ".hex"
     objcopy_image_format = "ihex"
   } else {
@@ -80,10 +81,18 @@ template("ti_simplelink_executable") {
     if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
       if (chip_enable_ota_requestor) {
         sources +=
-            [ "${chip_root}/src/platform/cc13x2_26x2/oad_image_header.c" ]
-        ldscript = "${chip_root}/src/platform/cc13x2_26x2/cc13x2x7_cc26x2x7_freertos_ota.lds"
+            [ "${chip_root}/src/platform/cc13xx_26xx/oad_image_header.c" ]
+        ldscript = "${chip_root}/src/platform/cc13xx_26xx/cc13x2_26x2/cc13x2x7_cc26x2x7_freertos_ota.lds"
       } else {
-        ldscript = "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/cc13x2x7_cc26x2x7.lds"
+        ldscript = "${chip_root}/src/platform/cc13xx_26xx/cc13x2_26x2/cc13x2x7_cc26x2x7_freertos.lds"
+      }
+    } else if (ti_simplelink_device_family == "cc13x4_26x4") {
+      if (chip_enable_ota_requestor) {
+        sources +=
+            [ "${chip_root}/src/platform/cc13xx_26xx/oad_image_header.c" ]
+        ldscript = "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/cc13x4_cc26x4_freertos_ota.lds"
+      } else {
+        ldscript = "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/cc13x4_cc26x4_freertos.lds"
       }
     } else if (ti_simplelink_device_family == "cc32xx") {
       ldscript = "${ti_simplelink_sdk_root}/source/ti/boards/cc32xxsf/cc32xxsf_freertos.lds"
@@ -143,7 +152,7 @@ template("ti_simplelink_executable") {
       if (defined(invoker.bim_hex)) {
         bim_hex = invoker.bim_hex
       } else {
-        bim_hex = "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/ble5stack/hexfiles/bim_offchip/Release/${ti_simplelink_bim_name}_bim_offchip.hex"
+        bim_hex = "${ti_simplelink_sdk_root}/examples/nortos/${ti_simplelink_board}/bim/hexfiles/bim_offchip/Release/bim_offchip.hex"
       }
 
       args = [

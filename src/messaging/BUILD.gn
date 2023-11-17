@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 
 declare_args() {
   # Allows to change time between retries during the case session
@@ -66,11 +67,13 @@ static_library("messaging") {
 
   public_deps = [
     ":messaging_mrp_config",
+    "${chip_root}/src/app/icd:notifier",
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/protocols/secure_channel:type_definitions",
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/raw",
   ]

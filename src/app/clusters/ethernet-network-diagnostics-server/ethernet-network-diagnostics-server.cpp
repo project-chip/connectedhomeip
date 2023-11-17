@@ -74,12 +74,13 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticD
 CHIP_ERROR EthernetDiagosticsAttrAccess::ReadPHYRate(AttributeValueEncoder & aEncoder)
 {
     Attributes::PHYRate::TypeInfo::Type pHYRate;
-    PHYRateType value = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_10_M;
+    auto value = app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum::kRate10M;
 
     if (DeviceLayer::GetDiagnosticDataProvider().GetEthPHYRate(value) == CHIP_NO_ERROR)
     {
         pHYRate.SetNonNull(value);
-        ChipLogProgress(Zcl, "The current nominal, usable speed at the top of the physical layer of the Node: %d", value);
+        ChipLogProgress(Zcl, "The current nominal, usable speed at the top of the physical layer of the Node: %d",
+                        chip::to_underlying(value));
     }
     else
     {
@@ -138,7 +139,7 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & 
 
     switch (aPath.mAttributeId)
     {
-    case PHYRate::Id: {
+    case Attributes::PHYRate::Id: {
         return ReadPHYRate(aEncoder);
     }
     case FullDuplex::Id: {

@@ -22,6 +22,7 @@
  */
 
 #include <lib/support/CodeUtils.h>
+#include <platform/LockTracker.h>
 #include <system/PlatformEventSupport.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
@@ -51,6 +52,8 @@ void LayerImplFreeRTOS::Shutdown()
 
 CHIP_ERROR LayerImplFreeRTOS::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delay = Clock::kZero);
@@ -73,8 +76,30 @@ CHIP_ERROR LayerImplFreeRTOS::StartTimer(Clock::Timeout delay, TimerCompleteCall
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR LayerImplFreeRTOS::ExtendTimerTo(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+{
+    VerifyOrReturnError(delay.count() > 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    assertChipStackLockedByCurrentThread();
+
+    Clock::Timeout remainingTime = mTimerList.GetRemainingTime(onComplete, appState);
+    if (remainingTime.count() < delay.count())
+    {
+        return StartTimer(delay, onComplete, appState);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+bool LayerImplFreeRTOS::IsTimerActive(TimerCompleteCallback onComplete, void * appState)
+{
+    return (mTimerList.GetRemainingTime(onComplete, appState) > Clock::kZero);
+}
+
 void LayerImplFreeRTOS::CancelTimer(TimerCompleteCallback onComplete, void * appState)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturn(mLayerState.IsInitialized());
 
     TimerList::Node * timer = mTimerList.Remove(onComplete, appState);
@@ -86,6 +111,8 @@ void LayerImplFreeRTOS::CancelTimer(TimerCompleteCallback onComplete, void * app
 
 CHIP_ERROR LayerImplFreeRTOS::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     // Ideally we would not use a timer here at all, but if we try to just

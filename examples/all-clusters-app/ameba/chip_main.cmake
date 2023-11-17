@@ -13,6 +13,10 @@ set(pigweed_dir "${chip_dir}/third_party/pigweed/repo")
 
 include(${pigweed_dir}/pw_build/pigweed.cmake)
 include(${pigweed_dir}/pw_protobuf_compiler/proto.cmake)
+include(${pigweed_dir}/pw_assert/backend.cmake)
+include(${pigweed_dir}/pw_log/backend.cmake)
+include(${pigweed_dir}/pw_sys_io/backend.cmake)
+include(${pigweed_dir}/pw_trace/backend.cmake)
 
 set(dir_pw_third_party_nanopb "${chip_dir}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
@@ -149,21 +153,30 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
-
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
-
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/chipinterface.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/BindingHandler.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/DeviceCallbacks.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/CHIPDeviceManager.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/Globals.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/LEDWidget.cpp
-    ${chip_dir}/examples/all-clusters-app/ameba/main/DsoHack.cpp
+    ${chip_dir}/examples/all-clusters-app/ameba/main/OperationalStateManager.cpp
+    ${chip_dir}/examples/all-clusters-app/ameba/main/ManualOperationCommand.cpp
+    ${chip_dir}/examples/all-clusters-app/ameba/main/SmokeCOAlarmManager.cpp
 
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_hook.c
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_table.c
+
+    ${chip_dir}/examples/platform/ameba/test_event_trigger/AmebaTestEventTriggerDelegate.cpp
 
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )
@@ -234,6 +247,7 @@ target_link_libraries(${chip_main} PUBLIC
     pw_hdlc
     pw_log
     pw_rpc.server
+    pw_sys_io
     pw_trace_tokenized
     pw_trace_tokenized.trace_buffer
     pw_trace_tokenized.rpc_service
@@ -252,9 +266,11 @@ list(
     -DINET_CONFIG_ENABLE_IPV4=0
     -DCHIP_PROJECT=1
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
-    -DUSE_ZAP_CONFIG
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
+    -DCHIP_SHELL_MAX_TOKENS=11
+    -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=0
+    -DCONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER=0
 )
 
 if (matter_enable_persistentstorage_audit)
@@ -291,8 +307,7 @@ list(
     APPEND chip_main_cpp_flags
 
 	-Wno-unused-parameter
-	-std=gnu++11
-	-std=c++14
+	-std=c++17
 	-fno-rtti
 )
 target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags} )

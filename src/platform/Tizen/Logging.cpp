@@ -15,14 +15,15 @@
  *    limitations under the License.
  */
 
-#include <platform/logging/LogV.h>
+#include <cstdint>
+#include <cstdio>
+
+#include <dlog.h>
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
-
-#include <dlog.h>
-#include <stdio.h>
+#include <platform/logging/LogV.h>
 
 namespace chip {
 namespace Logging {

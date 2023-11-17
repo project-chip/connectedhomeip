@@ -36,5 +36,5 @@ void registerCommandsPayload(Commands & commands)
         make_unique<SetupPayloadVerhoeffGenerate>(),          //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for parsing and generating setup payloads.");
 }

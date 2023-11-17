@@ -17,7 +17,9 @@
 
 #include "ChipThreadWork.h"
 #include <platform/CHIPDeviceLayer.h>
-#include <semaphore.h>
+
+#include <condition_variable>
+#include <mutex>
 
 namespace chip {
 namespace ThreadWork {
@@ -26,12 +28,21 @@ namespace {
 struct WorkData
 {
     WorkCallback callback;
-    sem_t done;
+    std::mutex mux;
+    std::condition_variable cond;
+    bool done = false;
 
-    WorkData() { sem_init(&done, 0 /* shared */, 0); }
-    ~WorkData() { sem_destroy(&done); }
-    void Post() { sem_post(&done); }
-    void Wait() { sem_wait(&done); }
+    void Post()
+    {
+        std::unique_lock lock(mux);
+        done = true;
+        cond.notify_all();
+    }
+    void Wait()
+    {
+        std::unique_lock lock(mux);
+        cond.wait(lock, [&] { return done; });
+    }
 };
 
 void PerformWork(intptr_t arg)

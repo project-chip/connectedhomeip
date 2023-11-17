@@ -22,10 +22,10 @@
 #include "ArrayParser.h"
 #include "AttributePathIB.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -53,9 +53,9 @@ public:
     /**
      *  @brief Mark the end of this AttributePathIB
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    AttributePathIBs::Builder & EndOfAttributePathIBs();
+    CHIP_ERROR EndOfAttributePathIBs();
 
 private:
     AttributePathIB::Builder mAttributePath;

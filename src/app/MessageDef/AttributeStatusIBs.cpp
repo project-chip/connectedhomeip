@@ -38,17 +38,16 @@ AttributeStatusIB::Builder & AttributeStatusIBs::Builder::CreateAttributeStatus(
     return mAttributeStatus;
 }
 
-AttributeStatusIBs::Builder & AttributeStatusIBs::Builder::EndOfAttributeStatuses()
+CHIP_ERROR AttributeStatusIBs::Builder::EndOfAttributeStatuses()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
 CHIP_ERROR AttributeStatusIBs::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err            = CHIP_NO_ERROR;
-    size_t NumAttributeStatus = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("AttributeStatusIBs =");
@@ -68,8 +67,6 @@ CHIP_ERROR AttributeStatusIBs::Parser::PrettyPrint() const
             ReturnErrorOnFailure(status.PrettyPrint());
             PRETTY_PRINT_DECDEPTH();
         }
-
-        ++NumAttributeStatus;
     }
 
     PRETTY_PRINT("],");

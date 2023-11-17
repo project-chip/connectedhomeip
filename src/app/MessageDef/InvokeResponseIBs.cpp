@@ -79,10 +79,10 @@ InvokeResponseIB::Builder & InvokeResponseIBs::Builder::CreateInvokeResponse()
     return mInvokeResponse;
 }
 
-InvokeResponseIBs::Builder & InvokeResponseIBs::Builder::EndOfInvokeResponses()
+CHIP_ERROR InvokeResponseIBs::Builder::EndOfInvokeResponses()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

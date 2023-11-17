@@ -26,7 +26,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -34,7 +34,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the ClusterRevision from DUT"
+    - label: "Step 2: TH reads the ClusterRevision from DUT"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -42,7 +42,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "TH reads the FeatureMap from DUT"
+    - label: "Step 3: TH reads the FeatureMap from DUT"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -50,7 +50,31 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads AttributeList from DUT"
+    - label: "Step 4: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0xFFFD,
+                      0xFFFC,
+                      0xFFFB,
+                      0xFFFA,
+                      0xFFF9,
+                      0xFFF8,
+                      0x00,
+                      0x01,
+                      0x02,
+                      0x03,
+                      0x04,
+                      0x05,
+                  ]
+
+    - label: "Step 4: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -71,7 +95,16 @@ tests:
                       0x05,
                   ]
 
-    - label: "TH reads AcceptedCommandList from DUT"
+    - label: "Step 5: TH reads EventList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 6: TH reads AcceptedCommandList from DUT"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -79,25 +112,10 @@ tests:
               type: list
               contains: [0x00, 0x02, 0x04, 0x06, 0x07, 0x09, 0x0a, 0x0b]
 
-    - label: "TH reads GeneratedCommandList from DUT"
+    - label: "Step 7: TH reads GeneratedCommandList from DUT"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
           constraints:
               type: list
               contains: [0x01, 0x03, 0x05, 0x08]
-    #Commenting out the step EventList attribute which is out of scope for matter V1.0
-    #- label:
-    #      "Read EventList attribute from the DUT and Verify that the DUT
-    #      response provides a list of supported events."
-    #  verification: |
-    #      Not implemented in chip-tool
-    #  cluster: "LogCommands"
-    #  command: "UserPrompt"
-    #  PICS: PICS_USER_PROMPT
-    #  arguments:
-    #      values:
-    #          - name: "message"
-    #            value: "Please enter 'y' for success"
-    #          - name: "expectedValue"
-    #            value: "y"

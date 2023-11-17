@@ -332,10 +332,7 @@ public:
         }
         iter->Release();
 
-        if (err == CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(err);
         ReturnErrorOnFailure(groupDataProvider->RemoveKeySet(fabricIndex, keysetId));
 
         SetCommandExitStatus(CHIP_NO_ERROR);
@@ -361,5 +358,6 @@ void registerCommandsGroup(Commands & commands, CredentialIssuerCommands * creds
         make_unique<RemoveKeySet>(credsIssuerConfig),
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands,
+                                "Commands for manipulating group keys and memberships for chip-tool itself.");
 }

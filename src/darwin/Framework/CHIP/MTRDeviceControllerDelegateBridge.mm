@@ -18,6 +18,7 @@
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceController.h"
 #import "MTRError_Internal.h"
+#import "MTRLogging_Internal.h"
 
 MTRDeviceControllerDelegateBridge::MTRDeviceControllerDelegateBridge(void)
     : mDelegate(nil)
@@ -50,16 +51,13 @@ MTRCommissioningStatus MTRDeviceControllerDelegateBridge::MapStatus(chip::Contro
     case chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed:
         rv = MTRCommissioningStatusFailed;
         break;
-    case chip::Controller::DevicePairingDelegate::Status::SecurePairingDiscoveringMoreDevices:
-        rv = MTRCommissioningStatusDiscoveringMoreDevices;
-        break;
     }
     return rv;
 }
 
 void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
-    NSLog(@"DeviceControllerDelegate status updated: %d", status);
+    MTR_LOG_DEFAULT("DeviceControllerDelegate status updated: %d", status);
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     MTRDeviceController * strongController = mController;
@@ -75,7 +73,7 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
 
 void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
 {
-    NSLog(@"DeviceControllerDelegate Pairing complete. Status %s", chip::ErrorStr(error));
+    MTR_LOG_DEFAULT("DeviceControllerDelegate Pairing complete. Status %s", chip::ErrorStr(error));
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     MTRDeviceController * strongController = mController;
@@ -91,18 +89,49 @@ void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
 
 void MTRDeviceControllerDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
 {
-    NSLog(@"DeviceControllerDelegate Pairing deleted. Status %s", chip::ErrorStr(error));
+    MTR_LOG_DEFAULT("DeviceControllerDelegate Pairing deleted. Status %s", chip::ErrorStr(error));
 
     // This is never actually called; just do nothing.
 }
 
-void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
+void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info)
 {
-    NSLog(@"DeviceControllerDelegate Commissioning complete. NodeId %llu Status %s", nodeId, chip::ErrorStr(error));
+    chip::VendorId vendorId = info.basic.vendorId;
+    uint16_t productId = info.basic.productId;
+
+    MTR_LOG_DEFAULT("DeviceControllerDelegate Read Commissioning Info. VendorId %u ProductId %u", vendorId, productId);
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     MTRDeviceController * strongController = mController;
     if (strongDelegate && mQueue && strongController) {
+        if ([strongDelegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
+            dispatch_async(mQueue, ^{
+                auto * info = [[MTRProductIdentity alloc] initWithVendorID:@(vendorId) productID:@(productId)];
+                [strongDelegate controller:strongController readCommissioningInfo:info];
+            });
+        }
+    }
+}
+
+void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
+{
+    MTR_LOG_DEFAULT("DeviceControllerDelegate Commissioning complete. NodeId %llu Status %s", nodeId, chip::ErrorStr(error));
+
+    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
+    MTRDeviceController * strongController = mController;
+    if (strongDelegate && mQueue && strongController) {
+        if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)]) {
+            dispatch_async(mQueue, ^{
+                NSError * nsError = [MTRError errorForCHIPErrorCode:error];
+                NSNumber * nodeID = nil;
+                if (error == CHIP_NO_ERROR) {
+                    nodeID = @(nodeId);
+                }
+                [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID];
+            });
+            return;
+        }
+        // If only the DEPRECATED function is defined
         if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:)]) {
             dispatch_async(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
@@ -111,3 +140,16 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
         }
     }
 }
+
+@implementation MTRProductIdentity
+
+- (instancetype)initWithVendorID:(NSNumber *)vendorID productID:(NSNumber *)productID
+{
+    if (self = [super init]) {
+        _vendorID = vendorID;
+        _productID = productID;
+    }
+    return self;
+}
+
+@end

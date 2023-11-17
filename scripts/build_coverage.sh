@@ -119,7 +119,13 @@ if [ "$skip_gn" == false ]; then
     source "$CHIP_ROOT/scripts/activate.sh"
 
     # Generates ninja files
-    gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args='use_coverage=true chip_build_all_clusters_app=true'
+    EXTRA_GN_ARGS=""
+    if [[ "$TESTS" == "yaml" || "$TESTS" == "all" ]]; then
+      EXTRA_GN_ARGS="$EXTRA_GN_ARGS chip_build_all_clusters_app=true"
+    else
+        EXTRA_GN_ARGS="$EXTRA_GN_ARGS chip_build_tools=false"
+    fi
+    gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="use_coverage=true$EXTRA_GN_ARGS"
     ninja -C "$OUTPUT_ROOT"
 
     # Run unit tests
@@ -169,4 +175,5 @@ lcov --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$PWD"/zzz_generated
 lcov --add-tracefile "$COVERAGE_ROOT/lcov_base.info" --add-tracefile "$COVERAGE_ROOT/lcov_test.info" --output-file "$COVERAGE_ROOT/lcov_final.info"
 genhtml "$COVERAGE_ROOT/lcov_final.info" --output-directory "$COVERAGE_ROOT/html"
 
-tar czvf "$COVERAGE_ROOT/coverage_html.tar.gz" -C "$COVERAGE_ROOT/html" .
+# Copy webapp's YAML file to the coverage output directory
+cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" "$COVERAGE_ROOT/webapp_config.yaml"

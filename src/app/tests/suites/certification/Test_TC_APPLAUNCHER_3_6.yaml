@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -34,10 +34,10 @@ tests:
     # Issue 13029
     #this step implicitly validating the attribute(CurrentApp)constraints, as long as the payload is being parsed successfully
     - label:
-          "TH reads CurrentApp attribute from the DUT and Verify the in-focus
-          application attributes, which should include the display Application
-          ID(type:uint16) Catalog Vendor ID(type:string) or Null if there is no
-          current in-focus application"
+          "Step 1: TH reads CurrentApp attribute from the DUT and Verify the
+          in-focus application attributes, which should include the display
+          Application ID(type:uint16) Catalog Vendor ID(type:string) or Null if
+          there is no current in-focus application"
       PICS: APPLAUNCHER.S.A0001
       command: "readAttribute"
       attribute: "CurrentApp"

@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,16 +25,17 @@
 #include <lib/core/OTAImageHeader.h>
 
 @implementation MTROTAHeader
-+ (nullable MTROTAHeader *)headerFromData:(NSData *)data error:(NSError * __autoreleasing *)error
+- (instancetype)initWithData:(NSData *)data
 {
+    if (!(self = [super init])) {
+        return nil;
+    }
+
     chip::OTAImageHeaderParser parser;
 
     parser.Init();
 
     if (!parser.IsInitialized()) {
-        if (error != nil) {
-            *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil];
-        }
         return nil;
     }
 
@@ -42,33 +43,33 @@
     chip::OTAImageHeader header;
     CHIP_ERROR err = parser.AccumulateAndDecode(buffer, header);
     if (err != CHIP_NO_ERROR) {
-        if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
         parser.Clear();
         return nil;
     }
 
-    auto headerObj = [MTROTAHeader new];
-    headerObj.vendorID = @(header.mVendorId);
-    headerObj.productID = @(header.mProductId);
-    headerObj.payloadSize = @(header.mPayloadSize);
-    headerObj.softwareVersion = @(header.mSoftwareVersion);
-    headerObj.softwareVersionString = AsString(header.mSoftwareVersionString);
-    headerObj.releaseNotesURL = AsString(header.mReleaseNotesURL);
-    headerObj.imageDigest = AsData(header.mImageDigest);
-    headerObj.imageDigestType = static_cast<MTROTAImageDigestType>(chip::to_underlying(header.mImageDigestType));
+    _vendorID = @(header.mVendorId);
+    _productID = @(header.mProductId);
+    _payloadSize = @(header.mPayloadSize);
+    _softwareVersion = @(header.mSoftwareVersion);
+    _softwareVersionString = AsString(header.mSoftwareVersionString);
+    _releaseNotesURL = AsString(header.mReleaseNotesURL);
+    _imageDigest = AsData(header.mImageDigest);
+    _imageDigestType = static_cast<MTROTAImageDigestType>(chip::to_underlying(header.mImageDigestType));
 
     if (header.mMinApplicableVersion.HasValue()) {
-        headerObj.minApplicableVersion = @(header.mMinApplicableVersion.Value());
+        _minApplicableVersion = @(header.mMinApplicableVersion.Value());
+    } else {
+        _minApplicableVersion = nil;
     }
 
     if (header.mMaxApplicableVersion.HasValue()) {
-        headerObj.maxApplicableVersion = @(header.mMaxApplicableVersion.Value());
+        _maxApplicableVersion = @(header.mMaxApplicableVersion.Value());
+    } else {
+        _maxApplicableVersion = nil;
     }
 
     parser.Clear();
-    return headerObj;
+    return self;
 }
 @end
 
@@ -76,7 +77,11 @@
 
 + (nullable MTROTAHeader *)headerFromData:(NSData *)data error:(NSError * __autoreleasing *)error
 {
-    return [MTROTAHeader headerFromData:data error:error];
+    auto * header = [[MTROTAHeader alloc] initWithData:data];
+    if (header == nil && error != nil) {
+        *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
+    }
+    return header;
 }
 
 @end

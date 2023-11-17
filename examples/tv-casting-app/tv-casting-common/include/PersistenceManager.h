@@ -21,16 +21,20 @@
 #include "TargetEndpointInfo.h"
 #include "TargetVideoPlayerInfo.h"
 
-constexpr size_t kMaxCachedVideoPlayers = 32;
+inline constexpr size_t kMaxCachedVideoPlayers = 32;
 
-class PersistenceManager
+class PersistenceManager : public chip::FabricTable::Delegate
 {
 public:
     CHIP_ERROR AddVideoPlayer(TargetVideoPlayerInfo * targetVideoPlayerInfo);
 
     CHIP_ERROR ReadAllVideoPlayers(TargetVideoPlayerInfo outVideoPlayers[]);
 
+    void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex);
+
     CHIP_ERROR PurgeVideoPlayerCache();
+
+    CHIP_ERROR DeleteVideoPlayer(TargetVideoPlayerInfo * targetVideoPlayerInfo);
 
 private:
     CHIP_ERROR WriteAllVideoPlayers(TargetVideoPlayerInfo videoPlayers[]);
@@ -49,9 +53,14 @@ private:
         kVideoPlayerProductIdTag,
         kVideoPlayerDeviceTypeIdTag,
         kVideoPlayerDeviceNameTag,
+        kVideoPlayerHostNameTag,
         kVideoPlayerNumIPsTag,
         kVideoPlayerIPAddressTag,
         kIpAddressesContainerTag,
+        kVideoPlayerLastDiscoveredTag,
+        kVideoPlayerMACAddressTag,
+        kVideoPlayerInstanceNameTag,
+        kVideoPlayerPortTag,
 
         kContextTagMaxNum = UINT8_MAX
     };

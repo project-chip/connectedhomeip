@@ -71,15 +71,15 @@ tests:
       endpoint: 1
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #1"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
 
     - label: "Install ACLs"

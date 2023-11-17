@@ -22,7 +22,6 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <platform/bouffalolab/BL702/OTAImageProcessorImpl.h>
 
 class OTAConfig
 {
@@ -30,4 +29,6 @@ public:
     OTAConfig(){};
 
     static void Init();
+    static constexpr uint32_t kInitOTARequestorDelaySec = 3;
+    static void InitOTARequestorHandler(chip::System::Layer * systemLayer, void * appState);
 };

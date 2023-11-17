@@ -58,15 +58,19 @@ for define in "${defines[@]}"; do
     esac
     target_defines+=,\"${define//\"/\\\"}\"
 done
+[[ $CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES == YES ]] && {
+    target_defines+=,\"CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES=1\"
+}
 target_defines=[${target_defines:1}]
 
 declare target_arch=
 declare target_cpu=
 declare target_cflags=
+declare current_arch="$(uname -m)"
 
 read -r -a archs <<<"$ARCHS"
 for arch in "${archs[@]}"; do
-    if [ -z "$target_arch"] ]; then
+    if [ -z "$target_arch" ] || [ "$arch" = "$current_arch" ]; then
         target_arch="$arch"
         case "$arch" in
             x86_64) target_cpu="x64" ;;
@@ -80,17 +84,23 @@ for arch in "${archs[@]}"; do
 done
 
 [[ $ENABLE_BITCODE == YES ]] && {
-    target_cflags+=',"-flto"'
+    if [ -n "$target_cflags" ]; then
+        target_cflags+=','
+    fi
+    target_cflags+='"-flto"'
 }
 
 declare -a args=(
     'default_configs_cosmetic=[]' # suppress colorization
     'chip_crypto="boringssl"'
+    'chip_build_controller_dynamic_server=true'
     'chip_build_tools=false'
     'chip_build_tests=false'
     'chip_enable_wifi=false'
+    'chip_enable_python_modules=false'
     'chip_log_message_max_size=4096' # might as well allow nice long log messages
     'chip_disable_platform_kvs=true'
+    'enable_fuzz_test_targets=false'
     "target_cpu=\"$target_cpu\""
     "target_defines=$target_defines"
     "target_cflags=[$target_cflags]"
@@ -98,7 +108,10 @@ declare -a args=(
     "mac_deployment_target=\"$LLVM_TARGET_TRIPLE_OS_VERSION$LLVM_TARGET_TRIPLE_SUFFIX\""
 )
 
-[[ $CONFIGURATION == Debug ]] && args+=('is_debug=true')
+case "$CONFIGURATION" in
+    Debug) args+=('is_debug=true') ;;
+    Release) args+=('is_debug=false') ;;
+esac
 
 [[ $PLATFORM_FAMILY_NAME != macOS ]] && {
     args+=(
@@ -110,6 +123,51 @@ declare -a args=(
 [[ $PLATFORM_FAMILY_NAME == macOS ]] && {
     args+=(
         'target_os="mac"'
+    )
+}
+
+[[ $CHIP_INET_CONFIG_ENABLE_IPV4 == NO ]] && {
+    args+=(
+        'chip_inet_config_enable_ipv4=false'
+    )
+}
+
+[[ $CHIP_IS_ASAN == YES ]] && {
+    args+=(
+        'is_asan=true'
+    )
+}
+
+[[ $CHIP_IS_UBSAN == YES ]] && {
+    args+=(
+        'is_ubsan=true'
+    )
+}
+
+[[ $CHIP_IS_TSAN == YES ]] && {
+    args+=(
+        'is_tsan=true'
+        # The system stats stuff races on the stats in various ways,
+        # so just disable it when using TSan.
+        'chip_system_config_provide_statistics=false'
+    )
+}
+
+[[ $CHIP_IS_CLANG == YES ]] && {
+    args+=(
+        'is_clang=true'
+    )
+}
+
+[[ $CHIP_IS_BLE == NO ]] && {
+    args+=(
+        'chip_config_network_layer_ble=false'
+    )
+}
+
+[[ $CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES == YES ]] && {
+    args+=(
+        'enable_encoding_sentinel_enum_values=true'
     )
 }
 

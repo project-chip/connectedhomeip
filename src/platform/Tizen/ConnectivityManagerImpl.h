@@ -19,37 +19,35 @@
 
 #pragma once
 
-#include <platform/ConnectivityManager.h>
-#include <platform/internal/GenericConnectivityManagerImpl.h>
-#include <platform/internal/GenericConnectivityManagerImpl_UDP.h>
+#include <cstdint>
+
+#include <inet/InetConfig.h>
+#include <lib/core/CHIPError.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <system/SystemClock.h>
+#include <system/SystemLayer.h>
+
+#include "platform/internal/GenericConnectivityManagerImpl.h"
+#include "platform/internal/GenericConnectivityManagerImpl_UDP.h"
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-#include <platform/internal/GenericConnectivityManagerImpl_TCP.h>
+#include "platform/internal/GenericConnectivityManagerImpl_TCP.h"
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
+#include "platform/internal/GenericConnectivityManagerImpl_BLE.h"
 #else
-#include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
+#include "platform/internal/GenericConnectivityManagerImpl_NoBLE.h"
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <platform/internal/GenericConnectivityManagerImpl_Thread.h>
+#include "platform/internal/GenericConnectivityManagerImpl_Thread.h"
 #else
-#include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
+#include "platform/internal/GenericConnectivityManagerImpl_NoThread.h"
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
+#include "platform/internal/GenericConnectivityManagerImpl_WiFi.h"
 #else
-#include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
+#include "platform/internal/GenericConnectivityManagerImpl_NoWiFi.h"
 #endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include "WiFiManager.h"
-#endif
-
-namespace chip {
-namespace Inet {
-class IPAddress;
-} // namespace Inet
-} // namespace chip
 
 namespace chip {
 namespace DeviceLayer {
@@ -85,9 +83,16 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 
 public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    void StartWiFiManagement(void);
-    void StopWiFiManagement(void);
+    void StartWiFiManagement();
+    void StopWiFiManagement();
+    bool IsWiFiManagementStarted();
+    CHIP_ERROR GetWiFiBssId(MutableByteSpan & value);
+    CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType);
+    CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion);
+    const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
 #endif
+
+    const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
 
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
@@ -116,9 +121,6 @@ private:
     void _MaintainOnDemandWiFiAP(void);
     System::Clock::Timeout _GetWiFiAPIdleTimeout(void);
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
-
-    static void ActivateWiFiManager(System::Layer * aLayer, void * aAppState);
-    static void DeactivateWiFiManager(System::Layer * aLayer, void * aAppState);
 #endif
 
     // ===== Members for internal use by the following friends.
@@ -130,6 +132,8 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
+    char mEthIfName[IFNAMSIZ];
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
     ConnectivityManager::WiFiAPMode mWiFiAPMode;
@@ -137,6 +141,7 @@ private:
     System::Clock::Timestamp mLastAPDemandTime;
     System::Clock::Timeout mWiFiStationReconnectInterval;
     System::Clock::Timeout mWiFiAPIdleTimeout;
+    static char sWiFiIfName[IFNAMSIZ];
 #endif
 };
 

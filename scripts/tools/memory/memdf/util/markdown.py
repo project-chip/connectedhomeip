@@ -34,7 +34,7 @@ def read_hierified(f):
         for i in range(0, len(header)):
             column = columns[i + 1].strip()
             if not column:
-                column = rows[-1][i]
+                column = rows[-1][i] if rows else '(blank)'
             row.append(column)
         rows.append(tuple(row))
 

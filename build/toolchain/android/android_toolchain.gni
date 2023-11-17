@@ -37,7 +37,6 @@ template("android_clang_toolchain") {
   _android_toolchain_args = {
     current_os = "android"
     is_clang = true
-
     forward_variables_from(_invoker_toolchain_args, "*")
   }
 
@@ -70,5 +69,6 @@ template("android_clang_toolchain") {
     ar = _ndk_prefix + "llvm-ar"
     cc = _ndk_prefix + _tool_name_root + "clang"
     cxx = _ndk_prefix + _tool_name_root + "clang++"
+    link_generate_map_file = false
   }
 }

@@ -86,14 +86,14 @@ CHIP_ERROR InvokeResponseIB::Parser::PrettyPrint() const
 CHIP_ERROR InvokeResponseIB::Parser::GetCommand(CommandDataIB::Parser * const apCommand) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kCommand)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kCommand), reader));
     return apCommand->Init(reader);
 }
 
 CHIP_ERROR InvokeResponseIB::Parser::GetStatus(CommandStatusIB::Parser * const apStatus) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kStatus)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kStatus), reader));
     return apStatus->Init(reader);
 }
 
@@ -115,10 +115,10 @@ CommandStatusIB::Builder & InvokeResponseIB::Builder::CreateStatus()
     return mStatus;
 }
 
-InvokeResponseIB::Builder & InvokeResponseIB::Builder::EndOfInvokeResponseIB()
+CHIP_ERROR InvokeResponseIB::Builder::EndOfInvokeResponseIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

@@ -19,6 +19,7 @@
 #include "TvApp-JNI.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/util/config.h>
 #include <cstdint>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
@@ -276,14 +277,14 @@ Commands::PlaybackResponse::Type MediaPlaybackManager::HandleMediaRequest(MediaP
         ChipLogError(AppServer, "Java exception in MediaPlaybackManager::Request %d", mediaPlaybackRequest);
         env->ExceptionDescribe();
         env->ExceptionClear();
-        response.status = MediaPlaybackStatusEnum::kInvalidStateForCommand;
+        response.status = StatusEnum::kInvalidStateForCommand;
     }
-    response.status = static_cast<MediaPlaybackStatusEnum>(ret);
+    response.status = static_cast<StatusEnum>(ret);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        response.status = MediaPlaybackStatusEnum::kInvalidStateForCommand;
+        response.status = StatusEnum::kInvalidStateForCommand;
         ChipLogError(Zcl, "MediaPlaybackManager::HandleMediaRequest status error: %s", err.AsString());
     }
 
@@ -292,7 +293,7 @@ exit:
 
 CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder & aEncoder)
 {
-    Structs::PlaybackPosition::Type response;
+    Structs::PlaybackPositionStruct::Type response;
     response.updatedAt = 0;
     response.position  = Nullable<uint64_t>(0);
 

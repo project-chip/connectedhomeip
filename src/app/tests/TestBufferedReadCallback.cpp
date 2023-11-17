@@ -17,7 +17,7 @@
  */
 
 #include "app-common/zap-generated/ids/Attributes.h"
-#include "lib/core/CHIPTLVTags.h"
+#include "lib/core/TLVTags.h"
 #include "protocols/interaction_model/Constants.h"
 #include "system/SystemPacketBuffer.h"
 #include "system/TLVPacketBufferBackingStore.h"
@@ -488,7 +488,7 @@ void DataSeriesGenerator::Generate()
                 path.mAttributeId = Clusters::UnitTesting::Attributes::ListInt8u::Id;
                 path.mListOp      = ConcreteDataAttributePath::ListOperation::AppendItem;
 
-                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), (uint8_t)(i)) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), (uint8_t) (i)) == CHIP_NO_ERROR);
 
                 writer.Finalize(&handle);
                 reader.Init(std::move(handle));

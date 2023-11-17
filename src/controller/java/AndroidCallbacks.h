@@ -17,15 +17,20 @@
 #pragma once
 
 #include <app/BufferedReadCallback.h>
+#include <app/CommandSender.h>
 #include <app/ReadClient.h>
+#include <app/WriteClient.h>
 #include <controller/CHIPDeviceController.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/JniTypeWrappers.h>
 #include <list>
 #include <utility>
 
 namespace chip {
 namespace Controller {
+
+CHIP_ERROR CreateChipAttributePath(JNIEnv * env, const app::ConcreteDataAttributePath & aPath, jobject & outObj);
 
 // Callback for success and failure cases of GetConnectedDevice().
 struct GetConnectedDeviceCallback
@@ -33,13 +38,13 @@ struct GetConnectedDeviceCallback
     GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback);
     ~GetConnectedDeviceCallback();
 
-    static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     Callback::Callback<OnDeviceConnected> mOnSuccess;
     Callback::Callback<OnDeviceConnectionFailure> mOnFailure;
-    jobject mWrapperCallbackRef = nullptr;
-    jobject mJavaCallbackRef    = nullptr;
+    JniGlobalReference mWrapperCallbackRef;
+    JniGlobalReference mJavaCallbackRef;
 };
 
 struct ReportCallback : public app::ClusterStateCache::Callback
@@ -65,67 +70,71 @@ struct ReportCallback : public app::ClusterStateCache::Callback
 
     CHIP_ERROR OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
 
+    void OnDeallocatePaths(app::ReadPrepareParams && aReadPrepareParams) override;
+
     /** Report errors back to Java layer. attributePath may be nullptr for general errors. */
     void ReportError(jobject attributePath, jobject eventPath, CHIP_ERROR err);
     void ReportError(jobject attributePath, jobject eventPath, Protocols::InteractionModel::Status status);
     void ReportError(jobject attributePath, jobject eventPath, const char * message, ChipError::StorageType errorCode);
 
-    CHIP_ERROR CreateChipAttributePath(const app::ConcreteDataAttributePath & aPath, jobject & outObj);
-
-    CHIP_ERROR CreateChipEventPath(const app::ConcreteEventPath & aPath, jobject & outObj);
+    CHIP_ERROR CreateChipEventPath(JNIEnv * env, const app::ConcreteEventPath & aPath, jobject & outObj);
 
     void UpdateClusterDataVersion();
 
     app::ReadClient * mReadClient = nullptr;
 
     app::ClusterStateCache mClusterCacheAdapter;
-    jobject mWrapperCallbackRef                 = nullptr;
-    jobject mSubscriptionEstablishedCallbackRef = nullptr;
-    jobject mResubscriptionAttemptCallbackRef   = nullptr;
-    jobject mReportCallbackRef                  = nullptr;
+    JniGlobalReference mWrapperCallbackRef;
+    JniGlobalReference mSubscriptionEstablishedCallbackRef;
+    JniGlobalReference mResubscriptionAttemptCallbackRef;
+    JniGlobalReference mReportCallbackRef;
     // NodeState Java object that will be returned to the application.
-    jobject mNodeStateObj = nullptr;
-    jclass mNodeStateCls  = nullptr;
+    JniGlobalReference mNodeStateObj;
 };
 
-struct ReportEventCallback : public app::ReadClient::Callback
+struct WriteAttributesCallback : public app::WriteClient::Callback
 {
-    /** Subscription established callback can be nullptr. */
-    ReportEventCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback,
-                        jobject resubscriptionAttemptCallback);
-    ~ReportEventCallback();
+    WriteAttributesCallback(jobject wrapperCallback, jobject javaCallback);
+    ~WriteAttributesCallback();
+    app::WriteClient::Callback * GetChunkedWriteCallback() { return &mChunkedWriteCallback; }
 
-    void OnReportBegin() override;
-
-    void OnReportEnd() override;
-
-    void OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus) override;
-
-    void OnError(CHIP_ERROR aError) override;
-
-    void OnDone(app::ReadClient *) override;
-
-    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override;
-
-    CHIP_ERROR OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
-
+    void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteDataAttributePath & aPath,
+                    app::StatusIB aStatus) override;
     /** Report errors back to Java layer. attributePath may be nullptr for general errors. */
-    void ReportError(jobject eventPath, CHIP_ERROR err);
-    void ReportError(jobject eventPath, Protocols::InteractionModel::Status status);
-    void ReportError(jobject eventPath, const char * message, ChipError::StorageType errorCode);
+    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aProtocolError) override;
 
-    CHIP_ERROR CreateChipEventPath(const app::ConcreteEventPath & aPath, jobject & outObj);
+    void OnDone(app::WriteClient * apWriteClient) override;
 
-    app::ReadClient * mReadClient = nullptr;
+    void ReportError(jobject attributePath, CHIP_ERROR err);
+    void ReportError(jobject attributePath, Protocols::InteractionModel::Status status);
+    void ReportError(jobject attributePath, const char * message, ChipError::StorageType errorCode);
 
-    app::BufferedReadCallback mBufferedReadAdapter;
-    jobject mWrapperCallbackRef                 = nullptr;
-    jobject mSubscriptionEstablishedCallbackRef = nullptr;
-    jobject mResubscriptionAttemptCallbackRef   = nullptr;
-    jobject mReportCallbackRef                  = nullptr;
-    // NodeState Java object that will be returned to the application.
-    jobject mNodeStateObj = nullptr;
-    jclass mNodeStateCls  = nullptr;
+    app::WriteClient * mWriteClient = nullptr;
+    app::ChunkedWriteCallback mChunkedWriteCallback;
+    JniGlobalReference mWrapperCallbackRef;
+    JniGlobalReference mJavaCallbackRef;
+};
+
+struct InvokeCallback : public app::CommandSender::Callback
+{
+    InvokeCallback(jobject wrapperCallback, jobject javaCallback);
+    ~InvokeCallback();
+
+    void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatusIB,
+                    TLV::TLVReader * apData) override;
+    /** Report errors back to Java layer. attributePath may be nullptr for general errors. */
+    void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
+
+    void OnDone(app::CommandSender * apCommandSender) override;
+
+    CHIP_ERROR CreateInvokeElement(JNIEnv * env, const app::ConcreteCommandPath & aPath, TLV::TLVReader * apData, jobject & outObj);
+    void ReportError(CHIP_ERROR err);
+    void ReportError(Protocols::InteractionModel::Status status);
+    void ReportError(const char * message, ChipError::StorageType errorCode);
+
+    app::CommandSender * mCommandSender = nullptr;
+    JniGlobalReference mWrapperCallbackRef;
+    JniGlobalReference mJavaCallbackRef;
 };
 
 } // namespace Controller

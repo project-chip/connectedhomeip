@@ -53,6 +53,7 @@ struct BindingManagerInitParams
     FabricTable * mFabricTable               = nullptr;
     CASESessionManager * mCASESessionManager = nullptr;
     PersistentStorageDelegate * mStorage     = nullptr;
+    bool mEstablishConnectionOnInit          = true;
 };
 
 /**
@@ -61,6 +62,7 @@ struct BindingManagerInitParams
  * when a binding is ready to be communicated with.
  *
  * A CASE connection will be triggered when:
+ *  - During init of the BindingManager, unless the application actively disables this using mEstablishConnectionOnInit
  *  - The binding cluster adds a unicast entry to the binding table.
  *  - A watched cluster changes with a unicast binding but we cannot find an active connection to the peer.
  *
@@ -143,7 +145,8 @@ private:
         Callback::Callback<OnDeviceConnectionFailure> * GetOnDeviceConnectionFailure() { return &mOnConnectionFailureCallback; }
 
     private:
-        static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+        static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                          const SessionHandle & sessionHandle)
         {
             ConnectionCallback * _this = static_cast<ConnectionCallback *>(context);
             _this->mBindingManager.HandleDeviceConnected(exchangeMgr, sessionHandle);
@@ -169,7 +172,7 @@ private:
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
     BindingManagerInitParams mInitParams;
 
-    void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     void HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error);
 
     // Used to keep track of synchronous failures from FindOrEstablishSession.

@@ -20,6 +20,7 @@
 
 #include <app/clusters/mode-select-server/supported-modes-manager.h>
 #include <app/util/af.h>
+#include <app/util/config.h>
 #include <cstring>
 
 namespace chip {
@@ -56,7 +57,8 @@ public:
 
     SupportedModesManager::ModeOptionsProvider getModeOptionsProvider(EndpointId endpointId) const override;
 
-    EmberAfStatus getModeOptionByMode(EndpointId endpointId, uint8_t mode, const ModeOptionStructType ** dataPtr) const override;
+    Protocols::InteractionModel::Status getModeOptionByMode(EndpointId endpointId, uint8_t mode,
+                                                            const ModeOptionStructType ** dataPtr) const override;
 
     ~StaticSupportedModesManager(){};
 

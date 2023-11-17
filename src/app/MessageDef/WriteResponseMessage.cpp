@@ -79,7 +79,7 @@ CHIP_ERROR WriteResponseMessage::Parser::PrettyPrint() const
 CHIP_ERROR WriteResponseMessage::Parser::GetWriteResponses(AttributeStatusIBs::Parser * const apWriteResponses) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kWriteResponses)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kWriteResponses), reader));
     return apWriteResponses->Init(reader);
 }
 
@@ -98,7 +98,7 @@ AttributeStatusIBs::Builder & WriteResponseMessage::Builder::GetWriteResponses()
     return mWriteResponses;
 }
 
-WriteResponseMessage::Builder & WriteResponseMessage::Builder::EndOfWriteResponseMessage()
+CHIP_ERROR WriteResponseMessage::Builder::EndOfWriteResponseMessage()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -108,7 +108,7 @@ WriteResponseMessage::Builder & WriteResponseMessage::Builder::EndOfWriteRespons
     {
         EndOfContainer();
     }
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

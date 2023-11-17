@@ -56,10 +56,8 @@ static constexpr uint8_t kMaxCredentialsPerUser      = 10;
 static constexpr uint8_t kMaxWeekdaySchedulesPerUser = 10;
 static constexpr uint8_t kMaxYeardaySchedulesPerUser = 10;
 static constexpr uint8_t kMaxHolidaySchedules        = 10;
-static constexpr uint8_t kMaxCredentialSize          = 8;
-
-// Indices received for user/credential/schedules are 1-indexed
-static constexpr uint8_t kStartIndexValue = 1;
+static constexpr uint8_t kMaxCredentialSize          = 20;
+static constexpr uint8_t kNumCredentialTypes         = 6;
 
 static constexpr uint8_t kMaxCredentials = kMaxUsers * kMaxCredentialsPerUser;
 } // namespace ResourceRanges
@@ -145,25 +143,26 @@ public:
     typedef void (*Callback_fn_completed)(Action_t);
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
 
-    bool Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
-    bool Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
+    bool Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err);
+    bool Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err);
 
     bool GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user);
     bool SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
-                 const chip::CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype,
-                 DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials);
+                 const chip::CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype,
+                 CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials);
 
-    bool GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+    bool GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                        EmberAfPluginDoorLockCredentialInfo & credential);
 
     bool SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
-                       DlCredentialStatus credentialStatus, DlCredentialType credentialType, const chip::ByteSpan & credentialData);
+                       DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
+                       const chip::ByteSpan & credentialData);
 
     DlStatus GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
                                 EmberAfPluginDoorLockWeekDaySchedule & schedule);
 
     DlStatus SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex, DlScheduleStatus status,
-                                DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
+                                DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
 
     DlStatus GetYeardaySchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                 EmberAfPluginDoorLockYearDaySchedule & schedule);
@@ -174,16 +173,17 @@ public:
     DlStatus GetHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule);
 
     DlStatus SetHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime,
-                                uint32_t localEndTime, DlOperatingMode operatingMode);
+                                uint32_t localEndTime, OperatingModeEnum operatingMode);
 
     bool IsValidUserIndex(uint16_t userIndex);
-    bool IsValidCredentialIndex(uint16_t credentialIndex, DlCredentialType type);
+    bool IsValidCredentialType(CredentialTypeEnum type);
+    bool IsValidCredentialIndex(uint16_t credentialIndex, CredentialTypeEnum type);
     bool IsValidWeekdayScheduleIndex(uint8_t scheduleIndex);
     bool IsValidYeardayScheduleIndex(uint8_t scheduleIndex);
     bool IsValidHolidayScheduleIndex(uint8_t scheduleIndex);
 
     bool setLockState(chip::EndpointId endpointId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
-                      DlOperationError & err);
+                      OperationErrorEnum & err);
     const char * lockStateToString(DlLockState lockState) const;
 
     bool ReadConfigValues();
@@ -204,14 +204,14 @@ private:
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
     EmberAfPluginDoorLockUserInfo mLockUsers[kMaxUsers];
-    EmberAfPluginDoorLockCredentialInfo mLockCredentials[kMaxCredentials];
+    EmberAfPluginDoorLockCredentialInfo mLockCredentials[kNumCredentialTypes][kMaxCredentials];
     WeekDaysScheduleInfo mWeekdaySchedule[kMaxUsers][kMaxWeekdaySchedulesPerUser];
     YearDayScheduleInfo mYeardaySchedule[kMaxUsers][kMaxYeardaySchedulesPerUser];
     HolidayScheduleInfo mHolidaySchedule[kMaxHolidaySchedules];
 
     char mUserNames[ArraySize(mLockUsers)][DOOR_LOCK_MAX_USER_NAME_SIZE];
-    uint8_t mCredentialData[kMaxCredentials][kMaxCredentialSize];
-    DlCredential mCredentials[kMaxUsers][kMaxCredentialsPerUser];
+    uint8_t mCredentialData[kNumCredentialTypes][kMaxCredentials][kMaxCredentialSize];
+    CredentialStruct mCredentials[kMaxUsers][kMaxCredentials];
 
     static LockManager sLock;
     P6DoorLock::LockInitParams::LockParam LockParams;

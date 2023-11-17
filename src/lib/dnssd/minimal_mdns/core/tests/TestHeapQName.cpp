@@ -93,7 +93,7 @@ int Teardown(void * inContext)
 
 } // namespace
 
-int TestHeapQName(void)
+int TestHeapQName()
 {
     nlTestSuite theSuite = {
         "HeapQName",

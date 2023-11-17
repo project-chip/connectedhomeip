@@ -48,15 +48,16 @@ CHIP_ERROR WriteHandler::Init()
 
 void WriteHandler::Close()
 {
-    mSuppressResponse = false;
     VerifyOrReturn(mState != State::Uninitialized);
 
-    ClearState();
-}
-
-void WriteHandler::Abort()
-{
-    ClearState();
+    // DeliverFinalListWriteEnd will be a no-op if we have called
+    // DeliverFinalListWriteEnd in success conditions, so passing false for
+    // wasSuccessful here is safe: if it does anything, we were in fact not
+    // successful.
+    DeliverFinalListWriteEnd(false /* wasSuccessful */);
+    mExchangeCtx.Release();
+    mSuppressResponse = false;
+    MoveToState(State::Uninitialized);
 }
 
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
@@ -158,10 +159,8 @@ void WriteHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCont
 CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferTLVWriter && aMessageWriter, System::PacketBufferHandle & packet)
 {
     VerifyOrReturnError(mState == State::AddStatus, CHIP_ERROR_INCORRECT_STATE);
-    AttributeStatusIBs::Builder & attributeStatusIBs = mWriteResponseBuilder.GetWriteResponses().EndOfAttributeStatuses();
-    ReturnErrorOnFailure(attributeStatusIBs.GetError());
-    mWriteResponseBuilder.EndOfWriteResponseMessage();
-    ReturnErrorOnFailure(mWriteResponseBuilder.GetError());
+    ReturnErrorOnFailure(mWriteResponseBuilder.GetWriteResponses().EndOfAttributeStatuses());
+    ReturnErrorOnFailure(mWriteResponseBuilder.EndOfWriteResponseMessage());
     ReturnErrorOnFailure(aMessageWriter.Finalize(&packet));
     return CHIP_NO_ERROR;
 }
@@ -291,16 +290,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = element.GetPath(&attributePath);
         SuccessOrExit(err);
 
-        err = attributePath.GetEndpoint(&(dataAttributePath.mEndpointId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetCluster(&(dataAttributePath.mClusterId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetAttribute(&(dataAttributePath.mAttributeId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetListIndex(dataAttributePath);
+        err = attributePath.GetConcreteAttributePath(dataAttributePath);
         SuccessOrExit(err);
 
         err = element.GetData(&dataReader);
@@ -340,7 +330,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         MatterPreAttributeWriteCallback(dataAttributePath);
         TLV::TLVWriter backup;
         DataVersion version = 0;
-        mWriteResponseBuilder.Checkpoint(backup);
+        mWriteResponseBuilder.GetWriteResponses().Checkpoint(backup);
         err = element.GetDataVersion(&version);
         if (CHIP_NO_ERROR == err)
         {
@@ -354,7 +344,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = WriteSingleClusterData(subjectDescriptor, dataAttributePath, dataReader, this);
         if (err != CHIP_NO_ERROR)
         {
-            mWriteResponseBuilder.Rollback(backup);
+            mWriteResponseBuilder.GetWriteResponses().Rollback(backup);
             err = AddStatus(dataAttributePath, StatusIB(err));
         }
         MatterPostAttributeWriteCallback(dataAttributePath);
@@ -406,13 +396,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         err = element.GetPath(&attributePath);
         SuccessOrExit(err);
 
-        err = attributePath.GetCluster(&(dataAttributePath.mClusterId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetAttribute(&(dataAttributePath.mAttributeId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetListIndex(dataAttributePath);
+        err = attributePath.GetGroupAttributePath(dataAttributePath);
         SuccessOrExit(err);
 
         err = element.GetData(&dataReader);
@@ -653,8 +637,7 @@ CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, cons
     ReturnErrorOnFailure(attributeStatusIB.GetError());
     statusIBBuilder.EncodeStatusIB(aStatus);
     ReturnErrorOnFailure(statusIBBuilder.GetError());
-    attributeStatusIB.EndOfAttributeStatusIB();
-    ReturnErrorOnFailure(attributeStatusIB.GetError());
+    ReturnErrorOnFailure(attributeStatusIB.EndOfAttributeStatusIB());
 
     MoveToState(State::AddStatus);
     return CHIP_NO_ERROR;
@@ -689,13 +672,6 @@ void WriteHandler::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
     ChipLogDetail(DataManagement, "IM WH moving to [%s]", GetStateStr());
-}
-
-void WriteHandler::ClearState()
-{
-    DeliverFinalListWriteEnd(false /* wasSuccessful */);
-    mExchangeCtx.Release();
-    MoveToState(State::Uninitialized);
 }
 
 } // namespace app

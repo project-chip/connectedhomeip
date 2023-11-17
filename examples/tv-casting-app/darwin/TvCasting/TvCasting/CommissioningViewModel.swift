@@ -36,37 +36,15 @@ class CommissioningViewModel: ObservableObject {
     func prepareForCommissioning(selectedCommissioner: DiscoveredNodeData?) {
         if let castingServerBridge = CastingServerBridge.getSharedInstance()
         {
-            castingServerBridge.openBasicCommissioningWindow(DispatchQueue.main,
-                commissioningWindowRequestedHandler: { (result: Bool) -> () in
-                    DispatchQueue.main.async {
-                        self.commisisoningWindowOpened = result
+            castingServerBridge.setDacHolder(ExampleDAC(), clientQueue: DispatchQueue.main, setDacHolderStatus: { (error: MatterError) -> () in
+                DispatchQueue.main.async {
+                    self.Log.info("CommissioningViewModel.setDacHolder status was \(error)")
+                    if(error.code == 0)
+                    {
+                        self.openBasicCommissioningWindow()
                     }
-                },
-                commissioningCompleteCallback: { (result: Bool) -> () in
-                    self.Log.info("Commissioning status: \(result)")
-                    DispatchQueue.main.async {
-                        self.commisisoningComplete = result
-                    }
-                },
-                onConnectionSuccessCallback: { (videoPlayer: VideoPlayer) -> () in
-                    DispatchQueue.main.async {
-                        self.connectionSuccess = true
-                        self.connectionStatus = "Connected to \(String(describing: videoPlayer))"
-                        self.Log.info("ConnectionViewModel.verifyOrEstablishConnection.onConnectionSuccessCallback called with \(videoPlayer.nodeId)")
-                    }
-                },
-                onConnectionFailureCallback: { (error: MatterError) -> () in
-                    DispatchQueue.main.async {
-                        self.connectionSuccess = false
-                        self.connectionStatus = "Failed to connect to video player!"
-                        self.Log.info("ConnectionViewModel.verifyOrEstablishConnection.onConnectionFailureCallback called with \(error)")
-                    }
-                },
-                onNewOrUpdatedEndpointCallback: { (contentApp: ContentApp) -> () in
-                    DispatchQueue.main.async {
-                        self.Log.info("CommissioningViewModel.openBasicCommissioningWindow.onNewOrUpdatedEndpointCallback called with \(contentApp.endpointId)")
-                    }
-                })
+                }
+            })
         }
                 
         // Send User directed commissioning request if a commissioner with a known IP addr was selected
@@ -76,7 +54,60 @@ class CommissioningViewModel: ObservableObject {
         }
     }
     
-    private func sendUserDirectedCommissioningRequest(selectedCommissioner: DiscoveredNodeData?) {        
+    private func openBasicCommissioningWindow() {
+        if let castingServerBridge = CastingServerBridge.getSharedInstance()
+        {
+            castingServerBridge.openBasicCommissioningWindow(DispatchQueue.main,
+                commissioningCallbackHandlers: CommissioningCallbackHandlers(
+                    commissioningWindowRequestedHandler: { (result: Bool) -> () in
+                        DispatchQueue.main.async {
+                            self.Log.info("Commissioning Window opening status: \(result)")
+                            self.commisisoningWindowOpened = result
+                        }
+                    },
+                    commissioningCompleteCallback: { (result: Bool) -> () in
+                        self.Log.info("Commissioning status: \(result)")
+                        DispatchQueue.main.async {
+                            self.commisisoningComplete = result
+                        }
+                    },
+                    sessionEstablishmentStartedCallback: {
+                        self.Log.info("PASE session establishment started")
+                    },
+                    sessionEstablishedCallback: {
+                        self.Log.info("PASE session established")
+                    },
+                    sessionEstablishmentErrorCallback: { (err: MatterError) -> () in
+                        self.Log.info("PASE session establishment error : \(err)")
+                    },
+                    sessionEstablishmentStoppedCallback: {
+                        self.Log.info("PASE session establishment stopped")
+                    }
+                ),
+                onConnectionSuccessCallback: { (videoPlayer: VideoPlayer) -> () in
+                    DispatchQueue.main.async {
+                        self.connectionSuccess = true
+                        self.connectionStatus = "Connected to \(String(describing: videoPlayer))"
+                        self.Log.info("CommissioningViewModel.verifyOrEstablishConnection.onConnectionSuccessCallback called with \(videoPlayer.nodeId)")
+                    }
+                },
+                onConnectionFailureCallback: { (error: MatterError) -> () in
+                    DispatchQueue.main.async {
+                        self.connectionSuccess = false
+                        self.connectionStatus = "Failed to connect to video player!"
+                        self.Log.info("CommissioningViewModel.verifyOrEstablishConnection.onConnectionFailureCallback called with \(error)")
+                    }
+                },
+                onNewOrUpdatedEndpointCallback: { (contentApp: ContentApp) -> () in
+                    DispatchQueue.main.async {
+                        self.Log.info("CommissioningViewModel.openBasicCommissioningWindow.onNewOrUpdatedEndpointCallback called with \(contentApp.endpointId)")
+                    }
+                })
+        }
+        
+    }
+    
+    private func sendUserDirectedCommissioningRequest(selectedCommissioner: DiscoveredNodeData?) {
         if let castingServerBridge = CastingServerBridge.getSharedInstance()
         {
             castingServerBridge.sendUserDirectedCommissioningRequest(selectedCommissioner!, clientQueue: DispatchQueue.main, udcRequestSentHandler: { (result: Bool) -> () in

@@ -26,10 +26,12 @@ list(
     -DCONFIG_PLATFORM_8721D
     -DCONFIG_USE_MBEDTLS_ROM_ALG
     -DCONFIG_FUNCION_O0_OPTIMIZE
+    -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=0
     -DDM_ODM_SUPPORT_TYPE=32
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
     -D_POSIX_REALTIME_SIGNALS
+    -DCHIP_SHELL_MAX_TOKENS=11
 )
 
 list(
@@ -42,6 +44,7 @@ list(
     -Wno-unused-variable
     -Wno-deprecated-declarations
     -Wno-unused-parameter
+    -Wno-unused-label
     -Wno-format
     -Wno-stringop-truncation
     -Wno-format-nonliteral
@@ -104,7 +107,7 @@ string(APPEND CHIP_GN_ARGS "ameba_cc = \"arm-none-eabi-gcc\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cxx = \"arm-none-eabi-c++\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cpu = \"ameba\"\n")
 string(APPEND CHIP_GN_ARGS "chip_inet_config_enable_ipv4 = false\n")
-string(APPEND CHIP_GN_ARGS "chip_use_transitional_commissionable_data_provider = false\n")
+string(APPEND CHIP_GN_ARGS "chip_use_transitional_commissionable_data_provider = true\n")
 
 # Enable persistent storage audit
 if (matter_enable_persistentstorage_audit)

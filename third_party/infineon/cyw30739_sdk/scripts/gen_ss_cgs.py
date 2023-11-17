@@ -25,7 +25,6 @@ import io
 import os
 import pathlib
 import sys
-
 from collections import OrderedDict
 
 THREAD_FACTORY_KEY_BASE = 0x2000

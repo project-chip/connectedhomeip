@@ -1,12 +1,11 @@
 {{> header}}
-{{#if (chip_has_client_clusters)}}
-#include "CHIPCallbackTypes.h"
+#include <jni/CHIPCallbackTypes.h>
+#include <jni/CHIPReadCallbacks.h>
 #include "CHIPInvokeCallbacks.h"
-#include "CHIPReadCallbacks.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <controller/java/zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
-#include <zap-generated/CHIPClientCallbacks.h>
 
 #include <controller/java/AndroidCallbacks.h>
 #include <controller/java/AndroidClusterExceptions.h>
@@ -29,9 +28,10 @@
 using namespace chip;
 using namespace chip::Controller;
 
-{{#chip_client_clusters}}
-{{#chip_server_cluster_attributes}}
-{{#unless (isStrEqual chipCallback.name "Unsupported")}}
+{{#zcl_clusters}}
+{{#zcl_attributes_server removeKeys='isOptional'}}
+{{#if_unsupported_attribute_callback type isArray ../id}}
+{{else}}
 {{#if isWritableAttribute}}
 
 JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, {{asJniBasicType type true}} value, jobject timedWriteTimeoutMs)
@@ -44,7 +44,7 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    {{>encode_value target="cppValue" source="value" cluster=(asUpperCamelCase parent.name) depth=0}}
+    {{>encode_value target="cppValue" source="value" cluster=parent.name depth=0}}
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -74,9 +74,8 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
     onFailure.release();
 }
 {{/if}}
-{{/unless}}
-{{/chip_server_cluster_attributes}}
-{{/chip_client_clusters}}
-{{/if}}
+{{/if_unsupported_attribute_callback}}
+{{/zcl_attributes_server}}
+{{/zcl_clusters}}
 
 #pragma clang diagnostic pop

@@ -18,24 +18,25 @@ name:
     Verification (DUT as Server)
 
 PICS:
-    - MC.S.UDC
+    - MC.S.M.UDC
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
     - label:
-          "TH start scanning for available commissioners using Commissioner
-          Discovery"
+          "Step 1: TH start scanning for available commissioners using
+          Commissioner Discovery"
       verification: |
           ./chip-tv-casting-app
 
           The shell should show a discovered commissioner, similar to the following:
 
           [1653089767279] [88361:1149415] CHIP: [SVR] Discovered Commissioner #0
-          [1653089767279] [88361:1149415] CHIP: [DIS]         Hostname: 147dda9ac00a        [1653089767279] [88361:1149415] CHIP: [DIS]         IP Address #1: 169.254.81.148
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Hostname: 147dda9ac00a
+          [1653089767279] [88361:1149415] CHIP: [DIS]         IP Address #1: 169.254.81.148
           [1653089767279] [88361:1149415] CHIP: [DIS]         Port: 5650
           [1653089767279] [88361:1149415] CHIP: [DIS]         Mrp Interval idle: 5000 ms
           [1653089767279] [88361:1149415] CHIP: [DIS]         Mrp Interval active: 2000 ms
@@ -49,7 +50,8 @@ tests:
           [1653089767279] [88361:1149415] CHIP: [SVR] Example: cast request 0
       disabled: true
 
-    - label: "TH is instructed to select the commissioner found in step 1"
+    - label:
+          "Step 2: TH is instructed to select the commissioner found in step 1"
       verification: |
           Into the shell, enter "cast request 0" to send a user-directed-commissioning request to the DUT
 
@@ -59,7 +61,9 @@ tests:
           [1653179218011] [47890:1899175] CHIP: [SVR] Server initializing...
       disabled: true
 
-    - label: "TH provides 11/21 digit manual pairing code or setup passcode."
+    - label:
+          "Step 3: TH provides 11/21 digit manual pairing code or setup
+          passcode."
       verification: |
           The TH should display the setup passcode in the shell output (20202021 is the passcode below):
 
@@ -76,7 +80,7 @@ tests:
       disabled: true
 
     - label:
-          "DUT Prompts user to enter the pairing code (provided by TH in
+          "Step 4: DUT Prompts user to enter the pairing code (provided by TH in
           previous step)."
       verification: |
           Into the DUT UX, accept request for commissioning. Manufacturer may utilize a custom method for obtaining user consent other than an on-screen prompt.
@@ -90,11 +94,11 @@ tests:
           [1653088463910] [86837:1122544] CHIP: [SVR] Commissioning completed successfully
       disabled: true
 
-    - label: "TH reads the endpoints from the DUT"
+    - label: "Step 5: TH reads the endpoints from the DUT"
       verification: |
           Into the shell, enter "cast cluster descriptor read device-list 0 1" to read the device list of the descriptor cluster on endpoint 1
 
-          > cast cluster descriptor read device-list 0 1
+          > cast cluster descriptor read device-type-list   0 1
           ....
           [1653180010083] [48426:1914389] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2009082322
           [1653180010083] [48426:1914389] CHIP: [TOO]   device list: 1 entries
@@ -104,11 +108,11 @@ tests:
           [1653180010083] [48426:1914389] CHIP: [TOO]      }
       disabled: true
 
-    - label: "TH reads the endpoints from the DUT"
+    - label: "Step 6: TH reads the endpoints from the DUT"
       verification: |
           Into the shell, enter "cast cluster descriptor read device-list 0 2" to read the device list of the descriptor cluster on endpoint 2
 
-          > cast cluster descriptor read device-list 0 2
+          > cast cluster descriptor read device-type-list 0 2
           ....
           [1653180162379] [48426:1917385] CHIP: [TOO] Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 631462374
           [1653180162379] [48426:1917385] CHIP: [TOO]   device list: 1 entries
@@ -118,11 +122,13 @@ tests:
           [1653180162379] [48426:1917385] CHIP: [TOO]      }
       disabled: true
 
-    - label: "TH reads the endpoints from the DUT"
+    - label: "Step 7: TH reads the endpoints from the DUT"
       verification: |
-          Into the shell, enter "cast cluster descriptor read device-list 0 6" to read the device list of the descriptor cluster on endpoint 6
+          Into the shell, enter "cast cluster descriptor read device-list 0 4" to read the device list of the descriptor cluster on endpoint 4
+          Descriptor cluster is supporting  endpoint 1 and 2 in RPI platform hence if TH  tried to read the device list of the descriptor cluster on endpoint 4  from the DUT, DUT should send the response as UNSUPPORTED_ENDPOINT,
 
-          > cast cluster descriptor read device-list 0 6
+          It may vary based the DUT
+          > cast cluster descriptor read device-type-list 0 4
           ....
           [1653180214397] [48426:1919098] CHIP: [TOO] Endpoint: 6 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 4094146641
           [1653180214397] [48426:1919098] CHIP: [TOO]   device list: 1 entries

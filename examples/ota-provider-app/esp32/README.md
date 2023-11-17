@@ -81,4 +81,4 @@ privileges to all nodes for the OTA Provider cluster (0x0029) on every endpoint
 ---
 
 Once OTA provider is commissioned then head over to
-[OTA Requestor Example](../../ota-requestor-app/esp32).
+[OTA Requestor Example](../../ota-requestor-app/esp32/README.md).

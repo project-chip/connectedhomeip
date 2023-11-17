@@ -16,6 +16,7 @@
  */
 
 #include <app/util/binding-table.h>
+#include <app/util/config.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/DataModelTypes.h>
 

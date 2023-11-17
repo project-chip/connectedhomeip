@@ -13,16 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+import sys
 import unittest
 
-try:
-    from build.target import *
-except:
-    import sys
-    import os
-
-    sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-    from target import *
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from build.target import BuildTarget, TargetPart  # noqa: E402 isort:skip
 
 
 class FakeBuilder:

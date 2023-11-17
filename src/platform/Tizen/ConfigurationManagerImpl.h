@@ -24,9 +24,15 @@
 
 #pragma once
 
-#include <platform/internal/GenericConfigurationManagerImpl.h>
+#include <cstdint>
+#include <cstdlib>
 
-#include <platform/Tizen/PosixConfig.h>
+#include <lib/core/CHIPError.h>
+#include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/PersistedStorage.h>
+
+#include "PosixConfig.h"
+#include "platform/internal/GenericConfigurationManagerImpl.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -39,6 +45,11 @@ class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImp
 public:
     CHIP_ERROR StoreVendorId(uint16_t vendorId);
     CHIP_ERROR StoreProductId(uint16_t productId);
+
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+    CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
+    CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
 
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();

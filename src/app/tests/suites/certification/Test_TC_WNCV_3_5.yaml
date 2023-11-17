@@ -25,13 +25,13 @@ config:
     endpoint: 1
     fastMotionDuration:
         type: int16u
-        defaultValue: 3000
+        defaultValue: 5000
     fullMotionDuration:
         type: int16u
         defaultValue: 6000
 
 tests:
-    - label: "0: Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -43,15 +43,16 @@ tests:
     ### Step 1x -> Initialize the Covering position before any testing
     ### MANDATORY Init Commands
     - label:
-          "1a: TH sends UpOrOpen command to preposition the DUT in the opposite
-          direction"
+          "Step 1a: TH sends UpOrOpen command to preposition the DUT in the
+          opposite direction"
       command: "UpOrOpen"
       PICS: WNCV.S.C00.Rsp
 
     ### DUT adjusts to a non-closed position
     ### Testers should input the fastMotionDuration parameter that match their DUT behavior
     - label:
-          "1b: TH Waits for fastMotionDuration seconds movement(s) on the device"
+          "Step 1b: TH Waits for fastMotionDuration seconds movement(s) on the
+          device"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -62,14 +63,15 @@ tests:
     ######## DownOrClose Long-Run Command #######
     ### Step 2x -> Check DownOrClose Long-Run effects
     ### MANDATORY Command
-    - label: "2a: TH sends DownOrClose command to DUT"
+    - label: "Step 2a: TH sends DownOrClose command to DUT"
       command: "DownOrClose"
       PICS: WNCV.S.C01.Rsp
 
     ### DUT move toward its fully-closed position
     ### Testers should input the fullMotionDuration parameter that match their DUT behavior
     - label:
-          "2b: TH Waits for fullMotionDuration seconds movement(s) on the device"
+          "Step 2b: TH Waits for fullMotionDuration seconds movement(s) on the
+          device"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -77,7 +79,7 @@ tests:
               - name: "ms"
                 value: fullMotionDuration
 
-    - label: "2c: TH reads OperationalStatus attribute from DUT"
+    - label: "Step 2c: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
       PICS: WNCV.S.A000a
@@ -88,8 +90,8 @@ tests:
     ### Step 3x -> Verify the DUT has reached its fully-open limits
     ### Mandatory Depends on the FeatureMap
     - label:
-          "3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
-          from DUT"
+          "Step 3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
@@ -98,7 +100,7 @@ tests:
 
     ### Optional Depends on the FeatureMap
     - label:
-          "3b: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
+          "Step 3b: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
@@ -108,8 +110,8 @@ tests:
 
     ### Mandatory Depends on the FeatureMap
     - label:
-          "3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
-          from DUT"
+          "Step 3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
@@ -118,7 +120,7 @@ tests:
 
     ### Optional Depends on the FeatureMap
     - label:
-          "3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
+          "Step 3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"

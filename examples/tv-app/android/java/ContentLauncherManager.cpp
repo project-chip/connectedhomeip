@@ -49,7 +49,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
                                                  const DecodableList<ParameterType> & parameterList, bool autoplay,
                                                  const chip::CharSpan & data)
 {
-    Commands::LaunchResponse::Type response;
+    Commands::LauncherResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -86,7 +86,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
         jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
         JniUtfString dataStr(env, jdataStr);
 
-        response.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(status);
+        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
         response.data   = chip::Optional<CharSpan>(dataStr.charSpan());
 
         err = helper.Success(response);
@@ -103,7 +103,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
                                              const chip::CharSpan & displayString,
                                              const BrandingInformationType & brandingInformation)
 {
-    Commands::LaunchResponse::Type response;
+    Commands::LauncherResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -141,7 +141,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
         jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
         JniUtfString dataStr(env, jdataStr);
 
-        response.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(status);
+        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
         response.data   = chip::Optional<CharSpan>(dataStr.charSpan());
 
         err = helper.Success(response);

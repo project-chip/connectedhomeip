@@ -392,7 +392,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
-    if (!IsSpanUsable(block))
+    if (block.empty())
     {
         ReleaseBlock();
         return CHIP_NO_ERROR;
@@ -543,8 +543,8 @@ int OTAImageProcessorImpl::ProgramMemory()
     }
     ChipLogProgress(SoftwareUpdate,
                     "Secondary slot program with offset: "
-                    "0x%" PRIx64,
-                    mParams.downloadedBytes);
+                    "0x" ChipLogFormatX64,
+                    ChipLogValueX64(mParams.downloadedBytes));
     mParams.downloadedBytes += mBlock.size();
 
     return ret;

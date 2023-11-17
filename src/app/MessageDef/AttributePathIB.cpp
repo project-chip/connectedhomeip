@@ -66,7 +66,7 @@ CHIP_ERROR AttributePathIB::Parser::PrettyPrint() const
             {
                 NodeId node;
                 reader.Get(node);
-                PRETTY_PRINT("\tNode = 0x%" PRIx64 ",", node);
+                PRETTY_PRINT("\tNode = 0x" ChipLogFormatX64 ",", ChipLogValueX64(node));
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -171,8 +171,14 @@ CHIP_ERROR AttributePathIB::Parser::GetListIndex(DataModel::Nullable<ListIndex> 
     return GetNullableUnsignedInteger(to_underlying(Tag::kListIndex), apListIndex);
 }
 
-CHIP_ERROR AttributePathIB::Parser::GetListIndex(ConcreteDataAttributePath & aAttributePath) const
+CHIP_ERROR AttributePathIB::Parser::GetGroupAttributePath(ConcreteDataAttributePath & aAttributePath) const
 {
+    ReturnErrorOnFailure(GetCluster(&aAttributePath.mClusterId));
+    VerifyOrReturnError(IsValidClusterId(aAttributePath.mClusterId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+    ReturnErrorOnFailure(GetAttribute(&aAttributePath.mAttributeId));
+    VerifyOrReturnError(IsValidAttributeId(aAttributePath.mAttributeId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     DataModel::Nullable<ListIndex> listIndex;
     err = GetListIndex(&(listIndex));
@@ -196,6 +202,14 @@ CHIP_ERROR AttributePathIB::Parser::GetListIndex(ConcreteDataAttributePath & aAt
         err                    = CHIP_NO_ERROR;
     }
     return err;
+}
+
+CHIP_ERROR AttributePathIB::Parser::GetConcreteAttributePath(ConcreteDataAttributePath & aAttributePath) const
+{
+    ReturnErrorOnFailure(GetGroupAttributePath(aAttributePath));
+
+    // And now read our endpoint.
+    return GetEndpoint(&aAttributePath.mEndpointId);
 }
 
 CHIP_ERROR AttributePathIB::Parser::ParsePath(AttributePathParams & aAttribute) const
@@ -260,7 +274,7 @@ AttributePathIB::Builder & AttributePathIB::Builder::EnableTagCompression(const 
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kEnableTagCompression)), aEnableTagCompression);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kEnableTagCompression), aEnableTagCompression);
     }
     return *this;
 }
@@ -270,7 +284,7 @@ AttributePathIB::Builder & AttributePathIB::Builder::Node(const NodeId aNode)
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kNode)), aNode);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kNode), aNode);
     }
     return *this;
 }
@@ -280,7 +294,7 @@ AttributePathIB::Builder & AttributePathIB::Builder::Endpoint(const EndpointId a
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kEndpoint)), aEndpoint);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kEndpoint), aEndpoint);
     }
     return *this;
 }
@@ -290,7 +304,7 @@ AttributePathIB::Builder & AttributePathIB::Builder::Cluster(const ClusterId aCl
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kCluster)), aCluster);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kCluster), aCluster);
     }
     return *this;
 }
@@ -300,7 +314,7 @@ AttributePathIB::Builder & AttributePathIB::Builder::Attribute(const AttributeId
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kAttribute)), aAttribute);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kAttribute), aAttribute);
     }
     return *this;
 }
@@ -310,7 +324,7 @@ AttributePathIB::Builder & AttributePathIB::Builder::ListIndex(const DataModel::
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = DataModel::Encode(*mpWriter, TLV::ContextTag(to_underlying(Tag::kListIndex)), aListIndex);
+        mError = DataModel::Encode(*mpWriter, TLV::ContextTag(Tag::kListIndex), aListIndex);
     }
     return *this;
 }
@@ -320,15 +334,15 @@ AttributePathIB::Builder & AttributePathIB::Builder::ListIndex(const chip::ListI
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kListIndex)), aListIndex);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kListIndex), aListIndex);
     }
     return *this;
 }
 
-AttributePathIB::Builder & AttributePathIB::Builder::EndOfAttributePathIB()
+CHIP_ERROR AttributePathIB::Builder::EndOfAttributePathIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 
 CHIP_ERROR AttributePathIB::Builder::Encode(const AttributePathParams & aAttributePathParams)
@@ -353,8 +367,7 @@ CHIP_ERROR AttributePathIB::Builder::Encode(const AttributePathParams & aAttribu
         ListIndex(aAttributePathParams.mListIndex);
     }
 
-    EndOfAttributePathIB();
-    return GetError();
+    return EndOfAttributePathIB();
 }
 
 CHIP_ERROR AttributePathIB::Builder::Encode(const ConcreteDataAttributePath & aAttributePath)
@@ -377,8 +390,7 @@ CHIP_ERROR AttributePathIB::Builder::Encode(const ConcreteDataAttributePath & aA
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    EndOfAttributePathIB();
-    return GetError();
+    return EndOfAttributePathIB();
 }
 
 } // namespace app

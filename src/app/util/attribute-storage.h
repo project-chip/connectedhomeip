@@ -17,14 +17,17 @@
 
 #pragma once
 
-//#include PLATFORM_HEADER
+// #include PLATFORM_HEADER
 #include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af.h>
+#include <app/util/config.h>
+#include <app/util/endpoint-config-api.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
-#include <app-common/zap-generated/att-storage.h>
+#include <app/att-storage.h>
 #endif
 
 #if !defined(ATTRIBUTE_STORAGE_CONFIGURATION) && defined(EMBER_TEST)
@@ -50,14 +53,13 @@
 #include <app-common/zap-generated/attribute-type.h>
 
 #define DECLARE_DYNAMIC_ENDPOINT(endpointName, clusterList)                                                                        \
-    EmberAfEndpointType endpointName = { clusterList, sizeof(clusterList) / sizeof(EmberAfCluster), 0 }
+    EmberAfEndpointType endpointName = { clusterList, ArraySize(clusterList), 0 }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName) EmberAfCluster clusterListName[] = {
 
 #define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, incomingCommands, outgoingCommands)                                       \
     {                                                                                                                              \
-        clusterId, clusterAttrs, sizeof(clusterAttrs) / sizeof(EmberAfAttributeMetadata), 0, ZAP_CLUSTER_MASK(SERVER), NULL,       \
-            incomingCommands, outgoingCommands                                                                                     \
+        clusterId, clusterAttrs, ArraySize(clusterAttrs), 0, ZAP_CLUSTER_MASK(SERVER), NULL, incomingCommands, outgoingCommands    \
     }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_END }
@@ -66,13 +68,13 @@
 
 #define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END()                                                                                       \
     {                                                                                                                              \
-        0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT()                                     \
+        ZAP_EMPTY_DEFAULT(), 0xFFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)                                     \
     } /* cluster revision */                                                                                                       \
     }
 
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
     {                                                                                                                              \
-        attId, ZAP_TYPE(attType), attSizeBytes, attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT()               \
+        ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
     }
 
 #define CLUSTER_TICK_FREQ_ALL (0x00)
@@ -88,12 +90,6 @@ void emAfCallInits(void);
 
 #define emberAfClusterIsClient(cluster) ((bool) (((cluster)->mask & CLUSTER_MASK_CLIENT) != 0))
 #define emberAfClusterIsServer(cluster) ((bool) (((cluster)->mask & CLUSTER_MASK_SERVER) != 0))
-#define emberAfDoesClusterHaveInitFunction(cluster) ((bool) (((cluster)->mask & CLUSTER_MASK_INIT_FUNCTION) != 0))
-#define emberAfDoesClusterHaveAttributeChangedFunction(cluster)                                                                    \
-    ((bool) (((cluster)->mask & CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION) != 0))
-#define emberAfDoesClusterHaveDefaultResponseFunction(cluster)                                                                     \
-    ((bool) (((cluster)->mask & CLUSTER_MASK_DEFAULT_RESPONSE_FUNCTION) != 0))
-#define emberAfDoesClusterHaveMessageSentFunction(cluster) ((bool) (((cluster)->mask & CLUSTER_MASK_MESSAGE_SENT_FUNCTION) != 0))
 
 // Initial configuration
 void emberAfEndpointConfigure(void);
@@ -104,10 +100,6 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
 bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord);
 bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
                         EmberAfAttributeSearchRecord * attRecord);
-
-// Returns endpoint type for the given endpoint id if there is an enabled
-// endpoint with that endpoint id.  Otherwise returns null.
-const EmberAfEndpointType * emberAfFindEndpointType(chip::EndpointId endpointId);
 
 // Check if a cluster is implemented or not. If yes, the cluster is returned.
 //
@@ -152,9 +144,6 @@ chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpoint
 // Returns number of clusters put into the passed cluster list
 // for the given endpoint and client/server polarity
 uint8_t emberAfGetClustersFromEndpoint(chip::EndpointId endpoint, chip::ClusterId * clusterList, uint8_t listLen, bool server);
-
-// Returns server cluster within the endpoint, or NULL if it isn't there
-const EmberAfCluster * emberAfFindServerCluster(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 // Returns cluster within the endpoint; Does not ignore disabled endpoints
 const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(chip::EndpointId endpoint, chip::ClusterId clusterId,
@@ -212,13 +201,34 @@ const EmberAfCluster * emberAfGetClusterByIndex(chip::EndpointId endpoint, uint8
 //
 chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpoint, CHIP_ERROR & err);
 
+/**
+ * Get the semantic tags of the endpoint.
+ * Fills in the provided SemanticTagStruct with tag at index `index` if there is one,
+ * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of tag,
+ * or returns CHIP_ERROR_NOT_FOUND if the endpoint is invalid.
+ * @param endpoint The target endpoint.
+ * @param index The index of the tag, with 0 representing the first tag.
+ * @param tag  The SemanticTagStruct is filled.
+ */
+CHIP_ERROR GetSemanticTagForEndpointAtIndex(chip::EndpointId endpoint, size_t index,
+                                            chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag);
+
 //
-// Over-ride the device type list current associated with an endpoint with a user-provided list. The buffers backing
+// Override the device type list current associated with an endpoint with a user-provided list. The buffers backing
 // that list have to live as long as the endpoint is enabled.
 //
 // NOTE: It is the application's responsibility to free the existing list that is being replaced if needed.
 //
 CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const EmberAfDeviceType> deviceTypeList);
+
+//
+// Override the tag list current associated with an endpoint with a user-provided list. The buffers backing
+// that list have to live as long as the endpoint is enabled.
+//
+// NOTE: It is the application's responsibility to free the existing list that is being replaced if needed.
+//
+CHIP_ERROR SetTagList(chip::EndpointId endpoint,
+                      chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList);
 
 // Register a dynamic endpoint. This involves registering descriptors that describe
 // the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing
@@ -259,13 +269,20 @@ chip::Optional<chip::AttributeId> emberAfGetServerAttributeIdByIndex(chip::Endpo
                                                                      uint16_t attributeIndex);
 
 /**
- * Register an attribute access override.  It will remain registered until
- * the endpoint it's registered for is disabled (or until shutdown if it's
- * registered for all endpoints).  Registration will fail if there is an
- * already-registered override for the same set of attributes.
+ * Register an attribute access override.  It will remain registered until the
+ * endpoint it's registered for is disabled (or until shutdown if it's
+ * registered for all endpoints) or until it is explicitly unregistered.
+ * Registration will fail if there is an already-registered override for the
+ * same set of attributes.
  *
  * @return false if there is an existing override that the new one would
  *               conflict with.  In this case the override is not registered.
  * @return true if registration was successful.
  */
 bool registerAttributeAccessOverride(chip::app::AttributeAccessInterface * attrOverride);
+
+/**
+ * Unregister an attribute access override (for example if the object
+ * implementing AttributeAccessInterface is being destroyed).
+ */
+void unregisterAttributeAccessOverride(chip::app::AttributeAccessInterface * attrOverride);

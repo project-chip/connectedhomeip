@@ -152,7 +152,7 @@ enum PublicEventTypes
      *
      * Signals a change to the sleepy end device interval.
      */
-    kSEDIntervalChange,
+    kICDPollingIntervalChange,
 
     /**
      * CHIPoBLE Connection Established
@@ -212,9 +212,14 @@ enum PublicEventTypes
     kOperationalNetworkEnabled,
 
     /**
-     * Signals that DNS-SD platform layer was initialized and is ready to operate.
+     * Signals that DNS-SD has been initialized and is ready to operate.
      */
-    kDnssdPlatformInitialized,
+    kDnssdInitialized,
+
+    /**
+     * Signals that DNS-SD backend was restarted and services must be published again.
+     */
+    kDnssdRestartNeeded,
 
     /**
      * Signals that bindings were updated.
@@ -225,6 +230,15 @@ enum PublicEventTypes
      * Signals that the state of the OTA engine changed.
      */
     kOtaStateChanged,
+
+    /**
+     * Server initialization has completed.
+     *
+     * Signals that all server components have been initialized and the node is ready to establish
+     * connections with other nodes. This event can be used to trigger on-boot actions that require
+     * sending messages to other nodes.
+     */
+    kServerReady,
 };
 
 /**
@@ -244,6 +258,12 @@ enum InternalEventTypes
     kCHIPoBLEUnsubscribe,
     kCHIPoBLEWriteReceived,
     kCHIPoBLEIndicateConfirm,
+
+    /**
+     * Post this event in case of a BLE connection error. This event should be posted
+     * if the BLE central disconnects without unsubscribing from the BLE characteristic.
+     * This event should populate CHIPoBLEConnectionError structure.
+     */
     kCHIPoBLEConnectionError,
     kCHIPoBLENotifyConfirm
 };
@@ -480,6 +500,10 @@ struct ChipDeviceEvent final
             uint64_t nodeId;
             FabricIndex fabricIndex;
         } CommissioningComplete;
+        struct
+        {
+            FabricIndex fabricIndex;
+        } BindingsChanged;
 
         struct
         {
@@ -487,6 +511,16 @@ struct ChipDeviceEvent final
             bool addNocCommandHasBeenInvoked;
             bool updateNocCommandHasBeenInvoked;
         } FailSafeTimerExpired;
+
+        struct
+        {
+            bool armed;
+        } FailSafeState;
+
+        struct
+        {
+            bool open;
+        } CommissioningWindowStatus;
 
         struct
         {

@@ -15,16 +15,21 @@
  *    limitations under the License.
  */
 
-#include <lib/support/SafePointerCast.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <ifaddrs.h>
+
+#include <algorithm>
+#include <cerrno>
+#include <cstring>
+#include <iterator>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include <app-common/zap-generated/cluster-enums.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/NetworkCommissioning.h>
 #include <platform/Tizen/ConnectivityUtils.h>
 #include <platform/Tizen/NetworkCommissioningDriver.h>
-
-#include <cerrno>
-#include <ifaddrs.h>
-#include <limits>
-#include <string>
-#include <vector>
 
 namespace chip {
 namespace DeviceLayer {
@@ -38,7 +43,7 @@ TizenEthernetDriver::EthernetNetworkIterator::EthernetNetworkIterator(TizenEther
     for (const auto * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
     {
         if (DeviceLayer::Internal::ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) ==
-            app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
+            app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kEthernet)
         {
             mInterfaces.push_back(ifa->ifa_name);
             if (mInterfaces.size() == mDriver->GetMaxNetworks())
@@ -56,7 +61,8 @@ bool TizenEthernetDriver::EthernetNetworkIterator::Next(Network & item)
     VerifyOrReturnValue(mInterfacesIdx < mInterfaces.size(), false);
 
     const auto & iface = mInterfaces[mInterfacesIdx++];
-    item.networkIDLen  = std::min(iface.size(), kMaxNetworkIDLen);
+    static_assert(kMaxNetworkIDLen <= UINT8_MAX, "Our length won't fit in networkIDLen");
+    item.networkIDLen = static_cast<uint8_t>(std::min(iface.size(), kMaxNetworkIDLen));
     memcpy(item.networkID, iface.c_str(), item.networkIDLen);
     item.connected = true;
 

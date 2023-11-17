@@ -21,18 +21,18 @@
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
 #include "esp_netif.h"
-#include "esp_spi_flash.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include <app/server/OnboardingCodesUtil.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <lib/support/ErrorStr.h>
 #include <ota/OTAHelper.h>
+#include <platform/ESP32/ESP32Utils.h>
 #include <shell_extension/launch.h>
 
 #include "OTAImageProcessorImpl.h"
@@ -65,6 +65,9 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 static void InitServer(intptr_t context)
 {
+    // Print QR Code URL
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
+
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 
     // We only have network commissioning on endpoint 0.
@@ -124,22 +127,17 @@ extern "C" void app_main()
 
     ESP_LOGI(TAG, "OTA Requester!");
 
-    /* Print chip information */
-    esp_chip_info_t chip_info;
-    esp_chip_info(&chip_info);
-    ESP_LOGI(TAG, "This is ESP32 chip with %d CPU cores, WiFi%s%s, ", chip_info.cores,
-             (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "", (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
-
-    ESP_LOGI(TAG, "silicon revision %d, ", chip_info.revision);
-
-    ESP_LOGI(TAG, "%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
-             (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
-
     // Initialize the ESP NVS layer.
     esp_err_t err = nvs_flash_init();
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
+        return;
+    }
+    err = esp_event_loop_create_default();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_event_loop_create_default() failed: %s", esp_err_to_name(err));
         return;
     }
 
@@ -148,6 +146,13 @@ extern "C" void app_main()
     OTARequestorCommands::GetInstance().Register();
 #endif // CONFIG_ENABLE_CHIP_SHELL
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if (DeviceLayer::Internal::ESP32Utils::InitWiFiStack() != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to initialize Wi-Fi stack");
+        return;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
@@ -155,7 +160,7 @@ extern "C" void app_main()
     CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
     if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
+        ESP_LOGE(TAG, "device.Init() failed: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
 

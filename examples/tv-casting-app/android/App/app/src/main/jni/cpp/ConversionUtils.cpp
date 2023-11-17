@@ -21,10 +21,12 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <string.h>
+#include <system/SystemClock.h>
 
 CHIP_ERROR convertJAppParametersToCppAppParams(jobject appParameters, AppParams & outAppParams)
 {
-    ChipLogProgress(AppServer, "convertJContentAppToTargetEndpointInfo called");
+    ChipLogProgress(AppServer, "convertJAppParametersToCppAppParams called");
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(appParameters != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -32,12 +34,27 @@ CHIP_ERROR convertJAppParametersToCppAppParams(jobject appParameters, AppParams 
     ReturnErrorOnFailure(
         chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/AppParameters", jAppParametersClass));
 
-    jfieldID jRotatingDeviceIdUniqueIdField = env->GetFieldID(jAppParametersClass, "rotatingDeviceIdUniqueId", "[B");
-    jobject jRotatingDeviceIdUniqueId       = env->GetObjectField(appParameters, jRotatingDeviceIdUniqueIdField);
+    jmethodID getRotatingDeviceIdUniqueIdMethod = env->GetMethodID(jAppParametersClass, "getRotatingDeviceIdUniqueId", "()[B");
+    if (getRotatingDeviceIdUniqueIdMethod == nullptr)
+    {
+        ChipLogError(Zcl, "Failed to access AppParameters 'getRotatingDeviceIdUniqueId' method");
+        env->ExceptionClear();
+    }
+
+    jobject jRotatingDeviceIdUniqueId = (jobject) env->CallObjectMethod(appParameters, getRotatingDeviceIdUniqueIdMethod);
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(Zcl, "Java exception in AppParameters::getRotatingDeviceIdUniqueId");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     if (jRotatingDeviceIdUniqueId != nullptr)
     {
-        chip::JniByteArray jniRotatingDeviceIdUniqueIdByteArray(env, static_cast<jbyteArray>(jRotatingDeviceIdUniqueId));
-        outAppParams.SetRotatingDeviceIdUniqueId(MakeOptional(jniRotatingDeviceIdUniqueIdByteArray.byteSpan()));
+        chip::JniByteArray * jniRotatingDeviceIdUniqueIdByteArray =
+            new chip::JniByteArray(env, static_cast<jbyteArray>(jRotatingDeviceIdUniqueId));
+        outAppParams.SetRotatingDeviceIdUniqueId(MakeOptional(jniRotatingDeviceIdUniqueIdByteArray->byteSpan()));
     }
 
     return CHIP_NO_ERROR;
@@ -46,6 +63,7 @@ CHIP_ERROR convertJAppParametersToCppAppParams(jobject appParameters, AppParams 
 CHIP_ERROR convertJContentAppToTargetEndpointInfo(jobject contentApp, TargetEndpointInfo & outTargetEndpointInfo)
 {
     ChipLogProgress(AppServer, "convertJContentAppToTargetEndpointInfo called");
+    VerifyOrReturnError(contentApp != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jclass jContentAppClass;
@@ -95,8 +113,9 @@ CHIP_ERROR convertTargetEndpointInfoToJContentApp(TargetEndpointInfo * targetEnd
             chip::JniReferences::GetInstance().CreateArrayList(jClustersArrayList);
             for (size_t i = 0; i < kMaxNumberOfClustersPerEndpoint && clusters[i] != chip::kInvalidClusterId; i++)
             {
-                jobject jCluster = nullptr;
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>("java/lang/Integer", "(I)V", clusters[i], jCluster);
+                jobject jCluster  = nullptr;
+                jint jniclusterId = static_cast<jint>(clusters[i]);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniclusterId, jCluster);
                 chip::JniReferences::GetInstance().AddToList(jClustersArrayList, jCluster);
             }
         }
@@ -109,6 +128,7 @@ CHIP_ERROR convertTargetEndpointInfoToJContentApp(TargetEndpointInfo * targetEnd
 CHIP_ERROR convertJVideoPlayerToTargetVideoPlayerInfo(jobject videoPlayer, TargetVideoPlayerInfo & outTargetVideoPlayerInfo)
 {
     ChipLogProgress(AppServer, "convertJVideoPlayerToTargetVideoPlayerInfo called");
+    VerifyOrReturnError(videoPlayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jclass jVideoPlayerClass;
@@ -132,7 +152,42 @@ CHIP_ERROR convertJVideoPlayerToTargetVideoPlayerInfo(jobject videoPlayer, Targe
     jfieldID getDeviceNameField = env->GetFieldID(jVideoPlayerClass, "deviceName", "Ljava/lang/String;");
     jstring jDeviceName         = static_cast<jstring>(env->GetObjectField(videoPlayer, getDeviceNameField));
     const char * deviceName     = env->GetStringUTFChars(jDeviceName, 0);
-    outTargetVideoPlayerInfo.Initialize(nodeId, fabricIndex, nullptr, nullptr, vendorId, productId, deviceType, deviceName);
+
+    jfieldID getHostNameField = env->GetFieldID(jVideoPlayerClass, "hostName", "Ljava/lang/String;");
+    jstring jHostName         = static_cast<jstring>(env->GetObjectField(videoPlayer, getHostNameField));
+    const char * hostName     = env->GetStringUTFChars(jHostName, 0);
+
+    jfieldID jPort = env->GetFieldID(jVideoPlayerClass, "port", "I");
+    uint16_t port  = static_cast<uint16_t>(env->GetIntField(videoPlayer, jPort));
+
+    jfieldID getInstanceNameField = env->GetFieldID(jVideoPlayerClass, "instanceName", "Ljava/lang/String;");
+    jstring jInstanceName         = static_cast<jstring>(env->GetObjectField(videoPlayer, getInstanceNameField));
+    const char * instanceName     = {};
+    if (jInstanceName != nullptr)
+    {
+        instanceName = env->GetStringUTFChars(jInstanceName, 0);
+    }
+
+    jfieldID jLastDiscoveredMs = env->GetFieldID(jVideoPlayerClass, "lastDiscoveredMs", "J");
+    long lastDiscoveredMs      = static_cast<long>(env->GetLongField(videoPlayer, jLastDiscoveredMs));
+
+    jfieldID getMACAddressField = env->GetFieldID(jVideoPlayerClass, "MACAddress", "Ljava/lang/String;");
+    jstring jMACAddress         = static_cast<jstring>(env->GetObjectField(videoPlayer, getMACAddressField));
+    const char * MACAddress     = jMACAddress == nullptr ? nullptr : env->GetStringUTFChars(jMACAddress, 0);
+
+    jfieldID jIsAsleep = env->GetFieldID(jVideoPlayerClass, "isAsleep", "Z");
+    bool isAsleep      = static_cast<bool>(env->GetBooleanField(videoPlayer, jIsAsleep));
+
+    outTargetVideoPlayerInfo.Initialize(nodeId, fabricIndex, nullptr, nullptr, vendorId, productId, deviceType, deviceName,
+                                        hostName, 0, nullptr, port, instanceName, chip::System::Clock::Timestamp(lastDiscoveredMs));
+
+    if (MACAddress != nullptr)
+    {
+        chip::CharSpan MACAddressSpan(MACAddress, 2 * 2 * chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength);
+        outTargetVideoPlayerInfo.SetMACAddress(MACAddressSpan);
+    }
+
+    outTargetVideoPlayerInfo.SetIsAsleep(isAsleep);
 
     jfieldID jContentAppsField = env->GetFieldID(jVideoPlayerClass, "contentApps", "Ljava/util/List;");
     jobject jContentApps       = env->GetObjectField(videoPlayer, jContentAppsField);
@@ -172,8 +227,9 @@ CHIP_ERROR convertTargetVideoPlayerInfoToJVideoPlayer(TargetVideoPlayerInfo * ta
         jclass jVideoPlayerClass;
         ReturnErrorOnFailure(
             chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/VideoPlayer", jVideoPlayerClass));
-        jmethodID jVideoPlayerConstructor =
-            env->GetMethodID(jVideoPlayerClass, "<init>", "(JBLjava/lang/String;IIILjava/util/List;ILjava/util/List;Z)V");
+        jmethodID jVideoPlayerConstructor = env->GetMethodID(jVideoPlayerClass, "<init>",
+                                                             "(JBLjava/lang/String;IIILjava/util/List;ILjava/util/List;Ljava/lang/"
+                                                             "String;Ljava/lang/String;IJLjava/lang/String;ZZ)V");
 
         jobject jContentAppList        = nullptr;
         TargetEndpointInfo * endpoints = targetVideoPlayerInfo->GetEndpoints();
@@ -190,6 +246,23 @@ CHIP_ERROR convertTargetVideoPlayerInfoToJVideoPlayer(TargetVideoPlayerInfo * ta
 
         jstring deviceName =
             targetVideoPlayerInfo->GetDeviceName() == nullptr ? nullptr : env->NewStringUTF(targetVideoPlayerInfo->GetDeviceName());
+
+        jstring hostName =
+            targetVideoPlayerInfo->GetHostName() == nullptr ? nullptr : env->NewStringUTF(targetVideoPlayerInfo->GetHostName());
+
+        jstring instanceName = targetVideoPlayerInfo->GetInstanceName() == nullptr
+            ? nullptr
+            : env->NewStringUTF(targetVideoPlayerInfo->GetInstanceName());
+
+        jstring MACAddress = nullptr;
+        if (targetVideoPlayerInfo->GetMACAddress() != nullptr && targetVideoPlayerInfo->GetMACAddress()->data() != nullptr)
+        {
+            char MACAddressWithNil[2 * chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength + 1];
+            memcpy(MACAddressWithNil, targetVideoPlayerInfo->GetMACAddress()->data(),
+                   targetVideoPlayerInfo->GetMACAddress()->size());
+            MACAddressWithNil[targetVideoPlayerInfo->GetMACAddress()->size()] = '\0';
+            MACAddress                                                        = env->NewStringUTF(MACAddressWithNil);
+        }
 
         jobject jIPAddressList                    = nullptr;
         const chip::Inet::IPAddress * ipAddresses = targetVideoPlayerInfo->GetIpAddresses();
@@ -213,11 +286,12 @@ CHIP_ERROR convertTargetVideoPlayerInfoToJVideoPlayer(TargetVideoPlayerInfo * ta
             }
         }
 
-        outVideoPlayer = env->NewObject(jVideoPlayerClass, jVideoPlayerConstructor, targetVideoPlayerInfo->GetNodeId(),
-                                        targetVideoPlayerInfo->GetFabricIndex(), deviceName, targetVideoPlayerInfo->GetVendorId(),
-                                        targetVideoPlayerInfo->GetProductId(), targetVideoPlayerInfo->GetDeviceType(),
-                                        jContentAppList, targetVideoPlayerInfo->GetNumIPs(), jIPAddressList,
-                                        targetVideoPlayerInfo->GetOperationalDeviceProxy() != nullptr);
+        outVideoPlayer = env->NewObject(
+            jVideoPlayerClass, jVideoPlayerConstructor, targetVideoPlayerInfo->GetNodeId(), targetVideoPlayerInfo->GetFabricIndex(),
+            deviceName, targetVideoPlayerInfo->GetVendorId(), targetVideoPlayerInfo->GetProductId(),
+            targetVideoPlayerInfo->GetDeviceType(), jContentAppList, targetVideoPlayerInfo->GetNumIPs(), jIPAddressList, hostName,
+            instanceName, targetVideoPlayerInfo->GetPort(), targetVideoPlayerInfo->GetLastDiscovered().count(), MACAddress,
+            targetVideoPlayerInfo->IsAsleep(), targetVideoPlayerInfo->GetOperationalDeviceProxy() != nullptr);
     }
     return CHIP_NO_ERROR;
 }
@@ -226,6 +300,7 @@ CHIP_ERROR convertJDiscoveredNodeDataToCppDiscoveredNodeData(jobject jDiscovered
                                                              chip::Dnssd::DiscoveredNodeData & outCppDiscoveredNodeData)
 {
     ChipLogProgress(AppServer, "convertJDiscoveredNodeDataToCppDiscoveredNodeData called");
+    VerifyOrReturnError(jDiscoveredNodeData != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -241,7 +316,7 @@ CHIP_ERROR convertJDiscoveredNodeDataToCppDiscoveredNodeData(jobject jDiscovered
                                    env->GetStringUTFChars(jHostName, 0));
     }
 
-    jfieldID getInstanceNameField = env->GetFieldID(jDiscoveredNodeDataClass, "deviceName", "Ljava/lang/String;");
+    jfieldID getInstanceNameField = env->GetFieldID(jDiscoveredNodeDataClass, "instanceName", "Ljava/lang/String;");
     jstring jInstanceName         = static_cast<jstring>(env->GetObjectField(jDiscoveredNodeData, getInstanceNameField));
     if (jInstanceName != nullptr)
     {
@@ -271,8 +346,11 @@ CHIP_ERROR convertJDiscoveredNodeDataToCppDiscoveredNodeData(jobject jDiscovered
 
     jfieldID getDeviceNameField = env->GetFieldID(jDiscoveredNodeDataClass, "deviceName", "Ljava/lang/String;");
     jstring jDeviceName         = static_cast<jstring>(env->GetObjectField(jDiscoveredNodeData, getDeviceNameField));
-    chip::Platform::CopyString(outCppDiscoveredNodeData.commissionData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
-                               env->GetStringUTFChars(jDeviceName, 0));
+    if (jDeviceName != nullptr)
+    {
+        chip::Platform::CopyString(outCppDiscoveredNodeData.commissionData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
+                                   env->GetStringUTFChars(jDeviceName, 0));
+    }
 
     // TODO: map rotating ID
     jfieldID jRotatingIdLenField = env->GetFieldID(jDiscoveredNodeDataClass, "rotatingIdLen", "I");

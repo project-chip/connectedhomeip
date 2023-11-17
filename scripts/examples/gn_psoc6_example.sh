@@ -28,7 +28,7 @@ elif [ -d "$HOME/ModusToolbox" ]; then
     export CY_TOOLS_PATHS="$HOME/ModusToolbox/tools_2.4"
 else
     # Install Modustoolbox
-    curl --fail --location --silent --show-error https://download.cypress.com/downloadmanager/software/ModusToolbox/ModusToolbox_2.4/ModusToolbox_2.4.0.5972-linux-install.tar.gz -o /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz -o /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz &&
+    curl --fail --location --silent --show-error https://itoolspriv.infineon.com/itbhs/api/packages/com.ifx.tb.tool.modustoolbox/Versions/2.4.0.5972-public/artifacts/ModusToolbox_2.4.0.5972-linux-install.tar.gz/download?noredirect -o /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz &&
         tar -C "$HOME" -zxf /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz &&
         rm /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz
 

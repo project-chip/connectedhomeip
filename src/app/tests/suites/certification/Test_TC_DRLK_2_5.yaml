@@ -34,223 +34,259 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Create new user"
+    - label: "Precondition: Create new user"
       command: "SetUser"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
 
-    - label: "Read the user back and verify its fields"
+    - label: "Precondition: Read the user back and verify its fields"
       command: "GetUser"
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
-              - name: "credentials"
-                value: null
-              - name: "creatorFabricIndex"
+              - name: "Credentials"
+                value: []
+              - name: "CreatorFabricIndex"
                 value: 1
-              - name: "lastModifiedFabricIndex"
+              - name: "LastModifiedFabricIndex"
                 value: 1
-              - name: "nextUserIndex"
+              - name: "NextUserIndex"
                 value: null
 
-    - label: "TH reads NumberOfWeekDay SchedulesSupportedPerUser attribute"
+    - label:
+          "Step 1: TH reads NumberOfWeekDay SchedulesSupportedPerUser attribute"
       PICS: DRLK.S.F04 && DRLK.S.A0014
       command: "readAttribute"
       attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
       response:
-          saveAs: NumberOfWeekDaySchedulesSupportedPerUser
+          saveAs: NumberOfWeekDaySchedulesSupportedPerUserValue
           constraints:
               minValue: 0
               maxValue: 255
 
-    - label: "TH reads NumberOfTotalUsers Supported attribute"
+    - label: "Step 2: TH reads NumberOfTotalUsers Supported attribute"
       PICS: DRLK.S.F08 && DRLK.S.A0011
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
       response:
-          saveAs: NumberOfTotalUsersSupported
+          saveAs: NumberOfTotalUsersSupportedValue
           constraints:
               minValue: 0
               maxValue: 65534
 
-    - label: "TH send Set Week Day Schedule Command"
+    - label: "Step 3: TH send Set Week Day Schedule Command"
       PICS: DRLK.S.F04 && DRLK.S.C0b.Rsp
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 2
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 45
-              - name: "endHour"
+              - name: "EndHour"
                 value: 16
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 55
 
     #issue #18591
-    - label: "TH send Get Week Day Schedule Command to DUT"
+    - label: "Step 4: TH send Get Week Day Schedule Command to DUT"
       PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 2
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 45
-              - name: "endHour"
+              - name: "EndHour"
                 constraints:
                     hasValue: true
                     minValue: 16
-              - name: "endMinute"
+              - name: "EndMinute"
                 constraints:
                     hasValue: true
                     minValue: 55
 
-    - label: "TH send Set Week Day Schedule Command"
+    - label: "Step 5: TH send Set Week Day Schedule Command"
       PICS: DRLK.S.F04 && DRLK.S.C0b.Rsp
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 7
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 45
-              - name: "endHour"
+              - name: "EndHour"
                 value: 16
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 55
       response:
           error: INVALID_COMMAND
 
-    - label: "TH send Get Week Day Schedule Command to DUT"
+    - label: "Step 6: TH send Get Week Day Schedule Command to DUT"
       PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x85
-              - name: "daysMask"
+              - name: "DaysMask"
                 constraints:
                     hasValue: false
-              - name: "startHour"
+              - name: "StartHour"
                 constraints:
                     hasValue: false
-              - name: "startMinute"
+              - name: "StartMinute"
                 constraints:
                     hasValue: false
-              - name: "endHour"
+              - name: "EndHour"
                 constraints:
                     hasValue: false
-              - name: "endMinute"
+              - name: "EndMinute"
                 constraints:
                     hasValue: false
 
-    - label: "TH sends Clear Week Day Schedule Command to DUT"
+    - label:
+          "Step 7: TH sends Get Week Day Schedule Command to DUT for
+          non-existent User"
+      PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 2
+      response:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 2
+              - name: "Status"
+                value: 0x8B
+              - name: "DaysMask"
+                constraints:
+                    hasValue: false
+              - name: "StartHour"
+                constraints:
+                    hasValue: false
+              - name: "StartMinute"
+                constraints:
+                    hasValue: false
+              - name: "EndHour"
+                constraints:
+                    hasValue: false
+              - name: "EndMinute"
+                constraints:
+                    hasValue: false
+
+    - label: "Step 8: TH sends Clear Week Day Schedule Command to DUT"
       PICS: DRLK.S.F04 && DRLK.S.C0d.Rsp
       command: "ClearWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
 
-    - label: "TH sends Get Week Day Schedule Command to DUT"
+    - label: "Step 9: TH sends Get Week Day Schedule Command to DUT"
       PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
-              - name: "daysMask"
+              - name: "DaysMask"
                 constraints:
                     hasValue: false
-              - name: "startHour"
+              - name: "StartHour"
                 constraints:
                     hasValue: false
-              - name: "startMinute"
+              - name: "StartMinute"
                 constraints:
                     hasValue: false
-              - name: "endHour"
+              - name: "EndHour"
                 constraints:
                     hasValue: false
-              - name: "endMinute"
+              - name: "EndMinute"
                 constraints:
                     hasValue: false
 
@@ -259,5 +295,5 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1

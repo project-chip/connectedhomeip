@@ -14,22 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import coloredlogs
 import difflib
 import logging
 import os
 import subprocess
 import sys
-
 from typing import List
+
+import coloredlogs
 
 SCRIPT_ROOT = os.path.dirname(__file__)
 
 
 def build_expected_output(root: str, out: str) -> List[str]:
-    with open(os.path.join(SCRIPT_ROOT, 'expected_test_cmakelists.txt'), 'rt') as f:
-        for l in f.readlines():
-            yield l.replace("{root}", root).replace("{out}", out)
+    with open(os.path.join(SCRIPT_ROOT, 'expected_test_cmakelists.txt'), 'rt') as file:
+        for line in file.readlines():
+            yield line.replace("{root}", root).replace("{out}", out)
 
 
 def build_actual_output(root: str, out: str) -> List[str]:
@@ -37,14 +37,14 @@ def build_actual_output(root: str, out: str) -> List[str]:
     binary = os.path.join(SCRIPT_ROOT, '../gn_to_cmakelists.py')
     project = os.path.join(SCRIPT_ROOT, "test_project.json")
     cmake = os.path.join(SCRIPT_ROOT, "../../../out/CMakeLists.txt")
-    retval = subprocess.run([
+    subprocess.run([
         binary,
         project,
     ], stdout=subprocess.PIPE, check=True, encoding='UTF-8', )
 
     with open(cmake, 'rt') as f:
-        for l in f.readlines():
-            yield l
+        for line in f.readlines():
+            yield line
 
 
 def main():
@@ -54,15 +54,15 @@ def main():
     ROOT = '/TEST/BUILD/ROOT'
     OUT = '/OUTPUT/DIR'
 
-    expected = [l for l in build_expected_output(ROOT, OUT)]
-    actual = [l for l in build_actual_output(ROOT, OUT)]
+    expected = [line for line in build_expected_output(ROOT, OUT)]
+    actual = [line for line in build_actual_output(ROOT, OUT)]
 
     diffs = [line for line in difflib.unified_diff(expected, actual)]
 
     if diffs:
         logging.error("DIFFERENCE between expected and generated output")
-        for l in diffs:
-            logging.warning("  " + l.strip())
+        for line in diffs:
+            logging.warning("  " + line.strip())
         sys.exit(1)
 
 

@@ -18,8 +18,9 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -30,21 +31,20 @@
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <src/platform/nxp/k32w/k32w0/DefaultTestEventTriggerDelegate.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/attribute-storage.h>
 
 #include <DeviceInfoProviderImpl.h>
 
 /* OTA related includes */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-#include "OTAImageProcessorImpl.h"
 #include "OtaSupport.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <src/platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 #endif
 
 #include "Keyboard.h"
@@ -52,13 +52,9 @@
 #include "LEDWidget.h"
 #include "app_config.h"
 
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif
-#include "CHIPProjectConfig.h"
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 6000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -73,9 +69,8 @@ static QueueHandle_t sAppEventQueue;
 static LEDWidget sStatusLED;
 static LEDWidget sLightLED;
 
-static bool sIsThreadProvisioned        = false;
-static bool sHaveBLEConnections         = false;
-static bool sIsDnssdPlatformInitialized = false;
+static bool sIsThreadProvisioned = false;
+static bool sHaveBLEConnections  = false;
 
 static uint32_t eventMask = 0;
 
@@ -86,8 +81,12 @@ extern "C" void K32WUartProcess(void);
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip;
+using namespace chip::app;
 
 AppTask AppTask::sAppTask;
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+static AppTask::FactoryDataProvider sFactoryDataProvider;
+#endif
 
 // This key is for testing/certification only and should not be used in production devices.
 // For production devices this key must be provided from factory data.
@@ -95,11 +94,11 @@ uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] =
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
 static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, AppTask::OnIdentifyStop,
-                              EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, AppTask::OnTriggerEffect,
+                              Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, AppTask::OnTriggerEffect,
                               // Use invalid value for identifiers to enable TriggerEffect command
                               // to stop Identify command for each effect
-                              (EmberAfIdentifyEffectIdentifier)(EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT - 0x10),
-                              EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT };
+                              Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue,
+                              Clusters::Identify::EffectVariantEnum::kDefault };
 
 /* OTA related variables */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -107,9 +106,17 @@ static DefaultOTARequestor gRequestorCore;
 static DefaultOTARequestorStorage gRequestorStorage;
 static DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
 static BDXDownloader gDownloader;
-static OTAImageProcessorImpl gImageProcessor;
 
 constexpr uint16_t requestedOtaBlockSize = 1024;
+#endif
+
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA && CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
+CHIP_ERROR CustomFactoryDataRestoreMechanism(void)
+{
+    K32W_LOG("This is a custom factory data restore mechanism.");
+
+    return CHIP_NO_ERROR;
+}
 #endif
 
 CHIP_ERROR AppTask::StartAppTask()
@@ -127,6 +134,40 @@ CHIP_ERROR AppTask::StartAppTask()
     return err;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+static void CheckOtaEntry()
+{
+    K32W_LOG("Current OTA_ENTRY_TOP_ADDR: 0x%x", OTA_ENTRY_TOP_ADDR);
+
+    CustomOtaEntries_t ota_entries;
+    if (gOtaSuccess_c == OTA_GetCustomEntries(&ota_entries) && ota_entries.ota_state != otaNoImage)
+    {
+        if (ota_entries.ota_state == otaApplied)
+        {
+            K32W_LOG("OTA successfully applied");
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA && CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
+            // If this point is reached, it means OTA_CommitCustomEntries was successfully called.
+            // Delete the factory data backup to stop doing a restore when the factory data provider
+            // is initialized. This ensures that both the factory data and app were updated, otherwise
+            // revert to the backed up factory data.
+            PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
+#endif
+        }
+        else
+        {
+            K32W_LOG("OTA failed with status %d", ota_entries.ota_state);
+        }
+
+        // Clear the entry
+        OTA_ResetCustomEntries();
+    }
+    else
+    {
+        K32W_LOG("Unable to access OTA entries structure");
+    }
+}
+#endif
+
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -136,25 +177,29 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model and start server
     PlatformMgr().ScheduleWork(InitServer, 0);
 
-// Initialize device attestation config
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
-    // Initialize factory data provider
-    ReturnErrorOnFailure(K32W0FactoryDataProvider::GetDefaultInstance().Init());
-#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
-    SetDeviceInstanceInfoProvider(&mK32W0FactoryDataProvider);
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    CheckOtaEntry();
 #endif
-    SetDeviceAttestationCredentialsProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
-    SetCommissionableDataProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
+
+    // Initialize device attestation config
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
+    sFactoryDataProvider.RegisterRestoreMechanism(CustomFactoryDataRestoreMechanism);
+#endif
+    ReturnErrorOnFailure(sFactoryDataProvider.Init());
+    SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+    SetCommissionableDataProvider(&sFactoryDataProvider);
 #else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
+#endif // CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
 
     // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-#endif
+    AppTask::PrintOnboardingInfo();
 
     /* HW init leds */
     LED_Init();
@@ -199,23 +244,11 @@ CHIP_ERROR AppTask::Init()
         K32W_LOG("Get version error");
         assert(err == CHIP_NO_ERROR);
     }
+    uint32_t currentVersion;
+    err = ConfigurationMgr().GetSoftwareVersion(currentVersion);
 
-    K32W_LOG("Current Software Version: %s", currentSoftwareVer);
+    K32W_LOG("Current Software Version: %s, %" PRIu32, currentSoftwareVer, currentVersion);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    if (gImageProcessor.IsFirstImageRun())
-    {
-        // If DNS-SD initialization was captured by MatterEventHandler, then
-        // OTA initialization will be started as soon as possible. Otherwise,
-        // a periodic timer is started until the DNS-SD initialization event
-        // is received. Configurable delay: CHIP_DEVICE_CONFIG_INIT_OTA_DELAY
-        AppTask::OnScheduleInitOTA(nullptr, nullptr);
-    }
-    else
-    {
-        PlatformMgr().ScheduleWork(AppTask::InitOTA, 0);
-    }
-#endif
     return err;
 }
 
@@ -249,6 +282,18 @@ void AppTask::InitServer(intptr_t arg)
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
 }
 
+void AppTask::PrintOnboardingInfo()
+{
+    chip::PayloadContents payload;
+    CHIP_ERROR err = GetPayloadContents(payload, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "GetPayloadContents() failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    payload.commissioningFlow = chip::CommissioningFlow::kUserActionRequired;
+    PrintOnboardingCodes(payload);
+}
+
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 void AppTask::InitOTA(intptr_t arg)
 {
@@ -258,11 +303,17 @@ void AppTask::InitOTA(intptr_t arg)
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gRequestorUser.SetMaxDownloadBlockSize(requestedOtaBlockSize);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-    gImageProcessor.SetOTADownloader(&gDownloader);
+    auto & imageProcessor = OTAImageProcessorImpl::GetDefaultInstance();
+    gRequestorUser.Init(&gRequestorCore, &imageProcessor);
+    CHIP_ERROR err = imageProcessor.Init(&gDownloader);
+    if (err != CHIP_NO_ERROR)
+    {
+        K32W_LOG("Image processor init failed");
+        assert(err == CHIP_NO_ERROR);
+    }
 
     // Connect the gDownloader and Image Processor objects
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    gDownloader.SetImageProcessorDelegate(&imageProcessor);
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 }
 #endif
@@ -376,7 +427,7 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 
 void AppTask::KBD_Callback(uint8_t events)
 {
-    eventMask = eventMask | (uint32_t)(1 << events);
+    eventMask = eventMask | (uint32_t) (1 << events);
 }
 
 void AppTask::HandleKeyboard(void)
@@ -553,32 +604,6 @@ void AppTask::StartOTAQuery(intptr_t arg)
 {
     GetRequestorInstance()->TriggerImmediateQuery();
 }
-
-void AppTask::PostOTAResume()
-{
-    AppEvent event;
-    event.Type    = AppEvent::kEventType_OTAResume;
-    event.Handler = OTAResumeEventHandler;
-    sAppTask.PostEvent(&event);
-}
-
-void AppTask::OnScheduleInitOTA(chip::System::Layer * systemLayer, void * appState)
-{
-    if (sIsDnssdPlatformInitialized)
-    {
-        PlatformMgr().ScheduleWork(AppTask::InitOTA, 0);
-    }
-    else
-    {
-        CHIP_ERROR error = chip::DeviceLayer::SystemLayer().StartTimer(
-            chip::System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_INIT_OTA_DELAY), AppTask::OnScheduleInitOTA, nullptr);
-
-        if (error != CHIP_NO_ERROR)
-        {
-            K32W_LOG("Failed to schedule OTA initialization timer.");
-        }
-    }
-}
 #endif
 
 void AppTask::BleHandler(AppEvent * aEvent)
@@ -631,15 +656,10 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    if (event->Type == DeviceEventType::kOtaStateChanged && event->OtaStateChanged.newState == kOtaSpaceAvailable)
-    {
-        sAppTask.PostOTAResume();
-    }
-
-    if (event->Type == DeviceEventType::kDnssdPlatformInitialized)
+    if (event->Type == DeviceEventType::kDnssdInitialized)
     {
         K32W_LOG("Dnssd platform initialized.");
-        sIsDnssdPlatformInitialized = true;
+        PlatformMgr().ScheduleWork(AppTask::InitOTA, 0);
     }
 #endif
 
@@ -800,11 +820,9 @@ void AppTask::OnTriggerEffectComplete(chip::System::Layer * systemLayer, void * 
         // TriggerEffect finished - reset identifiers
         // Use invalid value for identifiers to enable TriggerEffect command
         // to stop Identify command for each effect
-        gIdentify.mCurrentEffectIdentifier =
-            (EmberAfIdentifyEffectIdentifier)(EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT - 0x10);
-        gIdentify.mTargetEffectIdentifier =
-            (EmberAfIdentifyEffectIdentifier)(EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT - 0x10);
-        gIdentify.mEffectVariant = EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT;
+        gIdentify.mCurrentEffectIdentifier = Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue;
+        gIdentify.mTargetEffectIdentifier  = Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue;
+        gIdentify.mEffectVariant           = Clusters::Identify::EffectVariantEnum::kDefault;
 
         RestoreLightingState();
     }
@@ -826,29 +844,30 @@ void AppTask::OnTriggerEffect(Identify * identify)
 
     switch (identify->mCurrentEffectIdentifier)
     {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
         timerDelay = 2;
         break;
 
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
         timerDelay = 15;
         break;
 
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
         timerDelay = 4;
         break;
 
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-        ChipLogProgress(Zcl, "Channel Change effect not supported, using effect %d", EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK);
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "Channel Change effect not supported, using effect %d",
+                        to_underlying(Clusters::Identify::EffectIdentifierEnum::kBlink));
         timerDelay = 2;
         break;
 
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
+    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
         chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerEffectComplete, identify);
         timerDelay = 1;
         break;
 
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
+    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
         chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerEffectComplete, identify);
         OnTriggerEffectComplete(&chip::DeviceLayer::SystemLayer(), identify);
         break;
@@ -874,19 +893,6 @@ void AppTask::PostTurnOnActionRequest(int32_t aActor, LightingManager::Action_t 
     event.LightEvent.Action = aAction;
     event.Handler           = LightActionEventHandler;
     PostEvent(&event);
-}
-
-void AppTask::OTAResumeEventHandler(AppEvent * aEvent)
-{
-    if (aEvent->Type == AppEvent::kEventType_OTAResume)
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-        if (gDownloader.GetState() == OTADownloader::State::kInProgress)
-        {
-            gImageProcessor.TriggerNewRequestForData();
-        }
-#endif
-    }
 }
 
 void AppTask::PostEvent(const AppEvent * aEvent)
@@ -922,8 +928,7 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     uint8_t newValue = !LightingMgr().IsTurnedOff();
 
     // write the new on/off value
-    EmberAfStatus status =
-        emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
@@ -940,7 +945,7 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
     bool onoffAttrValue = 0;
 
     /* get onoff attribute value */
-    (void) emberAfReadAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &onoffAttrValue, 1);
+    (void) app::Clusters::OnOff::Attributes::OnOff::Get(1, &onoffAttrValue);
 
     /* set the device state */
     sLightLED.Set(onoffAttrValue);

@@ -37,18 +37,27 @@
 // Use hard-coded test certificates already embedded in generic chip code => set it to 0
 // Use real/development certificates => set it to 1 + file the provisioning section from
 //                                      the internal flash
-#ifndef CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
-#define CONFIG_CHIP_K32W0_REAL_FACTORY_DATA 0
+#ifndef CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+#define CONFIG_CHIP_LOAD_REAL_FACTORY_DATA 0
 #endif
 
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+
+// Enable usage of custom factory data provider
+#ifndef CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+#define CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER 0
+#endif
+
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+#ifndef CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS
+// Set to 3: default number of custom Ids from CustomFactoryDataProvider example
+#define CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS 3
+#endif
+#endif
 
 // VID/PID for product => will be used by Basic Information Cluster
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x1037
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0xA220
-
-// set it to 0 for the moment
-#define CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER 0
 
 #ifndef CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION
 //-> format_version = 1
@@ -101,9 +110,6 @@
 // Use a default setup PIN code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
-
-// Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "CHIPUS"
 
 /**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER

@@ -100,11 +100,9 @@ protected:
     void _OnNetworkScanFinished(otActiveScanResult * aResult);
     void _UpdateNetworkStatus();
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
-    CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
-    CHIP_ERROR _RequestSEDActiveMode(bool onOff);
-#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     bool _HaveMeshConnectivity(void);
     CHIP_ERROR _GetAndLogThreadStatsCounters(void);
@@ -133,8 +131,11 @@ protected:
     CHIP_ERROR _DnsBrowse(const char * aServiceName, DnsBrowseCallback aCallback, void * aContext);
     CHIP_ERROR _DnsResolve(const char * aServiceName, const char * aInstanceName, DnsResolveCallback aCallback, void * aContext);
     static void DispatchResolve(intptr_t context);
+    static void DispatchResolveNoMemory(intptr_t context);
+    static void DispatchAddressResolve(intptr_t context);
     static void DispatchBrowseEmpty(intptr_t context);
     static void DispatchBrowse(intptr_t context);
+    static void DispatchBrowseNoMemory(intptr_t context);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
@@ -157,12 +158,6 @@ private:
     NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    ConnectivityManager::SEDIntervalsConfig mIntervalsConfig;
-    ConnectivityManager::SEDIntervalMode mIntervalsMode = ConnectivityManager::SEDIntervalMode::Idle;
-    uint32_t mActiveModeConsumers                       = 0;
-#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
@@ -222,7 +217,7 @@ private:
     static constexpr size_t kTotalDnsServiceTxtValueSize = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalValueSize,
                                                                     Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize);
     static constexpr size_t kTotalDnsServiceTxtKeySize   = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalKeySize,
-                                                                  Dnssd::OperationalAdvertisingParameters::kTxtTotalKeySize);
+                                                                    Dnssd::OperationalAdvertisingParameters::kTxtTotalKeySize);
 #else
     // Thread only supports operational discovery.
     static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber = Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber;
@@ -257,18 +252,18 @@ private:
 
     static void OnDnsBrowseResult(otError aError, const otDnsBrowseResponse * aResponse, void * aContext);
     static void OnDnsResolveResult(otError aError, const otDnsServiceResponse * aResponse, void * aContext);
+    static void OnDnsAddressResolveResult(otError aError, const otDnsAddressResponse * aResponse, void * aContext);
+
+    static CHIP_ERROR ResolveAddress(intptr_t context, otDnsAddressCallback callback);
+
     static CHIP_ERROR FromOtDnsResponseToMdnsData(otDnsServiceInfo & serviceInfo, const char * serviceType,
-                                                  chip::Dnssd::DnssdService & mdnsService,
-                                                  DnsServiceTxtEntries & serviceTxtEntries);
+                                                  chip::Dnssd::DnssdService & mdnsService, DnsServiceTxtEntries & serviceTxtEntries,
+                                                  otError error);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     static void OnJoinerComplete(otError aError, void * aContext);
     void OnJoinerComplete(otError aError);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR SetSEDIntervalMode(ConnectivityManager::SEDIntervalMode intervalType);
-#endif
 
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };

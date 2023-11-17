@@ -26,6 +26,7 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <crypto/RawKeySessionKeystore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -53,10 +54,6 @@
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/KeyValueStoreManager.h>
-
-#if defined(PW_RPC_ENABLED)
-#include <CommonRpc.h>
-#endif
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceHandlers.h"
@@ -122,6 +119,7 @@ MyServerStorageDelegate gServerStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
 NodeId gLocalId = kMaxOperationalNodeId;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
+Crypto::RawKeySessionKeystore gSessionKeystore;
 
 CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, FabricId fabricId)
 {
@@ -132,8 +130,10 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     factoryParams.listenPort               = commissionerPort;
     factoryParams.fabricIndependentStorage = &gServerStorage;
     factoryParams.fabricTable              = &Server::GetInstance().GetFabricTable();
+    factoryParams.sessionKeystore          = &gSessionKeystore;
 
     gGroupDataProvider.SetStorageDelegate(&gServerStorage);
+    gGroupDataProvider.SetSessionKeystore(factoryParams.sessionKeystore);
     ReturnErrorOnFailure(gGroupDataProvider.Init());
     factoryParams.groupDataProvider = &gGroupDataProvider;
 
@@ -171,7 +171,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
 
     Crypto::P256Keypair ephemeralKey;
-    ReturnErrorOnFailure(ephemeralKey.Initialize());
+    ReturnErrorOnFailure(ephemeralKey.Initialize(Crypto::ECPKeyTarget::ECDSA));
 
     ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, chip::kUndefinedCATs,
                                                                         ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
@@ -248,11 +248,12 @@ public:
     void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) override;
 
     void OnReadCommissioningInfo(const ReadCommissioningInfo & info) override;
+    void OnFabricCheck(NodeId matchingNodeId) override;
 
 private:
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
-                                    chip::SessionHandle & sessionHandle);
+                                    const chip::SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
@@ -272,9 +273,6 @@ void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
         break;
     case DevicePairingDelegate::Status::SecurePairingFailed:
         ChipLogError(AppServer, "Secure Pairing Failed");
-        break;
-    case DevicePairingDelegate::Status::SecurePairingDiscoveringMoreDevices:
-        ChipLogProgress(AppServer, "Secure Pairing Discovering More Device");
         break;
     }
 }
@@ -347,17 +345,21 @@ void PairingCommand::OnReadCommissioningInfo(const ReadCommissioningInfo & info)
 {
     ChipLogProgress(AppServer, "OnReadCommissioningInfo - vendorId=0x%04X productId=0x%04X", info.basic.vendorId,
                     info.basic.productId);
+}
 
-    if (info.nodeId != kUndefinedNodeId)
+void PairingCommand::OnFabricCheck(NodeId matchingNodeId)
+{
+    if (matchingNodeId != kUndefinedNodeId)
     {
-        ChipLogProgress(AppServer, "ALREADY ON FABRIC WITH nodeId=0x" ChipLogFormatX64, ChipLogValueX64(info.nodeId));
+        ChipLogProgress(AppServer, "ALREADY ON FABRIC WITH nodeId=0x" ChipLogFormatX64, ChipLogValueX64(matchingNodeId));
         // wait until attestation verification before cancelling so we can validate vid/pid
     }
 }
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-void PairingCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+void PairingCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                         const SessionHandle & sessionHandle)
 {
     ChipLogProgress(Controller, "OnDeviceConnectedFn");
     CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();

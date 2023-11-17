@@ -93,7 +93,7 @@ CHIP_ERROR DataVersionFilterIB::Parser::PrettyPrint() const
 CHIP_ERROR DataVersionFilterIB::Parser::GetPath(ClusterPathIB::Parser * const apPath) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kPath)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kPath), reader));
     return apPath->Init(reader);
 }
 
@@ -116,15 +116,15 @@ DataVersionFilterIB::Builder & DataVersionFilterIB::Builder::DataVersion(const c
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kDataVersion)), aDataVersion);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kDataVersion), aDataVersion);
     }
     return *this;
 }
 
-DataVersionFilterIB::Builder & DataVersionFilterIB::Builder::EndOfDataVersionFilterIB()
+CHIP_ERROR DataVersionFilterIB::Builder::EndOfDataVersionFilterIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

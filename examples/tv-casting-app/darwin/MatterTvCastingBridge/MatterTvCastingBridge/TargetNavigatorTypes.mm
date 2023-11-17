@@ -19,9 +19,9 @@
 
 #import "TargetNavigatorTypes.h"
 
-@implementation TargetNavigator_TargetInfo
+@implementation TargetNavigator_TargetInfoStruct
 
-- (TargetNavigator_TargetInfo * _Nonnull)initWithIdentifier:(NSNumber * _Nonnull)identifier name:(NSString * _Nonnull)name
+- (TargetNavigator_TargetInfoStruct * _Nonnull)initWithIdentifier:(NSNumber * _Nonnull)identifier name:(NSString * _Nonnull)name
 {
     self = [super init];
     if (self) {
@@ -33,11 +33,11 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"TargetNavigator_TargetInfo: identifier=%@ name=%@", _identifier, _name];
+    return [NSString stringWithFormat:@"TargetNavigator_TargetInfoStruct: identifier=%@ name=%@", _identifier, _name];
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    return [[TargetNavigator_TargetInfo alloc] initWithIdentifier:_identifier name:_name];
+    return [[TargetNavigator_TargetInfoStruct alloc] initWithIdentifier:_identifier name:_name];
 }
 @end

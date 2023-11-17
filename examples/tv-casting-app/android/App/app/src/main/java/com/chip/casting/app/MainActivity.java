@@ -1,16 +1,16 @@
 package com.chip.casting.app;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import com.chip.casting.AppParameters;
-import com.chip.casting.DACProviderStub;
 import com.chip.casting.DiscoveredNodeData;
 import com.chip.casting.TvCastingApp;
 import com.chip.casting.util.GlobalCastingConstants;
+import com.chip.casting.util.PreferencesConfigurationManager;
+import com.matter.casting.InitializationExample;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity
@@ -27,7 +27,14 @@ public class MainActivity extends AppCompatActivity
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    initJni();
+    boolean ret =
+        GlobalCastingConstants.ChipCastingSimplified
+            ? InitializationExample.initAndStart(this.getApplicationContext()).hasNoError()
+            : initJni();
+    if (!ret) {
+      Log.e(TAG, "Failed to initialize Matter TV casting library");
+      return;
+    }
 
     Fragment fragment = CommissionerDiscoveryFragment.newInstance(tvCastingApp);
     getSupportFragmentManager()
@@ -52,6 +59,11 @@ public class MainActivity extends AppCompatActivity
   }
 
   @Override
+  public void handleCertTestLauncherSelected() {
+    showFragment(CertTestFragment.newInstance(tvCastingApp));
+  }
+
+  @Override
   public void handleMediaPlaybackSelected() {
     showFragment(MediaPlaybackFragment.newInstance(tvCastingApp));
   }
@@ -66,20 +78,22 @@ public class MainActivity extends AppCompatActivity
    * AndroidChipPlatform to prepare platform, then start ChipAppServer, then call init on
    * TvCastingApp
    */
-  private void initJni() {
-    tvCastingApp = new TvCastingApp();
+  private boolean initJni() {
+    tvCastingApp = TvCastingApp.getInstance();
 
-    Context applicationContext = this.getApplicationContext();
+    tvCastingApp.setDACProvider(new com.chip.casting.util.DACProviderStub());
 
     AppParameters appParameters = new AppParameters();
+    appParameters.setConfigurationManager(
+        new PreferencesConfigurationManager(
+            this.getApplicationContext(), "chip.platform.ConfigurationManager"));
     byte[] rotatingDeviceIdUniqueId =
         new byte[AppParameters.MIN_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH];
     new Random().nextBytes(rotatingDeviceIdUniqueId);
     appParameters.setRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueId);
-    appParameters.setDacProvider(new DACProviderStub());
     appParameters.setSetupPasscode(GlobalCastingConstants.SetupPasscode);
     appParameters.setDiscriminator(GlobalCastingConstants.Discriminator);
-    tvCastingApp.initApp(applicationContext, appParameters);
+    return tvCastingApp.initApp(this.getApplicationContext(), appParameters);
   }
 
   private void showFragment(Fragment fragment, boolean showOnBack) {

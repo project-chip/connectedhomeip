@@ -729,7 +729,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         DnssdService result = {};
 
         result.mAddress.SetValue(chip::Inet::IPAddress());
-        ChipLogError(DeviceLayer, "Avahi resolve found");
+        ChipLogProgress(DeviceLayer, "Avahi resolve found");
 
         Platform::CopyString(result.mName, name);
         CopyTypeWithoutProtocol(result.mType, type);
@@ -868,6 +868,8 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
     return MdnsAvahi::GetInstance().Resolve(browseResult->mName, browseResult->mType, browseResult->mProtocol,
                                             browseResult->mAddressType, Inet::IPAddressType::kAny, interface, callback, context);
 }
+
+void ChipDnssdResolveNoLongerNeeded(const char * instanceName) {}
 
 CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
 {

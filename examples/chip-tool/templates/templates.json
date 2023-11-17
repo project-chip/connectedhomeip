@@ -21,6 +21,22 @@
         {
             "name": "cluster_header",
             "path": "../../../src/app/zap-templates/partials/cluster_header.zapt"
+        },
+        {
+            "name": "struct_parser_decl",
+            "path": "partials/StructParserDecl.zapt"
+        },
+        {
+            "name": "struct_parser_impl",
+            "path": "partials/StructParserImpl.zapt"
+        },
+        {
+            "name": "struct_logger_decl",
+            "path": "partials/StructLoggerDecl.zapt"
+        },
+        {
+            "name": "struct_logger_impl",
+            "path": "partials/StructLoggerImpl.zapt"
         }
     ],
     "templates": [

@@ -19,8 +19,8 @@
 #include "system/SystemClock.h"
 
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {
@@ -48,7 +48,8 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
 
     ReturnErrorOnFailure(mFabricTable.Init(initParams));
 
-    ReturnErrorOnFailure(mSessionManager.Init(&GetSystemLayer(), transport, &mMessageCounterManager, &mStorage, &mFabricTable));
+    ReturnErrorOnFailure(
+        mSessionManager.Init(&GetSystemLayer(), transport, &mMessageCounterManager, &mStorage, &mFabricTable, mSessionKeystore));
 
     ReturnErrorOnFailure(mExchangeManager.Init(&mSessionManager));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
@@ -162,10 +163,24 @@ CHIP_ERROR MessagingContext::CreateSessionBobToAlice()
                                                         mBobFabricIndex, mAliceAddress, CryptoContext::SessionRole::kInitiator);
 }
 
+CHIP_ERROR MessagingContext::CreateCASESessionBobToAlice()
+{
+    return mSessionManager.InjectCaseSessionWithTestKey(mSessionBobToAlice, kBobKeyId, kAliceKeyId, GetBobFabric()->GetNodeId(),
+                                                        GetAliceFabric()->GetNodeId(), mBobFabricIndex, mAliceAddress,
+                                                        CryptoContext::SessionRole::kInitiator);
+}
+
 CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
 {
     return mSessionManager.InjectPaseSessionWithTestKey(mSessionAliceToBob, kAliceKeyId, GetBobFabric()->GetNodeId(), kBobKeyId,
                                                         mAliceFabricIndex, mBobAddress, CryptoContext::SessionRole::kResponder);
+}
+
+CHIP_ERROR MessagingContext::CreateCASESessionAliceToBob()
+{
+    return mSessionManager.InjectCaseSessionWithTestKey(mSessionAliceToBob, kAliceKeyId, kBobKeyId, GetAliceFabric()->GetNodeId(),
+                                                        GetBobFabric()->GetNodeId(), mAliceFabricIndex, mBobAddress,
+                                                        CryptoContext::SessionRole::kResponder);
 }
 
 CHIP_ERROR MessagingContext::CreatePASESessionCharlieToDavid()

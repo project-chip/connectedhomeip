@@ -30,6 +30,11 @@ void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, Res
                                     const ResponseConfiguration & configuration)
 {
 #if INET_CONFIG_ENABLE_IPV4
+    if (!delegate->ShouldSend(*this))
+    {
+        return;
+    }
+
     chip::Inet::IPAddress addr;
     UniquePtr<IpAddressIterator> ips =
         GetAddressPolicy()->GetIpAddressesForEndpoint(source->Interface, chip::Inet::IPAddressType::kIPv4);
@@ -40,15 +45,24 @@ void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, Res
         assert(addr.IsIPv4());
 
         IPResourceRecord record(GetQName(), addr);
+        // We're the only thing around with our hostname, so we should set the
+        // cache-flush bit.
+        record.SetCacheFlush(true);
         configuration.Adjust(record);
         delegate->AddResponse(record);
     }
+    delegate->ResponsesAdded(*this);
 #endif
 }
 
 void IPv6Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                                     const ResponseConfiguration & configuration)
 {
+    if (!delegate->ShouldSend(*this))
+    {
+        return;
+    }
+
     chip::Inet::IPAddress addr;
     UniquePtr<IpAddressIterator> ips =
         GetAddressPolicy()->GetIpAddressesForEndpoint(source->Interface, chip::Inet::IPAddressType::kIPv6);
@@ -59,9 +73,13 @@ void IPv6Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, Res
         assert(addr.IsIPv6());
 
         IPResourceRecord record(GetQName(), addr);
+        // We're the only thing around with our hostname, so we should set the
+        // cache-flush bit.
+        record.SetCacheFlush(true);
         configuration.Adjust(record);
         delegate->AddResponse(record);
     }
+    delegate->ResponsesAdded(*this);
 }
 
 } // namespace Minimal

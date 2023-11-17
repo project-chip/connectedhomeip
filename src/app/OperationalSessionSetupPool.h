@@ -20,15 +20,15 @@
 #include <app/CASESessionManager.h>
 #include <app/OperationalSessionSetup.h>
 #include <lib/support/Pool.h>
-#include <transport/SessionHandle.h>
+#include <transport/Session.h>
 
 namespace chip {
 
 class OperationalSessionSetupPoolDelegate
 {
 public:
-    virtual OperationalSessionSetup * Allocate(DeviceProxyInitParams & params, ScopedNodeId peerId,
-                                               OperationalSessionReleaseDelegate * releaseDelegate) = 0;
+    virtual OperationalSessionSetup * Allocate(const CASEClientInitParams & params, CASEClientPoolDelegate * clientPool,
+                                               ScopedNodeId peerId, OperationalSessionReleaseDelegate * releaseDelegate) = 0;
 
     virtual void Release(OperationalSessionSetup * device) = 0;
 
@@ -47,10 +47,10 @@ class OperationalSessionSetupPool : public OperationalSessionSetupPoolDelegate
 public:
     ~OperationalSessionSetupPool() override { mSessionSetupPool.ReleaseAll(); }
 
-    OperationalSessionSetup * Allocate(DeviceProxyInitParams & params, ScopedNodeId peerId,
-                                       OperationalSessionReleaseDelegate * releaseDelegate) override
+    OperationalSessionSetup * Allocate(const CASEClientInitParams & params, CASEClientPoolDelegate * clientPool,
+                                       ScopedNodeId peerId, OperationalSessionReleaseDelegate * releaseDelegate) override
     {
-        return mSessionSetupPool.CreateObject(params, peerId, releaseDelegate);
+        return mSessionSetupPool.CreateObject(params, clientPool, peerId, releaseDelegate);
     }
 
     void Release(OperationalSessionSetup * device) override { mSessionSetupPool.ReleaseObject(device); }

@@ -14,50 +14,89 @@ cluster requests to a Matter device
 
 <hr>
 
-<a name="requirements"></a>
-
 ## Requirements for building
 
-You need Android SDK 21 & NDK 21.4.7075529 downloaded to your machine. Set the
-`$ANDROID_HOME` environment variable to where the SDK is downloaded and the
-`$ANDROID_NDK_HOME` environment variable to point to where the NDK package is
-downloaded.
+You need to have the following two software installed on your Ubuntu system:
 
-1. Install [Android Studio](https://developer.android.com/studio)
-2. Install NDK:
-    1. Tools -> SDK Manager -> SDK Tools Tab
-    2. Click [x] Show Package Details
-    3. Select NDK (Side by Side) -> 21.4.7075529
-    4. Apply
-3. Install Command Line Tools:
-    1. Tools -> SDK Manager -> SDK Tools Tab -> Android SDK Command Line Tools
-       (latest)
-    2. Apply
-4. Install SDK 21:
-    1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 5.0 (Lollipop) SDK
-       Level 21
-    2. Apply
-5. Install Emulator:
-    1. Tools -> Device Manager -> Create device -> Pixel 5 -> Android S API 31
-       -> Download
+1. Java Runtime Environment (JRE)
+2. Java Development Kit (JDK)
+
+```shell
+java -version
+```
+
+This will ensure either Java Runtime Environment is already installed on your
+system or not. In order to install the Java Runtime Environment on your system,
+run the following command as root:
+
+```
+sudo apt install default-jre Install Java default JRE
+```
+
+After installing the JRE, let us check if we have the Java Development Kit
+installed on our system or not.
+
+```shell
+javac -version
+```
+
+The above output shows that I need to install the Java compiler or the JDK on my
+system. You can install it through the following command as root:
+
+```shell
+sudo apt install default-jdk
+```
+
+You also need to install kotlin compiler on your Ubuntu system:
+
+kotlin compiler version 1.8.10 or above is needed to compile
+java-matter-controller, if you already have lower version kotlin compiler
+installed on your Ubuntu from apt,  
+you need to remove the Kotlin compiler package, run the following command:
+
+```shell
+sudo apt-get remove kotlin
+```
+
+Wait for the removal process to complete. Once it's done, the Kotlin compiler
+will be removed from your system.
+
+(Optional) If you want to remove any configuration files associated with Kotlin,
+run the following command:
+
+```shell
+sudo apt-get purge kotlin
+```
+
+Install kotlin compiler 1.8.10 or above, such as
+[kotlin-compiler-1.8.10-url](https://github.com/JetBrains/kotlin/releases/download/v1.8.10/kotlin-compiler-1.8.10.zip)
+
+```shell
+cd /usr/lib \
+&& sudo wget -q [kotlin-compiler-1.8.10-url] \
+&& sudo unzip kotlin-compiler-*.zip \
+&& sudo rm kotlin-compiler-*.zip \
+&& sudo rm -f kotlinc/bin/*.bat
+```
+
+Add a directory to PATH permanently by editing the `.bashrc` file located in the
+Home directory. Follow these steps:
+
+1. Open the `.bashrc` file using a text editor.
+2. Go to the end of the file.
+3. Paste the export syntax at the end of the file.
+
+```shell
+export PATH="/usr/lib/kotlinc/bin:$PATH"
+```
 
 ### Linux
 
-```
-export ANDROID_HOME=~/Android/Sdk
-export ANDROID_NDK_HOME=~/Android/Sdk/ndk/21.4.7075529
-```
-
-### MacOS
-
-```
-export ANDROID_HOME=~/Library/Android/sdk
-export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/21.4.7075529
+```shell
+export JAVA_PATH=[JDK path]
 ```
 
 <hr>
-
-<a name="preparing"></a>
 
 ## Preparing for build
 
@@ -71,16 +110,20 @@ Complete the following steps to prepare the Matter build:
     source scripts/bootstrap.sh
     ```
 
-<a name="building-running"></a>
-
 ## Building & Running the app
 
 This is the simplest option. In the command line, run the following command from
 the top Matter directory:
 
 ```shell
-./scripts/build/build_examples.py --target android-x86-java-matter-controller build
+./scripts/build/build_examples.py --target linux-x64-java-matter-controller build
 ```
 
 The Java executable file `java-matter-controller` will be generated at
 `out/android-x86-java-matter-controller/bin/`
+
+Run the java-matter-controller
+
+```shell
+java -Djava.library.path=../lib/jni -jar java-matter-controller
+```

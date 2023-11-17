@@ -27,9 +27,6 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 #include <lib/support/Base64.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
@@ -47,7 +44,7 @@ namespace chip {
 extern const char * kSpake2pI2RSessionInfo;
 extern const char * kSpake2pR2ISessionInfo;
 
-constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
+inline constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
 
 using namespace Crypto;
 
@@ -213,11 +210,7 @@ private:
     // mNextExpectedMsg is set when we are expecting a message.
     Optional<Protocols::SecureChannel::MsgType> mNextExpectedMsg;
 
-#ifdef ENABLE_HSM_SPAKE
-    Spake2pHSM_P256_SHA256_HKDF_HMAC mSpake2p;
-#else
     Spake2p_P256_SHA256_HKDF_HMAC mSpake2p;
-#endif
 
     Spake2pVerifier mPASEVerifier;
 
@@ -246,7 +239,7 @@ protected:
 };
 
 // The following constants are node IDs that test devices and test controllers use.
-constexpr chip::NodeId kTestControllerNodeId = 112233;
-constexpr chip::NodeId kTestDeviceNodeId     = 12344321;
+inline constexpr chip::NodeId kTestControllerNodeId = 112233;
+inline constexpr chip::NodeId kTestDeviceNodeId     = 12344321;
 
 } // namespace chip

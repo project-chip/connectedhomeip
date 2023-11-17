@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="General"/>
+
+  <bitmap name="Feature" type="bitmap32">
+      <cluster code="0x0008"/>
+      <field name="OnOff" mask="0x1"/>
+      <field name="Lighting" mask="0x2"/>
+      <field name="Frequency" mask="0x4"/>
+  </bitmap>
+
+  <enum name="MoveModeEnum" type="enum8">
+    <cluster code="0x0008"/>
+    <item name="Up" value="0x0"/>
+    <item name="Down" value="0x1"/>
+  </enum>
+
+  <enum name="StepModeEnum" type="enum8">
+    <cluster code="0x0008"/>
+    <item name="Up" value="0x0"/>
+    <item name="Down" value="0x1"/>
+  </enum>
+
+  <bitmap name="OptionsBitmap" type="bitmap8">
+    <cluster code="0x0008"/>
+    <field name="ExecuteIfOff" mask="0x1"/>
+    <field name="CoupleColorTempToLevel" mask="0x02"/>
+  </bitmap>
+
+  <cluster>
+    <name>Level Control</name>
+    <domain>General</domain>
+    <description>Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.'</description>
+    <code>0x0008</code>
+    <define>LEVEL_CONTROL_CLUSTER</define>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="5"/>
+
+    <attribute side="server" code="0x0000" define="CURRENT_LEVEL"                 type="int8u"                isNullable="true"           writable="false" default="0x00"   optional="false">CurrentLevel</attribute>
+    <attribute side="server" code="0x0001" define="LEVEL_CONTROL_REMAINING_TIME"  type="int16u"               min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">RemainingTime</attribute>
+    <attribute side="server" code="0x0002" define="MINIMUM_LEVEL"                 type="int8u"                min="0x00"    max="0xFF"    writable="false" default="0x00"   optional="true">MinLevel</attribute>
+    <attribute side="server" code="0x0003" define="MAXIMUM_LEVEL"                 type="int8u"                min="0x00"    max="0xFF"    writable="false" default="0xFE"   optional="true">MaxLevel</attribute>
+    <attribute side="server" code="0x0004" define="CURRENT_FREQUENCY"             type="int16u"               min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">CurrentFrequency</attribute>
+    <attribute side="server" code="0x0005" define="MIN_FREQUENCY"                 type="int16u"               min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">MinFrequency</attribute>
+    <attribute side="server" code="0x0006" define="MAX_FREQUENCY"                 type="int16u"               min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">MaxFrequency</attribute>
+    
+    <attribute side="server" code="0x0010" define="ON_OFF_TRANSITION_TIME"        type="int16u"                                         writable="true"  default="0x0000"   optional="true">OnOffTransitionTime</attribute>
+    <attribute side="server" code="0x0011" define="ON_LEVEL"                      type="int8u"                isNullable="true"         writable="true"                     optional="false">OnLevel</attribute>
+    <attribute side="server" code="0x0012" define="ON_TRANSITION_TIME"            type="int16u"               isNullable="true"         writable="true"                     optional="true">OnTransitionTime</attribute>
+    <attribute side="server" code="0x0013" define="OFF_TRANSITION_TIME"           type="int16u"               isNullable="true"         writable="true"                     optional="true">OffTransitionTime</attribute>
+    <attribute side="server" code="0x0014" define="DEFAULT_MOVE_RATE"             type="int8u"                isNullable="true"         writable="true"                     optional="true">DefaultMoveRate</attribute>
+    <attribute side="server" code="0x000F" define="OPTIONS"                       type="OptionsBitmap"  min="0x00" max="0x03"     writable="true"  default="0x00"     optional="false">Options</attribute>
+    <attribute side="server" code="0x4000" define="START_UP_CURRENT_LEVEL"        type="int8u"                isNullable="true"         writable="true"                     optional="true">
+      <description>StartUpCurrentLevel</description>
+      <access op="read" role="view"/>
+      <access op="write" role="manage"/>
+    </attribute>
+
+    <command source="client" code="0x00" name="MoveToLevel" optional="false" cli="zcl level-control mv-to-level">
+      <description>
+        Command description for MoveToLevel
+      </description>
+      <arg name="Level"           type="int8u"/>
+      <arg name="TransitionTime"  type="int16u" isNullable="true"/>
+      <arg name="OptionsMask"     type="OptionsBitmap"/>
+      <arg name="OptionsOverride" type="OptionsBitmap"/>
+    </command>
+
+    <command source="client" code="0x01" name="Move" optional="false" cli="zcl level-control move">
+      <description>
+        Command description for Move
+      </description>
+      <arg name="MoveMode" type="MoveModeEnum"/>
+      <arg name="Rate" type="int8u" isNullable="true"/>
+      <arg name="OptionsMask" type="OptionsBitmap"/>
+      <arg name="OptionsOverride" type="OptionsBitmap"/>
+    </command>
+
+    <command source="client" code="0x02" name="Step" optional="false" cli="zcl level-control step">
+      <description>
+        Command description for Step
+      </description>
+      <arg name="StepMode" type="StepModeEnum"/>
+      <arg name="StepSize" type="int8u"/>
+      <arg name="TransitionTime" type="int16u" isNullable="true"/>
+      <arg name="OptionsMask" type="OptionsBitmap"/>
+      <arg name="OptionsOverride" type="OptionsBitmap"/>
+    </command>
+
+    <command source="client" code="0x03" name="Stop" optional="false" cli="zcl level-control stop">
+      <description>
+        Command description for Stop
+      </description>
+      <arg name="OptionsMask" type="OptionsBitmap"/>
+      <arg name="OptionsOverride" type="OptionsBitmap"/>
+    </command>
+
+    <command source="client" code="0x04" name="MoveToLevelWithOnOff" optional="false" cli="zcl level-control o-mv-to-level">
+      <description>
+        Command description for MoveToLevelWithOnOff
+      </description>
+      <arg name="Level"           type="int8u"/>
+      <arg name="TransitionTime"  type="int16u" isNullable="true"/>
+      <arg name="OptionsMask"     type="OptionsBitmap"/>
+      <arg name="OptionsOverride" type="OptionsBitmap"/>
+    </command>
+
+    <command source="client" code="0x05" name="MoveWithOnOff" optional="false" cli="zcl level-control o-move">
+      <description>
+        Command description for MoveWithOnOff
+      </description>
+      <arg name="MoveMode" type="MoveModeEnum"/>
+      <arg name="Rate" type="int8u" isNullable="true"/>
+      <arg name="OptionsMask" type="OptionsBitmap"/>
+      <arg name="OptionsOverride" type="OptionsBitmap"/>
+    </command>
+
+    <command source="client" code="0x06" name="StepWithOnOff" optional="false" cli="zcl level-control o-step">
+      <description>
+        Command description for StepWithOnOff
+      </description>
+      <arg name="StepMode" type="StepModeEnum"/>
+      <arg name="StepSize" type="int8u"/>
+      <arg name="TransitionTime" type="int16u" isNullable="true"/>
+      <arg name="OptionsMask" type="OptionsBitmap"/>
+      <arg name="OptionsOverride" type="OptionsBitmap"/>
+    </command>
+
+    <command source="client" code="0x07" name="StopWithOnOff" optional="false" cli="zcl level-control o-stop">
+      <description>
+        Command description for StopWithOnOff
+      </description>
+      <arg name="OptionsMask" type="OptionsBitmap"/>
+      <arg name="OptionsOverride" type="OptionsBitmap"/>
+    </command>
+
+    <command source="client" code="0x08" name="MoveToClosestFrequency" optional="true">
+      <description>
+        Change the currrent frequency to the provided one, or a close
+        approximation if the exact provided one is not possible.
+      </description>
+      <arg name="Frequency" type="int16u"/>
+    </command>
+  </cluster>
+</configurator>

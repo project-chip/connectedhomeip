@@ -23,10 +23,10 @@
 #include "EventPathIBs.h"
 #include "MessageBuilder.h"
 #include "MessageParser.h"
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -140,7 +140,7 @@ public:
     /**
      *  @brief Mark the end of this SubscribeRequestMessage
      */
-    SubscribeRequestMessage::Builder & EndOfSubscribeRequestMessage();
+    CHIP_ERROR EndOfSubscribeRequestMessage();
 
 private:
     AttributePathIBs::Builder mAttributeRequests;

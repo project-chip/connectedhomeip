@@ -58,6 +58,7 @@ struct FactoryData
     uint32_t passcode;
     struct FactoryDataString enable_key;
     struct FactoryDataString user;
+    struct FactoryDataString certificate_declaration;
 
     bool vendorIdPresent;
     bool productIdPresent;

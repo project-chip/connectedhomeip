@@ -32,9 +32,9 @@ from __future__ import print_function
 
 import json
 import os
+import re
 import subprocess
 import sys
-import re
 from optparse import OptionParser
 
 # This script runs pkg-config, optionally filtering out some results, and
@@ -108,7 +108,7 @@ def MatchesAnyRegexp(flag, list_of_regexps):
     """Returns true if the first argument matches any regular expression in the
     given list."""
     for regexp in list_of_regexps:
-        if regexp.search(flag) != None:
+        if regexp.search(flag) is not None:
             return True
     return False
 
@@ -145,7 +145,7 @@ def main():
 
     # Make a list of regular expressions to strip out.
     strip_out = []
-    if options.strip_out != None:
+    if options.strip_out is not None:
         for regexp in options.strip_out:
             strip_out.append(re.compile(regexp))
 

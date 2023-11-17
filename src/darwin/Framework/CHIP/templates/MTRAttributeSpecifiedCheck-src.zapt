@@ -1,0 +1,47 @@
+{{> header excludeZapComment=true}}
+
+#import "MTRAttributeSpecifiedCheck.h"
+
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+
+using namespace chip;
+using namespace chip::app;
+
+{{#zcl_clusters}}
+{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+static BOOL AttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronyms=true}}Cluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::{{asUpperCamelCase name}};
+    switch (aAttributeId) {
+        {{#zcl_attributes_server}}
+        {{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
+        case Attributes::{{asUpperCamelCase name}}::Id: {
+            return YES;
+        }
+        {{/if}}
+        {{/zcl_attributes_server}}
+        default: {
+            return NO;
+        }
+    }
+}
+{{/if}}
+{{/zcl_clusters}}
+
+BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
+{
+    switch (aClusterId)
+    {
+        {{#zcl_clusters}}
+        {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+        case Clusters::{{asUpperCamelCase name}}::Id: {
+            return AttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronyms=true}}Cluster(aAttributeId);
+        }
+        {{/if}}
+        {{/zcl_clusters}}
+        default: {
+            return NO;
+        }
+    }
+}

@@ -27,7 +27,6 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/LockTracker.h>
 #include <transport/SessionDelegate.h>
-#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace Transport {
@@ -49,10 +48,10 @@ public:
     SessionHandle(Transport::Session & session) : mSession(session) {}
     ~SessionHandle() {}
 
-    SessionHandle(const SessionHandle &) = delete;
+    SessionHandle(const SessionHandle &)           = delete;
     SessionHandle operator=(const SessionHandle &) = delete;
     SessionHandle(SessionHandle &&)                = default;
-    SessionHandle & operator=(SessionHandle &&) = delete;
+    SessionHandle & operator=(SessionHandle &&)    = delete;
 
     bool operator==(const SessionHandle & that) const { return &mSession.Get() == &that.mSession.Get(); }
 
@@ -157,8 +156,6 @@ class UnauthenticatedSession;
 class IncomingGroupSession;
 class OutgoingGroupSession;
 
-constexpr System::Clock::Milliseconds32 kMinActiveTime = System::Clock::Milliseconds32(4000);
-
 class Session
 {
 public:
@@ -222,6 +219,8 @@ public:
 
     bool IsSecureSession() const { return GetSessionType() == SessionType::kSecure; }
 
+    bool IsUnauthenticatedSession() const { return GetSessionType() == SessionType::kUnauthenticated; }
+
     void DispatchSessionEvent(SessionDelegate::Event event)
     {
         // Holders might remove themselves when notified.
@@ -233,6 +232,11 @@ public:
             cur->DispatchSessionEvent(event);
         }
     }
+
+    // Return a session id that is usable for logging. This is the local session
+    // id for secure unicast sessions, 0 for non-secure unicast sessions, and
+    // the group id for group sessions.
+    uint16_t SessionIdForLogging() const;
 
 protected:
     // This should be called by sub-classes at the very beginning of the destructor, before any data field is disposed, such that
@@ -247,6 +251,10 @@ protected:
     }
 
     void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
+
+    const SecureSession * AsConstSecureSession() const;
+    const IncomingGroupSession * AsConstIncomingGroupSession() const;
+    const OutgoingGroupSession * AsConstOutgoingGroupSession() const;
 
     IntrusiveList<SessionHolder> mHolders;
 

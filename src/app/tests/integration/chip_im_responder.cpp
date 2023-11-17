@@ -28,12 +28,16 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/integration/common.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPCounter.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/support/CodeUtils.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -127,6 +131,11 @@ bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
     return true;
 }
 
+Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
+{
+    return Protocols::InteractionModel::Status::Success;
+}
+
 const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
 {
     // Note: This test does not make use of the real attribute metadata.
@@ -177,8 +186,8 @@ CHIP_ERROR InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
         { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
     };
 
-    chip::app::EventManagement::CreateEventManagement(apMgr, sizeof(logStorageResources) / sizeof(logStorageResources[0]),
-                                                      gCircularEventBuffer, logStorageResources, &gEventCounter);
+    chip::app::EventManagement::CreateEventManagement(apMgr, ArraySize(logStorageResources), gCircularEventBuffer,
+                                                      logStorageResources, &gEventCounter);
     return CHIP_NO_ERROR;
 }
 
@@ -197,7 +206,7 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &gMessageCounterManager, &gStorage,
-                               &gFabricTable);
+                               &gFabricTable, gSessionKeystore);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
@@ -206,7 +215,8 @@ int main(int argc, char * argv[])
     err = gMessageCounterManager.Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &gFabricTable);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &gFabricTable,
+                                                                 chip::app::reporting::GetDefaultReportScheduler());
     SuccessOrExit(err);
 
     err = InitializeEventLogging(&gExchangeManager);

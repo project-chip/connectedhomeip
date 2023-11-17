@@ -109,7 +109,7 @@ CHIP_ERROR InvokeRequestMessage::Parser::GetTimedRequest(bool * const apTimedReq
 CHIP_ERROR InvokeRequestMessage::Parser::GetInvokeRequests(InvokeRequests::Parser * const apInvokeRequests) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kInvokeRequests)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kInvokeRequests), reader));
     return apInvokeRequests->Init(reader);
 }
 
@@ -117,7 +117,7 @@ InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::SuppressResponse(
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kSuppressResponse)), aSuppressResponse);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kSuppressResponse), aSuppressResponse);
     }
     return *this;
 }
@@ -126,7 +126,7 @@ InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::TimedRequest(cons
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kTimedRequest)), aTimedRequest);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kTimedRequest), aTimedRequest);
     }
     return *this;
 }
@@ -140,7 +140,7 @@ InvokeRequests::Builder & InvokeRequestMessage::Builder::CreateInvokeRequests()
     return mInvokeRequests;
 }
 
-InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::EndOfInvokeRequestMessage()
+CHIP_ERROR InvokeRequestMessage::Builder::EndOfInvokeRequestMessage()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -150,7 +150,7 @@ InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::EndOfInvokeReques
     {
         EndOfContainer();
     }
-    return *this;
+    return GetError();
 }
 }; // namespace app
 }; // namespace chip

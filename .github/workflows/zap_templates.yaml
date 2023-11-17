@@ -17,35 +17,42 @@ name: ZAP
 on:
     push:
     pull_request:
+    merge_group:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+    
 jobs:
     zap_templates:
         name: ZAP templates generation
-        timeout-minutes: 90
 
         runs-on: ubuntu-20.04
         container:
-            image: connectedhomeip/chip-build:0.6.11
+            image: ghcr.io/project-chip/chip-build:26
         defaults:
             run:
                 shell: sh
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+                platform: linux
+            # Java formatting requires a newer java to run ktfmt
+            # TODO: this should be eventually inside Docker files
+            - name: Update java
+              run: |
+                apt-get update
+                DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing openjdk-17-jre
             - name: Generate all
-              run: scripts/tools/zap_regen_all.py
+              run: ./scripts/run_in_build_env.sh scripts/tools/zap_regen_all.py
             - name: Ensure git works in current working directory
               run: git config --global --add safe.directory `pwd`
             - name: Check for uncommited changes

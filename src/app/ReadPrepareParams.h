@@ -24,7 +24,7 @@
 #include <app/InteractionModelTimeout.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <messaging/ExchangeMgr.h>
 
 namespace chip {

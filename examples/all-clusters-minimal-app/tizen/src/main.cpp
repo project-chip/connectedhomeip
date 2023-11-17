@@ -47,6 +47,8 @@ void ApplicationInit()
     sEthernetNetworkCommissioningInstance.Init();
 }
 
+void ApplicationShutdown(){};
+
 int main(int argc, char * argv[])
 {
     TizenServiceAppMain app;

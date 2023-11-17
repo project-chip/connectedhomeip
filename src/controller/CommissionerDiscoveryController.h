@@ -138,7 +138,8 @@ public:
      *
      */
     virtual void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId,
-                                        chip::Messaging::ExchangeManager & exchangeMgr, chip::SessionHandle & sessionHandle) = 0;
+                                        chip::Messaging::ExchangeManager & exchangeMgr,
+                                        const chip::SessionHandle & sessionHandle) = 0;
 
     virtual ~PostCommissioningListener() = default;
 };
@@ -217,7 +218,7 @@ public:
      *
      */
     void CommissioningSucceeded(uint16_t vendorId, uint16_t productId, NodeId nodeId,
-                                chip::Messaging::ExchangeManager & exchangeMgr, chip::SessionHandle & sessionHandle);
+                                chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
 
     /**
      * This method should be called by the commissioner to indicate that commissioning failed.

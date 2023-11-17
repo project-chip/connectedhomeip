@@ -28,6 +28,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <atomic>
+
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -55,14 +57,58 @@ static void TestPlatformMgr_InitShutdown(nlTestSuite * inSuite, void * inContext
 
 static void TestPlatformMgr_BasicEventLoopTask(nlTestSuite * inSuite, void * inContext)
 {
+    std::atomic<int> counterRun{ 0 };
+
     CHIP_ERROR err = PlatformMgr().InitChipStack();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = PlatformMgr().StartEventLoopTask();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    // Start/stop the event loop task a few times.
+    for (size_t i = 0; i < 3; i++)
+    {
+        err = PlatformMgr().StartEventLoopTask();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = PlatformMgr().StopEventLoopTask();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        std::atomic<int> counterSync{ 2 };
+
+        // Verify that the event loop will not exit until we tell it to by
+        // scheduling few lambdas (for the test to pass, the event loop will
+        // have to process more than one event).
+        DeviceLayer::SystemLayer().ScheduleLambda([&]() {
+            counterRun++;
+            counterSync--;
+        });
+
+        // Sleep for a short time to allow the event loop to process the
+        // scheduled event and go to idle state. Without this sleep, the
+        // event loop may process both scheduled lambdas during single
+        // iteration of the event loop which would defeat the purpose of
+        // this test on POSIX platforms where the event loop is implemented
+        // using a "do { ... } while (shouldRun)" construct.
+        chip::test_utils::SleepMillis(10);
+
+        DeviceLayer::SystemLayer().ScheduleLambda([&]() {
+            counterRun++;
+            counterSync--;
+        });
+
+        // Wait for the event loop to process the scheduled events.
+        // Note, that we can not use any synchronization primitives like
+        // condition variables or barriers, because the test has to compile
+        // on all platforms. Instead we use a busy loop with a timeout.
+        for (size_t t = 0; counterSync != 0 && t < 1000; t++)
+            chip::test_utils::SleepMillis(1);
+
+        err = PlatformMgr().StopEventLoopTask();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        // Sleep for a short time to allow the event loop to stop.
+        // Note, in some platform implementations the event loop thread
+        // is self-terminating. We need time to process the stopping event
+        // inside event loop.
+        chip::test_utils::SleepMillis(10);
+    }
+
+    NL_TEST_ASSERT(inSuite, counterRun == (3 * 2));
 
     PlatformMgr().Shutdown();
 }
@@ -247,7 +293,7 @@ int TestPlatformMgr()
 {
     nlTestSuite theSuite = { "PlatformMgr tests", &sTests[0], TestPlatformMgr_Setup, TestPlatformMgr_Teardown };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

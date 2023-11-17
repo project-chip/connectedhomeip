@@ -44,6 +44,7 @@
 #include "wiced_memory.h"
 #include "wiced_misc_rtos_utils.h"
 #endif
+#include <wiced_sleep.h>
 
 /******************************************************
  *                      Macros
@@ -673,6 +674,28 @@ static button_manager_button_t * get_button(platform_button_t id)
     }
 
     return NULL;
+}
+
+/**
+ * Checks if there is pending event and then re-send the event.
+ *
+ * @return         void : no return value is expected.
+ */
+void wiced_button_manager_pending_event_handle(void)
+{
+    uint32_t a;
+    if (wiced_sleep_get_boot_mode() == WICED_SLEEP_FAST_BOOT)
+    {
+        for (a = 0; a < button_manager->number_of_buttons; a++)
+        {
+            if (platform_button_pending_event_get_and_clear(button_manager->buttons[a].configuration->button))
+            {
+                button_manager->configuration->event_handler(&button_manager->buttons[a], BUTTON_CLICK_EVENT,
+                                                             BUTTON_STATE_RELEASED);
+                break;
+            }
+        }
+    }
 }
 
 #ifdef CYW55572

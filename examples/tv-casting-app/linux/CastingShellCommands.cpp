@@ -20,8 +20,10 @@
  */
 
 #include "CastingShellCommands.h"
+
 #include "CastingServer.h"
 #include "CastingUtils.h"
+#include "app/clusters/bindings/BindingManager.h"
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>

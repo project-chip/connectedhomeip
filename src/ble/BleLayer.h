@@ -92,17 +92,17 @@ typedef enum
     kBleTransportProtocolVersion_V4   = 4 // BTP as defined by CHIP v1.0
 } BleTransportProtocolVersion;
 
-constexpr size_t kCapabilitiesRequestMagicnumLength          = 2;
-constexpr size_t kCapabilitiesRequestL2capMtuLength          = 2;
-constexpr size_t kCapabilitiesRequestSupportedVersionsLength = 4;
-constexpr size_t kCapabilitiesRequestWindowSizeLength        = 1;
+inline constexpr size_t kCapabilitiesRequestMagicnumLength          = 2;
+inline constexpr size_t kCapabilitiesRequestL2capMtuLength          = 2;
+inline constexpr size_t kCapabilitiesRequestSupportedVersionsLength = 4;
+inline constexpr size_t kCapabilitiesRequestWindowSizeLength        = 1;
 constexpr size_t kCapabilitiesRequestLength = (kCapabilitiesRequestMagicnumLength + kCapabilitiesRequestL2capMtuLength +
                                                kCapabilitiesRequestSupportedVersionsLength + kCapabilitiesRequestWindowSizeLength);
 
-constexpr size_t kCapabilitiesResponseMagicnumLength                = 2;
-constexpr size_t kCapabilitiesResponseL2capMtuLength                = 2;
-constexpr size_t kCapabilitiesResponseSelectedProtocolVersionLength = 1;
-constexpr size_t kCapabilitiesResponseWindowSizeLength              = 1;
+inline constexpr size_t kCapabilitiesResponseMagicnumLength                = 2;
+inline constexpr size_t kCapabilitiesResponseL2capMtuLength                = 2;
+inline constexpr size_t kCapabilitiesResponseSelectedProtocolVersionLength = 1;
+inline constexpr size_t kCapabilitiesResponseWindowSizeLength              = 1;
 constexpr size_t kCapabilitiesResponseLength(kCapabilitiesResponseMagicnumLength + kCapabilitiesResponseL2capMtuLength +
                                              kCapabilitiesResponseSelectedProtocolVersionLength +
                                              kCapabilitiesResponseWindowSizeLength);
@@ -249,6 +249,9 @@ public:
     CHIP_ERROR NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState = nullptr,
                                                BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
                                                BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError);
+    CHIP_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj, void * appState,
+                                        BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
+                                        BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError);
     CHIP_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj);
     CHIP_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 

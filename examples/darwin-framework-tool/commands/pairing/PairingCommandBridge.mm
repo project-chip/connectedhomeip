@@ -28,6 +28,24 @@
 using namespace ::chip;
 using namespace ::chip::Controller;
 
+extern NSMutableArray * gDiscoveredDevices;
+
+// A no-op MTRDeviceAttestationDelegate which lets us test (by default, in CI)
+// commissioning flows that have such a delegate.
+@interface NoOpAttestationDelegate : NSObject <MTRDeviceAttestationDelegate>
+@end
+
+@implementation NoOpAttestationDelegate
+- (void)deviceAttestationCompletedForController:(MTRDeviceController *)controller
+                             opaqueDeviceHandle:(void *)opaqueDeviceHandle
+                          attestationDeviceInfo:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
+                                          error:(NSError * _Nullable)error
+{
+    [controller continueCommissioningDevice:opaqueDeviceHandle ignoreAttestationFailure:NO error:nil];
+}
+
+@end
+
 void PairingCommandBridge::SetUpDeviceControllerDelegate()
 {
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
@@ -47,6 +65,17 @@ void PairingCommandBridge::SetUpDeviceControllerDelegate()
     case PairingNetworkType::Thread:
         [params setThreadOperationalDataset:[NSData dataWithBytes:mOperationalDataset.data() length:mOperationalDataset.size()]];
         break;
+    }
+
+    if (mUseDeviceAttestationDelegate.ValueOr(false)) {
+        params.deviceAttestationDelegate = [[NoOpAttestationDelegate alloc] init];
+        if (mDeviceAttestationFailsafeTime.HasValue()) {
+            params.failSafeTimeout = @(mDeviceAttestationFailsafeTime.Value());
+        }
+    }
+
+    if (mCountryCode.HasValue()) {
+        params.countryCode = [NSString stringWithUTF8String:mCountryCode.Value()];
     }
 
     [deviceControllerDelegate setCommandBridge:this];
@@ -69,6 +98,9 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
     case PairingMode::Ble:
         PairWithCode(&error);
         break;
+    case PairingMode::AlreadyDiscoveredByIndex:
+        PairWithIndex(&error);
+        break;
     }
 
     if (error != nil) {
@@ -83,6 +115,29 @@ void PairingCommandBridge::PairWithCode(NSError * __autoreleasing * error)
     auto * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@(mSetupPINCode) discriminator:@(mDiscriminator)];
     MTRDeviceController * commissioner = CurrentCommissioner();
     [commissioner setupCommissioningSessionWithPayload:payload newNodeID:@(mNodeId) error:error];
+}
+
+void PairingCommandBridge::PairWithIndex(NSError * __autoreleasing * error)
+{
+    SetUpDeviceControllerDelegate();
+    MTRDeviceController * commissioner = CurrentCommissioner();
+
+    if (mIndex >= [gDiscoveredDevices count]) {
+        auto errorString = [NSString stringWithFormat:@"Error retrieving discovered device at index %@", @(mIndex)];
+        *error = [[NSError alloc] initWithDomain:@"PairingDomain"
+                                            code:MTRErrorCodeGeneralError
+                                        userInfo:@ { NSLocalizedDescriptionKey : NSLocalizedString(errorString, nil) }];
+        return;
+    }
+
+    NSString * onboardingPayload = [NSString stringWithUTF8String:mOnboardingPayload];
+    auto * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:onboardingPayload error:error];
+    if (payload == nil) {
+        return;
+    }
+
+    auto discoveredDevice = (MTRCommissionableBrowserResult *) gDiscoveredDevices[mIndex];
+    [commissioner setupCommissioningSessionWithDiscoveredDevice:discoveredDevice payload:payload newNodeID:@(mNodeId) error:error];
 }
 
 void PairingCommandBridge::PairWithPayload(NSError * __autoreleasing * error)

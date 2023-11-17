@@ -34,8 +34,8 @@ struct InternalFlashFactoryData
 {
     CHIP_ERROR GetFactoryDataPartition(uint8_t *& data, size_t & dataSize)
     {
-        data     = reinterpret_cast<uint8_t *>(FLASH_AREA_OFFSET(factory_data));
-        dataSize = FLASH_AREA_SIZE(factory_data);
+        data     = reinterpret_cast<uint8_t *>(FIXED_PARTITION_OFFSET(factory_partition));
+        dataSize = FIXED_PARTITION_SIZE(factory_partition);
         return CHIP_NO_ERROR;
     }
 
@@ -46,7 +46,8 @@ struct ExternalFlashFactoryData
 {
     CHIP_ERROR GetFactoryDataPartition(uint8_t *& data, size_t & dataSize)
     {
-        int ret = flash_read(mFlashDevice, FLASH_AREA_OFFSET(factory_data), mFactoryDataBuffer, FLASH_AREA_SIZE(factory_data));
+        int ret = flash_read(mFlashDevice, FIXED_PARTITION_OFFSET(factory_partition), mFactoryDataBuffer,
+                             FIXED_PARTITION_SIZE(factory_partition));
 
         if (ret != 0)
         {
@@ -54,7 +55,7 @@ struct ExternalFlashFactoryData
         }
 
         data     = mFactoryDataBuffer;
-        dataSize = FLASH_AREA_SIZE(factory_data);
+        dataSize = FIXED_PARTITION_SIZE(factory_partition);
 
         return CHIP_NO_ERROR;
     }
@@ -62,7 +63,7 @@ struct ExternalFlashFactoryData
     CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     const struct device * mFlashDevice = DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
-    uint8_t mFactoryDataBuffer[FLASH_AREA_SIZE(factory_data)];
+    uint8_t mFactoryDataBuffer[FIXED_PARTITION_SIZE(factory_partition)];
 };
 
 template <class FlashFactoryData>
@@ -107,8 +108,8 @@ public:
     CHIP_ERROR GetEnableKey(MutableByteSpan & enableKey);
 
 private:
-    static constexpr uint16_t kFactoryDataPartitionSize    = FLASH_AREA_SIZE(factory_data);
-    static constexpr uint32_t kFactoryDataPartitionAddress = FLASH_AREA_OFFSET(factory_data);
+    static constexpr uint16_t kFactoryDataPartitionSize    = FIXED_PARTITION_SIZE(factory_partition);
+    static constexpr uint32_t kFactoryDataPartitionAddress = FIXED_PARTITION_OFFSET(factory_partition);
     static constexpr uint8_t kDACPrivateKeyLength          = 32;
     static constexpr uint8_t kDACPublicKeyLength           = 65;
 

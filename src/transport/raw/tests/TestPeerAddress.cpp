@@ -124,7 +124,7 @@ const nlTest sTests[] =
 
 } // namespace
 
-int TestPeerAddress(void)
+int TestPeerAddress()
 {
     // clang-format off
     nlTestSuite theSuite =

@@ -34,6 +34,7 @@
 #include <credentials/GroupDataProvider.h>
 #include <credentials/OperationalCertificateStore.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <protocols/secure_channel/SessionResumptionStorage.h>
 
 namespace chip {
 
@@ -90,24 +91,38 @@ struct SetupParams
     //
     bool enableServerInteractions = false;
 
+    /**
+     * Controls whether shutdown of the controller removes the corresponding
+     * entry from the fabric table.  For now the removal is just from the
+     * in-memory table, not from storage, which means that after controller
+     * shutdown the storage and the in-memory fabric table will be out of sync.
+     * This is acceptable for implementations that don't actually store any of
+     * the fabric table information, but if someone wants a true removal at some
+     * point another option will need to be added here.
+     */
+    bool removeFromFabricTableOnShutdown = true;
+
     Credentials::DeviceAttestationVerifier * deviceAttestationVerifier = nullptr;
     CommissioningDelegate * defaultCommissioner                        = nullptr;
 };
 
-// TODO everything other than the fabric storage, group data provider, OperationalKeystore
-// and OperationalCertificateStore here should be removed. We're blocked because of the
-// need to support !CHIP_DEVICE_LAYER
+// TODO everything other than the fabric storage, group data provider, OperationalKeystore,
+// OperationalCertificateStore, SessionKeystore, and SessionResumptionStorage here should
+// be removed. We're blocked because of the need to support !CHIP_DEVICE_LAYER
 struct FactoryInitParams
 {
     System::Layer * systemLayer                                        = nullptr;
     PersistentStorageDelegate * fabricIndependentStorage               = nullptr;
     Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
     Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
+    app::reporting::ReportScheduler::TimerDelegate * timerDelegate     = nullptr;
+    Crypto::SessionKeystore * sessionKeystore                          = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager      = nullptr;
     FabricTable * fabricTable                                          = nullptr;
     OperationalKeystore * operationalKeystore                          = nullptr;
     Credentials::OperationalCertificateStore * opCertStore             = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage                = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -154,7 +169,7 @@ public:
 
     ~DeviceControllerFactory();
     DeviceControllerFactory(DeviceControllerFactory const &) = delete;
-    void operator=(DeviceControllerFactory const &) = delete;
+    void operator=(DeviceControllerFactory const &)          = delete;
 
     //
     // Some clients do not prefer a complete shutdown of the stack being initiated if
@@ -162,7 +177,7 @@ public:
     // created to permit retention of the underlying system state.
     //
     // NB: The system state will still be freed in Shutdown() regardless of this call.
-    void RetainSystemState() { (void) mSystemState->Retain(); }
+    void RetainSystemState();
 
     //
     // To initiate shutdown of the stack upon termination of all resident controllers in the
@@ -171,7 +186,7 @@ public:
     //
     // This should only be invoked if a matching call to RetainSystemState() was called prior.
     //
-    void ReleaseSystemState() { mSystemState->Release(); }
+    void ReleaseSystemState();
 
     //
     // Retrieve a read-only pointer to the system state object that contains pointers to key stack
@@ -237,13 +252,16 @@ private:
     void PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params);
     CHIP_ERROR InitSystemState(FactoryInitParams params);
     CHIP_ERROR InitSystemState();
+    void ControllerInitialized(const DeviceController & controller);
 
     uint16_t mListenPort;
-    DeviceControllerSystemState * mSystemState              = nullptr;
-    PersistentStorageDelegate * mFabricIndependentStorage   = nullptr;
-    Crypto::OperationalKeystore * mOperationalKeystore      = nullptr;
-    Credentials::OperationalCertificateStore * mOpCertStore = nullptr;
-    bool mEnableServerInteractions                          = false;
+    DeviceControllerSystemState * mSystemState                          = nullptr;
+    PersistentStorageDelegate * mFabricIndependentStorage               = nullptr;
+    Crypto::OperationalKeystore * mOperationalKeystore                  = nullptr;
+    Credentials::OperationalCertificateStore * mOpCertStore             = nullptr;
+    Credentials::CertificateValidityPolicy * mCertificateValidityPolicy = nullptr;
+    SessionResumptionStorage * mSessionResumptionStorage                = nullptr;
+    bool mEnableServerInteractions                                      = false;
 };
 
 } // namespace Controller

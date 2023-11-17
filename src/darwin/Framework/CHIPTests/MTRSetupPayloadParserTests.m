@@ -250,4 +250,29 @@
     XCTAssertEqualObjects(payload.setUpPINCode, @(2));
 }
 
+- (void)testSerialNumberRoundTrip
+{
+    NSError * error;
+    MTRSetupPayload * payload =
+        [MTRSetupPayload setupPayloadWithOnboardingPayload:@"MT:M5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0"
+                                                     error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(payload);
+
+    XCTAssertEqualObjects(payload.serialNumber, @"123456789");
+
+    NSString * serialNumber = @"12345";
+    payload.serialNumber = serialNumber;
+
+    NSString * qrCode = [payload qrCodeString:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(qrCode);
+
+    MTRSetupPayload * newPayload = [MTRSetupPayload setupPayloadWithOnboardingPayload:qrCode error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(newPayload);
+
+    XCTAssertEqualObjects(newPayload.serialNumber, serialNumber);
+}
+
 @end

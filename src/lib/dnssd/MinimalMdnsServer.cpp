@@ -62,7 +62,7 @@ GlobalMinimalMdnsServer & GlobalMinimalMdnsServer::Instance()
 CHIP_ERROR GlobalMinimalMdnsServer::StartServer(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
                                                 uint16_t port)
 {
-    GlobalMinimalMdnsServer::Server().Shutdown();
+    GlobalMinimalMdnsServer::Server().ShutdownEndpoints();
 
     UniquePtr<ListenIterator> endpoints = GetAddressPolicy()->GetListenEndpoints();
 

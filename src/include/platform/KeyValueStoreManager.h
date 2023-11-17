@@ -30,7 +30,7 @@
 #include <type_traits>
 
 #include <lib/core/CHIPError.h>
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -179,8 +179,8 @@ protected:
     ~KeyValueStoreManager() = default;
 
     // No copy, move or assignment.
-    KeyValueStoreManager(const KeyValueStoreManager &)  = delete;
-    KeyValueStoreManager(const KeyValueStoreManager &&) = delete;
+    KeyValueStoreManager(const KeyValueStoreManager &)             = delete;
+    KeyValueStoreManager(const KeyValueStoreManager &&)            = delete;
     KeyValueStoreManager & operator=(const KeyValueStoreManager &) = delete;
 };
 

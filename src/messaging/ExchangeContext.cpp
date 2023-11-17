@@ -32,6 +32,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include <app/icd/ICDNotifier.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPKeyIds.h>
@@ -45,10 +46,6 @@
 #include <platform/LockTracker.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
-
-#if CONFIG_DEVICE_LAYER
-#include <platform/CHIPDeviceLayer.h>
-#endif
 
 using namespace chip::Encoding;
 using namespace chip::Inet;
@@ -79,6 +76,7 @@ bool ExchangeContext::IsResponseExpected() const
 void ExchangeContext::SetResponseExpected(bool inResponseExpected)
 {
     mFlags.Set(Flags::kFlagResponseExpected, inResponseExpected);
+    SetWaitingForResponseOrAck(inResponseExpected);
 }
 
 void ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout)
@@ -90,45 +88,6 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 {
     mResponseTimeout = timeout;
 }
-
-#if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
-void ExchangeContext::UpdateSEDIntervalMode()
-{
-    if (!HasSessionHandle())
-    {
-        // After the session has been deleted, no further communication can occur on the exchange,
-        // so withdraw a SED active mode request.
-        UpdateSEDIntervalMode(false);
-        return;
-    }
-
-    Transport::PeerAddress address;
-
-    switch (GetSessionHandle()->GetSessionType())
-    {
-    case Transport::Session::SessionType::kSecure:
-        address = GetSessionHandle()->AsSecureSession()->GetPeerAddress();
-        break;
-    case Transport::Session::SessionType::kUnauthenticated:
-        address = GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
-        break;
-    default:
-        return;
-    }
-
-    VerifyOrReturn(address.GetTransportType() != Transport::Type::kBle);
-    UpdateSEDIntervalMode(IsResponseExpected() || IsSendExpected() || IsMessageNotAcked());
-}
-
-void ExchangeContext::UpdateSEDIntervalMode(bool activeMode)
-{
-    if (activeMode != IsRequestingActiveMode())
-    {
-        SetRequestingActiveMode(activeMode);
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(activeMode);
-    }
-}
-#endif
 
 CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && msgBuf,
                                         const SendFlags & sendFlags)
@@ -156,6 +115,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     bool reliableTransmissionRequested =
         GetSessionHandle()->RequireMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) && !IsGroupExchangeContext();
 
+    bool currentMessageExpectResponse = false;
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse) && !IsGroupExchangeContext())
     {
@@ -177,6 +137,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
                 SetResponseExpected(false);
                 return err;
             }
+            currentMessageExpectResponse = true;
         }
     }
 
@@ -201,6 +162,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
             return CHIP_ERROR_MISSING_SECURE_SESSION;
         }
 
+        SessionHandle session = GetSessionHandle();
         CHIP_ERROR err;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -211,27 +173,45 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         else
         {
 #endif
-            err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), mSession.Get().Value(), mExchangeId, IsInitiator(),
+            err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), session, mExchangeId, IsInitiator(),
                                         GetReliableMessageContext(), reliableTransmissionRequested, protocolId, msgType,
                                         std::move(msgBuf));
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         }
 #endif
-
-        if (err != CHIP_NO_ERROR && IsResponseExpected())
+        if (err != CHIP_NO_ERROR)
         {
-            CancelResponseTimer();
-            SetResponseExpected(false);
+            // We should only cancel the response timer if the ExchangeContext fails to send the message that expects a
+            // response.
+            if (currentMessageExpectResponse)
+            {
+                CancelResponseTimer();
+                SetResponseExpected(false);
+            }
+
+            // If we can't even send a message (send failed with a non-transient
+            // error), mark the session as defunct, just like we would if we
+            // thought we sent the message and never got a response.
+            if (session->IsSecureSession() && session->AsSecureSession()->IsCASESession())
+            {
+                session->AsSecureSession()->MarkAsDefunct();
+            }
         }
-
-        // Standalone acks are not application-level message sends.
-        if (!isStandaloneAck && err == CHIP_NO_ERROR)
+        else
         {
-            //
-            // Once we've sent the message successfully, we can clear out the WillSendMessage flag.
-            //
-            mFlags.Clear(Flags::kFlagWillSendMessage);
-            MessageHandled();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+            app::ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+            // Standalone acks are not application-level message sends.
+            if (!isStandaloneAck)
+            {
+                //
+                // Once we've sent the message successfully, we can clear out the WillSendMessage flag.
+                //
+                mFlags.Clear(Flags::kFlagWillSendMessage);
+                MessageHandled();
+            }
         }
 
         return err;
@@ -267,8 +247,11 @@ void ExchangeContext::DoClose(bool clearRetransTable)
         mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(this);
     }
 
-    // Cancel the response timer.
-    CancelResponseTimer();
+    if (IsResponseExpected())
+    {
+        // Cancel the response timer.
+        CancelResponseTimer();
+    }
 }
 
 /**
@@ -342,6 +325,10 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
     // Do not request Ack for multicast
     SetAutoRequestAck(!session->IsGroupSession());
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    app::ICDNotifier::GetInstance().BroadcastActiveRequestNotification(app::ICDListener::KeepActiveFlags::kExchangeContextOpen);
+#endif
+
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogDetail(ExchangeManager, "ec++ id: " ChipLogFormatExchange, ChipLogValueExchange(this));
 #endif
@@ -357,10 +344,9 @@ ExchangeContext::~ExchangeContext()
     //
     VerifyOrDie(mFlags.Has(Flags::kFlagClosed));
 
-#if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
-    // Make sure that the exchange withdraws the request for Sleepy End Device active mode.
-    UpdateSEDIntervalMode(false);
-#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    app::ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(app::ICDListener::KeepActiveFlags::kExchangeContextOpen);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // Ideally, in this scenario, the retransmit table should
     // be clear of any outstanding messages for this context and
@@ -478,17 +464,31 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
 
 void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
 {
+    // Grab the value of WaitingForResponseOrAck() before we mess with our state.
+    bool gotMRPAck = !WaitingForResponseOrAck();
+
     SetResponseExpected(false);
+
+    // Hold a ref to ourselves so we can make calls into our delegate that might
+    // decrease our refcount (e.g. by expiring out session) without worrying
+    // about use-after-free.
+    ExchangeHandle ref(*this);
 
     // mSession might be null if this timeout is due to the session being
     // evicted.
     if (mSession)
     {
-        if (mSession->IsSecureSession() && mSession->AsSecureSession()->IsCASESession())
+        // If we timed out _after_ getting an ack for the message, that means
+        // the session is probably fine (since our message and the ack got
+        // through), so don't mark the session defunct if we got an MRP ack.
+        if (!gotMRPAck)
         {
-            mSession->AsSecureSession()->MarkAsDefunct();
+            if (mSession->IsSecureSession() && mSession->AsSecureSession()->IsCASESession())
+            {
+                mSession->AsSecureSession()->MarkAsDefunct();
+            }
+            mSession->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
         }
-        mSession->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
     }
 
     ExchangeDelegate * delegate = GetDelegate();
@@ -542,7 +542,6 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         if (payloadHeader.NeedsAck())
         {
             // An acknowledgment needs to be sent back to the peer for this message on this exchange,
-
             HandleNeedsAck(messageCounter, msgFlags);
         }
     }
@@ -573,7 +572,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         return CHIP_NO_ERROR;
     }
 
-    if (IsMessageNotAcked())
+    if (IsWaitingForAck())
     {
         // The only way we can get here is a spec violation on the other side:
         // we sent a message that needs an ack, and the other side responded
@@ -585,12 +584,23 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    // Since we got the response, cancel the response timer.
-    CancelResponseTimer();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // message received
+    app::ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    // If the context was expecting a response to a previously sent message, this message
-    // is implicitly that response.
-    SetResponseExpected(false);
+    // Set kFlagReceivedAtLeastOneMessage to true since we have received at least one new application level message
+    SetHasReceivedAtLeastOneMessage(true);
+
+    if (IsResponseExpected())
+    {
+        // Since we got the response, cancel the response timer.
+        CancelResponseTimer();
+
+        // If the context was expecting a response to a previously sent message, this message
+        // is implicitly that response.
+        SetResponseExpected(false);
+    }
 
     // Don't send messages on to our delegate if our dispatch does not allow
     // those messages.
@@ -606,10 +616,6 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
 
 void ExchangeContext::MessageHandled()
 {
-#if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
-    UpdateSEDIntervalMode();
-#endif
-
     if (mFlags.Has(Flags::kFlagClosed) || IsResponseExpected() || IsSendExpected())
     {
         return;

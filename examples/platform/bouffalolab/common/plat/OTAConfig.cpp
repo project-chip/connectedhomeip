@@ -19,6 +19,7 @@
 #include "OTAConfig.h"
 #include <app/server/Server.h>
 
+#include <platform/bouffalolab/common/OTAImageProcessorImpl.h>
 // Global OTA objects
 chip::DefaultOTARequestor gRequestorCore;
 chip::DefaultOTARequestorStorage gRequestorStorage;
@@ -43,4 +44,13 @@ void OTAConfig::Init()
     // Connect the Downloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     // Initialize and interconnect the Requestor and Image Processor objects -- END
+}
+
+void OTAConfig::InitOTARequestorHandler(chip::System::Layer * systemLayer, void * appState)
+{
+    if (!chip::GetRequestorInstance())
+    {
+        ChipLogProgress(NotSpecified, "Init OTA Requestor");
+        OTAConfig::Init();
+    }
 }

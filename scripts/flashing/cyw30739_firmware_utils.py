@@ -19,7 +19,6 @@ through an `Flasher` instance, or operations according to a command line.
 For `Flasher`, see the class documentation.
 """
 
-import os
 import sys
 
 import firmware_utils

@@ -16,6 +16,7 @@
  */
 
 #include <inet/IPAddress.h>
+#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Advertiser.h>
@@ -37,36 +38,50 @@ namespace {
 
 Shell::Engine sShellDnsBrowseSubcommands;
 Shell::Engine sShellDnsSubcommands;
+Dnssd::ResolverProxy sResolverProxy;
 
-class DnsShellResolverDelegate : public Dnssd::OperationalResolveDelegate, public Dnssd::CommissioningResolveDelegate
+class DnsShellResolverDelegate : public Dnssd::CommissioningResolveDelegate, public AddressResolve::NodeListener
 {
 public:
-    void OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData) override
+    DnsShellResolverDelegate() { mSelfHandle.SetListener(this); }
+
+    void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override
     {
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\r\n",
-                        ChipLogValueX64(nodeData.operationalData.peerId.GetCompressedFabricId()),
-                        ChipLogValueX64(nodeData.operationalData.peerId.GetNodeId()));
-        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.resolutionData.hostName);
-        for (size_t i = 0; i < nodeData.resolutionData.numIPs; ++i)
-        {
-            streamer_printf(streamer_get(), "   IP address: %s\r\n", nodeData.resolutionData.ipAddress[i].ToString(ipAddressBuf));
-        }
-        streamer_printf(streamer_get(), "   Port: %u\r\n", nodeData.resolutionData.port);
+                        ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
 
-        auto retryInterval = nodeData.resolutionData.GetMrpRetryIntervalIdle();
+        char addr_string[Transport::PeerAddress::kMaxToStringSize];
+        result.address.ToString(addr_string);
 
-        if (retryInterval.HasValue())
-            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\r\n", retryInterval.Value());
+        streamer_printf(streamer_get(), "Resolve completed: %s\r\n", addr_string);
+        streamer_printf(streamer_get(), "   Supports TCP:                  %s\r\n", result.supportsTcp ? "YES" : "NO");
+        streamer_printf(streamer_get(), "   MRP IDLE retransmit timeout:   %u ms\r\n",
+                        result.mrpRemoteConfig.mIdleRetransTimeout.count());
+        streamer_printf(streamer_get(), "   MRP ACTIVE retransmit timeout: %u ms\r\n",
+                        result.mrpRemoteConfig.mActiveRetransTimeout.count());
+        streamer_printf(streamer_get(), "   MRP ACTIVE Threshold time:     %u ms\r\n",
+                        result.mrpRemoteConfig.mActiveThresholdTime.count());
 
-        retryInterval = nodeData.resolutionData.GetMrpRetryIntervalActive();
+        streamer_printf(streamer_get(), "   ICD is operating as a:         %s\r\n", result.isICDOperatingAsLIT ? "LIT" : "SIT");
 
-        if (retryInterval.HasValue())
-            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", retryInterval.Value());
-
-        streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.resolutionData.supportsTcp ? "yes" : "no");
+        // Schedule a retry. Not called directly so we do not recurse in OnNodeAddressResolved
+        DeviceLayer::SystemLayer().ScheduleLambda([this] {
+            CHIP_ERROR err = AddressResolve::Resolver::Instance().TryNextResult(Handle());
+            if (err != CHIP_NO_ERROR && err != CHIP_ERROR_WELL_EMPTY)
+            {
+                ChipLogError(Discovery, "Failed to list next result: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+        });
     }
 
-    void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override {}
+    void OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason) override
+    {
+        streamer_printf(streamer_get(),
+                        "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " failed: %" CHIP_ERROR_FORMAT "\r\n",
+                        ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()), reason.Format());
+    }
+
+    AddressResolve::NodeLookupHandle & Handle() { return mSelfHandle; }
 
     void OnNodeDiscovered(const Dnssd::DiscoveredNodeData & nodeData) override
     {
@@ -103,7 +118,18 @@ public:
         if (retryInterval.HasValue())
             streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", retryInterval.Value());
 
+        if (nodeData.resolutionData.GetMrpRetryActiveThreshold().HasValue())
+        {
+            streamer_printf(streamer_get(), "   MRP retry active threshold time: %" PRIu32 "ms\r\n",
+                            nodeData.resolutionData.GetMrpRetryActiveThreshold().Value());
+        }
         streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.resolutionData.supportsTcp ? "yes" : "no");
+
+        if (nodeData.resolutionData.isICDOperatingAsLIT.HasValue())
+        {
+            streamer_printf(streamer_get(), "   ICD is operating as a: %s\r\n",
+                            nodeData.resolutionData.isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
+        }
         streamer_printf(streamer_get(), "   IP addresses:\r\n");
         for (uint8_t i = 0; i < nodeData.resolutionData.numIPs; i++)
         {
@@ -113,22 +139,28 @@ public:
 
 private:
     char ipAddressBuf[Inet::IPAddress::kMaxStringLength];
+    AddressResolve::NodeLookupHandle mSelfHandle;
 };
 
 DnsShellResolverDelegate sDnsShellResolverDelegate;
-Dnssd::ResolverProxy sResolverProxy;
 
 CHIP_ERROR ResolveHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(argc == 2, CHIP_ERROR_INVALID_ARGUMENT);
 
+    if (sDnsShellResolverDelegate.Handle().IsActive())
+    {
+        streamer_printf(streamer_get(), "Cancelling previous resolve...\r\n");
+        LogErrorOnFailure(AddressResolve::Resolver::Instance().CancelLookup(sDnsShellResolverDelegate.Handle(),
+                                                                            AddressResolve::Resolver::FailureCallback::Call));
+    }
+
     streamer_printf(streamer_get(), "Resolving ...\r\n");
 
-    PeerId peerId;
-    peerId.SetCompressedFabricId(strtoull(argv[0], nullptr, 10));
-    peerId.SetNodeId(strtoull(argv[1], nullptr, 10));
+    AddressResolve::NodeLookupRequest request(
+        PeerId().SetCompressedFabricId(strtoull(argv[0], nullptr, 10)).SetNodeId(strtoull(argv[1], nullptr, 10)));
 
-    return sResolverProxy.ResolveNodeId(peerId, Inet::IPAddressType::kAny);
+    return AddressResolve::Resolver::Instance().LookupNode(request, sDnsShellResolverDelegate.Handle());
 }
 
 bool ParseSubType(int argc, char ** argv, Dnssd::DiscoveryFilter & filter)
@@ -226,7 +258,6 @@ CHIP_ERROR DnsHandler(int argc, char ** argv)
     }
 
     sResolverProxy.Init(DeviceLayer::UDPEndPointManager());
-    sResolverProxy.SetOperationalDelegate(&sDnsShellResolverDelegate);
     sResolverProxy.SetCommissioningDelegate(&sDnsShellResolverDelegate);
 
     return sShellDnsSubcommands.ExecCommand(argc, argv);

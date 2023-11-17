@@ -22,10 +22,11 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-id MTRDecodeAttributeValue(const chip::app::ConcreteAttributePath & aPath, chip::TLV::TLVReader & aReader, CHIP_ERROR * aError);
+id _Nullable MTRDecodeAttributeValue(const chip::app::ConcreteAttributePath & aPath, chip::TLV::TLVReader & aReader,
+                                     CHIP_ERROR * aError);
 
 NS_ASSUME_NONNULL_END

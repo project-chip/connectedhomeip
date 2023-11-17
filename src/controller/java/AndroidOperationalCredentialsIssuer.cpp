@@ -21,7 +21,7 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <lib/core/CASEAuthTag.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/PersistentStorageMacros.h>
@@ -68,7 +68,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     if (storage.SyncGetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize) != CHIP_NO_ERROR)
     {
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
-        ReturnErrorOnFailure(mIssuer.Initialize());
+        ReturnErrorOnFailure(mIssuer.Initialize(Crypto::ECPKeyTarget::ECDSA));
         ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
 
         keySize = static_cast<uint16_t>(sizeof(serializedKey));
@@ -111,27 +111,14 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     // If root certificate not found in the storage, generate new root certificate.
     else
     {
-        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(mIssuerId));
-
-        ChipLogProgress(Controller, "Generating RCAC");
-        chip::Credentials::X509CertRequestParams rcac_request = { 0, mNow, mNow + mValidity, rcac_dn, rcac_dn };
-        ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rcac));
-
-        VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
+        ReturnErrorOnFailure(GenerateRootCertificate(mIssuer, mIssuerId, Optional<FabricId>(), mNow, mNow + mValidity, rcac));
         PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
                           ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size()))));
     }
 
     icac.reduce_size(0);
 
-    ChipDN noc_dn;
-    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterFabricId(fabricId));
-    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterNodeId(nodeId));
-    ReturnErrorOnFailure(noc_dn.AddCATs(cats));
-
-    ChipLogProgress(Controller, "Generating NOC");
-    chip::Credentials::X509CertRequestParams noc_request = { 1, mNow, mNow + mValidity, noc_dn, rcac_dn };
-    return NewNodeOperationalX509Cert(noc_request, pubkey, mIssuer, noc);
+    return GenerateOperationalCertificate(mIssuer, rcac, pubkey, fabricId, nodeId, cats, mNow, mNow + mValidity, noc);
 }
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
@@ -199,8 +186,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
         ReturnErrorOnFailure(reader.Next());
     }
 
-    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrReturnError(reader.GetTag() == AnonymousTag(), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    ReturnErrorOnFailure(reader.Expect(kTLVType_Structure, AnonymousTag()));
 
     TLVType containerType;
     ReturnErrorOnFailure(reader.EnterContainer(containerType));
@@ -297,7 +283,8 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
 }
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::NOCChainGenerated(CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                                                  const ByteSpan & rcac, Optional<Crypto::AesCcm128KeySpan> ipk,
+                                                                  const ByteSpan & rcac,
+                                                                  Optional<Crypto::IdentityProtectionKeySpan> ipk,
                                                                   Optional<NodeId> adminSubject)
 {
     ReturnErrorCodeIf(mOnNOCCompletionCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -319,7 +306,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::LocalGenerateNOCChain(const Byte
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = JniReferences::GetInstance().FindMethod(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef,
-                                                  "onOpCSRGenerationComplete", "([B)V", &method);
+                                                             "onOpCSRGenerationComplete", "([B)V", &method);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %" CHIP_ERROR_FORMAT, err.Format());
@@ -347,8 +334,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::LocalGenerateNOCChain(const Byte
         ReturnErrorOnFailure(reader.Next());
     }
 
-    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrReturnError(reader.GetTag() == AnonymousTag(), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    ReturnErrorOnFailure(reader.Expect(kTLVType_Structure, AnonymousTag()));
 
     TLVType containerType;
     ReturnErrorOnFailure(reader.EnterContainer(containerType));
@@ -384,7 +370,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::LocalGenerateNOCChain(const Byte
     // Prepare IPK to be sent back. A more fully-fledged operational credentials delegate
     // would obtain a suitable key per fabric.
     uint8_t ipkValue[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-    Crypto::AesCcm128KeySpan ipkSpan(ipkValue);
+    Crypto::IdentityProtectionKeySpan ipkSpan(ipkValue);
 
     ReturnErrorCodeIf(defaultIpkSpan.size() != sizeof(ipkValue), CHIP_ERROR_INTERNAL);
 
@@ -400,6 +386,75 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::LocalGenerateNOCChain(const Byte
                                                static_cast<uint32_t>(csrElements.size()), javaCsr);
     JniReferences::GetInstance().GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, javaCsr);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateRootCertificate(Crypto::P256Keypair & keypair, uint64_t issuerId,
+                                                                        Optional<FabricId> fabricId, uint32_t validityStart,
+                                                                        uint32_t validityEnd, MutableByteSpan & rcac)
+{
+    ChipDN rcac_dn;
+    ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(issuerId));
+
+    if (fabricId.HasValue())
+    {
+        FabricId fabric = fabricId.Value();
+        VerifyOrReturnError(IsValidFabricId(fabric), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterFabricId(fabric));
+    }
+
+    ChipLogProgress(Controller, "Generating RCAC");
+    chip::Credentials::X509CertRequestParams rcac_request = { 0, validityStart, validityEnd, rcac_dn, rcac_dn };
+    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, keypair, rcac));
+
+    VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateIntermediateCertificate(
+    Crypto::P256Keypair & rootKeypair, const ByteSpan & rcac, const Crypto::P256PublicKey & intermediatePublicKey,
+    uint64_t issuerId, Optional<FabricId> fabricId, uint32_t validityStart, uint32_t validityEnd, MutableByteSpan & icac)
+{
+    ChipDN rcac_dn;
+    ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
+
+    ChipDN icac_dn;
+    ReturnErrorOnFailure(icac_dn.AddAttribute_MatterICACId(issuerId));
+
+    if (fabricId.HasValue())
+    {
+        FabricId fabric = fabricId.Value();
+        VerifyOrReturnError(IsValidFabricId(fabric), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(icac_dn.AddAttribute_MatterFabricId(fabric));
+    }
+
+    ChipLogProgress(Controller, "Generating ICAC");
+    chip::Credentials::X509CertRequestParams icac_request = { 0, validityStart, validityEnd, icac_dn, rcac_dn };
+    ReturnErrorOnFailure(NewICAX509Cert(icac_request, intermediatePublicKey, rootKeypair, icac));
+
+    VerifyOrReturnError(CanCastTo<uint16_t>(icac.size()), CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateOperationalCertificate(Crypto::P256Keypair & signingKeypair,
+                                                                               const ByteSpan & signingCertificate,
+                                                                               const Crypto::P256PublicKey & operationalPublicKey,
+                                                                               FabricId fabricId, NodeId nodeId,
+                                                                               const chip::CATValues & cats, uint32_t validityStart,
+                                                                               uint32_t validityEnd, MutableByteSpan & noc)
+{
+    ChipDN rcac_dn;
+    ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(signingCertificate, rcac_dn));
+
+    ChipDN noc_dn;
+    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterFabricId(fabricId));
+    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterNodeId(nodeId));
+    ReturnErrorOnFailure(noc_dn.AddCATs(cats));
+
+    ChipLogProgress(Controller, "Generating NOC");
+    chip::Credentials::X509CertRequestParams noc_request = { 1, validityStart, validityEnd, noc_dn, rcac_dn };
+    return NewNodeOperationalX509Cert(noc_request, operationalPublicKey, signingKeypair, noc);
 }
 
 CHIP_ERROR N2J_CSRInfo(JNIEnv * env, jbyteArray nonce, jbyteArray elements, jbyteArray csrElementsSignature, jbyteArray csr,

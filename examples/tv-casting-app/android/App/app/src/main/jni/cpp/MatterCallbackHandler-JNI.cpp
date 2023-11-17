@@ -31,10 +31,13 @@ CHIP_ERROR CallbackBaseJNI::SetUp(JNIEnv * env, jobject inHandler)
     mClazz = env->GetObjectClass(mObject);
     VerifyOrExit(mClazz != nullptr, ChipLogError(AppServer, "Failed to get handler Java class"));
 
-    mMethod = env->GetMethodID(mClazz, "handle", mMethodSignature);
+    mSuperClazz = env->GetSuperclass(mClazz);
+    VerifyOrExit(mSuperClazz != nullptr, ChipLogError(AppServer, "Failed to get handler's parent's Java class"));
+
+    mMethod = env->GetMethodID(mSuperClazz, "handleInternal", mMethodSignature);
     if (mMethod == nullptr)
     {
-        ChipLogError(AppServer, "Failed to access 'handle' method with signature %s", mMethodSignature);
+        ChipLogError(AppServer, "Failed to access 'handleInternal' method with signature %s", mMethodSignature);
         env->ExceptionClear();
     }
 
@@ -252,11 +255,11 @@ jobject SampledPositionSuccessHandlerJNI::ConvertToJObject(
     jobject jSampledPosition = nullptr;
     if (!responseData.IsNull())
     {
-        const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType & playbackPosition =
+        const chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType & playbackPosition =
             responseData.Value();
 
         jclass responseTypeClass = nullptr;
-        CHIP_ERROR err = JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/MediaPlaybackTypes$PlaybackPosition",
+        CHIP_ERROR err = JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/MediaPlaybackTypes$PlaybackPositionStruct",
                                                                   responseTypeClass);
         if (err != CHIP_NO_ERROR)
         {
@@ -321,7 +324,7 @@ jobject TargetListSuccessHandlerJNI::ConvertToJObject(
     auto iter = responseData.begin();
     while (iter.Next())
     {
-        const chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType & targetInfo = iter.GetValue();
+        const chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType & targetInfo = iter.GetValue();
 
         jclass responseTypeClass = nullptr;
         CHIP_ERROR err =
@@ -369,7 +372,7 @@ jobject SupportedStreamingProtocolsSuccessHandlerJNI::ConvertToJObject(
     chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableArgType responseData)
 {
     ChipLogProgress(AppServer, "SupportedStreamingProtocolsSuccessHandlerJNI::ConvertToJObject called");
-    return ConvertToIntegerJObject(responseData);
+    return ConvertToIntegerJObject(responseData.Raw());
 }
 
 // APPLICATION BASIC

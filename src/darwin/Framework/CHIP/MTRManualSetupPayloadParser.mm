@@ -17,8 +17,8 @@
 #import "MTRManualSetupPayloadParser.h"
 
 #import "MTRError_Internal.h"
-#import "MTRLogging.h"
-#import "MTRMemory.h"
+#import "MTRFramework.h"
+#import "MTRLogging_Internal.h"
 #import "MTRSetupPayload_Internal.h"
 
 #import <setup_payload/ManualSetupPayloadParser.h>
@@ -29,10 +29,14 @@
     chip::ManualSetupPayloadParser * _chipManualSetupPayloadParser;
 }
 
++ (void)initialize
+{
+    MTRFrameworkInit();
+}
+
 - (id)initWithDecimalStringRepresentation:(NSString *)decimalStringRepresentation
 {
     if (self = [super init]) {
-        [MTRMemory ensureInit];
         _decimalStringRepresentation = decimalStringRepresentation;
         _chipManualSetupPayloadParser = new chip::ManualSetupPayloadParser(std::string([decimalStringRepresentation UTF8String]));
     }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -38,8 +38,7 @@ MTROTAHeader * ParseOTAHeader(const char * otaFilePath)
         return nil;
     }
 
-    NSError * error;
-    return [MTROTAHeader headerFromData:[NSData dataWithBytes:buffer.data() length:buffer.size()] error:&error];
+    return [[MTROTAHeader alloc] initWithData:[NSData dataWithBytes:buffer.data() length:buffer.size()]];
 }
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
@@ -88,8 +87,8 @@ static bool ParseJsonFileAndPopulateCandidates(
             [NSNumber numberWithUnsignedLongLong:iter.get("maxApplicableSoftwareVersion", 1000).asUInt64()];
         auto otaURL = [NSString stringWithUTF8String:iter.get("otaURL", "https://test.com").asCString()];
 
-        candidate.deviceModelData.vendorId = vendorId;
-        candidate.deviceModelData.productId = productId;
+        candidate.deviceModelData.vendorID = vendorId;
+        candidate.deviceModelData.productID = productId;
         candidate.softwareVersion = softwareVersion;
         candidate.softwareVersionString = softwareVersionString;
         candidate.deviceModelData.cDVersionNumber = cDVersionNumber;
@@ -161,14 +160,14 @@ CHIP_ERROR OTASoftwareUpdateBase::SetActionReplyStatus(uint16_t action)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     if (action == 0) {
-        mOTADelegate.action = MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed;
-        ChipLogDetail(chipTool, "Successfully set action to: MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed");
+        mOTADelegate.action = MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed;
+        ChipLogDetail(chipTool, "Successfully set action to: MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed");
     } else if (action == 1) {
-        mOTADelegate.action = MTROtaSoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction;
-        ChipLogDetail(chipTool, "Successfully set action to: MTROtaSoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction");
+        mOTADelegate.action = MTROTASoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction;
+        ChipLogDetail(chipTool, "Successfully set action to: MTROTASoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction");
     } else if (action == 2) {
-        mOTADelegate.action = MTROtaSoftwareUpdateProviderOTAApplyUpdateActionDiscontinue;
-        ChipLogDetail(chipTool, "Successfully set action to: MTROtaSoftwareUpdateProviderOTAApplyUpdateActionDiscontinue");
+        mOTADelegate.action = MTROTASoftwareUpdateProviderOTAApplyUpdateActionDiscontinue;
+        ChipLogDetail(chipTool, "Successfully set action to: MTROTASoftwareUpdateProviderOTAApplyUpdateActionDiscontinue");
     } else {
         ChipLogError(chipTool, "Only accepts the following: 0 (Proceed), 1 (Await Next Action), 2 (Discontinue)");
         error = CHIP_ERROR_INTERNAL;
@@ -179,18 +178,18 @@ CHIP_ERROR OTASoftwareUpdateBase::SetReplyStatus(uint16_t status)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     if (status == 0) {
-        mOTADelegate.queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable;
-        ChipLogDetail(chipTool, "Successfully set status to: MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable");
+        mOTADelegate.queryImageStatus = MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable;
+        ChipLogDetail(chipTool, "Successfully set status to: MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable");
     } else if (status == 1) {
-        mOTADelegate.queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusBusy;
-        ChipLogDetail(chipTool, "Successfully set status to: MTROtaSoftwareUpdateProviderOTAQueryStatusBusy");
+        mOTADelegate.queryImageStatus = MTROTASoftwareUpdateProviderOTAQueryStatusBusy;
+        ChipLogDetail(chipTool, "Successfully set status to: MTROTASoftwareUpdateProviderOTAQueryStatusBusy");
     } else if (status == 2) {
-        mOTADelegate.queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable;
-        ChipLogDetail(chipTool, "Successfully set status to: MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable");
+        mOTADelegate.queryImageStatus = MTROTASoftwareUpdateProviderOTAQueryStatusNotAvailable;
+        ChipLogDetail(chipTool, "Successfully set status to: MTROTASoftwareUpdateProviderOTAQueryStatusNotAvailable");
     } else if (status == 4) {
-        mOTADelegate.queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported;
+        mOTADelegate.queryImageStatus = MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported;
         ChipLogDetail(
-            chipTool, "Successfully set status to: MTROtaSoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported");
+            chipTool, "Successfully set status to: MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported");
     } else {
         ChipLogError(chipTool, "Only accepts the following: 0 (Available), 1 (Busy), 2 (Not Available), 3 (Not Supported)");
         error = CHIP_ERROR_INTERNAL;
@@ -246,8 +245,8 @@ CHIP_ERROR OTASoftwareUpdateBase::SetCandidatesFromFilePath(char * _Nonnull file
 
         ChipLogDetail(chipTool, "Validating image list candidate %s: ", [candidate.deviceModelData.otaURL UTF8String]);
 
-        auto vendorId = [candidate.deviceModelData.vendorId unsignedIntValue];
-        auto productId = [candidate.deviceModelData.productId unsignedIntValue];
+        auto vendorId = [candidate.deviceModelData.vendorID unsignedIntValue];
+        auto productId = [candidate.deviceModelData.productID unsignedIntValue];
         auto softwareVersion = [candidate.softwareVersion unsignedLongValue];
         auto softwareVersionString = [candidate.softwareVersionString UTF8String];
         auto softwareVersionStringLength = [candidate.softwareVersionString length];

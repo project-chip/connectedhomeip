@@ -25,7 +25,7 @@
 #include "CastingUtils.h"
 #if defined(ENABLE_CHIP_SHELL)
 #include "CastingShellCommands.h"
-#include <lib/shell/Engine.h>
+#include <lib/shell/Engine.h> // nogncheck
 #include <thread>
 #endif
 
@@ -134,12 +134,18 @@ int main(int argc, char * argv[])
         SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
     }
 
+    SuccessOrExit(err = CastingServer::GetInstance()->PreInit());
+
     // Enter commissioning mode, open commissioning window
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(CHIP_NO_ERROR == initParams.InitializeStaticResourcesBeforeServerInit());
     VerifyOrDie(CHIP_NO_ERROR == chip::Server::GetInstance().Init(initParams));
 
-    if (ConnectToCachedVideoPlayer() == CHIP_NO_ERROR)
+    if (argc > 1)
+    {
+        ChipLogProgress(AppServer, "Command line parameters detected. Skipping auto-start.");
+    }
+    else if (ConnectToCachedVideoPlayer() == CHIP_NO_ERROR)
     {
         ChipLogProgress(AppServer, "Skipping commissioner discovery / User directed commissioning flow.");
     }
@@ -155,7 +161,7 @@ int main(int argc, char * argv[])
     }
 
     registerClusters(gCommands, &gCredIssuerCommands);
-    registerClusterSubscriptions(gCommands, &gCredIssuerCommands);
+    registerCommandsSubscriptions(gCommands, &gCredIssuerCommands);
 
     if (argc > 1)
     {

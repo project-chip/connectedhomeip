@@ -15,14 +15,18 @@
  *    limitations under the License.
  */
 
-#import <MTRDeviceAttestationDelegate.h>
+#import "MTRDeviceAttestationDelegate.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceAttestationDeviceInfo ()
-- (instancetype)initWithDACCertificate:(NSData *)dacCertificate
-                     dacPAICertificate:(NSData *)dacPAICertificate
-                certificateDeclaration:(NSData *)certificateDeclaration;
+
+- (instancetype)initWithDACCertificate:(MTRCertificateDERBytes)dacCertificate
+                     dacPAICertificate:(MTRCertificateDERBytes)dacPAICertificate
+                certificateDeclaration:(NSData *)certificateDeclaration
+              basicInformationVendorID:(NSNumber *)basicInformationVendorID
+             basicInformationProductID:(NSNumber *)basicInformationProductID;
+
 @end
 
 NS_ASSUME_NONNULL_END

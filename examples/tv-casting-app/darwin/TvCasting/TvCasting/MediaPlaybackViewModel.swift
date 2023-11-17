@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class MediaPlaybackViewModel: ObservableObject {
                         break
                     }
                 }
-                
+
                 castingServerBridge.mediaPlayback_subscribeCurrentState(targetContentApp!, minInterval: UInt16(minInterval) ?? 0, maxInterval: UInt16(maxInterval) ?? 1, clientQueue: DispatchQueue.main,
                                                                         requestSentHandler: { (result: MatterError) -> () in
                     self.Log.info("MediaPlaybackViewModel.subscribeToCurrentState.requestSentHandler result \(result)")

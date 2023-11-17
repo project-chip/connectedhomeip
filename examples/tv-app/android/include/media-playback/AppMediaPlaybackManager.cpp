@@ -18,6 +18,7 @@
 #include "AppMediaPlaybackManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/util/config.h>
 #include <cstdint>
 #include <jni.h>
 #include <json/json.h>
@@ -130,11 +131,11 @@ uint64_t AppMediaPlaybackManager::HandleMediaRequestGetAttribute(chip::Attribute
 {
     ChipLogProgress(Zcl, "Received AppMediaPlaybackManager::HandleMediaRequestGetAttribute:%d", attributeId);
     chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::MediaPlayback::Id, attributeId);
-    const char * resStr = mAttributeDelegate->Read(aPath);
-    ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleMediaRequestGetAttribute response %s", resStr);
+    std::string resStr = mAttributeDelegate->Read(aPath);
+    ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleMediaRequestGetAttribute response %s", resStr.c_str());
 
     uint64_t ret = std::numeric_limits<uint64_t>::max();
-    if (resStr != nullptr && *resStr != 0)
+    if (resStr.length() != 0)
     {
         Json::Reader reader;
         Json::Value value;
@@ -143,7 +144,7 @@ uint64_t AppMediaPlaybackManager::HandleMediaRequestGetAttribute(chip::Attribute
             std::string attrId = to_string(attributeId);
             ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleMediaRequestGetAttribute response parsing done. reading attr %s",
                             attrId.c_str());
-            if (!value[attrId].empty())
+            if (!value[attrId].empty() && value[attrId].isUInt())
             {
                 ret = static_cast<uint64_t>(value[attrId].asUInt());
                 return ret;
@@ -164,22 +165,23 @@ Commands::PlaybackResponse::Type AppMediaPlaybackManager::HandleMediaRequest(Med
     // Ideally should not come here
     ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleMediaRequest");
     Commands::PlaybackResponse::Type response;
-    response.status = MediaPlaybackStatusEnum::kInvalidStateForCommand;
+    response.status = StatusEnum::kInvalidStateForCommand;
     return response;
 }
 
 CHIP_ERROR AppMediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder & aEncoder)
 {
-    Structs::PlaybackPosition::Type response;
+    Structs::PlaybackPositionStruct::Type response;
     response.updatedAt = 0;
     response.position  = Nullable<uint64_t>(0);
 
     ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleGetSampledPosition");
     chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::MediaPlayback::Id,
                                                chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::Id);
-    const char * resStr = mAttributeDelegate->Read(aPath);
+    std::string resStr = mAttributeDelegate->Read(aPath);
+    ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleGetSampledPosition response %s", resStr.c_str());
 
-    if (resStr != nullptr && *resStr != 0)
+    if (resStr.length() != 0)
     {
         Json::Reader reader;
         Json::Value value;
@@ -188,13 +190,14 @@ CHIP_ERROR AppMediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncod
             std::string attrId = to_string(chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::Id);
             ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSampledPosition response parsing done. reading attr %s",
                             attrId.c_str());
-            if (!value[attrId].empty())
+            if (!value[attrId].empty() && value[attrId].isObject())
             {
                 std::string updatedAt = to_string(
-                    static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Fields::kUpdatedAt));
+                    static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Fields::kUpdatedAt));
                 std::string position = to_string(
-                    static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Fields::kPosition));
-                if (!value[attrId][updatedAt].empty() && !value[attrId][position].empty())
+                    static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Fields::kPosition));
+                if (!value[attrId][updatedAt].empty() && !value[attrId][position].empty() && value[attrId][updatedAt].isUInt() &&
+                    value[attrId][position].isUInt())
                 {
                     // valid response
                     response.updatedAt = value[attrId][updatedAt].asUInt();

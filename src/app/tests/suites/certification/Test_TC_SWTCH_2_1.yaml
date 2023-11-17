@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,9 +31,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read NumberOfPositions attribute"
+    - label: "Step 2a: Read NumberOfPositions attribute"
       command: "readAttribute"
-      attribute: "number of positions"
+      attribute: "NumberOfPositions"
       response:
           saveAs: NumberOfPositionsValue
           constraints:
@@ -41,19 +41,19 @@ tests:
               minValue: 2
               maxValue: 255
 
-    - label: "Read CurrentPosition attribute"
+    - label: "Step 2b: Read CurrentPosition attribute"
       command: "readAttribute"
-      attribute: "current position"
+      attribute: "CurrentPosition"
       response:
           constraints:
               type: int8u
               minValue: 0
               maxValue: NumberOfPositionsValue - 1
 
-    - label: "Read MultiPressMax attribute"
+    - label: "Step 2c: Read MultiPressMax attribute"
       PICS: SWTCH.S.F04
       command: "readAttribute"
-      attribute: "multi press max"
+      attribute: "MultiPressMax"
       response:
           constraints:
               type: int8u

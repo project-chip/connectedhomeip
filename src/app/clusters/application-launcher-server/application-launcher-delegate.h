@@ -30,8 +30,8 @@ namespace app {
 namespace Clusters {
 namespace ApplicationLauncher {
 
-using Application          = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type;
-using ApplicationEPType    = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type;
+using Application          = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type;
+using ApplicationEPType    = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type;
 using LauncherResponseType = chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type;
 
 /** @brief
@@ -43,9 +43,9 @@ public:
     Delegate() : Delegate(false){};
     Delegate(bool featureMapContentPlatform) { mFeatureMapContentPlatform = featureMapContentPlatform; };
 
-    inline bool HasFeature(ApplicationLauncherFeature feature)
+    inline bool HasFeature(Feature feature)
     {
-        if (feature == ApplicationLauncherFeature::kApplicationPlatform)
+        if (feature == Feature::kApplicationPlatform)
         {
             return mFeatureMapContentPlatform;
         }

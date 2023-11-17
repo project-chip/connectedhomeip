@@ -1,0 +1,224 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    198.2.5. [TC-DISHALM-3.4] Temperature Low alarm functionality with DUT as
+    Server
+
+PICS:
+    - DISHALM.S
+    - DISHALM.S.M.TempLowAlarmSupported
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          This is a simulated example log for instructional purposes only. In real scenarios, the actual log may vary depending on the feature implementation in Reference App.
+      disabled: true
+
+    - label: "Step 1a: Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 1b: Set up subscription to Notify event"
+      PICS: DISHALM.S.E00
+      verification: |
+          Please use Interactive mode to  subscribe the Notify event
+          Here the command to enter interactive mode after provision :-
+           ./chip-tool interactive start
+
+          Please subscribe to the OperationalError event by sending below mentioned command
+          dishwasheralarm subscribe-event notify  4 10 1  1 --keepSubscriptions 1
+      disabled: true
+
+    - label: "Step 1c: TH reads from the DUT the Latch attribute."
+      PICS: DISHALM.S.A0001
+      verification: |
+          ./chip-tool dishwasheralarm read latch 1 1
+           On TH(chip-tool), Verify that the DUT response contains a 32-bit and Save the value returned in the response as LatchResponse.
+
+           [1689842371.478172][2614:2616] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_0001 DataVersion: 3155962179
+           [1689842371.478244][2614:2616] CHIP:TOO: Latch: 3
+           [1689842371.478410][2614:2616] CHIP:EM: <<< [E:35394i S:46214 M:140335917 (Ack:184279491)] (S) Msg TX to 1:0000000000000001 [C4B0] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 1d: Set the value of LatchResponse to 0."
+      PICS: " !DISHALM.S.A0001 "
+      verification: |
+          When the DISHALM.S.A0001(Latch)  feature is not supported or enabled, Set the value of LatchResponse to 0.
+      disabled: true
+
+    - label:
+          "Step 2a: Operate device to set the condition to raise the TempLow
+          alarm"
+      PICS: DISHALM.S.M.ManuallyControlled
+      verification: |
+          Operate device to set the condition to raise the TempLow alarm then Verify the received Notify event  State bit 3 is set to TRUE On TH(chip-tool).
+          [1690973612.883794][3893:3895] CHIP:DMG:         InteractionModelRevision = 1
+          [1690973612.883819][3893:3895] CHIP:DMG: }
+          [1690973612.883993][3893:3895] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Event 0x0000_0000
+          [1690973612.884020][3893:3895] CHIP:TOO:   Event number: 4
+          [1690973612.884041][3893:3895] CHIP:TOO:   Priority: Info
+          [1690973612.884061][3893:3895] CHIP:TOO:   Timestamp: 1690973105431
+          [1690973612.884143][3893:3895] CHIP:TOO:   Notify: {
+          [1690973612.884171][3893:3895] CHIP:TOO:     Active: 7
+          [1690973612.884195][3893:3895] CHIP:TOO:     Inactive: 0
+          [1690973612.884219][3893:3895] CHIP:TOO:     State: 1
+          [1690973612.884243][3893:3895] CHIP:TOO:     Mask: 47
+          [1690973612.884267][3893:3895] CHIP:TOO:    }
+          [1690973612.884325][3893:3895] CHIP:DMG: MoveToState ReadClient[0xffff8c010ac0]: Moving to [AwaitingSu]
+          [1690973612.884464][3893:3895] CHIP:EM: <<< [E:55179i S:51346 M:176888098 (Ack:160976726)] (S) Msg TX to 1:0000000000000001 [C934] --- Type 0001:01 (IM:StatusResponse)
+          [1690973612.884511][3893:3895] CHIP:IN: (S) Sending msg 176888098 on secure session with LSID: 51346
+          [1690973612.885556][3893:3895] CHIP:EM: >>> [E:55179i S:51346 M:160976727 (Ack:176888098)] (S) Msg RX from 1:0000000000000001 [C934] --- Type 0001:04 (IM:SubscribeResponse)
+          [1690973612.885597][3893:3895] CHIP:EM: Found matching exchange: 55179i, Delegate: 0xffff8c010ad0
+          [1690973612.885651][3893:3895] CHIP:EM: Rxd Ack; Removing MessageCounter:176888098 from Retrans Table on exchange 55179i
+          [1690973612.885692][3893:3895] CHIP:DMG: SubscribeResponse is received
+          [1690973612.885735][3893:3895] CHIP:DMG: SubscribeResponseMessage =
+          [1690973612.885762][3893:3895] CHIP:DMG: {
+          [1690973612.885787][3893:3895] CHIP:DMG:         SubscriptionId = 0xfbcf12a6,
+          [1690973612.885815][3893:3895] CHIP:DMG:         MaxInterval = 0xa,
+          [1690973612.885842][3893:3895] CHIP:DMG:         InteractionModelRevision = 1
+          [1690973612.885867][3893:3895] CHIP:DMG: }
+          [1690973612.885896][3893:3895] CHIP:DMG: Subscription established with SubscriptionID = 0xfbcf12a6 MinInterval = 4s MaxInterval = 10s Peer = 01:0000000000000001
+          [1690973612.885925][3893:3895] CHIP:DMG: MoveToState ReadClient[0xffff8c010ac0]: Moving to [Subscripti]
+      disabled: true
+
+    - label:
+          "Step 2b: After a few seconds, TH reads from the DUT the State
+          attribute"
+      PICS: DISHALM.S.A0002
+      verification: |
+          After a few seconds, TH reads from the DUT the State attribute by sending below mentioned command
+          dishwasheralarm read state 1 1
+           On TH(chip-tool), Verify that the DUT response contains a 32-bit value with bit 3 set to 1.
+
+           [1689842479.694724][2624:2626] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_0002 DataVersion: 3155962179
+           [1689842479.694781][2624:2626] CHIP:TOO: State: 2
+           [1689842479.694921][2624:2626] CHIP:EM: <<< [E:40120i S:46763 M:178458342 (Ack:246107556)] (S) Msg TX to 1:0000000000000001 [C4B0] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label:
+          "Step 2c: Operate device to set the condition to lower the TempLow
+          alarm"
+      PICS: DISHALM.S.M.ManuallyControlled
+      verification: |
+          Operate device to set the condition to lower the TempLow alarm then Verify the received Notify event  State bit 3 is set to false  if DISHALM.S.A0001(Latch) is 0. On TH(chip-tool).
+          [1690973612.883794][3893:3895] CHIP:DMG:         InteractionModelRevision = 1
+          [1690973612.883819][3893:3895] CHIP:DMG: }
+          [1690973612.883993][3893:3895] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Event 0x0000_0000
+          [1690973612.884020][3893:3895] CHIP:TOO:   Event number: 4
+          [1690973612.884041][3893:3895] CHIP:TOO:   Priority: Info
+          [1690973612.884061][3893:3895] CHIP:TOO:   Timestamp: 1690973105431
+          [1690973612.884143][3893:3895] CHIP:TOO:   Notify: {
+          [1690973612.884171][3893:3895] CHIP:TOO:     Active: 7
+          [1690973612.884195][3893:3895] CHIP:TOO:     Inactive: 0
+          [1690973612.884219][3893:3895] CHIP:TOO:     State: 0
+          [1690973612.884243][3893:3895] CHIP:TOO:     Mask: 47
+          [1690973612.884267][3893:3895] CHIP:TOO:    }
+          [1690973612.884325][3893:3895] CHIP:DMG: MoveToState ReadClient[0xffff8c010ac0]: Moving to [AwaitingSu]
+          [1690973612.884464][3893:3895] CHIP:EM: <<< [E:55179i S:51346 M:176888098 (Ack:160976726)] (S) Msg TX to 1:0000000000000001 [C934] --- Type 0001:01 (IM:StatusResponse)
+          [1690973612.884511][3893:3895] CHIP:IN: (S) Sending msg 176888098 on secure session with LSID: 51346
+          [1690973612.885556][3893:3895] CHIP:EM: >>> [E:55179i S:51346 M:160976727 (Ack:176888098)] (S) Msg RX from 1:0000000000000001 [C934] --- Type 0001:04 (IM:SubscribeResponse)
+          [1690973612.885597][3893:3895] CHIP:EM: Found matching exchange: 55179i, Delegate: 0xffff8c010ad0
+          [1690973612.885651][3893:3895] CHIP:EM: Rxd Ack; Removing MessageCounter:176888098 from Retrans Table on exchange 55179i
+          [1690973612.885692][3893:3895] CHIP:DMG: SubscribeResponse is received
+          [1690973612.885735][3893:3895] CHIP:DMG: SubscribeResponseMessage =
+          [1690973612.885762][3893:3895] CHIP:DMG: {
+          [1690973612.885787][3893:3895] CHIP:DMG:         SubscriptionId = 0xfbcf12a6,
+          [1690973612.885815][3893:3895] CHIP:DMG:         MaxInterval = 0xa,
+          [1690973612.885842][3893:3895] CHIP:DMG:         InteractionModelRevision = 1
+          [1690973612.885867][3893:3895] CHIP:DMG: }
+          [1690973612.885896][3893:3895] CHIP:DMG: Subscription established with SubscriptionID = 0xfbcf12a6 MinInterval = 4s MaxInterval = 10s Peer = 01:0000000000000001
+          [1690973612.885925][3893:3895] CHIP:DMG: MoveToState ReadClient[0xffff8c010ac0]: Moving to [Subscripti]
+      disabled: true
+
+    - label:
+          "Step 2d: After a few seconds, TH reads from the DUT the State
+          attribute"
+      PICS: DISHALM.S.A0002
+      verification: |
+          After a few seconds, TH reads from the DUT the State attribute by sending below mentioned command
+
+          dishwasheralarm read state 1 1
+           On TH(chip-tool), Verify that the DUT response contains a 32-bit value with Bit 3 of response SHALL be 0 if bit 3 if DISHALM.S.A0001(Latch) is 0
+          Bit 3 of response SHALL be 1 if bit 3 if DISHALM.S.A0001(Latch) is 1.
+           [1689842479.694724][2624:2626] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_0002 DataVersion: 3155962179
+           [1689842479.694781][2624:2626] CHIP:TOO: State: 2
+           [1689842479.694921][2624:2626] CHIP:EM: <<< [E:40120i S:46763 M:178458342 (Ack:246107556)] (S) Msg TX to 1:0000000000000001 [C4B0] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label:
+          "Step 3a: TH sends command Reset to DUT with bit 3 (TempLow) of Alarms
+          set to 1"
+      PICS: DISHALM.S.F00 && DISHALM.S.C00.Rsp
+      verification: |
+          dishwasheralarm reset  8 1 1
+          Verify the success Response on TH(chip-tool)
+          [1690974433.649056][3934:3936] CHIP:DMG:         ],
+          [1690974433.649084][3934:3936] CHIP:DMG:
+          [1690974433.649106][3934:3936] CHIP:DMG:         InteractionModelRevision = 1
+          [1690974433.649129][3934:3936] CHIP:DMG: },
+          [1690974433.649187][3934:3936] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_005D Command=0x0000_0000 Status=0x0
+          [1690974433.649228][3934:3936] CHIP:DMG: ICR moving to [AwaitingDe]
+
+           On TH(chip-tool), Verify that received Notify event with State bit 3 set to FALSE if DISHALM.S.A0001(Latch) is 1.
+          [1690974241.274464][3923:3925] CHIP:DMG:         InteractionModelRevision = 1
+          [1690974241.274486][3923:3925] CHIP:DMG: }
+          [1690974241.274723][3923:3925] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Event 0x0000_0000
+          [1690974241.274752][3923:3925] CHIP:TOO:   Event number: 4
+          [1690974241.274774][3923:3925] CHIP:TOO:   Priority: Info
+          [1690974241.274795][3923:3925] CHIP:TOO:   Timestamp: 1690973105431
+          [1690974241.274920][3923:3925] CHIP:TOO:   Notify: {
+          [1690974241.274951][3923:3925] CHIP:TOO:     Active: 7
+          [1690974241.274988][3923:3925] CHIP:TOO:     Inactive: 0
+          [1690974241.275014][3923:3925] CHIP:TOO:     State: 0
+          [1690974241.275039][3923:3925] CHIP:TOO:     Mask: 47
+          [1690974241.275092][3923:3925] CHIP:TOO:    }
+          [1690974241.275164][3923:3925] CHIP:DMG: MoveToState ReadClient[0xffff7c010ac0]: Moving to [AwaitingSu]
+          [1690974241.275346][3923:3925] CHIP:EM: <<< [E:2958i S:43592 M:104435282 (Ack:209133214)] (S) Msg TX to 1:0000000000000001 [C934] --- Type 0001:01 (IM:StatusResponse)
+          [1690974241.275394][3923:3925] CHIP:IN: (S) Sending msg 104435282 on secure session with LSID: 43592
+          [1690974241.276590][3923:3925] CHIP:EM: >>> [E:2958i S:43592 M:209133215 (Ack:104435282)] (S) Msg RX from 1:0000000000000001 [C934] --- Type 0001:04 (IM:SubscribeResponse)
+          [1690974241.276633][3923:3925] CHIP:EM: Found matching exchange: 2958i, Delegate: 0xffff7c010ad0
+          [1690974241.276724][3923:3925] CHIP:EM: Rxd Ack; Removing MessageCounter:104435282 from Retrans Table on exchange 2958i
+          [1690974241.276766][3923:3925] CHIP:DMG: SubscribeResponse is received
+          [1690974241.276850][3923:3925] CHIP:DMG: SubscribeResponseMessage =
+          [1690974241.276881][3923:3925] CHIP:DMG: {
+          [1690974241.276918][3923:3925] CHIP:DMG:         SubscriptionId = 0x4ab1f037,
+          [1690974241.276949][3923:3925] CHIP:DMG:         MaxInterval = 0xa,
+          [1690974241.276976][3923:3925] CHIP:DMG:         InteractionModelRevision = 1
+          [1690974241.277011][3923:3925] CHIP:DMG: }
+          [1690974241.277042][3923:3925] CHIP:DMG: Subscription established with SubscriptionID = 0x4ab1f037 MinInterval = 4s MaxInterval = 10s Peer = 01:0000000000000001
+          [1690974241.277083][3923:3925] CHIP:DMG: MoveToState ReadClient[0xffff7c010ac0]: Moving to [Subscripti]
+      disabled: true
+
+    - label:
+          "Step 3b: After a few seconds, TH reads from the DUT the State
+          attribute"
+      PICS: DISHALM.S.F00 && DISHALM.S.A0002
+      verification: |
+          After a few seconds, TH reads from the DUT the State attribute by sending below mentioned command
+
+          dishwasheralarm read state 1 1
+           On TH(chip-tool), Verify that the DUT response contains a 32-bit value with bit 3 set to 0.
+
+           [1689842479.694724][2624:2626] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_0002 DataVersion: 3155962179
+           [1689842479.694781][2624:2626] CHIP:TOO: State: 0
+           [1689842479.694921][2624:2626] CHIP:EM: <<< [E:40120i S:46763 M:178458342 (Ack:246107556)] (S) Msg TX to 1:0000000000000001 [C4B0] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true

@@ -35,6 +35,13 @@ class HostCryptoLibrary(Enum):
             return 'chip_crypto="boringssl"'
 
 
+class HostFuzzingType(Enum):
+    """Defines fuzz target options available for host targets."""
+    NONE = auto()
+    LIB_FUZZER = auto()
+    OSS_FUZZ = auto()
+
+
 class HostApp(Enum):
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
@@ -53,12 +60,20 @@ class HostApp(Enum):
     CERT_TOOL = auto()
     OTA_PROVIDER = auto()
     OTA_REQUESTOR = auto()
+    SIMULATED_APP1 = auto()
+    SIMULATED_APP2 = auto()
     PYTHON_BINDINGS = auto()
     EFR32_TEST_RUNNER = auto()
     TV_CASTING = auto()
     BRIDGE = auto()
-    DYNAMIC_BRIDGE = auto()
     JAVA_MATTER_CONTROLLER = auto()
+    KOTLIN_MATTER_CONTROLLER = auto()
+    CONTACT_SENSOR = auto()
+    DISHWASHER = auto()
+    REFRIGERATOR = auto()
+    RVC = auto()
+    AIR_PURIFIER = auto()
+    LIT_ICD = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -87,6 +102,8 @@ class HostApp(Enum):
             return 'shell/standalone'
         elif self == HostApp.OTA_PROVIDER:
             return 'ota-provider-app/linux'
+        elif self in [HostApp.SIMULATED_APP1, HostApp.SIMULATED_APP2]:
+            return 'placeholder/linux/'
         elif self == HostApp.OTA_REQUESTOR:
             return 'ota-requestor-app/linux'
         elif self in [HostApp.ADDRESS_RESOLVE, HostApp.TESTS, HostApp.PYTHON_BINDINGS, HostApp.CERT_TOOL]:
@@ -97,10 +114,22 @@ class HostApp(Enum):
             return 'tv-casting-app/linux'
         elif self == HostApp.BRIDGE:
             return 'bridge-app/linux'
-        elif self == HostApp.DYNAMIC_BRIDGE:
-            return 'dynamic-bridge-app/linux'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             return 'java-matter-controller'
+        elif self == HostApp.KOTLIN_MATTER_CONTROLLER:
+            return 'kotlin-matter-controller'
+        elif self == HostApp.CONTACT_SENSOR:
+            return 'contact-sensor-app/linux'
+        elif self == HostApp.DISHWASHER:
+            return 'dishwasher-app/linux'
+        elif self == HostApp.REFRIGERATOR:
+            return 'refrigerator-app/linux'
+        elif self == HostApp.RVC:
+            return 'rvc-app/linux'
+        elif self == HostApp.AIR_PURIFIER:
+            return 'air-purifier-app/linux'
+        elif self == HostApp.LIT_ICD:
+            return 'lit-icd-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -152,6 +181,12 @@ class HostApp(Enum):
         elif self == HostApp.CERT_TOOL:
             yield 'chip-cert'
             yield 'chip-cert.map'
+        elif self == HostApp.SIMULATED_APP1:
+            yield 'chip-app1'
+            yield 'chip-app1.map'
+        elif self == HostApp.SIMULATED_APP2:
+            yield 'chip-app2'
+            yield 'chip-app2.map'
         elif self == HostApp.OTA_PROVIDER:
             yield 'chip-ota-provider-app'
             yield 'chip-ota-provider-app.map'
@@ -168,12 +203,30 @@ class HostApp(Enum):
         elif self == HostApp.BRIDGE:
             yield 'chip-bridge-app'
             yield 'chip-bridge-app.map'
-        elif self == HostApp.DYNAMIC_BRIDGE:
-            yield 'dynamic-chip-bridge-app'
-            yield 'dynamic-chip-bridge-app.map'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             yield 'java-matter-controller'
             yield 'java-matter-controller.map'
+        elif self == HostApp.KOTLIN_MATTER_CONTROLLER:
+            yield 'kotlin-matter-controller'
+            yield 'kotlin-matter-controller.map'
+        elif self == HostApp.CONTACT_SENSOR:
+            yield 'contact-sensor-app'
+            yield 'contact-sensor-app.map'
+        elif self == HostApp.DISHWASHER:
+            yield 'dishwasher-app'
+            yield 'dishwasher-app.map'
+        elif self == HostApp.REFRIGERATOR:
+            yield 'refrigerator-app'
+            yield 'refrigerator-app.map'
+        elif self == HostApp.RVC:
+            yield 'rvc-app'
+            yield 'rvc-app.map'
+        elif self == HostApp.AIR_PURIFIER:
+            yield 'air-purifier-app'
+            yield 'air-purifier-app.map'
+        elif self == HostApp.LIT_ICD:
+            yield 'lit-icd-app'
+            yield 'lit-icd-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -222,14 +275,11 @@ class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True,
-                 enable_thread=True, use_tsan=False, use_asan=False,
-                 separate_event_loop=True, use_libfuzzer=False, use_clang=False,
-                 interactive_mode=True, extra_tests=False,
-                 use_platform_mdns=False, enable_rpcs=False,
-                 use_coverage=False, use_dmalloc=False,
-                 minmdns_address_policy=None,
-                 minmdns_high_verbosity=False,
-                 crypto_library: HostCryptoLibrary = None):
+                 enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
+                 separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
+                 interactive_mode=True, extra_tests=False, use_platform_mdns=False, enable_rpcs=False,
+                 use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
+                 minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -260,6 +310,9 @@ class HostBuilder(GnBuilder):
         if use_asan:
             self.extra_gn_options.append('is_asan=true')
 
+        if use_ubsan:
+            self.extra_gn_options.append('is_ubsan=true')
+
         if use_dmalloc:
             self.extra_gn_options.append('chip_config_memory_debug_checks=true')
             self.extra_gn_options.append('chip_config_memory_debug_dmalloc=true')
@@ -276,8 +329,13 @@ class HostBuilder(GnBuilder):
         if not interactive_mode:
             self.extra_gn_options.append('config_use_interactive_mode=false')
 
-        if use_libfuzzer:
+        if fuzzing_type == HostFuzzingType.LIB_FUZZER:
             self.extra_gn_options.append('is_libfuzzer=true')
+        elif fuzzing_type == HostFuzzingType.OSS_FUZZ:
+            self.extra_gn_options.append('oss_fuzz=true')
+
+        if imgui_ui:
+            self.extra_gn_options.append('chip_examples_enable_imgui_ui=true')
 
         self.use_coverage = use_coverage
         if use_coverage:
@@ -338,6 +396,15 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
             self.build_command = 'chip-repl'
 
+        if self.app == HostApp.SIMULATED_APP1:
+            self.extra_gn_options.append('chip_tests_zap_config="app1"')
+
+        if self.app == HostApp.SIMULATED_APP2:
+            self.extra_gn_options.append('chip_tests_zap_config="app2"')
+
+        if self.app == HostApp.TESTS and fuzzing_type != HostFuzzingType.NONE:
+            self.build_command = 'fuzz_tests'
+
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
             return self.extra_gn_options
@@ -362,31 +429,6 @@ class HostBuilder(GnBuilder):
             return self.extra_gn_options
         else:
             raise Exception('Unknown host board type: %r' % self)
-
-    def copyToExampleApp(self, jnilibs_dir, libs_dir, libs, jars):
-        self._Execute(
-            ["mkdir", "-p", jnilibs_dir], title="Prepare Native libs " + self.identifier
-        )
-
-        for libName in libs:
-            self._Execute(
-                [
-                    "cp",
-                    os.path.join(
-                        self.output_dir, "lib", "jni", self.board.AbiName(), libName
-                    ),
-                    os.path.join(jnilibs_dir, libName),
-                ]
-            )
-
-        for jarName in jars.keys():
-            self._Execute(
-                [
-                    "cp",
-                    os.path.join(self.output_dir, "lib", jars[jarName]),
-                    os.path.join(libs_dir, jarName),
-                ]
-            )
 
     def createJavaExecutable(self, java_program):
         self._Execute(
@@ -427,6 +469,15 @@ class HostBuilder(GnBuilder):
                     ],
                     title="Copying Manifest.txt to " + self.output_dir,
                 )
+            if exampleName == "kotlin-matter-controller":
+                self._Execute(
+                    [
+                        "cp",
+                        os.path.join(self.root, "Manifest.txt"),
+                        self.output_dir,
+                    ],
+                    title="Copying Manifest.txt to " + self.output_dir,
+                )
 
         if self.app == HostApp.TESTS and self.use_coverage:
             self.coverage_dir = os.path.join(self.output_dir, 'coverage')
@@ -442,32 +493,6 @@ class HostBuilder(GnBuilder):
                            '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
                            '--exclude', '/usr/include/*',
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
-            if self.app.exampleName == "java-matter-controller" and 'JAVA_PATH' in os.environ:
-                jnilibs_dir = os.path.join(
-                    self.root,
-                    "examples/",
-                    self.app.ExampleName(),
-                    "app/libs/jniLibs",
-                    self.board.AbiName(),
-                )
-
-                libs_dir = os.path.join(
-                    self.root, "examples/", self.app.ExampleName(), "app/libs"
-                )
-
-                libs = [
-                    "libSetupPayloadParser.so",
-                    "libCHIPController.so",
-                    "libc++_shared.so",
-                ]
-
-                jars = {
-                    "CHIPController.jar": "third_party/connectedhomeip/src/controller/java/CHIPController.jar",
-                    "SetupPayloadParser.jar": "third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar",
-                }
-
-                self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
-                self.createJavaExecutable("java-matter-controller")
 
     def PostBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
@@ -482,6 +507,12 @@ class HostBuilder(GnBuilder):
                            ], title="Final coverage info")
             self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), '--output-directory',
                            os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
+
+        if self.app == HostApp.JAVA_MATTER_CONTROLLER:
+            self.createJavaExecutable("java-matter-controller")
+
+        if self.app == HostApp.KOTLIN_MATTER_CONTROLLER:
+            self.createJavaExecutable("kotlin-matter-controller")
 
     def build_outputs(self):
         outputs = {}

@@ -31,5 +31,13 @@ class Nullable():
     def __lt__(self, other):
         return True
 
+    def __hash__(self):
+        ''' Explicitly implement __hash__() to imply immutability when used in
+            dataclasses.
+
+            See also: https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass
+        '''
+        return 0
+
 
 NullValue = Nullable()

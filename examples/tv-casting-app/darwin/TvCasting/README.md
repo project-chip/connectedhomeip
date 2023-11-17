@@ -11,6 +11,7 @@ the TV.
 
 -   [Matter TV Casting iOS App Example](#matter-tv-casting-ios-app-example)
     -   [Building the Application](#building-the-application)
+        -   [Building through command line](#building-through-command-line)
         -   [Compilation Fixes](#compilation-fixes)
     -   [Installing the Application](#installing-the-application)
 
@@ -34,6 +35,20 @@ fail with missing signing configuration errors.
 
 You need to update the Project configuration for TvCasting app to use your
 Personal Developer account and a unique Bundle ID.
+
+### Building through command line
+
+To build the app through the command line, use the xcodebuild app.
+
+```shell
+xcodebuild -workspace TvCastingDarwin.xcworkspace -scheme TvCasting -sdk <SDK_TARGET>
+```
+
+The list of available SDKs can be found by using the showsdks flag.
+
+```shell
+xcodebuild -showsdks
+```
 
 ### Compilation Fixes
 
@@ -78,3 +93,8 @@ to run.
 
 Now you can launch the application from the Home screen or from Xcode by hitting
 the run button once more.
+
+## Debugging
+
+Use the "TvCasting" scheme when building to enable debugging. If you wish to
+build the app without any debugging symbols, use the "TvCasting Release" scheme.

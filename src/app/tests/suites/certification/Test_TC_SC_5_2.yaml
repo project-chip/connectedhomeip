@@ -11,52 +11,204 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 19.1.2. [TC-SC-5.2] Receiving a group message - TH to DUT
+name: 26.1.2. [TC-SC-5.2] Receiving a group message - TH to DUT
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Groups"
     endpoint: 0
 
+    # Users should set endpoint value on the command line to PIXIT.G.ENDPOINT
+    Groups.Endpoint: 1
+
 tests:
-    - label: "Precondition"
-      verification: |
-          DUT and TH are commissioned.
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-          DUT and TH are part of a common group.- Run TC-SC-5.1 to establish this precondition
+    - label: "Read the commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeId
 
-          DUT supports the Identify cluster
-      disabled: true
+    - label: "Step 1: TH adds ACL Operate privileges for Group 0x0103"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [commissionerNodeId],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 4,
+                      AuthMode: 3,
+                      Subjects: [0x0103],
+                      Targets: null,
+                  },
+              ]
 
-    - label: "TH writes ACL entry by setting AuthMode as Group to DUT"
-      verification: |
-          As this step is executed in the TC-SC-5.1, we can skip this step during execution.
-      disabled: true
+    - label: "Step 2: TH sends KeySetWrite command with TH key"
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a3,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: 18446744073709551613,
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 18446744073709551614,
+                    }
+
+    - label: "Step 3: TH binds GroupId to GroupKeySet"
+      cluster: "Group Key Management"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a3 },
+              ]
 
     - label:
-          "TH sends a multicast Identify command with the IdentifyTime set to
-          0x0078 (120s) to DUT with GroupID and PIXIT.G.ENDPOINT"
-      PICS: I.S.C00.Rsp
-      verification: |
-          ./chip-tool identify identify 0x0078 0xffffffffffff0001 1
+          "Step 4: TH sends RemoveAllGroups command to the DUT on
+          PIXIT.G.ENDPOINT"
+      endpoint: Groups.Endpoint
+      command: "RemoveAllGroups"
 
-          Verify command send  to group on the TH Log:
-
-          [1657785273.973231][1618:1623] CHIP:DL: HandlePlatformSpecificBLEEvent 32784[1657785273.973291][1618:1623] CHIP:TOO: Sending command to group 0x1
-          [1657785273.973316][1618:1623] CHIP:TOO: Sending cluster (0x00000003) command (0x00000000) on Group 1
-      disabled: true
+    - label: "Step 5: TH sends AddGroup command to the DUT on PIXIT.G.ENDPOINT"
+      endpoint: Groups.Endpoint
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0103
+              - name: GroupName
+                value: "Test Group 0103"
+      response:
+          values:
+              - name: Status
+                value: 0
+              - name: GroupID
+                value: 0x0103
 
     - label:
-          "TH reads immediately IdentifyTime attribute from DUT on the
-          PIXIT.G.ENDPOINT set by DUT"
-      PICS: I.S.A0000
-      verification: |
-          ./chip-tool identify read identify-time 1 1
+          "Step 6: TH sends AddGroup command again but using group messaging
+          (0x0103)"
+      groupId: 0x0103
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0101
+              - name: GroupName
+                value: "Test Group 0101"
 
-          Verify   identify time ,on the TH Log:
+    # Give the group AddGroup time to actually happen; unicast delivery can outrace
+    # multicast if the unicast packet is sent immediately after the multicast one.
+    - label: "Wait for AddGroup"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
 
-          [1657785288.647504][1624:1629] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 1130139861
-          [1657785288.647621][1624:1629] CHIP:TOO:   identify time: 106
-      disabled: true
+    - label: "Verify there is no response from DUT"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: "!PICS_SDK_CI_ONLY"
+      arguments:
+          values:
+              - name: "message"
+                value: "Verify that there is no response from DUT"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 7: TH sends ViewGroup command on Endpoint PIXIT.G.ENDPOINT "
+      PICS: G.S.F00
+      endpoint: Groups.Endpoint
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0101
+      response:
+          values:
+              - name: Status
+                value: 0
+              - name: GroupID
+                value: 0x0101
+              - name: GroupName
+                value: "Test Group 0101"
+
+    - label: "Step 8: TH sends ViewGroup command on Endpoint PIXIT.G.ENDPOINT "
+      PICS: "!(G.S.F00)"
+      endpoint: Groups.Endpoint
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0101
+      response:
+          values:
+              - name: Status
+                value: 0
+              - name: GroupID
+                value: 0x0101
+              - name: GroupName
+                value: ""
+
+    - label: "Step 9: TH removes the GroupKeySet"
+      cluster: "Group Key Management"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: GroupKeySetID
+                value: 0x01a3
+
+    - label:
+          "Step 10: TH cleans up groups using RemoveAllGroups command to the DUT
+          on PIXIT.G.ENDPOINT"
+      endpoint: Groups.Endpoint
+      command: "RemoveAllGroups"
+
+    - label: "Step 11: TH removes ACL Operate privileges for Group 0x0103"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [commissionerNodeId],
+                      Targets: null,
+                  },
+              ]

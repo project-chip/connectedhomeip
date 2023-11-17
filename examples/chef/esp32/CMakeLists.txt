@@ -27,7 +27,6 @@ include(${CMAKE_CURRENT_LIST_DIR}/../../common/cmake/idf_flashing.cmake)
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
     "${CMAKE_CURRENT_LIST_DIR}/../../common/QRCode"
-    "${IDF_PATH}/examples/common_components/led_strip"
 )
 
 if(${IDF_TARGET} STREQUAL "esp32")
@@ -38,13 +37,19 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(${CMAKE_CURRENT_LIST_DIR}/../project_include.cmake)
-message(STATUS "Product ID " ${CONFIG_DEVICE_PRODUCT_ID})
 message(STATUS "Vendor ID " ${CONFIG_DEVICE_VENDOR_ID})
+message(STATUS "Product ID " ${CONFIG_DEVICE_PRODUCT_ID})
+message(STATUS "Product Name " ${CONFIG_DEVICE_PRODUCT_NAME})
 message(STATUS "SW Version String" ${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING})
-idf_build_set_property(COMPILE_OPTIONS "-DCHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${CONFIG_DEVICE_PRODUCT_ID}" APPEND)
 idf_build_set_property(COMPILE_OPTIONS "-DCHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${CONFIG_DEVICE_VENDOR_ID}" APPEND)
+idf_build_set_property(COMPILE_OPTIONS "-DCHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${CONFIG_DEVICE_PRODUCT_ID}" APPEND)
+if(NOT ${CONFIG_DEVICE_PRODUCT_NAME} STREQUAL "")
+    idf_build_set_property(COMPILE_OPTIONS "-DCHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\"${CONFIG_DEVICE_PRODUCT_NAME}\"" APPEND)
+endif()
+# Forwarding the customized software version string to the ESP32 firmware image
 if(NOT ${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING} STREQUAL "")
     idf_build_set_property(COMPILE_OPTIONS "-DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING}\"" APPEND)
+    set(PROJECT_VER ${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING})
 endif()
 idf_build_set_property(COMPILE_OPTIONS "-DCHIP_PLATFORM_ESP32=1" APPEND)
 
@@ -80,8 +85,4 @@ add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
 add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
 add_subdirectory(third_party/connectedhomeip/examples/platform/esp32/pw_sys_io)
 
-get_target_property(_target_cxx_flags pw_build.cpp17 INTERFACE_COMPILE_OPTIONS)
-list(REMOVE_ITEM _target_cxx_flags $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
-list(APPEND _target_cxx_flags $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++17>)
-set_target_properties(pw_build.cpp17 PROPERTIES INTERFACE_COMPILE_OPTIONS "${_target_cxx_flags}")
 endif(CONFIG_ENABLE_PW_RPC)

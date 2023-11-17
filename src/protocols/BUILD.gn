@@ -14,6 +14,10 @@
 
 import("//build_overrides/chip.gni")
 
+source_set("type_definitions") {
+  sources = [ "Protocols.h" ]
+}
+
 static_library("protocols") {
   output_name = "libChipProtocols"
 
@@ -35,6 +39,7 @@ static_library("protocols") {
 
   public_deps = [
     ":im_status",
+    ":type_definitions",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
@@ -52,6 +57,7 @@ static_library("im_status") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":type_definitions",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]

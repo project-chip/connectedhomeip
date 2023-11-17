@@ -22,8 +22,8 @@
  *      the SecureSessionTable class within the transport layer
  *
  */
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <transport/SecureSessionTable.h>
 
@@ -102,7 +102,7 @@ void TestBasicFunctionality(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, sessions[i].HasValue());
     }
 
-    //#endif
+    // #endif
     System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
@@ -162,7 +162,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestPeerConnectionsFn(void)
+int TestPeerConnectionsFn()
 {
     nlTestSuite theSuite = { "Transport-SecureSessionTable", &sTests[0], Initialize, Finalize };
     nlTestRunner(&theSuite, nullptr);

@@ -1,0 +1,40 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.4.7. [TC-WNCV-6.1] Basic Commands Verification with client as DUT
+
+PICS:
+    - WNCV.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Window Covering"
+    endpoint: 0
+
+tests:
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
+
+    - label: "Step 1a: DUT sends UpOrOpen command to TH"
+      wait: "UpOrOpen"
+      PICS: WNCV.C.C00.Tx
+
+    - label: "Step 2a: DUT sends DownOrClose command to TH"
+      wait: "DownOrClose"
+      PICS: WNCV.C.C01.Tx
+
+    - label: "Step 3a: DUT sends StopMotion command to TH"
+      wait: "StopMotion"
+      PICS: WNCV.C.C02.Tx

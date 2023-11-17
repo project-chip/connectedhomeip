@@ -17,16 +17,11 @@
 
 #include <app/util/af.h>
 
-#include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandHandler.h>
@@ -36,8 +31,12 @@
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
+
+using imcode = Protocols::InteractionModel::Status;
 
 constexpr int16_t kDefaultAbsMinHeatSetpointLimit = 700;  // 7C (44.5 F) is the default
 constexpr int16_t kDefaultAbsMaxHeatSetpointLimit = 3000; // 30C (86 F) is the default
@@ -67,6 +66,90 @@ constexpr int8_t kDefaultDeadBand                 = 25; // 2.5C is the default
 
 #define FEATURE_MAP_DEFAULT FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO
 
+namespace {
+
+class ThermostatAttrAccess : public AttributeAccessInterface
+{
+public:
+    ThermostatAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Thermostat::Id) {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+};
+
+ThermostatAttrAccess gThermostatAttrAccess;
+
+CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    VerifyOrDie(aPath.mClusterId == Thermostat::Id);
+
+    uint32_t ourFeatureMap;
+    bool localTemperatureNotExposedSupported = (FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
+        ((ourFeatureMap & to_underlying(Feature::kLocalTemperatureNotExposed)) != 0);
+
+    switch (aPath.mAttributeId)
+    {
+    case LocalTemperature::Id:
+        if (localTemperatureNotExposedSupported)
+        {
+            return aEncoder.EncodeNull();
+        }
+        break;
+    case RemoteSensing::Id:
+        if (localTemperatureNotExposedSupported)
+        {
+            uint8_t valueRemoteSensing;
+            EmberAfStatus status = RemoteSensing::Get(aPath.mEndpointId, &valueRemoteSensing);
+            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                StatusIB statusIB(ToInteractionModelStatus(status));
+                return statusIB.ToChipError();
+            }
+            valueRemoteSensing &= 0xFE; // clear bit 1 (LocalTemperature RemoteSensing bit)
+            return aEncoder.Encode(valueRemoteSensing);
+        }
+        break;
+    default: // return CHIP_NO_ERROR and just read from the attribute store in default
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    VerifyOrDie(aPath.mClusterId == Thermostat::Id);
+
+    uint32_t ourFeatureMap;
+    bool localTemperatureNotExposedSupported = (FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
+        ((ourFeatureMap & to_underlying(Feature::kLocalTemperatureNotExposed)) != 0);
+
+    switch (aPath.mAttributeId)
+    {
+    case RemoteSensing::Id:
+        if (localTemperatureNotExposedSupported)
+        {
+            uint8_t valueRemoteSensing;
+            ReturnErrorOnFailure(aDecoder.Decode(valueRemoteSensing));
+            if (valueRemoteSensing & 0x01) // If setting bit 1 (LocalTemperature RemoteSensing bit)
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+
+            EmberAfStatus status = RemoteSensing::Set(aPath.mEndpointId, valueRemoteSensing);
+            StatusIB statusIB(ToInteractionModelStatus(status));
+            return statusIB.ToChipError();
+        }
+        break;
+    default: // return CHIP_NO_ERROR and just write to the attribute store in default
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+} // anonymous namespace
+
 void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
 {
     // TODO
@@ -82,8 +165,6 @@ void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
     // can get the values.
     // or should this just be the responsibility of the thermostat application?
 }
-
-using imcode = Protocols::InteractionModel::Status;
 
 Protocols::InteractionModel::Status
 MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
@@ -338,8 +419,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         {
         case ThermostatControlSequence::kCoolingOnly:
         case ThermostatControlSequence::kCoolingWithReheat:
-            if (RequestedSystemMode == ThermostatSystemMode::kHeat ||
-                RequestedSystemMode == ThermostatSystemMode::kEmergencyHeating)
+            if (RequestedSystemMode == ThermostatSystemMode::kHeat || RequestedSystemMode == ThermostatSystemMode::kEmergencyHeat)
                 return imcode::InvalidValue;
             else
                 return imcode::Success;
@@ -383,8 +463,6 @@ bool emberAfThermostatClusterSetWeeklyScheduleCallback(app::CommandHandler * com
     return false;
 }
 
-using namespace chip::app::Clusters::Thermostat::Attributes;
-
 int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoint)
 {
     // Optional Mfg supplied limits
@@ -400,7 +478,7 @@ int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoin
     // min/max are user imposed min/max
 
     // Note that the limits are initialized above per the spec limits
-    // if they are not present emberAfReadAttribute() will not update the value so the defaults are used
+    // if they are not present Get() will not update the value so the defaults are used
     EmberAfStatus status;
 
     // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3724
@@ -471,7 +549,7 @@ int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoin
     // min/max are user imposed min/max
 
     // Note that the limits are initialized above per the spec limits
-    // if they are not present emberAfReadAttribute() will not update the value so the defaults are used
+    // if they are not present Get() will not update the value so the defaults are used
     EmberAfStatus status;
 
     // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3724
@@ -567,7 +645,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
 
     switch (mode)
     {
-    case EMBER_ZCL_SETPOINT_ADJUST_MODE_HEAT_AND_COOL_SETPOINTS:
+    case SetpointAdjustMode::kBoth:
         if (HeatSupported && CoolSupported)
         {
             int16_t DesiredCoolingSetpoint, CoolLimit, DesiredHeatingSetpoint, HeatLimit;
@@ -647,7 +725,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
             status = EMBER_ZCL_STATUS_SUCCESS;
         break;
 
-    case EMBER_ZCL_SETPOINT_ADJUST_MODE_COOL_SETPOINT:
+    case SetpointAdjustMode::kCool:
         if (CoolSupported)
         {
             if (OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
@@ -700,7 +778,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
             status = EMBER_ZCL_STATUS_INVALID_COMMAND;
         break;
 
-    case EMBER_ZCL_SETPOINT_ADJUST_MODE_HEAT_SETPOINT:
+    case SetpointAdjustMode::kHeat:
         if (HeatSupported)
         {
             if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
@@ -758,8 +836,11 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
         break;
     }
 
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
     return true;
 }
 
-void MatterThermostatPluginServerInitCallback() {}
+void MatterThermostatPluginServerInitCallback()
+{
+    registerAttributeAccessOverride(&gThermostatAttrAccess);
+}

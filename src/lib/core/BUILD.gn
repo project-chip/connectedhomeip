@@ -64,24 +64,43 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_TRANSPORT_PW_TRACE_ENABLED=${chip_enable_transport_pw_trace}",
     "CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST=${chip_config_minmdns_dynamic_operational_responder_list}",
     "CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES=${chip_config_minmdns_max_parallel_resolves}",
+    "CHIP_CONFIG_CANCELABLE_HAS_INFO_STRING_FIELD=${chip_config_cancelable_has_info_string_field}",
+    "CHIP_CONFIG_BIG_ENDIAN_TARGET=${chip_target_is_big_endian}",
+    "CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_WRITE=${chip_tlv_validate_char_string_on_write}",
+    "CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ=${chip_tlv_validate_char_string_on_read}",
   ]
+
+  visibility = [ ":chip_config_header" ]
 }
 
 source_set("chip_config_header") {
-  sources = [
-    "CHIPConfig.h",
-    "CHIPEventLoggingConfig.h",
-  ]
+  sources = [ "CHIPConfig.h" ]
 
   public_configs = [ "${chip_root}/src:includes" ]
 
   public_deps = [
-    ":chip_buildconfig",
     "${chip_root}/src/ble:ble_config_header",
+    "${chip_root}/src/inet:inet_config_header",
     "${chip_root}/src/system:system_config_header",
   ]
 
+  deps = [ ":chip_buildconfig" ]
+
   allow_circular_includes_from = [ "${chip_root}/src/ble:ble_config_header" ]
+}
+
+source_set("error") {
+  sources = [
+    "CHIPError.cpp",
+    "CHIPError.h",
+    "ErrorStr.cpp",
+    "ErrorStr.h",
+  ]
+
+  public_deps = [
+    ":chip_config_header",
+    "${chip_root}/src/lib/support:attributes",
+  ]
 }
 
 static_library("core") {
@@ -93,22 +112,10 @@ static_library("core") {
     # instead.
     "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums.h",
     "CHIPCallback.h",
-    "CHIPCircularTLVBuffer.cpp",
-    "CHIPCircularTLVBuffer.h",
     "CHIPCore.h",
     "CHIPEncoding.h",
-    "CHIPError.cpp",
-    "CHIPError.h",
     "CHIPKeyIds.cpp",
     "CHIPKeyIds.h",
-    "CHIPTLV.h",
-    "CHIPTLVDebug.cpp",
-    "CHIPTLVReader.cpp",
-    "CHIPTLVTags.h",
-    "CHIPTLVTypes.h",
-    "CHIPTLVUpdater.cpp",
-    "CHIPTLVUtilities.cpp",
-    "CHIPTLVWriter.cpp",
     "ClusterEnums.h",
     "DataModelTypes.h",
     "GroupId.h",
@@ -117,12 +124,24 @@ static_library("core") {
     "OTAImageHeader.h",
     "PasscodeId.h",
     "PeerId.h",
+    "TLV.h",
+    "TLVCircularBuffer.cpp",
+    "TLVCircularBuffer.h",
+    "TLVDebug.cpp",
+    "TLVReader.cpp",
+    "TLVTags.cpp",
+    "TLVTags.h",
+    "TLVTypes.h",
+    "TLVUpdater.cpp",
+    "TLVUtilities.cpp",
+    "TLVWriter.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     ":chip_config_header",
+    ":error",
     "${chip_root}/src/ble",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/support",

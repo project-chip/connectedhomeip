@@ -311,6 +311,14 @@ public:
     bool IsUp();
 
     /**
+     * Returns whether the current network interface is a loopback interface
+     *
+     * @return  \c true if current network interface is a loopback interface, \c false
+     *          if not, or if the iterator is positioned beyond the end of the list.
+     */
+    bool IsLoopback();
+
+    /**
      * Returns whether the current network interface supports multicast.
      *
      * @return  \c true if current network interface supports multicast, \c false
@@ -503,6 +511,14 @@ public:
      *          if the iterator is not positioned on an interface address.
      */
     bool IsUp();
+
+    /**
+     * Returns whether the current network interface is a loopback interface
+     *
+     * @return  \c true if current network interface is a loopback interface, \c false
+     *          if not, or if the iterator is positioned beyond the end of the list.
+     */
+    bool IsLoopback();
 
     /**
      * Returns whether the network interface associated with the current interface address supports multicast.

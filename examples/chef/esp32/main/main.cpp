@@ -35,17 +35,13 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 
-#include <app-common/zap-generated/att-storage.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
+#include <app/att-storage.h>
 #include <app/server/Dnssd.h>
-#include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
@@ -182,7 +178,15 @@ void InitServer(intptr_t)
 extern "C" void app_main(void)
 {
     ESP_ERROR_CHECK(nvs_flash_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
     chip::Platform::MemoryInit();
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if (DeviceLayer::Internal::ESP32Utils::InitWiFiStack() != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to initialize the Wi-Fi stack");
+        return;
+    }
+#endif
     chip::DeviceLayer::PlatformMgr().InitChipStack();
     chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 

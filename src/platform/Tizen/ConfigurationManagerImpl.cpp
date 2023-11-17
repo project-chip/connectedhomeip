@@ -23,19 +23,22 @@
  *          for Tizen platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include "ConfigurationManagerImpl.h"
 
-#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/Tizen/PosixConfig.h>
-#include <platform/Tizen/WiFiManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include "WiFiManager.h"
+#endif
 
 namespace chip {
 namespace DeviceLayer {
+
+using namespace ::chip::DeviceLayer::Internal;
 
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
@@ -43,7 +46,7 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::Init(void)
+CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR error;
 
@@ -88,12 +91,12 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 #endif
 }
 
-bool ConfigurationManagerImpl::CanFactoryReset(void)
+bool ConfigurationManagerImpl::CanFactoryReset()
 {
     return true;
 }
 
-void ConfigurationManagerImpl::InitiateFactoryReset(void) {}
+void ConfigurationManagerImpl::InitiateFactoryReset() {}
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(Platform::PersistedStorage::Key key, uint32_t & value)
 {
@@ -170,9 +173,29 @@ CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t 
     return Internal::PosixConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
-void ConfigurationManagerImpl::RunConfigUnitTest(void)
+void ConfigurationManagerImpl::RunConfigUnitTest()
 {
     Internal::PosixConfig::RunConfigUnitTest();
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return ReadConfigValue(PosixConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return WriteConfigValue(PosixConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
+{
+    return ReadConfigValue(PosixConfig::kCounterKey_BootReason, bootReason);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
+{
+    return WriteConfigValue(PosixConfig::kCounterKey_BootReason, bootReason);
 }
 
 ConfigurationManager & ConfigurationMgrImpl()

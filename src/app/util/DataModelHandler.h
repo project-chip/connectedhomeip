@@ -32,4 +32,4 @@
  * data model messages.
  *
  */
-void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeMgr);
+void InitDataModelHandler();

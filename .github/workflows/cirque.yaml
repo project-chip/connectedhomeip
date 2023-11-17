@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,20 +17,22 @@ name: Cirque
 on:
     push:
     pull_request:
+    merge_group:
     workflow_dispatch:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+    
 jobs:
     cirque:
         name: Cirque
-        timeout-minutes: 90
 
         env:
-            DOCKER_RUN_VERSION: 0.6.06
-            GITHUB_CACHE_PATH: /tmp/cirque-cache/
+            GITHUB_CACHE_PATH: /tmp/cirque-cache
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -38,7 +40,7 @@ jobs:
         # need to run with privilege, which isn't supported by job.XXX.contaner
         #  https://github.com/actions/container-action/issues/2
         #         container:
-        #             image: connectedhomeip/chip-build-cirque:0.6.06
+        #             image: ghcr.io/project-chip/chip-build-cirque:26
         #             volumes:
         #                 - "/tmp:/tmp"
         #                 - "/dev/pts:/dev/pts"
@@ -48,82 +50,78 @@ jobs:
         #             options: "--privileged"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v4
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform linux
-
-            - name: Get cirque cache key
-              id: cirque-key
-              run: |
-                  echo "::set-output name=val::$(scripts/tests/cirque_tests.sh cachekeyhash)"
-
-            - name: Cache
-              uses: actions/cache@v2
-              if: ${{ !env.ACT }}
-              id: cache
+              uses: ./.github/actions/checkout-submodules
               with:
+                platform: linux
+
+            - name: Bootstrap Cache
+              uses: ./.github/actions/bootstrap-cache
+            - name: Bootstrap Cirque
+              run: |
+                  integrations/docker/images/stage-2/chip-build-cirque/run.sh \
+                    -- sh -c " \
+                       git config --global --add safe.directory '*' \
+                       && bash scripts/bootstrap.sh \
+                       && chown -R $(id -u):$(id -g) .environment \
+                    "
+
+            - name: Get Cirque Bootstrap cache key
+              id: cirque-bootstrap-cache-key
+              run: echo "val=$(scripts/tests/cirque_tests.sh cachekeyhash)" >> $GITHUB_OUTPUT
+            - uses: Wandalen/wretry.action@v1.3.0
+              name: Cirque Bootstrap cache
+              if: ${{ !env.ACT }}
+              continue-on-error: true
+              timeout-minutes: 10
+              with:
+                action: buildjet/cache@v3
+                attempt_limit: 3
+                attempt_delay: 2000
+                with: |
+                  key: ${{ runner.os }}-cirque-${{ steps.cirque-bootstrap-cache-key.outputs.val }}
+                  restore-keys: ${{ runner.os }}-cirque-
                   path: ${{ env.GITHUB_CACHE_PATH }}
-                  key: ${{ runner.os }}-cirque-${{ steps.cirque-key.outputs.val }}
-                  restore-keys: |
-                      ${{ runner.os }}-cirque-
-
-            - name: Bootstrap
-              timeout-minutes: 15
-              run: |
-                  integrations/docker/images/chip-build-cirque/run.sh \
-                    --env GITHUB_ACTION_RUN=1 \
-                    --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
-                    --volume /tmp:/tmp \
-                    -- sh -c '\
-                       git config --global --add safe.directory "*" \
-                       && scripts/build/gn_bootstrap.sh \
-                    '
-
             - name: Cirque Bootstrap
-              timeout-minutes: 15
               run: |
-                  integrations/docker/images/chip-build-cirque/run.sh \
+                  integrations/docker/images/stage-2/chip-build-cirque/run.sh \
                     --env GITHUB_ACTION_RUN=1 \
                     --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
                     --volume /tmp:/tmp \
                     -- scripts/tests/cirque_tests.sh bootstrap
+
             - name: Artifact suffix
               id: outsuffix
-              uses: haya14busa/action-cond@v1.0.0
+              uses: haya14busa/action-cond@v1
               if: ${{ !env.ACT }}
               with:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Build Binaries
-              timeout-minutes: 30
               run: |
-                  integrations/docker/images/chip-build-cirque/run.sh \
-                    --env GITHUB_ACTION_RUN=1 \
-                    --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
-                    --volume /tmp:/tmp \
-                    -- sh -c '\
-                       git config --global --add safe.directory "*" \
-                       && scripts/build/gn_gen_cirque.sh
-                      '
+                  integrations/docker/images/stage-2/chip-build-cirque/run.sh \
+                    -- sh -c " \
+                       git config --global --add safe.directory '*' \
+                       && scripts/build/gn_gen_cirque.sh \
+                      "
             - name: Run Tests
-              timeout-minutes: 45
               run: |
-                  integrations/docker/images/chip-build-cirque/run.sh \
+                  integrations/docker/images/stage-2/chip-build-cirque/run.sh \
                      --env LOG_DIR=/tmp/cirque_test_output \
                      --env CLEANUP_DOCKER_FOR_CI=1 \
                      --env GITHUB_ACTION_RUN=1 \
                      --privileged \
                      --volume /tmp:/tmp \
                      --volume /dev/pts:/dev/pts \
-                     -- scripts/tests/cirque_tests.sh run_all_tests
+                     -- sh -c " \
+                       git config --global --add safe.directory '*' \
+                       && scripts/tests/cirque_tests.sh run_all_tests \
+                      "
+                   
+
             - name: Uploading Binaries
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}

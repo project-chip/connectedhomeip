@@ -272,4 +272,15 @@
 #endif
 #endif // INET_CONFIG_UDP_SOCKET_PKTINFO
 
+/**
+ *  @def HAVE_SO_BINDTODEVICE
+ *
+ *  @brief
+ *    Should be set to 1 if the SO_BINDTODEVICE option to setsockopt is
+ *    available.
+ */
+#ifndef HAVE_SO_BINDTODEVICE
+#define HAVE_SO_BINDTODEVICE 0
+#endif
+
 // clang-format on

@@ -18,12 +18,11 @@
 #include <app/util/af.h>
 
 #include <app/CommandHandler.h>
-#include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;
 
-void emberAfThermostatClusterClientInitCallback(void)
+void emberAfThermostatClusterClientInitCallback()
 {
     // TODO
 }

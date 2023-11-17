@@ -20,22 +20,16 @@ get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconne
 get_filename_component(CHEF ${CMAKE_CURRENT_SOURCE_DIR}/../ REALPATH)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
-include(${CHEF}/project_include.cmake)
 
 get_filename_component(GEN_DIR ${CHEF}/out/${SAMPLE_NAME}/zap-generated REALPATH)
 
 set(CONF_FILE prj.conf)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${CONFIG_DEVICE_PRODUCT_ID}")
-set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${CONFIG_DEVICE_VENDOR_ID}")
-set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_PLATFORM_NRFCONNECT=1")
-if(NOT ${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING} STREQUAL "")
-  set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING}\"")
-endif()
-message(STATUS "Product ID " ${CONFIG_DEVICE_PRODUCT_ID})
-message(STATUS "Vendor ID " ${CONFIG_DEVICE_VENDOR_ID})
-message(STATUS "SW Version String" ${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING})
+message(STATUS "Vendor ID " ${CONFIG_CHIP_DEVICE_VENDOR_ID})
+message(STATUS "Product ID " ${CONFIG_CHIP_DEVICE_PRODUCT_ID})
+message(STATUS "Product Name " ${CONFIG_CHIP_DEVICE_PRODUCT_NAME})
+message(STATUS "SW Version String" ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING})
 
 # Set Kconfig root files that will be processed as a first Kconfig for used child images.
 set(mcuboot_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.mcuboot.root)
@@ -65,13 +59,15 @@ target_include_directories(app PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common
                            ${GEN_DIR}
                            ${CHEF}
+                           ${CHEF}/common
                            ${GEN_DIR}/../
                            ${CHIP_ROOT}/src
+                           ${CHIP_ROOT}/examples/shell/shell_common/include
                            ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include
 )
 
-if (CONFIG_ENABLE_CHIP_SHELL)
+if (CONFIG_CHIP_LIB_SHELL)
   target_sources(app PRIVATE
     ${CHEF}/shell_common/globals.cpp
     ${CHEF}/shell_common/cmd_misc.cpp
@@ -81,29 +77,28 @@ if (CONFIG_ENABLE_CHIP_SHELL)
   target_include_directories(app PRIVATE
     ${CHEF}/shell_common/include
   )
-endif (CONFIG_ENABLE_CHIP_SHELL)
+endif()
 
 target_sources(app PRIVATE
     ${CHEF}/nrfconnect/main.cpp
     ${CHEF}/common/stubs.cpp
-    ${GEN_DIR}/IMClusterCommandHandler.cpp
+    ${CHEF}/common/chef-channel-manager.cpp
+    ${CHEF}/common/chef-air-quality.cpp
+    ${CHEF}/common/chef-concentration-measurement.cpp
+    ${CHEF}/common/chef-rvc-mode-delegate.cpp
+    ${CHEF}/common/chef-rvc-operational-state-delegate.cpp
 )
 
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)
 chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${CHEF}/devices/${SAMPLE_NAME}.zap
-    GEN_DIR ${GEN_DIR}
 )
 
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
 
 
-if (CONFIG_ENABLE_PW_RPC)
-
-target_compile_options(app PRIVATE
-                       "-DCONFIG_ENABLE_PW_RPC=1"
-)
+if (CONFIG_CHIP_PW_RPC)
 
 # Make all targets created below depend on zephyr_interface to inherit MCU-related compilation flags
 link_libraries($<BUILD_INTERFACE:zephyr_interface>)
@@ -117,7 +112,6 @@ pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert.check pw_assert_log.check_backend)
 pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
 pw_set_backend(pw_sys_io pw_sys_io.nrfconnect)
-pw_set_backend(pw_trace pw_trace_tokenized)
 set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
 add_subdirectory(third_party/connectedhomeip/examples/platform/nrfconnect/pw_sys_io)
@@ -209,7 +203,6 @@ target_compile_options(app PRIVATE
                        "-DPW_RPC_DESCRIPTOR_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_THREAD_SERVICE=1"
-                       "-DPW_RPC_TRACING_SERVICE=1"
 )
 
 target_link_libraries(app PRIVATE
@@ -219,17 +212,10 @@ target_link_libraries(app PRIVATE
   thread_service.nanopb_rpc
   pw_checksum
   pw_hdlc
+  pw_hdlc.pw_rpc
   pw_log
   pw_rpc.server
-  pw_trace_tokenized
-  pw_trace_tokenized.trace_buffer
-  pw_trace_tokenized.rpc_service
-  pw_trace_tokenized.protos.nanopb_rpc
+  pw_sys_io
 )
 
-target_link_options(app
-  PUBLIC
-    "-T${PIGWEED_ROOT}/pw_tokenizer/pw_tokenizer_linker_sections.ld"
-)
-
-endif(CONFIG_ENABLE_PW_RPC)
+endif(CONFIG_CHIP_PW_RPC)

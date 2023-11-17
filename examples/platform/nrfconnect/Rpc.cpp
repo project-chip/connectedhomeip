@@ -26,7 +26,7 @@
 
 #include <zephyr/kernel.h>
 
-LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 #include "pigweed/rpc_services/Attributes.h"
@@ -95,9 +95,20 @@ K_TIMER_DEFINE(reboot_timer, reboot_timer_handler, NULL);
 class NrfDevice final : public Device
 {
 public:
-    pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
+    pw::Status Reboot(const chip_rpc_RebootRequest & request, pw_protobuf_Empty & response) override
     {
-        k_timer_start(&reboot_timer, K_SECONDS(1), K_FOREVER);
+        k_timeout_t delay;
+        if (request.delay_ms != 0)
+        {
+            delay = K_MSEC(request.delay_ms);
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Did not receive a reboot delay. Defaulting to 1s");
+            delay = K_SECONDS(1);
+        }
+
+        k_timer_start(&reboot_timer, delay, K_FOREVER);
         return pw::OkStatus();
     }
 };
@@ -109,7 +120,8 @@ class NrfButton final : public Button
 public:
     pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
-        GetAppTask().ButtonEventHandler(request.pushed << request.idx /* button_state */, 1 << request.idx /* has_changed */);
+        AppTask::Instance().ButtonEventHandler(request.pushed << request.idx /* button_state */,
+                                               1 << request.idx /* has_changed */);
         return pw::OkStatus();
     }
 };
@@ -156,7 +168,7 @@ Thread thread;
 #endif // defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
 
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
-pw::trace::TraceService trace_service;
+pw::trace::TraceService trace_service(pw::trace::GetTokenizedTracer());
 #endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 
 void RegisterServices(pw::rpc::Server & server)

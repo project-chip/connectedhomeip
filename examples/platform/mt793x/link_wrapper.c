@@ -58,6 +58,14 @@ void __assert_func(const char * file, int line, const char * func, const char * 
 #include <assert.h>
 #include <stdlib.h>
 
+void * __wrap__calloc_r(size_t nmemb, size_t size)
+{
+    void * p = pvPortCalloc(nmemb, size);
+    while (!p)
+        ;
+    return p;
+}
+
 void * __wrap__malloc_r(void * REENT, size_t size)
 {
     void * p = pvPortMalloc(size);

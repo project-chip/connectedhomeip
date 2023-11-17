@@ -4,8 +4,8 @@ import chip.clusterinfo.CommandResponseInfo
 import java.io.Serializable
 
 /**
- * HistoryCommand stores information about each executed command and display
- * necessary information for each item in [ClusterInteractionHistoryFragment]
+ * HistoryCommand stores information about each executed command and display necessary information
+ * for each item in [ClusterInteractionHistoryFragment]
  */
 data class HistoryCommand(
   val clusterName: String,

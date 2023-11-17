@@ -46,7 +46,11 @@ matrix:
           # ```python
           # content
           # ```
-          - open: '(?s)^(?P<open> *`{3,})[a-z]*$'
+          #
+          # Allow MyST extended syntax like:
+          # ```{include} my/file.md
+          # ```
+          - open: '(?s)^(?P<open> *`{3,})([a-z]*$|{[a-z]*?}\s*[^\n]*?$)'
             close: '^(?P=open)$'
           # Ignore text between inline back ticks
           - open: '(?P<open>`+)'

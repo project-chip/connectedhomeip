@@ -1,0 +1,10 @@
+[
+    { ref: "../iwyu.imp" },
+
+    { include: [ '"bluetooth_type.h"', private, '<bluetooth.h>', public ] },
+    { include: [ '"dns-sd.h"', private, '<dns-sd.h>', public ] },
+    { include: [ '"thread-type.h"', private, '<thread.h>', public ] },
+    { include: [ '"thread.h"', private, '<thread.h>', public ] },
+    { include: [ '<thread-type.h>', private, '<thread.h>', public ] },
+    { include: [ '<tizen_error.h>', private, '<tizen.h>', public ] },
+]

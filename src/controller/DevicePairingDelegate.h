@@ -40,7 +40,6 @@ public:
     {
         SecurePairingSuccess = 0,
         SecurePairingFailed,
-        SecurePairingDiscoveringMoreDevices,
     };
 
     /**
@@ -83,6 +82,12 @@ public:
      *  Called with the ReadCommissioningInfo returned from the target
      */
     virtual void OnReadCommissioningInfo(const ReadCommissioningInfo & info) {}
+
+    /**
+     * @brief
+     * Called when MatchingFabricInfo returned from target
+     */
+    virtual void OnFabricCheck(NodeId matchingNodeId) {}
 
     /**
      * @brief

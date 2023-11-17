@@ -32,9 +32,7 @@ namespace Minimal {
 namespace BroadcastIpAddresses {
 
 // Get standard mDNS Broadcast addresses
-
-void GetIpv6Into(chip::Inet::IPAddress & dest);
-void GetIpv4Into(chip::Inet::IPAddress & dest);
+chip::Inet::IPAddress Get(chip::Inet::IPAddressType addressType);
 
 } // namespace BroadcastIpAddresses
 
@@ -130,17 +128,17 @@ public:
 
     ServerBase(EndpointInfoPoolType & pool) : mEndpoints(pool)
     {
-        BroadcastIpAddresses::GetIpv6Into(mIpv6BroadcastAddress);
-
+        mIpv6BroadcastAddress = BroadcastIpAddresses::Get(chip::Inet::IPAddressType::kIPv6);
 #if INET_CONFIG_ENABLE_IPV4
-        BroadcastIpAddresses::GetIpv4Into(mIpv4BroadcastAddress);
+        mIpv4BroadcastAddress = BroadcastIpAddresses::Get(chip::Inet::IPAddressType::kIPv4);
 #endif
     }
     virtual ~ServerBase();
 
-    /// Closes all currently open endpoints
+    /// Closes all currently open endpoints and resets the 'initialized' flag
     void Shutdown();
 
+    void ShutdownEndpoints();
     void ShutdownEndpoint(EndpointInfo & aEndpoint);
 
     /// Listen on the given interfaces/address types.
@@ -177,13 +175,6 @@ public:
         return *this;
     }
 
-    /// Iterator through all Endpoints
-    template <typename Function>
-    chip::Loop ForEachEndPoints(Function && function)
-    {
-        return mEndpoints.ForEachActiveObject(std::forward<Function>(function));
-    }
-
     /// A server is considered listening if any UDP endpoint is active.
     ///
     /// This is expected to return false after any Shutdown() and will
@@ -206,6 +197,7 @@ private:
 #if INET_CONFIG_ENABLE_IPV4
     chip::Inet::IPAddress mIpv4BroadcastAddress;
 #endif
+    bool mIsInitialized = false;
 };
 
 // The PoolImpl impl is used as a base class because its destructor must be called after ServerBase's destructor.

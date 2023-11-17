@@ -1,0 +1,44 @@
+#include <tlv/meta/{{table_name}}.h>
+
+namespace chip {
+namespace TLVMeta {
+namespace {
+
+using namespace chip::FlatTree;
+using namespace chip::TLV;
+
+{%- for table in sub_tables %}
+
+const Entry<ItemInfo> _{{table.full_name}}[] = {
+  {%-  for entry in table.entries %}
+  { { {{entry.code}}, "{{entry.name}}", ItemType::{{entry.item_type}} }, {{entry.reference | indexInTable(sub_tables)}} }, // {{entry.real_type}}
+  {%- endfor %}
+};
+{%- endfor %}
+
+const Entry<ItemInfo> _all_clusters[] = {
+{%- for cluster in clusters | sort(attribute='code') %}
+  { { ClusterTag({{"0x%02X" | format(cluster.code)}}), "{{cluster.name}}", ItemType::kDefault }, {{cluster.name | indexInTable(sub_tables)}} },
+{%- endfor %}
+
+};
+
+// For any non-structure list like u64[] or similar.
+const Entry<ItemInfo> _primitive_type_list[] = {
+  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, kInvalidNodeIndex },
+};
+
+} // namespace
+
+#define _ENTRY(n) { sizeof(n) / sizeof(n[0]), n}
+
+const std::array<const Node<ItemInfo>, {{ sub_tables | length }} + 2> {{table_name}} = { {
+  _ENTRY(_all_clusters), // 0
+  _ENTRY(_primitive_type_list), // 1
+{%- for table in sub_tables %}
+  _ENTRY(_{{table.full_name}}), // {{loop.index + 1}}
+{%- endfor %}
+} };
+
+} // namespace TLVMeta
+} // namespace chip

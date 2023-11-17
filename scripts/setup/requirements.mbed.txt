@@ -1,0 +1,8 @@
+mbed-tools>=7.55.1.dev1 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+pytest==6.2.5 ; sys_platform == 'linux'
+mbed-ls==1.8.11 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+pdoc3 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+gitpython ; platform_machine != 'aarch64' and sys_platform == 'linux'
+python-dotenv ; platform_machine != 'aarch64' and sys_platform == 'linux'
+pyudev ; platform_machine != 'aarch64' and sys_platform == 'linux'
+typing-extensions ; platform_machine != 'aarch64' and sys_platform == 'linux'

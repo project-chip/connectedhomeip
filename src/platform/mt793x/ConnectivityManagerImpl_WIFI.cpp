@@ -386,7 +386,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP(void)
     uint16_t discriminator = 0x8888;
 
     ssid_len       = snprintf(ssid, sizeof(ssid), "%s%03X-%04X-%04X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX, discriminator,
-                        CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+                              CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
     int8_t channel = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
 
     filogic_wifi_ap_config_async(mFilogicCtx, channel, ssid, ssid_len);

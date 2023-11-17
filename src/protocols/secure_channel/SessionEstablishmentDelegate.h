@@ -26,7 +26,7 @@
 #pragma once
 
 #include <system/SystemPacketBuffer.h>
-#include <transport/SessionHandle.h>
+#include <transport/Session.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 

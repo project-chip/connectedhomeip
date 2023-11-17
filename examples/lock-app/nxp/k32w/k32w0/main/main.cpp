@@ -31,12 +31,22 @@
 #include "FreeRtosHooks.h"
 #include "app_config.h"
 
+#if PDM_SAVE_IDLE
+#include <openthread/platform/settings.h>
+#endif
+
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#include "fsl_gpio.h"
+#include "fsl_iocon.h"
+#include "gpio_pins.h"
+#endif
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
 #include "Keyboard.h"
 #include "OtaSupport.h"
 #include "PWR_Configuration.h"
@@ -57,7 +67,7 @@ extern InitFunc __init_array_end;
 extern "C" void sched_enable();
 
 /* low power requirements */
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
 extern "C" void setThreadInitialized(bool isInitialized);
 extern "C" bool isThreadInitialized();
 #endif
@@ -92,6 +102,12 @@ extern "C" void main_task(void const * argument)
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
 
+#if PDM_SAVE_IDLE
+    /* OT Settings needs to be initialized
+     * early as XCVR is making use of it */
+    otPlatSettingsInit(NULL, NULL, 0);
+#endif
+
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
@@ -117,7 +133,7 @@ extern "C" void main_task(void const * argument)
         goto exit;
     }
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
     setThreadInitialized(TRUE);
 #endif
 
@@ -156,7 +172,7 @@ exit:
 extern "C" void otSysEventSignalPending(void)
 {
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
     /* make sure that 15.4 radio is initialized before waking up the Thread task */
     if (isThreadInitialized())
 #endif
@@ -165,3 +181,29 @@ extern "C" void otSysEventSignalPending(void)
         portYIELD_FROM_ISR(yieldRequired);
     }
 }
+
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+extern "C" void vOptimizeConsumption(void)
+{
+    /* BUTTON2 change contact, BUTTON4 start adv/factoryreset */
+    uint32_t u32SkipIO = (1 << IOCON_USER_BUTTON1_PIN) | (1 << IOCON_USER_BUTTON2_PIN);
+
+    /* Pins are set to GPIO mode (IOCON FUNC0), pulldown and analog mode */
+    uint32_t u32PIOvalue = (IOCON_FUNC0 | IOCON_MODE_PULLDOWN | IOCON_ANALOG_EN);
+
+    const gpio_pin_config_t pin_config = { .pinDirection = kGPIO_DigitalInput, .outputLogic = 1U };
+
+    if (u32PIOvalue != 0)
+    {
+        for (int i = 0; i < 22; i++)
+        {
+            if (((u32SkipIO >> i) & 0x1) != 1)
+            {
+                /* configure GPIOs to Input mode */
+                GPIO_PinInit(GPIO, 0, i, &pin_config);
+                IOCON_PinMuxSet(IOCON, 0, i, u32PIOvalue);
+            }
+        }
+    }
+}
+#endif

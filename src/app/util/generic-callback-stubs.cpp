@@ -16,7 +16,7 @@
  */
 
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app/util/basic-types.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/Constants.h>
 
@@ -28,7 +28,7 @@ EmberAfAttributeWritePermission __attribute__((weak))
 emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
                                           uint8_t type)
 {
-    return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL; // Default
+    return EmberAfAttributeWritePermission::AllowWriteNormal; // Default
 }
 
 bool __attribute__((weak)) emberAfAttributeReadAccessCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
@@ -53,13 +53,6 @@ emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, 
                                       uint8_t * buffer)
 {
     return EMBER_ZCL_STATUS_FAILURE;
-}
-
-void __attribute__((weak)) emberAfRegistrationAbortCallback() {}
-
-bool __attribute__((weak)) emberAfStartMoveCallback()
-{
-    return false;
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))

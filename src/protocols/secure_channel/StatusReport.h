@@ -21,6 +21,7 @@
 #include <lib/support/BufferWriter.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
+#include <system/SystemClock.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -93,6 +94,15 @@ public:
     Protocols::Id GetProtocolId() const { return mProtocolId; }
     uint16_t GetProtocolCode() const { return mProtocolCode; }
     const System::PacketBufferHandle & GetProtocolData() const { return mProtocolData; }
+
+    /**
+     * Builds a busy status report with protocol data containing the minimum wait time.
+     *
+     * @param[in] minimumWaitTime Time in milliseconds before initiator retries the request
+     *
+     * @return Packet buffer handle which can be passed to SendMessage.
+     */
+    static System::PacketBufferHandle MakeBusyStatusReportMessage(System::Clock::Milliseconds16 minimumWaitTime);
 
 private:
     GeneralStatusCode mGeneralCode;

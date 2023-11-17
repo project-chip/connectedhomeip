@@ -19,6 +19,7 @@
 #include "TvApp-JNI.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/util/config.h>
 #include <cstdlib>
 #include <jni.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -78,7 +79,7 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder
 
         for (jint i = 0; i < length; i++)
         {
-            chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
+            chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type channelInfo;
             jobject channelObject = env->GetObjectArrayElement(channelInfoList, i);
             jclass channelClass   = env->GetObjectClass(channelObject);
 
@@ -131,7 +132,7 @@ exit:
 
 CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
 {
-    chip::app::Clusters::Channel::Structs::LineupInfo::Type lineupInfo;
+    chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type lineupInfo;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -193,7 +194,7 @@ exit:
 
 CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEncoder)
 {
-    chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
+    chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type channelInfo;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     ChipLogProgress(Zcl, "Received ChannelManager::HandleGetCurrentChannel");
@@ -285,7 +286,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
 
         jfieldID getStatusField = env->GetFieldID(channelClass, "status", "I");
         jint jstatus            = env->GetIntField(channelObject, getStatusField);
-        response.status         = static_cast<app::Clusters::Channel::ChannelStatusEnum>(jstatus);
+        response.status         = static_cast<app::Clusters::Channel::StatusEnum>(jstatus);
 
         jfieldID getNameField = env->GetFieldID(channelClass, "name", "Ljava/lang/String;");
         jstring jname         = static_cast<jstring>(env->GetObjectField(channelObject, getNameField));
@@ -329,7 +330,7 @@ exit:
     return static_cast<bool>(ret);
 }
 
-bool ChannelManager::HandleSkipChannel(const uint16_t & count)
+bool ChannelManager::HandleSkipChannel(const int16_t & count)
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();

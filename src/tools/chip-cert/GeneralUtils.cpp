@@ -27,6 +27,7 @@
 
 #include "chip-cert.h"
 
+#include <errno.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/SafeInt.h>
@@ -339,8 +340,8 @@ bool WriteDataIntoFile(const char * fileName, const uint8_t * data, size_t dataL
         ExitNow(res = false);
     }
 
-    // Add new line if the output is stdout
-    if ((strcmp(fileName, "-") == 0) && (fwrite("\n", 1, 1, file) != 1))
+    // Add new line if the output is to stdout in a text format
+    if ((strcmp(fileName, "-") == 0) && (dataFmt != kDataFormat_Raw) && (fwrite("\n", 1, 1, file) != 1))
     {
         fprintf(stderr, "Unable to write to %s: %s\n", fileName, strerror(ferror(file) ? errno : ENOSPC));
         ExitNow(res = false);

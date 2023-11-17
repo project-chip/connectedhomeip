@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -96,7 +95,7 @@ CHIP_ERROR ActionsAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attr
 }
 } // anonymous namespace
 
-void MatterActionsPluginServerInitCallback(void)
+void MatterActionsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

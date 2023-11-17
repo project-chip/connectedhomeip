@@ -21,7 +21,6 @@
 #include "DeviceCallbacks.h"
 #include "Globals.h"
 #include "LEDWidget.h"
-#include "OpenThreadLaunch.h"
 #include "QRCodeScreen.h"
 #include "ShellCommands.h"
 #include "WiFiWidget.h"
@@ -40,8 +39,10 @@
 #include <app/util/af.h>
 #include <binding-handler.h>
 #include <common/Esp32AppServer.h>
+#include <common/Esp32ThreadInit.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <platform/ESP32/ESP32Utils.h>
 
 #if CONFIG_HAVE_DISPLAY
 #include "DeviceWithDisplay.h"
@@ -49,10 +50,6 @@
 
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
-#endif
-
-#if CONFIG_OPENTHREAD_ENABLED
-#include <platform/ThreadStackManager.h>
 #endif
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -82,6 +79,7 @@ namespace {
 class AppCallbacks : public AppDelegate
 {
 public:
+    void OnCommissioningSessionEstablishmentStarted() {}
     void OnCommissioningSessionStarted() override { bluetoothLED.Set(true); }
     void OnCommissioningSessionStopped() override
     {
@@ -115,7 +113,6 @@ static void InitServer(intptr_t context)
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
-    InitBindingHandlers();
 #if CONFIG_DEVICE_TYPE_M5STACK
     SetupPretendDevices();
 #endif
@@ -128,6 +125,12 @@ extern "C" void app_main()
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
+        return;
+    }
+    err = esp_event_loop_create_default();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_event_loop_create_default() failed: %s", esp_err_to_name(err));
         return;
     }
 #if CONFIG_ENABLE_PW_RPC
@@ -144,10 +147,13 @@ extern "C" void app_main()
     CASECommands::GetInstance().Register();
 #endif // CONFIG_ENABLE_CHIP_SHELL
 
-#if CONFIG_OPENTHREAD_ENABLED
-    LaunchOpenThread();
-    ThreadStackMgr().InitThreadStack();
-#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if (DeviceLayer::Internal::ESP32Utils::InitWiFiStack() != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to initialize Wi-Fi stack");
+        return;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
@@ -156,7 +162,7 @@ extern "C" void app_main()
     DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
     if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
+        ESP_LOGE(TAG, "device.Init() failed: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
 
@@ -174,9 +180,10 @@ extern "C" void app_main()
     error = GetAppTask().StartAppTask();
     if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %s", ErrorStr(error));
+        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %" CHIP_ERROR_FORMAT, error.Format());
     }
 
+    ESPOpenThreadInit();
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }
 

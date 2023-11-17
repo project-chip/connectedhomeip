@@ -28,12 +28,14 @@ import chip.platform.ChipMdnsCallbackImpl;
 import chip.platform.DiagnosticDataProviderImpl;
 import chip.platform.NsdManagerServiceBrowser;
 import chip.platform.NsdManagerServiceResolver;
-import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 public class TvCastingApp {
   private static final String TAG = TvCastingApp.class.getSimpleName();
@@ -41,12 +43,36 @@ public class TvCastingApp {
   private static final List<Long> DISCOVERY_TARGET_DEVICE_TYPE_FILTER =
       Arrays.asList(35L); // Video player = 35;
 
+  // delay before which we assume undiscovered cached players may be in STR mode
+  private static final long CHIP_DEVICE_CONFIG_STR_DISCOVERY_DELAY_SEC = 5;
+
+  private static TvCastingApp sInstance;
   private Context applicationContext;
   private ChipAppServer chipAppServer;
   private NsdManagerServiceResolver.NsdManagerResolverAvailState nsdManagerResolverAvailState;
+  private boolean discoveryStarted = false;
+  private Object discoveryLock = new Object();
+
+  private List<DiscoveredNodeData> discoveredPlayers;
+  private ScheduledFuture<?> reportSleepingVideoPlayerCommissionersFuture;
+
+  private WifiManager.MulticastLock multicastLock;
+  private NsdManager nsdManager;
+  private NsdDiscoveryListener nsdDiscoveryListener;
+
+  private TvCastingApp() {}
+
+  public static TvCastingApp getInstance() {
+    if (sInstance == null) {
+      sInstance = new TvCastingApp();
+    }
+    return sInstance;
+  }
 
   public boolean initApp(Context applicationContext, AppParameters appParameters) {
-    if (applicationContext == null || appParameters == null) {
+    if (applicationContext == null
+        || appParameters == null
+        || appParameters.getConfigurationManager() == null) {
       return false;
     }
 
@@ -59,76 +85,232 @@ public class TvCastingApp {
         new AndroidChipPlatform(
             new AndroidBleManager(),
             new PreferencesKeyValueStoreManager(applicationContext),
-            new PreferencesConfigurationManager(applicationContext),
+            appParameters.getConfigurationManager(),
             nsdManagerServiceResolver,
             new NsdManagerServiceBrowser(applicationContext),
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
 
-    chipPlatform.updateCommissionableDataProviderData(
-        appParameters.getSpake2pVerifierBase64(),
-        appParameters.getSpake2pSaltBase64(),
-        appParameters.getSpake2pIterationCount(),
-        appParameters.getSetupPasscode(),
-        appParameters.getDiscriminator());
+    boolean ret =
+        chipPlatform.updateCommissionableDataProviderData(
+            appParameters.getSpake2pVerifierBase64(),
+            appParameters.getSpake2pSaltBase64(),
+            appParameters.getSpake2pIterationCount(),
+            appParameters.getSetupPasscode(),
+            appParameters.getDiscriminator());
+    if (!ret) {
+      Log.e(
+          TAG,
+          "TvCastingApp.initApp failed to updateCommissionableDataProviderData on chipPlatform");
+      return ret;
+    }
+
+    ret = preInitJni(appParameters);
+    if (!ret) {
+      Log.e(TAG, "TvCastingApp.initApp failed in preInitJni");
+      return ret;
+    }
 
     chipAppServer = new ChipAppServer();
-    chipAppServer.startApp();
+    ret = chipAppServer.startApp();
+    if (!ret) {
+      Log.e(TAG, "TvCastingApp.initApp failed in start chipAppServer");
+      return ret;
+    }
 
-    setDACProvider(appParameters.getDacProvider());
     return initJni(appParameters);
   }
 
-  private native void setDACProvider(DACProvider provider);
+  public native void setDACProvider(DACProvider provider);
+
+  private native boolean preInitJni(AppParameters appParameters);
 
   private native boolean initJni(AppParameters appParameters);
 
   public void discoverVideoPlayerCommissioners(
-      long discoveryDurationSeconds,
       SuccessCallback<DiscoveredNodeData> discoverySuccessCallback,
       FailureCallback discoveryFailureCallback) {
-    Log.d(TAG, "TvCastingApp.discoverVideoPlayerCommissioners called");
+    synchronized (discoveryLock) {
+      Log.d(TAG, "TvCastingApp.discoverVideoPlayerCommissioners called");
 
-    List<VideoPlayer> preCommissionedVideoPlayers = readCachedVideoPlayers();
+      if (this.discoveryStarted) {
+        Log.d(TAG, "Discovery already started, stopping before starting again");
+        stopVideoPlayerDiscovery();
+      }
 
-    WifiManager wifiManager =
-        (WifiManager) applicationContext.getSystemService(Context.WIFI_SERVICE);
-    WifiManager.MulticastLock multicastLock = wifiManager.createMulticastLock("multicastLock");
-    multicastLock.setReferenceCounted(true);
-    multicastLock.acquire();
+      List<VideoPlayer> preCommissionedVideoPlayers = readCachedVideoPlayers();
 
-    NsdManager nsdManager = (NsdManager) applicationContext.getSystemService(Context.NSD_SERVICE);
-    NsdDiscoveryListener nsdDiscoveryListener =
-        new NsdDiscoveryListener(
-            nsdManager,
-            DISCOVERY_TARGET_SERVICE_TYPE,
-            DISCOVERY_TARGET_DEVICE_TYPE_FILTER,
-            preCommissionedVideoPlayers,
-            discoverySuccessCallback,
-            discoveryFailureCallback,
-            nsdManagerResolverAvailState);
+      WifiManager wifiManager =
+          (WifiManager) applicationContext.getSystemService(Context.WIFI_SERVICE);
+      multicastLock = wifiManager.createMulticastLock("multicastLock");
+      multicastLock.setReferenceCounted(true);
+      multicastLock.acquire();
 
-    nsdManager.discoverServices(
-        DISCOVERY_TARGET_SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, nsdDiscoveryListener);
+      nsdManager = (NsdManager) applicationContext.getSystemService(Context.NSD_SERVICE);
+      discoveredPlayers = new ArrayList<>();
+      nsdDiscoveryListener =
+          new NsdDiscoveryListener(
+              nsdManager,
+              DISCOVERY_TARGET_SERVICE_TYPE,
+              DISCOVERY_TARGET_DEVICE_TYPE_FILTER,
+              preCommissionedVideoPlayers,
+              new SuccessCallback<DiscoveredNodeData>() {
+                @Override
+                public void handle(DiscoveredNodeData commissioner) {
+                  Log.d(TAG, "Discovered commissioner added " + commissioner);
+                  discoveredPlayers.add(commissioner);
+                  discoverySuccessCallback.handle(commissioner);
+                }
+              },
+              discoveryFailureCallback,
+              nsdManagerResolverAvailState);
 
-    Executors.newSingleThreadScheduledExecutor()
-        .schedule(
-            new Runnable() {
-              @Override
-              public void run() {
-                Log.d(TAG, "TvCastingApp stopping Video Player commissioner discovery");
-                nsdManager.stopServiceDiscovery(nsdDiscoveryListener);
-                multicastLock.release();
-              }
-            },
-            discoveryDurationSeconds,
-            TimeUnit.SECONDS);
-    Log.d(TAG, "TvCastingApp.discoverVideoPlayerCommissioners ended");
+      nsdManager.discoverServices(
+          DISCOVERY_TARGET_SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, nsdDiscoveryListener);
+      Log.d(TAG, "TvCastingApp.discoverVideoPlayerCommissioners started");
+
+      /**
+       * Surface players (as DiscoveredNodeData objects on discoverySuccessCallback) that we
+       * previously connected to and received their WakeOnLAN MACAddress, but could not discover
+       * over DNS-SD this time in CHIP_DEVICE_CONFIG_STR_DISCOVERY_DELAY_SEC. This API will also
+       * ensure that the reported players were previously discoverable within
+       * CHIP_DEVICE_CONFIG_STR_CACHE_LAST_DISCOVERED_HOURS.
+       *
+       * <p>The DiscoveredNodeData object for such players will have the IsAsleep attribute set to
+       * true, which can optionally be used for any special UX treatment when displaying them.
+       *
+       * <p>Surfacing such players as discovered will allow displaying them to the user, who may
+       * want to cast to them. In such a case, the VerifyOrEstablishConnection API will turn them on
+       * over WakeOnLan.
+       */
+      this.reportSleepingVideoPlayerCommissionersFuture =
+          Executors.newScheduledThreadPool(1)
+              .schedule(
+                  () -> {
+                    Log.d(
+                        TAG,
+                        "Scheduling reportSleepingCommissioners with commissioner count "
+                            + (preCommissionedVideoPlayers != null
+                                ? preCommissionedVideoPlayers.size()
+                                : 0));
+                    reportSleepingVideoPlayerCommissioners(
+                        preCommissionedVideoPlayers, discoverySuccessCallback);
+                  },
+                  CHIP_DEVICE_CONFIG_STR_DISCOVERY_DELAY_SEC * 1000,
+                  TimeUnit.MILLISECONDS);
+
+      this.discoveryStarted = true;
+    }
+  }
+
+  private void reportSleepingVideoPlayerCommissioners(
+      List<VideoPlayer> cachedVideoPlayers,
+      SuccessCallback<DiscoveredNodeData> discoverySuccessCallback) {
+    Log.d(
+        TAG,
+        "TvCastingApp.reportSleepingVideoPlayerCommissioners called with commissioner count "
+            + (cachedVideoPlayers != null ? cachedVideoPlayers.size() : 0));
+    if (cachedVideoPlayers == null) {
+      Log.d(TAG, "No cached video players available.");
+      return;
+    }
+
+    for (VideoPlayer player : cachedVideoPlayers) {
+      Log.d(TAG, "Cached Video Player: " + player);
+      // do NOT surface this cached Player if we don't have its MACAddress
+      if (player.getMACAddress() == null) {
+        Log.d(
+            TAG,
+            "TvCastingApp.reportSleepingVideoPlayerCommissioners Skipping Player with hostName"
+                + player.getHostName()
+                + " but no MACAddress");
+        continue;
+      }
+
+      // do NOT surface this cached Player if it has not been discoverable recently (in
+      // CHIP_DEVICE_CONFIG_STR_CACHE_LAST_DISCOVERED_HOURS)
+      if (!WasRecentlyDiscoverable(player)) {
+        Log.d(
+            TAG,
+            "TvCastingApp.reportSleepingVideoPlayerCommissioners Skipping Player with hostName"
+                + player.getHostName()
+                + " that has not been discovered recently");
+        continue;
+      }
+
+      // do NOT surface this cached Player if it was just discovered right now (in this discovery
+      // call)
+      boolean justDiscovered =
+          discoveredPlayers
+              .stream()
+              .anyMatch(
+                  new Predicate<DiscoveredNodeData>() {
+                    @Override
+                    public boolean test(DiscoveredNodeData discoveredNodeData) {
+                      return player.getHostName().equals(discoveredNodeData.getHostName());
+                    }
+                  });
+      if (justDiscovered) {
+        Log.d(
+            TAG,
+            "TvCastingApp.reportSleepingVideoPlayerCommissioners Skipping Player with hostName"
+                + player.getHostName()
+                + " that was just discovered");
+        continue;
+      }
+
+      // DO surface this cached Player (as asleep)
+      Log.d(TAG, "Reporting sleeping player with hostName " + player.getHostName());
+      player.setIsAsleep(true);
+      discoverySuccessCallback.handle(new DiscoveredNodeData(player));
+    }
+  }
+
+  private native boolean WasRecentlyDiscoverable(VideoPlayer player);
+
+  public void stopVideoPlayerDiscovery() {
+    synchronized (discoveryLock) {
+      Log.d(TAG, "TvCastingApp trying to stop video player discovery");
+      if (this.discoveryStarted
+          && nsdManager != null
+          && multicastLock != null
+          && nsdDiscoveryListener != null) {
+        Log.d(TAG, "TvCastingApp stopping Video Player commissioner discovery");
+        try {
+          nsdManager.stopServiceDiscovery(nsdDiscoveryListener);
+        } catch (IllegalArgumentException e) {
+          Log.w(
+              TAG,
+              "TvCastingApp received exception on calling nsdManager.stopServiceDiscovery() "
+                  + e.getMessage());
+        }
+
+        if (multicastLock.isHeld()) {
+          multicastLock.release();
+        }
+
+        if (reportSleepingVideoPlayerCommissionersFuture != null) {
+          reportSleepingVideoPlayerCommissionersFuture.cancel(false);
+        }
+        this.discoveryStarted = false;
+      }
+    }
+  }
+
+  void resetDiscoveryState() {
+    synchronized (discoveryLock) {
+      Log.d(TAG, "TvCastingApp resetting discovery state");
+      this.discoveryStarted = false;
+      this.nsdDiscoveryListener = null;
+      if (multicastLock != null && multicastLock.isHeld()) {
+        multicastLock.release();
+      }
+    }
   }
 
   public native boolean openBasicCommissioningWindow(
       int duration,
-      Object commissioningCompleteHandler,
+      CommissioningCallbacks commissioningCallbacks,
       SuccessCallback<VideoPlayer> onConnectionSuccess,
       FailureCallback onConnectionFailure,
       SuccessCallback<ContentApp> onNewOrUpdatedEndpointCallback);
@@ -151,6 +333,8 @@ public class TvCastingApp {
   public native void disconnect();
 
   public native List<VideoPlayer> getActiveTargetVideoPlayers();
+
+  public native boolean purgeCache();
 
   /*
    * CONTENT LAUNCHER CLUSTER
@@ -229,6 +413,14 @@ public class TvCastingApp {
   public native boolean mediaPlayback_stopPlayback(ContentApp contentApp, Object responseHandler);
 
   public native boolean mediaPlayback_next(ContentApp contentApp, Object responseHandler);
+
+  public native boolean mediaPlayback_previous(ContentApp contentApp, Object responseHandler);
+
+  public native boolean mediaPlayback_rewind(ContentApp contentApp, Object responseHandler);
+
+  public native boolean mediaPlayback_fastForward(ContentApp contentApp, Object responseHandler);
+
+  public native boolean mediaPlayback_startOver(ContentApp contentApp, Object responseHandler);
 
   public native boolean mediaPlayback_seek(
       ContentApp contentApp, long position, Object responseHandler);
@@ -399,7 +591,13 @@ public class TvCastingApp {
   public native boolean applicationBasic_readApplicationVersion(
       ContentApp contentApp,
       SuccessCallback<String> readSuccessHandler,
-      FailureCallback readFailureHandlerr);
+      FailureCallback readFailureHandler);
+
+  public native boolean onOff_on(ContentApp contentApp, Object responseHandler);
+
+  public native boolean onOff_off(ContentApp contentApp, Object responseHandler);
+
+  public native boolean onOff_toggle(ContentApp contentApp, Object responseHandler);
 
   static {
     System.loadLibrary("TvCastingApp");

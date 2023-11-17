@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include "lib/core/CHIPTLV.h"
-#include "lib/core/CHIPTLVTags.h"
-#include "lib/core/CHIPTLVTypes.h"
+#include "lib/core/TLV.h"
+#include "lib/core/TLVTags.h"
+#include "lib/core/TLVTypes.h"
 #include "protocols/interaction_model/Constants.h"
 #include "system/SystemPacketBuffer.h"
 #include "system/TLVPacketBufferBackingStore.h"

@@ -100,7 +100,7 @@ const nlTest sTests[] = { NL_TEST_DEF("Test escaping API", TestEscaping), NL_TES
 
 } // namespace
 
-int TestIniEscaping(void)
+int TestIniEscaping()
 {
     nlTestSuite theSuite = { "IniEscaping tests", &sTests[0], nullptr, nullptr };
 

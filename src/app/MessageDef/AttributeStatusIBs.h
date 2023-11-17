@@ -22,10 +22,10 @@
 #include "ArrayParser.h"
 #include "AttributeStatusIB.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -45,9 +45,9 @@ public:
     /**
      *  @brief Mark the end of this AttributeStatusIBs
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    AttributeStatusIBs::Builder & EndOfAttributeStatuses();
+    CHIP_ERROR EndOfAttributeStatuses();
 
 private:
     AttributeStatusIB::Builder mAttributeStatus;

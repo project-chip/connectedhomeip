@@ -18,15 +18,16 @@
 
 #include "InteractiveCommands.h"
 
-#include <editline.h>
-#include <iomanip>
-#include <sstream>
+#include <platform/logging/LogV.h>
 
-char kInteractiveModeName[]                            = "";
+#include <editline.h>
+
 constexpr const char * kInteractiveModePrompt          = ">>> ";
-constexpr uint8_t kInteractiveModeArgumentsMaxLength   = 32;
 constexpr const char * kInteractiveModeHistoryFilePath = "/tmp/chip_tool_history";
 constexpr const char * kInteractiveModeStopCommand     = "quit()";
+constexpr const char * kCategoryError                  = "Error";
+constexpr const char * kCategoryProgress               = "Info";
+constexpr const char * kCategoryDetail                 = "Debug";
 
 namespace {
 
@@ -41,7 +42,220 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
     chip::Logging::Platform::LogV(module, category, msg, args);
     ClearLine();
 }
-} // namespace
+
+class ScopedLock
+{
+public:
+    ScopedLock(std::mutex & mutex) : mMutex(mutex) { mMutex.lock(); }
+
+    ~ScopedLock() { mMutex.unlock(); }
+
+private:
+    std::mutex & mMutex;
+};
+
+struct InteractiveServerResultLog
+{
+    std::string module;
+    std::string message;
+    std::string messageType;
+};
+
+struct InteractiveServerResult
+{
+    bool mEnabled       = false;
+    bool mIsAsyncReport = false;
+    uint16_t mTimeout   = 0;
+    int mStatus         = EXIT_SUCCESS;
+    std::vector<std::string> mResults;
+    std::vector<InteractiveServerResultLog> mLogs;
+
+    // The InteractiveServerResult instance (gInteractiveServerResult) is initially
+    // accessed on the main thread in InteractiveServerCommand::RunCommand, which is
+    // when chip-tool starts in 'interactive server' mode.
+    //
+    // Then command results are normally sent over the wire onto the main thread too
+    // when a command is received over WebSocket in InteractiveServerCommand::OnWebSocketMessageReceived
+    // which for most cases runs a command onto the chip thread and block until
+    // it is resolved (or until it timeouts).
+    //
+    // But in the meantime, when some parts of the command result happens, it is appended
+    // to the mResults vector onto the chip thread.
+    //
+    // For empty commands, which means that the test suite is *waiting* for some events
+    // (e.g a subscription report), the command results are sent over the chip thread
+    // (this is the isAsyncReport use case).
+    //
+    // Finally, logs can be appended from either the chip thread or the main thread.
+    //
+    // This class should be refactored to abstract that properly and reduce the scope of
+    // of the mutex, but in the meantime, the access to the members of this class are
+    // protected by a mutex.
+    std::mutex mMutex;
+
+    void Setup(bool isAsyncReport, uint16_t timeout)
+    {
+        auto lock      = ScopedLock(mMutex);
+        mEnabled       = true;
+        mIsAsyncReport = isAsyncReport;
+        mTimeout       = timeout;
+
+        if (mIsAsyncReport && mTimeout)
+        {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(StartAsyncTimeout, reinterpret_cast<intptr_t>(this));
+        }
+    }
+
+    void Reset()
+    {
+        auto lock = ScopedLock(mMutex);
+
+        if (mIsAsyncReport && mTimeout)
+        {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(StopAsyncTimeout, reinterpret_cast<intptr_t>(this));
+        }
+
+        mEnabled       = false;
+        mIsAsyncReport = false;
+        mTimeout       = 0;
+        mStatus        = EXIT_SUCCESS;
+        mResults.clear();
+        mLogs.clear();
+    }
+
+    bool IsAsyncReport()
+    {
+        auto lock = ScopedLock(mMutex);
+        return mIsAsyncReport;
+    }
+
+    void MaybeAddLog(const char * module, uint8_t category, const char * base64Message)
+    {
+        auto lock = ScopedLock(mMutex);
+        VerifyOrReturn(mEnabled);
+
+        const char * messageType = nullptr;
+        switch (category)
+        {
+        case chip::Logging::kLogCategory_Error:
+            messageType = kCategoryError;
+            break;
+        case chip::Logging::kLogCategory_Progress:
+            messageType = kCategoryProgress;
+            break;
+        case chip::Logging::kLogCategory_Detail:
+            messageType = kCategoryDetail;
+            break;
+        default:
+            // This should not happen.
+            chipDie();
+            break;
+        }
+
+        mLogs.push_back(InteractiveServerResultLog({ module, base64Message, messageType }));
+    }
+
+    void MaybeAddResult(const char * result)
+    {
+        auto lock = ScopedLock(mMutex);
+        VerifyOrReturn(mEnabled);
+
+        mResults.push_back(result);
+    }
+
+    std::string AsJsonString()
+    {
+        auto lock = ScopedLock(mMutex);
+
+        std::stringstream content;
+        content << "{";
+
+        content << "  \"results\": [";
+        if (mResults.size())
+        {
+            for (const auto & result : mResults)
+            {
+                content << result << ",";
+            }
+
+            // Remove last comma.
+            content.seekp(-1, std::ios_base::end);
+        }
+
+        if (mStatus != EXIT_SUCCESS)
+        {
+            if (mResults.size())
+            {
+                content << ",";
+            }
+            content << "{ \"error\": \"FAILURE\" }";
+        }
+        content << "],";
+
+        content << "\"logs\": [";
+        if (mLogs.size())
+        {
+            for (const auto & log : mLogs)
+            {
+                content << "{"
+                           "  \"module\": \"" +
+                        log.module +
+                        "\","
+                        "  \"category\": \"" +
+                        log.messageType +
+                        "\","
+                        "  \"message\": \"" +
+                        log.message +
+                        "\""
+                        "},";
+            }
+
+            // Remove last comma.
+            content.seekp(-1, std::ios_base::end);
+        }
+        content << "]";
+
+        content << "}";
+        return content.str();
+    }
+
+    static void StartAsyncTimeout(intptr_t arg)
+    {
+        auto self    = reinterpret_cast<InteractiveServerResult *>(arg);
+        auto timeout = chip::System::Clock::Seconds16(self->mTimeout);
+        chip::DeviceLayer::SystemLayer().StartTimer(timeout, OnAsyncTimeout, self);
+    }
+
+    static void StopAsyncTimeout(intptr_t arg)
+    {
+        auto self = reinterpret_cast<InteractiveServerResult *>(arg);
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnAsyncTimeout, self);
+    }
+
+    static void OnAsyncTimeout(chip::System::Layer *, void * appState)
+    {
+        RemoteDataModelLogger::LogErrorAsJSON(CHIP_ERROR_TIMEOUT);
+    }
+};
+
+InteractiveServerResult gInteractiveServerResult;
+
+void ENFORCE_FORMAT(3, 0) InteractiveServerLoggingCallback(const char * module, uint8_t category, const char * msg, va_list args)
+{
+    va_list args_copy;
+    va_copy(args_copy, args);
+
+    chip::Logging::Platform::LogV(module, category, msg, args);
+
+    char message[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    vsnprintf(message, sizeof(message), msg, args_copy);
+    va_end(args_copy);
+
+    char base64Message[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE * 2] = {};
+    chip::Base64Encode(chip::Uint8::from_char(message), static_cast<uint16_t>(strlen(message)), base64Message);
+
+    gInteractiveServerResult.MaybeAddLog(module, category, base64Message);
+}
 
 char * GetCommand(char * command)
 {
@@ -62,6 +276,56 @@ char * GetCommand(char * command)
 
     return command;
 }
+} // namespace
+
+CHIP_ERROR InteractiveServerCommand::RunCommand()
+{
+    // Logs needs to be redirected in order to refresh the screen appropriately when something
+    // is dumped to stdout while the user is typing a command.
+    chip::Logging::SetLogRedirectCallback(InteractiveServerLoggingCallback);
+
+    RemoteDataModelLogger::SetDelegate(this);
+    ReturnErrorOnFailure(mWebSocketServer.Run(mPort, this));
+
+    gInteractiveServerResult.Reset();
+    SetCommandExitStatus(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
+}
+
+bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
+{
+    bool isAsyncReport = strlen(msg) == 0;
+    uint16_t timeout   = 0;
+    if (!isAsyncReport && strlen(msg) <= 5 /* Only look for numeric values <= 65535 */)
+    {
+        std::stringstream ss;
+        ss << msg;
+        ss >> timeout;
+        if (!ss.fail())
+        {
+            isAsyncReport = true;
+        }
+    }
+
+    gInteractiveServerResult.Setup(isAsyncReport, timeout);
+    VerifyOrReturnValue(!isAsyncReport, true);
+
+    auto shouldStop = ParseCommand(msg, &gInteractiveServerResult.mStatus);
+    mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
+    gInteractiveServerResult.Reset();
+    return shouldStop;
+}
+
+CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
+{
+    gInteractiveServerResult.MaybeAddResult(json);
+    if (gInteractiveServerResult.IsAsyncReport())
+    {
+        mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
+        gInteractiveServerResult.Reset();
+    }
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR InteractiveStartCommand::RunCommand()
 {
@@ -72,10 +336,11 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     chip::Logging::SetLogRedirectCallback(LoggingCallback);
 
     char * command = nullptr;
+    int status;
     while (true)
     {
         command = GetCommand(command);
-        if (command != nullptr && !ParseCommand(command))
+        if (command != nullptr && !ParseCommand(command, &status))
         {
             break;
         }
@@ -91,39 +356,25 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
-bool InteractiveStartCommand::ParseCommand(char * command)
+bool InteractiveCommand::ParseCommand(char * command, int * status)
 {
     if (strcmp(command, kInteractiveModeStopCommand) == 0)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredCleanups, 0);
+        // If scheduling the cleanup fails, there is not much we can do.
+        // But if something went wrong while the application is leaving it could be because things have
+        // not been cleaned up properly, so it is still useful to log the failure.
+        LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredCleanups, 0));
         return false;
     }
 
-    char * args[kInteractiveModeArgumentsMaxLength];
-    args[0]       = kInteractiveModeName;
-    int argsCount = 1;
-    std::string arg;
-
-    std::stringstream ss(command);
-    while (ss >> std::quoted(arg, '\''))
-    {
-        if (argsCount == kInteractiveModeArgumentsMaxLength)
-        {
-            ChipLogError(chipTool, "Too many arguments. Ignoring.");
-            return true;
-        }
-
-        char * carg = new char[arg.size() + 1];
-        strcpy(carg, arg.c_str());
-        args[argsCount++] = carg;
-    }
-
     ClearLine();
-    mHandler->RunInteractive(argsCount, args);
 
-    // Do not delete arg[0]
-    while (--argsCount)
-        delete[] args[argsCount];
+    *status = mHandler->RunInteractive(command, GetStorageDirectory(), NeedsOperationalAdvertising());
 
     return true;
+}
+
+bool InteractiveCommand::NeedsOperationalAdvertising()
+{
+    return mAdvertiseOperational.ValueOr(true);
 }

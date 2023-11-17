@@ -15,17 +15,25 @@
  *    limitations under the License.
  */
 #include "DnssdImpl.h"
+#include "DnssdType.h"
 #include "MdnsError.h"
 
 #include <lib/support/CHIPMemString.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::Dnssd;
+using namespace chip::Dnssd::Internal;
 
 namespace {
 
 constexpr uint8_t kDnssdKeyMaxSize          = 32;
 constexpr uint8_t kDnssdTxtRecordMaxEntries = 20;
+constexpr const char * kLocalDot            = "local.";
+
+bool IsLocalDomain(const char * domain)
+{
+    return strcmp(kLocalDot, domain) == 0;
+}
 
 std::string GetHostNameWithoutDomain(const char * hostnameWithDomain)
 {
@@ -37,17 +45,6 @@ std::string GetHostNameWithoutDomain(const char * hostnameWithDomain)
     }
 
     return hostname;
-}
-
-std::string GetFullTypeWithoutSubTypes(std::string fullType)
-{
-    size_t position = fullType.find(",");
-    if (position != std::string::npos)
-    {
-        fullType.erase(position);
-    }
-
-    return fullType;
 }
 
 void GetTextEntries(DnssdService & service, const unsigned char * data, uint16_t len)
@@ -107,22 +104,35 @@ DNSServiceProtocol GetProtocol(const chip::Inet::IPAddressType & addressType)
 #endif
 }
 
+DnssdService GetService(const char * name, const char * type, DnssdServiceProtocol protocol, uint32_t interfaceId)
+{
+    DnssdService service = {};
+    service.mInterface   = chip::Inet::InterfaceId(interfaceId);
+    service.mProtocol    = protocol;
+
+    auto baseType = GetBaseType(type);
+    chip::Platform::CopyString(service.mType, baseType.c_str());
+    chip::Platform::CopyString(service.mName, name);
+
+    return service;
+}
+
 } // namespace
 
 namespace chip {
 namespace Dnssd {
 
-CHIP_ERROR GenericContext::Finalize(DNSServiceErrorType err)
+CHIP_ERROR GenericContext::FinalizeInternal(const char * errorStr, CHIP_ERROR err)
 {
     if (MdnsContexts::GetInstance().Has(this) == CHIP_NO_ERROR)
     {
-        if (kDNSServiceErr_NoError == err)
+        if (CHIP_NO_ERROR == err)
         {
             DispatchSuccess();
         }
         else
         {
-            DispatchFailure(err);
+            DispatchFailure(errorStr, err);
         }
     }
     else
@@ -130,7 +140,17 @@ CHIP_ERROR GenericContext::Finalize(DNSServiceErrorType err)
         chip::Platform::Delete(this);
     }
 
-    return Error::ToChipError(err);
+    return err;
+}
+
+CHIP_ERROR GenericContext::Finalize(CHIP_ERROR err)
+{
+    return FinalizeInternal(err.AsString(), err);
+}
+
+CHIP_ERROR GenericContext::Finalize(DNSServiceErrorType err)
+{
+    return FinalizeInternal(Error::ToString(err), Error::ToChipError(err));
 }
 
 MdnsContexts::~MdnsContexts()
@@ -145,7 +165,13 @@ MdnsContexts::~MdnsContexts()
 
 CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
 {
-    VerifyOrReturnError(context != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(context != nullptr || sdRef != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (context == nullptr)
+    {
+        DNSServiceRefDeallocate(sdRef);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     if (sdRef == nullptr)
     {
@@ -156,6 +182,9 @@ CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
     auto err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
     if (kDNSServiceErr_NoError != err)
     {
+        // We can't just use our Delete to deallocate the service ref here,
+        // because our context may not have its serviceRef set yet.
+        DNSServiceRefDeallocate(sdRef);
         chip::Platform::Delete(context);
         return Error::ToChipError(err);
     }
@@ -166,10 +195,8 @@ CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MdnsContexts::Remove(GenericContext * context)
+bool MdnsContexts::RemoveWithoutDeleting(GenericContext * context)
 {
-    bool found = false;
-
     std::vector<GenericContext *>::const_iterator iter = mContexts.cbegin();
     while (iter != mContexts.cend())
     {
@@ -179,12 +206,20 @@ CHIP_ERROR MdnsContexts::Remove(GenericContext * context)
             continue;
         }
 
-        Delete(*iter);
         mContexts.erase(iter);
-        found = true;
-        break;
+        return true;
     }
 
+    return false;
+}
+
+CHIP_ERROR MdnsContexts::Remove(GenericContext * context)
+{
+    bool found = RemoveWithoutDeleting(context);
+    if (found)
+    {
+        Delete(context);
+    }
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
@@ -233,14 +268,14 @@ CHIP_ERROR MdnsContexts::Has(GenericContext * context)
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-CHIP_ERROR MdnsContexts::GetRegisterContextOfType(const char * type, RegisterContext ** context)
+CHIP_ERROR MdnsContexts::GetRegisterContextOfTypeAndName(const char * type, const char * name, RegisterContext ** context)
 {
     bool found = false;
     std::vector<GenericContext *>::iterator iter;
 
     for (iter = mContexts.begin(); iter != mContexts.end(); iter++)
     {
-        if ((*iter)->type == ContextType::Register && (static_cast<RegisterContext *>(*iter))->matches(type))
+        if ((*iter)->type == ContextType::Register && (static_cast<RegisterContext *>(*iter))->matches(type, name))
         {
             *context = static_cast<RegisterContext *>(*iter);
             found    = true;
@@ -249,6 +284,32 @@ CHIP_ERROR MdnsContexts::GetRegisterContextOfType(const char * type, RegisterCon
     }
 
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
+}
+
+ResolveContext * MdnsContexts::GetExistingResolveForInstanceName(const char * instanceName)
+{
+    for (auto & ctx : mContexts)
+    {
+        if (ctx->type == ContextType::Resolve && (static_cast<ResolveContext *>(ctx))->Matches(instanceName))
+        {
+            return static_cast<ResolveContext *>(ctx);
+        }
+    }
+
+    return nullptr;
+}
+
+BrowseWithDelegateContext * MdnsContexts::GetExistingBrowseForDelegate(DnssdBrowseDelegate * delegate)
+{
+    for (auto & ctx : mContexts)
+    {
+        if (ctx->type == ContextType::BrowseWithDelegate && (static_cast<BrowseWithDelegateContext *>(ctx))->Matches(delegate))
+        {
+            return static_cast<BrowseWithDelegateContext *>(ctx);
+        }
+    }
+
+    return nullptr;
 }
 
 RegisterContext::RegisterContext(const char * sType, const char * instanceName, DnssdPublishCallback cb, void * cbContext)
@@ -261,10 +322,10 @@ RegisterContext::RegisterContext(const char * sType, const char * instanceName, 
     mInstanceName = instanceName;
 }
 
-void RegisterContext::DispatchFailure(DNSServiceErrorType err)
+void RegisterContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
-    ChipLogError(Discovery, "Mdns: Register failure (%s)", Error::ToString(err));
-    callback(context, nullptr, nullptr, Error::ToChipError(err));
+    ChipLogError(Discovery, "Mdns: Register failure (%s)", errorStr);
+    callback(context, nullptr, nullptr, err);
     MdnsContexts::GetInstance().Remove(this);
 }
 
@@ -278,6 +339,8 @@ void RegisterContext::DispatchSuccess()
     mHostNameRegistrar.Register();
 }
 
+BrowseContext * BrowseContext::sContextDispatchingSuccess = nullptr;
+
 BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol)
 {
     type     = ContextType::Browse;
@@ -286,44 +349,173 @@ BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServ
     protocol = cbContextProtocol;
 }
 
-void BrowseContext::DispatchFailure(DNSServiceErrorType err)
+void BrowseContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
-    ChipLogError(Discovery, "Mdns: Browse failure (%s)", Error::ToString(err));
-    callback(context, nullptr, 0, true, Error::ToChipError(err));
+    ChipLogError(Discovery, "Mdns: Browse failure (%s)", errorStr);
+    callback(context, nullptr, 0, true, err);
     MdnsContexts::GetInstance().Remove(this);
 }
 
 void BrowseContext::DispatchSuccess()
 {
-    callback(context, services.data(), services.size(), true, CHIP_NO_ERROR);
-    MdnsContexts::GetInstance().Remove(this);
+    // This should never be called: We either DispatchPartialSuccess or
+    // DispatchFailure.
+    VerifyOrDie(false);
 }
 
 void BrowseContext::DispatchPartialSuccess()
 {
+    sContextDispatchingSuccess = this;
     callback(context, services.data(), services.size(), false, CHIP_NO_ERROR);
+    sContextDispatchingSuccess = nullptr;
     services.clear();
 }
 
-ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType)
+void BrowseContext::OnBrowse(DNSServiceFlags flags, const char * name, const char * type, const char * domain, uint32_t interfaceId)
 {
-    type     = ContextType::Resolve;
-    context  = cbContext;
-    callback = cb;
-    protocol = GetProtocol(cbAddressType);
+    (flags & kDNSServiceFlagsAdd) ? OnBrowseAdd(name, type, domain, interfaceId) : OnBrowseRemove(name, type, domain, interfaceId);
+
+    if (!(flags & kDNSServiceFlagsMoreComing))
+    {
+        DispatchPartialSuccess();
+    }
+}
+
+void BrowseContext::OnBrowseAdd(const char * name, const char * type, const char * domain, uint32_t interfaceId)
+{
+    ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
+                    StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
+
+    VerifyOrReturn(IsLocalDomain(domain));
+    auto service = GetService(name, type, protocol, interfaceId);
+    services.push_back(service);
+}
+
+void BrowseContext::OnBrowseRemove(const char * name, const char * type, const char * domain, uint32_t interfaceId)
+{
+    ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
+                    StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
+
+    VerifyOrReturn(name != nullptr);
+    VerifyOrReturn(IsLocalDomain(domain));
+
+    services.erase(std::remove_if(services.begin(), services.end(),
+                                  [name, type, interfaceId](const DnssdService & service) {
+                                      return strcmp(name, service.mName) == 0 && type == GetFullType(&service) &&
+                                          service.mInterface == chip::Inet::InterfaceId(interfaceId);
+                                  }),
+                   services.end());
+}
+
+BrowseWithDelegateContext::BrowseWithDelegateContext(DnssdBrowseDelegate * delegate, DnssdServiceProtocol cbContextProtocol)
+{
+    type     = ContextType::BrowseWithDelegate;
+    context  = static_cast<void *>(delegate);
+    protocol = cbContextProtocol;
+}
+
+void BrowseWithDelegateContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
+{
+    ChipLogError(Discovery, "Mdns: Browse failure (%s)", errorStr);
+
+    auto delegate = static_cast<DnssdBrowseDelegate *>(context);
+    delegate->OnBrowseStop(err);
+    MdnsContexts::GetInstance().Remove(this);
+}
+
+void BrowseWithDelegateContext::DispatchSuccess()
+{
+    auto delegate = static_cast<DnssdBrowseDelegate *>(context);
+    delegate->OnBrowseStop(CHIP_NO_ERROR);
+    MdnsContexts::GetInstance().Remove(this);
+}
+
+void BrowseWithDelegateContext::OnBrowse(DNSServiceFlags flags, const char * name, const char * type, const char * domain,
+                                         uint32_t interfaceId)
+{
+    (flags & kDNSServiceFlagsAdd) ? OnBrowseAdd(name, type, domain, interfaceId) : OnBrowseRemove(name, type, domain, interfaceId);
+}
+
+void BrowseWithDelegateContext::OnBrowseAdd(const char * name, const char * type, const char * domain, uint32_t interfaceId)
+{
+    ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
+                    StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
+
+    VerifyOrReturn(IsLocalDomain(domain));
+
+    auto delegate = static_cast<DnssdBrowseDelegate *>(context);
+    auto service  = GetService(name, type, protocol, interfaceId);
+    delegate->OnBrowseAdd(service);
+}
+
+void BrowseWithDelegateContext::OnBrowseRemove(const char * name, const char * type, const char * domain, uint32_t interfaceId)
+{
+    ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
+                    StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
+
+    VerifyOrReturn(name != nullptr);
+    VerifyOrReturn(IsLocalDomain(domain));
+
+    auto delegate = static_cast<DnssdBrowseDelegate *>(context);
+    auto service  = GetService(name, type, protocol, interfaceId);
+    delegate->OnBrowseRemove(service);
+}
+
+ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
+                               const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
+                               std::shared_ptr<uint32_t> && consumerCounterToUse) :
+    browseThatCausedResolve(browseCausingResolve)
+{
+    type            = ContextType::Resolve;
+    context         = cbContext;
+    callback        = cb;
+    protocol        = GetProtocol(cbAddressType);
+    instanceName    = instanceNameToResolve;
+    consumerCounter = std::move(consumerCounterToUse);
+}
+
+ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
+                               const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse) :
+    browseThatCausedResolve(nullptr)
+{
+    type            = ContextType::Resolve;
+    context         = delegate;
+    callback        = nullptr;
+    protocol        = GetProtocol(cbAddressType);
+    instanceName    = instanceNameToResolve;
+    consumerCounter = std::move(consumerCounterToUse);
 }
 
 ResolveContext::~ResolveContext() {}
 
-void ResolveContext::DispatchFailure(DNSServiceErrorType err)
+void ResolveContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
-    ChipLogError(Discovery, "Mdns: Resolve failure (%s)", Error::ToString(err));
-    callback(context, nullptr, Span<Inet::IPAddress>(), Error::ToChipError(err));
-    MdnsContexts::GetInstance().Remove(this);
+    ChipLogError(Discovery, "Mdns: Resolve failure (%s)", errorStr);
+    // Remove before dispatching, so calls back into
+    // ChipDnssdResolveNoLongerNeeded don't find us and try to also remove us.
+    bool needDelete = MdnsContexts::GetInstance().RemoveWithoutDeleting(this);
+
+    if (nullptr == callback)
+    {
+        // Nothing to do.
+    }
+    else
+    {
+        callback(context, nullptr, Span<Inet::IPAddress>(), err);
+    }
+
+    if (needDelete)
+    {
+        MdnsContexts::GetInstance().Delete(this);
+    }
 }
 
 void ResolveContext::DispatchSuccess()
 {
+    // Remove before dispatching, so calls back into
+    // ChipDnssdResolveNoLongerNeeded don't find us and try to also remove us.
+    bool needDelete = MdnsContexts::GetInstance().RemoveWithoutDeleting(this);
+
     for (auto & interface : interfaces)
     {
         auto & ips = interface.second.addresses;
@@ -334,39 +526,64 @@ void ResolveContext::DispatchSuccess()
             continue;
         }
 
-        ChipLogDetail(Discovery, "Mdns: Resolve success on interface %" PRIu32, interface.first);
-        callback(context, &interface.second.service, Span<Inet::IPAddress>(ips.data(), ips.size()), CHIP_NO_ERROR);
+        ChipLogProgress(Discovery, "Mdns: Resolve success on interface %" PRIu32, interface.first);
+
+        auto & service = interface.second.service;
+        auto addresses = Span<Inet::IPAddress>(ips.data(), ips.size());
+        if (nullptr == callback)
+        {
+            auto delegate = static_cast<CommissioningResolveDelegate *>(context);
+            DiscoveredNodeData nodeData;
+            service.ToDiscoveredNodeData(addresses, nodeData);
+            delegate->OnNodeDiscovered(nodeData);
+        }
+        else
+        {
+            callback(context, &service, addresses, CHIP_NO_ERROR);
+        }
         break;
     }
 
-    MdnsContexts::GetInstance().Remove(this);
+    if (needDelete)
+    {
+        MdnsContexts::GetInstance().Delete(this);
+    }
 }
 
 CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct sockaddr * address)
 {
+    // If we don't have any information about this interfaceId, just ignore the
+    // address, since it won't be usable anyway without things like the port.
+    // This can happen if "local" is set up as a search domain in the DNS setup
+    // on the system, because the hostnames we are looking up all end in
+    // ".local".  In other words, we can get regular DNS results in here, not
+    // just DNS-SD ones.
+    if (interfaces.find(interfaceId) == interfaces.end())
+    {
+        return CHIP_NO_ERROR;
+    }
+
     chip::Inet::IPAddress ip;
     ReturnErrorOnFailure(chip::Inet::IPAddress::GetIPAddressFromSockAddr(*address, ip));
-    interfaces[interfaceId].addresses.push_back(ip);
 
-#ifdef CHIP_DETAIL_LOGGING
+#ifdef CHIP_PROGRESS_LOGGING
     char addrStr[INET6_ADDRSTRLEN];
     ip.ToString(addrStr, sizeof(addrStr));
-    ChipLogDetail(Discovery, "Mdns: %s interface: %" PRIu32 " ip:%s", __func__, interfaceId, addrStr);
-#endif // CHIP_DETAIL_LOGGING
+    ChipLogProgress(Discovery, "Mdns: %s interface: %" PRIu32 " ip:%s", __func__, interfaceId, addrStr);
+#endif // CHIP_PROGRESS_LOGGING
+
+    if (ip.IsIPv6LinkLocal() && interfaceId == kDNSServiceInterfaceIndexLocalOnly)
+    {
+        // We need a real interface to use a link-local address.  Just ignore
+        // this one, because trying to use it will simply lead to "No route to
+        // host" errors.
+        ChipLogProgress(Discovery, "Mdns: Ignoring link-local address with no usable interface");
+        return CHIP_NO_ERROR;
+    }
+
+    interfaces[interfaceId].addresses.push_back(ip);
 
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ResolveContext::OnNewLocalOnlyAddress()
-{
-    sockaddr_in6 sockaddr;
-    memset(&sockaddr, 0, sizeof(sockaddr));
-    sockaddr.sin6_len    = sizeof(sockaddr);
-    sockaddr.sin6_family = AF_INET6;
-    sockaddr.sin6_addr   = in6addr_loopback;
-    sockaddr.sin6_port   = htons((unsigned short) interfaces[kDNSServiceInterfaceIndexLocalOnly].service.mPort);
-
-    return OnNewAddress(kDNSServiceInterfaceIndexLocalOnly, reinterpret_cast<struct sockaddr *>(&sockaddr));
 }
 
 bool ResolveContext::HasAddress()
@@ -385,7 +602,7 @@ bool ResolveContext::HasAddress()
 void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostnameWithDomain, uint16_t port,
                                     uint16_t txtLen, const unsigned char * txtRecord)
 {
-#if CHIP_DETAIL_LOGGING
+#if CHIP_PROGRESS_LOGGING
     std::string txtString;
     auto txtRecordIter  = txtRecord;
     size_t remainingLen = txtLen;
@@ -416,9 +633,9 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
         txtRecordIter += len;
         remainingLen -= len;
     }
-#endif // CHIP_DETAIL_LOGGING
-    ChipLogDetail(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32 " port: %u TXT:\"%s\"", __func__,
-                  hostnameWithDomain, fullname, interfaceId, ntohs(port), txtString.c_str());
+#endif // CHIP_PROGRESS_LOGGING
+    ChipLogProgress(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32 " port: %u TXT:\"%s\"", __func__,
+                    hostnameWithDomain, fullname, interfaceId, ntohs(port), txtString.c_str());
 
     InterfaceInfo interface;
     interface.service.mPort = ntohs(port);

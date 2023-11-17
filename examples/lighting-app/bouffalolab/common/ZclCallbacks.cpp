@@ -20,7 +20,7 @@
  *   This file implements the handler for data model messages.
  */
 
-#include "AppConfig.h"
+#include <plat.h>
 
 #include <AppTask.h>
 #include <app-common/zap-generated/ids/Attributes.h>

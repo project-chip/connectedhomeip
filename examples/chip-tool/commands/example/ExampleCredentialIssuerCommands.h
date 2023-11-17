@@ -19,6 +19,7 @@
 #pragma once
 
 #include <commands/common/CredentialIssuerCommands.h>
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
@@ -44,6 +45,7 @@ public:
         return CHIP_NO_ERROR;
     }
     chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() override { return &mOpCredsIssuer; }
+    void SetCredentialIssuerCATValues(chip::CATValues cats) override { mOpCredsIssuer.SetCATValuesForNextNOCRequest(cats); }
     CHIP_ERROR GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
                                           chip::Crypto::P256Keypair & keypair, chip::MutableByteSpan & rcac,
                                           chip::MutableByteSpan & icac, chip::MutableByteSpan & noc) override
@@ -79,7 +81,7 @@ public:
             {
                 mDacVerifier->EnableCdTestKeySupport(isEnabled);
             }
-
+            break;
         default:
             break;
         }

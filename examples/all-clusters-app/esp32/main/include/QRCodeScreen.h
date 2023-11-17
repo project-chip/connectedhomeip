@@ -25,10 +25,10 @@
 
 #pragma once
 
+#include "sdkconfig.h"
+#if CONFIG_HAVE_DISPLAY
 #include "Screen.h"
 #include "ScreenManager.h"
-
-#if CONFIG_HAVE_DISPLAY
 
 #include <cstdint>
 #include <vector>

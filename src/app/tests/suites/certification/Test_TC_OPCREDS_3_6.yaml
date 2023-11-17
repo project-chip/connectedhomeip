@@ -1,0 +1,115 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 12.3.6. [TC-OPCREDS-3.6] Last Fabric removal validation [DUT-Server]
+
+PICS:
+    - OPCREDS.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: TH1 fully commissions the DUT"
+      verification: |
+          On DUT side:
+          sudo ./chip-all-clusters-app --wifi
+
+          On TH side:
+          ./chip-tool pairing code 1 34970112332 --trace_decode 1
+          Verify the TH1 commissioning is success
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success"
+      disabled: true
+
+    - label:
+          "Step 2: TH1 sends RemoveFabric command with Fabric Index as
+          FabricIndex_TH1 to DUT"
+      PICS: OPCREDS.S.C0a.Rsp
+      verification: |
+          ./chip-tool operationalcredentials remove-fabric 1 1 0
+
+          On TH1(Chip-tool)  in NOCResponse Verify the statuscode is success(0)
+
+          [1674780232627] [8807:372926] CHIP: [DMG] InvokeResponseMessage =
+          [1674780232627] [8807:372926] CHIP: [DMG] {
+          [1674780232627] [8807:372926] CHIP: [DMG]         suppressResponse = false,
+          [1674780232627] [8807:372926] CHIP: [DMG]         InvokeResponseIBs =
+          [1674780232627] [8807:372926] CHIP: [DMG]         [
+          [1674780232627] [8807:372926] CHIP: [DMG]                 InvokeResponseIB =
+          [1674780232627] [8807:372926] CHIP: [DMG]                 {
+          [1674780232627] [8807:372926] CHIP: [DMG]                         CommandDataIB =
+          [1674780232627] [8807:372926] CHIP: [DMG]                         {
+          [1674780232627] [8807:372926] CHIP: [DMG]                                 CommandPathIB =
+          [1674780232627] [8807:372926] CHIP: [DMG]                                 {
+          [1674780232627] [8807:372926] CHIP: [DMG]                                         EndpointId = 0x0,
+          [1674780232627] [8807:372926] CHIP: [DMG]                                         ClusterId = 0x3e,
+          [1674780232627] [8807:372926] CHIP: [DMG]                                         CommandId = 0x8,
+          [1674780232627] [8807:372926] CHIP: [DMG]                                 },
+          [1674780232627] [8807:372926] CHIP: [DMG]
+          [1674780232627] [8807:372926] CHIP: [DMG]                                 CommandFields =
+          [1674780232627] [8807:372926] CHIP: [DMG]                                 {
+          [1674780232627] [8807:372926] CHIP: [DMG]                                         0x0 = 11,
+          [1674780232627] [8807:372926] CHIP: [DMG]                                 },
+          [1674780232627] [8807:372926] CHIP: [DMG]                         },
+          [1674780232627] [8807:372926] CHIP: [DMG]
+          [1674780232627] [8807:372926] CHIP: [DMG]                 },
+          [1674780232627] [8807:372926] CHIP: [DMG]
+          [1674780232627] [8807:372926] CHIP: [DMG]         ],
+          [1674780232627] [8807:372926] CHIP: [DMG]
+          [1674780232627] [8807:372926] CHIP: [DMG]         InteractionModelRevision = 1
+          [1674780232627] [8807:372926] CHIP: [DMG] },
+          [1674780232627] [8807:372926] CHIP: [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1674780232627] [8807:372926] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1674780232627] [8807:372926] CHIP: [TOO]   NOCResponse: {
+          [1674780232627] [8807:372926] CHIP: [TOO]     statusCode: 0
+          [1674780232627] [8807:372926] CHIP: [TOO]    }
+          [1674780232627] [8807:372926] CHIP: [DMG] ICR moving to [AwaitingDe]
+          [1674780232627] [8807:372926] CHIP: [EM] <<< [E:31626i M:201286751 (Ack:54014818)] (S) Msg TX to 1:0000000000000001 [1A5D] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1674780232627] [8807:372926] CHIP: [IN] (S) Sending msg 201286751 on secure session with LSID: 14333
+          [1674780232627] [8807:372926] CHIP: [EM] Flushed pending ack for MessageCounter:54014818 on exchange 31626i
+          [1674780232627] [8807:372921] CHIP: [CTL] Shutting down the commissioner
+          [1674780232627] [8807:372921] CHIP: [CTL] Stopping commissioning discovery over DNS-SD
+          [1674780232627] [8807:372921] CHIP: [CTL] Shutting down the controller
+          [1674780232627] [8807:372921] CHIP: [IN] Expiring all sessions for fabric 0x1!!
+          [1674780232627] [8807:372921] CHIP: [IN] SecureSession[0x600001c041e0]: MarkForEviction Type:2 LSID:14333
+          [1674780232627] [8807:372921] CHIP: [SC] SecureSession[0x600001c041e0]: Moving from state 'kActive' --> 'kPendingEviction'
+          [1674780232627] [8807:372921] CHIP: [IN] SecureSession[0x600001c041e0]: Released - Type:2 LSID:14333
+      disabled: true
+
+    - label:
+          "Step 3: Verify that the DUT is not advertising as an operational node
+          on DNS-SD with service type _matter._tcp"
+      verification: |
+          Verify that the DUT is not advertising as an operational node on DNS-SD with service type _matter._tcp
+          avahi-browse -rt _matter._tcp
+      disabled: true
+
+    - label:
+          "Step 4: If the DUT is advertising as a commissionable node with CM=2
+          over DNS-SD or advertising the Matter service over BLE, TH commissions
+          the device"
+      verification: |
+          Verify that the DUT is discoverable over DNS-SD with service type _matterc._udp with no subtype _CM and text key for CM with value 0
+
+          avahi-browse -rt _matterc._udp
+
+          br-aa67f1f8401d IPv4 DC126952E0AC4BD5                              _matterc._udp        local
+             hostname = [E45F012EED550000.local]
+             address = [172.18.0.1]
+             port = [5540]
+             txt = ["PI=" "PH=33" "CM=0" "D=3840" "T=1" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
+      disabled: true

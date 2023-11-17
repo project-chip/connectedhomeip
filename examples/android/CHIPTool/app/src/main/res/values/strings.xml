@@ -30,6 +30,7 @@
     <string name="enter_endpoint_id_hint_text">Enter Endpoint ID</string>
     <string name="update_device_address_btn_text">Update address</string>
     <string name="update_device_address_failure">Device address update failed: %1$s</string>
+    <string name="commissioned_device_id_text">Commissioned Device ID :</string>
 
     <string name="address_commissioning_title_text">Commission with IP address</string>
     <string name="default_discriminator">3840</string>
@@ -102,10 +103,16 @@
     <string name="enter_setup_pin_code_hint_text">Enter Setup PIN Code</string>
     <string name="enhanced_commissioning_method_btn_text">Enhanced Commissioning Method</string>
     <string name="revoke_btn_text">Revoke</string>
+    <string name="read_window_status_btn_text">Read Window Status</string>
+    <string name="read_admin_fabric_index_btn_text">Read Admin FabricIndex</string>
+    <string name="read_admin_vendor_id_btn_text">Read Admin VID</string>
 
     <string name="op_cred_client_btn_text">Operational Credentials cluster</string>
     <string name="op_cred_client_read_supported_fabric_btn_text">Read Supported Fabric count</string>
     <string name="op_cred_client_read_commissioned_fabric_btn_text">Read Commissioned Fabric count</string>
+    <string name="op_cred_client_read_fabrics_btn_text">Read Fabrics</string>
+    <string name="op_cred_client_remove_fabrics_btn_text">Remove Fabrics</string>
+    <string name="op_cred_client_fabric_index_hint_text">FabricIndex</string>
 
     <string name="basic_cluster_btn_text">Basic cluster</string>
     <string name="basic_cluster_write_btn_text">Write</string>
@@ -131,11 +138,13 @@
     <string name="basic_cluster_serial_number_text">SerialNumber</string>
     <string name="basic_cluster_local_config_disabled_text">LocalConfigDisabled</string>
     <string name="basic_cluster_reachable_text">Reachable</string>
+    <string name="basic_cluster_unique_id_text">UniqueID</string>
     <string name="basic_cluster_cluster_revision_text">ClusterRevision</string>
 
     <string name="read_dialog_title_text">Read</string>
     <string name="read_dialog_read_btn_text">Read</string>
     <string name="read_dialog_is_fabric_filtered_hint">is Fabric Filtered (bool)</string>
+    <string name="read_dialog_event_min_hint">Minimum Event Number</string>
 
     <string name="subscribe_dialog_title_text">Subscribe</string>
     <string name="subscribe_dialog_subscribe_btn_text">Subscribe</string>
@@ -143,16 +152,51 @@
     <string name="subscribe_dialog_max_interval_hint">Maximum interval (seconds)</string>
     <string name="subscribe_dialog_keep_subscriptions_hint">keep subscriptions (bool)</string>
     <string name="subscribe_dialog_is_fabric_filtered_hint">is Fabric Filtered (bool)</string>
+    <string name="subscribe_dialog_event_min_hint">Minimum Event Number</string>
+
+    <string name="write_dialog_title_text">Write</string>
+    <string name="write_dialog_write_btn_text">Write</string>
+    <string name="write_dialog_value_type_hint">Write Value Type</string>
+    <string name="write_dialog_write_value_hint">Write Value</string>
+    <string name="write_dialog_data_version_hint">Data Version (Optional)</string>
+    <string name="write_dialog_timed_request_timeout_hint">Timed Request Timeout</string>
+    <string name="write_dialog_im_timeout_hint">Timeout</string>
+    <string name="write_dialog_user_guide_hint">Example:\nIdentifyCluster, IdentifyTime - Type : UInt\nBasicInformationCluster, UserLabel - Type : String\nIf you want to enter an array, separate the value by \',\'.(abc,def)</string>
+
+    <string name="invoke_dialog_title_text">Invoke</string>
+    <string name="invoke_dialog_write_btn_text">Invoke</string>
+    <string name="invoke_dialog_value_type_hint">Invoke Value Type</string>
+    <string name="invoke_dialog_write_value_hint">Invoke Value</string>
+    <string name="invoke_dialog_timed_request_timeout_hint">Timed Request Timeout</string>
+    <string name="invoke_dialog_im_timeout_hint">Timeout</string>
+    <string name="invoke_dialog_user_guide_hint">Usage : [Type]:[Value],[Type]:[Value]\nType:UnsignedInt, Int, Boolean, Float, Double, String, ByteArray(Hex)\nExample:\nLevelControlCluster, moveToLevel : UnsignedInt:100,UnsignedInt:0</string>
+
+    <string name="shutdown_dialog_title_text">Shutdown Subscription</string>
+    <string name="shutdown_dialog_fabric_index_hint">Fabric Index</string>
+    <string name="shutdown_dialog_subscription_id_hint">Subscription Id</string>
+    <string name="shutdown_dialog_shutdown_btn_text">Shutdown</string>
+    <string name="shutdown_dialog_shutdown_all_btn_text">Shutdown All</string>
 
     <string name="endpoint_id_label">Endpoint ID</string>
     <string name="cluster_id_label">Cluster ID</string>
     <string name="attribute_id_label">Attribute ID</string>
     <string name="event_id_label">Event ID</string>
+    <string name="command_id_label">Command ID</string>
+    <string name="isUrgent_label">isUrgent</string>
     <string name="wildcard_help_label">Leave blank for wildcard</string>
     <string name="wildcard_subscribe_btn_text">Subscribe</string>
     <string name="wildcard_read_btn_text">Read</string>
+    <string name="wildcard_invoke_btn_text">Invoke</string>
+    <string name="wildcard_write_btn_text">Write</string>
+    <string name="wildcard_add_attribute_btn_text">Add Attribute</string>
+    <string name="wildcard_add_event_btn_text">Add Event</string>
+    <string name="wildcard_reset_btn_text">Reset</string>
+    <string name="wildcard_send_btn_text">Send</string>
+    <string name="wildcard_shutdown_subscription_btn_text">Shutdown Subscription</string>
     <string name="wildcard_subscribe_event_btn_text">Subscribe Event</string>
     <string name="wildcard_read_event_btn_text">Read Event</string>
+    <string name="wildcard_empty_error_toast_message">Please add it to the list using Add Button.</string>
+    <string name="wildcard_subscribe_established_toast_message">Subscription established</string>
 
     <string name="provision_custom_flow_btn_text">Provision CHIP device with Custom Flow</string>
     <string name="chip_device_info_commissioning_flow_label">Commissioning Flow:</string>
@@ -174,4 +218,45 @@
     <string name="select_a_cluster">Select a cluster</string>
     <string name="endpoint_name">Endpoint: </string>
     <string name="wifi_connect_btn_text">Connect</string>
+
+    <string name="unpair_device_btn_text">Unpair</string>
+
+    <string name="group_setting_btn_text">Group Setting</string>
+    <string name="group_setting_group_text">Group :</string>
+    <string name="group_setting_key_text">Key :</string>
+    <string name="group_setting_send_key_set_write_text">Send KeySetWrite</string>
+    <string name="group_setting_write_group_key_map_text">Write GroupKey</string>
+    <string name="group_setting_group_key_set_id_text">GroupKeySetID</string>
+    <string name="group_setting_key_set_text">Key Set</string>
+    <string name="group_setting_group_key_text">GroupKey</string>
+    <string name="group_setting_send_add_group_text">Send AddGroup</string>
+    <string name="group_setting_add_access_control_text">Add Acl</string>
+    <string name="group_setting_add_group_text">Add Group</string>
+    <string name="group_setting_remove_group_text">Remove Group</string>
+    <string name="group_setting_add_key_set_text">Add KeySet</string>
+    <string name="group_setting_remove_key_set_text">remove KeySet</string>
+    <string name="group_setting_bind_key_set_text">Bind KeySet</string>
+    <string name="group_setting_unbind_key_set_text">Unbind KeySet</string>
+    <string name="group_setting_group_id_text">Group ID</string>
+    <string name="group_setting_group_name_text">Group Name</string>
+    <string name="group_setting_key_set_id_text">Key Set ID</string>
+    <string name="group_setting_key_policy_text">Key Policy</string>
+    <string name="group_setting_validity_time_text">Validity Time</string>
+    <string name="group_setting_validity_time_default_text">2220000</string>
+    <string name="group_setting_validity_time_default1_text">2220001</string>
+    <string name="group_setting_validity_time_default2_text">2220002</string>
+    <string name="group_setting_epoch_key_text">Epoch Key</string>
+    <string name="group_setting_epoch_key_default_text">d0d1d2d3d4d5d6d7d8d9dadbdcdddedf</string>
+    <string name="group_setting_access_control_entry_text">Access Control Entry :</string>
+    <string name="group_setting_add_btn_text">Add</string>
+    <string name="group_setting_remove_btn_text">Remove</string>
+    <string name="group_setting_bind_btn_text">Bind</string>
+    <string name="group_setting_unbind_btn_text">Unbind</string>
+    <string name="group_setting_send_btn_text">Send</string>
+    <string name="group_setting_write_btn_text">Write</string>
+
+    <string name="ota_provider_btn_text">OTA Provider</string>
+    <string name="ota_provider_vendorId_text">Vendor ID</string>
+    <string name="ota_provider_select_firmware_file_text">Select Firmware</string>
+    <string name="ota_provider_start_firmware_update_text">Start Firmware Update</string>
 </resources>

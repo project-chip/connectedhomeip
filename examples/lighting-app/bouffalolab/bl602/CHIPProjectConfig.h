@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,22 +27,14 @@
 
 #pragma once
 
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
- *
- * Enables the use of a hard-coded default Chip device id and credentials if no device id
- * is found in Chip NV storage.
- *
- * This option is for testing only and should be disabled in production releases.
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
-
 // Use a default pairing code if one hasn't been provisioned in flash.
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #endif
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+#endif
 // For convenience, Chip Security Test Mode can be enabled and the
 // requirement for authentication in various protocols can be disabled.
 //
@@ -55,19 +46,13 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0x235A: Chip's Vendor Id.
- * 0xFFF1: Test vendor
  */
-//#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x130D
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x534B: BL602 lock-app
- * TODO: 3R
  */
-//#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0xF001
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005
 
 /**
@@ -89,6 +74,7 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
+#endif
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
@@ -98,7 +84,6 @@
 /* The SoftwareVersion attribute of the Basic cluster. */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0001
-#endif
 #endif
 
 /**
@@ -110,23 +95,6 @@
  * This value is generally *not* incremented for device software revisions.
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION 1
-
-/**
- * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
- *
- * A string identifying the firmware revision running on the device.
- * CHIP service currently expects the firmware version to be in the format
- * {MAJOR_VERSION}.0d{MINOR_VERSION}
- */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING "0.1ALPHA"
-#endif
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
- *
- * Enable support for Chip-over-BLE (CHIPoBLE).
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 
 /**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
@@ -144,3 +112,5 @@
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
 
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
+
+#define CHIP_BLE_DEVICE_NAME "MatterLight"

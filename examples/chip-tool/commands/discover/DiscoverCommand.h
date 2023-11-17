@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "../../config/PersistentStorage.h"
 #include "../common/CHIPCommand.h"
+#include <controller/ExamplePersistentStorage.h>
 
 class DiscoverCommand : public CHIPCommand
 {

@@ -42,18 +42,6 @@ set(CHIP_CFLAGS
     -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF=0
     -DCHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS=1
     -I${CMAKE_CURRENT_SOURCE_DIR}/main/include
-    -DMBEDTLS_CONFIG_FILE=<config-tls-generic.h>
-    -isystem$ENV{ZEPHYR_BASE}/modules/mbedtls/configs
-    -isystem$ENV{ZEPHYR_BASE}/../mbedtls/include
-)
-
-set(CHIP_TESTS
-    -lCHIP_tests
-)
-
-set(CHIP_LIBRARIES
-    -lCHIP
-    ${CHIP_TESTS}
 )
 
 # Load NCS/Zephyr build system
@@ -68,7 +56,6 @@ project(AllChipTests)
 enable_testing()
 
 target_sources(app PRIVATE main/runner.cpp)
-target_link_options(app PUBLIC -Wl,--whole-archive ${CHIP_TESTS} -Wl,--no-whole-archive)
 target_link_libraries(app PUBLIC chip $<TARGET_FILE:kernel>)
 target_compile_definitions(app PUBLIC CHIP_HAVE_CONFIG_H)
 

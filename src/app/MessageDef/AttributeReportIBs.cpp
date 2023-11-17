@@ -78,10 +78,10 @@ AttributeReportIB::Builder & AttributeReportIBs::Builder::CreateAttributeReport(
     return mAttributeReport;
 }
 
-AttributeReportIBs::Builder & AttributeReportIBs::Builder::EndOfAttributeReportIBs()
+CHIP_ERROR AttributeReportIBs::Builder::EndOfAttributeReportIBs()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 
 CHIP_ERROR AttributeReportIBs::Builder::EncodeAttributeStatus(const ConcreteReadAttributePath & aPath, const StatusIB & aStatus)
@@ -103,8 +103,8 @@ CHIP_ERROR AttributeReportIBs::Builder::EncodeAttributeStatus(const ConcreteRead
     statusIBBuilder.EncodeStatusIB(aStatus);
     ReturnErrorOnFailure(statusIBBuilder.GetError());
 
-    ReturnErrorOnFailure(attributeStatusIBBuilder.EndOfAttributeStatusIB().GetError());
-    return attributeReport.EndOfAttributeReportIB().GetError();
+    ReturnErrorOnFailure(attributeStatusIBBuilder.EndOfAttributeStatusIB());
+    return attributeReport.EndOfAttributeReportIB();
 }
 
 } // namespace app

@@ -1,0 +1,346 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <cluster>
+    <name>Carbon Monoxide Concentration Measurement</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>Attributes for reporting carbon monoxide concentration measurements</description>
+    <code>0x040C</code>
+    <define>CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+  </cluster>
+
+  <cluster>
+    <name>Carbon Dioxide Concentration Measurement</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>Attributes for reporting carbon dioxide concentration measurements</description>
+    <code>0x040D</code>
+    <define>CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
+    <!-- Attributes -->
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+  </cluster>
+
+  <cluster>
+    <name>Nitrogen Dioxide Concentration Measurement</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>Attributes for reporting nitrogen dioxide concentration measurements</description>
+    <code>0x0413</code>
+    <define>NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+  </cluster>
+
+  <cluster>
+    <name>Ozone Concentration Measurement</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>Attributes for reporting ozone concentration measurements</description>
+    <code>0x0415</code>
+    <define>OZONE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+  </cluster>
+
+  <cluster>
+    <name>PM2.5 Concentration Measurement</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>Attributes for reporting PM2.5 concentration measurements</description>
+    <code>0x042a</code>
+    <define>PM2_5_CONCENTRATION_MEASUREMENT_CLUSTER</define>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+  </cluster>
+
+  <cluster>
+    <name>Formaldehyde Concentration Measurement</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>Attributes for reporting formaldehyde concentration measurements</description>
+    <code>0x042b</code>
+    <define>FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+  </cluster>
+
+  <cluster>
+    <name>PM1 Concentration Measurement</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>Attributes for reporting PM1 concentration measurements</description>
+    <code>0x042c</code>
+    <define>PM1_CONCENTRATION_MEASUREMENT_CLUSTER</define>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+  </cluster>
+
+  <cluster>
+    <name>PM10 Concentration Measurement</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>Attributes for reporting PM10 concentration measurements</description>
+    <code>0x042d</code>
+    <define>PM10_CONCENTRATION_MEASUREMENT_CLUSTER</define>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+  </cluster>
+
+  <cluster>
+    <name>Total Volatile Organic Compounds Concentration Measurement</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>Attributes for reporting total volatile organic compounds concentration measurements</description>
+    <code>0x042e</code>
+    <define>TVOC_CONCENTRATION_MEASUREMENT_CLUSTER</define>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+  </cluster>
+
+  <cluster>
+    <name>Radon Concentration Measurement</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>Attributes for reporting radon concentration measurements</description>
+    <code>0x042f</code>
+    <define>RADON_CONCENTRATION_MEASUREMENT_CLUSTER</define>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="elapsed_s" min="0" max="604800" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+  </cluster>
+
+  <!-- Feature Map -->
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x040c"/>
+    <cluster code="0x040d" />
+    <cluster code="0x0413" />
+    <cluster code="0x0415" />
+    <cluster code="0x042a" />
+    <cluster code="0x042b" />
+    <cluster code="0x042c" />
+    <cluster code="0x042d" />
+    <cluster code="0x042e" />
+    <cluster code="0x042f" />
+    <field name="Numeric Measurement" mask="0x01" />
+    <field name="Level Indication" mask="0x02" />
+    <field name="Medium Level" mask="0x04" />
+    <field name="Critical Level" mask="0x08" />
+    <field name="Peak Measurement" mask="0x10" />
+    <field name="Average Measurement" mask="0x20" />
+  </bitmap>
+
+  <!-- Cluster Data Types -->
+  <enum name="LevelValueEnum" type="enum8">
+    <cluster code="0x040c"/>
+    <cluster code="0x040d" />
+    <cluster code="0x0413" />
+    <cluster code="0x0415" />
+    <cluster code="0x042a" />
+    <cluster code="0x042b" />
+    <cluster code="0x042c" />
+    <cluster code="0x042d" />
+    <cluster code="0x042e" />
+    <cluster code="0x042f" />
+    <item name="Unknown" value="0x00"/>
+    <item name="Low" value="0x01"/>
+    <item name="Medium" value="0x02"/>
+    <item name="High" value="0x03"/>
+    <item name="Critical" value="0x04"/>
+  </enum>
+
+  <enum name="MeasurementUnitEnum" type="enum8">
+    <cluster code="0x040c"/>
+    <cluster code="0x040d" />
+    <cluster code="0x0413" />
+    <cluster code="0x0415" />
+    <cluster code="0x042a" />
+    <cluster code="0x042b" />
+    <cluster code="0x042c" />
+    <cluster code="0x042d" />
+    <cluster code="0x042e" />
+    <cluster code="0x042f" />
+    <item name="PPM" value="0x00"/>
+    <item name="PPB" value="0x01"/>
+    <item name="PPT" value="0x02"/>
+    <item name="MGM3" value="0x03"/>
+    <item name="UGM3" value="0x04"/>
+    <item name="NGM3" value="0x05"/>
+    <item name="PM3" value="0x06"/>
+    <item name="BQM3" value="0x07"/>
+  </enum>
+
+  <enum name="MeasurementMediumEnum" type="enum8">
+    <cluster code="0x040c"/>
+    <cluster code="0x040d" />
+    <cluster code="0x0413" />
+    <cluster code="0x0415" />
+    <cluster code="0x042a" />
+    <cluster code="0x042b" />
+    <cluster code="0x042c" />
+    <cluster code="0x042d" />
+    <cluster code="0x042e" />
+    <cluster code="0x042f" />
+    <item name="Air" value="0x00"/>
+    <item name="Water" value="0x01"/>
+    <item name="Soil" value="0x02"/>
+  </enum>
+</configurator>

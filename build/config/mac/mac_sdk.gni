@@ -28,7 +28,7 @@ if (current_os != "mac") {
   target_sdk = current_os
 }
 
-deployment_target = "10.15"
+deployment_target = "11.0"
 if (current_os == "mac") {
   if (current_cpu == "arm64") {
     deployment_target = "11.0"

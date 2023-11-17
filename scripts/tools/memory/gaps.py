@@ -18,12 +18,10 @@
 
 import sys
 
-from elftools.elf.elffile import ELFFile  # type: ignore
-
 import memdf.collect
 import memdf.report
 import memdf.select
-
+from elftools.elf.elffile import ELFFile  # type: ignore
 from memdf import Config, ConfigDescription
 
 CONFIG: ConfigDescription = {

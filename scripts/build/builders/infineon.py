@@ -111,5 +111,5 @@ class InfineonBuilder(GnBuilder):
     def flashbundle(self):
         with open(os.path.join(self.output_dir, self.app.FlashBundleName()), 'r') as fp:
             return {
-                l.strip(): os.path.join(self.output_dir, l.strip()) for l in fp.readlines() if l.strip()
+                line.strip(): os.path.join(self.output_dir, line.strip()) for line in fp.readlines() if line.strip()
             }

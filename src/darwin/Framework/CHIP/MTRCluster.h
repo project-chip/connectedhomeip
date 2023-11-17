@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,19 +15,21 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
 
-MTR_NEWLY_DEPRECATED("ResponseHandler is not used")
+MTR_DEPRECATED("ResponseHandler is not used", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 typedef void (^ResponseHandler)(id _Nullable value, NSError * _Nullable error);
-MTR_NEWLY_DEPRECATED("Please use MTRStatusCompletion instead")
+MTR_DEPRECATED("Please use MTRStatusCompletion instead", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 typedef void (^StatusCompletion)(NSError * _Nullable error);
-MTR_NEWLY_DEPRECATED("Please use MTRSubscriptionEstablishedHandler instead")
+MTR_DEPRECATED(
+    "Please use MTRSubscriptionEstablishedHandler instead", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 typedef void (^SubscriptionEstablishedHandler)(void);
 
 typedef void (^MTRStatusCompletion)(NSError * _Nullable error);
 typedef void (^MTRSubscriptionEstablishedHandler)(void);
 
 @class MTRBaseDevice;
+@class MTRDevice;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -38,6 +40,29 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRCluster : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * The endpoint this cluster lives on.
+ */
+@property (nonatomic, readonly) NSNumber * endpointID NS_REFINED_FOR_SWIFT MTR_NEWLY_AVAILABLE;
+@end
+
+/**
+ * Base for all MTRBaseCluster* types.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRGenericBaseCluster : MTRCluster
+@end
+
+/**
+ * Base for all MTRCluster* types.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRGenericCluster : MTRCluster
+/**
+ * The device this cluster object is associated with.
+ */
+@property (nonatomic, strong, readonly) MTRDevice * device;
 @end
 
 /**
@@ -77,7 +102,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * MTRReadParams
- *    This is used to control the behavior of attribute reads and subscribes.
+ *    This is used to control the behavior of attribute/event reads and subscribes.
  *    If not provided (i.e. nil passed for the MTRReadParams argument), will be
  *    treated as if a default-initialized object was passed in.
  */
@@ -92,13 +117,23 @@ NS_ASSUME_NONNULL_BEGIN
  * If NO, the read/subscribe is not fabric-filtered and will see all
  * non-fabric-sensitive data for the given attribute path.
  */
-@property (nonatomic, assign, getter=shouldFilterByFabric) BOOL filterByFabric MTR_NEWLY_AVAILABLE;
+@property (nonatomic, assign, getter=shouldFilterByFabric)
+    BOOL filterByFabric MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Sets a filter for which events will be reported in the read/subscribe interaction.
+ *
+ * If nil (the default value), all of the queued events will be reported from lowest to highest event number.
+ *
+ * If not nil, queued events with an event number smaller than minEventNumber will not be reported.
+ */
+@property (nonatomic, copy, nullable) NSNumber * minEventNumber MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @end
 
 /**
  * MTRSubscribeParams
- *    This is used to control the behavior of attribute subscribes.  If not
+ *    This is used to control the behavior of attribute/event subscribes.  If not
  *    provided (i.e. nil passed for the MTRSubscribeParams argument), will be
  *    treated as if a default-initialized object was passed in.
  */
@@ -113,7 +148,8 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If NO, the subscribe will allow any previous subscriptions to remain.
  */
-@property (nonatomic, assign, getter=shouldReplaceExistingSubscriptions) BOOL replaceExistingSubscriptions;
+@property (nonatomic, assign, getter=shouldReplaceExistingSubscriptions)
+    BOOL replaceExistingSubscriptions MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Whether the subscription should automatically try to re-establish if it
@@ -127,14 +163,15 @@ NS_ASSUME_NONNULL_BEGIN
  * called again.
  *
  */
-@property (nonatomic, assign, getter=shouldResubscribeIfLost) BOOL resubscribeIfLost;
+@property (nonatomic, assign, getter=shouldResubscribeAutomatically)
+    BOOL resubscribeAutomatically MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The minimum time, in seconds, between consecutive reports a server will send
  * for this subscription.  This can be used to rate-limit the subscription
  * traffic.  Any non-negative value is allowed, including 0.
  */
-@property (nonatomic, copy) NSNumber * minInterval;
+@property (nonatomic, copy) NSNumber * minInterval MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The suggested maximum time, in seconds, during which the server is allowed to
@@ -142,7 +179,17 @@ NS_ASSUME_NONNULL_BEGIN
  * minInterval.  The server is allowed to use a larger time than this as the
  * maxInterval it selects if it needs to (e.g. to meet its power budget).
  */
-@property (nonatomic, copy) NSNumber * maxInterval;
+@property (nonatomic, copy) NSNumber * maxInterval MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Controls whether events will be reported urgently. The default value is YES.
+ *
+ * If YES, the events will be reported as soon as the minInterval does not prevent it.
+ *
+ * If NO, the events will be reported at the maximum interval.
+ */
+@property (nonatomic, assign, getter=shouldReportEventsUrgently)
+    BOOL reportEventsUrgently MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Initialize an MTRSubscribeParams.  Must provide a minInterval and
@@ -154,15 +201,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRReadParams (Deprecated)
 
-@property (nonatomic, copy, nullable) NSNumber * fabricFiltered MTR_NEWLY_DEPRECATED("Please use filterByFabric");
+@property (nonatomic, copy, nullable) NSNumber * fabricFiltered MTR_DEPRECATED(
+    "Please use filterByFabric", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end
 
 @interface MTRSubscribeParams (Deprecated)
 
-@property (nonatomic, copy, nullable)
-    NSNumber * keepPreviousSubscriptions MTR_NEWLY_DEPRECATED("Please use replaceExistingSubscriptions");
-@property (nonatomic, copy, nullable) NSNumber * autoResubscribe MTR_NEWLY_DEPRECATED("Please use resubscribeIfLost");
+@property (nonatomic, copy, nullable) NSNumber * keepPreviousSubscriptions MTR_DEPRECATED(
+    "Please use replaceExistingSubscriptions", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+@property (nonatomic, copy, nullable) NSNumber * autoResubscribe MTR_DEPRECATED(
+    "Please use resubscribeAutomatically", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 /**
  * init and new exist for now, for backwards compatibility, and initialize with
@@ -170,8 +219,10 @@ NS_ASSUME_NONNULL_BEGIN
  * own.  Uses of MTRSubscribeParams that rely on init must all be using
  * (deprecated) APIs that pass in a separate minInterval and maxInterval.
  */
-- (instancetype)init MTR_NEWLY_DEPRECATED("Please use initWithMinInterval");
-+ (instancetype)new MTR_NEWLY_DEPRECATED("Please use initWithMinInterval");
+- (instancetype)init MTR_DEPRECATED(
+    "Please use initWithMinInterval", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
++ (instancetype)new MTR_DEPRECATED(
+    "Please use initWithMinInterval", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 NS_ASSUME_NONNULL_END

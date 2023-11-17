@@ -17,6 +17,7 @@
 #pragma once
 
 #include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeContext.h>
@@ -131,15 +132,18 @@ public:
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
     secure_channel::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
     FabricTable & GetFabricTable() { return mFabricTable; }
+    Crypto::DefaultSessionKeystore & GetSessionKeystore() { return mSessionKeystore; }
 
     FabricIndex GetAliceFabricIndex() { return mAliceFabricIndex; }
     FabricIndex GetBobFabricIndex() { return mBobFabricIndex; }
     const FabricInfo * GetAliceFabric() { return mFabricTable.FindFabricWithIndex(mAliceFabricIndex); }
     const FabricInfo * GetBobFabric() { return mFabricTable.FindFabricWithIndex(mBobFabricIndex); }
 
-    CHIP_ERROR CreateSessionBobToAlice();
-    CHIP_ERROR CreateSessionAliceToBob();
-    CHIP_ERROR CreateSessionBobToFriends();
+    CHIP_ERROR CreateSessionBobToAlice(); // Creates PASE session
+    CHIP_ERROR CreateCASESessionBobToAlice();
+    CHIP_ERROR CreateSessionAliceToBob(); // Creates PASE session
+    CHIP_ERROR CreateCASESessionAliceToBob();
+    CHIP_ERROR CreateSessionBobToFriends(); // Creates PASE session
     CHIP_ERROR CreatePASESessionCharlieToDavid();
     CHIP_ERROR CreatePASESessionDavidToCharlie();
 
@@ -182,6 +186,7 @@ private:
     chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
     chip::PersistentStorageOperationalKeystore mOpKeyStore;
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
+    chip::Crypto::DefaultSessionKeystore mSessionKeystore;
 
     FabricIndex mAliceFabricIndex = kUndefinedFabricIndex;
     FabricIndex mBobFabricIndex   = kUndefinedFabricIndex;

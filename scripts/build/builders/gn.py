@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import shlex
 
 from .builder import Builder
@@ -60,7 +59,15 @@ class GnBuilder(Builder):
             '--root=%s' % self.root
         ]
 
-        extra_args = self.GnBuildArgs()
+        extra_args = []
+
+        if self.options.pw_command_launcher:
+            extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
+
+        if self.options.pregen_dir:
+            extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
+
+        extra_args.extend(self.GnBuildArgs() or [])
         if extra_args:
             cmd += ['--args=%s' % ' '.join(extra_args)]
 

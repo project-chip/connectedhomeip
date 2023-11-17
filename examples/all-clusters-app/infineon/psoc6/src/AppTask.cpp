@@ -23,10 +23,8 @@
 #include "AppEvent.h"
 #include "ButtonHandler.h"
 #include "LEDWidget.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -42,6 +40,7 @@
 #include <DeviceInfoProviderImpl.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/Infineon/PSOC6/NetworkCommissioningDriver.h>
+#include <static-supported-temperature-levels.h>
 
 /* OTA related includes */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -97,6 +96,7 @@ BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 #endif
 
+chip::app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 } // namespace
 
 using namespace ::chip;
@@ -139,6 +139,7 @@ static void InitServer(intptr_t context)
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     GetAppTask().InitOTARequestor();
 #endif
+    chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 CHIP_ERROR AppTask::StartAppTask()
@@ -408,8 +409,7 @@ void AppTask::OnOffUpdateClusterState(intptr_t context)
     uint8_t onoff = sLightLED.Get();
 
     // write the new on/off value
-    EmberAfStatus status =
-        emberAfWriteServerAttribute(2, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &onoff, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(2, onoff);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {

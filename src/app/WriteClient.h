@@ -29,13 +29,14 @@
 #include <app/data-model/FabricScoped.h>
 #include <app/data-model/List.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <platform/LockTracker.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
@@ -46,10 +47,10 @@ namespace app {
 class InteractionModelEngine;
 
 /**
- *  @brief The read client represents the initiator side of a Write Interaction, and is responsible
+ *  @brief The write client represents the initiator side of a Write Interaction, and is responsible
  *  for generating one Write Request for a particular set of attributes, and handling the Write response.
- *  Consumer can allocate one write client, then call PrepareAttribute, insert attribute value, followed by FinishAttribute for
- * every attribute it wants to insert in write request, then call SendWriteRequest
+ *  Consumer can allocate one write client, then call PrepareAttribute, insert attribute value, followed
+ *  by FinishAttribute for every attribute it wants to insert in write request, then call SendWriteRequest
  *
  *  Note: When writing lists, you may receive multiple write status responses for a single list.
  *  Please see ChunkedWriteCallback.h for a high level API which will merge status codes for
@@ -127,15 +128,21 @@ public:
         mpExchangeMgr(apExchangeMgr),
         mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
         mSuppressResponse(aSuppressResponse)
-    {}
+    {
+        assertChipStackLockedByCurrentThread();
+    }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                 uint16_t aReservedSize) :
         mpExchangeMgr(apExchangeMgr),
         mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mReservedSize(aReservedSize)
-    {}
+    {
+        assertChipStackLockedByCurrentThread();
+    }
 #endif
+
+    ~WriteClient() { assertChipStackLockedByCurrentThread(); }
 
     /**
      *  Encode an attribute value that can be directly encoded using DataModel::Encode. Will create a new chunk when necessary.
@@ -260,8 +267,7 @@ private:
 
         ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
         VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(
-            DataModel::Encode(*writer, chip::TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData)), value));
+        ReturnErrorOnFailure(DataModel::Encode(*writer, chip::TLV::ContextTag(chip::app::AttributeDataIB::Tag::kData), value));
         ReturnErrorOnFailure(FinishAttributeIB());
 
         return CHIP_NO_ERROR;
@@ -274,8 +280,8 @@ private:
 
         ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
         VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::EncodeForWrite(
-            *writer, chip::TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData)), value));
+        ReturnErrorOnFailure(
+            DataModel::EncodeForWrite(*writer, chip::TLV::ContextTag(chip::app::AttributeDataIB::Tag::kData), value));
         ReturnErrorOnFailure(FinishAttributeIB());
 
         return CHIP_NO_ERROR;
@@ -298,7 +304,6 @@ private:
         {
             // If it failed with no memory, then we create a new chunk for it.
             mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
-            mWriteRequestBuilder.GetWriteRequests().ResetError();
             ReturnErrorOnFailure(StartNewMessage());
             ReturnErrorOnFailure(TryEncodeSingleAttributeDataIB(attributePath, value));
         }

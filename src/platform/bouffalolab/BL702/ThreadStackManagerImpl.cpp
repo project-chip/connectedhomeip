@@ -17,15 +17,15 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
-
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
-#include <openthread/platform/entropy.h>
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
 #include <lib/support/CHIPPlatformMemory.h>
+
+#include <openthread/platform/entropy.h>
 
 #include <mbedtls/platform.h>
 
@@ -48,13 +48,10 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ot_alarmInit();
-    ot_radioInit();
-
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
-    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
+    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
     SuccessOrExit(err);
 
     mbedtls_platform_set_calloc_free(pvPortCalloc, vPortFree);
@@ -73,15 +70,13 @@ bool ThreadStackManagerImpl::IsInitialized()
 
 using namespace ::chip::DeviceLayer;
 
-ot_system_event_t ot_system_event_var;
+ot_system_event_t ot_system_event_var = OT_SYSTEM_EVENT_NONE;
 
 void otSysProcessDrivers(otInstance * aInstance)
 {
-    ot_system_event_t sevent = OT_SYSTEM_EVENT_NONE;
+    ot_system_event_t sevent = otrGetNotifyEvent();
 
-    OT_GET_NOTIFY(sevent);
     ot_alarmTask(sevent);
-    // ot_uartTask(sevent);
     ot_radioTask(sevent);
 }
 
@@ -108,12 +103,48 @@ extern "C" otInstance * otrGetInstance()
     return ThreadStackMgrImpl().OTInstance();
 }
 
-extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
+extern "C" uint32_t otrEnterCrit(void)
 {
-    return calloc(aNum, aSize);
+    if (xPortIsInsideInterrupt())
+    {
+        return taskENTER_CRITICAL_FROM_ISR();
+    }
+    else
+    {
+        taskENTER_CRITICAL();
+        return 0;
+    }
 }
 
-extern "C" void otPlatFree(void * aPtr)
+extern "C" void otrExitCrit(uint32_t tag)
 {
-    free(aPtr);
+    if (xPortIsInsideInterrupt())
+    {
+        taskEXIT_CRITICAL_FROM_ISR(tag);
+    }
+    else
+    {
+        taskEXIT_CRITICAL();
+    }
+}
+
+extern "C" ot_system_event_t otrGetNotifyEvent(void)
+{
+    ot_system_event_t sevent = OT_SYSTEM_EVENT_NONE;
+
+    taskENTER_CRITICAL();
+    sevent              = ot_system_event_var;
+    ot_system_event_var = OT_SYSTEM_EVENT_NONE;
+    taskEXIT_CRITICAL();
+
+    return sevent;
+}
+
+extern "C" void otrNotifyEvent(ot_system_event_t sevent)
+{
+    uint32_t tag        = otrEnterCrit();
+    ot_system_event_var = (ot_system_event_t) (ot_system_event_var | sevent);
+    otrExitCrit(tag);
+
+    otSysEventSignalPending();
 }

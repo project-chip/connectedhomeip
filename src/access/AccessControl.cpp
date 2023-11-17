@@ -23,18 +23,19 @@
 
 #include "AccessControl.h"
 
+#include <lib/core/Global.h>
+
 namespace chip {
 namespace Access {
 
 using chip::CATValues;
 using chip::FabricIndex;
 using chip::NodeId;
-using namespace chip::Access;
 
 namespace {
 
-AccessControl defaultAccessControl;
-AccessControl * globalAccessControl = &defaultAccessControl;
+Global<AccessControl> defaultAccessControl;
+AccessControl * globalAccessControl = nullptr; // lazily defaulted to defaultAccessControl in GetAccessControl
 
 static_assert(((unsigned(Privilege::kAdminister) & unsigned(Privilege::kManage)) == 0) &&
                   ((unsigned(Privilege::kAdminister) & unsigned(Privilege::kOperate)) == 0) &&
@@ -174,8 +175,8 @@ char GetPrivilegeStringForLogging(Privilege privilege)
 
 } // namespace
 
-AccessControl::Entry::Delegate AccessControl::Entry::mDefaultDelegate;
-AccessControl::EntryIterator::Delegate AccessControl::EntryIterator::mDefaultDelegate;
+Global<AccessControl::Entry::Delegate> AccessControl::Entry::mDefaultDelegate;
+Global<AccessControl::EntryIterator::Delegate> AccessControl::EntryIterator::mDefaultDelegate;
 
 CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate, DeviceTypeResolver & deviceTypeResolver)
 {
@@ -329,7 +330,9 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
         {
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
             ChipLogProgress(DataManagement, "AccessControl: %s (delegate)",
-                            (result == CHIP_NO_ERROR) ? "allowed" : (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
+                            (result == CHIP_NO_ERROR)                  ? "allowed"
+                                : (result == CHIP_ERROR_ACCESS_DENIED) ? "denied"
+                                                                       : "error");
 #else
             if (result != CHIP_NO_ERROR)
             {
@@ -549,17 +552,18 @@ bool AccessControl::IsValid(const Entry & entry)
     const char * log = "unexpected error";
     IgnoreUnusedVariable(log); // logging may be disabled
 
-    AuthMode authMode;
-    FabricIndex fabricIndex;
-    Privilege privilege;
-    size_t subjectCount = 0;
-    size_t targetCount  = 0;
+    AuthMode authMode       = AuthMode::kNone;
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
+    Privilege privilege     = static_cast<Privilege>(0);
+    size_t subjectCount     = 0;
+    size_t targetCount      = 0;
 
-    SuccessOrExit(entry.GetAuthMode(authMode));
-    SuccessOrExit(entry.GetFabricIndex(fabricIndex));
-    SuccessOrExit(entry.GetPrivilege(privilege));
-    SuccessOrExit(entry.GetSubjectCount(subjectCount));
-    SuccessOrExit(entry.GetTargetCount(targetCount));
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = entry.GetAuthMode(authMode));
+    SuccessOrExit(err = entry.GetFabricIndex(fabricIndex));
+    SuccessOrExit(err = entry.GetPrivilege(privilege));
+    SuccessOrExit(err = entry.GetSubjectCount(subjectCount));
+    SuccessOrExit(err = entry.GetTargetCount(targetCount));
 
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
     ChipLogProgress(DataManagement, "AccessControl: validating f=%u p=%c a=%c s=%d t=%d", fabricIndex,
@@ -582,7 +586,7 @@ bool AccessControl::IsValid(const Entry & entry)
     for (size_t i = 0; i < subjectCount; ++i)
     {
         NodeId subject;
-        SuccessOrExit(entry.GetSubject(i, subject));
+        SuccessOrExit(err = entry.GetSubject(i, subject));
         const bool kIsCase  = authMode == AuthMode::kCase;
         const bool kIsGroup = authMode == AuthMode::kGroup;
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
@@ -594,7 +598,7 @@ bool AccessControl::IsValid(const Entry & entry)
     for (size_t i = 0; i < targetCount; ++i)
     {
         Entry::Target target;
-        SuccessOrExit(entry.GetTarget(i, target));
+        SuccessOrExit(err = entry.GetTarget(i, target));
         const bool kHasCluster    = target.flags & Entry::Target::kCluster;
         const bool kHasEndpoint   = target.flags & Entry::Target::kEndpoint;
         const bool kHasDeviceType = target.flags & Entry::Target::kDeviceType;
@@ -608,7 +612,14 @@ bool AccessControl::IsValid(const Entry & entry)
     return true;
 
 exit:
-    ChipLogError(DataManagement, "AccessControl: %s", log);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "AccessControl: %s %" CHIP_ERROR_FORMAT, log, err.Format());
+    }
+    else
+    {
+        ChipLogError(DataManagement, "AccessControl: %s", log);
+    }
     return false;
 }
 
@@ -623,7 +634,7 @@ void AccessControl::NotifyEntryChanged(const SubjectDescriptor * subjectDescript
 
 AccessControl & GetAccessControl()
 {
-    return *globalAccessControl;
+    return (globalAccessControl) ? *globalAccessControl : defaultAccessControl.get();
 }
 
 void SetAccessControl(AccessControl & accessControl)
@@ -634,7 +645,7 @@ void SetAccessControl(AccessControl & accessControl)
 
 void ResetAccessControlToDefault()
 {
-    globalAccessControl = &defaultAccessControl;
+    globalAccessControl = nullptr;
 }
 
 } // namespace Access

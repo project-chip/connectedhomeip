@@ -16,6 +16,7 @@
 # options are used from examples/.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/config/standalone/args.gni")
 
 chip_device_platform = "beken"
 

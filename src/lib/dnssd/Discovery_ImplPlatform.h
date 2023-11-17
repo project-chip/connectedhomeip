@@ -20,6 +20,7 @@
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/Global.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/dnssd/ResolverProxy.h>
@@ -38,6 +39,7 @@ class DiscoveryImplPlatform : public ServiceAdvertiser, public Resolver
 public:
     // Members that implement both ServiceAdveriser and Resolver interfaces.
     CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> *) override { return InitImpl(); }
+    bool IsInitialized() override;
     void Shutdown() override;
 
     // Members that implement ServiceAdvertiser interface.
@@ -49,12 +51,13 @@ public:
     CHIP_ERROR UpdateCommissionableInstanceName() override;
 
     // Members that implement Resolver interface.
-    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mResolverProxy.SetOperationalDelegate(delegate); }
+    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override
     {
         mResolverProxy.SetCommissioningDelegate(delegate);
     }
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
+    void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR StopDiscovery() override;
@@ -63,9 +66,16 @@ public:
     static DiscoveryImplPlatform & GetInstance();
 
 private:
-    DiscoveryImplPlatform();
+    enum class State : uint8_t
+    {
+        kUninitialized,
+        kInitializing,
+        kInitialized
+    };
 
-    DiscoveryImplPlatform(const DiscoveryImplPlatform &) = delete;
+    DiscoveryImplPlatform() = default;
+
+    DiscoveryImplPlatform(const DiscoveryImplPlatform &)             = delete;
     DiscoveryImplPlatform & operator=(const DiscoveryImplPlatform &) = delete;
 
     CHIP_ERROR InitImpl();
@@ -82,19 +92,16 @@ private:
                               size_t subTypeSize, uint16_t port, Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
                               DnssdServiceProtocol procotol, PeerId peerId);
 
-    OperationalAdvertisingParameters mOperationalNodeAdvertisingParams;
-    CommissionAdvertisingParameters mCommissionableNodeAdvertisingParams;
-    CommissionAdvertisingParameters mCommissionerNodeAdvertisingParams;
-    bool mIsOperationalNodePublishing    = false;
-    bool mIsCommissionableNodePublishing = false;
-    bool mIsCommissionerNodePublishing   = false;
+    static void HandleNodeIdResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & addresses,
+                                    CHIP_ERROR error);
+
+    State mState = State::kUninitialized;
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
-
-    bool mDnssdInitialized = false;
-
     ResolverProxy mResolverProxy;
+    OperationalResolveDelegate * mOperationalDelegate = nullptr;
 
-    static DiscoveryImplPlatform sManager;
+    friend class Global<DiscoveryImplPlatform>;
+    static Global<DiscoveryImplPlatform> sManager;
 };
 
 } // namespace Dnssd

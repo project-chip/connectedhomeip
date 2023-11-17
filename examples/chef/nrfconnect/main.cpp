@@ -39,11 +39,11 @@
 #include <ChipShellCollection.h>
 #endif
 
-#ifdef CONFIG_ENABLE_PW_RPC
+#ifdef CONFIG_CHIP_PW_RPC
 #include "Rpc.h"
 #endif
 
-LOG_MODULE_REGISTER(app, CONFIG_MATTER_LOG_LEVEL);
+LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace chip;
 using namespace chip::Shell;
@@ -57,7 +57,7 @@ int main()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#ifdef CONFIG_ENABLE_PW_RPC
+#ifdef CONFIG_CHIP_PW_RPC
     rpc::Init();
 #endif
 
@@ -138,7 +138,7 @@ int main()
         ChipLogError(AppServer, "OpenBasicCommissioningWindow() failed");
     }
 
-#if CONFIG_ENABLE_CHIP_SHELL || CONFIG_CHIP_LIB_SHELL
+#if CONFIG_CHIP_LIB_SHELL
     int rc = Engine::Root().Init();
     if (rc != 0)
     {
@@ -154,7 +154,7 @@ int main()
     cmd_app_server_init();
 #endif
 
-#if CONFIG_ENABLE_CHIP_SHELL || CONFIG_CHIP_LIB_SHELL
+#if CONFIG_CHIP_LIB_SHELL
     Engine::Root().RunMainLoop();
 #endif
 

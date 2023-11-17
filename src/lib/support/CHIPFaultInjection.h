@@ -24,7 +24,6 @@
 #pragma once
 
 #include <lib/core/CHIPConfig.h>
-#include <lib/core/CHIPEventLoggingConfig.h>
 
 #if CHIP_WITH_NLFAULTINJECTION
 

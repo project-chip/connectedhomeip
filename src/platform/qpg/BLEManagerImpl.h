@@ -127,7 +127,7 @@ private:
     CHIP_ERROR MapBLEError(int bleErr) const;
     /* Callbacks from BLE stack*/
     static void ExternalCbHandler(qvCHIP_Ble_MsgHdr_t * pMsg);
-    static void HandleTXCharRead(uint16_t connId, uint16_t handle, uint8_t operation, uint16_t offset, qvCHIP_Ble_Attr_t * pAttr);
+    static void HandleTXCharRead(uint16_t connId, uint16_t handle, uint8_t operation, uint16_t offset, qvCHIP_Ble_Attr_t * pAttr) {}
     static void HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t operation, uint16_t offset, uint16_t len,
                                   uint8_t * pValue, qvCHIP_Ble_Attr_t * pAttr);
     void HandleTXCharCCCDWrite(qvCHIP_Ble_AttsCccEvt_t * event);
@@ -139,6 +139,10 @@ private:
     static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
     static void CancelBleAdvTimeoutTimer(void);
     static void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    CHIP_ERROR PrepareAdditionalData();
+#endif /* CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING */
 };
 
 /**

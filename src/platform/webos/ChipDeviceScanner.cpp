@@ -322,7 +322,7 @@ bool ChipDeviceScanner::cancelDiscoveryCb(LSHandle * sh, LSMessage * message, vo
     return true;
 }
 
-CHIP_ERROR ChipDeviceScanner::StopChipScan(void)
+CHIP_ERROR ChipDeviceScanner::StopChipScan()
 {
     int ret = 0;
     ReturnErrorCodeIf(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);
@@ -336,7 +336,7 @@ CHIP_ERROR ChipDeviceScanner::StopChipScan(void)
     ChipLogProgress(DeviceLayer, "CHIP Scanner Async Thread Quit Done..Wait for Thread Windup...!");
 
     // Report to Impl class
-    mDelegate->OnChipScanComplete();
+    mDelegate->OnScanComplete();
 
     mIsScanning = false;
 

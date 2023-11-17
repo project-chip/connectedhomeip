@@ -51,7 +51,7 @@ public:
         env->DeleteGlobalRef(mContentAppEndpointManager);
     }
 
-    const char * Read(const chip::app::ConcreteReadAttributePath & aPath);
+    std::string Read(const chip::app::ConcreteReadAttributePath & aPath);
 
 private:
     void InitializeJNIObjects(jobject manager)
@@ -67,7 +67,7 @@ private:
         VerifyOrReturn(ContentAppEndpointManagerClass != nullptr,
                        ChipLogError(Zcl, "Failed to get ContentAppEndpointManager Java class"));
 
-        mReadAttributeMethod = env->GetMethodID(ContentAppEndpointManagerClass, "readAttribute", "(III)Ljava/lang/String;");
+        mReadAttributeMethod = env->GetMethodID(ContentAppEndpointManagerClass, "readAttribute", "(IJJ)Ljava/lang/String;");
         if (mReadAttributeMethod == nullptr)
         {
             ChipLogError(Zcl, "Failed to access ContentAppEndpointManager 'readAttribute' method");

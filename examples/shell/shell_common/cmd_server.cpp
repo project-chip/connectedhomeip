@@ -119,17 +119,18 @@ static bool PrintServerSession(void * context, SessionHandle & session)
     case Session::SessionType::kSecure: {
         SecureSession * secureSession         = session->AsSecureSession();
         SecureSession::Type secureSessionType = secureSession->GetSecureSessionType();
-        streamer_printf(
-            streamer_get(), "session type=SECURE %s id=0x%04x peerSessionId=0x%04x peerNodeId=0x%016" PRIx64 " fabricIdx=%d\r\n",
-            secureSessionType == SecureSession::Type::kCASE ? "CASE" : "PASE", secureSession->GetLocalSessionId(),
-            secureSession->AsSecureSession()->GetPeerSessionId(), secureSession->GetPeerNodeId(), secureSession->GetFabricIndex());
+        streamer_printf(streamer_get(),
+                        "session type=SECURE %s id=0x%04x peerSessionId=0x%04x peerNodeId=0x" ChipLogFormatX64 " fabricIdx=%d\r\n",
+                        secureSessionType == SecureSession::Type::kCASE ? "CASE" : "PASE", secureSession->GetLocalSessionId(),
+                        secureSession->AsSecureSession()->GetPeerSessionId(), ChipLogValueX64(secureSession->GetPeerNodeId()),
+                        secureSession->GetFabricIndex());
         break;
     }
 
     case Session::SessionType::kUnauthenticated: {
         UnauthenticatedSession * unsecuredSession = session->AsUnauthenticatedSession();
-        streamer_printf(streamer_get(), "session type=UNSECURED id=0x0000 peerNodeId=0x%016" PRIx64 "\r\n",
-                        unsecuredSession->GetPeerNodeId());
+        streamer_printf(streamer_get(), "session type=UNSECURED id=0x0000 peerNodeId=0x" ChipLogFormatX64 "\r\n",
+                        ChipLogValueX64(unsecuredSession->GetPeerNodeId()));
         break;
     }
 
@@ -170,7 +171,7 @@ static CHIP_ERROR CmdAppServerClusters(int argc, char ** argv)
 {
     bool server = true;
 
-    for (int i = 0; i < emberAfEndpointCount(); i++)
+    for (uint16_t i = 0; i < emberAfEndpointCount(); i++)
     {
         EndpointId endpoint = emberAfEndpointFromIndex(i);
 
@@ -190,7 +191,7 @@ static CHIP_ERROR CmdAppServerClusters(int argc, char ** argv)
 
 static CHIP_ERROR CmdAppServerEndpoints(int argc, char ** argv)
 {
-    for (int i = 0; i < emberAfEndpointCount(); i++)
+    for (uint16_t i = 0; i < emberAfEndpointCount(); i++)
     {
         EndpointId endpoint = emberAfEndpointFromIndex(i);
 

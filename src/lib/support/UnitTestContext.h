@@ -23,6 +23,31 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
+/**
+ *  @def NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, inCondition)
+ *
+ *  @brief
+ *    This is used to assert the results of a conditional check
+ *    through out a test in a test suite.
+ *
+ *  @param[in]    inSuite      A pointer to the test suite the assertion
+ *                             should be accounted against.
+ *  @param[in]    inCondition  Code for the logical predicate to be checked
+ *                             for truth. If the condition fails, the
+ *                             assertion fails.
+ *
+ */
+#define NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, inCondition)                                                                        \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        NL_TEST_ASSERT(inSuite, inCondition);                                                                                      \
+                                                                                                                                   \
+        if (!(inCondition))                                                                                                        \
+        {                                                                                                                          \
+            return;                                                                                                                \
+        }                                                                                                                          \
+    } while (0)
+
 namespace chip {
 
 /// Performs a memory Init/Shutdown in a controlled manner

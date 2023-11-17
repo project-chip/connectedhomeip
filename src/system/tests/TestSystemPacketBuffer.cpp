@@ -2008,7 +2008,7 @@ const nlTest sTests[] =
 };
 // clang-format on
 
-int TestSystemPacketBuffer(void)
+int TestSystemPacketBuffer()
 {
     // clang-format off
     nlTestSuite theSuite = {

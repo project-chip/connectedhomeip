@@ -42,24 +42,24 @@ directory.
 
 ## Requirements for building
 
-You need Android SDK 21 & NDK 21.4.7075529 downloaded to your machine. Set the
+You need Android SDK 26 & NDK 23.2.8568313 downloaded to your machine. Set the
 `$ANDROID_HOME` environment variable to where the SDK is downloaded and the
 `$ANDROID_NDK_HOME` environment variable to point to where the NDK package is
-downloaded.
+downloaded. The build also requires `kotlinc` to be in your `$PATH`.
 
 1. Install [Android Studio](https://developer.android.com/studio)
 2. Install NDK:
     1. Tools -> SDK Manager -> SDK Tools Tab
     2. Click [x] Show Package Details
-    3. Select NDK (Side by Side) -> 21.4.7075529
+    3. Select NDK (Side by Side) -> 23.2.8568313
     4. Apply
 3. Install Command Line Tools:
     1. Tools -> SDK Manager -> SDK Tools Tab -> Android SDK Command Line Tools
        (latest)
     2. Apply
-4. Install SDK 21:
-    1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 5.0 (Lollipop) SDK
-       Level 21
+4. Install SDK 26:
+    1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 8.0 (Oreo) SDK Level
+       26
     2. Apply
 5. Install Emulator:
     1. Tools -> Device Manager -> Create device -> Pixel 5 -> Android S API 31
@@ -69,14 +69,14 @@ downloaded.
 
 ```
 export ANDROID_HOME=~/Android/Sdk
-export ANDROID_NDK_HOME=~/Android/Sdk/ndk/21.4.7075529
+export ANDROID_NDK_HOME=~/Android/Sdk/ndk/23.2.8568313
 ```
 
 ### MacOS
 
 ```
 export ANDROID_HOME=~/Library/Android/sdk
-export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/21.4.7075529
+export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/23.2.8568313
 ```
 
 <a name="abi"></a>
@@ -103,8 +103,16 @@ JDK version on MacOS for Apple Silicon is 'openjdk 17.0.1' or above.
 
 Using JDK bundled with Android Studio will help with that.
 
+Android Studio Dolphin and below:
+
 ```shell
 export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/Contents/Home/
+```
+
+Android Studio Electric Eel 2022.1.1 and above:
+
+```shell
+export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jbr/Contents/Home/
 ```
 
 <hr>
@@ -203,7 +211,7 @@ or
 ## Building Android CHIPTest from scripts
 
 Currently, the CHIPTest can only be built from scripts. The steps are similar to
-[building CHIPTool from scripts](#building-scripts).
+[building CHIPTool from scripts](#building-android-chiptool-from-scripts).
 
 ```shell
 ./scripts/build/build_examples.py --target android-arm64-chip-test build

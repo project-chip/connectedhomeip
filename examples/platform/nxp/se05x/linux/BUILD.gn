@@ -59,6 +59,7 @@ source_set("app-main") {
   include_dirs = [
     "${chip_root}/examples/platform/linux",
     "${chip_root}/examples/platform/nxp/se05x",
+    "${chip_root}/src/platform/nxp/crypto/se05x",
   ]
 
   defines = []
@@ -108,8 +109,6 @@ source_set("commissioner-main") {
     "${chip_root}/src/app/server",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/lib",
-    "${chip_root}/src/lib/shell",
-    "${chip_root}/src/lib/shell:shell_core",
   ]
 
   if (chip_enable_transport_trace) {

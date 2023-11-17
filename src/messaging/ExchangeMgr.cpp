@@ -219,10 +219,10 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // Legend that can be used to decode this log line can be found in README.md
     //
     ChipLogProgress(ExchangeManager,
-                    ">>> [E:" ChipLogFormatExchangeId " M:" ChipLogFormatMessageCounter "%s] (%s) Msg RX from %u:" ChipLogFormatX64
-                    " [%04X] --- Type %04x:%02x (%s:%s)",
-                    ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), packetHeader.GetMessageCounter(), ackBuf,
-                    Transport::GetSessionTypeString(session), session->GetFabricIndex(),
+                    ">>> [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter
+                    "%s] (%s) Msg RX from %u:" ChipLogFormatX64 " [%04X] --- Type %04x:%02x (%s:%s)",
+                    ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), session->SessionIdForLogging(),
+                    packetHeader.GetMessageCounter(), ackBuf, Transport::GetSessionTypeString(session), session->GetFabricIndex(),
                     ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId),
                     payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType(), protocolName, msgTypeName);
 #endif
@@ -300,9 +300,17 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // an ack to the peer.
     else if (!payloadHeader.NeedsAck())
     {
-        // Using same error message for all errors to reduce code size.
-        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT,
-                     CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR.Format());
+        // We can easily get standalone acks here: any time we fail to get a
+        // timely ack for the last message in an exchange and retransmit it,
+        // then get acks for both the message and the retransmit, the second ack
+        // will end up in this block.  That's not really an error condition, so
+        // there is no need to log an error in that case.
+        if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
+        {
+            // Using same error message for all errors to reduce code size.
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT,
+                         CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR.Format());
+        }
         return;
     }
 

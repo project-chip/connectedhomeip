@@ -19,8 +19,9 @@
 #pragma once
 
 #include "commands/common/Commands.h"
-#include "commands/pairing/CloseSessionCommand.h"
-#include "commands/pairing/CommissionedListCommand.h"
+#include "commands/pairing/GetCommissionerNodeIdCommand.h"
+#include "commands/pairing/GetCommissionerRootCertificateCommand.h"
+#include "commands/pairing/IssueNOCChainCommand.h"
 #include "commands/pairing/OpenCommissioningWindowCommand.h"
 #include "commands/pairing/PairingCommand.h"
 
@@ -172,11 +173,38 @@ public:
     {}
 };
 
-class Ethernet : public PairingCommand
+class PairAlreadyDiscovered : public PairingCommand
 {
 public:
-    Ethernet(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("ethernet", PairingMode::Ethernet, PairingNetworkType::Ethernet, credsIssuerConfig)
+    PairAlreadyDiscovered(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("already-discovered", PairingMode::AlreadyDiscovered, PairingNetworkType::None, credsIssuerConfig)
+    {}
+};
+
+class PairAlreadyDiscoveredByIndex : public PairingCommand
+{
+public:
+    PairAlreadyDiscoveredByIndex(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("already-discovered-by-index", PairingMode::AlreadyDiscoveredByIndex, PairingNetworkType::None,
+                       credsIssuerConfig)
+    {}
+};
+
+class PairAlreadyDiscoveredByIndexWithWiFi : public PairingCommand
+{
+public:
+    PairAlreadyDiscoveredByIndexWithWiFi(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("already-discovered-by-index-with-wifi", PairingMode::AlreadyDiscoveredByIndex, PairingNetworkType::WiFi,
+                       credsIssuerConfig)
+    {}
+};
+
+class PairAlreadyDiscoveredByIndexWithCode : public PairingCommand
+{
+public:
+    PairAlreadyDiscoveredByIndexWithCode(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("already-discovered-by-index-with-code", PairingMode::AlreadyDiscoveredByIndexWithCode,
+                       PairingNetworkType::None, credsIssuerConfig)
     {}
 };
 
@@ -206,7 +234,10 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<PairBleWiFi>(credsIssuerConfig),
         make_unique<PairBleThread>(credsIssuerConfig),
         make_unique<PairSoftAP>(credsIssuerConfig),
-        make_unique<Ethernet>(credsIssuerConfig),
+        make_unique<PairAlreadyDiscovered>(credsIssuerConfig),
+        make_unique<PairAlreadyDiscoveredByIndex>(credsIssuerConfig),
+        make_unique<PairAlreadyDiscoveredByIndexWithWiFi>(credsIssuerConfig),
+        make_unique<PairAlreadyDiscoveredByIndexWithCode>(credsIssuerConfig),
         make_unique<PairOnNetwork>(credsIssuerConfig),
         make_unique<PairOnNetworkShort>(credsIssuerConfig),
         make_unique<PairOnNetworkLong>(credsIssuerConfig),
@@ -219,8 +250,10 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         //        make_unique<CommissionedListCommand>(),
         make_unique<StartUdcServerCommand>(credsIssuerConfig),
         make_unique<OpenCommissioningWindowCommand>(credsIssuerConfig),
-        make_unique<CloseSessionCommand>(credsIssuerConfig),
+        make_unique<GetCommissionerNodeIdCommand>(credsIssuerConfig),
+        make_unique<GetCommissionerRootCertificateCommand>(credsIssuerConfig),
+        make_unique<IssueNOCChainCommand>(credsIssuerConfig),
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for commissioning devices.");
 }

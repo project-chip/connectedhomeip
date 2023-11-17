@@ -35,8 +35,7 @@
 
 #include <app/util/af-types.h>
 
-#include <app/util/debug-printing.h>
-#include <app/util/ember-print.h>
+#include <app/util/endpoint-config-api.h>
 
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
@@ -81,6 +80,14 @@ bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId)
 bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
 
 /**
+ * @brief Returns true if endpoint contains the ZCL client with specified id.
+ *
+ * This function returns true if
+ * the endpoint contains client of a given cluster.
+ */
+bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId);
+
+/**
  * @brief write an attribute, performing all the checks.
  *
  * This function will attempt to write the attribute value from
@@ -98,11 +105,6 @@ bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
 EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                     uint8_t * dataPtr, EmberAfAttributeType dataType);
 
-// For now, just define emberAfWriteServerAttribute to emberAfWriteAttribute, to
-// minimize code churn.
-// TODO: Remove this define.
-#define emberAfWriteServerAttribute emberAfWriteAttribute
-
 /**
  * @brief Read the attribute value, performing all the checks.
  *
@@ -114,40 +116,6 @@ EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId c
  */
 EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                    uint8_t * dataPtr, uint16_t readLength);
-
-// For now, just define emberAfReadServerAttribute to emberAfReadAttribute, to
-// minimize code churn.
-// TODO: Remove this define.
-#define emberAfReadServerAttribute emberAfReadAttribute
-
-/**
- * @brief this function returns the size of the ZCL data in bytes.
- *
- * @param dataType Zcl data type
- * @return size in bytes or 0 if invalid data type
- */
-uint8_t emberAfGetDataSize(uint8_t dataType);
-
-/**
- * @brief macro that returns true if the cluster is in the manufacturer specific range
- *
- * @param cluster EmberAfCluster* to consider
- */
-#define emberAfClusterIsManufacturerSpecific(cluster) ((cluster)->clusterId >= 0xFC00)
-
-/**
- * @brief macro that returns true if attribute is saved in external storage.
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsExternal(metadata) (((metadata)->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE) != 0)
-
-/**
- * @brief macro that returns true if attribute is a singleton
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsSingleton(metadata) (((metadata)->mask & ATTRIBUTE_MASK_SINGLETON) != 0)
 
 /**
  * @brief macro that returns size of attribute in bytes.
@@ -162,12 +130,7 @@ extern EmberAfDefinedEndpoint emAfEndpoints[];
 #endif
 
 /**
- * @brief Macro that takes index of endpoint, and returns Zigbee endpoint
- */
-chip::EndpointId emberAfEndpointFromIndex(uint16_t index);
-
-/**
- * @brief Returns root endpoint of a composed bridged device
+ * @brief Returns parent endpoint for a given endpoint index
  */
 chip::EndpointId emberAfParentEndpointFromIndex(uint16_t index);
 
@@ -184,20 +147,46 @@ uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint);
 uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId endpoint);
 
 /**
- * Returns the endpoint index within a given cluster (Server-side),
- * looking only for standard clusters.
- */
-uint16_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
+ *  @brief Returns the index of the given endpoint in the list of all endpoints that might support the given cluster server.
+ *
+ * Returns kEmberInvalidEndpointIndex if the given endpoint does not support the
+ * given cluster or if the given endpoint is disabled.
+ *
+ * This function always returns the same index for a given endpointId instance, fixed or dynamic.
+ *
+ * The return index for fixed endpoints will range from 0 to (fixedClusterServerEndpointCount - 1),
+ * For dynamic endpoints the indexing assumes that any dynamic endpoint could start supporting
+ * the given server cluster and their index will range from fixedClusterServerEndpointCount to
+ * (fixedClusterServerEndpointCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT - 1).
+ *
+ * For example, if a device has 4 fixed endpoints (ids 0-3) and 2 dynamic
+ * endpoints, and cluster X is supported on endpoints 1 and 3, then
+ * fixedClusterServerEndpointCount should be 2 and
+ *
+ * 1) emberAfGetClusterServerEndpointIndex(0, X) returns kEmberInvalidEndpointIndex
+ * 2) emberAfGetClusterServerEndpointIndex(1, X) returns 0
+ * 3) emberAfGetClusterServerEndpointIndex(2, X) returns kEmberInvalidEndpointIndex
+ * 4) emberAfGetClusterServerEndpointIndex(3, X) returns 1
 
-/**
- * @brief Macro that returns the primary endpoint.
+ * The Dynamic endpoints are placed after the fixed ones;
+ * therefore their return index will always be >= to fixedClusterServerEndpointCount
+ *
+ * If a dynamic endpoint, supporting cluster X, is defined to dynamic index 1 with endpoint id 7,
+ * (via emberAfSetDynamicEndpoint(1, 7, ...))
+ * then emberAfGetClusterServerEndpointIndex(7, X) returns 3 (fixedClusterServerEndpointCount{2} + DynamicEndpointIndex {1}).
+ *
+ * If now a second dynamic endpoint, also supporting cluster X, is defined to dynamic index 0
+ * with endpoint id 9  (via emberAfSetDynamicEndpoint(0, 9, ...)),
+ * emberAfGetClusterServerEndpointIndex(9, X) returns 2. (fixedClusterServerEndpointCount{2} + DynamicEndpointIndex {0}).
+ * and emberAfGetClusterServerEndpointIndex(7, X) still returns 3
+ *
+ * @param endpoint Endpoint number
+ * @param cluster Id the of the Cluster server you are interrested on
+ * @param fixedClusterServerEndpointCount The number of fixed endpoints containing this cluster server.  Typically one of the
+ EMBER_AF_*_CLUSTER_SERVER_ENDPOINT_COUNT constants.
  */
-#define emberAfPrimaryEndpoint() (emAfEndpoints[0].endpoint)
-
-/**
- * @brief Returns the total number of endpoints (dynamic and pre-compiled).
- */
-uint16_t emberAfEndpointCount(void);
+uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                              uint16_t fixedClusterServerEndpointCount);
 
 /**
  * @brief Returns the number of pre-compiled endpoints.
@@ -205,76 +194,10 @@ uint16_t emberAfEndpointCount(void);
 uint16_t emberAfFixedEndpointCount(void);
 
 /**
- * Data types are either analog or discrete. This makes a difference for
- * some of the ZCL global commands
- */
-enum
-{
-    EMBER_AF_DATA_TYPE_ANALOG   = 0,
-    EMBER_AF_DATA_TYPE_DISCRETE = 1,
-    EMBER_AF_DATA_TYPE_NONE     = 2
-};
-
-/**
  *@brief Returns true if type is signed, false otherwise.
  */
 bool emberAfIsTypeSigned(EmberAfAttributeType dataType);
 
-/**
- * @brief Function that extracts a 64-bit integer from the message buffer
- */
-uint64_t emberAfGetInt64u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
-#define emberAfGetInt64s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt64u(message, currentIndex, msgLen))
-
-/**
- * @brief Function that extracts a 32-bit integer from the message buffer
- */
-uint32_t emberAfGetInt32u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
-#define emberAfGetInt32s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt32u(message, currentIndex, msgLen))
-
-/**
- * @brief Function that extracts a 24-bit integer from the message buffer
- */
-uint32_t emberAfGetInt24u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
-#define emberAfGetInt24s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt24u(message, currentIndex, msgLen))
-
-/**
- * @brief Function that extracts a 16-bit integer from the message buffer
- */
-uint16_t emberAfGetInt16u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
-#define emberAfGetInt16s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt16u(message, currentIndex, msgLen))
-
-/**
- * @brief Function that extracts a ZCL string from the message buffer
- */
-uint8_t * emberAfGetString(uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
-/**
- * @brief Function that extracts a ZCL long string from the message buffer
- */
-uint8_t * emberAfGetLongString(uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
-
-/**
- * @brief Macro for consistency, that extracts single byte out of the message
- */
-#define emberAfGetInt8u(message, currentIndex, msgLen) message[currentIndex]
-#define emberAfGetInt8s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt8u(message, currentIndex, msgLen))
-
-/**
- * @brief Macro for consistency that copies a uint8_t from variable into buffer.
- */
-#define emberAfCopyInt8u(data, index, x) (data[index] = (x))
-/**
- * @brief function that copies a uint16_t value into a buffer
- */
-void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x);
-/**
- * @brief function that copies a uint24_t value into a buffer
- */
-void emberAfCopyInt24u(uint8_t * data, uint16_t index, uint32_t x);
-/**
- * @brief function that copies a uint32_t value into a buffer
- */
-void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x);
 /*
  * @brief Function that copies a ZCL string type into a buffer.  The size
  * parameter should indicate the maximum number of characters to copy to the
@@ -303,42 +226,10 @@ void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size);
  */
 bool emberAfIsDeviceIdentifying(chip::EndpointId endpoint);
 
-/**
- * @brief Function that enables or disables an endpoint.
- *
- * By calling this function, you turn off all processing of incoming traffic
- * for a given endpoint.
- *
- * @param endpoint Zigbee endpoint number
- */
-void emberAfSetDeviceEnabled(chip::EndpointId endpoint, bool enabled);
-
 /** @} END Device Control */
 
 /** @name Miscellaneous */
 // @{
-
-/**
- * @brief Enable/disable endpoints
- */
-bool emberAfEndpointEnableDisable(chip::EndpointId endpoint, bool enable);
-
-/**
- * @brief Determine if an endpoint at the specified index is enabled or disabled
- */
-bool emberAfEndpointIndexIsEnabled(uint16_t index);
-
-/**
- * @brief Returns true if a given ZCL data type is a string type.
- *
- * You should use this function if you need to perform a different
- * memory operation on a certain attribute because it is a string type.
- * Since ZCL strings carry length as the first byte(s), it is often required
- * to treat them differently than regular data types.
- *
- * @return true if data type is a string.
- */
-bool emberAfIsThisDataTypeAStringType(EmberAfAttributeType dataType);
 
 /** @brief Returns true if a given ZCL data type is a list type. */
 bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType);
@@ -357,282 +248,7 @@ bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType);
  */
 int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t len, bool signedNumber);
 
-/**
- * @brief populates the passed EUI64 with the local EUI64 MAC address.
- */
-void emberAfGetEui64(EmberEUI64 returnEui64);
-
-/**
- * @brief Returns the node ID of the local node.
- */
-EmberNodeId emberAfGetNodeId(void);
-
-/**
- * @brief Returns the current network state.  This call caches the results
- *   on the host to prevent frequent EZSP transactions.
- */
-EmberNetworkStatus emberAfNetworkState(void);
-
 /** @} END Miscellaneous */
-
-/** @name Sleep Control */
-//@{
-
-/**
- * @brief Friendly define for use in the scheduling or canceling client events
- * with emberAfScheduleClusterTick() and emberAfDeactivateClusterTick().
- */
-#define EMBER_AF_CLIENT_CLUSTER_TICK true
-
-/**
- * @brief Friendly define for use in the scheduling or canceling server events
- * with emberAfScheduleClusterTick() and emberAfDeactivateClusterTick().
- */
-#define EMBER_AF_SERVER_CLUSTER_TICK false
-
-/**
- * @brief This function is used to schedule a cluster-related event inside the
- * application framework's event mechanism.  This function provides a wrapper
- * for the Ember stack event mechanism which allows the cluster code to access
- * its events by their endpoint, cluster id, and client/server identity.  The
- * passed poll and sleep controls allow the cluster to indicate whether it
- * needs to long or short poll and whether it needs to stay awake or if it can
- * sleep.
- *
- * @param endpoint the endpoint of the event to be scheduled.
- * @param clusterId the cluster id of the event to be scheduled.
- * @param isClient ::EMBER_AF_CLIENT_CLUSTER_TICK if the event to be scheduled
- *        is associated with a client cluster or ::EMBER_AF_SERVER_CLUSTER_TICK
- *        otherwise.
- * @param delayMs the number of milliseconds until the event should be called.
- * @param pollControl ::EMBER_AF_SHORT_POLL if the cluster needs to short poll
- *        or ::EMBER_AF_LONG_POLL otherwise.
- * @param sleepControl ::EMBER_AF_STAY_AWAKE if the cluster needs to stay awake
- *        or EMBER_AF_OK_TO_SLEEP otherwise.
- *
- * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
- */
-EmberStatus emberAfScheduleTickExtended(chip::EndpointId endpoint, chip::ClusterId clusterId, bool isClient, uint32_t delayMs,
-                                        EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl);
-
-/**
- * @brief This function is used to schedule a cluster-related event inside the
- * This function is a wrapper for ::emberAfScheduleTickExtended.  The cluster
- * on the given endpoint will be set to long poll if sleepControl is set to
- * ::EMBER_AF_OK_TO_HIBERNATE or will be set to short poll otherwise.  It will
- * stay awake if sleepControl is ::EMBER_AF_STAY_AWAKE and will sleep
- * otherwise.
- *
- * @param endpoint the endpoint of the event to be scheduled.
- * @param clusterId the cluster id of the event to be scheduled.
- * @param isClient ::EMBER_AF_CLIENT_CLUSTER_TICK if the event to be scheduled
- *        is associated with a client cluster or ::EMBER_AF_SERVER_CLUSTER_TICK
- *        otherwise.
- * @param delayMs the number of milliseconds until the event should be called.
- * @param sleepControl the priority of the event, what the processor should
- *        be allowed to do in terms of sleeping while the event is active.
- *
- * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
- */
-EmberStatus emberAfScheduleClusterTick(chip::EndpointId endpoint, chip::ClusterId clusterId, bool isClient, uint32_t delayMs,
-                                       EmberAfEventSleepControl sleepControl);
-
-/**
- * @brief A function used to schedule a cluster server event.  This function
- * is a wrapper for ::emberAfScheduleTickExtended.
- *
- * @param endpoint the endpoint of the event to be scheduled.
- * @param clusterId the cluster id of the event to be scheduled.
- * @param delayMs the number of milliseconds until the event should be called.
- * @param pollControl ::EMBER_AF_SHORT_POLL if the cluster needs to short poll
- *        or ::EMBER_AF_LONG_POLL otherwise.
- * @param sleepControl ::EMBER_AF_STAY_AWAKE if the cluster needs to stay awake
- *        or EMBER_AF_OK_TO_SLEEP otherwise.
- *
- * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
- */
-EmberStatus emberAfScheduleServerTickExtended(chip::EndpointId endpoint, chip::ClusterId clusterId, uint32_t delayMs,
-                                              EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl);
-
-/**
- * @brief A function used to schedule a cluster server event.  This function
- * is a wrapper for ::emberAfScheduleServerTickExtended.  It indicates that
- * the cluster server on the given endpoint can long poll and can sleep.
- *
- * @param endpoint the endpoint of the event to be scheduled
- * @param clusterId the cluster id of the event to be scheduled.
- * @param delayMs the number of milliseconds until the event should be called.
- *
- * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
- */
-EmberStatus emberAfScheduleServerTick(chip::EndpointId endpoint, chip::ClusterId clusterId, uint32_t delayMs);
-
-/**
- * @brief A function used to deactivate a cluster-related event.  This function
- * provides a wrapper for the Ember stack's event mechanism which allows an
- * event to be accessed by its endpoint, cluster id, and client/server
- * identity.
- *
- * @param endpoint the endpoint of the event to be deactivated.
- * @param clusterId the cluster id of the event to be deactivated.
- * @param isClient ::EMBER_AF_CLIENT_CLUSTER_TICK if the event to be
- *        deactivated is a client cluster ::EMBER_AF_SERVER_CLUSTER_TICK
- *        otherwise.
- *
- * @return EMBER_SUCCESS if the event was deactivated or an error otherwise.
- */
-EmberStatus emberAfDeactivateClusterTick(chip::EndpointId endpoint, chip::ClusterId clusterId, bool isClient);
-
-/**
- * @brief A function used to deactivate a cluster server event.  This function
- * is a wrapper for ::emberAfDeactivateClusterTick.
- *
- * @param endpoint the endpoint of the event to be deactivated.
- * @param clusterId the cluster id of the event to be deactivated.
- *
- * @return EMBER_SUCCESS if the event was deactivated or an error otherwise.
- */
-EmberStatus emberAfDeactivateServerTick(chip::EndpointId endpoint, chip::ClusterId clusterId);
-
-/**
- * @brief Sets the ::EmberEventControl to run "delayMs" milliseconds in the
- * future.  This function first verifies that the delay is within the
- * acceptable range before scheduling the event.
- *
- * @param control a pointer to the event control.
- * @param delayMs the number of milliseconds until the next event.
- *
- * @return If delayMs is less than or equal to
-           ::EMBER_MAX_EVENT_CONTROL_DELAY_MS, this function will schedule the
-           event and return ::EMBER_SUCCESS.  Otherwise it will return
-           ::EMBER_BAD_ARGUMENT.
- */
-EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t delayMs);
-
-/** @} END Sleep Control */
-
-/** @name Messaging */
-// @{
-
-/**
- * @brief Sends a default response to a cluster command.
- *
- * This function is used to prepare and send a default response to a cluster
- * command.
- *
- * @param cmd The cluster command to which to respond.
- * @param status Status code for the default response command.
- * @return An ::EmberStatus value that indicates the success or failure of
- * sending the response.
- */
-EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberAfStatus status);
-
-/**
- * @brief Sends a default response to a cluster command using the
- * current command.
- *
- * This function is used to prepare and send a default response to a cluster
- * command.
- *
- * @param status Status code for the default response command.
- * @return An ::EmberStatus value that indicates the success or failure of
- * sending the response.
- */
-EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status);
-
-/**
- * @brief Access to client API APS frame.
- */
-EmberApsFrame * emberAfGetCommandApsFrame(void);
-
-/**
- * @brief Set the source and destination endpoints in the client API APS frame.
- */
-void emberAfSetCommandEndpoints(chip::EndpointId sourceEndpoint, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief Use this function to find devices in the network with endpoints
- *   matching a given cluster ID in their descriptors.
- *   Target may either be a specific device, or the broadcast
- *   address EMBER_RX_ON_WHEN_IDLE_BROADCAST_ADDRESS.
- *
- * With this function a service discovery is initiated and received
- * responses are returned by executing the callback function passed in.
- * For unicast discoveries, the callback will be executed only once.
- * Either the target will return a result or a timeout will occur.
- * For broadcast discoveries, the callback may be called multiple times
- * and after a period of time the discovery will be finished with a final
- * call to the callback.
- *
- * @param target The destination node ID for the discovery; either a specific
- *  node's ID or EMBER_RX_ON_WHEN_IDLE_BROADCAST_ADDRESS.
- * @param clusterId The cluster being discovered.
- * @param serverCluster EMBER_AF_SERVER_CLUSTER_DISCOVERY (true) if discovering
- *  servers for the target cluster; EMBER_AF_CLIENT_CLUSTER_DISCOVERY (false)
- *  if discovering clients for that cluster.
- * @param callback Function pointer for the callback function triggered when
- *  a match is discovered.  (For broadcast discoveries, this is called once per
- *  matching node, even if a node has multiple matching endpoints.)
- */
-EmberStatus emberAfFindDevicesByCluster(EmberNodeId target, chip::ClusterId clusterId, bool serverCluster,
-                                        EmberAfServiceDiscoveryCallback * callback);
-
-#if !defined(DOXYGEN_SHOULD_SKIP_THIS)
-/**
- * @brief Use this macro to retrieve the current command. This
- * macro may only be used within the command parsing context. For instance
- * Any of the command handling callbacks may use this macro. If this macro
- * is used outside the command context, the returned EmberAfClusterCommand pointer
- * will be null.
- */
-#define emberAfCurrentCommand() (emAfCurrentCommand)
-extern EmberAfClusterCommand * emAfCurrentCommand;
-#endif
-
-/**
- * @brief returns the current endpoint that is being served.
- *
- * The purpose of this macro is mostly to access endpoint that
- * is being served in the command callbacks.
- */
-#define emberAfCurrentEndpoint() (emberAfCurrentCommand()->apsFrame->destinationEndpoint)
-
-/** @} END Messaging */
-
-/** @name ZCL macros */
-// @{
-// Frame control fields (8 bits total)
-// Bits 0 and 1 are Frame Type Sub-field
-#define ZCL_FRAME_CONTROL_FRAME_TYPE_MASK (EMBER_BIT(0) | EMBER_BIT(1))
-#define ZCL_CLUSTER_SPECIFIC_COMMAND EMBER_BIT(0)
-#define ZCL_PROFILE_WIDE_COMMAND 0
-#define ZCL_GLOBAL_COMMAND (ZCL_PROFILE_WIDE_COMMAND)
-// Bit 2 is Manufacturer Specific Sub-field
-#define ZCL_MANUFACTURER_SPECIFIC_MASK EMBER_BIT(2)
-// Bit 3 is Direction Sub-field
-#define ZCL_FRAME_CONTROL_DIRECTION_MASK EMBER_BIT(3)
-#define ZCL_FRAME_CONTROL_SERVER_TO_CLIENT EMBER_BIT(3)
-#define ZCL_FRAME_CONTROL_CLIENT_TO_SERVER 0
-// Bit 4 is Disable Default Response Sub-field
-#define ZCL_DISABLE_DEFAULT_RESPONSE_MASK EMBER_BIT(4)
-// Bits 5 to 7 are reserved
-
-#define ZCL_DIRECTION_CLIENT_TO_SERVER 0
-#define ZCL_DIRECTION_SERVER_TO_CLIENT 1
-
-// Packet must be at least 3 bytes for ZCL overhead.
-//   Frame Control (1-byte)
-//   Sequence Number (1-byte)
-//   Command Id (1-byte)
-#define EMBER_AF_ZCL_OVERHEAD 3
-#define EMBER_AF_ZCL_MANUFACTURER_SPECIFIC_OVERHEAD 5
-
-// Permitted values for emberAfSetFormAndJoinMode
-#define FIND_AND_JOIN_MODE_ALLOW_2_4_GHZ EMBER_BIT(0)
-#define FIND_AND_JOIN_MODE_ALLOW_SUB_GHZ EMBER_BIT(1)
-#define FIND_AND_JOIN_MODE_ALLOW_BOTH (FIND_AND_JOIN_MODE_ALLOW_2_4_GHZ | FIND_AND_JOIN_MODE_ALLOW_SUB_GHZ)
-
-/** @} END ZCL macros */
 
 /** @} END addtogroup */
 
@@ -643,12 +259,6 @@ extern EmberAfClusterCommand * emAfCurrentCommand;
 #define EMBER_TEST_ASSERT(x)
 #endif
 #endif
-
-/**
- * @brief API for parsing a cluster-specific message.  Implemented by
- * generated code.
- */
-EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
 
 /**
  * Returns the pointer to the data version storage for the given endpoint and
@@ -692,6 +302,31 @@ private:
     uint16_t mEndpointCount = emberAfEndpointCount();
     ClusterId mClusterId;
 };
+
+/**
+ * @brief Sets the parent endpoint for a given endpoint
+ */
+CHIP_ERROR SetParentEndpointForEndpoint(EndpointId childEndpoint, EndpointId parentEndpoint);
+
+/**
+ * @brief Sets an Endpoint to use Flat Composition
+ */
+CHIP_ERROR SetFlatCompositionForEndpoint(EndpointId endpoint);
+
+/**
+ * @brief Sets an Endpoint to use Tree Composition
+ */
+CHIP_ERROR SetTreeCompositionForEndpoint(EndpointId endpoint);
+
+/**
+ * @brief Returns true is an Endpoint has flat composition
+ */
+bool IsFlatCompositionForEndpoint(EndpointId endpoint);
+
+/**
+ * @brief Returns true is an Endpoint has tree composition
+ */
+bool IsTreeCompositionForEndpoint(EndpointId endpoint);
 
 } // namespace app
 } // namespace chip

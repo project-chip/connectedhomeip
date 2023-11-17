@@ -1,0 +1,42 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/bouffalolab_iot_sdk.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/mbedtls.gni")
+import("//build_overrides/pigweed.gni")
+import("${chip_root}/examples/platform/bouffalolab/bl702l/args.gni")
+
+chip_device_platform = "bl702l"
+
+chip_enable_ota_requestor = true
+
+lwip_platform = "bl702l"
+
+riscv_platform_config = "${bouffalolab_iot_sdk_build_root}/common/rsicv.gni"
+
+mbedtls_target = "${bouffalolab_iot_sdk_build_root}/bl702l:bl_iot_sdk"
+
+chip_inet_config_enable_tcp_endpoint = false
+
+chip_build_tests = false
+
+openthread_external_mbedtls = mbedtls_target
+
+openthread_core_config_platform_check_file =
+    "bl702l-openthread-core-bl-config-check.h"
+openthread_project_include_dirs =
+    [ "${chip_root}/src/platform/bouffalolab/BL702L" ]
+openthread_external_platform =
+    "${bouffalolab_iot_sdk_build_root}/bl702l:bl_iot_sdk"

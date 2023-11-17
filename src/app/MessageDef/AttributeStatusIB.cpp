@@ -88,14 +88,14 @@ CHIP_ERROR AttributeStatusIB::Parser::PrettyPrint() const
 CHIP_ERROR AttributeStatusIB::Parser::GetPath(AttributePathIB::Parser * const apPath) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kPath)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kPath), reader));
     return apPath->Init(reader);
 }
 
 CHIP_ERROR AttributeStatusIB::Parser::GetErrorStatus(StatusIB::Parser * const apErrorStatus) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kErrorStatus)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kErrorStatus), reader));
     return apErrorStatus->Init(reader);
 }
 
@@ -117,10 +117,10 @@ StatusIB::Builder & AttributeStatusIB::Builder::CreateErrorStatus()
     return mErrorStatus;
 }
 
-AttributeStatusIB::Builder & AttributeStatusIB::Builder::EndOfAttributeStatusIB()
+CHIP_ERROR AttributeStatusIB::Builder::EndOfAttributeStatusIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

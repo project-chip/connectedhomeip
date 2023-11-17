@@ -41,6 +41,7 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <system/SystemError.h>
@@ -256,12 +257,12 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     // init all the EndPoints
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumUDPEps);
     err = gUDP.NewEndPoint(&testUDPEP);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumTCPEps);
     err = gTCP.NewEndPoint(&testTCPEP1);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 
     err = InterfaceId::Null().GetLinkLocalAddr(&addr);
@@ -308,7 +309,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, 1));
 
     err = gUDP.NewEndPoint(&testUDPEP);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 #if INET_CONFIG_ENABLE_IPV4
     err = testUDPEP->Bind(IPAddressType::kIPv4, addr_v4, 3000, intId);

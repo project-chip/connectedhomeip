@@ -1,1 +1,1 @@
-bootstrap.sh
+setup/bootstrap.sh

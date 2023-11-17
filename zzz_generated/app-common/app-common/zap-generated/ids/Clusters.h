@@ -61,9 +61,9 @@ static constexpr ClusterId Id = 0x0000001F;
 namespace Actions {
 static constexpr ClusterId Id = 0x00000025;
 } // namespace Actions
-namespace Basic {
+namespace BasicInformation {
 static constexpr ClusterId Id = 0x00000028;
-} // namespace Basic
+} // namespace BasicInformation
 namespace OtaSoftwareUpdateProvider {
 static constexpr ClusterId Id = 0x00000029;
 } // namespace OtaSoftwareUpdateProvider
@@ -112,9 +112,9 @@ static constexpr ClusterId Id = 0x00000037;
 namespace TimeSynchronization {
 static constexpr ClusterId Id = 0x00000038;
 } // namespace TimeSynchronization
-namespace BridgedDeviceBasic {
+namespace BridgedDeviceBasicInformation {
 static constexpr ClusterId Id = 0x00000039;
-} // namespace BridgedDeviceBasic
+} // namespace BridgedDeviceBasicInformation
 namespace Switch {
 static constexpr ClusterId Id = 0x0000003B;
 } // namespace Switch
@@ -145,9 +145,78 @@ static constexpr ClusterId Id = 0x00000044;
 namespace BooleanState {
 static constexpr ClusterId Id = 0x00000045;
 } // namespace BooleanState
+namespace IcdManagement {
+static constexpr ClusterId Id = 0x00000046;
+} // namespace IcdManagement
+namespace Timer {
+static constexpr ClusterId Id = 0x00000047;
+} // namespace Timer
+namespace OvenMode {
+static constexpr ClusterId Id = 0x00000049;
+} // namespace OvenMode
 namespace ModeSelect {
 static constexpr ClusterId Id = 0x00000050;
 } // namespace ModeSelect
+namespace LaundryWasherMode {
+static constexpr ClusterId Id = 0x00000051;
+} // namespace LaundryWasherMode
+namespace RefrigeratorAndTemperatureControlledCabinetMode {
+static constexpr ClusterId Id = 0x00000052;
+} // namespace RefrigeratorAndTemperatureControlledCabinetMode
+namespace LaundryWasherControls {
+static constexpr ClusterId Id = 0x00000053;
+} // namespace LaundryWasherControls
+namespace RvcRunMode {
+static constexpr ClusterId Id = 0x00000054;
+} // namespace RvcRunMode
+namespace RvcCleanMode {
+static constexpr ClusterId Id = 0x00000055;
+} // namespace RvcCleanMode
+namespace TemperatureControl {
+static constexpr ClusterId Id = 0x00000056;
+} // namespace TemperatureControl
+namespace RefrigeratorAlarm {
+static constexpr ClusterId Id = 0x00000057;
+} // namespace RefrigeratorAlarm
+namespace DishwasherMode {
+static constexpr ClusterId Id = 0x00000059;
+} // namespace DishwasherMode
+namespace AirQuality {
+static constexpr ClusterId Id = 0x0000005B;
+} // namespace AirQuality
+namespace SmokeCoAlarm {
+static constexpr ClusterId Id = 0x0000005C;
+} // namespace SmokeCoAlarm
+namespace DishwasherAlarm {
+static constexpr ClusterId Id = 0x0000005D;
+} // namespace DishwasherAlarm
+namespace MicrowaveOvenMode {
+static constexpr ClusterId Id = 0x0000005E;
+} // namespace MicrowaveOvenMode
+namespace MicrowaveOvenControl {
+static constexpr ClusterId Id = 0x0000005F;
+} // namespace MicrowaveOvenControl
+namespace OperationalState {
+static constexpr ClusterId Id = 0x00000060;
+} // namespace OperationalState
+namespace RvcOperationalState {
+static constexpr ClusterId Id = 0x00000061;
+} // namespace RvcOperationalState
+namespace HepaFilterMonitoring {
+static constexpr ClusterId Id = 0x00000071;
+} // namespace HepaFilterMonitoring
+namespace ActivatedCarbonFilterMonitoring {
+static constexpr ClusterId Id = 0x00000072;
+} // namespace ActivatedCarbonFilterMonitoring
+namespace BooleanSensorConfiguration {
+static constexpr ClusterId Id = 0x00000080;
+} // namespace BooleanSensorConfiguration
+namespace ValveConfigurationAndControl {
+static constexpr ClusterId Id = 0x00000081;
+} // namespace ValveConfigurationAndControl
+namespace DemandResponseLoadControl {
+static constexpr ClusterId Id = 0x00000096;
+} // namespace DemandResponseLoadControl
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock
@@ -193,6 +262,36 @@ static constexpr ClusterId Id = 0x00000405;
 namespace OccupancySensing {
 static constexpr ClusterId Id = 0x00000406;
 } // namespace OccupancySensing
+namespace CarbonMonoxideConcentrationMeasurement {
+static constexpr ClusterId Id = 0x0000040C;
+} // namespace CarbonMonoxideConcentrationMeasurement
+namespace CarbonDioxideConcentrationMeasurement {
+static constexpr ClusterId Id = 0x0000040D;
+} // namespace CarbonDioxideConcentrationMeasurement
+namespace NitrogenDioxideConcentrationMeasurement {
+static constexpr ClusterId Id = 0x00000413;
+} // namespace NitrogenDioxideConcentrationMeasurement
+namespace OzoneConcentrationMeasurement {
+static constexpr ClusterId Id = 0x00000415;
+} // namespace OzoneConcentrationMeasurement
+namespace Pm25ConcentrationMeasurement {
+static constexpr ClusterId Id = 0x0000042A;
+} // namespace Pm25ConcentrationMeasurement
+namespace FormaldehydeConcentrationMeasurement {
+static constexpr ClusterId Id = 0x0000042B;
+} // namespace FormaldehydeConcentrationMeasurement
+namespace Pm1ConcentrationMeasurement {
+static constexpr ClusterId Id = 0x0000042C;
+} // namespace Pm1ConcentrationMeasurement
+namespace Pm10ConcentrationMeasurement {
+static constexpr ClusterId Id = 0x0000042D;
+} // namespace Pm10ConcentrationMeasurement
+namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
+static constexpr ClusterId Id = 0x0000042E;
+} // namespace TotalVolatileOrganicCompoundsConcentrationMeasurement
+namespace RadonConcentrationMeasurement {
+static constexpr ClusterId Id = 0x0000042F;
+} // namespace RadonConcentrationMeasurement
 namespace WakeOnLan {
 static constexpr ClusterId Id = 0x00000503;
 } // namespace WakeOnLan
@@ -238,6 +337,9 @@ static constexpr ClusterId Id = 0xFFF1FC05;
 namespace FaultInjection {
 static constexpr ClusterId Id = 0xFFF1FC06;
 } // namespace FaultInjection
+namespace SampleMei {
+static constexpr ClusterId Id = 0xFFF1FC20;
+} // namespace SampleMei
 
 } // namespace Clusters
 } // namespace app

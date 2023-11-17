@@ -1,0 +1,39 @@
+{{> header excludeZapComment=true}}
+
+#import <Matter/MTRDefines.h>
+#import <Matter/MTRCommandPayloadsObjc.h>
+
+#include <app-common/zap-generated/cluster-objects.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+{{#zcl_clusters}}
+{{#zcl_commands}}
+{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForCommandPayload=true)}}
+
+@interface MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params (InternalMethods)
+
+{{! We only need to generate conversion from decodable structs for the server-generated commands }}
+{{#if (isStrEqual source "server")}}
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &)decodableStruct;
+{{/if}}
+
+{{! We only need to generate encoding to data value for client-generated commands }}
+{{#if (isStrEqual source "client")}}
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+{{/if}}
+
+@end
+
+
+
+{{/if}}
+{{/zcl_commands}}
+{{/zcl_clusters}}
+
+// Make sure that MTRBasicClusterMfgSpecificPingParams has _encodeAsDataValue just so it compiles.
+@interface MTRBasicClusterMfgSpecificPingParams (InternalMethods)
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+@end
+
+NS_ASSUME_NONNULL_END

@@ -74,7 +74,7 @@ public class ChipAttributePath {
   }
 
   /** Create a new {@link ChipAttributePath} with only concrete ids. */
-  public static ChipAttributePath newInstance(long endpointId, long clusterId, long attributeId) {
+  public static ChipAttributePath newInstance(int endpointId, long clusterId, long attributeId) {
     return new ChipAttributePath(
         ChipPathId.forId(endpointId), ChipPathId.forId(clusterId), ChipPathId.forId(attributeId));
   }

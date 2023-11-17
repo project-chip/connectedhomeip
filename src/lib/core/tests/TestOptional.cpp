@@ -23,11 +23,13 @@
  *
  */
 
-#include <inttypes.h>
-#include <stdint.h>
-#include <string.h>
+#include <array>
+#include <cinttypes>
+#include <cstdint>
+#include <cstring>
 
 #include <lib/core/Optional.h>
+#include <lib/support/Span.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
@@ -44,6 +46,8 @@ struct Count
 
     Count(Count && o) : m(o.m) { ++created; }
     Count & operator=(Count &&) = default;
+
+    bool operator==(const Count & o) const { return m == o.m; }
 
     int m;
 
@@ -62,10 +66,10 @@ struct CountMovable : public Count
 public:
     CountMovable(int i) : Count(i) {}
 
-    CountMovable(const CountMovable & o) = delete;
+    CountMovable(const CountMovable & o)           = delete;
     CountMovable & operator=(const CountMovable &) = delete;
 
-    CountMovable(CountMovable && o) = default;
+    CountMovable(CountMovable && o)           = default;
     CountMovable & operator=(CountMovable &&) = default;
 };
 
@@ -74,26 +78,43 @@ int Count::destroyed;
 
 static void TestBasic(nlTestSuite * inSuite, void * inContext)
 {
+    // Set up our test Count objects, which will mess with counts, before we reset the
+    // counts.
+    Count c100(100), c101(101), c102(102);
+
     Count::ResetCounter();
 
     {
         auto testOptional = Optional<Count>::Value(100);
         NL_TEST_ASSERT(inSuite, Count::created == 1 && Count::destroyed == 0);
         NL_TEST_ASSERT(inSuite, testOptional.HasValue() && testOptional.Value().m == 100);
+        NL_TEST_ASSERT(inSuite, testOptional == c100);
+        NL_TEST_ASSERT(inSuite, testOptional != c101);
+        NL_TEST_ASSERT(inSuite, testOptional != c102);
 
         testOptional.ClearValue();
         NL_TEST_ASSERT(inSuite, Count::created == 1 && Count::destroyed == 1);
         NL_TEST_ASSERT(inSuite, !testOptional.HasValue());
+        NL_TEST_ASSERT(inSuite, testOptional != c100);
+        NL_TEST_ASSERT(inSuite, testOptional != c101);
+        NL_TEST_ASSERT(inSuite, testOptional != c102);
 
         testOptional.SetValue(Count(101));
         NL_TEST_ASSERT(inSuite, Count::created == 3 && Count::destroyed == 2);
         NL_TEST_ASSERT(inSuite, testOptional.HasValue() && testOptional.Value().m == 101);
+        NL_TEST_ASSERT(inSuite, testOptional != c100);
+        NL_TEST_ASSERT(inSuite, testOptional == c101);
+        NL_TEST_ASSERT(inSuite, testOptional != c102);
 
         testOptional.Emplace(102);
         NL_TEST_ASSERT(inSuite, Count::created == 4 && Count::destroyed == 3);
         NL_TEST_ASSERT(inSuite, testOptional.HasValue() && testOptional.Value().m == 102);
+        NL_TEST_ASSERT(inSuite, testOptional != c100);
+        NL_TEST_ASSERT(inSuite, testOptional != c101);
+        NL_TEST_ASSERT(inSuite, testOptional == c102);
     }
 
+    // Our test Count objects are still in scope here.
     NL_TEST_ASSERT(inSuite, Count::created == 4 && Count::destroyed == 4);
 }
 
@@ -165,6 +186,39 @@ static void TestMove(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, Count::created == 4 && Count::destroyed == 4);
 }
 
+static void TestConversion(nlTestSuite * inSuite, void * inContext)
+{
+    // FixedSpan is implicitly convertible from std::array
+    using WidgetView    = FixedSpan<const bool, 10>;
+    using WidgetStorage = std::array<bool, 10>;
+
+    auto optStorage                   = MakeOptional<WidgetStorage>();
+    auto const & constOptStorage      = optStorage;
+    auto optOtherStorage              = MakeOptional<WidgetStorage>();
+    auto const & constOptOtherStorage = optOtherStorage;
+
+    NL_TEST_ASSERT(inSuite, optStorage.HasValue());
+    NL_TEST_ASSERT(inSuite, optOtherStorage.HasValue());
+
+    Optional<WidgetView> optView(constOptStorage);
+    NL_TEST_ASSERT(inSuite, optView.HasValue());
+    NL_TEST_ASSERT(inSuite, &optView.Value()[0] == &optStorage.Value()[0]);
+
+    optView = optOtherStorage;
+    optView = constOptOtherStorage;
+    NL_TEST_ASSERT(inSuite, optView.HasValue());
+    NL_TEST_ASSERT(inSuite, &optView.Value()[0] == &optOtherStorage.Value()[0]);
+
+    struct ExplicitBool
+    {
+        explicit ExplicitBool(bool) {}
+    };
+    Optional<ExplicitBool> e(Optional<bool>(true)); // OK, explicitly constructing the optional
+
+    // The following should not compile
+    // e = Optional<bool>(false); // relies on implicit conversion
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -176,7 +230,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("OptionalMake", TestMake),
     NL_TEST_DEF("OptionalCopy", TestCopy),
     NL_TEST_DEF("OptionalMove", TestMove),
-
+    NL_TEST_DEF("OptionalConversion", TestConversion),
     NL_TEST_SENTINEL()
 };
 // clang-format on
@@ -191,7 +245,7 @@ int TestOptional_Teardown(void * inContext)
     return SUCCESS;
 }
 
-int TestOptional(void)
+int TestOptional()
 {
     // clang-format off
     nlTestSuite theSuite =

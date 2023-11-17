@@ -25,14 +25,15 @@
 
 #include "DeviceCallbacks.h"
 #include "CHIPDeviceManager.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/server/Dnssd.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
 #include <lib/dnssd/Advertiser.h>
+#include <platform/Ameba/AmebaUtils.h>
 #include <route_hook/ameba_route_hook.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -72,6 +73,18 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         OnInternetConnectivityChange(event);
         break;
 
+    case DeviceEventType::kCHIPoBLEConnectionEstablished:
+        ChipLogProgress(DeviceLayer, "CHIPoBLE Connection Established");
+        break;
+
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
+        ChipLogProgress(DeviceLayer, "CHIPoBLE Connection Closed");
+        break;
+
+    case DeviceEventType::kCHIPoBLEAdvertisingChange:
+        ChipLogProgress(DeviceLayer, "CHIPoBLE advertising has changed");
+        break;
+
     case DeviceEventType::kInterfaceIpAddressChanged:
         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
             (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
@@ -82,6 +95,16 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             // newly selected address.
             chip::app::DnssdServer::Instance().StartServer();
         }
+        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
+        {
+            ChipLogProgress(DeviceLayer, "Initializing route hook...");
+            ameba_route_hook_init();
+        }
+        break;
+
+    case DeviceEventType::kCommissioningComplete:
+        ChipLogProgress(DeviceLayer, "Commissioning Complete");
+        chip::DeviceLayer::Internal::AmebaUtils::SetCurrentProvisionedNetwork();
         break;
     }
 }
@@ -91,11 +114,11 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
 {
     switch (clusterId)
     {
-    case ZCL_ON_OFF_CLUSTER_ID:
+    case app::Clusters::OnOff::Id:
         OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
         break;
 
-    case ZCL_IDENTIFY_CLUSTER_ID:
+    case app::Clusters::Identify::Id:
         OnIdentifyPostAttributeChangeCallback(endpointId, attributeId, value);
         break;
 
@@ -106,9 +129,6 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
 
 void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    static bool isOTAInitialized = false;
-#endif
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
         ChipLogProgress(DeviceLayer, "IPv4 Server ready...");
@@ -122,16 +142,13 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ChipLogProgress(DeviceLayer, "IPv6 Server ready...");
         chip::app::DnssdServer::Instance().StartServer();
-
-        ChipLogProgress(DeviceLayer, "Initializing route hook...");
-        ameba_route_hook_init();
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         // Init OTA requestor only when we have gotten IPv6 address
-        if (!isOTAInitialized)
+        if (!OTAInitializer::Instance().CheckInit())
         {
+            ChipLogProgress(DeviceLayer, "Initializing OTA");
             chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
                                                         InitOTARequestorHandler, nullptr);
-            isOTAInitialized = true;
         }
 #endif
     }
@@ -143,7 +160,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
 
 void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID,
+    VerifyOrExit(attributeId == app::Clusters::OnOff::Attributes::OnOff::Id,
                  ChipLogError(DeviceLayer, TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2,
                  ChipLogError(DeviceLayer, TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
@@ -165,7 +182,7 @@ void IdentifyTimerHandler(Layer * systemLayer, void * appState, CHIP_ERROR error
 
 void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
+    VerifyOrExit(attributeId == app::Clusters::Identify::Attributes::IdentifyTime::Id,
                  ChipLogError(DeviceLayer, "[%s] Unhandled Attribute ID: '0x%04x", TAG, attributeId));
     VerifyOrExit(endpointId == 1, ChipLogError(DeviceLayer, "[%s] Unexpected EndPoint ID: `0x%02x'", TAG, endpointId));
 
@@ -175,10 +192,4 @@ void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointI
     identifyTimerCount = (*value) * 4;
 exit:
     return;
-}
-
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
-{
-    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
-    return true;
 }

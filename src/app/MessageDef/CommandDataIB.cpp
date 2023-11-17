@@ -64,6 +64,14 @@ CHIP_ERROR CommandDataIB::Parser::PrettyPrint() const
             ReturnErrorOnFailure(CheckIMPayload(reader, 0, "CommandFields"));
             PRETTY_PRINT_DECDEPTH();
             break;
+        case to_underlying(Tag::kRef):
+            VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+            {
+                uint16_t reference;
+                ReturnErrorOnFailure(reader.Get(reference));
+                PRETTY_PRINT("\tRef = 0x%x,", reference);
+            }
+            break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
             break;
@@ -86,14 +94,19 @@ CHIP_ERROR CommandDataIB::Parser::PrettyPrint() const
 CHIP_ERROR CommandDataIB::Parser::GetPath(CommandPathIB::Parser * const apPath) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kPath)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kPath), reader));
     return apPath->Init(reader);
 }
 
 CHIP_ERROR CommandDataIB::Parser::GetFields(TLV::TLVReader * const apReader) const
 {
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kFields)), *apReader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kFields), *apReader));
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommandDataIB::Parser::GetRef(uint16_t * const apRef) const
+{
+    return GetUnsignedInteger(to_underlying(Tag::kRef), apRef);
 }
 
 CommandPathIB::Builder & CommandDataIB::Builder::CreatePath()
@@ -102,10 +115,15 @@ CommandPathIB::Builder & CommandDataIB::Builder::CreatePath()
     return mPath;
 }
 
-CommandDataIB::Builder & CommandDataIB::Builder::EndOfCommandDataIB()
+CHIP_ERROR CommandDataIB::Builder::Ref(const uint16_t aRef)
+{
+    return mpWriter->Put(TLV::ContextTag(Tag::kRef), aRef);
+}
+
+CHIP_ERROR CommandDataIB::Builder::EndOfCommandDataIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

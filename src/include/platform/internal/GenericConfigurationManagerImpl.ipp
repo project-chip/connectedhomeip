@@ -26,6 +26,7 @@
 #ifndef GENERIC_CONFIGURATION_MANAGER_IMPL_CPP
 #define GENERIC_CONFIGURATION_MANAGER_IMPL_CPP
 
+#include <FirmwareBuildTime.h>
 #include <ble/CHIPBleServiceData.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/RandUtils.h>
@@ -290,6 +291,12 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildChipEpo
         chipEpochTime = sFirmwareBuildChipEpochTime.Value();
         return CHIP_NO_ERROR;
     }
+#ifdef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME_MATTER_EPOCH_S
+    {
+        chipEpochTime = chip::System::Clock::Seconds32(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME_MATTER_EPOCH_S);
+        return CHIP_NO_ERROR;
+    }
+#endif
     // Else, attempt to read the hard-coded values.
     VerifyOrReturnError(!BUILD_DATE_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(!BUILD_TIME_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME), CHIP_ERROR_INTERNAL);
@@ -541,18 +548,19 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::IncrementLifetimeCounte
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetRotatingDeviceIdUniqueId(const ByteSpan & uniqueIdSpan)
 {
-    ReturnErrorCodeIf(uniqueIdSpan.size() != kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(mRotatingDeviceIdUniqueId, uniqueIdSpan.data(), kRotatingDeviceIDUniqueIDLength);
+    ReturnErrorCodeIf(uniqueIdSpan.size() < kMinRotatingDeviceIDUniqueIDLength, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(uniqueIdSpan.size() > CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(mRotatingDeviceIdUniqueId, uniqueIdSpan.data(), uniqueIdSpan.size());
+    mRotatingDeviceIdUniqueIdLength = uniqueIdSpan.size();
     return CHIP_NO_ERROR;
 }
 
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
-    ReturnErrorCodeIf(sizeof(mRotatingDeviceIdUniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(uniqueIdSpan.size() != kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(uniqueIdSpan.data(), mRotatingDeviceIdUniqueId, sizeof(mRotatingDeviceIdUniqueId));
-    uniqueIdSpan.reduce_size(sizeof(mRotatingDeviceIdUniqueId));
+    ReturnErrorCodeIf(mRotatingDeviceIdUniqueIdLength > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(uniqueIdSpan.data(), mRotatingDeviceIdUniqueId, mRotatingDeviceIdUniqueIdLength);
+    uniqueIdSpan.reduce_size(mRotatingDeviceIdUniqueIdLength);
     return CHIP_NO_ERROR;
 }
 
@@ -655,15 +663,14 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingInst
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_CONFIG_TEST
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::RunUnitTests()
+void GenericConfigurationManagerImpl<ConfigClass>::RunUnitTests()
 {
-#if !defined(NDEBUG)
     ChipLogProgress(DeviceLayer, "Running configuration unit test");
     RunConfigUnitTest();
-#endif
-    return CHIP_NO_ERROR;
 }
+#endif
 
 template <class ConfigClass>
 void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
@@ -696,6 +703,19 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
             productId = 0;
         }
         ChipLogProgress(DeviceLayer, "  Product Id: %u (0x%X)", productId, productId);
+    }
+
+    {
+        char productName[ConfigurationManager::kMaxProductNameLength + 1];
+        err = deviceInstanceInfoProvider->GetProductName(productName, sizeof(productName));
+        if (CHIP_NO_ERROR == err)
+        {
+            ChipLogProgress(DeviceLayer, "  Product Name: %s", productName);
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "  Product Name: n/a (%" CHIP_ERROR_FORMAT ")", err.Format());
+        }
     }
 
     {

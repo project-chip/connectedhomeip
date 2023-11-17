@@ -190,62 +190,64 @@ CHIP_ERROR ConnectivityManagerImpl::CommitConfig()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(MutableByteSpan & value)
 {
-    int ret = wlan_get_current_network(&sta_network);
-    uint8_t macAddress[6];
+    constexpr size_t bssIdSize = 6;
+    VerifyOrReturnError(value.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    if (ret == WM_SUCCESS)
+    int ret = wlan_get_current_network(&sta_network);
+
+    if (ret != WM_SUCCESS)
     {
-        memcpy(macAddress, sta_network.bssid, 6);
+        ChipLogProgress(DeviceLayer, "GetWiFiBssId failed: %d", ret);
+        return CHIP_ERROR_READ_FAILED;
     }
-    else
-    {
-        memset(macAddress, 0, 6);
-    }
-    ChipLogProgress(DeviceLayer, "GetWiFiBssId: %02x:%02x:%02x:%02x:%02x:%02x", macAddress[0], macAddress[1], macAddress[2],
-                    macAddress[3], macAddress[4], macAddress[5]);
-    value = ByteSpan(macAddress, 6);
+
+    memcpy(value.data(), sta_network.bssid, bssIdSize);
+    value.reduce_size(bssIdSize);
+
+    ChipLogProgress(DeviceLayer, "GetWiFiBssId: %02x:%02x:%02x:%02x:%02x:%02x", value.data()[0], value.data()[1], value.data()[2],
+                    value.data()[3], value.data()[4], value.data()[5]);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(uint8_t & securityType)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & securityType)
 {
     int ret = wlan_get_current_network(&sta_network);
     if (ret != WM_SUCCESS)
     {
         // Set as no security by default
-        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
+        securityType = SecurityTypeEnum::kNone;
         return CHIP_NO_ERROR;
     }
     switch (sta_network.security.type)
     {
     case WLAN_SECURITY_WEP_OPEN:
     case WLAN_SECURITY_WEP_SHARED:
-        securityType = EMBER_ZCL_SECURITY_TYPE_WEP;
+        securityType = SecurityTypeEnum::kWep;
         break;
     case WLAN_SECURITY_WPA:
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA;
+        securityType = SecurityTypeEnum::kWpa;
         break;
     case WLAN_SECURITY_WPA2:
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
+        securityType = SecurityTypeEnum::kWpa2;
         break;
     case WLAN_SECURITY_WPA3_SAE:
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA3;
+        securityType = SecurityTypeEnum::kWpa3;
         break;
     case WLAN_SECURITY_NONE:
     default: // Default: No_security
-        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
+        securityType = SecurityTypeEnum::kNone;
     }
 
-    ChipLogProgress(DeviceLayer, "GetWiFiSecurityType: %u", securityType);
+    ChipLogProgress(DeviceLayer, "GetWiFiSecurityType: %u", to_underlying(securityType));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(uint8_t & wiFiVersion)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(WiFiVersionEnum & wiFiVersion)
 {
-    wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
-    ChipLogProgress(DeviceLayer, "GetWiFiVersion: %u", wiFiVersion);
+    wiFiVersion = WiFiVersionEnum::kN;
+    ChipLogProgress(DeviceLayer, "GetWiFiVersion: %u", to_underlying(wiFiVersion));
     return CHIP_NO_ERROR;
 }
 
@@ -365,29 +367,29 @@ bool ConnectivityManagerImpl::_GetBssInfo(const uint8_t sid, NetworkCommissionin
     // => rssi
     result.rssi = static_cast<int8_t>(0 - res.rssi);
     // => band, mw320 only works in 2.4G
-    result.wiFiBand = app::Clusters::NetworkCommissioning::WiFiBand::k2g4;
+    result.wiFiBand = app::Clusters::NetworkCommissioning::WiFiBandEnum::k2g4;
     // => channel
     result.channel = res.channel;
     // => security
     if (res.wep)
     {
-        result.security.SetRaw(EMBER_ZCL_SECURITY_TYPE_WEP);
+        result.security.Set(WiFiSecurity::kWep);
     }
     else if (res.wpa)
     {
-        result.security.SetRaw(EMBER_ZCL_SECURITY_TYPE_WPA);
+        result.security.Set(WiFiSecurity::kWpaPersonal);
     }
     else if ((res.wpa2) || (res.wpa2_entp))
     {
-        result.security.SetRaw(EMBER_ZCL_SECURITY_TYPE_WPA2);
+        result.security.Set(WiFiSecurity::kWpa2Personal);
     }
     else if (res.wpa3_sae)
     {
-        result.security.SetRaw(EMBER_ZCL_SECURITY_TYPE_WPA3);
+        result.security.Set(WiFiSecurity::kWpa3Personal);
     }
     else
     {
-        result.security.SetRaw(EMBER_ZCL_SECURITY_TYPE_NONE);
+        result.security.Set(WiFiSecurity::kUnencrypted);
     }
 
     return true;

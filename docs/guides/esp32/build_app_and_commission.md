@@ -11,7 +11,7 @@ the esp32 application.
 -   [Build, flash and monitor an example](#build-flash-and-monitor-an-example)
 -   [Commissioning](#commissioning)
     -   [Building Standalone chip-tool](#building-standalone-chip-tool)
-    -   [Commissioning the WiFi devices](#commissioning-the-wifi-devices-esp32-esp32c3-esp32s3)
+    -   [Commissioning the WiFi devices](#commissioning-the-wifi-devices-esp32-esp32c3-esp32s3-esp32c6)
     -   [Commissioning the Thread device](#commissioning-the-thread-device-esp32h2)
     -   [Commissioning Parameters](#commissioning-parameters)
 -   [Flashing app using script](#flashing-app-using-script)
@@ -20,7 +20,7 @@ the esp32 application.
 
 ## Supported target chips
 
-All the CHIP demo application is intended to work on: the
+All the Matter demo application is intended to work on: the
 [ESP32-DevKitC](https://www.espressif.com/en/products/hardware/esp32-devkitc/overview),
 the
 [ESP32-WROVER-KIT_V4.1](https://www.espressif.com/en/products/hardware/esp-wrover-kit/overview),
@@ -31,7 +31,8 @@ and the ESP32S3.
 
 All the applications support variants of ESP32, ESP32C3, ESP32S3 chips.
 
-ESP32H2 is only supported and tested with lighting-app.
+ESP32H2 and ESP32C6 are only supported and tested with lighting-app and
+all-clusters-app.
 
 Note: M5Stack Core 2 display is not supported in the tft component, while other
 functionality can still work fine.
@@ -51,11 +52,10 @@ functionality can still work fine.
     $ source export.sh
     ```
 
--   CHIP
+-   Matter
 
-    Before running any other build command, the scripts/activate.sh environment
-    setup script should be sourced at the top level. This script set up a Python
-    environment with libraries used to build and test.
+    Activate the Matter environment. Below command needs to be executed after
+    sourcing `esp-idf/export.sh`.
 
     ```
     $ cd path/to/connectedhomeip
@@ -79,25 +79,27 @@ functionality can still work fine.
     $ cd examples/<app-name>/esp32
     ```
 
--   Set the chip target to build
+-   Set the Matter target to build
 
     ```
-    $ idf.py set-target (CHIP)
+    $ idf.py set-target (target chip)
     ```
 
     All the example applications supports target chips: esp32, esp32s3, esp32c3
 
-    ESP32H2 is only supported in lighting-app, to set it as target
+    ESP32H2 and ESP32C6 are only supported in lighting-app, to set it as target
 
     ```
-    idf.py --preview set-target esp32h2
+    $ idf.py --preview set-target esp32h2
+    $ idf.py --preview set-target esp32c6
     ```
 
 -   Configuration Options
 
     To build the default configuration (`sdkconfig.defaults`) skip this step.
 
-    To build a specific configuration (example `m5stack`):
+    To build a specific configuration (example `m5stack` or `esp32h2` or
+    `esp32c6`):
 
     ```
     $ rm sdkconfig
@@ -118,7 +120,7 @@ functionality can still work fine.
 -   Build the application
 
     ```
-    idf.py build
+    $ idf.py build
     ```
 
 -   Flash the application
@@ -159,14 +161,14 @@ Below apps can be used for commissioning the application running on ESP32:
 ### Building Standalone chip-tool
 
 ```
-cd path/to/connectedhomeip
-scripts/examples/gn_build_example.sh examples/chip-tool out/debug
+$ cd path/to/connectedhomeip
+$ scripts/examples/gn_build_example.sh examples/chip-tool out/debug
 ```
 
 Run the built executable and pass it the discriminator and pairing code of the
 remote device, as well as the network credentials to use.
 
-#### Commissioning the WiFi devices (ESP32, ESP32C3, ESP32S3)
+#### Commissioning the WiFi devices (ESP32, ESP32C3, ESP32S3, ESP32C6)
 
 ```
 $ out/debug/chip-tool pairing ble-wifi 12345 MY_SSID MY_PASSWORD 20202021 3840
@@ -188,18 +190,22 @@ $ out/debug/chip-tool pairing ble-wifi 12345 MY_SSID MY_PASSWORD 20202021 3840
 -   Commissioning the Thread device
 
     ```
-     $ ./out/debug/chip-tool pairing ble-thread 12345 hex:<operational-dataset> 20202021 3840
+    $ ./out/debug/chip-tool pairing ble-thread 12345 hex:<operational-dataset> 20202021 3840
     ```
 
 #### Commissioning the Ethernet device (ESP32-Ethernet-Kit)
 
 ```
-$ out/debug/chip-tool pairing ethernet 12345 20202021 3840 device-remote-ip 5540
+$ out/debug/chip-tool pairing onnetwork 12345 20202021
 ```
 
 Note: In order to commission an ethernet device, from all-clusters-app enable
 these config options: select `ESP32-Ethernet-Kit` under `Demo->Device Type` and
-select `On-Network` rendezvous mode under `Demo->Rendezvous Mode`
+select `On-Network` rendezvous mode under `Demo->Rendezvous Mode`. Currently
+default ethernet board supported is IP101, if you want to use other types of
+ethernet board then you can extend the `ESPEthernetDriver` class in your
+application and override the current implementation under
+`ESPEthernetDriver::Init`
 
 #### Commissioning Parameters
 
@@ -219,6 +225,7 @@ follow [Using ESP32 Factory Data Provider guide](factory_data.md)
         ```
         $ idf.py set-target esp32
         $ idf.py set-target esp32c3
+        $ idf.py set-target esp32c6
         ```
 
     -   Execute below sequence of commands

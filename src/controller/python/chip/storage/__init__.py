@@ -18,18 +18,16 @@
 # Needed to use types in type hints before they are fully defined.
 from __future__ import annotations
 
+import base64
+import copy
 import ctypes
-from dataclasses import dataclass, field
-from typing import *
-from ctypes import *
-from rich.pretty import pprint
 import json
 import logging
-import base64
+from ctypes import CFUNCTYPE, POINTER, c_bool, c_char, c_char_p, c_uint16, c_void_p, py_object
+from typing import Dict
+
 import chip.exceptions
-import copy
 import chip.native
-import builtins
 
 _SyncSetKeyValueCbFunct = CFUNCTYPE(
     None, py_object, c_char_p, POINTER(c_char),  c_uint16)
@@ -113,7 +111,7 @@ class PersistentStorage:
         if (path is not None):
             self.logger().warn(f"Initializing persistent storage from file: {path}")
         else:
-            self.logger().warn(f"Initializing persistent storage from dict")
+            self.logger().warn("Initializing persistent storage from dict")
 
         self._handle = chip.native.GetLibraryHandle()
         self._isActive = True
@@ -140,11 +138,11 @@ class PersistentStorage:
             self._jsonData = jsonData
 
         if ('sdk-config' not in self._jsonData):
-            logging.warn(f"No valid SDK configuration present - clearing out configuration")
+            logging.warn("No valid SDK configuration present - clearing out configuration")
             self._jsonData['sdk-config'] = {}
 
         if ('repl-config' not in self._jsonData):
-            logging.warn(f"No valid REPL configuration present - clearing out configuration")
+            logging.warn("No valid REPL configuration present - clearing out configuration")
             self._jsonData['repl-config'] = {}
 
         # Clear out the file so that calling 'Commit' will re-open the file at that time in write mode.
@@ -152,7 +150,9 @@ class PersistentStorage:
 
         self._handle.pychip_Storage_InitializeStorageAdapter.restype = c_void_p
         self._handle.pychip_Storage_InitializeStorageAdapter.argtypes = [ctypes.py_object,
-                                                                         _SyncSetKeyValueCbFunct, _SyncGetKeyValueCbFunct, _SyncDeleteKeyValueCbFunct]
+                                                                         _SyncSetKeyValueCbFunct,
+                                                                         _SyncGetKeyValueCbFunct,
+                                                                         _SyncDeleteKeyValueCbFunct]
 
         self._closure = self._handle.pychip_Storage_InitializeStorageAdapter(ctypes.py_object(
             self), _OnSyncSetKeyValueCb, _OnSyncGetKeyValueCb, _OnSyncDeleteKeyValueCb)
@@ -194,7 +194,7 @@ class PersistentStorage:
             raise ValueError("Invalid Key")
 
         if (value is None):
-            del(self._jsonData['repl-config'][key])
+            del (self._jsonData['repl-config'][key])
         else:
             self._jsonData['repl-config'][key] = value
 
@@ -238,7 +238,7 @@ class PersistentStorage:
         '''
         self.logger().info(f"DeleteSdkKey: {key}")
 
-        del(self._jsonData['sdk-config'][key])
+        del (self._jsonData['sdk-config'][key])
         self.Commit()
 
     def Shutdown(self):

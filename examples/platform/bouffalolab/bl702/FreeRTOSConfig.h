@@ -134,7 +134,7 @@
 #define configUSE_TIMERS 1
 #define configTIMER_TASK_PRIORITY (configMAX_PRIORITIES - 1)
 #define configTIMER_QUEUE_LENGTH 4
-#define configTIMER_TASK_STACK_DEPTH (400)
+#define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE * 2)
 
 /* Task priorities.  Allow these to be overridden. */
 #ifndef uartPRIMARY_PRIORITY
@@ -159,11 +159,15 @@ to exclude the API function. */
 
 /* Normal assert() semantics without relying on the provision of an assert.h
 header file. */
+#ifdef __cplusplus
+extern "C" void vAssertCalled(void);
+#else
 extern void vAssertCalled(void);
+#endif
 #define configASSERT(x)                                                                                                            \
     if ((x) == 0)                                                                                                                  \
     vAssertCalled()
-//#define configASSERT( x ) if( ( x ) == 0 )  portABORT()
+// #define configASSERT( x ) if( ( x ) == 0 )  portABORT()
 
 /* Overwrite some of the stack sizes allocated to various test and demo tasks.
 Like all task stack sizes, the value is the number of words, not bytes. */
@@ -179,7 +183,11 @@ Like all task stack sizes, the value is the number of words, not bytes. */
 
 #if (configUSE_TICKLESS_IDLE != 0)
 #include "portmacro.h"
+#ifdef __cplusplus
+extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime);
+#else
 extern void vApplicationSleep(TickType_t xExpectedIdleTime);
+#endif
 #define portSUPPRESS_TICKS_AND_SLEEP(xExpectedIdleTime) vApplicationSleep(xExpectedIdleTime)
 #endif
 

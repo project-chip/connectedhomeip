@@ -27,7 +27,7 @@
 #include <controller/python/chip/native/PyChipError.h>
 #include <json/json.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/dnssd/Resolver.h>
 
 using namespace chip;
@@ -128,6 +128,10 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
         {
             jsonVal["mrpRetryIntervalActive"] = dnsSdInfo->resolutionData.GetMrpRetryIntervalActive().Value().count();
         }
+        if (dnsSdInfo->resolutionData.GetMrpRetryActiveThreshold().HasValue())
+        {
+            jsonVal["mrpRetryActiveThreshold"] = dnsSdInfo->resolutionData.GetMrpRetryActiveThreshold().Value().count();
+        }
         jsonVal["supportsTcp"] = dnsSdInfo->resolutionData.supportsTcp;
         {
             Json::Value addresses;
@@ -138,6 +142,14 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
                 addresses[j] = buf;
             }
             jsonVal["addresses"] = addresses;
+        }
+        if (dnsSdInfo->resolutionData.isICDOperatingAsLIT.HasValue())
+        {
+            jsonVal["isICDOperatingAsLIT"] = dnsSdInfo->resolutionData.isICDOperatingAsLIT.Value();
+        }
+        if (dnsSdInfo->commissionData.rotatingIdLen > 0)
+        {
+            jsonVal["rotatingId"] = rotatingId;
         }
 
         {
@@ -192,6 +204,11 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
             ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
         }
         ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->resolutionData.supportsTcp);
+        if (dnsSdInfo->resolutionData.isICDOperatingAsLIT.HasValue())
+        {
+            ChipLogProgress(Discovery, "\tICD is operating as a\t%s",
+                            dnsSdInfo->resolutionData.isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
+        }
         for (unsigned j = 0; j < dnsSdInfo->resolutionData.numIPs; ++j)
         {
             char buf[Inet::IPAddress::kMaxStringLength];

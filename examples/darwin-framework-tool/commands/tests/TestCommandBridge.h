@@ -41,7 +41,7 @@ const char basePath[] = "./src/app/tests/suites/commands/delay/scripts/";
 const char * getScriptsFolder() { return basePath; }
 } // namespace
 
-constexpr const char * kDefaultKey = "default";
+inline constexpr const char * kDefaultKey = "default";
 
 @interface TestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property TestCommandBridge * commandBridge;
@@ -58,7 +58,7 @@ constexpr const char * kDefaultKey = "default";
 
 NS_ASSUME_NONNULL_END
 
-constexpr uint16_t kTimeoutInSeconds = 90;
+inline constexpr uint16_t kTimeoutInSeconds = 90;
 
 class TestCommandBridge : public CHIPCommandBridge,
                           public ValueChecker,
@@ -111,7 +111,7 @@ public:
     CHIP_ERROR WaitForMs(
         const char * _Nullable identity, const chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type & value)
     {
-        dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(value.ms * NSEC_PER_MSEC));
+        dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t) (value.ms * NSEC_PER_MSEC));
         dispatch_after(delayTime, mCallbackQueue, ^(void) {
             NextTest();
         });
@@ -181,7 +181,6 @@ public:
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
         SetIdentity(identity);
-
         [controller setDeviceControllerDelegate:mDeviceControllerDelegate queue:mCallbackQueue];
         [mDeviceControllerDelegate setDeviceId:value.nodeId];
         [mDeviceControllerDelegate setActive:YES];
@@ -202,6 +201,26 @@ public:
         return MTRErrorToCHIPErrorCode(err);
     }
 
+    CHIP_ERROR GetCommissionerNodeId(const char * _Nullable identity,
+        const chip::app::Clusters::CommissionerCommands::Commands::GetCommissionerNodeId::Type & value,
+        void (^_Nonnull OnResponse)(const chip::GetCommissionerNodeIdResponse &))
+    {
+        auto * controller = GetCommissioner(identity);
+        VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        auto id = [controller.controllerNodeId unsignedLongLongValue];
+        ChipLogProgress(chipTool, "Commissioner Node Id: %llu", id);
+
+        chip::GetCommissionerNodeIdResponse outValue;
+        outValue.nodeId = id;
+
+        dispatch_async(mCallbackQueue, ^{
+            OnResponse(outValue);
+        });
+
+        return CHIP_NO_ERROR;
+    }
+
     /////////// SystemCommands Interface /////////
     CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override
     {
@@ -215,7 +234,11 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    MTRBaseDevice * _Nullable GetDevice(const char * _Nullable identity) { return mConnectedDevices[identity]; }
+    MTRBaseDevice * _Nullable GetDevice(const char * _Nullable identity)
+    {
+        SetIdentity(identity);
+        return mConnectedDevices[identity];
+    }
 
     // PairingDeleted and PairingComplete need to be public so our pairing
     // delegate can call them.
@@ -287,7 +310,8 @@ protected:
         return ConstraintsChecker::CheckConstraintIsHexString(itemName, value, expectHexString);
     }
 
-    template <typename T> bool CheckConstraintContains(const char * _Nonnull itemName, const NSArray * _Nonnull current, T expected)
+    template <typename T>
+    bool CheckConstraintContains(const char * _Nonnull itemName, const NSArray * _Nonnull current, T expected)
     {
         for (id currentElement in current) {
             if ([currentElement isEqualToNumber:@(expected)]) {
@@ -299,7 +323,8 @@ protected:
         return false;
     }
 
-    template <typename T> bool CheckConstraintExcludes(const char * _Nonnull itemName, const NSArray * _Nonnull current, T expected)
+    template <typename T>
+    bool CheckConstraintExcludes(const char * _Nonnull itemName, const NSArray * _Nonnull current, T expected)
     {
         for (id currentElement in current) {
             if ([currentElement isEqualToNumber:@(expected)]) {
@@ -365,7 +390,8 @@ protected:
         return CheckConstraintNotValue(itemName, current, @(expected));
     }
 
-    template <typename T> bool CheckConstraintNotValue(const char * _Nonnull itemName, NSError * _Nullable current, T expected)
+    template <typename T>
+    bool CheckConstraintNotValue(const char * _Nonnull itemName, NSError * _Nullable current, T expected)
     {
         NSNumber * currentValue = @(MTRErrorToCHIPErrorCode(current).AsInteger());
         return CheckConstraintNotValue(itemName, currentValue, @(expected));
@@ -373,25 +399,37 @@ protected:
 
     using ConstraintsChecker::CheckConstraintMinLength;
 
-    bool CheckConstraintMinLength(const char * _Nonnull itemName, NSString * _Nonnull current, uint64_t expected)
+    bool CheckConstraintMinLength(const char * _Nonnull itemName, NSString * _Nullable current, uint64_t expected)
     {
+        if (current == nil) {
+            return true;
+        }
         return CheckConstraintMinLength(itemName, [current length], expected);
     }
 
-    bool CheckConstraintMinLength(const char * _Nonnull itemName, NSArray * _Nonnull current, uint64_t expected)
+    bool CheckConstraintMinLength(const char * _Nonnull itemName, NSArray * _Nullable current, uint64_t expected)
     {
+        if (current == nil) {
+            return true;
+        }
         return CheckConstraintMinLength(itemName, [current count], expected);
     }
 
     using ConstraintsChecker::CheckConstraintMaxLength;
 
-    bool CheckConstraintMaxLength(const char * _Nonnull itemName, NSString * _Nonnull current, uint64_t expected)
+    bool CheckConstraintMaxLength(const char * _Nonnull itemName, NSString * _Nullable current, uint64_t expected)
     {
+        if (current == nil) {
+            return true;
+        }
         return CheckConstraintMaxLength(itemName, [current length], expected);
     }
 
-    bool CheckConstraintMaxLength(const char * _Nonnull itemName, NSArray * _Nonnull current, uint64_t expected)
+    bool CheckConstraintMaxLength(const char * _Nonnull itemName, NSArray * _Nullable current, uint64_t expected)
     {
+        if (current == nil) {
+            return true;
+        }
         return CheckConstraintMaxLength(itemName, [current count], expected);
     }
 
@@ -399,32 +437,62 @@ protected:
 
     // Used when the minValue is a saved variable, since ConstraintsChecker does
     // not expect Core Foundation types.
-    template <typename T, std::enable_if_t<std::is_signed<T>::value, int> = 0>
-    bool CheckConstraintMinValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
+    template <typename T, std::enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, int> = 0>
+    bool CheckConstraintMinValue(const char * _Nonnull itemName, T current, const NSNumber * _Nullable expected)
     {
+        if (expected == nil) {
+            return true;
+        }
         return ConstraintsChecker::CheckConstraintMinValue(itemName, current, [expected longLongValue]);
     }
 
-    template <typename T, std::enable_if_t<!std::is_signed<T>::value, int> = 0>
-    bool CheckConstraintMinValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
+    template <typename T, std::enable_if_t<std::is_integral<T>::value && !std::is_signed<T>::value, int> = 0>
+    bool CheckConstraintMinValue(const char * _Nonnull itemName, T current, const NSNumber * _Nullable expected)
     {
+        if (expected == nil) {
+            return true;
+        }
         return ConstraintsChecker::CheckConstraintMinValue(itemName, current, [expected unsignedLongLongValue]);
+    }
+
+    template <typename T, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
+    bool CheckConstraintMinValue(const char * _Nonnull itemName, T current, const NSNumber * _Nullable expected)
+    {
+        if (expected == nil) {
+            return true;
+        }
+        return ConstraintsChecker::CheckConstraintMinValue(itemName, current, [expected doubleValue]);
     }
 
     using ConstraintsChecker::CheckConstraintMaxValue;
 
     // Used when the maxValue is a saved variable, since ConstraintsChecker does
     // not expect Core Foundation types.
-    template <typename T, std::enable_if_t<std::is_signed<T>::value, int> = 0>
-    bool CheckConstraintMaxValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
+    template <typename T, std::enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, int> = 0>
+    bool CheckConstraintMaxValue(const char * _Nonnull itemName, T current, const NSNumber * _Nullable expected)
     {
+        if (expected == nil) {
+            return true;
+        }
         return ConstraintsChecker::CheckConstraintMaxValue(itemName, current, [expected longLongValue]);
     }
 
-    template <typename T, std::enable_if_t<!std::is_signed<T>::value, int> = 0>
-    bool CheckConstraintMaxValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
+    template <typename T, std::enable_if_t<std::is_integral<T>::value && !std::is_signed<T>::value, int> = 0>
+    bool CheckConstraintMaxValue(const char * _Nonnull itemName, T current, const NSNumber * _Nullable expected)
     {
+        if (expected == nil) {
+            return true;
+        }
         return ConstraintsChecker::CheckConstraintMaxValue(itemName, current, [expected unsignedLongLongValue]);
+    }
+
+    template <typename T, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
+    bool CheckConstraintMaxValue(const char * _Nonnull itemName, T current, const NSNumber * _Nullable expected)
+    {
+        if (expected == nil) {
+            return true;
+        }
+        return ConstraintsChecker::CheckConstraintMaxValue(itemName, current, [expected doubleValue]);
     }
 
     bool CheckConstraintHasValue(const char * _Nonnull itemName, id _Nullable current, bool shouldHaveValue)
@@ -475,25 +543,29 @@ protected:
         return CheckValue(itemName, currentValue, expected);
     }
 
-    template <typename T> bool CheckValue(const char * _Nonnull itemName, NSNumber * _Nonnull current, T expected)
+    template <typename T>
+    bool CheckValue(const char * _Nonnull itemName, NSNumber * _Nonnull current, T expected)
     {
         return CheckValue(itemName, current, @(expected));
     }
 
-    template <typename T> bool CheckValue(const char * _Nonnull itemName, id _Nonnull current, T expected)
+    template <typename T>
+    bool CheckValue(const char * _Nonnull itemName, id _Nonnull current, T expected)
     {
         NSNumber * currentValue = current;
         return CheckValue(itemName, currentValue, @(expected));
     }
 
-    template <typename T> bool CheckValue(const char * _Nonnull itemName, NSError * _Nullable current, T expected)
+    template <typename T>
+    bool CheckValue(const char * _Nonnull itemName, NSError * _Nullable current, T expected)
     {
 
         NSNumber * currentValue = @(current.code);
         return CheckValue(itemName, currentValue, @(expected));
     }
 
-    template <typename T, typename U> bool CheckValue(const char * _Nonnull itemName, T current, U expected)
+    template <typename T, typename U>
+    bool CheckValue(const char * _Nonnull itemName, T current, U expected)
     {
 
         return ValueChecker::CheckValue(itemName, current, expected);
@@ -573,19 +645,19 @@ NS_ASSUME_NONNULL_BEGIN
     using namespace chip::app::Clusters::OperationalCredentials;
 
     if (CHIP_ERROR_INVALID_PUBLIC_KEY == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidPublicKey));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidPublicKey));
     }
     if (CHIP_ERROR_WRONG_NODE_ID == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNodeOpId));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidNodeOpId));
     }
     if (CHIP_ERROR_UNSUPPORTED_CERT_FORMAT == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNOC));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidNOC));
     }
     if (CHIP_ERROR_FABRIC_EXISTS == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kFabricConflict));
     }
     if (CHIP_ERROR_INVALID_FABRIC_INDEX == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidFabricIndex));
     }
 
     return StatusIB(err);

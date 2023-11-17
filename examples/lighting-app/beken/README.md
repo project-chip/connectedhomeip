@@ -4,7 +4,7 @@ This example demonstrates the Matter Lighting application on BEKEN platforms.
 
 ---
 
--   [Matter BEKEN Lighting Example](#matter-BEKEN-lighting-example)
+-   [Matter BEKEN Lighting Example](#matter-beken-lighting-example)
     -   [Supported Devices](#supported-devices)
     -   [Building the Example Application](#building-the-example-application)
     -   [Commissioning over BLE using chip-tool](#commissioning-over-ble-using-chip-tool)

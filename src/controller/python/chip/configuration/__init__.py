@@ -61,11 +61,11 @@ def SetCommissionerCAT(cat: int):
 
 
 def GetCommissionerCAT() -> int:
- """Returns the current local (controllers/commissioning) device CAT. If none has been set,
-    a default is set and used."""
-  global _local_cat
+    """Returns the current local (controllers/commissioning) device CAT. If none has been set,
+       a default is set and used."""
+    global _local_cat
 
-   if _local_cat is None:
+    if _local_cat is None:
         SetCommissionerCAT(DEFAULT_COMMISSIONER_CAT)
 
     return _local_cat

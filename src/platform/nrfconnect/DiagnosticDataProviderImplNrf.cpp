@@ -42,23 +42,30 @@ DiagnosticDataProviderImplNrf & DiagnosticDataProviderImplNrf::GetDefaultInstanc
 }
 
 #ifdef CONFIG_WIFI_NRF700X
-CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiBssId(ByteSpan & value)
+CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiBssId(MutableByteSpan & value)
 {
     WiFiManager::WiFiInfo info;
-    CHIP_ERROR err = WiFiManager::Instance().GetWiFiInfo(info);
-    value          = info.mBssId;
-    return err;
+    ReturnErrorOnFailure(WiFiManager::Instance().GetWiFiInfo(info));
+    ReturnErrorCodeIf(sizeof(info.mBssId) >= value.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(value.data(), info.mBssId, sizeof(info.mBssId));
+    value.reduce_size(sizeof(info.mBssId));
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiSecurityType(uint8_t & securityType)
+CHIP_ERROR
+DiagnosticDataProviderImplNrf::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
+
     WiFiManager::WiFiInfo info;
     CHIP_ERROR err = WiFiManager::Instance().GetWiFiInfo(info);
     securityType   = info.mSecurityType;
     return err;
 }
 
-CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiVersion(uint8_t & wiFiVersion)
+CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion)
 {
     WiFiManager::WiFiInfo info;
     CHIP_ERROR err = WiFiManager::Instance().GetWiFiInfo(info);
@@ -71,9 +78,7 @@ CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiChannelNumber(uint16_t & channe
     WiFiManager::WiFiInfo info;
     CHIP_ERROR err = WiFiManager::Instance().GetWiFiInfo(info);
     channelNumber  = info.mChannel;
-    (void) err;
-    // above will return 0 until the wpa_supplicant driver API implementation is refined
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiRssi(int8_t & rssi)
@@ -81,39 +86,55 @@ CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiRssi(int8_t & rssi)
     WiFiManager::WiFiInfo info;
     CHIP_ERROR err = WiFiManager::Instance().GetWiFiInfo(info);
     rssi           = info.mRssi;
-    (void) err;
-    // above will return -128 until the wpa_supplicant driver API implementation is refined
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    return err;
 }
 
-// below will be implemented when the WiFi driver exposes Zephyr NET_STATISTICS API
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err  = WiFiManager::Instance().GetNetworkStatistics(stats);
+    beaconLostCount = stats.mBeaconsLostCount;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err = WiFiManager::Instance().GetNetworkStatistics(stats);
+    beaconRxCount  = stats.mBeaconsSuccessCount;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err         = WiFiManager::Instance().GetNetworkStatistics(stats);
+    packetMulticastRxCount = stats.mPacketMulticastRxCount;
+    return err;
 }
+
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err         = WiFiManager::Instance().GetNetworkStatistics(stats);
+    packetMulticastTxCount = stats.mPacketMulticastTxCount;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err       = WiFiManager::Instance().GetNetworkStatistics(stats);
+    packetUnicastRxCount = stats.mPacketUnicastRxCount;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err       = WiFiManager::Instance().GetNetworkStatistics(stats);
+    packetUnicastTxCount = stats.mPacketUnicastTxCount;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)

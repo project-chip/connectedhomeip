@@ -72,7 +72,7 @@ void HandleIncomingBleConnection(BLEEndPoint * bleEP)
     ChipLogProgress(DeviceLayer, "con rcvd");
 }
 
-void BLEManagerImpl::InitConnectionData(void)
+void BLEManagerImpl::InitConnectionData()
 {
     /* Initialize Hashmap */
     if (!mConnectionMap)
@@ -500,7 +500,7 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
 {
     bool result = false;
     result      = SubscribeCharacteristicToWebOS(conId, static_cast<const uint8_t *>(svcId->bytes),
-                                            static_cast<const uint8_t *>(charId->bytes));
+                                                 static_cast<const uint8_t *>(charId->bytes));
     return result;
 }
 
@@ -917,31 +917,26 @@ void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * 
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::OnChipScanComplete(void)
-{
-    if (mBLEScanConfig.mBleScanState != BleScanState::kScanForDiscriminator &&
-        mBLEScanConfig.mBleScanState != BleScanState::kScanForAddress)
-    {
-        ChipLogProgress(DeviceLayer, "Scan complete notification without an active scan.");
-        return;
-    }
-
-    ChipLogError(DeviceLayer, "Scan Completed with Timeout: Notify Upstream.");
-    BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_TIMEOUT);
-    mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
-}
-
 void BLEManagerImpl::OnScanComplete()
 {
-    if (mBLEScanConfig.mBleScanState != BleScanState::kScanForDiscriminator &&
-        mBLEScanConfig.mBleScanState != BleScanState::kScanForAddress)
+    switch (mBLEScanConfig.mBleScanState)
     {
+    case BleScanState::kNotScanning:
         ChipLogProgress(Ble, "Scan complete notification without an active scan.");
-        return;
+        break;
+    case BleScanState::kScanForAddress:
+    case BleScanState::kScanForDiscriminator:
+        mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+        ChipLogProgress(Ble, "Scan complete. No matching device found.");
+        break;
+    case BleScanState::kConnecting:
+        break;
     }
+}
 
-    BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_TIMEOUT);
-    mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+void BLEManagerImpl::OnScanError(CHIP_ERROR err)
+{
+    ChipLogDetail(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 bool BLEManagerImpl::gattGetServiceCb(LSHandle * sh, LSMessage * message, void * userData)

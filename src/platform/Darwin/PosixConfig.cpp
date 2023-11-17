@@ -184,7 +184,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PosixConfig::FactoryResetConfig(void)
+CHIP_ERROR PosixConfig::FactoryResetConfig()
 {
     CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     SuccessOrExit(err);

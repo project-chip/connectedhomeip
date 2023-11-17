@@ -6,24 +6,22 @@ example for the nRF Connect platform into a Matter fabric.
 
 This guide references the nRF52840 DK and Matter nRF Connect Lighting Example
 Application that communicates with other nodes over a Thread network, but the
-instructions can be adapted to other platforms and applications. In particular,
-some sections of this guide include deviations from the original procedure that
-are needed to test a Wi-Fi device.
+instructions can be adapted to other platforms and applications. For instance,
+some sections of this guide include steps for testing a Wi-Fi device, which are
+adapted from the original Thread-based procedure.
 
 <hr>
 
 -   [Overview](#overview)
 -   [Requirements](#requirements)
 -   [Setting up Thread Border Router](#setting-up-thread-border-router)
--   [Building and programming nRF Connect Example Application](#building-example)
--   [Building and installing Android CHIPTool](#building-chiptool)
--   [Preparing accessory device](#preparing-accessory)
--   [Commissioning accessory device](#commissioning-accessory)
--   [Sending Matter commands](#sending-chip-commands)
+-   [Building and programming nRF Connect Example Application](#building-and-programming-nrf-connect-example-application)
+-   [Building and installing Android CHIPTool](#building-and-installing-android-chiptool)
+-   [Preparing accessory device](#preparing-accessory-device)
+-   [Commissioning accessory device](#commissioning-accessory-device)
+-   [Sending Matter commands](#sending-matter-commands)
 
 <hr>
-
-<a name="overview"></a>
 
 ## Overview
 
@@ -54,8 +52,6 @@ Lighting Example Application:
 
 <hr>
 
-<a name="requirements"></a>
-
 ## Requirements
 
 You need the following hardware and software for commissioning the nRF Connect
@@ -68,6 +64,7 @@ accessory using Android CHIPTool:
     replace this DK with another compatible device, such as the nRF5340 DK or
     nRF7002 DK. nRF52840 DK and nRF5340 DK can be used to test Matter over
     Thread, and nRF7002 DK can be used to test Matter over Wi-Fi.
+
 -   1x nRF52840 DK for running the
     [OpenThread Radio Co-Processor](https://openthread.io/platforms/co-processor)
     firmware. You can replace this DK with another compatible device, such as
@@ -84,8 +81,6 @@ accessory using Android CHIPTool:
 
 <hr>
 
-<a name="setting-up-thread-border-router"></a>
-
 ## Setting up Thread Border Router
 
 > _Note:_ This step is only needed if you're testing a Thread device. Skip it if
@@ -100,8 +95,6 @@ Access Point.
 
 <hr>
 
-<a name="building-example"></a>
-
 ## Building and programming nRF Connect Example Application
 
 Build and program the example application onto your compatible device.
@@ -110,8 +103,6 @@ For this guide, see the documentation of Matter nRF Connect Lighting Example
 Application to learn how to build and program the example onto an nRF52840 DK.
 
 <hr>
-
-<a name="building-chiptool"></a>
 
 ## Building and installing Android CHIPTool
 
@@ -147,8 +138,6 @@ CHIPTool is now ready to be used for commissioning.
 
 <hr>
 
-<a name="preparing-accessory"></a>
-
 ## Preparing accessory device
 
 To prepare the accessory device for commissioning, complete the following steps:
@@ -172,8 +161,6 @@ To prepare the accessory device for commissioning, complete the following steps:
 
 <hr>
 
-<a name="commissioning-accessory"></a>
-
 ## Commissioning accessory device
 
 To commission the accessory device into the Matter fabric, complete the
@@ -196,8 +183,6 @@ following steps:
     this process, the application returns to the main menu.
 
 <hr>
-
-<a name="sending-commands"></a>
 
 ## Sending Matter commands
 

@@ -1,0 +1,50 @@
+{
+    "name": "CHIP Application templates",
+    "version": "chip-v1",
+    "helpers": [
+        "partials/helper.js",
+        "common/ListHelper.js",
+        "common/StringHelper.js",
+        "common/ChipTypesHelper.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js"
+    ],
+    "override": "common/override.js",
+    "partials": [
+        {
+            "name": "idl_structure_definition",
+            "path": "partials/idl/structure_definition.zapt"
+        },
+        {
+            "name": "idl_structure_member",
+            "path": "partials/idl/structure_member.zapt"
+        },
+        {
+            "name": "idl_command_request_response",
+            "path": "partials/idl/command_request_response.zapt"
+        },
+        {
+            "name": "idl_command_request_struct",
+            "path": "partials/idl/command_request_struct.zapt"
+        },
+        {
+            "name": "idl_command_response_struct",
+            "path": "partials/idl/command_response_struct.zapt"
+        },
+        {
+            "name": "idl_attribute_definition",
+            "path": "partials/idl/attribute_definition.zapt"
+        },
+        {
+            "name": "idl_cluster_definition",
+            "path": "partials/idl/cluster_definition.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "templates/app/MatterIDL_Client.zapt",
+            "name": "Human-readable Matter IDL (All client clusters)",
+            "output": "Clusters.matter"
+        }
+    ]
+}

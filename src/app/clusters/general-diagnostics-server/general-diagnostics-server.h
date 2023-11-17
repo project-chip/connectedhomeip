@@ -40,7 +40,7 @@ public:
      * @brief
      *   Called after the current device is rebooted.
      */
-    void OnDeviceReboot(GeneralDiagnostics::BootReasonType bootReason);
+    void OnDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason);
 
     /**
      * @brief

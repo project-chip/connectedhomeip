@@ -179,7 +179,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestQueryResponder(void)
+int TestQueryResponder()
 {
     nlTestSuite theSuite = { "QueryResponder", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

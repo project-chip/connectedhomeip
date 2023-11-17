@@ -30,6 +30,7 @@
 
 #include <DeviceInfoProviderImpl.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <static-supported-temperature-levels.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
@@ -70,6 +71,10 @@ static DeviceInfoProviderImpl sExampleDeviceInfoProvider;
 AppTask AppTask::sAppTask;
 
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
+
+namespace {
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 static DefaultOTARequestor sRequestorCore;
@@ -270,6 +275,7 @@ int AppTask::Init()
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
     return 0;
 }
 

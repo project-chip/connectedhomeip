@@ -20,7 +20,6 @@
  * @brief Implementation for the User Label Server Cluster
  ***************************************************************************/
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -217,7 +216,7 @@ public:
 
 UserLabelFabricTableDelegate gUserLabelFabricDelegate;
 
-void MatterUserLabelPluginServerInitCallback(void)
+void MatterUserLabelPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&gUserLabelFabricDelegate);

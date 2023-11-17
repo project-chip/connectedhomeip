@@ -124,7 +124,9 @@ static inline Platform::ScopedMemoryBufferWithSize<uint8_t> CopyByteSpanHelper(c
 }
 
 DeviceAttestationVerifier::AttestationDeviceInfo::AttestationDeviceInfo(const AttestationInfo & attestationInfo) :
-    mPaiDerBuffer(CopyByteSpanHelper(attestationInfo.paiDerBuffer)), mDacDerBuffer(CopyByteSpanHelper(attestationInfo.dacDerBuffer))
+    mPaiDerBuffer(CopyByteSpanHelper(attestationInfo.paiDerBuffer)),
+    mDacDerBuffer(CopyByteSpanHelper(attestationInfo.dacDerBuffer)), mBasicInformationVendorId(attestationInfo.vendorId),
+    mBasicInformationProductId(attestationInfo.productId)
 {
     ByteSpan certificationDeclarationSpan;
     ByteSpan attestationNonceSpan;

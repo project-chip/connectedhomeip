@@ -167,7 +167,7 @@ static const nlTest sTests[] = { NL_TEST_DEF_FN(TestZclStringWhenBufferIsZero),
                                  NL_TEST_DEF_FN(TestZclStringBiggerThanMaximumSize_Length_257),
                                  NL_TEST_SENTINEL() };
 
-int TestZclString(void)
+int TestZclString()
 {
     nlTestSuite theSuite = { "CHIP Memory Allocation tests", &sTests[0], TestZclString_Setup, TestZclString_Teardown };
 

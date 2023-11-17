@@ -21,11 +21,11 @@ package chip.devicecontroller;
 public class ChipClusterException extends Exception {
   private static final long serialVersionUID = 1L;
 
-  public int errorCode;
+  public long errorCode;
 
   public ChipClusterException() {}
 
-  public ChipClusterException(int errorCode) {
+  public ChipClusterException(long errorCode) {
     super(String.format("CHIP cluster error: %d", errorCode));
     this.errorCode = errorCode;
   }

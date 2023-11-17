@@ -27,14 +27,18 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ReliableMessageContext.h>
 
+#include <app/AppConfig.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Defer.h>
 #include <messaging/ErrorCategory.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageMgr.h>
+#include <platform/PlatformManager.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
+
+using namespace chip::DeviceLayer;
 
 namespace chip {
 namespace Messaging {
@@ -49,6 +53,11 @@ ExchangeContext * ReliableMessageContext::GetExchangeContext()
 ReliableMessageMgr * ReliableMessageContext::GetReliableMessageMgr()
 {
     return static_cast<ExchangeContext *>(this)->GetExchangeMgr()->GetReliableMessageMgr();
+}
+
+void ReliableMessageContext::SetWaitingForAck(bool waitingForAck)
+{
+    mFlags.Set(Flags::kFlagWaitingForAck, waitingForAck);
 }
 
 CHIP_ERROR ReliableMessageContext::FlushAcks()
@@ -83,7 +92,11 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
 void ReliableMessageContext::HandleRcvdAck(uint32_t ackMessageCounter)
 {
     // Msg is an Ack; Check Retrans Table and remove message context
-    if (!GetReliableMessageMgr()->CheckAndRemRetransTable(this, ackMessageCounter))
+    if (GetReliableMessageMgr()->CheckAndRemRetransTable(this, ackMessageCounter))
+    {
+        SetWaitingForResponseOrAck(false);
+    }
+    else
     {
         // This can happen quite easily due to a packet with a piggyback ack
         // being lost and retransmitted.
@@ -94,7 +107,6 @@ void ReliableMessageContext::HandleRcvdAck(uint32_t ackMessageCounter)
 }
 
 CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags)
-
 {
     CHIP_ERROR err = HandleNeedsAckInner(messageCounter, messageFlags);
 

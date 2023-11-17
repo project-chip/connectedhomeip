@@ -1,6 +1,6 @@
-# Setup ESP-IDF and CHIP Environment
+# Setup ESP-IDF and Matter Environment
 
-Setting up IDF and CHIP environment is one time setup.
+Setting up IDF and Matter environment is one time setup.
 
 ## Setup ESP-IDF (Espressif IoT Development Framework)
 
@@ -13,69 +13,65 @@ step.
 
 ### Install Prerequisites
 
--   [Linux](https://docs.espressif.com/projects/esp-idf/en/v4.4.3/esp32/get-started/linux-setup.html)
--   [macOS](https://docs.espressif.com/projects/esp-idf/en/v4.4.3/esp32/get-started/macos-setup.html)
+-   [Linux](https://docs.espressif.com/projects/esp-idf/en/v5.1/esp32/get-started/linux-macos-setup.html#for-linux-users)
+-   [macOS](https://docs.espressif.com/projects/esp-idf/en/v5.1/esp32/get-started/linux-macos-setup.html#for-macos-users)
 
-### Get IDF v4.4.3
+### Get IDF v5.1.1
 
--   Clone ESP-IDF
-    [v4.4.3 release](https://github.com/espressif/esp-idf/releases/tag/v4.4.3)
-
-    ```
-    $ git clone -b v4.4.3 --recursive https://github.com/espressif/esp-idf.git
-    $ cd esp-idf
-    $ ./install.sh
-    ```
-
--   To update an existing esp-idf toolchain to v4.4.3:
+-   Clone ESP-IDF [v5.1.1
+    release](https://github.com/espressif/esp-idf/releases/tag/v5.1.1
 
     ```
-    $ cd path/to/esp-idf
-    $ git fetch origin
-    $ git checkout v4.4.3
-    $ git reset --hard origin/v4.4.3
-    $ git submodule update --recursive --init
-    $ git clean -fdx
-    $ ./install.sh
+    git clone -b v5.1.1 --recursive --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git
+    cd esp-idf
+    ./install.sh
     ```
 
--   For ESP32H2, please checkout tag
-    [v5.0-beta1](https://github.com/espressif/esp-idf/tree/v5.0-beta1),
-    currently only lighting-app is supported on H2
+-   To update an existing esp-idf toolchain to v5.1.1:
 
     ```
-    $ cd esp-idf
-    $ git checkout v5.0-beta1
-    $ git submodule update --init
-    $ ./install.sh
+    cd path/to/esp-idf
+    git fetch --depth 1 origin v5.1.1
+    git reset --hard FETCH_HEAD
+    git submodule update --depth 1 --recursive --init
+
+    # -ff is for cleaning untracked files as well as submodules
+    git clean -ffdx
+    ./install.sh
     ```
 
-## Setup CHIP environment
+## Setup Matter environment
 
 ### Install Prerequisites
 
 -   [Linux](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md#installing-prerequisites-on-linux)
 -   [macOS](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md#installing-prerequisites-on-macos)
 
-### Prepare for building
+### Bootstrap Matter environment
 
-Before running any other build command, the `scripts/activate.sh` environment
-setup script should be sourced at the top level. This script takes care of
-downloading GN, ninja, and setting up a Python environment with libraries used
-to build and test.
-
-```
-source scripts/activate.sh
-```
-
-If this script says the environment is out of date, it can be updated by
-running:
+Execute the below command to bootstrap Matter environment. This script takes
+care of downloading GN, ninja, and setting up a Python environment with
+libraries used to build and test.
 
 ```
 source scripts/bootstrap.sh
 ```
 
+Whenever Matter environment is out of date, it can be updated by running above
+command.
+
+In IDF v4.4.x, `esptool` is part of the esp-idf repository, but in IDF v5.x, it
+is moved out as a Python package which can be installed using pip.
+
+If you are using IDF v5.x or later, please install `esptool` using the command
+below:
+
+```
+# Please make sure to run this command in the Matter Python environment
+python3 -m pip install esptool
+```
+
 ---
 
-Once IDF and CHIP environment is set up, head over to
+Once IDF and Matter environment is set up, head over to
 [application building and commissioning guide](build_app_and_commission.md).

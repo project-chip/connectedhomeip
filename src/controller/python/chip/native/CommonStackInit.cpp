@@ -56,7 +56,8 @@ struct __attribute__((packed)) PyCommonStackInitParams
 void pychip_CauseCrash()
 {
     uint8_t * ptr = nullptr;
-    *ptr          = 0;
+    // NOLINTNEXTLINE(clang-analyzer-core.NullDereference): Intentionally trying to cause crash.
+    *ptr = 0;
 }
 
 PyChipError pychip_CommonStackInit(const PyCommonStackInitParams * aParams)

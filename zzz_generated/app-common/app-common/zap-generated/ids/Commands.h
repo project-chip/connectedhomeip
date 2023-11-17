@@ -295,7 +295,7 @@ static constexpr CommandId Id = 0x0000000B;
 } // namespace Commands
 } // namespace Actions
 
-namespace Basic {
+namespace BasicInformation {
 namespace Commands {
 
 namespace MfgSpecificPing {
@@ -303,7 +303,7 @@ static constexpr CommandId Id = 0x10020000;
 } // namespace MfgSpecificPing
 
 } // namespace Commands
-} // namespace Basic
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateProvider {
 namespace Commands {
@@ -334,9 +334,9 @@ static constexpr CommandId Id = 0x00000004;
 namespace OtaSoftwareUpdateRequestor {
 namespace Commands {
 
-namespace AnnounceOtaProvider {
+namespace AnnounceOTAProvider {
 static constexpr CommandId Id = 0x00000000;
-} // namespace AnnounceOtaProvider
+} // namespace AnnounceOTAProvider
 
 } // namespace Commands
 } // namespace OtaSoftwareUpdateRequestor
@@ -410,6 +410,14 @@ namespace ReorderNetwork {
 static constexpr CommandId Id = 0x00000008;
 } // namespace ReorderNetwork
 
+namespace QueryIdentity {
+static constexpr CommandId Id = 0x00000009;
+} // namespace QueryIdentity
+
+namespace QueryIdentityResponse {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace QueryIdentityResponse
+
 } // namespace Commands
 } // namespace NetworkCommissioning
 
@@ -433,6 +441,14 @@ namespace Commands {
 namespace TestEventTrigger {
 static constexpr CommandId Id = 0x00000000;
 } // namespace TestEventTrigger
+
+namespace TimeSnapshot {
+static constexpr CommandId Id = 0x00000001;
+} // namespace TimeSnapshot
+
+namespace TimeSnapshotResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace TimeSnapshotResponse
 
 } // namespace Commands
 } // namespace GeneralDiagnostics
@@ -480,9 +496,29 @@ static constexpr CommandId Id = 0x00000000;
 namespace TimeSynchronization {
 namespace Commands {
 
-namespace SetUtcTime {
+namespace SetUTCTime {
 static constexpr CommandId Id = 0x00000000;
-} // namespace SetUtcTime
+} // namespace SetUTCTime
+
+namespace SetTrustedTimeSource {
+static constexpr CommandId Id = 0x00000001;
+} // namespace SetTrustedTimeSource
+
+namespace SetTimeZone {
+static constexpr CommandId Id = 0x00000002;
+} // namespace SetTimeZone
+
+namespace SetTimeZoneResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace SetTimeZoneResponse
+
+namespace SetDSTOffset {
+static constexpr CommandId Id = 0x00000004;
+} // namespace SetDSTOffset
+
+namespace SetDefaultNTP {
+static constexpr CommandId Id = 0x00000005;
+} // namespace SetDefaultNTP
 
 } // namespace Commands
 } // namespace TimeSynchronization
@@ -589,6 +625,64 @@ static constexpr CommandId Id = 0x00000005;
 } // namespace Commands
 } // namespace GroupKeyManagement
 
+namespace IcdManagement {
+namespace Commands {
+
+namespace RegisterClient {
+static constexpr CommandId Id = 0x00000000;
+} // namespace RegisterClient
+
+namespace RegisterClientResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace RegisterClientResponse
+
+namespace UnregisterClient {
+static constexpr CommandId Id = 0x00000002;
+} // namespace UnregisterClient
+
+namespace StayActiveRequest {
+static constexpr CommandId Id = 0x00000003;
+} // namespace StayActiveRequest
+
+} // namespace Commands
+} // namespace IcdManagement
+
+namespace Timer {
+namespace Commands {
+
+namespace SetTimer {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SetTimer
+
+namespace ResetTimer {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ResetTimer
+
+namespace AddTime {
+static constexpr CommandId Id = 0x00000002;
+} // namespace AddTime
+
+namespace ReduceTime {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ReduceTime
+
+} // namespace Commands
+} // namespace Timer
+
+namespace OvenMode {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace OvenMode
+
 namespace ModeSelect {
 namespace Commands {
 
@@ -598,6 +692,250 @@ static constexpr CommandId Id = 0x00000000;
 
 } // namespace Commands
 } // namespace ModeSelect
+
+namespace LaundryWasherMode {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace LaundryWasherMode
+
+namespace RefrigeratorAndTemperatureControlledCabinetMode {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace RefrigeratorAndTemperatureControlledCabinetMode
+
+namespace RvcRunMode {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace RvcRunMode
+
+namespace RvcCleanMode {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace RvcCleanMode
+
+namespace TemperatureControl {
+namespace Commands {
+
+namespace SetTemperature {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SetTemperature
+
+} // namespace Commands
+} // namespace TemperatureControl
+
+namespace DishwasherMode {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace DishwasherMode
+
+namespace SmokeCoAlarm {
+namespace Commands {
+
+namespace SelfTestRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SelfTestRequest
+
+} // namespace Commands
+} // namespace SmokeCoAlarm
+
+namespace DishwasherAlarm {
+namespace Commands {
+
+namespace Reset {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Reset
+
+namespace ModifyEnabledAlarms {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ModifyEnabledAlarms
+
+} // namespace Commands
+} // namespace DishwasherAlarm
+
+namespace MicrowaveOvenControl {
+namespace Commands {
+
+namespace SetCookingParameters {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SetCookingParameters
+
+namespace AddMoreTime {
+static constexpr CommandId Id = 0x00000001;
+} // namespace AddMoreTime
+
+} // namespace Commands
+} // namespace MicrowaveOvenControl
+
+namespace OperationalState {
+namespace Commands {
+
+namespace Pause {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Pause
+
+namespace Stop {
+static constexpr CommandId Id = 0x00000001;
+} // namespace Stop
+
+namespace Start {
+static constexpr CommandId Id = 0x00000002;
+} // namespace Start
+
+namespace Resume {
+static constexpr CommandId Id = 0x00000003;
+} // namespace Resume
+
+namespace OperationalCommandResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace OperationalCommandResponse
+
+} // namespace Commands
+} // namespace OperationalState
+
+namespace RvcOperationalState {
+namespace Commands {
+
+namespace Pause {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Pause
+
+namespace Stop {
+static constexpr CommandId Id = 0x00000001;
+} // namespace Stop
+
+namespace Start {
+static constexpr CommandId Id = 0x00000002;
+} // namespace Start
+
+namespace Resume {
+static constexpr CommandId Id = 0x00000003;
+} // namespace Resume
+
+namespace OperationalCommandResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace OperationalCommandResponse
+
+} // namespace Commands
+} // namespace RvcOperationalState
+
+namespace HepaFilterMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace HepaFilterMonitoring
+
+namespace ActivatedCarbonFilterMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace ActivatedCarbonFilterMonitoring
+
+namespace BooleanSensorConfiguration {
+namespace Commands {
+
+namespace SuppressRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SuppressRequest
+
+} // namespace Commands
+} // namespace BooleanSensorConfiguration
+
+namespace ValveConfigurationAndControl {
+namespace Commands {
+
+namespace Open {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Open
+
+namespace Close {
+static constexpr CommandId Id = 0x00000001;
+} // namespace Close
+
+namespace SetLevel {
+static constexpr CommandId Id = 0x00000002;
+} // namespace SetLevel
+
+} // namespace Commands
+} // namespace ValveConfigurationAndControl
+
+namespace DemandResponseLoadControl {
+namespace Commands {
+
+namespace RegisterLoadControlProgramRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace RegisterLoadControlProgramRequest
+
+namespace UnregisterLoadControlProgramRequest {
+static constexpr CommandId Id = 0x00000001;
+} // namespace UnregisterLoadControlProgramRequest
+
+namespace AddLoadControlEventRequest {
+static constexpr CommandId Id = 0x00000002;
+} // namespace AddLoadControlEventRequest
+
+namespace RemoveLoadControlEventRequest {
+static constexpr CommandId Id = 0x00000003;
+} // namespace RemoveLoadControlEventRequest
+
+namespace ClearLoadControlEventsRequest {
+static constexpr CommandId Id = 0x00000004;
+} // namespace ClearLoadControlEventsRequest
+
+} // namespace Commands
+} // namespace DemandResponseLoadControl
 
 namespace DoorLock {
 namespace Commands {
@@ -698,6 +1036,10 @@ namespace ClearCredential {
 static constexpr CommandId Id = 0x00000026;
 } // namespace ClearCredential
 
+namespace UnboltDoor {
+static constexpr CommandId Id = 0x00000027;
+} // namespace UnboltDoor
+
 } // namespace Commands
 } // namespace DoorLock
 
@@ -774,6 +1116,16 @@ static constexpr CommandId Id = 0x00000003;
 
 } // namespace Commands
 } // namespace Thermostat
+
+namespace FanControl {
+namespace Commands {
+
+namespace Step {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Step
+
+} // namespace Commands
+} // namespace FanControl
 
 namespace ColorControl {
 namespace Commands {
@@ -904,9 +1256,9 @@ namespace Pause {
 static constexpr CommandId Id = 0x00000001;
 } // namespace Pause
 
-namespace StopPlayback {
+namespace Stop {
 static constexpr CommandId Id = 0x00000002;
-} // namespace StopPlayback
+} // namespace Stop
 
 namespace StartOver {
 static constexpr CommandId Id = 0x00000003;
@@ -1004,9 +1356,9 @@ namespace LaunchURL {
 static constexpr CommandId Id = 0x00000001;
 } // namespace LaunchURL
 
-namespace LaunchResponse {
+namespace LauncherResponse {
 static constexpr CommandId Id = 0x00000002;
-} // namespace LaunchResponse
+} // namespace LauncherResponse
 
 } // namespace Commands
 } // namespace ContentLauncher
@@ -1246,6 +1598,24 @@ static constexpr CommandId Id = 0x00000001;
 
 } // namespace Commands
 } // namespace FaultInjection
+
+namespace SampleMei {
+namespace Commands {
+
+namespace Ping {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Ping
+
+namespace AddArgumentsResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace AddArgumentsResponse
+
+namespace AddArguments {
+static constexpr CommandId Id = 0x00000002;
+} // namespace AddArguments
+
+} // namespace Commands
+} // namespace SampleMei
 
 } // namespace Clusters
 } // namespace app

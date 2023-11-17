@@ -67,6 +67,9 @@ config("psoc6_sdk_config") {
   asmflags = mtb_json.asflags
   ldflags = filter_exclude(mtb_json.ldflags, [ "-T*" ])
 
+  # TODO, once the issue is properly fixed we should no longer need this warning.
+  cflags_c += [ "-Wno-error=array-parameter" ]
+
   # Pull out linker flags with paths (-T flags) and make paths absolute
   # OTA app provides it's own linker script
   if (!chip_enable_ota_requestor) {
@@ -82,6 +85,8 @@ config("psoc6_sdk_config") {
     }
   }
 
+  ldflags += [ "-Wl,--no-warn-rwx-segment" ]
+
   # --specs=nano.specs is getting added twice and causing compile issues so remove from cxx flags here.
   cflags_c -= [ "--specs=nano.specs" ]
   cflags_cc -= [ "--specs=nano.specs" ]
@@ -89,7 +94,12 @@ config("psoc6_sdk_config") {
   ldflags -= [ "--specs=nano.specs" ]
 }
 
+source_set("syscalls_stub") {
+  sources = [ "syscalls_stubs.cpp" ]
+}
+
 group("psoc6_build") {
   public_configs = [ ":psoc6_sdk_config" ]
   public_deps = [ psoc6_target_project ]
+  deps = [ ":syscalls_stub" ]
 }

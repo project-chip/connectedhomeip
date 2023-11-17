@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,42 +18,15 @@
 
 #pragma once
 
-#include "AppEvent.h"
+#include "AppTaskCommon.h"
 
-#include <zephyr/drivers/gpio.h>
-
-#include <platform/CHIPDeviceLayer.h>
-
-#include <cstdint>
-
-struct k_timer;
-
-class AppTask
+class AppTask : public AppTaskCommon
 {
-public:
-    CHIP_ERROR StartApp();
-
-    void PostEvent(AppEvent * event);
-
 private:
     friend AppTask & GetAppTask(void);
+    friend class AppTaskCommon;
 
     CHIP_ERROR Init();
-
-    void DispatchEvent(AppEvent * event);
-
-    static void UpdateStatusLED();
-    static void FactoryResetButtonEventHandler(void);
-    static void StartBleAdvButtonEventHandler(void);
-
-    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-
-    static void FactoryResetHandler(AppEvent * aEvent);
-    static void StartBleAdvHandler(AppEvent * aEvent);
-
-    static void InitButtons(void);
-
-    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static AppTask sAppTask;
 };

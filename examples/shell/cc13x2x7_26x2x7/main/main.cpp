@@ -29,7 +29,6 @@
 #include <ti/drivers/Board.h>
 #include <ti/drivers/GPIO.h>
 #include <ti/drivers/NVS.h>
-#include <ti/drivers/UART.h>
 
 #include <ti/drivers/AESECB.h>
 #include <ti/drivers/ECDH.h>
@@ -38,7 +37,7 @@
 #include <ti/drivers/SHA2.h>
 
 #include <bget.h>
-#define TOTAL_ICALL_HEAP_SIZE (0xc800)
+#define TOTAL_ICALL_HEAP_SIZE (0xc700)
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -58,6 +57,17 @@ extern "C" void vApplicationStackOverflowHook(void)
     }
 }
 
+/* Wrapper functions for using the queue registry regardless of whether it is enabled or disabled */
+extern "C" void vQueueAddToRegistryWrapper(QueueHandle_t xQueue, const char * pcQueueName)
+{
+    /* This function is intentionally left empty as the Queue Registry is disabled */
+}
+
+extern "C" void vQueueUnregisterQueueWrapper(QueueHandle_t xQueue)
+{
+    /* This function is intentionally left empty as the Queue Registry is disabled */
+}
+
 // ================================================================================
 // Main Code
 // ================================================================================
@@ -71,8 +81,6 @@ int main(void)
     GPIO_init();
 
     NVS_init();
-
-    UART_init();
 
     ECDH_init();
 

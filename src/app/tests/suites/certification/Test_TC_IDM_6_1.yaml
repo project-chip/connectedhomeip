@@ -20,20 +20,17 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
     - label:
-          "TH sends Read Request Message to DUT with EventRequests set to a
-          specific event from a specific cluster on a specific endpoint on a
-          specific node that is, [Node = Specific, Endpoint = Specific, Cluster
-          = Specific, Event = Specific]."
+          "Step 1: TH sends Read Request Message to DUT with EventRequests set
+          to a specific event from a specific cluster on a specific endpoint on
+          a specific node that is, [Node = Specific, Endpoint = Specific,
+          Cluster = Specific, Event = Specific]."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
-
-
-          sudo ./chip-tool basic read-event start-up 1  0
+          ./chip-tool  basicinformation read-event start-up 1  0
 
           On TH(chip-tool) verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
 
@@ -78,14 +75,12 @@ tests:
       disabled: true
 
     - label:
-          "TH sends Read Request Message to DUT with EventRequests set to all
-          events from a specific cluster on a specific endpoint on a specific
-          node that is, [Node = Specific, Endpoint = Specific, Cluster =
-          Specific, Event = Wildcard]."
+          "Step 2: TH sends Read Request Message to DUT with EventRequests set
+          to all events from a specific cluster on a specific endpoint on a
+          specific node that is, [Node = Specific, Endpoint = Specific, Cluster
+          = Specific, Event = Wildcard]."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
-
-           ./chip-tool any read-event-by-id 0x0028 0x0FFFFFFFF 1 0
+          ./chip-tool any read-event-by-id 0x0028 0x0FFFFFFFF 1 0
           On TH(chip-tool) verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
           [1652420332.235228][6031:6036] CHIP:DMG: ReportDataMessage =
           [1652420332.235259][6031:6036] CHIP:DMG: {
@@ -128,10 +123,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends Read Request Message to DUT with EventRequests set to all
-          events from all clusters on a specific endpoint on a specific node
-          that is, [Node = Specific, Endpoint = Specific, Cluster = Wildcard,
-          Event = Wildcard]."
+          "Step 3: TH sends Read Request Message to DUT with EventRequests set
+          to all events from all clusters on a specific endpoint on a specific
+          node that is, [Node = Specific, Endpoint = Specific, Cluster =
+          Wildcard, Event = Wildcard]."
       verification: |
           ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0
 
@@ -171,14 +166,12 @@ tests:
       disabled: true
 
     - label:
-          "TH sends Read Request Message to DUT with EventRequests set to a
-          specific event from a specific cluster on all endpoints on a specific
-          node that is, [Node = Specific, Endpoint = Wildcard, Cluster =
-          Specific, Event = Specific]."
+          "Step 4: TH sends Read Request Message to DUT with EventRequests set
+          to a specific event from a specific cluster on all endpoints on a
+          specific node that is, [Node = Specific, Endpoint = Wildcard, Cluster
+          = Specific, Event = Specific]."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
-
-          sudo ./chip-tool basic read-event start-up 1  0xFFFF
+          ./chip-tool  basicinformation read-event start-up 1  0xFFFF
 
           On TH(chip-tool), verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
 
@@ -223,14 +216,12 @@ tests:
       disabled: true
 
     - label:
-          "TH sends Read Request Message to DUT with EventRequests set to all
-          events from a specific cluster on all endpoints on a specific node
-          that is, [Node = Specific, Endpoint = Wildcard, Cluster = Specific,
-          Event = Wildcard]."
+          "Step 5: TH sends Read Request Message to DUT with EventRequests set
+          to all events from a specific cluster on all endpoints on a specific
+          node that is, [Node = Specific, Endpoint = Wildcard, Cluster =
+          Specific, Event = Wildcard]."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
-
-          sudo ./chip-tool basic read-event-by-id 0xFFFFFFFF 1  0xFFFF
+          ./chip-tool  basicinformation read-event-by-id 0xFFFFFFFF 1  0xFFFF
           On TH(chip-tool) verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
 
           [1653051699.893049][11691:11696] CHIP:DMG: ReportDataMessage =
@@ -274,12 +265,12 @@ tests:
       disabled: true
 
     - label:
-          "TH sends Read Request Message to DUT with EventRequests set to all
-          events from all clusters on all endpoints on a specific node that is,
-          [Node = Specific, Endpoint = Wildcard, Cluster = Wildcard, Event =
-          Wildcard]."
+          "Step 6: TH sends Read Request Message to DUT with EventRequests set
+          to all events from all clusters on all endpoints on a specific node
+          that is, [Node = Specific, Endpoint = Wildcard, Cluster = Wildcard,
+          Event = Wildcard]."
       verification: |
-          sudo ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1  0xFFFF
+          ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1  0xFFFF
           On TH(chip-tool) verify DUT sends  Report Data Message with the data for specific event in Read Request Message.
           [1653051769.144914][11706:11711] CHIP:DMG: ReportDataMessage =
           [1653051769.144939][11706:11711] CHIP:DMG: {
@@ -404,19 +395,17 @@ tests:
       disabled: true
 
     - label:
-          "TH sends Read Request Message to DUT with EventRequests set to path
-          which indicates a cluster event that is not supported."
+          "Step 7: TH sends Read Request Message to DUT with EventRequests set
+          to path which indicates a cluster event that is not supported."
       verification: |
           Mark this as not testable /NA. Out of Scope for V1.0
       disabled: true
 
     - label:
-          "TH sends Read Request Message to DUT with EventRequests set to path
-          which requires a privilege that is not granted for the cluster in the
-          path."
+          "Step 8: TH sends Read Request Message to DUT with EventRequests set
+          to path which requires a privilege that is not granted for the cluster
+          in the path."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
-
           To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except ACL cluster command if try to send any other command will get status as unsupported access
 
@@ -467,7 +456,7 @@ tests:
 
            ./chip-tool any read-event-by-id 0x28 0 1 0
 
-          verify DUT is responsds with UNSUPPORTED_ACCESS  for the data sent in the above command
+          verify DUT is responds with UNSUPPORTED_ACCESS  for the data sent in the above command
 
           [1653054249.514825][12265:12270] CHIP:DMG: ReportDataMessage =
           [1653054249.514833][12265:12270] CHIP:DMG: {
@@ -505,13 +494,13 @@ tests:
       disabled: true
 
     - label:
-          "TH sends Read Request Message to DUT with EventRequests set to
-          Wildcard path where reading an event in the path requires a privilege
-          that is not granted for the cluster in the path."
+          "Step 9: TH sends Read Request Message to DUT with EventRequests set
+          to Wildcard path where reading an event in the path requires a
+          privilege that is not granted for the cluster in the path."
       verification: |
           To Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
 
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [11223344], "targets": null}]' 1 0
           ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
           On TH(chip-tool) verify DUT sends Report Data Message with no entry for that event in EventReports list.
 
@@ -526,13 +515,13 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a Read Request Message to the DUT to read back events. Note
-          down the largest event number received in the report data message sent
-          back from the DUT. TH sends Read Request Message to DUT with the
-          EventMin field set to a number less than what was received in the
-          previous step."
+          "Step 10: TH sends a Read Request Message to the DUT to read back
+          events. Note down the largest event number received in the report data
+          message sent back from the DUT. TH sends Read Request Message to DUT
+          with the EventMin field set to a number less than what was received in
+          the previous step."
       verification: |
-          sudo ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
+          ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
 
 
           On TH(chip-tool) verify that the DUT sends Report Data Message with EventReports
@@ -565,9 +554,9 @@ tests:
           [1655986008.401906][4813:4818] CHIP:TOO:    }
           [1655986008.402045][4813:4818] CHIP:EM: Sending Standalone Ack for MessageCounter:51662085 on exchange 4386i
 
-          sudo ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF --event-min 0
+          ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF --event-min 0
 
-          On TH verify that the DUT sends Report Data Message with EventReports for event numbers higher than the EventMin field.
+          On TH verify that the DUT sends Report Data Message with EventReports for event numbers higher than or Equal to the EventMin field.
 
           [1655986113.735628][4843:4848] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
           [1655986113.735661][4843:4848] CHIP:TOO:          Event number: 0
@@ -598,14 +587,13 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a Read Request Message to the DUT to read back events. Note
-          down the largest event number received in the report data message sent
-          back from the DUT. TH sends Read Request Message to DUT with the
-          EventMin field set to a number much greater than what was received in
-          the previous step."
+          "Step 11: TH sends a Read Request Message to the DUT to read back
+          events. Note down the largest event number received in the report data
+          message sent back from the DUT. TH sends Read Request Message to DUT
+          with the EventMin field set to a number much greater than what was
+          received in the previous step."
       verification: |
-          The cluster used in the below command is an example, User can use any supported chip cluster.
-          sudo ./chip-tool basic read-event start-up 1 0 --event-min 131073
+          ./chip-tool  basicinformation read-event start-up 1 0 --event-min 131073
 
           On TH(chip-tool) verify that the DUT sends  Report Data Message with empty EventReports
           [1650622225.700153][3069:3074] CHIP:DMG: ReportDataMessage =
@@ -616,9 +604,9 @@ tests:
       disabled: true
 
     - label:
-          "[Testing Chunked Event Data] TH sends Read Request Message to DUT
-          with EventRequests set to all events so as to create a very large
-          event data. For every chunked data message received, DUT sends a
+          "Step 12: [Testing Chunked Event Data] TH sends Read Request Message
+          to DUT with EventRequests set to all events so as to create a very
+          large event data. For every chunked data message received, DUT sends a
           status response."
       verification: |
           Try to verify this step in  doorlock app, below mentioned  wildcard command to  read-event  from TH to DUT.

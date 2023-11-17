@@ -53,7 +53,7 @@ CHIP_ERROR ClusterPathIB::Parser::PrettyPrint() const
             {
                 NodeId node;
                 reader.Get(node);
-                PRETTY_PRINT("\tNode = 0x%" PRIx64 ",", node);
+                PRETTY_PRINT("\tNode = 0x" ChipLogFormatX64 ",", ChipLogValueX64(node));
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -117,7 +117,7 @@ ClusterPathIB::Builder & ClusterPathIB::Builder::Node(const NodeId aNode)
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kNode)), aNode);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kNode), aNode);
     }
     return *this;
 }
@@ -127,7 +127,7 @@ ClusterPathIB::Builder & ClusterPathIB::Builder::Endpoint(const EndpointId aEndp
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kEndpoint)), aEndpoint);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kEndpoint), aEndpoint);
     }
     return *this;
 }
@@ -137,15 +137,15 @@ ClusterPathIB::Builder & ClusterPathIB::Builder::Cluster(const ClusterId aCluste
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kCluster)), aCluster);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kCluster), aCluster);
     }
     return *this;
 }
 
-ClusterPathIB::Builder & ClusterPathIB::Builder::EndOfClusterPathIB()
+CHIP_ERROR ClusterPathIB::Builder::EndOfClusterPathIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

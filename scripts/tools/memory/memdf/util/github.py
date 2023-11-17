@@ -18,13 +18,11 @@
 import itertools
 import logging
 import os
-
 from typing import Iterable, Mapping, Optional
 
 import dateutil  # type: ignore
 import dateutil.parser  # type: ignore
 import ghapi.all  # type: ignore
-
 from memdf import Config, ConfigDescription
 
 
@@ -132,7 +130,7 @@ class Gh:
             page = 0
             for i in ghapi.all.paged(
                     self.ghapi.actions.list_artifacts_for_repo,
-                    per_page):
+                    per_page=per_page):
                 if not i.artifacts:
                     break
                 for a in i.artifacts:

@@ -4,6 +4,7 @@
 
 -   [Android - Building](./android_building.md)
 -   [Apple - Testing with iPhone, iPad, macOS, Apple TV, HomePod, Watch, etc](./darwin.md)
+-   [ASR - Getting Started Guide](./asr_getting_started_guide.md)
 -   [Espressif (ESP32) - Getting Started Guide](./esp32/README.md)
 -   [Infineon PSoC6 - Software Update](./infineon_psoc6_software_update.md)
 -   [Linux - Simulated Devices](./simulated_device_linux.md)
@@ -21,7 +22,13 @@
 -   [Silicon Labs - Documentation](https://github.com/SiliconLabs/matter#readme)
 -   [Silicon Labs - Building](./silabs_efr32_building.md)
 -   [Silicon Labs - Software Update](./silabs_efr32_software_update.md)
--   [TI - Platform Overview](./ti_platform_overview.md)
+-   [STMicroelectronics (STM32)](./stm32_getting_started_guide.md)
+-   [TI - Platform Overview](./ti/ti_platform_overview.md)
+-   [Open IoT SDK - Platform Overview](./openiotsdk_platform_overview.md)
+-   [Open IoT SDK - Examples](./openiotsdk_examples.md)
+-   [Open IoT SDK - Unit Tests](./openiotsdk_unit_tests.md)
+-   [Open IoT SDK - Commissioning](./openiotsdk_commissioning.md)
+-   [Open IoT SDK - Software Update](./openiotsdk_examples_software_update.md)
 
 ## Development Guides
 

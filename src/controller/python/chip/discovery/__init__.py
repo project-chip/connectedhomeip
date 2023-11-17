@@ -14,16 +14,15 @@
 #    limitations under the License.
 #
 
-import logging
-import time
-import threading
 import enum
-
+import logging
+import threading
+import time
 from dataclasses import dataclass
-from typing import List, Dict, Set, Callable
+from typing import Callable, List, Optional, Set
 
 from chip.discovery.library_handle import _GetDiscoveryLibraryHandle
-from chip.discovery.types import DiscoverSuccessCallback_t, DiscoverFailureCallback_t
+from chip.discovery.types import DiscoverFailureCallback_t, DiscoverSuccessCallback_t
 from chip.native import PyChipError
 
 
@@ -86,8 +85,11 @@ class CommissionableNode():
     pairingHint: int = None
     mrpRetryIntervalIdle: int = None
     mrpRetryIntervalActive: int = None
+    mrpRetryActiveThreshold: int = None
     supportsTcp: bool = None
+    isICDOperatingAsLIT: bool = None
     addresses: List[str] = None
+    rotatingId: Optional[str] = None
 
 
 # Milliseconds to wait for additional results onece a single result has
@@ -142,7 +144,7 @@ class _PendingDiscoveries:
                     if self.NeedsCallback(item):
                         try:
                             item.callback(item.result)
-                        except:
+                        except Exception:
                             logging.exception("Node discovery callback failed")
                     else:
                         updatedDiscoveries.append(item)

@@ -38,22 +38,22 @@ tests:
       PICS: MEDIAPLAYBACK.S.C01.Rsp
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
-    - label: "Reads the CurrentState attribute from the DUT"
+    - label: "Step 1: Reads the CurrentState attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
-    - label: "Sends a Play command to the DUT"
+    - label: "Step 2: Sends a Play command to the DUT"
       PICS: MEDIAPLAYBACK.S.C00.Rsp
       command: "Play"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the media state is playing"
@@ -67,19 +67,19 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the CurrentState attribute"
+    - label: "Step 3: Reads the CurrentState attribute"
       PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 0
 
-    - label: "Sends a StartOver command to the DUT"
+    - label: "Step 4: Sends a StartOver command to the DUT"
       PICS: MEDIAPLAYBACK.S.C03.Rsp
       command: "StartOver"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the media is started over"
@@ -93,12 +93,12 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Sends a Next command to the DUT"
+    - label: "Step 5: Sends a Next command to the DUT"
       PICS: MEDIAPLAYBACK.S.C05.Rsp
       command: "Next"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the next media item in the queue has been loaded"
@@ -113,12 +113,12 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Sends a Previous command to the DUT"
+    - label: "Step 6: Sends a Previous command to the DUT"
       PICS: MEDIAPLAYBACK.S.C04.Rsp
       command: "Previous"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the previous media item in the queue has been loaded"
@@ -134,7 +134,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Sends a SkipForward command to the DUT "
+    - label: "Step 7: Sends a SkipForward command to the DUT "
       PICS: MEDIAPLAYBACK.S.C08.Rsp
       command: "SkipForward"
       arguments:
@@ -143,7 +143,7 @@ tests:
                 value: 10000
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the media has skipped forward 10 seconds"
@@ -158,14 +158,14 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the SampledPosition attribute from the DUT"
+    - label: "Step 8: Reads the SampledPosition attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0003 && MEDIAPLAYBACK.S.C08.Rsp
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
-          value: 10000
+          value: { "Position": 10000 }
 
-    - label: "Sends a SkipBackward command to the DUT "
+    - label: "Step 9: Sends a SkipBackward command to the DUT "
       PICS: MEDIAPLAYBACK.S.C09.Rsp
       command: "SkipBackward"
       arguments:
@@ -174,7 +174,7 @@ tests:
                 value: 10000
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the media has skipped backward 10 seconds"
@@ -189,9 +189,9 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the SampledPosition attribute from the DUT"
+    - label: "Step 10: Reads the SampledPosition attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0003 && MEDIAPLAYBACK.S.C09.Rsp
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
-          value: 0
+          value: { "Position": 0 }

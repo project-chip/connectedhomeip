@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include <functional>
-#include <inttypes.h>
+#include <cstdint>
+#include <cstring>
 
 #include <lib/core/CHIPError.h>
 
@@ -66,7 +66,6 @@ public:
     static const Key kConfigKey_ServiceId;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
-    static const Key kConfigKey_WiFiStationSecType;
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
@@ -75,6 +74,9 @@ public:
     static const Key kConfigKey_Spake2pVerifier;
     static const Key kConfigKey_VendorId;
     static const Key kConfigKey_ProductId;
+
+    static const Key kCounterKey_TotalOperationalHours;
+    static const Key kCounterKey_BootReason;
 
     static CHIP_ERROR Init(void);
 

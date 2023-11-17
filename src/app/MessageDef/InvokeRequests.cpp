@@ -79,10 +79,10 @@ CommandDataIB::Builder & InvokeRequests::Builder::CreateCommandData()
     return mCommandData;
 }
 
-InvokeRequests::Builder & InvokeRequests::Builder::EndOfInvokeRequests()
+CHIP_ERROR InvokeRequests::Builder::EndOfInvokeRequests()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

@@ -50,7 +50,7 @@ static_library("qpg") {
     "qpgConfig.h",
   ]
 
-  deps = []
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
 
   public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
 
@@ -82,7 +82,11 @@ static_library("qpg") {
     ]
 
     if (chip_mdns == "platform") {
-      sources += [ "../OpenThread/DnssdImpl.cpp" ]
+      sources += [
+        "../OpenThread/DnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.h",
+      ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }

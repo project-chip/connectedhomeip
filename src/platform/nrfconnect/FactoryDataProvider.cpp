@@ -19,12 +19,12 @@
 #include "CHIPDevicePlatformConfig.h"
 #include <crypto/CHIPCryptoPAL.h>
 
-#if CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
+#ifdef CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
 #include <credentials/CertificationDeclaration.h>
 #include <platform/Zephyr/ZephyrConfig.h>
 #endif
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 
 namespace chip {
 namespace {
@@ -81,7 +81,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
         return error;
     }
 
-    if (!ParseFactoryData(factoryData, factoryDataSize, &mFactoryData))
+    if (!ParseFactoryData(factoryData, static_cast<uint16_t>(factoryDataSize), &mFactoryData))
     {
         ChipLogError(DeviceLayer, "Failed to parse factory data");
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -101,7 +101,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
 template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
-#if CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
+#ifdef CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
     size_t cdLen = 0;
 
     if (Internal::ZephyrConfig::ReadConfigValueBin(Internal::ZephyrConfig::kConfigKey_CertificationDeclaration,
@@ -323,6 +323,8 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetRotatingDeviceIdUniqueId(Mu
 
     memcpy(uniqueIdSpan.data(), mFactoryData.rd_uid.data, mFactoryData.rd_uid.len);
 
+    uniqueIdSpan.reduce_size(mFactoryData.rd_uid.len);
+
     return CHIP_NO_ERROR;
 }
 
@@ -335,6 +337,53 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetEnableKey(MutableByteSpan &
     memcpy(enableKey.data(), mFactoryData.enable_key.data, mFactoryData.enable_key.len);
 
     enableKey.reduce_size(mFactoryData.enable_key.len);
+
+    return CHIP_NO_ERROR;
+}
+
+template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish)
+{
+    ReturnErrorCodeIf(!finish, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!mFactoryData.productFinishPresent, CHIP_ERROR_NOT_IMPLEMENTED);
+    *finish = static_cast<app::Clusters::BasicInformation::ProductFinishEnum>(mFactoryData.product_finish);
+
+    return CHIP_NO_ERROR;
+}
+
+template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor)
+{
+    ReturnErrorCodeIf(!primaryColor, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!mFactoryData.primaryColorPresent, CHIP_ERROR_NOT_IMPLEMENTED);
+
+    *primaryColor = static_cast<app::Clusters::BasicInformation::ColorEnum>(mFactoryData.primary_color);
+
+    return CHIP_NO_ERROR;
+}
+
+template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetUserData(MutableByteSpan & userData)
+{
+    ReturnErrorCodeIf(!mFactoryData.user.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    ReturnErrorCodeIf(userData.size() < mFactoryData.user.len, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(userData.data(), mFactoryData.user.data, mFactoryData.user.len);
+
+    userData.reduce_size(mFactoryData.user.len);
+
+    return CHIP_NO_ERROR;
+}
+
+template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetUserKey(const char * userKey, void * buf, size_t & len)
+{
+    ReturnErrorCodeIf(!mFactoryData.user.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    ReturnErrorCodeIf(!buf, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    bool success = FindUserDataEntry(&mFactoryData, userKey, buf, len, &len);
+
+    ReturnErrorCodeIf(!success, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     return CHIP_NO_ERROR;
 }

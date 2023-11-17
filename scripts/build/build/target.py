@@ -42,10 +42,10 @@ import itertools
 import logging
 import os
 import re
-
 from dataclasses import dataclass
-from typing import Any, Dict, List, Iterable, Optional
+from typing import Any, Dict, Iterable, List, Optional
 
+from builders.builder import BuilderOptions
 
 report_rejected_parts = True
 
@@ -94,6 +94,27 @@ class TargetPart:
                 return False
 
         return True
+
+    def ToDict(self):
+        """Converts a TargetPart into a dictionary
+        """
+
+        result: Dict[str, str] = {}
+        result['name'] = self.name
+
+        build_arguments: Dict[str, str] = {}
+        for key, value in self.build_arguments.items():
+            build_arguments[key] = str(value)
+
+        result['build_arguments'] = build_arguments
+
+        if self.only_if_re is not None:
+            result['only_if_re'] = str(self.only_if_re.pattern)
+
+        if self.except_if_re is not None:
+            result['except_if_re'] = str(self.except_if_re.pattern)
+
+        return result
 
 
 def _HasVariantPrefix(value: str, prefix: str):
@@ -264,6 +285,44 @@ class BuildTarget:
 
         return result
 
+    def ToDict(self):
+        """Outputs a parseable description of the available variants
+        and modifiers:
+
+            like:
+
+            {
+                "name": "foo"
+                "shorthand": "foo-bar-baz[-m1]"
+                "parts": [
+                    {
+                        "name": "foo",
+                        "build_arguments": {
+                            "board": "bar"
+                        }
+                    }
+                    {
+                        "name": "baz",
+                        "build_arguments": {
+                            "app": "foo.baz"
+                        }
+                    }
+                ],
+                "modifiers": [
+                    {
+                        "name": "modifier1",
+                        "m1": "True"
+                    }
+                ]
+            }
+        """
+        return {
+            'name': self.name,
+            'shorthand': self.HumanString(),
+            'parts': [[part.ToDict() for part in target] for target in self.fixed_targets],
+            'modifiers': [part.ToDict() for part in self.modifiers]
+        }
+
     def AllVariants(self) -> Iterable[str]:
         """Returns all possible accepted variants by this target.
 
@@ -330,7 +389,7 @@ class BuildTarget:
         return _StringIntoParts(value, suffix, self.fixed_targets, self.modifiers)
 
     def Create(self, name: str, runner, repository_path: str, output_prefix: str,
-               enable_flashbundle: bool):
+               builder_options: BuilderOptions):
 
         parts = self.StringIntoTargetParts(name)
 
@@ -348,6 +407,6 @@ class BuildTarget:
         builder.identifier = name
         builder.output_dir = os.path.join(output_prefix, name)
         builder.chip_dir = repository_path
-        builder.enable_flashbundle(enable_flashbundle)
+        builder.options = builder_options
 
         return builder

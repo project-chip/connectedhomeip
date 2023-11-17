@@ -24,7 +24,7 @@
 #include <zephyr/usb/usb_device.h>
 #endif
 
-LOG_MODULE_REGISTER(app, CONFIG_MATTER_LOG_LEVEL);
+LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
 

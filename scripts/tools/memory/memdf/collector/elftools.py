@@ -17,16 +17,14 @@
 
 import pathlib
 
-from elftools.elf.elffile import ELFFile  # type: ignore
+import elftools.elf.constants  # type: ignore
 import elftools.elf.descriptions  # type: ignore
 import elftools.elf.sections  # type: ignore
-import elftools.elf.constants  # type: ignore
-
 import memdf.name
-
+from elftools.elf.elffile import ELFFile  # type: ignore
 from memdf.collector.util import simplify_source
+from memdf.df import DFs, SectionDF, SegmentDF, SymbolDF
 from memdf.util.config import Config, ConfigDescription
-from memdf.df import DFs, SegmentDF, SectionDF, SymbolDF
 
 CONFIG: ConfigDescription = {}
 

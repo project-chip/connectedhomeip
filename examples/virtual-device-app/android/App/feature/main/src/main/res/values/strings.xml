@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_main" translatable="false">Matter Virtual Device</string>
+    <string name="title_loading" translatable="false">Loading</string>
+    <string name="description_loading">Commissioning in process.</string>
+
+    <string name="dialog_force_factory_reset_message">"The last commissioning was not completed. The Matter device app will be reset and closed."</string>    
+    <string name="dialog_timeout_factory_reset_message">"The commissioning timed out. The Matter device app will be reset and closed."</string>
+</resources>

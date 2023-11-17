@@ -118,7 +118,8 @@ void TestSecureSessionTable::CreateSessionTable(std::vector<SessionParameters> &
 
         session.Value()->AsSecureSession()->Activate(
             ScopedNodeId(1, sessionParams[i].mPeer.GetFabricIndex()), sessionParams[i].mPeer, CATValues(), static_cast<uint16_t>(i),
-            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(0), System::Clock::Milliseconds32(0)));
+            ReliableMessageProtocolConfig(System::Clock::Milliseconds32(0), System::Clock::Milliseconds32(0),
+                                          System::Clock::Milliseconds16(0)));
         session.Value()->AsSecureSession()->mLastActivityTime = sessionParams[i].mLastActivityTime;
         session.Value()->AsSecureSession()->mState            = sessionParams[i].mState;
 

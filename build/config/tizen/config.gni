@@ -13,9 +13,9 @@
 # limitations under the License.
 
 declare_args() {
-  # Location of The Tizen sysroot
-  tizen_sdk_sysroot = ""
-
-  # Location of the Tizen SDK.
+  # Location of Tizen SDK
   tizen_sdk_root = ""
+
+  # Location of Tizen SDK sysroot
+  tizen_sdk_sysroot = ""
 }

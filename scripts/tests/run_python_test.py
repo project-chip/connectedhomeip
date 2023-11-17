@@ -14,13 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
-import coloredlogs
 import datetime
 import logging
 import os
-import pathlib
-import pty
+import os.path
 import queue
 import re
 import shlex
@@ -31,6 +28,8 @@ import threading
 import time
 import typing
 
+import click
+import coloredlogs
 from colorama import Fore, Style
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
@@ -46,7 +45,7 @@ def EnqueueLogOutput(fp, tag, q):
             try:
                 timestamp = float(line[1:18].decode())
                 line = line[19:]
-            except Exception as ex:
+            except Exception:
                 pass
         sys.stdout.buffer.write(
             (f"[{datetime.datetime.fromtimestamp(timestamp).isoformat(sep=' ')}]").encode() + tag + line)
@@ -69,21 +68,37 @@ def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: st
 
 
 @click.command()
-@click.option("--app", type=click.Path(exists=True), default=None, help='Path to local application to use, omit to use external apps.')
-@click.option("--factoryreset", is_flag=True, help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.')
-@click.option("--app-args", type=str, default='', help='The extra arguments passed to the device.')
-@click.option("--script", type=click.Path(exists=True), default=os.path.join(DEFAULT_CHIP_ROOT, 'src', 'controller', 'python', 'test', 'test_scripts', 'mobile-device-test.py'), help='Test script to use.')
-@click.option("--script-args", type=str, default='', help='Path to the test script to use, omit to use the default test script (mobile-device-test.py).')
-@click.option("--script-gdb", is_flag=True, help='Run script through gdb')
-def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: str, script_gdb: bool):
-    if factoryreset:
+@click.option("--app", type=click.Path(exists=True), default=None,
+              help='Path to local application to use, omit to use external apps.')
+@click.option("--factoryreset", is_flag=True,
+              help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.')
+@click.option("--factoryreset-app-only", is_flag=True,
+              help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests, but not the controller config')
+@click.option("--app-args", type=str, default='',
+              help='The extra arguments passed to the device. Can use placholders like {SCRIPT_BASE_NAME}')
+@click.option("--script", type=click.Path(exists=True), default=os.path.join(DEFAULT_CHIP_ROOT,
+                                                                             'src',
+                                                                             'controller',
+                                                                             'python',
+                                                                             'test',
+                                                                             'test_scripts',
+                                                                             'mobile-device-test.py'), help='Test script to use.')
+@click.option("--script-args", type=str, default='',
+              help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
+@click.option("--script-gdb", is_flag=True,
+              help='Run script through gdb')
+def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str, script: str, script_args: str, script_gdb: bool):
+    app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
+    script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
+
+    if factoryreset or factoryreset_app_only:
         # Remove native app config
         retcode = subprocess.call("rm -rf /tmp/chip* /tmp/repl*", shell=True)
         if retcode != 0:
             raise Exception("Failed to remove /tmp/chip* for factory reset.")
 
         print("Contents of test directory: %s" % os.getcwd())
-        print(subprocess.check_output(["ls -l"], shell=True).decode('us-ascii'))
+        print(subprocess.check_output(["ls -l"], shell=True).decode('utf-8'))
 
         # Remove native app KVS if that was used
         kvs_match = re.search(r"--KVS (?P<kvs_path>[^ ]+)", app_args)
@@ -94,6 +109,7 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
             if retcode != 0:
                 raise Exception("Failed to remove %s for factory reset." % kvs_path_to_remove)
 
+    if factoryreset:
         # Remove Python test admin storage if provided
         storage_match = re.search(r"--storage-path (?P<storage_path>[^ ]+)", script_args)
         if storage_match:
@@ -125,10 +141,12 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
 
     if script_gdb:
         #
-        # When running through Popen, we need to preserve some space-delimited args to GDB as a single logical argument. To do that, let's use '|' as a placeholder
-        # for the space character so that the initial split will not tokenize them, and then replace that with the space char there-after.
+        # When running through Popen, we need to preserve some space-delimited args to GDB as a single logical argument.
+        # To do that, let's use '|' as a placeholder for the space character so that the initial split will not tokenize them,
+        # and then replace that with the space char there-after.
         #
-        script_command = "gdb -batch -return-child-result -q -ex run -ex thread|apply|all|bt --args python3".split() + script_command
+        script_command = ("gdb -batch -return-child-result -q -ex run -ex "
+                          "thread|apply|all|bt --args python3".split() + script_command)
     else:
         script_command = "/usr/bin/env python3".split() + script_command
 
@@ -164,4 +182,4 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
 
 
 if __name__ == '__main__':
-    main()
+    main(auto_envvar_prefix='CHIP')

@@ -25,8 +25,9 @@
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <static-supported-temperature-levels.h>
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
 
@@ -41,6 +42,10 @@ static events::EventQueue sAppEventQueue;
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials;
+
+namespace {
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+}
 
 AppTask AppTask::sAppTask;
 
@@ -84,7 +89,7 @@ int AppTask::Init()
         ChipLogError(NotSpecified, "DFU manager initialization failed: %s", error.AsString());
         return EXIT_FAILURE;
     }
-
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
     return 0;
 }
 

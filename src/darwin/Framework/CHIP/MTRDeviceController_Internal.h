@@ -29,6 +29,16 @@
 
 #import "MTRBaseDevice.h"
 #import "MTRDeviceController.h"
+#import "MTRDeviceControllerDataStore.h"
+
+#import <Matter/MTRDefines.h>
+#import <Matter/MTRDeviceControllerStartupParams.h>
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+#import <Matter/MTRDeviceControllerStorageDelegate.h>
+#else
+#import "MTRDeviceControllerStorageDelegate_Wrapper.h"
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+#import <Matter/MTROTAProviderDelegate.h>
 
 @class MTRDeviceControllerStartupParamsInternal;
 @class MTRDeviceControllerFactory;
@@ -44,7 +54,14 @@ namespace Controller {
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRDeviceController (InternalMethods)
+@interface MTRDeviceController ()
+
+#if !MTR_PER_CONTROLLER_STORAGE_ENABLED
+/**
+ * The ID assigned to this controller at creation time.
+ */
+@property (readonly, nonatomic) NSUUID * uniqueIdentifier;
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #pragma mark - MTRDeviceControllerFactory methods
 
@@ -62,16 +79,41 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Will return chip::kUndefinedFabricIndex if we do not have a fabric index.
- * This property MUST be gotten from the Matter work queue.
  */
 @property (readonly) chip::FabricIndex fabricIndex;
+
+/**
+ * Will return the compressed fabric id of the fabric if the controller is
+ * running, else nil.
+ *
+ * This property MUST be gotten from the Matter work queue.
+ */
+@property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
+
+/**
+ * The per-controller data store this controller was initialized with, if any.
+ */
+@property (nonatomic, readonly, nullable) MTRDeviceControllerDataStore * controllerDataStore;
+
+/**
+ * OTA delegate and its queue, if this controller supports OTA.  Either both
+ * will be non-nil or both will be nil.
+ */
+@property (nonatomic, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
+@property (nonatomic, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
 
 /**
  * Init a newly created controller.
  *
  * Only MTRDeviceControllerFactory should be calling this.
  */
-- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory queue:(dispatch_queue_t)queue;
+- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
+                          queue:(dispatch_queue_t)queue
+                storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+           storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
+            otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
+       otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
+               uniqueIdentifier:(NSUUID *)uniqueIdentifier;
 
 /**
  * Check whether this controller is running on the given fabric, as represented
@@ -108,31 +150,42 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Ensure we have a CASE session to the given node ID and then call the provided
  * connection callback.  This may be called on any queue (including the Matter
- * event queue) and will always call the provided connection callback on the
- * Matter queue, asynchronously.  Consumers must be prepared to run on the
- * Matter queue (an in particular must not use any APIs that will try to do sync
- * dispatch to the Matter queue).
+ * event queue) and on success will always call the provided connection callback
+ * on the Matter queue, asynchronously.  Consumers must be prepared to run on
+ * the Matter queue (an in particular must not use any APIs that will try to do
+ * sync dispatch to the Matter queue).
  *
- * If the controller is not running when this function is called, will return NO
- * and never invoke the completion.  If the controller is not running when the
- * async dispatch on the Matter queue would happen, an error will be dispatched
- * to the completion handler.
+ * If the controller is not running when this function is called, it will
+ * synchronously invoke the completion with an error, on whatever queue
+ * getSessionForNode was called on.
+ *
+ * If the controller is not running when the async dispatch on the Matter queue
+ * happens, the completion will be invoked with an error on the Matter queue.
  */
-- (BOOL)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
+- (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
  * Get a session for the commissionee device with the given device id.  This may
- * be called on any queue (including the Matter event queue) and will always
- * call the provided connection callback on the Matter queue, asynchronously.
- * Consumers must be prepared to run on the Matter queue (an in particular must
- * not use any APIs that will try to do sync dispatch to the Matter queue).
+ * be called on any queue (including the Matter event queue) and on success will
+ * always call the provided connection callback on the Matter queue,
+ * asynchronously.  Consumers must be prepared to run on the Matter queue (an in
+ * particular must not use any APIs that will try to do sync dispatch to the
+ * Matter queue).
  *
- * If the controller is not running when this function is called, will return NO
- * and never invoke the completion.  If the controller is not running when the
- * async dispatch on the Matter queue would happen, an error will be dispatched
- * to the completion handler.
+ * If the controller is not running when this function is called, it will
+ * synchronously invoke the completion with an error, on whatever queue
+ * getSessionForCommissioneeDevice was called on.
+ *
+ * If the controller is not running when the async dispatch on the Matter queue
+ * happens, the completion will be invoked with an error on the Matter queue.
  */
-- (BOOL)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion;
+- (void)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion;
+
+/**
+ * Returns the transport used by the current session with the given device,
+ * or `MTRTransportTypeUndefined` if no session is currently active.
+ */
+- (MTRTransportType)sessionTransportTypeForDevice:(MTRBaseDevice *)device;
 
 /**
  * Invalidate the CASE session for the given node ID.  This is a temporary thing
@@ -150,9 +203,22 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * The DeviceCommissioner pointer passed to the callback should only be used
  * synchronously during the callback invocation.
+ *
+ * If the error handler is nil, failure to run the block will be silent.
  */
-- (void)asyncDispatchToMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
-                      errorHandler:(void (^)(NSError *))errorHandler;
+- (void)asyncGetCommissionerOnMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
+                             errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
+
+/**
+ * Try to asynchronously dispatch the given block on the Matter queue.  If the
+ * controller is not running either at call time or when the block would be
+ * about to run, the provided error handler will be called with an error.  Note
+ * that this means the error handler might be called on an arbitrary queue, and
+ * might be called before this function returns or after it returns.
+ *
+ * If the error handler is nil, failure to run the block will be silent.
+ */
+- (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
 
 /**
  * Get an MTRBaseDevice for the given node id.  This exists to allow subclasses
@@ -160,6 +226,12 @@ NS_ASSUME_NONNULL_BEGIN
  * sort of MTRBaseDevice they return.
  */
 - (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID;
+
+/**
+ * Notify the controller that a new operational instance with the given node id
+ * and a compressed fabric id that matches this controller has been observed.
+ */
+- (void)operationalInstanceAdded:(chip::NodeId)nodeID;
 
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages

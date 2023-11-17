@@ -114,5 +114,7 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * /*service*/, chip::Inet::InterfaceId 
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+void ChipDnssdResolveNoLongerNeeded(const char * instanceName) {}
+
 } // namespace Dnssd
 } // namespace chip

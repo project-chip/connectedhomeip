@@ -23,10 +23,16 @@
 
 #pragma once
 
+#include <lib/core/Global.h>
+#include <lib/support/CodeUtils.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 namespace chip {
 namespace DeviceLayer {
+
+class BleScannerDelegate;
+
 namespace Internal {
 
 using namespace chip::Ble;
@@ -42,6 +48,8 @@ class BLEManagerImpl final : public BLEManager, private BleLayer
 
 public:
     CHIP_ERROR ConfigureBle(uint32_t aNodeId, bool aIsCentral) { return CHIP_NO_ERROR; }
+    CHIP_ERROR StartScan(BleScannerDelegate * delegate = nullptr);
+    CHIP_ERROR StopScan();
 
 private:
     // ===== Members that implement the BLEManager internal interface.
@@ -63,7 +71,7 @@ private:
     friend BLEManager & BLEMgr(void);
     friend BLEManagerImpl & BLEMgrImpl(void);
 
-    static BLEManagerImpl sInstance;
+    static Global<BLEManagerImpl> sInstance;
 
     BleConnectionDelegate * mConnectionDelegate   = nullptr;
     BlePlatformDelegate * mPlatformDelegate       = nullptr;
@@ -78,7 +86,7 @@ private:
  */
 inline BLEManager & BLEMgr(void)
 {
-    return BLEManagerImpl::sInstance;
+    return BLEManagerImpl::sInstance.get();
 }
 
 /**
@@ -89,7 +97,7 @@ inline BLEManager & BLEMgr(void)
  */
 inline BLEManagerImpl & BLEMgrImpl(void)
 {
-    return BLEManagerImpl::sInstance;
+    return BLEManagerImpl::sInstance.get();
 }
 
 } // namespace Internal

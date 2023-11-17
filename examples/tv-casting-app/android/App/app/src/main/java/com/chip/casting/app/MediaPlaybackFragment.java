@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import com.chip.casting.ContentApp;
 import com.chip.casting.FailureCallback;
 import com.chip.casting.MatterError;
@@ -63,13 +64,16 @@ public class MediaPlaybackFragment extends Fragment {
             TextView currentStateValue = getView().findViewById(R.id.currentStateValue);
 
             SuccessCallback<MediaPlaybackTypes.PlaybackStateEnum> successCallback =
-                playbackStateEnum -> {
-                  Log.d(
-                      TAG,
-                      "handle() called on SuccessCallback<MediaPlaybackResponseTypes.PlaybackStateEnum> with "
-                          + playbackStateEnum);
-                  getActivity()
-                      .runOnUiThread(
+                new SuccessCallback<MediaPlaybackTypes.PlaybackStateEnum>() {
+                  @Override
+                  public void handle(MediaPlaybackTypes.PlaybackStateEnum playbackStateEnum) {
+                    Log.d(
+                        TAG,
+                        "handle() called on SuccessCallback<MediaPlaybackResponseTypes.PlaybackStateEnum> with "
+                            + playbackStateEnum);
+                    FragmentActivity fragmentActivity = getActivity();
+                    if (fragmentActivity != null) {
+                      fragmentActivity.runOnUiThread(
                           new Runnable() {
                             @Override
                             public void run() {
@@ -78,6 +82,8 @@ public class MediaPlaybackFragment extends Fragment {
                               }
                             }
                           });
+                    }
+                  }
                 };
 
             FailureCallback failureCallback =
@@ -97,18 +103,22 @@ public class MediaPlaybackFragment extends Fragment {
                 };
 
             SubscriptionEstablishedCallback subscriptionEstablishedCallback =
-                (SubscriptionEstablishedCallback)
-                    () -> {
-                      Log.d(TAG, "handle() called on SubscriptionEstablishedCallback");
-                      getActivity()
-                          .runOnUiThread(
-                              new Runnable() {
-                                @Override
-                                public void run() {
-                                  subscriptionStatus.setText("Subscription established!");
-                                }
-                              });
-                    };
+                new SubscriptionEstablishedCallback() {
+                  @Override
+                  public void handle() {
+                    Log.d(TAG, "handle() called on SubscriptionEstablishedCallback");
+                    FragmentActivity fragmentActivity = getActivity();
+                    if (fragmentActivity != null) {
+                      fragmentActivity.runOnUiThread(
+                          new Runnable() {
+                            @Override
+                            public void run() {
+                              subscriptionStatus.setText("Subscription established!");
+                            }
+                          });
+                    }
+                  }
+                };
 
             boolean retVal =
                 tvCastingApp.mediaPlayback_subscribeToCurrentState(

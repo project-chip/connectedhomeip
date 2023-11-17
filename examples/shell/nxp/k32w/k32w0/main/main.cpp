@@ -36,6 +36,10 @@
 #include "FreeRtosHooks.h"
 #include "app_config.h"
 
+#if PDM_SAVE_IDLE
+#include <openthread/platform/settings.h>
+#endif
+
 const uint16_t shell_task_size    = 3096;
 const uint8_t shell_task_priority = 0;
 
@@ -96,6 +100,12 @@ extern "C" void main_task(void const * argument)
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
+
+#if PDM_SAVE_IDLE
+    /* OT Settings needs to be initialized
+     * early as XCVR is making use of it */
+    otPlatSettingsInit(NULL, NULL, 0);
+#endif
 
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)

@@ -56,5 +56,6 @@ public interface BleManager {
   void onNotifyChipConnectionClosed(int connId);
 
   // BleConnectionDelegate
-  void onNewConnection(int discriminator);
+  void onNewConnection(
+      int discriminator, boolean isShortDiscriminator, long implPtr, long appStatePtr);
 }

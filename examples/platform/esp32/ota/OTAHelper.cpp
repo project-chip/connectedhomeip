@@ -49,6 +49,15 @@ chip::Optional<bool> gRequestorCanConsent;
 static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kUnknown;
 chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
 
+// WARNING: This is just an example for using key for decrypting the encrypted OTA image
+// Please do not use it as is for production use cases
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+extern const char sOTADecryptionKeyStart[] asm("_binary_esp_image_encryption_key_pem_start");
+extern const char sOTADecryptionKeyEnd[] asm("_binary_esp_image_encryption_key_pem_end");
+
+CharSpan sOTADecryptionKey(sOTADecryptionKeyStart, sOTADecryptionKeyEnd - sOTADecryptionKeyStart);
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
 } // namespace
 
 bool CustomOTARequestorDriver::CanConsent()
@@ -56,26 +65,27 @@ bool CustomOTARequestorDriver::CanConsent()
     return gRequestorCanConsent.ValueOr(DeviceLayer::ExtendedOTARequestorDriver::CanConsent());
 }
 
-static void InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
-{
-    SetRequestorInstance(&gRequestorCore);
-    gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
-    gImageProcessor.SetOTADownloader(&gDownloader);
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-
-    if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
-    {
-        gUserConsentProvider.SetUserConsentState(gUserConsentState);
-        gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
-    }
-}
-
 void OTAHelpers::InitOTARequestor()
 {
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec), InitOTARequestorHandler,
-                                                nullptr);
+    if (!GetRequestorInstance())
+    {
+        SetRequestorInstance(&gRequestorCore);
+        gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
+        gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+        gImageProcessor.SetOTADownloader(&gDownloader);
+        gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+        gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+        gImageProcessor.InitEncryptedOTA(sOTADecryptionKey);
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
+        if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
+        {
+            gUserConsentProvider.SetUserConsentState(gUserConsentState);
+            gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
+        }
+    }
 }
 
 namespace chip {

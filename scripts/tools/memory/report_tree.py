@@ -25,16 +25,13 @@ Use `--limit=size` to truncate the tree.
 
 import os
 import sys
-
-from typing import (Dict, Sequence, Optional)
+from typing import Dict, Optional, Sequence
 
 import anytree  # type: ignore
-
 import memdf.collect
 import memdf.name
 import memdf.report
 import memdf.select
-
 from memdf import Config, DFs, SymbolDF
 
 

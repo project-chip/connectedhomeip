@@ -15,16 +15,20 @@
  *    limitations under the License.
  */
 
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/ThreadStackManager.h>
-#include <platform/Tizen/NetworkCommissioningDriver.h>
-#include <platform/Tizen/ThreadStackManagerImpl.h>
+#include <cstdint>
+#include <cstring>
 
-#include <limits>
-#include <string>
-#include <vector>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
+#include <lib/support/ThreadOperationalDataset.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/ConnectivityManager.h>
+#include <platform/NetworkCommissioning.h>
+#include <platform/ThreadStackManager.h>
+
+#include "NetworkCommissioningDriver.h"
+#include "ThreadStackManagerImpl.h"
 
 namespace chip {
 namespace DeviceLayer {

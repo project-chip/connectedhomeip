@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,6 +17,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRBaseDevice.h>
+#import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
  * subscription returns.  Then reads can happen against the cache without going
  * out to the network.
  */
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRClusterStateCacheContainer : NSObject
 
 /**
@@ -55,7 +55,7 @@ MTR_NEWLY_AVAILABLE
 
 @end
 
-MTR_NEWLY_DEPRECATED("Please use MTRClusterStateCacheContainer")
+MTR_DEPRECATED("Please use MTRClusterStateCacheContainer", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRAttributeCacheContainer : NSObject
 
 - (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId

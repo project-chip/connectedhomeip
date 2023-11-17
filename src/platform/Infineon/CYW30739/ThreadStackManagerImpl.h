@@ -26,7 +26,8 @@
 
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
-#include <wiced_rtos.h>
+
+#include "EventFlags.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -45,6 +46,8 @@ public:
     // ===== Methods that implement the ThreadStackManager abstract interface.
     CHIP_ERROR _InitThreadStack();
 
+    void SignalThreadActivityPending();
+    void SignalThreadActivityPendingFromISR();
     inline bool IsCurrentTask(void) { return wiced_rtos_is_current_thread(mThread) == WICED_SUCCESS; }
 
 protected:
@@ -55,11 +58,6 @@ protected:
     bool _TryLockThreadStack();
     void _UnlockThreadStack();
 
-    // ===== Methods that override the GenericThreadStackManagerImpl_OpenThread abstract interface.
-
-    void _OnCHIPoBLEAdvertisingStart();
-    void _OnCHIPoBLEAdvertisingStop();
-
 private:
     // ===== Members for internal use by the following friends.
 
@@ -67,6 +65,7 @@ private:
     friend ThreadStackManagerImpl & ::chip::DeviceLayer::ThreadStackMgrImpl(void);
 
     wiced_thread_t * mThread;
+    EventFlags mEventFlags;
     wiced_mutex_t * mMutex;
     static ThreadStackManagerImpl sInstance;
 
@@ -75,6 +74,8 @@ private:
     void ThreadTaskMain(void);
 
     static void ThreadTaskMain(uint32_t arg);
+    static constexpr uint32_t kActivityPendingEventFlag        = 1 << 0;
+    static constexpr uint32_t kActivityPendingFromISREventFlag = 1 << 1;
 };
 
 /**

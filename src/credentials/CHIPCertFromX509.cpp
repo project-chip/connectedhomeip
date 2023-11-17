@@ -35,8 +35,8 @@
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
+#include <lib/core/TLV.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -61,25 +61,25 @@ static CHIP_ERROR ConvertValidity(ASN1Reader & reader, TLVWriter & writer)
 {
     CHIP_ERROR err;
     ASN1UniversalTime asn1Time;
-    uint32_t chipEpochTime;
+    uint32_t chipEpochTimeNotBefore;
+    uint32_t chipEpochTimeNotAfter;
 
     ASN1_PARSE_ENTER_SEQUENCE
     {
         ASN1_PARSE_TIME(asn1Time);
-
-        err = ASN1ToChipEpochTime(asn1Time, chipEpochTime);
-        SuccessOrExit(err);
-
-        err = writer.Put(ContextTag(kTag_NotBefore), chipEpochTime);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(ASN1ToChipEpochTime(asn1Time, chipEpochTimeNotBefore));
 
         ASN1_PARSE_TIME(asn1Time);
+        ReturnErrorOnFailure(ASN1ToChipEpochTime(asn1Time, chipEpochTimeNotAfter));
 
-        err = ASN1ToChipEpochTime(asn1Time, chipEpochTime);
-        SuccessOrExit(err);
+        // Perform this check if NotAfter value is different from Never-Expire value.
+        if (chipEpochTimeNotAfter != kNullCertTime)
+        {
+            VerifyOrReturnError(chipEpochTimeNotBefore < chipEpochTimeNotAfter, ASN1_ERROR_INVALID_ENCODING);
+        }
 
-        err = writer.Put(ContextTag(kTag_NotAfter), chipEpochTime);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(writer.Put(ContextTag(kTag_NotBefore), chipEpochTimeNotBefore));
+        ReturnErrorOnFailure(writer.Put(ContextTag(kTag_NotAfter), chipEpochTimeNotAfter));
     }
     ASN1_EXIT_SEQUENCE;
 

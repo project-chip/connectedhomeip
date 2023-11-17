@@ -37,30 +37,20 @@
 #define CHIP_DEVICE_CHIP0BLE_DEBUG 0
 #endif
 
+/**
+ * @def CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+ *
+ * Set unique id to maximum length if not defined to ensure the actual unique
+ * id is retrieved instead of the default one (if factory data read fails).
+ */
+#ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+#define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH 32
+#endif
+
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to the K32W platform.
 // These can be overridden by the application as needed.
-
-/**
- * @def CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
- *
- * The priority of the SoftDevice observer event handler registered by the
- * chip BleLayer.
- */
-#ifndef CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
-#define CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY 3
-#endif // CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
-
-/**
- * @def CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
- *
- * The SoftDevice BLE connection configuration tag used by the chip
- * BleLayer.
- */
-#ifndef CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
-#define CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG 1
-#endif // CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
 
 #ifndef CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION
 //-> format_version = 1
@@ -124,6 +114,16 @@
 #endif // CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
 
 /**
+ * @def CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
+ *
+ * Enables default OTA TLV factory data processor.
+ * Disabled by default.
+ */
+#ifndef CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
+#define CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR 0
+#endif // CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
+
+/**
  * @def CHIP_DEVICE_LAYER_ENABLE_PDM_LOGS
  *
  * Flag to enable PDM events logging. Disabled by default.
@@ -177,3 +177,5 @@
 #endif
 
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
+
+#include <platform/nxp/k32w/common/CHIPDevicePlatformRamStorageConfig.h>

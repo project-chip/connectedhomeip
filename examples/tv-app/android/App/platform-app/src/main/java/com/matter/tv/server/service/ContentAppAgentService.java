@@ -15,6 +15,8 @@ import com.matter.tv.app.api.IMatterAppAgent;
 import com.matter.tv.app.api.MatterIntentConstants;
 import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.receivers.ContentAppDiscoveryService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class ContentAppAgentService extends Service {
@@ -38,6 +40,8 @@ public class ContentAppAgentService extends Service {
   private static final int ATTRIBUTE_TIMEOUT = 2; // seconds
 
   private static ResponseRegistry responseRegistry = new ResponseRegistry();
+  private static ExecutorService executorService =
+      Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
   private final IBinder appAgentBinder =
       new IMatterAppAgent.Stub() {
@@ -76,8 +80,14 @@ public class ContentAppAgentService extends Service {
           ContentApp contentApp =
               ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApp(pkg);
           if (contentApp != null && contentApp.getEndpointId() != ContentApp.INVALID_ENDPOINTID) {
-            AppPlatformService.get()
-                .reportAttributeChange(contentApp.getEndpointId(), clusterId, attributeId);
+            // Make this call async so that even if the content apps make this call during command
+            // processing and synchronously, the command processing thread will not block for the
+            // chip stack lock.
+            executorService.execute(
+                () -> {
+                  AppPlatformService.get()
+                      .reportAttributeChange(contentApp.getEndpointId(), clusterId, attributeId);
+                });
             return true;
           }
           Log.e(TAG, "No matter content app found for package " + pkg);
@@ -97,12 +107,12 @@ public class ContentAppAgentService extends Service {
   }
 
   public static String sendCommand(
-      Context context, String packageName, int clusterId, int commandId, String payload) {
+      Context context, String packageName, long clusterId, long commandId, String payload) {
     Intent in = new Intent(MatterIntentConstants.ACTION_MATTER_COMMAND);
     Bundle extras = new Bundle();
     extras.putByteArray(MatterIntentConstants.EXTRA_COMMAND_PAYLOAD, payload.getBytes());
-    extras.putInt(MatterIntentConstants.EXTRA_COMMAND_ID, commandId);
-    extras.putInt(MatterIntentConstants.EXTRA_CLUSTER_ID, clusterId);
+    extras.putLong(MatterIntentConstants.EXTRA_COMMAND_ID, commandId);
+    extras.putLong(MatterIntentConstants.EXTRA_CLUSTER_ID, clusterId);
     in.putExtras(extras);
     in.setPackage(packageName);
     int flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES;
@@ -117,13 +127,13 @@ public class ContentAppAgentService extends Service {
   }
 
   public static String sendAttributeReadRequest(
-      Context context, String packageName, int clusterId, int attributeId) {
+      Context context, String packageName, long clusterId, long attributeId) {
     Intent in = new Intent(MatterIntentConstants.ACTION_MATTER_COMMAND);
     Bundle extras = new Bundle();
     extras.putString(
         MatterIntentConstants.EXTRA_ATTRIBUTE_ACTION, MatterIntentConstants.ATTRIBUTE_ACTION_READ);
-    extras.putInt(MatterIntentConstants.EXTRA_ATTRIBUTE_ID, attributeId);
-    extras.putInt(MatterIntentConstants.EXTRA_CLUSTER_ID, clusterId);
+    extras.putLong(MatterIntentConstants.EXTRA_ATTRIBUTE_ID, attributeId);
+    extras.putLong(MatterIntentConstants.EXTRA_CLUSTER_ID, clusterId);
     in.putExtras(extras);
     in.setPackage(packageName);
     int flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES;

@@ -1,0 +1,183 @@
+{%- macro encode_value(source, encodable, depth) -%}
+  {%- if encodable.is_nullable -%}
+    @Nullable {{encode_value(source, encodable.without_nullable(), depth + 1)}}
+  {%- elif encodable.is_optional -%}
+    Optional<{{encode_value(source, encodable.without_optional(), depth + 1)}}>
+  {%- elif encodable.is_list -%}
+    ArrayList<{{encode_value(source, encodable.without_list(), depth + 1)}}>
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    ChipStructs.{{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.boxed_java_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro encode_tlv(source, encodable, variable, depth) -%}
+  {%- if encodable.is_nullable -%}
+    {{variable}} != null ? {{encode_tlv(source, encodable.without_nullable(), variable, depth + 1)}} : new NullType()
+  {%- elif encodable.is_optional -%}
+    {{variable}}.<BaseTLVType>map(({{"nonOptional{}".format(variable)}}) -> {{encode_tlv(source, encodable.without_optional(), "nonOptional{}".format(variable), depth + 1)}}).orElse(new EmptyType())
+  {%- elif encodable.is_list -%}
+    ArrayType.generateArrayType({{variable}}, ({{"element{}".format(variable)}}) -> {{encode_tlv(source, encodable.without_list(), "element{}".format(variable), depth + 1)}})
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    {{variable}}.encodeTlv()
+  {%- else -%}
+    new {{encodable.java_tlv_type}}Type({{variable}})
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro decode_tlv(source, encodable, variable, depth) -%}
+  {%- if encodable.is_optional -%}
+    Optional.of({{decode_tlv(source, encodable.without_optional(), variable, depth + 1)}})
+  {%- elif encodable.is_list -%}
+    {{variable}}.map(({{"element{}".format(variable)}}) -> {{decode_tlv(source, encodable.without_list(), "element{}".format(variable), depth + 1)}})
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    ChipStructs.{{source.name}}Cluster{{struct.name}}.decodeTlv({{variable}})
+  {%- else -%}
+    {{variable}}.value({{encodable.boxed_java_type}}.class)
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro get_tlvType(encodable) -%}
+  {%- if encodable.is_list -%}
+    Array
+  {%- elif encodable.is_struct -%}
+    Struct
+  {%- else -%}
+    {{encodable.java_tlv_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+package chip.devicecontroller;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
+
+import static chip.devicecontroller.ChipTLVType.*;
+
+public class ChipStructs {
+{%- for cluster in clientClusters | sort(attribute='code') -%}
+{%- set typeLookup = idl | createLookupContext(cluster) %}
+{%- for struct in cluster.structs %}
+{%- if not struct.tag %}
+public static class {{cluster.name}}Cluster{{struct.name}} {
+  {%- for field in struct.fields %}
+  {%- set encodable = field | asEncodable(typeLookup) %}
+  public {{encode_value(cluster, encodable, 0)}} {{field.name}};
+  {%- endfor %}
+
+  {%- for field in struct.fields %}
+  {%- set encodable = field | asEncodable(typeLookup) %}
+  private static final long {{field.name | constcase}}_ID = {{field.code}}L;
+  {%- endfor %}
+
+  public {{cluster.name}}Cluster{{struct.name}}(
+    {%- for field in struct.fields %}
+    {%- set encodable = field | asEncodable(typeLookup) %}
+    {{encode_value(cluster, encodable, 0)}} {{field.name}}
+    {%- if loop.index0 < loop.length - 1 -%}{{","}}{%- endif -%}
+    {%- endfor %}
+  ) {
+    {%- for field in struct.fields %}
+    {%- set encodable = field | asEncodable(typeLookup) %}
+    this.{{field.name}} = {{field.name}};
+    {%- endfor %}
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    {%- for field in struct.fields %}
+    {%- set encodable = field | asEncodable(typeLookup) %}
+    values.add(new StructElement({{field.name | constcase}}_ID, {{encode_tlv(cluster, encodable, field.name, 0)}}));
+    {%- endfor %}
+
+    return new StructType(values);
+  }
+
+  public static {{cluster.name}}Cluster{{struct.name}} decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+
+    {%- for field in struct.fields %}
+{%- set encodable = field | asEncodable(typeLookup) %}
+{%- set encodable2 = field | asEncodable(typeLookup) %}
+    {{encode_value(cluster, encodable, 0)}} {{field.name | lowfirst_except_acronym}}
+{%- if encodable2.is_nullable -%}
+{{" = null"}}
+{%- elif encodable2.is_optional -%}
+{{" = Optional.empty()"}}
+{%- else -%}
+{{" = null"}}
+{%- endif -%}
+;
+{%- endfor %}
+    for (StructElement element: ((StructType)tlvValue).value()) {
+{%- for field in struct.fields -%}
+{%- set encodable = field | asEncodable(typeLookup) %}
+      {% if loop.index0 > 0 -%}{{"} else "}}{%- endif -%}if (element.contextTagNum() == {{field.name | constcase}}_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.{{get_tlvType(encodable)}}) {
+          {{get_tlvType(encodable)}}Type castingValue = element.value({{get_tlvType(encodable)}}Type.class);
+          {{field.name | lowfirst_except_acronym}} = {{decode_tlv(cluster, encodable, "castingValue", 0)}};
+        }
+{%- endfor -%}
+{% raw %}
+      }
+{%- endraw %}
+    }
+    return new {{cluster.name}}Cluster{{struct.name}}(
+  {%- for field in struct.fields %}
+      {{field.name}}{%- if loop.index0 < loop.length - 1 -%}{{","}}{%- endif %}
+  {%- endfor %}
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("{{cluster.name}}Cluster{{struct.name}} {\n");
+    {%- for field in struct.fields %}
+    {%- set encodable = field | asEncodable(typeLookup) %}
+    output.append("\t{{field.name}}: ");
+    {%- if encodable.is_list %}
+    output.append({{field.name}});
+    {%- elif encodable.is_octet_string -%}
+    {%- if encodable.is_optional %}
+    output.append({{field.name}}.isPresent() ? Arrays.toString({{field.name}}.get()) : "");
+    {%- else %}
+    output.append(Arrays.toString({{field.name}}));
+    {%- endif %}
+    {%- else %}
+    output.append({{field.name}});
+    {%- endif %}
+    output.append("\n");
+    {%- endfor %}
+    output.append("}\n");
+    return output.toString();
+  }
+}
+{%- endif %}
+{%- endfor %}
+{%- endfor %}
+}

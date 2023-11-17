@@ -27,6 +27,7 @@
 
 #include <CC32XXConfig.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <ti/drivers/net/wifi/simplelink.h>
 
@@ -229,8 +230,8 @@ public:
             bufferLength += (uint16_t) strlen(currentEntry->Key());
 
             // copy value length
-            list[bufferLength]     = (uint8_t)(currentEntry->Len() & 0xFF);
-            list[bufferLength + 1] = (uint8_t)((currentEntry->Len() & 0xFF00) >> 8);
+            list[bufferLength]     = (uint8_t) (currentEntry->Len() & 0xFF);
+            list[bufferLength + 1] = (uint8_t) ((currentEntry->Len() & 0xFF00) >> 8);
             bufferLength           = bufferLength + 2;
 
             // copy value
@@ -266,7 +267,7 @@ public:
             // read in value length
 
             uint16_t valueLen = 0;
-            valueLen          = (uint16_t)(list[currentLength] | list[currentLength + 1] << 8);
+            valueLen          = (uint16_t) (list[currentLength] | list[currentLength + 1] << 8);
             currentLength += 2;
 
             // read in value
@@ -281,7 +282,7 @@ public:
 
             // value is stored in the LL, we do not need the value variable above
 
-            delete value;
+            delete[] value;
         }
     }
 };
@@ -308,7 +309,6 @@ const CC32XXConfig::Key CC32XXConfig::kConfigKey_FabricSecret       = { "TI_kCon
 const CC32XXConfig::Key CC32XXConfig::kConfigKey_GroupKeyIndex      = { "TI_kConfigKey_GroupKeyIndex" };
 const CC32XXConfig::Key CC32XXConfig::kConfigKey_LastUsedEpochKeyId = { "TI_kConfigKey_LastUsedEpochKeyId" };
 const CC32XXConfig::Key CC32XXConfig::kConfigKey_FailSafeArmed      = { "TI_kConfigKey_FailSafeArmed" };
-const CC32XXConfig::Key CC32XXConfig::kConfigKey_WiFiStationSecType = { "TI_kConfigKey_WiFiStationSecType" };
 const CC32XXConfig::Key CC32XXConfig::kConfigKey_RegulatoryLocation = { "TI_kConfigKey_RegulatoryLocation" };
 const CC32XXConfig::Key CC32XXConfig::kConfigKey_CountryCode        = { "TI_kConfigKey_CountryCode" };
 const CC32XXConfig::Key CC32XXConfig::kConfigKey_Breadcrumb         = { "TI_kConfigKey_Breadcrumb" };
@@ -322,7 +322,7 @@ CC32XXKVSList * pList;
 
 CHIP_ERROR CC32XXConfig::Init()
 {
-    cc32xxLog("[%s], KVS List created", __FUNCTION__);
+    cc32xxLog("[CC32XXConfig::Init] KVS List created");
     pList = new CC32XXKVSList();
     ReadKVSFromNV();
     return CHIP_NO_ERROR;

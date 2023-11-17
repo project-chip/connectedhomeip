@@ -35,7 +35,7 @@
 #include <app/MessageDef/WriteRequestMessage.h>
 #include <app/MessageDef/WriteResponseMessage.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -232,14 +232,13 @@ void ParseEventFilters(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 void BuildAttributePathIB(nlTestSuite * apSuite, AttributePathIB::Builder & aAttributePathBuilder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    aAttributePathBuilder.EnableTagCompression(false)
-        .Node(1)
-        .Endpoint(2)
-        .Cluster(3)
-        .Attribute(4)
-        .ListIndex(5)
-        .EndOfAttributePathIB();
-    err = aAttributePathBuilder.GetError();
+    err            = aAttributePathBuilder.EnableTagCompression(false)
+              .Node(1)
+              .Endpoint(2)
+              .Cluster(3)
+              .Attribute(4)
+              .ListIndex(5)
+              .EndOfAttributePathIB();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 

@@ -29,6 +29,8 @@
 
 #define SYSTEM_STATE_LED DK_LED1
 #define PUMP_STATE_LED DK_LED2
+#define FACTORY_RESET_SIGNAL_LED DK_LED3
+#define FACTORY_RESET_SIGNAL_LED1 DK_LED4
 
 // Time it takes in ms for the simulated pump to move from one state to another.
 #define PUMP_START_PERIOS_MS 2000

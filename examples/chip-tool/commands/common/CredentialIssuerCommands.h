@@ -19,11 +19,17 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <vector>
+
+namespace chip {
+namespace Controller {
+struct SetupParams;
+class OperationalCredentialsDelegate;
+} // namespace Controller
+} // namespace chip
 
 class CredentialIssuerCommands
 {
@@ -66,6 +72,8 @@ public:
     virtual CHIP_ERROR AddAdditionalCDVerifyingCerts(const std::vector<std::vector<uint8_t>> & additionalCdCerts) = 0;
 
     virtual chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() = 0;
+
+    virtual void SetCredentialIssuerCATValues(chip::CATValues cats) = 0;
 
     /**
      * @brief

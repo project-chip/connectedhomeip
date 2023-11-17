@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-//#include "FreeRTOS.h"
-//#include "task.h"
+// #include "FreeRTOS.h"
+// #include "task.h"
 
 #include <lib/shell/Engine.h>
 
@@ -28,9 +28,10 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 
-//#include <lib/support/RandUtils.h>   //==> rm from TE7.5
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+// #include <lib/support/RandUtils.h>   //==> rm from TE7.5
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
@@ -40,6 +41,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <static-supported-temperature-levels.h>
 
 #include <app/InteractionModelEngine.h>
 
@@ -58,9 +60,9 @@
 #include "app/clusters/ota-requestor/DefaultOTARequestor.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorDriver.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
-//#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
+// #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
 #include "platform/nxp/mw320/OTAImageProcessorImpl.h"
-//#include "app/clusters/ota-requestor/OTARequestorDriver.h"
+// #include "app/clusters/ota-requestor/OTARequestorDriver.h"
 
 // for ota module test
 #include "mw320_ota.h"
@@ -118,6 +120,8 @@ static SemaphoreHandle_t aesLock;
 static struct wlan_network sta_network;
 static struct wlan_network uap_network;
 
+chip::app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+
 const int TASK_MAIN_PRIO         = OS_PRIO_3;
 const int TASK_MAIN_STACK_SIZE   = 800;
 portSTACK_TYPE * task_main_stack = NULL;
@@ -168,7 +172,7 @@ void InitOTARequestor(void)
     // TODO: instatiate and initialize these values when QueryImageResponse tells us an image is available
     // TODO: add API for OTARequestor to pass QueryImageResponse info to the application to use for OTADownloader init
     // OTAImageProcessor ipParams;
-    // ipParams.imageFile = CharSpan("dnld_img.txt");
+    // ipParams.imageFile = "dnld_img.txt"_span;
     // gImageProcessor.SetOTAImageProcessorParams(ipParams);
     gImageProcessor.SetOTADownloader(&gDownloader);
 
@@ -288,7 +292,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 {
     PRINTF("====> emberAfExternalAttributeReadCallback\r\n");
 
-    if(clusterId == ZCL_SWITCH_CLUSTER_ID) {
+    if(clusterId == Clusters::Switch::Id) {
         *buffer = g_ButtonPress;
     }
     return EMBER_ZCL_STATUS_SUCCESS;
@@ -1078,6 +1082,8 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
     InitBindingHandlers();
     // binding --
 
+    chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+
     return;
 }
 
@@ -1143,13 +1149,15 @@ void task_test_main(void * param)
             is_on             = !is_on;
             value             = (uint16_t) is_on;
             // sync-up the switch attribute:
-            PRINTF("--> update ZCL_CURRENT_POSITION_ATTRIBUTE_ID [%d] \r\n", value);
-            emAfWriteAttribute(1, ZCL_SWITCH_CLUSTER_ID, ZCL_CURRENT_POSITION_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true,
-                               false);
+            PRINTF("--> update CurrentPosition [%d] \r\n", value);
+            Clusters::Switch::Attributes::CurrentPosition::Set(1, value);
 #ifdef SUPPORT_MANUAL_CTRL
+#error                                                                                                                             \
+    "This code thinks it's setting the OnOff attribute, but it's actually setting the NumberOfPositions attribute!  And passing the wrong size for either case.  Figure out what it's trying to do."
             // sync-up the Light attribute (for test event, OO.M.ManuallyControlled)
-            PRINTF("--> update [ZCL_ON_OFF_CLUSTER_ID]: ZCL_ON_OFF_ATTRIBUTE_ID [%d] \r\n", value);
-            emAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true, false);
+            PRINTF("--> update [Clusters::Switch::Id]: OnOff::Id [%d] \r\n", value);
+            emAfWriteAttribute(1, Clusters::Switch::Id, Clusters::OnOff::Attributes::OnOff::Id, (uint8_t *) &value, sizeof(value),
+                               true, false);
 #endif // SUPPORT_MANUAL_CTRL
 
             need2sync_sw_attr = false;
@@ -1499,8 +1507,9 @@ bool lowPowerClusterSleep()
 
 static void OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID,
-                 ChipLogError(DeviceLayer, "Unhandled Attribute ID: '0x%04lx", attributeId));
+    using namespace Clusters::OnOff::Attributes;
+
+    VerifyOrExit(attributeId == OnOff::Id, ChipLogError(DeviceLayer, "Unhandled Attribute ID: '0x%04lx", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     // At this point we can assume that value points to a bool value.
@@ -1512,24 +1521,25 @@ exit:
 
 static void OnSwitchAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
+    using namespace Clusters::Switch::Attributes;
+
     //	auto * pimEngine = chip::app::InteractionModelEngine::GetInstance();
     //	bool do_sendrpt = false;
 
-    VerifyOrExit(attributeId == ZCL_CURRENT_POSITION_ATTRIBUTE_ID,
-                 ChipLogError(DeviceLayer, "Unhandled Attribute ID: '0x%04lx", attributeId));
+    VerifyOrExit(attributeId == CurrentPosition::Id, ChipLogError(DeviceLayer, "Unhandled Attribute ID: '0x%04lx", attributeId));
     // Send the switch status report now
 /*
         for (uint32_t i = 0 ; i<pimEngine->GetNumActiveReadHandlers() ; i++) {
                 ReadHandler * phandler = pimEngine->ActiveHandlerAt(i);
                 if (phandler->IsType(chip::app::ReadHandler::InteractionType::Subscribe) &&
                         (phandler->IsGeneratingReports() || phandler->IsAwaitingReportResponse())) {
-                        phandler->UnblockUrgentEventDelivery();
+                        phandler->ForceDirtyState();
                         do_sendrpt = true;
                         break;
                 }
         }
         if (do_sendrpt == true) {
-                ConcreteEventPath event_path(endpointId, ZCL_SWITCH_CLUSTER_ID, 0);
+                ConcreteEventPath event_path(endpointId, Clusters::Switch::Id, 0);
                 pimEngine->GetReportingEngine().ScheduleEventDelivery(event_path, chip::app::EventOptions::Type::kUrgent,
    sizeof(uint16_t));
         }
@@ -1549,20 +1559,23 @@ Identify_Time_t id_time[MAX_ENDPOINT_COUNT];
 
 void IdentifyTimerHandler(System::Layer * systemLayer, void * appState)
 {
+    using namespace Clusters::Identify::Attributes;
+
     Identify_Time_t * pidt = (Identify_Time_t *) appState;
     PRINTF(" -> %s(%u, %u) \r\n", __FUNCTION__, pidt->ep, pidt->identifyTimerCount);
     if (pidt->identifyTimerCount)
     {
         pidt->identifyTimerCount--;
-        emAfWriteAttribute(pidt->ep, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, (uint8_t *) &pidt->identifyTimerCount,
-                           sizeof(identifyTimerCount), true, false);
+        IdentifyTime::Set(pidt->ep, pidt->identifyTimerCount);
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, pidt);
     }
 }
 
 static void OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
+    using namespace Clusters::Identify::Attributes;
+
+    VerifyOrExit(attributeId == IdentifyTime::Id,
                  ChipLogError(DeviceLayer, "[%s] Unhandled Attribute ID: '0x%04lx", TAG, attributeId));
     VerifyOrExit((endpointId < MAX_ENDPOINT_COUNT),
                  ChipLogError(DeviceLayer, "[%s] EndPoint > max: [%u, %u]", TAG, endpointId, MAX_ENDPOINT_COUNT));
@@ -1587,16 +1600,16 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     // path.mEndpointId, path.mClusterId, path.mAttributeId, mask, type, size, value
     switch (path.mClusterId)
     {
-    case ZCL_ON_OFF_CLUSTER_ID:
+    case Clusters::OnOff::Id:
         OnOnOffPostAttributeChangeCallback(path.mEndpointId, path.mAttributeId, value);
         break;
-    case ZCL_SWITCH_CLUSTER_ID:
+    case Clusters::Switch::Id:
         OnSwitchAttributeChangeCallback(path.mEndpointId, path.mAttributeId, value);
         // SwitchToggleOnOff();
         // Trigger to send on/off/toggle command to the bound devices
         chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
         break;
-    case ZCL_IDENTIFY_CLUSTER_ID:
+    case Clusters::Identify::Id:
         OnIdentifyPostAttributeChangeCallback(path.mEndpointId, path.mAttributeId, value);
         break;
     default:

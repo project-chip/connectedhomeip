@@ -35,6 +35,8 @@ static_library("Ameba") {
     "ConnectivityManagerImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
+    "FactoryDataDecoder.cpp",
+    "FactoryDataDecoder.h",
     "FactoryDataProvider.cpp",
     "FactoryDataProvider.h",
     "KeyValueStoreManagerImpl.cpp",
@@ -52,6 +54,7 @@ static_library("Ameba") {
 
   deps = [
     "${chip_root}/src/lib/dnssd:platform_header",
+    "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
   ]
 

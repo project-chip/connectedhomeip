@@ -44,6 +44,7 @@ AdvSendAdvert
 AE
 aef
 AES
+AIDL
 AlarmCode
 algs
 alloc
@@ -54,7 +55,7 @@ AmebaZ
 amebaz2
 announcementReason
 AnnounceOTAProvider
-AnnounceOtaProviderRequest
+AnnounceOTAProviderRequest
 APIs
 apk
 AppConfig
@@ -87,6 +88,7 @@ ARMmbed
 armv
 ASAN
 asdk
+ASR
 AssertionError
 AST
 ASYNC
@@ -120,11 +122,13 @@ AXXXF
 AYNJV
 babaf
 backend
+backends
 backticks
 backtrace
 BallastConfiguration
 BarrierControl
 BasicCHIPRegression
+BasicInformation
 baudrate
 BD
 BDX
@@ -150,6 +154,7 @@ blocklist
 blockquote
 bluetoothd
 bluez
+BOOL
 BooleanState
 bootable
 Bootloader
@@ -158,9 +163,10 @@ bouffalolab
 BRD
 breakpoint
 bredr
-BridgedDeviceBasic
+BridgedDeviceBasicInformation
 bridgedLightEndpoint
 bringup
+BroadcastReceiver
 BromateConcentrationMeasurement
 BromodichloromethaneConcentrationMeasurement
 BromoformConcentrationMeasurement
@@ -301,6 +307,7 @@ contrib
 controllee
 conv
 CopperConcentrationMeasurement
+Corstone
 cortexa
 cp
 cpio
@@ -353,6 +360,8 @@ DCONF
 DCONFIG
 debianutils
 debugText
+decrypt
+decrypted
 DEDEDEDE
 deepnote
 DefaultOTAProviders
@@ -414,6 +423,7 @@ diffsyms
 dimmable
 dirname
 dirs
+disableNotifyUpdateApplied
 disambiguated
 discoverable
 DispatchEvent
@@ -431,6 +441,7 @@ Dnsmasq
 dnsmasqd
 DNSSD
 DNSStubListener
+docbuild
 Dockerfile
 Dockerfiles
 Don'ts
@@ -466,10 +477,12 @@ edaf
 edc
 EDR
 ee
+eea
 EEE
 eef
 ef
 EFR
+efuse
 eg
 EjQ
 elftools
@@ -559,6 +572,7 @@ FW
 gbl
 gcloud
 GDB
+gdbgui
 gdbserver
 GeneralCommissioning
 GeneralDiagnostics
@@ -578,6 +592,7 @@ getManualTests
 getstarted
 getTests
 GH
+ghcr
 ghp
 githubusercontent
 gitignore
@@ -602,6 +617,7 @@ GroupKeyManagement
 groupKeySecurityPolicy
 groupKeySetID
 groupsettings
+gsdk
 gtk
 GUA
 Gv
@@ -618,6 +634,7 @@ hci
 hciattach
 hciconfig
 hdlc
+HEPA
 HKDF
 HMAC
 hoc
@@ -637,11 +654,14 @@ IasWd
 iaszone
 ibb
 ICA
+ICD
 iCloud
 ICMP
 IDF
 IDL
 IDLs
+idt
+IDT
 idx
 ifconfig
 ifdef
@@ -676,7 +696,6 @@ instantiation
 integrations
 IntelliSense
 InteractionModelVersion
-Interation
 Interoperable
 introvideos
 InvokeCommandRequests
@@ -714,6 +733,7 @@ Jupyter
 jupyterlab
 KA
 kAdminister
+kbd
 kBusy
 kCase
 Kconfig
@@ -772,6 +792,8 @@ LightingApp
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
+lladdr
+LLADDR
 LocalConfigDisabled
 localedef
 localhost
@@ -832,6 +854,7 @@ MDNS
 MediaInput
 MediaPlayback
 MediaTek
+MEI
 mem
 memdf
 MemMonitoring
@@ -886,6 +909,7 @@ MyPASSWORD
 MySSID
 NAMESERVER
 NAMESPACE
+namespaces
 namespacing
 nano
 natively
@@ -907,6 +931,7 @@ nl
 NLUnitTest
 NLUnitTests
 nmcli
+nmtui
 noc
 NodeId
 nongnu
@@ -942,7 +967,9 @@ OnOff
 OnOffClusterTest
 OnOffSwitchConfiguration
 OnPlatformEvent
+onwards
 OO
+openiotsdk
 openjdk
 OpenOCD
 OpenSSL
@@ -968,6 +995,7 @@ otaissues
 OTAProvider
 OTAProviderIpAddress
 OTAProviderNodeId
+otaproviders
 OTAProviderSerialPort
 OTARequesterImpl
 OTARequestorDriver
@@ -981,6 +1009,7 @@ otatesting
 otaURL
 OTBR
 otcli
+outform
 outgoingCommands
 OxygenConcentrationMeasurement
 OzoneConcentrationMeasurement
@@ -998,11 +1027,14 @@ params
 PartNumber
 PASE
 Passcode
+passRetained
+passwd
 PBKDF
 pbuf
 pbufs
 pbxproj
 PCA
+pcap
 pcaps
 PDFs
 PDK
@@ -1012,6 +1044,7 @@ peerNodeId
 peerSessionId
 pem
 percentageLiftValue
+perfetto
 periodicQueryTimeout
 pexpect
 pickString
@@ -1019,12 +1052,15 @@ PID
 Pigweed
 PinCode
 pinrequest
+PIXIT
 pkgconfig
+PKI
 plaintext
 PlatformManager
 PlatformManagerImpl
 plt
 png
+Podman
 PollControl
 pollInterval
 polymorphism
@@ -1056,6 +1092,7 @@ ProxyDiscovery
 ProxyValid
 ProxyView
 PRs
+PSA
 PSCAN
 PSECT
 PSK
@@ -1100,6 +1137,7 @@ ReadConfigValue
 readelf
 readfds
 README
+READMEs
 readonly
 readthedocs
 Reag
@@ -1139,19 +1177,25 @@ rootfs
 RPC
 RPCs
 RPi
+RPi's
 RPis
+RSA
 rsn
 RSSI
 RST
 rsync
+RTC
 rtd
 RTL
 rtld
 RTOS
 RTT
+RTX
+runArgs
 RUNAS
 RunMain
 runtime
+RVC
 rw
 RXD
 sandboxed
@@ -1159,6 +1203,8 @@ saveAs
 sbin
 scalability
 scalable
+schema
+schemas
 scm
 sco
 scp
@@ -1172,6 +1218,7 @@ SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
+SecureCertDACProvider
 SED
 SEGGER
 semver
@@ -1196,7 +1243,9 @@ sexualized
 sfv
 SHA
 ShadeConfiguration
+SHAs
 showDocumentation
+showsdks
 shubhamdp
 SIGINT
 SiLabs
@@ -1204,6 +1253,7 @@ Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
+SiWx
 sizedb
 sl
 SLAAC
@@ -1224,6 +1274,7 @@ SoftwareVersion
 softwareVersionStr
 SoftwareVersionString
 softwareVersionValid
+SparkFun
 sphinxcontrib
 SPI
 spiflash
@@ -1240,6 +1291,9 @@ StatusCode
 stderr
 stdout
 sterm
+stlink
+stm
+stmicroelectronics
 storagepath
 str
 strcpy
@@ -1254,6 +1308,7 @@ subdirectory
 subfolder
 submodule
 submodules
+subnet
 subprocess
 SubscribeResponse
 SubscriptionId
@@ -1311,6 +1366,7 @@ textboxes
 TFT
 ThermostatUserInterfaceConfiguration
 ThIsIsNoTMyReAlGiThUbToKeNSoDoNoTtRy
+thread
 ThreadNetworkDiagnostics
 threadOperationalDataset
 ThreadStackManager
@@ -1319,17 +1375,20 @@ ths
 Thunderboard
 timedInteractionTimeoutMs
 TimeFormatLocalization
+timeframe
 timeoutMs
 TimeSynchronization
 tinycrypt
 Tizen
 TKIP
+TLS
 tlsr
 TLV
 tmp
 tngvndl
 TODO
 toJson
+tokenization
 tokenized
 tokenizer
 toolchain
@@ -1374,6 +1433,7 @@ ug
 ui
 uint
 ULA
+Ultrafast
 UNBLUR
 uncommissioned
 Unencrypted
@@ -1384,6 +1444,7 @@ UnitLocalization
 unpair
 unprovisioned
 Unsecure
+Unselect
 untrusted
 updateAvailable
 updateNotAvailable
@@ -1446,6 +1507,7 @@ wic
 WiFiNetworkDiagnostics
 WindowCovering
 WindowCoveringGoToLiftPercentage
+WiseMCU
 wlan
 wmm
 WPA
@@ -1466,6 +1528,7 @@ xbef
 xc
 xcd
 Xcode
+xcodebuild
 xcodeproj
 xcworkspace
 xd

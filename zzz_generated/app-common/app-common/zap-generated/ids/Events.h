@@ -53,7 +53,7 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace Actions
 
-namespace Basic {
+namespace BasicInformation {
 namespace Events {
 
 namespace StartUp {
@@ -73,7 +73,7 @@ static constexpr EventId Id = 0x00000003;
 } // namespace ReachableChanged
 
 } // namespace Events
-} // namespace Basic
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateRequestor {
 namespace Events {
@@ -92,6 +92,24 @@ static constexpr EventId Id = 0x00000002;
 
 } // namespace Events
 } // namespace OtaSoftwareUpdateRequestor
+
+namespace PowerSource {
+namespace Events {
+
+namespace WiredFaultChange {
+static constexpr EventId Id = 0x00000000;
+} // namespace WiredFaultChange
+
+namespace BatFaultChange {
+static constexpr EventId Id = 0x00000001;
+} // namespace BatFaultChange
+
+namespace BatChargeFaultChange {
+static constexpr EventId Id = 0x00000002;
+} // namespace BatChargeFaultChange
+
+} // namespace Events
+} // namespace PowerSource
 
 namespace GeneralDiagnostics {
 namespace Events {
@@ -157,7 +175,33 @@ static constexpr EventId Id = 0x00000002;
 } // namespace Events
 } // namespace WiFiNetworkDiagnostics
 
-namespace BridgedDeviceBasic {
+namespace TimeSynchronization {
+namespace Events {
+
+namespace DSTTableEmpty {
+static constexpr EventId Id = 0x00000000;
+} // namespace DSTTableEmpty
+
+namespace DSTStatus {
+static constexpr EventId Id = 0x00000001;
+} // namespace DSTStatus
+
+namespace TimeZoneStatus {
+static constexpr EventId Id = 0x00000002;
+} // namespace TimeZoneStatus
+
+namespace TimeFailure {
+static constexpr EventId Id = 0x00000003;
+} // namespace TimeFailure
+
+namespace MissingTrustedTimeSource {
+static constexpr EventId Id = 0x00000004;
+} // namespace MissingTrustedTimeSource
+
+} // namespace Events
+} // namespace TimeSynchronization
+
+namespace BridgedDeviceBasicInformation {
 namespace Events {
 
 namespace StartUp {
@@ -177,7 +221,7 @@ static constexpr EventId Id = 0x00000003;
 } // namespace ReachableChanged
 
 } // namespace Events
-} // namespace BridgedDeviceBasic
+} // namespace BridgedDeviceBasicInformation
 
 namespace Switch {
 namespace Events {
@@ -222,6 +266,142 @@ static constexpr EventId Id = 0x00000000;
 
 } // namespace Events
 } // namespace BooleanState
+
+namespace RefrigeratorAlarm {
+namespace Events {
+
+namespace Notify {
+static constexpr EventId Id = 0x00000000;
+} // namespace Notify
+
+} // namespace Events
+} // namespace RefrigeratorAlarm
+
+namespace SmokeCoAlarm {
+namespace Events {
+
+namespace SmokeAlarm {
+static constexpr EventId Id = 0x00000000;
+} // namespace SmokeAlarm
+
+namespace COAlarm {
+static constexpr EventId Id = 0x00000001;
+} // namespace COAlarm
+
+namespace LowBattery {
+static constexpr EventId Id = 0x00000002;
+} // namespace LowBattery
+
+namespace HardwareFault {
+static constexpr EventId Id = 0x00000003;
+} // namespace HardwareFault
+
+namespace EndOfService {
+static constexpr EventId Id = 0x00000004;
+} // namespace EndOfService
+
+namespace SelfTestComplete {
+static constexpr EventId Id = 0x00000005;
+} // namespace SelfTestComplete
+
+namespace AlarmMuted {
+static constexpr EventId Id = 0x00000006;
+} // namespace AlarmMuted
+
+namespace MuteEnded {
+static constexpr EventId Id = 0x00000007;
+} // namespace MuteEnded
+
+namespace InterconnectSmokeAlarm {
+static constexpr EventId Id = 0x00000008;
+} // namespace InterconnectSmokeAlarm
+
+namespace InterconnectCOAlarm {
+static constexpr EventId Id = 0x00000009;
+} // namespace InterconnectCOAlarm
+
+namespace AllClear {
+static constexpr EventId Id = 0x0000000A;
+} // namespace AllClear
+
+} // namespace Events
+} // namespace SmokeCoAlarm
+
+namespace DishwasherAlarm {
+namespace Events {
+
+namespace Notify {
+static constexpr EventId Id = 0x00000000;
+} // namespace Notify
+
+} // namespace Events
+} // namespace DishwasherAlarm
+
+namespace OperationalState {
+namespace Events {
+
+namespace OperationalError {
+static constexpr EventId Id = 0x00000000;
+} // namespace OperationalError
+
+namespace OperationCompletion {
+static constexpr EventId Id = 0x00000001;
+} // namespace OperationCompletion
+
+} // namespace Events
+} // namespace OperationalState
+
+namespace RvcOperationalState {
+namespace Events {
+
+namespace OperationalError {
+static constexpr EventId Id = 0x00000000;
+} // namespace OperationalError
+
+namespace OperationCompletion {
+static constexpr EventId Id = 0x00000001;
+} // namespace OperationCompletion
+
+} // namespace Events
+} // namespace RvcOperationalState
+
+namespace BooleanSensorConfiguration {
+namespace Events {
+
+namespace AlarmsStateChanged {
+static constexpr EventId Id = 0x00000000;
+} // namespace AlarmsStateChanged
+
+namespace SensorFault {
+static constexpr EventId Id = 0x00000001;
+} // namespace SensorFault
+
+} // namespace Events
+} // namespace BooleanSensorConfiguration
+
+namespace ValveConfigurationAndControl {
+namespace Events {
+
+namespace ValveStateChanged {
+static constexpr EventId Id = 0x00000000;
+} // namespace ValveStateChanged
+
+namespace ValveFault {
+static constexpr EventId Id = 0x00000001;
+} // namespace ValveFault
+
+} // namespace Events
+} // namespace ValveConfigurationAndControl
+
+namespace DemandResponseLoadControl {
+namespace Events {
+
+namespace LoadControlEventStatusChange {
+static constexpr EventId Id = 0x00000000;
+} // namespace LoadControlEventStatusChange
+
+} // namespace Events
+} // namespace DemandResponseLoadControl
 
 namespace DoorLock {
 namespace Events {

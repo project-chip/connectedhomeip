@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/icd/ICDStateObserver.h>
 #include <app/server/CommissioningModeProvider.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
@@ -29,7 +30,7 @@
 namespace chip {
 namespace app {
 
-class DLL_EXPORT DnssdServer
+class DLL_EXPORT DnssdServer : public ICDStateObserver
 {
 public:
     static constexpr System::Clock::Timestamp kTimeoutCleared = System::Clock::kZero;
@@ -60,8 +61,9 @@ public:
     Inet::InterfaceId GetInterfaceId() { return mInterfaceId; }
 
     //
-    // Override the referenced fabric table from the default that is present
-    // in Server::GetInstance().GetFabricTable() to something else.
+    // Set the fabric table the DnssdServer should use for operational
+    // advertising.  This must be set before StartServer() is called for the
+    // first time.
     //
     void SetFabricTable(FabricTable * table)
     {
@@ -84,6 +86,10 @@ public:
     void OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    template <class AdvertisingParams>
+    void AddICDKeyToAdvertisement(AdvertisingParams & advParams);
+#endif
     /// Start operational advertising
     CHIP_ERROR AdvertiseOperational();
 
@@ -93,6 +99,10 @@ public:
 
     /// (Re-)starts the Dnssd server, using the provided commissioning mode.
     void StartServer(Dnssd::CommissioningMode mode);
+
+    //// Stop the Dnssd server.  After this call, SetFabricTable must be called
+    //// again before calling StartServer().
+    void StopServer();
 
     CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
 
@@ -109,6 +119,12 @@ public:
      * @return CHIP_NO_ERROR on success or CHIP_ERROR_INVALID_ARGUMENT on invalid value
      */
     CHIP_ERROR SetEphemeralDiscriminator(Optional<uint16_t> discriminator);
+
+    // ICDStateObserver
+    // No action is needed by the DnssdServer on active or idle state entries
+    void OnEnterActiveMode() override{};
+    void OnTransitionToIdle() override{};
+    void OnICDModeChange() override;
 
 private:
     /// Overloaded utility method for commissioner and commissionable advertisement
@@ -130,8 +146,6 @@ private:
     //
     bool HaveOperationalCredentials();
 
-    Time::TimeSource<Time::Source::kSystem> mTimeSource;
-
     FabricTable * mFabricTable                             = nullptr;
     CommissioningModeProvider * mCommissioningModeProvider = nullptr;
 
@@ -143,6 +157,8 @@ private:
     Optional<uint16_t> mEphemeralDiscriminator;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    Time::TimeSource<Time::Source::kSystem> mTimeSource;
+
     /// Get the current extended discovery timeout (set by
     /// SetExtendedDiscoveryTimeoutSecs, or the configuration default if not set).
     int32_t GetExtendedDiscoveryTimeoutSecs();

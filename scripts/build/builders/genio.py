@@ -1,5 +1,4 @@
 import os
-
 from enum import Enum, auto
 
 from .gn import GnBuilder
@@ -28,7 +27,7 @@ class GenioApp(Enum):
     def FlashBundleName(self):
         if self == GenioApp.LIGHT:
             return 'lighting_app.flashbundle.txt'
-        elif self == GEnioApp.SHELL:
+        elif self == GenioApp.SHELL:
             return 'shell.flashbundle.txt'
         else:
             raise Exception('Unknown app type: %r' % self)

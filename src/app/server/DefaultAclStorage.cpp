@@ -26,9 +26,9 @@ using namespace chip::Access;
 using EncodableEntry   = AclStorage::EncodableEntry;
 using Entry            = AccessControl::Entry;
 using EntryListener    = AccessControl::EntryListener;
-using StagingAuthMode  = Clusters::AccessControl::AuthMode;
-using StagingPrivilege = Clusters::AccessControl::Privilege;
-using StagingTarget    = Clusters::AccessControl::Structs::Target::Type;
+using StagingAuthMode  = Clusters::AccessControl::AccessControlEntryAuthModeEnum;
+using StagingPrivilege = Clusters::AccessControl::AccessControlEntryPrivilegeEnum;
+using StagingTarget    = Clusters::AccessControl::Structs::AccessControlTargetStruct::Type;
 using Target           = AccessControl::Entry::Target;
 
 namespace {

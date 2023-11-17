@@ -19,7 +19,7 @@
 #include "CustomCSRResponseOperationalKeyStore.h"
 
 #include <credentials/FabricTable.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace chip {
@@ -63,8 +63,8 @@ CHIP_ERROR CustomCSRResponseOperationalKeyStore::ReuseOpKeypair(FabricIndex fabr
 
     // Scope 1: Load up the keypair data from storage
     {
-        // Use a CapacityBoundBuffer to get RAII secret data clearing on scope exit.
-        Crypto::CapacityBoundBuffer<OpKeyTLVMaxSize()> buf;
+        // Use a SensitiveDataBuffer to get RAII secret data clearing on scope exit.
+        Crypto::SensitiveDataBuffer<OpKeyTLVMaxSize()> buf;
 
         // Load up the operational key structure from storage
         uint16_t size = static_cast<uint16_t>(buf.Capacity());

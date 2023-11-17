@@ -36,9 +36,6 @@
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
-// Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "CHIPUS"
-
 /**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
  *
@@ -116,5 +113,9 @@
  * @brief Defines the maximum number of WriteHandler, limits the number of active write transactions on server.
  */
 #define CHIP_IM_MAX_NUM_WRITE_HANDLER 1
+
+// All clusters app has 3 group endpoints. This needs to defined here so that
+// CHIP_CONFIG_MAX_GROUPS_PER_FABRIC is properly configured.
+#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 3
 
 #endif // CHIP_PROJECT_CONFIG_H

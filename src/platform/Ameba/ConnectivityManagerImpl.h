@@ -84,6 +84,9 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
+public:
+    void ChangeWiFiStationState(WiFiStationState newState);
+
 private:
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
@@ -130,7 +133,6 @@ private:
     void DriveStationState(void);
     void OnStationConnected(void);
     void OnStationDisconnected(void);
-    void ChangeWiFiStationState(WiFiStationState newState);
     static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState);
 
     void DriveAPState(void);
@@ -139,9 +141,8 @@ private:
     static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState);
 
     void UpdateInternetConnectivityState(void);
-    void OnStationIPv4AddressAvailable(void);
-    void OnStationIPv4AddressLost(void);
-    void OnIPv6AddressAvailable(void);
+    void OnStationIPv4v6AddressAvailable(void);
+    void OnStationIPv4v6AddressLost(void);
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
@@ -155,6 +156,7 @@ private:
     static void RtkWiFiStationConnectedHandler(char * buf, int buf_len, int flags, void * userdata);
     static void RtkWiFiStationDisconnectedHandler(char * buf, int buf_len, int flags, void * userdata);
     static void RtkWiFiScanCompletedHandler(void);
+    static void RtkWiFiDHCPCompletedHandler(char * buf, int buf_len, int flags, void * userdata);
     void DHCPProcess(void);
     static void DHCPProcessThread(void * param);
     static int conn_callback_dispatcher(void * object);

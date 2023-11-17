@@ -35,6 +35,7 @@ constexpr TLV::Tag kLastKnownGoodChipEpochSecondsTag = TLV::ContextTag(0);
 
 void LastKnownGoodTime::LogTime(const char * msg, System::Clock::Seconds32 chipEpochTime)
 {
+#if CHIP_PROGRESS_LOGGING
     char buf[26] = { 0 }; // strlen("00000-000-000T000:000:000") == 25
     uint16_t year;
     uint8_t month;
@@ -45,6 +46,10 @@ void LastKnownGoodTime::LogTime(const char * msg, System::Clock::Seconds32 chipE
     ChipEpochToCalendarTime(chipEpochTime.count(), year, month, day, hour, minute, second);
     snprintf(buf, sizeof(buf), "%04u-%02u-%02uT%02u:%02u:%02u", year, month, day, hour, minute, second);
     ChipLogProgress(TimeService, "%s%s", StringOrNullMarker(msg), buf);
+#else
+    IgnoreUnusedVariable(msg);
+    IgnoreUnusedVariable(chipEpochTime);
+#endif
 }
 
 CHIP_ERROR LastKnownGoodTime::LoadLastKnownGoodChipEpochTime(System::Clock::Seconds32 & lastKnownGoodChipEpochTime) const

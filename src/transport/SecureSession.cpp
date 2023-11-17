@@ -87,8 +87,8 @@ void SecureSession::MoveToState(State targetState)
 {
     if (mState != targetState)
     {
-        ChipLogProgress(SecureChannel, "SecureSession[%p]: Moving from state '%s' --> '%s'", this, StateToString(mState),
-                        StateToString(targetState));
+        ChipLogProgress(SecureChannel, "SecureSession[%p, LSID:%d]: State change '%s' --> '%s'", this, mLocalSessionId,
+                        StateToString(mState), StateToString(targetState));
         mState = targetState;
     }
 }

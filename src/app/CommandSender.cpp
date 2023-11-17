@@ -26,16 +26,25 @@
 #include "InteractionModelEngine.h"
 #include "StatusResponse.h"
 #include <app/TimedRequest.h>
+#include <platform/LockTracker.h>
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 
 namespace chip {
 namespace app {
 
-CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest) :
-    mExchangeCtx(*this), mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(false),
-    mTimedRequest(aIsTimedRequest)
-{}
+CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest,
+                             bool aSuppressResponse) :
+    mExchangeCtx(*this),
+    mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest)
+{
+    assertChipStackLockedByCurrentThread();
+}
+
+CommandSender::~CommandSender()
+{
+    assertChipStackLockedByCurrentThread();
+}
 
 CHIP_ERROR CommandSender::AllocateBuffer()
 {
@@ -61,7 +70,7 @@ CHIP_ERROR CommandSender::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Optional<System::Clock::Timeout> timeout)
+CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout)
 {
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
 
@@ -76,15 +85,6 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Opti
 
     mExchangeCtx->SetResponseTimeout(timeout.ValueOr(session->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
 
-    if (mTimedRequest != mTimedInvokeTimeoutMs.HasValue())
-    {
-        ChipLogError(
-            DataManagement,
-            "Inconsistent timed request state in CommandSender: mTimedRequest (%d) != mTimedInvokeTimeoutMs.HasValue() (%d)",
-            mTimedRequest, mTimedInvokeTimeoutMs.HasValue());
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
     if (mTimedInvokeTimeoutMs.HasValue())
     {
         ReturnErrorOnFailure(TimedRequest::Send(mExchangeCtx.Get(), mTimedInvokeTimeoutMs.Value()));
@@ -93,6 +93,29 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Opti
     }
 
     return SendInvokeRequest();
+}
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+CHIP_ERROR CommandSender::TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(const SessionHandle & session,
+                                                                                 Optional<System::Clock::Timeout> timeout)
+{
+    VerifyOrReturnError(mTimedRequest, CHIP_ERROR_INCORRECT_STATE);
+    return SendCommandRequestInternal(session, timeout);
+}
+#endif
+
+CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Optional<System::Clock::Timeout> timeout)
+{
+
+    if (mTimedRequest != mTimedInvokeTimeoutMs.HasValue())
+    {
+        ChipLogError(
+            DataManagement,
+            "Inconsistent timed request state in CommandSender: mTimedRequest (%d) != mTimedInvokeTimeoutMs.HasValue() (%d)",
+            mTimedRequest, mTimedInvokeTimeoutMs.HasValue());
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    return SendCommandRequestInternal(session, timeout);
 }
 
 CHIP_ERROR CommandSender::SendGroupCommandRequest(const SessionHandle & session)
@@ -361,7 +384,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
 
     if (aStartDataStruct)
     {
-        ReturnErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kFields)),
+        ReturnErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::Tag::kFields),
                                                                        TLV::kTLVType_Structure, mDataElementContainerType));
     }
 
@@ -382,9 +405,9 @@ CHIP_ERROR CommandSender::FinishCommand(bool aEndDataStruct)
         ReturnErrorOnFailure(commandData.GetWriter()->EndContainer(mDataElementContainerType));
     }
 
-    ReturnErrorOnFailure(commandData.EndOfCommandDataIB().GetError());
-    ReturnErrorOnFailure(mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests().GetError());
-    ReturnErrorOnFailure(mInvokeRequestBuilder.EndOfInvokeRequestMessage().GetError());
+    ReturnErrorOnFailure(commandData.EndOfCommandDataIB());
+    ReturnErrorOnFailure(mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
+    ReturnErrorOnFailure(mInvokeRequestBuilder.EndOfInvokeRequestMessage());
 
     MoveToState(State::AddedCommand);
 

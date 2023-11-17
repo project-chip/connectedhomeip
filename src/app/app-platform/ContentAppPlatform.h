@@ -38,9 +38,20 @@ using BindingListType = chip::app::Clusters::Binding::Attributes::Binding::TypeI
 namespace chip {
 namespace AppPlatform {
 
-constexpr EndpointId kTargetBindingClusterEndpointId = 0;
-constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;
-constexpr EndpointId kLocalSpeakerEndpointId         = 2;
+// The AppPlatform overrides emberAfExternalAttributeReadCallback to handle external attribute reads for ContentApps.
+// This callback can be used to handle external attribute reads for attributes belonging to static endpoints.
+EmberAfStatus AppPlatformExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                                       const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                       uint16_t maxReadLength);
+
+// The AppPlatform overrides emberAfExternalAttributeWriteCallback to handle external attribute writes for ContentApps.
+// This callback can be used to handle external attribute writes for attributes belonging to static endpoints.
+EmberAfStatus AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                                        const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
+
+inline constexpr EndpointId kTargetBindingClusterEndpointId = 0;
+inline constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;
+inline constexpr EndpointId kLocalSpeakerEndpointId         = 2;
 
 class DLL_EXPORT ContentAppFactory
 {

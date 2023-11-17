@@ -18,14 +18,19 @@
 
 #include "AllClustersCommandDelegate.h"
 
-#include <app-common/zap-generated/att-storage.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/att-storage.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
+#include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <platform/PlatformManager.h>
+
+#include <air-quality-instance.h>
+#include <dishwasher-mode.h>
+#include <laundry-washer-mode.h>
+#include <rvc-modes.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -143,6 +148,36 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     {
         self->OnRebootSignalHandler(BootReasonType::kSoftwareReset);
     }
+    else if (name == "ModeChange")
+    {
+        using chip::app::DataModel::MakeNullable;
+        std::string device   = self->mJsonValue["Device"].asString();
+        std::string type     = self->mJsonValue["Type"].asString();
+        Json::Value jsonMode = self->mJsonValue["Mode"];
+        DataModel::Nullable<uint8_t> mode;
+        if (!jsonMode.isNull())
+        {
+            mode = MakeNullable(static_cast<uint8_t>(jsonMode.asUInt()));
+        }
+        else
+        {
+            mode.SetNull();
+        }
+        self->OnModeChangeHandler(device, type, mode);
+    }
+    else if (name == "SetAirQuality")
+    {
+        Json::Value jsonAirQualityEnum = self->mJsonValue["NewValue"];
+
+        if (jsonAirQualityEnum.isNull())
+        {
+            ChipLogError(NotSpecified, "The SetAirQuality command requires the NewValue key.");
+        }
+        else
+        {
+            self->OnAirQualityChange(static_cast<uint32_t>(jsonAirQualityEnum.asUInt()));
+        }
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command: Should never happens");
@@ -161,9 +196,10 @@ bool AllClustersAppCommandHandler::IsClusterPresentOnAnyEndpoint(ClusterId clust
 
 void AllClustersAppCommandHandler::OnRebootSignalHandler(BootReasonType bootReason)
 {
-    if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) != CHIP_NO_ERROR)
+    if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) == CHIP_NO_ERROR)
     {
-        Server::GetInstance().DispatchShutDownAndStopEventLoop();
+        Server::GetInstance().GenerateShutDownEvent();
+        PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
     }
     else
     {
@@ -181,16 +217,16 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         GeneralFaults<kMaxHardwareFaults> previous;
         GeneralFaults<kMaxHardwareFaults> current;
 
-#if CHIP_CONFIG_TEST
-        // On Linux Simulation, set following hardware faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
-        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
+        using GeneralDiagnostics::HardwareFaultEnum;
 
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
-#endif
+        // On Linux Simulation, set following hardware faults statically.
+        ReturnOnFailure(previous.add(to_underlying(HardwareFaultEnum::kRadio)));
+        ReturnOnFailure(previous.add(to_underlying(HardwareFaultEnum::kPowerSource)));
+
+        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kRadio)));
+        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kSensor)));
+        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kPowerSource)));
+        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kUserInterfaceFault)));
         Clusters::GeneralDiagnosticsServer::Instance().OnHardwareFaultsDetect(previous, current);
     }
     else if (eventId == Clusters::GeneralDiagnostics::Events::RadioFaultChange::Id)
@@ -198,16 +234,14 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         GeneralFaults<kMaxRadioFaults> previous;
         GeneralFaults<kMaxRadioFaults> current;
 
-#if CHIP_CONFIG_TEST
         // On Linux Simulation, set following radio faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
-        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
+        ReturnOnFailure(previous.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kWiFiFault)));
+        ReturnOnFailure(previous.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kThreadFault)));
 
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT));
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT));
-#endif
+        ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kWiFiFault)));
+        ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kCellularFault)));
+        ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kThreadFault)));
+        ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kNFCFault)));
         Clusters::GeneralDiagnosticsServer::Instance().OnRadioFaultsDetect(previous, current);
     }
     else if (eventId == Clusters::GeneralDiagnostics::Events::NetworkFaultChange::Id)
@@ -215,15 +249,13 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         GeneralFaults<kMaxNetworkFaults> previous;
         GeneralFaults<kMaxNetworkFaults> current;
 
-#if CHIP_CONFIG_TEST
         // On Linux Simulation, set following radio faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
-        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
+        ReturnOnFailure(previous.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kHardwareFailure)));
+        ReturnOnFailure(previous.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kNetworkJammed)));
 
-        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
-        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
-        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
-#endif
+        ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kHardwareFailure)));
+        ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kNetworkJammed)));
+        ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kConnectionFailed)));
         Clusters::GeneralDiagnosticsServer::Instance().OnNetworkFaultsDetect(previous, current);
     }
     else
@@ -249,8 +281,12 @@ void AllClustersAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
     softwareFault.name.SetValue(CharSpan::fromCharString(threadName));
 
     std::time_t result = std::time(nullptr);
-    char * asctime     = std::asctime(std::localtime(&result));
-    softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(asctime), strlen(asctime)));
+    // Using size of 50 as it is double the expected 25 characters "Www Mmm dd hh:mm:ss yyyy\n".
+    char timeChar[50];
+    if (std::strftime(timeChar, sizeof(timeChar), "%c", std::localtime(&result)))
+    {
+        softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
+    }
 
     Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
 }
@@ -286,6 +322,9 @@ void AllClustersAppCommandHandler::OnSwitchLongPressedHandler(uint8_t newPositio
     ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed for a long time:%d", newPosition);
 
     Clusters::SwitchServer::Instance().OnLongPress(endpoint, newPosition);
+
+    // Long press to trigger smokeco self-test
+    SmokeCoAlarmServer::Instance().RequestSelfTest(endpoint);
 }
 
 void AllClustersAppCommandHandler::OnSwitchShortReleasedHandler(uint8_t previousPosition)
@@ -338,6 +377,67 @@ void AllClustersAppCommandHandler::OnSwitchMultiPressCompleteHandler(uint8_t pre
     ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
 
     Clusters::SwitchServer::Instance().OnMultiPressComplete(endpoint, previousPosition, count);
+}
+
+void AllClustersAppCommandHandler::OnModeChangeHandler(std::string device, std::string type, DataModel::Nullable<uint8_t> mode)
+{
+    ModeBase::Instance * modeInstance = nullptr;
+    if (device == "DishWasher")
+    {
+        modeInstance = DishwasherMode::Instance();
+    }
+    else if (device == "LaundryWasher")
+    {
+        modeInstance = LaundryWasherMode::Instance();
+    }
+    else if (device == "RvcClean")
+    {
+        modeInstance = RvcCleanMode::Instance();
+    }
+    else if (device == "RvcRun")
+    {
+        modeInstance = RvcRunMode::Instance();
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Invalid device type : %s", device.c_str());
+        return;
+    }
+
+    if (type == "Current")
+    {
+        if (mode.IsNull())
+        {
+            ChipLogDetail(NotSpecified, "Invalid value : null");
+            return;
+        }
+        modeInstance->UpdateCurrentMode(mode.Value());
+    }
+    else if (type == "StartUp")
+    {
+        modeInstance->UpdateStartUpMode(mode);
+    }
+    else if (type == "On")
+    {
+        modeInstance->UpdateOnMode(mode);
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Invalid mode type : %s", type.c_str());
+        return;
+    }
+}
+
+void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
+{
+    AirQuality::Instance * airQualityInstance = AirQuality::GetInstance();
+    Protocols::InteractionModel::Status status =
+        airQualityInstance->UpdateAirQuality(static_cast<AirQuality::AirQualityEnum>(aNewValue));
+
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogDetail(NotSpecified, "Invalid value: %u", aNewValue);
+    }
 }
 
 void AllClustersCommandDelegate::OnEventCommandReceived(const char * json)

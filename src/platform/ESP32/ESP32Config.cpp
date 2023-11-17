@@ -85,10 +85,17 @@ const ESP32Config::Key ESP32Config::kConfigKey_PairedAccountId    = { kConfigNam
 const ESP32Config::Key ESP32Config::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
 const ESP32Config::Key ESP32Config::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const ESP32Config::Key ESP32Config::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
-const ESP32Config::Key ESP32Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const ESP32Config::Key ESP32Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "reg-location" };
 const ESP32Config::Key ESP32Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 const ESP32Config::Key ESP32Config::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
+const ESP32Config::Key ESP32Config::kConfigKey_LockUser           = { kConfigNamespace_ChipConfig, "lock-user" };
+const ESP32Config::Key ESP32Config::kConfigKey_Credential         = { kConfigNamespace_ChipConfig, "credential" };
+const ESP32Config::Key ESP32Config::kConfigKey_LockUserName       = { kConfigNamespace_ChipConfig, "lock-user-name" };
+const ESP32Config::Key ESP32Config::kConfigKey_CredentialData     = { kConfigNamespace_ChipConfig, "credential-data" };
+const ESP32Config::Key ESP32Config::kConfigKey_UserCredentials    = { kConfigNamespace_ChipConfig, "user-credential" };
+const ESP32Config::Key ESP32Config::kConfigKey_WeekDaySchedules   = { kConfigNamespace_ChipConfig, "week-day-sched" };
+const ESP32Config::Key ESP32Config::kConfigKey_YearDaySchedules   = { kConfigNamespace_ChipConfig, "year-day-sched" };
+const ESP32Config::Key ESP32Config::kConfigKey_HolidaySchedules   = { kConfigNamespace_ChipConfig, "holiday-sched" };
 
 // Keys stored in the Chip-counters namespace
 const ESP32Config::Key ESP32Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
@@ -105,7 +112,7 @@ const char * ESP32Config::GetPartitionLabelByNamespace(const char * ns)
     {
         return CHIP_DEVICE_CONFIG_CHIP_CONFIG_NAMESPACE_PARTITION;
     }
-    else if (strcmp(ns, kConfigNamespace_ChipCounters))
+    else if (strcmp(ns, kConfigNamespace_ChipCounters) == 0)
     {
         return CHIP_DEVICE_CONFIG_CHIP_COUNTERS_NAMESPACE_PARTITION;
     }
@@ -331,7 +338,7 @@ CHIP_ERROR ESP32Config::WriteConfigValueBin(Key key, const uint8_t * data, size_
         // Commit the value to the persistent store.
         ReturnMappedErrorOnFailure(nvs_commit(handle));
 
-        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %" PRId32 ")", StringOrNullMarker(key.Namespace),
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %u)", StringOrNullMarker(key.Namespace),
                         StringOrNullMarker(key.Name), dataLen);
         return CHIP_NO_ERROR;
     }
@@ -363,10 +370,10 @@ bool ESP32Config::ConfigValueExists(Key key)
 {
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
     nvs_iterator_t iterator = NULL;
-    esp_err_t err           = nvs_entry_find(NVS_DEFAULT_PART_NAME, key.Namespace, NVS_TYPE_ANY, &iterator);
+    esp_err_t err           = nvs_entry_find(GetPartitionLabelByNamespace(key.Namespace), key.Namespace, NVS_TYPE_ANY, &iterator);
     for (; iterator && err == ESP_OK; err = nvs_entry_next(&iterator))
 #else
-    nvs_iterator_t iterator = nvs_entry_find(NVS_DEFAULT_PART_NAME, key.Namespace, NVS_TYPE_ANY);
+    nvs_iterator_t iterator = nvs_entry_find(GetPartitionLabelByNamespace(key.Namespace), key.Namespace, NVS_TYPE_ANY);
     for (; iterator; iterator = nvs_entry_next(iterator))
 #endif
     {

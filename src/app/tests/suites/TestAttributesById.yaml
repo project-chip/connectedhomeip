@@ -1,0 +1,280 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Attributes Tests
+
+config:
+    nodeId: 0x12344321
+    endpoint: 1
+    cluster: "Unit Testing"
+
+    UnsupportedCluster: 0xFFF1FC06
+    UnsupportedAttribute: 0xFFF11FFF
+    UnsupportedEndPoint: 254
+
+    AttributeRequestMessage.Cluster: 0xFFF1FC05
+    AttributeRequestMessage.Attribute: 0x0000
+    AttributeRequestMessage.EndPoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Read Request Message with a path that indicates a specific endpoint
+          that is unsupported"
+      cluster: "AnyCommands"
+      command: "ReadById"
+      endpoint: UnsupportedEndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: AttributeRequestMessage.Cluster
+              - name: "AttributeId"
+                value: AttributeRequestMessage.Attribute
+      response:
+          error: UNSUPPORTED_ENDPOINT
+
+    - label:
+          "Read Request Message with a path that indicates a specific cluster
+          that is unsupported"
+      cluster: "AnyCommands"
+      command: "ReadById"
+      endpoint: AttributeRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: UnsupportedCluster
+              - name: "AttributeId"
+                value: AttributeRequestMessage.Attribute
+      response:
+          error: UNSUPPORTED_CLUSTER
+
+    - label:
+          "Read Request Message with a path that indicates a specific command
+          that is unsupported"
+      cluster: "AnyCommands"
+      command: "ReadById"
+      endpoint: AttributeRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: AttributeRequestMessage.Cluster
+              - name: "AttributeId"
+                value: UnsupportedAttribute
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label:
+          "Read Request Message with a valid path that indicates a specific
+          endpoint/cluster/attribute"
+      cluster: "AnyCommands"
+      command: "ReadById"
+      endpoint: AttributeRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: AttributeRequestMessage.Cluster
+              - name: "AttributeId"
+                value: AttributeRequestMessage.Attribute
+      response:
+          value: false
+
+    - label:
+          "Write Request Message with a path that indicates a specific endpoint
+          that is unsupported"
+      cluster: "AnyCommands"
+      command: "WriteById"
+      endpoint: UnsupportedEndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: AttributeRequestMessage.Cluster
+              - name: "AttributeId"
+                value: AttributeRequestMessage.Attribute
+              - name: "Value"
+                value: true
+      response:
+          error: UNSUPPORTED_ENDPOINT
+
+    - label:
+          "Write Request Message with a path that indicates a specific cluster
+          that is unsupported"
+      cluster: "AnyCommands"
+      command: "WriteById"
+      endpoint: AttributeRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: UnsupportedCluster
+              - name: "AttributeId"
+                value: AttributeRequestMessage.Attribute
+              - name: "Value"
+                value: true
+      response:
+          error: UNSUPPORTED_CLUSTER
+
+    - label:
+          "Write Request Message with a path that indicates a specific command
+          that is unsupported"
+      cluster: "AnyCommands"
+      command: "WriteById"
+      endpoint: AttributeRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: AttributeRequestMessage.Cluster
+              - name: "AttributeId"
+                value: UnsupportedAttribute
+              - name: "Value"
+                value: true
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label:
+          "Write Request Message with a valid path that indicates a specific
+          endpoint/cluster/attribute"
+      cluster: "AnyCommands"
+      command: "WriteById"
+      endpoint: AttributeRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: AttributeRequestMessage.Cluster
+              - name: "AttributeId"
+                value: AttributeRequestMessage.Attribute
+              - name: "Value"
+                value: true
+
+    - label:
+          "Write Request Message with a valid path that indicates a specific
+          endpoint/cluster/attribute and set it back to defaults."
+      cluster: "AnyCommands"
+      command: "WriteById"
+      endpoint: AttributeRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: AttributeRequestMessage.Cluster
+              - name: "AttributeId"
+                value: AttributeRequestMessage.Attribute
+              - name: "Value"
+                value: false
+
+    - label:
+          "Subscribe Request Message with a path that indicates a specific
+          endpoint that is unsupported"
+      cluster: "AnyCommands"
+      command: "SubscribeById"
+      endpoint: UnsupportedEndPoint
+      minInterval: 2
+      maxInterval: 5
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: AttributeRequestMessage.Cluster
+              - name: "AttributeId"
+                value: AttributeRequestMessage.Attribute
+      response:
+          error: INVALID_ACTION
+
+    - label:
+          "Subscribe Request Message with a path that indicates a specific
+          cluster that is unsupported"
+      cluster: "AnyCommands"
+      command: "SubscribeById"
+      endpoint: AttributeRequestMessage.EndPoint
+      minInterval: 2
+      maxInterval: 5
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: UnsupportedCluster
+              - name: "AttributeId"
+                value: AttributeRequestMessage.Attribute
+      response:
+          error: INVALID_ACTION
+
+    - label:
+          "Subscribe Request Message with a path that indicates a specific
+          command that is unsupported"
+      cluster: "AnyCommands"
+      command: "SubscribeById"
+      endpoint: AttributeRequestMessage.EndPoint
+      minInterval: 2
+      maxInterval: 5
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: AttributeRequestMessage.Cluster
+              - name: "AttributeId"
+                value: UnsupportedAttribute
+      response:
+          error: INVALID_ACTION
+
+    - label:
+          "Subscribe Request Message with a valid path that indicates a specific
+          endpoint/cluster/attribute"
+      cluster: "AnyCommands"
+      command: "SubscribeById"
+      endpoint: AttributeRequestMessage.EndPoint
+      minInterval: 2
+      maxInterval: 5
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: AttributeRequestMessage.Cluster
+              - name: "AttributeId"
+                value: AttributeRequestMessage.Attribute
+
+    - label:
+          "Write Request Message with a valid path that indicates a specific
+          endpoint/cluster/attribute"
+      cluster: "AnyCommands"
+      command: "WriteById"
+      endpoint: AttributeRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: AttributeRequestMessage.Cluster
+              - name: "AttributeId"
+                value: AttributeRequestMessage.Attribute
+              - name: "Value"
+                value: true
+
+    - label: "Check for attribute report"
+      command: "waitForReport"
+      attribute: "boolean"
+      response:
+          value: true
+
+    - label:
+          "Write Request Message with a valid path that indicates a specific
+          endpoint/cluster/attribute and set it back to defaults."
+      cluster: "AnyCommands"
+      command: "WriteById"
+      endpoint: AttributeRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: AttributeRequestMessage.Cluster
+              - name: "AttributeId"
+                value: AttributeRequestMessage.Attribute
+              - name: "Value"
+                value: false
