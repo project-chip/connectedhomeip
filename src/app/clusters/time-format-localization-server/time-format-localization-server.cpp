@@ -47,7 +47,6 @@ public:
     TimeFormatLocalizationAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TimeFormatLocalization::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
     CHIP_ERROR ReadSupportedCalendarTypes(AttributeValueEncoder & aEncoder);
@@ -132,38 +131,6 @@ bool IsSupportedCalendarType(CalendarTypeEnum newType, CalendarTypeEnum & validT
     return false;
 }
 
-CHIP_ERROR TimeFormatLocalizationAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    VerifyOrDie(aPath.mClusterId == TimeFormatLocalization::Id);
-
-    switch (aPath.mAttributeId)
-    {
-    case ActiveCalendarType::Id:
-        CalendarTypeEnum value;
-        ReturnErrorOnFailure(aDecoder.Decode(value));
-
-        if (value != CalendarTypeEnum::kUseActiveLocale)
-        {
-            // Valid range is from 0 to unknown.
-            // This relies that unknown value is the first unused value and values
-            // increase over time
-            if (to_underlying(value) >= to_underlying(CalendarTypeEnum::kUnknownEnumValue))
-            {
-                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-            }
-        }
-
-        if (ActiveCalendarType::Set(aPath.mEndpointId, value) != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
-        break;
-    default:
-        break;
-    }
-    return CHIP_NO_ERROR;
-}
-
 } // anonymous namespace
 
 // =============================================================================
@@ -199,28 +166,24 @@ emberAfPluginTimeFormatLocalizationOnUnhandledAttributeChange(EndpointId Endpoin
 Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback(
     const ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    Protocols::InteractionModel::Status res;
-
     switch (attributePath.mAttributeId)
     {
-    case ActiveCalendarType::Id:
-        if (sizeof(uint8_t) == size)
-        {
-            res = emberAfPluginTimeFormatLocalizationOnCalendarTypeChange(attributePath.mEndpointId,
-                                                                          static_cast<CalendarTypeEnum>(*value));
-        }
-        else
-        {
-            res = Protocols::InteractionModel::Status::InvalidValue;
-        }
-        break;
+    case ActiveCalendarType::Id: {
+        VerifyOrReturnValue(sizeof(uint8_t) == size, Protocols::InteractionModel::Status::InvalidValue);
 
-    default:
-        res = emberAfPluginTimeFormatLocalizationOnUnhandledAttributeChange(attributePath.mEndpointId, attributeType, size, value);
-        break;
+        CalendarTypeEnum calendarType = static_cast<CalendarTypeEnum>(*value);
+
+        // Valid range is from 0 to unknown. This relies that unknown value is
+        // the first unused value and values increase over time
+        VerifyOrReturnValue(((calendarType == CalendarTypeEnum::kUseActiveLocale) ||
+                             (to_underlying(calendarType) < to_underlying(CalendarTypeEnum::kUnknownEnumValue))),
+                            Protocols::InteractionModel::Status::ConstraintError);
+
+        return emberAfPluginTimeFormatLocalizationOnCalendarTypeChange(attributePath.mEndpointId, calendarType);
     }
-
-    return res;
+    default:
+        return emberAfPluginTimeFormatLocalizationOnUnhandledAttributeChange(attributePath.mEndpointId, attributeType, size, value);
+    }
 }
 
 void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
