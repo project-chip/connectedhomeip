@@ -1614,7 +1614,7 @@ void OnBasicFailure(void * context, CHIP_ERROR error)
     commissioner->CommissioningStageComplete(error);
 }
 
-void NonConcurrentTimeout(void * context, CHIP_ERROR error)
+static void NonConcurrentTimeout(void * context, CHIP_ERROR error)
 {
     if (error == CHIP_ERROR_TIMEOUT)
     {
@@ -1622,10 +1622,17 @@ void NonConcurrentTimeout(void * context, CHIP_ERROR error)
     }
     else
     {
-        ChipLogProgress(Controller, "Non-concurrent mode: Received failure response %s\n", chip::ErrorStr(error));
-        DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-        commissioner->CommissioningStageComplete(error);
+        ChipLogProgress(Controller, "Non-concurrent mode: Received failure response %" CHIP_ERROR_FORMAT, error.Format());
     }
+}
+
+static void NonConcurrentNetworkResponse(
+    void * context, const NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
+{
+    // In Non Concurrent mode the commissioning network should have been shut down and not sent the
+    // ConnectNetworkResponse. In case it does send it this handles the message
+    ChipLogError(Controller, "Non-concurrent Mode : Received Unexpected ConnectNetwork response, ignoring. Status=%u",
+                    to_underlying(data.networkingStatus));
 }
 
 void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
@@ -2273,15 +2280,6 @@ void DeviceCommissioner::OnArmFailSafe(void * context,
 
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);
-}
-
-void DeviceCommissioner::NonConcurrentNetworkResponse(
-    void * context, const NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
-{
-    // In Non Concurrent mode the commissioning network should have been shut down and not sent the
-    // ConnectNetworkResponse. In case it does send it this handles the message
-    ChipLogProgress(Controller, "NonConcurrent Mode : Received Unexpected ConnectNetwork response, ignoring. Status=%u",
-                    to_underlying(data.networkingStatus));
 }
 
 void DeviceCommissioner::OnSetRegulatoryConfigResponse(
@@ -2965,13 +2963,16 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         else
         {
             // Concurrent Connections not allowed. Send the ConnectNetwork command but do not wait for the
-            // ConnectNetworkResponse on the Commissioing network as it will not be present. Stop the timeout
+            // ConnectNetworkResponse on the Commissioning network as it will not be present. Log the expected timeout
             // and run what would have been in the onConnectNetworkResponse callback.
-            SendCommand(proxy, request, NonConcurrentNetworkResponse, NonConcurrentTimeout, endpoint, NullOptional);
-            // As there will be no ConnectNetworkResponse, it is an implicit kSuccess so a default report is fine
-            CommissioningDelegate::CommissioningReport report;
-            DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(this);
-            commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+            err = SendCommand(proxy, request, NonConcurrentNetworkResponse, NonConcurrentTimeout, endpoint, NullOptional);
+            if (err == CHIP_NO_ERROR)
+            {
+                // As there will be no ConnectNetworkResponse, it is an implicit kSuccess so a default report is fine
+                CommissioningDelegate::CommissioningReport report;
+                CommissioningStageComplete(CHIP_NO_ERROR, report);
+                return;
+            }
         }
 
         if (err != CHIP_NO_ERROR)
