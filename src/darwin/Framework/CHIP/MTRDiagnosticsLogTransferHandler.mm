@@ -15,51 +15,53 @@
  *    limitations under the License.
  */
 
+#include "MTRDiagnosticsLogTransferHandler.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceController_Internal.h"
-#import "NSDataSpanConversion.h"
-
-#include "MTRDiagnosticLogsTransferHandler.h"
 #include <MTRError_Internal.h>
+
+#import "NSDataSpanConversion.h"
 
 using namespace chip;
 using namespace chip::bdx;
 using namespace chip::app;
 
+// Max block size for the BDX transfer.
 constexpr uint32_t kMaxBdxBlockSize = 1024;
 
-// Timeout for the BDX transfer session. The OTA Spec mandates this should be >= 5 minutes.
+// Timeout for the BDX transfer session..
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
-constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kReceiver;
+constexpr TransferRole kBdxRole = TransferRole::kReceiver;
 
-CHIP_ERROR MTRDiagnosticLogsTransferHandler::PrepareForTransfer(System::Layer * _Nonnull layer, FabricIndex fabricIndex, NodeId nodeId)
+CHIP_ERROR MTRDiagnosticsLogTransferHandler::PrepareForTransfer(System::Layer * _Nonnull layer, FabricIndex fabricIndex, NodeId peerNodeId)
 {
     assertChipStackLockedByCurrentThread();
 
-    ReturnErrorOnFailure(ConfigureState(fabricIndex, nodeId));
+    mFabricIndex.SetValue(fabricIndex);
+    mPeerNodeId.SetValue(peerNodeId);
 
-    BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kSenderDrive);
+    BitFlags<TransferControlFlags> flags(TransferControlFlags::kSenderDrive);
 
     return Responder::PrepareForTransfer(layer, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout);
 }
 
-bdx::StatusCode GetBdxStatusCodeFromChipError(CHIP_ERROR err)
+StatusCode GetBdxStatusCodeFromChipError(CHIP_ERROR err)
 {
     if (err == CHIP_ERROR_INCORRECT_STATE) {
-        return bdx::StatusCode::kUnexpectedMessage;
+        return StatusCode::kUnexpectedMessage;
     }
     if (err == CHIP_ERROR_INVALID_ARGUMENT) {
-        return bdx::StatusCode::kBadMessageContents;
+        return StatusCode::kBadMessageContents;
     }
-    return bdx::StatusCode::kUnknown;
+    return StatusCode::kUnknown;
 }
 
-CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnTransferSessionBegin(TransferSession::OutputEvent & event)
+CHIP_ERROR MTRDiagnosticsLogTransferHandler::OnTransferSessionBegin(TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturnError(mFabricIndex.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mPeerNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
     NSError * error = nil;
 
     mFileHandle = [NSFileHandle fileHandleForWritingToURL:mFileURL error:&error];
@@ -71,7 +73,7 @@ CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnTransferSessionBegin(TransferSess
     }
 
     TransferSession::TransferAcceptData acceptData;
-    acceptData.ControlMode = bdx::TransferControlFlags::kSenderDrive;
+    acceptData.ControlMode = TransferControlFlags::kSenderDrive;
     acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
     acceptData.StartOffset = mTransfer.GetStartOffset();
     acceptData.Length = mTransfer.GetTransferLength();
@@ -80,11 +82,11 @@ CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnTransferSessionBegin(TransferSess
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnTransferSessionEnd(TransferSession::OutputEvent & event)
+CHIP_ERROR MTRDiagnosticsLogTransferHandler::OnTransferSessionEnd(TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mFabricIndex.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mPeerNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     if (event.EventType == TransferSession::OutputEventType::kTransferTimeout) {
@@ -101,14 +103,14 @@ CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnTransferSessionEnd(TransferSessio
     return error;
 }
 
-CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnBlockReceived(TransferSession::OutputEvent & event)
+CHIP_ERROR MTRDiagnosticsLogTransferHandler::OnBlockReceived(TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturnError(mFabricIndex.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mPeerNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
-    chip::ByteSpan blockData(event.blockdata.Data, event.blockdata.Length);
+    ByteSpan blockData(event.blockdata.Data, event.blockdata.Length);
 
     if (mFileHandle != nil) {
         [mFileHandle seekToEndOfFile];
@@ -135,7 +137,7 @@ CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnBlockReceived(TransferSession::Ou
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnMessageToSend(TransferSession::OutputEvent & event)
+CHIP_ERROR MTRDiagnosticsLogTransferHandler::OnMessageToSend(TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -165,7 +167,7 @@ CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnMessageToSend(TransferSession::Ou
     return err;
 }
 
-void MTRDiagnosticLogsTransferHandler::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
+void MTRDiagnosticsLogTransferHandler::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
     ChipLogError(BDX, "Got an event %s", event.ToString(event.EventType));
@@ -215,13 +217,13 @@ void MTRDiagnosticLogsTransferHandler::HandleTransferSessionOutput(TransferSessi
     }
 }
 
-void MTRDiagnosticLogsTransferHandler::AbortTransfer(chip::bdx::StatusCode reason)
+void MTRDiagnosticsLogTransferHandler::AbortTransfer(StatusCode reason)
 {
     assertChipStackLockedByCurrentThread();
     mTransfer.AbortTransfer(reason);
 }
 
-void MTRDiagnosticLogsTransferHandler::Reset()
+void MTRDiagnosticsLogTransferHandler::Reset()
 {
     assertChipStackLockedByCurrentThread();
     mFileURL = nil;
@@ -233,20 +235,10 @@ void MTRDiagnosticLogsTransferHandler::Reset()
         mExchangeCtx = nil;
     }
     mFabricIndex.ClearValue();
-    mNodeId.ClearValue();
+    mPeerNodeId.ClearValue();
 }
 
-CHIP_ERROR MTRDiagnosticLogsTransferHandler::ConfigureState(chip::FabricIndex fabricIndex, chip::NodeId nodeId)
-{
-    assertChipStackLockedByCurrentThread();
-
-    mFabricIndex.SetValue(fabricIndex);
-    mNodeId.SetValue(nodeId);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnMessageReceived(
+CHIP_ERROR MTRDiagnosticsLogTransferHandler::OnMessageReceived(
     Messaging::ExchangeContext * _Nonnull ec, const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     VerifyOrReturnError(ec != nil, CHIP_ERROR_INCORRECT_STATE);
@@ -255,19 +247,17 @@ CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnMessageReceived(
 
     // If we receive a ReceiveInit message, then we prepare for transfer
     if (payloadHeader.HasMessageType(MessageType::SendInit)) {
-        NodeId nodeId = ec->GetSessionHandle()->GetPeer().GetNodeId();
+        NodeId peerNodeId = ec->GetSessionHandle()->GetPeer().GetNodeId();
         FabricIndex fabricIndex = ec->GetSessionHandle()->GetFabricIndex();
 
-        if (nodeId != kUndefinedNodeId && fabricIndex != kUndefinedFabricIndex) {
-            err = PrepareForTransfer(&(DeviceLayer::SystemLayer()), fabricIndex, nodeId);
+        if (peerNodeId != kUndefinedNodeId && fabricIndex != kUndefinedFabricIndex) {
+            err = PrepareForTransfer(&(DeviceLayer::SystemLayer()), fabricIndex, peerNodeId);
             if (err != CHIP_NO_ERROR) {
                 ChipLogError(BDX, "Failed to prepare for transfer for BDX");
                 return err;
             }
         }
     }
-
     TransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
-
     return err;
 }

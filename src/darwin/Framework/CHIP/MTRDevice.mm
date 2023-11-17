@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#import <Matter/MTRClusters.h>
 #import <Matter/MTRDefines.h>
 #import <os/lock.h>
 
@@ -29,24 +28,20 @@
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDevice_Internal.h"
+#import "MTRDiagnosticsLogDownloadTask.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging_Internal.h"
-#import "NSDataSpanConversion.h"
-#import "NSStringSpanConversion.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 
 #include "lib/core/CHIPError.h"
 #include "lib/core/DataModelTypes.h"
 #include <app/ConcreteAttributePath.h>
 
-#include "MTRDiagnosticLogsTransferHandler.h"
 #include <app/AttributePathParams.h>
 #include <app/BufferedReadCallback.h>
 #include <app/ClusterStateCache.h>
 #include <app/InteractionModelEngine.h>
-#include <controller/CHIPDeviceControllerFactory.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
 typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
@@ -150,8 +145,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @property (nonatomic) chip::FabricIndex fabricIndex;
 @property (nonatomic) MTRWeakReference<id<MTRDeviceDelegate>> * weakDelegate;
 @property (nonatomic) dispatch_queue_t delegateQueue;
-@property (nonatomic) dispatch_source_t timerSource;
-@property (nonatomic) MTRDiagnosticLogsTransferHandler * diagnosticLogsTransferHandler;
+@property (nonatomic) MTRDiagnosticsLogDownloadTask * diagnosticsLogDownloadTask;
 @property (nonatomic) NSArray<NSDictionary<NSString *, id> *> * unreportedEvents;
 
 /**
@@ -1321,196 +1315,18 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [baseDevice openCommissioningWindowWithDiscriminator:discriminator duration:duration queue:queue completion:completion];
 }
 
-- (NSString *)_toLogTypeString:(MTRDiagnosticLogType)type
-{
-    switch (type) {
-    case MTRDiagnosticLogTypeEndUserSupport:
-        return @"EndUserSupport";
-    case MTRDiagnosticLogTypeNetworkDiagnostics:
-        return @"NetworkDiag";
-    case MTRDiagnosticLogTypeCrash:
-        return @"Crash";
-    default:
-        return @"";
-    }
-}
-
-- (NSString *)_getFileDesignatorForLogType:(MTRDiagnosticLogType)type
-{
-
-    NSString * fileDesignator = [NSString stringWithFormat:@"%@%@/%@", @"bdx:/", self.nodeID, [self _toLogTypeString:type]];
-    return fileDesignator;
-}
-
-- (void)_startTimerForDownload:(NSTimeInterval)timeout
-{
-    _timerSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, DISPATCH_TIMER_STRICT, self.queue);
-    VerifyOrDie(_timerSource != nullptr);
-
-    dispatch_source_set_timer(
-        _timerSource, dispatch_walltime(nullptr, static_cast<int64_t>(timeout * NSEC_PER_MSEC)), DISPATCH_TIME_FOREVER, 2 * NSEC_PER_MSEC);
-
-    dispatch_source_set_event_handler(_timerSource, ^{
-        dispatch_async(self.queue, ^{
-            if (self->_diagnosticLogsTransferHandler != nil) {
-                self->_diagnosticLogsTransferHandler->AbortTransfer(chip::bdx::StatusCode::kUnknown);
-            }
-        });
-        dispatch_source_cancel(self->_timerSource);
-    });
-    dispatch_resume(_timerSource);
-}
-
-- (NSURL * _Nullable)_temporaryFileURLForDownload:(MTRDiagnosticLogType)type
-                                            queue:(dispatch_queue_t)queue
-                                       completion:(void (^)(NSURL * _Nullable logResult, NSError * error))completion
-{
-    NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.dateFormat = @"yyyy-MM-dd_HH:mm:ss.SSSZZZ";
-
-    NSString * timeString = [dateFormatter stringFromDate:NSDate.now];
-
-    NSString * fileName = [NSString stringWithFormat:@"%@_%@_%@", timeString, self.nodeID, [self _toLogTypeString:type]];
-
-    NSURL * filePath = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName] isDirectory:YES];
-    NSError * error = nil;
-
-    NSURL * downloadFileURL = [[NSFileManager defaultManager] URLForDirectory:NSItemReplacementDirectory
-                                                                     inDomain:NSUserDomainMask
-                                                            appropriateForURL:filePath
-                                                                       create:YES
-                                                                        error:&error];
-    if (downloadFileURL == nil || error != nil) {
-        return nil;
-    }
-
-    if ([[NSFileManager defaultManager] createFileAtPath:[filePath path] contents:nil attributes:nil]) {
-        return filePath;
-    }
-    return nil;
-}
-
-- (bool)_isErrorResponse:(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable)response
-{
-    chip::app::Clusters::DiagnosticLogs::StatusEnum statusValue = static_cast<chip::app::Clusters::DiagnosticLogs::StatusEnum>(response.status.intValue);
-    return (response == nil || (response.status != nil && statusValue != chip::app::Clusters::DiagnosticLogs::StatusEnum::kNoLogs && statusValue != chip::app::Clusters::DiagnosticLogs::StatusEnum::kExhausted) || response.logContent.length == 0);
-}
-
-- (void)_invokeCompletion:(void (^)(NSURL * _Nullable logResult, NSError * error))completion
-                 filepath:(NSURL * _Nullable)filepath
-                    queue:(dispatch_queue_t)queue
-                    error:(NSError * _Nullable)error
-{
-    dispatch_async(queue, ^{
-        completion(filepath, error);
-    });
-
-    dispatch_async(self.queue, ^{
-        if (self->_diagnosticLogsTransferHandler != nil) {
-            delete (self->_diagnosticLogsTransferHandler);
-            self->_diagnosticLogsTransferHandler = nil;
-        }
-    });
-}
-
-- (void)_invokeCompletionWithError:(void (^)(NSURL * _Nullable logResult, NSError * error))completion
-                             queue:(dispatch_queue_t)queue
-                             error:(NSError * _Nullable)error
-{
-    [self _invokeCompletion:completion filepath:nil queue:queue error:error];
-}
-
-- (void)_downloadLogOfType:(MTRDiagnosticLogType)type
-                   timeout:(NSTimeInterval)timeout
-                     queue:(dispatch_queue_t)queue
-                completion:(void (^)(NSURL * _Nullable logResult, NSError * error))completion
-{
-    if (type != MTRDiagnosticLogTypeEndUserSupport && type != MTRDiagnosticLogTypeNetworkDiagnostics && type != MTRDiagnosticLogTypeCrash) {
-        [self _invokeCompletionWithError:completion queue:queue error:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidArgument userInfo:nil]];
-        return;
-    }
-
-    MTRClusterDiagnosticLogs * cluster = [[MTRClusterDiagnosticLogs alloc] initWithDevice:self endpointID:@(0) queue:queue];
-    if (cluster == nil) {
-        [self _invokeCompletionWithError:completion queue:queue error:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil]];
-        return;
-    }
-
-    NSURL * filePath = [self _temporaryFileURLForDownload:type queue:queue completion:completion];
-    if (filePath == nil) {
-        [self _invokeCompletionWithError:completion queue:queue error:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil]];
-    }
-
-    self->_diagnosticLogsTransferHandler = new MTRDiagnosticLogsTransferHandler(filePath, ^(bool result) {
-        if (result == YES) {
-            [self _invokeCompletion:completion filepath:filePath queue:queue error:nil];
-        } else {
-            [self _invokeCompletionWithError:completion queue:queue error:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil]];
-        }
-    });
-
-    // Get the device commissionee and get the exchange manager to register for unsolicited message handler for BDX messages
-    [self.deviceController asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
-        if (commissioner == nil) {
-            [self _invokeCompletionWithError:completion queue:queue error:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil]];
-            return;
-        }
-
-        commissioner->ExchangeMgr()->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, self->_diagnosticLogsTransferHandler);
-
-        dispatch_async(self.queue, ^{
-            // Start a timer if a timeout is provided
-            if (timeout > 0) {
-                [self _startTimerForDownload:timeout];
-            }
-
-            MTRDiagnosticLogsClusterRetrieveLogsRequestParams * requestParams = [[MTRDiagnosticLogsClusterRetrieveLogsRequestParams alloc] init];
-            requestParams.intent = @(type);
-            requestParams.requestedProtocol = @(chip::to_underlying(chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum::kBdx));
-            requestParams.transferFileDesignator = [self _getFileDesignatorForLogType:type];
-            [cluster retrieveLogsRequestWithParams:requestParams expectedValues:nil expectedValueInterval:nil
-                                        completion:^(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable response, NSError * _Nullable error) {
-                                            // If we are in a BDX session and there is no error, do nothing. Completion will be called when BDX succeeds or fails.
-                                            if (self->_diagnosticLogsTransferHandler != nil && error == nil) {
-                                                return;
-                                            }
-
-                                            if ([self _isErrorResponse:response]) {
-                                                if (self->_timerSource) {
-                                                    dispatch_source_cancel(self->_timerSource);
-                                                }
-
-                                                [self _invokeCompletionWithError:completion queue:queue error:error];
-                                                return;
-                                            }
-
-                                            // If the response has a log content, copy it into the temporary location and send the URL.
-                                            if (response != nil && response.logContent != nil && response.logContent.length > 0) {
-                                                if ([response.logContent writeToURL:filePath atomically:YES]) {
-                                                    if (self->_timerSource) {
-                                                        dispatch_source_cancel(self->_timerSource);
-                                                    }
-                                                    [self _invokeCompletion:completion filepath:filePath queue:queue error:nil];
-                                                    return;
-                                                }
-                                            }
-                                        }];
-        });
-    }
-        errorHandler:^(NSError * error) {
-            if (self->_timerSource) {
-                dispatch_source_cancel(self->_timerSource);
-            }
-            [self _invokeCompletionWithError:completion queue:queue error:error];
-        }];
-}
-
 - (void)downloadLogOfType:(MTRDiagnosticLogType)type
                   timeout:(NSTimeInterval)timeout
                     queue:(dispatch_queue_t)queue
                completion:(void (^)(NSURL * _Nullable logResult, NSError * error))completion
 {
-    [self _downloadLogOfType:type timeout:timeout queue:queue completion:completion];
+    self->_diagnosticsLogDownloadTask = [[MTRDiagnosticsLogDownloadTask alloc] initWithDevice:self];
+    [self->_diagnosticsLogDownloadTask downloadLogOfType:type timeout:timeout queue:queue completion:completion];
+}
+
+- (void)removeDiagnosticsLogDownloadTask
+{
+    self->_diagnosticsLogDownloadTask = nil;
 }
 
 #pragma mark - Cache management

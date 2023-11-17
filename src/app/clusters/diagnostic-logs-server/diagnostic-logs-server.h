@@ -33,12 +33,10 @@ namespace Clusters {
 namespace DiagnosticLogs {
 
 // Spec mandated max file designator length
-static constexpr uint8_t kLogFileDesignatorMaxLen = 32;
-
-static constexpr const uint16_t kDiagnosticLogsEndpoint = 0;
+static constexpr uint8_t kMaxFileDesignatorLen = 32;
 
 // Spec mandated max size of the log content field in the Response paylod
-static constexpr uint16_t kLogContentMaxSize = 1024;
+static constexpr uint16_t kMaxLogContentSize = 1024;
 
 /// A reference implementation for DiagnosticLogs source.
 class DiagnosticLogsServer
@@ -55,24 +53,57 @@ public:
      */
     void SetLogProviderDelegate(EndpointId endpoint, LogProviderDelegate * delegate);
 
-    void HandleLogRequestForResponsePayload(chip::app::CommandHandler * commandHandler, chip::app::ConcreteCommandPath path,
-                                            IntentEnum intent);
+    /**
+     * Handles the request to download diagnostic logs of type specified in the intent argument for protocol type ResponsePayload
+     * This should return whatever fits in the logContent field of the RetrieveLogsResponse command
+     *
+     * @param commandHandler The command handler object from the RetrieveLogsRequest command
+     *
+     * @param path The command path from the RetrieveLogsRequest command
+     *
+     * @param intent The log type requested in the RetrieveLogsRequest command
+     *
+     */
+    void HandleLogRequestForResponsePayload(CommandHandler * commandHandler, ConcreteCommandPath path, IntentEnum intent);
 
 #if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
 
-    void HandleBDXResponse(CHIP_ERROR error);
+    /**
+     * Send the command response to the requestor with the status value passed in.
+     * This should be called if there are any errors before we receive a SendAccept
+     * from the requestor.
+     *
+     * @param status The status to send in the command response payload.
+     *
+     */
+    void SendCommandResponse(StatusEnum status);
 
-    CHIP_ERROR HandleLogRequestForBDXProtocol(chip::Messaging::ExchangeContext * exchangeCtx, chip::EndpointId endpointId,
-                                              IntentEnum intent, chip::CharSpan fileDesignator);
+    /**
+     * Handles the request to download diagnostic logs of type specified in the intent argument for protocol type BDX
+     * This should return whatever fits in the logContent field of the RetrieveLogsResponse command
+     *
+     * @param commandHandler The command handler object from the RetrieveLogsRequest command
+     *
+     * @param path The command path from the RetrieveLogsRequest command
+     *
+     * @param intent The log type requested in the RetrieveLogsRequest command
+     *
+     */
+    CHIP_ERROR HandleLogRequestForBDXProtocol(Messaging::ExchangeContext * exchangeCtx, EndpointId endpointId, IntentEnum intent,
+                                              CharSpan fileDesignator);
 
     void SetAsyncCommandHandleAndPath(CommandHandler * commandObj, const ConcreteCommandPath & commandPath);
 
-    bool HasValidFileDesignator(chip::CharSpan transferFileDesignator);
+    bool HasValidFileDesignator(CharSpan transferFileDesignator);
 
     bool IsBDXProtocolRequested(TransferProtocolEnum requestedProtocol);
 
-    void SendErrorResponse(chip::app::CommandHandler * commandHandler, chip::app::ConcreteCommandPath path,
-                                   StatusEnum status);
+    /**
+     * Called to notify the DiagnosticsLogsServer that BDX has completed and the mDiagnosticLogsBDXTransferHandler
+     * object has been destroyed. We should set the mDiagnosticLogsBDXTransferHandler to null here.
+     *
+     */
+    void HandleBDXTransferDone() { mDiagnosticLogsBDXTransferHandler = nullptr; }
 
 #endif
 
@@ -85,8 +116,8 @@ private:
 
     LogSessionHandle mLogSessionHandle;
 
-    chip::app::CommandHandler::Handle mAsyncCommandHandle;
-    chip::app::ConcreteCommandPath mRequestPath = chip::app::ConcreteCommandPath(0, 0, 0);
+    CommandHandler::Handle mAsyncCommandHandle;
+    ConcreteCommandPath mRequestPath = ConcreteCommandPath(0, 0, 0);
     IntentEnum mIntent;
 
     static DiagnosticLogsServer sInstance;

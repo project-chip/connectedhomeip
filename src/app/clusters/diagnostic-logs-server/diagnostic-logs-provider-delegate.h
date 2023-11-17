@@ -29,8 +29,8 @@ namespace DiagnosticLogs {
 
 typedef uint16_t LogSessionHandle;
 
-// The value 0xFF will be used as an invalid log session handle and must not be used as a valid value for LogSessionHandle
-constexpr uint8_t kInvalidLogSessionHandle = 0xFF;
+// The value UINT16_MAX will be used as an invalid log session handle and must not be used as a valid value for LogSessionHandle
+constexpr LogSessionHandle kInvalidLogSessionHandle = UINT16_MAX;
 
 /** @brief
  *    Defines methods for implementing application-specific logic for getting the log data from the diagnostic logs provider
@@ -49,19 +49,21 @@ public:
      * @param[in] logType The type of log for which the start of log collection is requested.
      *
      * @return LogSessionHandle  The unique log session handle that identifies the log collection session that has been started.
+     *                           Returns kInvalidLogSessionHandle if there are no logs of the logType.
      */
     virtual LogSessionHandle StartLogCollection(IntentEnum logType) = 0;
 
     /**
      * Called to get the next chunk for the log session identified by logSessionHandle.
-     * Should return the number of bytes read and indicate if EOF has been reached.
+     * Should return CHIP_NO_ERROR if we were able to read successfully from the file into the buffer, otherwise
+     * an appropriate error code is returned.
      *
      * @param[in] logSessionHandle  The unique handle for this log session returned from a call to StartLogCollection.
      * @param[out] outBuffer        The buffer thats passed in by the caller to write to.
      * @param[in] bufferLen         The size of the buffer passed in.
      * @param[out] outIsEOF         Set to true if EOF is reached otherwise set to false.
      */
-    virtual uint64_t GetNextChunk(LogSessionHandle logSessionHandle, chip::MutableByteSpan & outBuffer, bool & outIsEOF) = 0;
+    virtual CHIP_ERROR GetNextChunk(LogSessionHandle logSessionHandle, chip::MutableByteSpan & outBuffer, bool & outIsEOF) = 0;
 
     /**
      * Called to end log collection for the log session identified by logSessionHandle

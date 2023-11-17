@@ -22,6 +22,7 @@
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 
+using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::app::Clusters::DiagnosticLogs;
 
@@ -37,9 +38,14 @@ constexpr uint16_t kOptionCrashFilePath              = 0xFF05;
 
 static chip::Credentials::Examples::TestHarnessDACProvider mDacProvider;
 
-static char mEndUserSupportLogFileDesignator[kLogFileDesignatorMaxLen];
-static char mNetworkDiagnosticsLogFileDesignator[kLogFileDesignatorMaxLen];
-static char mCrashLogFileDesignator[kLogFileDesignatorMaxLen];
+chip::Optional<std::string> mEndUserSupportLogFilePath;
+chip::Optional<std::string> mNetworkDiagnosticsLogFilePath;
+chip::Optional<std::string> mCrashLogFilePath;
+
+bool AppOptions::IsNullOrEmpty(const char * value)
+{
+    return (value == nullptr || strlen(value) == 0 || strncmp(value, "", strlen(value)) == 0);
+}
 
 bool AppOptions::HandleOptions(const char * program, OptionSet * options, int identifier, const char * name, const char * value)
 {
@@ -55,30 +61,24 @@ bool AppOptions::HandleOptions(const char * program, OptionSet * options, int id
         break;
     }
     case kOptionEndUserSupportFilePath: {
-        if (strlen(value) > kLogFileDesignatorMaxLen)
+        if (!IsNullOrEmpty(value))
         {
-            PrintArgError("%s: Invalid file path length. Must be less that %d: %d\n", program, kLogFileDesignatorMaxLen,
-                          strlen(value));
+            mEndUserSupportLogFilePath.SetValue(std::string{ value });
         }
-        strncpy(mEndUserSupportLogFileDesignator, value, strlen(value));
         break;
     }
     case kOptionNetworkDiagnosticsFilePath: {
-        if (strlen(value) > kLogFileDesignatorMaxLen)
+        if (!IsNullOrEmpty(value))
         {
-            PrintArgError("%s: Invalid file path length. Must be less that %d: %d\n", program, kLogFileDesignatorMaxLen,
-                          strlen(value));
+            mNetworkDiagnosticsLogFilePath.SetValue(std::string{ value });
         }
-        strncpy(mNetworkDiagnosticsLogFileDesignator, value, strlen(value));
         break;
     }
     case kOptionCrashFilePath: {
-        if (strlen(value) > kLogFileDesignatorMaxLen)
+        if (!IsNullOrEmpty(value))
         {
-            PrintArgError("%s: Invalid file path length. Must be less that %d: %d\n", program, kLogFileDesignatorMaxLen,
-                          strlen(value));
+            mCrashLogFilePath.SetValue(std::string{ value });
         }
-        strncpy(mCrashLogFileDesignator, value, strlen(value));
         break;
     }
     default:
@@ -123,17 +123,17 @@ chip::Credentials::DeviceAttestationCredentialsProvider * AppOptions::GetDACProv
     return &mDacProvider;
 }
 
-char * AppOptions::GetEndUserSupportLogFileDesignator()
+Optional<std::string> AppOptions::GetEndUserSupportLogFilePath()
 {
-    return mEndUserSupportLogFileDesignator;
+    return mEndUserSupportLogFilePath;
 }
 
-char * AppOptions::GetNetworkDiagnosticsLogFileDesignator()
+Optional<std::string> AppOptions::GetNetworkDiagnosticsLogFilePath()
 {
-    return mNetworkDiagnosticsLogFileDesignator;
+    return mNetworkDiagnosticsLogFilePath;
 }
 
-char * AppOptions::GetCrashLogFileDesignator()
+Optional<std::string> AppOptions::GetCrashLogFilePath()
 {
-    return mCrashLogFileDesignator;
+    return mCrashLogFilePath;
 }

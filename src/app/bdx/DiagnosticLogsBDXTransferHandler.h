@@ -25,41 +25,71 @@
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-provider-delegate.h>
 
 #include <protocols/bdx/TransferFacilitator.h>
+#include <transport/Session.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace DiagnosticLogs {
+
 /**
- * The BDX transfer handler than initiates a BDX transfer session as a Sender using the synchronous Sender Drive
- * transfer mode. It gets the chunks of the log and sends the block accross to the receiver until
+ * The BDX transfer handler that initiates a BDX transfer session as a Sender using the synchronous Sender Drive
+ * transfer mode. It gets the chunks of the log and sends the block across to the receiver until
  * all the blocks have been transferred and the delegate reports that end of file is reached.
  */
-class DiagnosticLogsBDXTransferHandler : public chip::bdx::Initiator
+class DiagnosticLogsBDXTransferHandler : public bdx::Initiator
 {
 public:
     DiagnosticLogsBDXTransferHandler(){};
     ~DiagnosticLogsBDXTransferHandler(){};
 
-    CHIP_ERROR Init();
+    /**
+     * Intializes the BDX transfer session by creating a new exchange context for the transfer session.
+     * It starts the BDX transfer session by calling InitiateTransfer of the which sends the SendInit BDX message
+     * to the log requestor.
+     *
+     * @param[in] exchangeMgr  The exchange manager from the command handler object for the RetreiveLogRequest command
+     * @param[in] sessionHandle The session handle from the command handler object for the RetreiveLogRequest command
+     * @param[in] fabricIndex The fabric index of the requestor
+     * @param[in] peerNodeId The node id of the requestor
+     * @param[in] delegate The log provider delegate that will provide the log chunks
+     * @param[in] intent The log type requested
+     * @param[in] fileDesignator The file designator to use for the BDX transfer
+     */
+    CHIP_ERROR InitializeTransfer(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle,
+                                  FabricIndex fabricIndex, NodeId peerNodeId, LogProviderDelegate * delegate, IntentEnum intent,
+                                  CharSpan fileDesignator);
 
-    CHIP_ERROR InitializeTransfer(chip::Messaging::ExchangeContext * exchangeCtx, chip::FabricIndex fabricIndex,
-                                  chip::NodeId nodeId, LogProviderDelegate * delegate, IntentEnum intent,
-                                  chip::CharSpan fileDesignator);
-
-    void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
-
-    void Reset();
+    /**
+     * This method handles BDX messages and other TransferSession events.
+     *
+     * @param[in] event An OutputEvent that contains output from the TransferSession object.
+     */
+    void HandleTransferSessionOutput(bdx::TransferSession::OutputEvent & event) override;
 
 private:
-    void SendNextBlock(MutableByteSpan & buffer);
+    /**
+     * This method is called to reset state. It resets the transfer, cleans up the
+     * exchange and ends log collection.
+     */
+    void Reset();
 
-    chip::Optional<chip::FabricIndex> mFabricIndex;
-    chip::Optional<chip::NodeId> mNodeId;
+    /**
+     * This method handles any error that might occur during the BDX session.
+     * If the error occurs before SendAccept is received, it sends a command response
+     * with appropriate status to the requestor. After that, it resets state and
+     * deletes itself.
+     *
+     * @param[in] error The error that occured during the BDX session
+     */
+    void HandleBDXError(CHIP_ERROR error);
 
-    chip::Messaging::ExchangeContext * mExchangeCtx;
+    Optional<FabricIndex> mFabricIndex;
+    Optional<NodeId> mPeerNodeId;
 
-    bool mInitialized;
+    Messaging::ExchangeContext * mBDXTransferExchangeCtx;
+
+    bool mInitialized = false;
 
     uint64_t mNumBytesSent;
 
@@ -68,6 +98,8 @@ private:
     LogProviderDelegate * mDelegate;
 
     IntentEnum mIntent;
+
+    bool mIsAcceptReceived = false;
 };
 
 } // namespace DiagnosticLogs

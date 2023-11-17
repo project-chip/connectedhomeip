@@ -40,34 +40,36 @@ class LogProvider : public LogProviderDelegate
 public:
     LogSessionHandle StartLogCollection(IntentEnum logType);
 
-    uint64_t GetNextChunk(LogSessionHandle logSessionHandle, chip::MutableByteSpan & outBuffer, bool & outIsEOF);
+    CHIP_ERROR GetNextChunk(LogSessionHandle logSessionHandle, MutableByteSpan & outBuffer, bool & outIsEOF);
 
     void EndLogCollection(LogSessionHandle logSessionHandle);
 
     uint64_t GetTotalNumberOfBytesConsumed(LogSessionHandle logSessionHandle);
 
-    void SetEndUserSupportLogFileDesignator(const char * logFileName);
+    void SetEndUserSupportLogFilePath(Optional<std::string> logFilePath);
 
-    void SetNetworkDiagnosticsLogFileDesignator(const char * logFileName);
+    void SetNetworkDiagnosticsLogFilePath(Optional<std::string> logFilePath);
 
-    void SetCrashLogFileDesignator(const char * logFileName);
+    void SetCrashLogFilePath(Optional<std::string> logFilePath);
 
     LogProvider(){};
 
     ~LogProvider(){};
 
-    static inline LogProvider & GetInstance() { return sInstance; }
+    static inline LogProvider & getLogProvider() { return sInstance; }
 
 private:
-    const char * GetLogFilePath(IntentEnum logType);
+    Optional<std::string> GetLogFilePath(IntentEnum logType);
 
-    char mEndUserSupportLogFileDesignator[kLogFileDesignatorMaxLen];
-    char mNetworkDiagnosticsLogFileDesignator[kLogFileDesignatorMaxLen];
-    char mCrashLogFileDesignator[kLogFileDesignatorMaxLen];
+    Optional<std::string> mEndUserSupportLogFilePath;
+    Optional<std::string> mNetworkDiagnosticsLogFilePath;
+    Optional<std::string> mCrashLogFilePath;
 
     std::ifstream mFileStream;
 
     LogSessionHandle mLogSessionHandle;
+
+    bool mIsInALogCollectionSession;
 
     uint64_t mTotalNumberOfBytesConsumed;
 };

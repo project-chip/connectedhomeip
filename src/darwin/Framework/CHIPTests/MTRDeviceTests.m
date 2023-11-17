@@ -39,6 +39,7 @@
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kDownloadLogTimeoutInSeconds = 30;
+static const uint16_t kDownloadLogDelayTimeoutInSeconds = 5;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
@@ -2606,30 +2607,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 #endif // MTR_ENABLE_PROVISIONAL
 }
 
-/**
- * Given a path relative to the Matter root, create an absolute path to the file.
- */
-- (NSString *)absolutePathFor:(NSString *)matterRootRelativePath
-{
-    // Find the right absolute path to our file.  PWD should
-    // point to our src/darwin/Framework.
-    NSString * pwd = [[NSProcessInfo processInfo] environment][@"PWD"];
-    NSMutableArray * pathComponents = [[NSMutableArray alloc] init];
-    [pathComponents addObject:[pwd substringToIndex:(pwd.length - @"src/darwin/Framework".length)]];
-    [pathComponents addObjectsFromArray:[matterRootRelativePath pathComponents]];
-    return [NSString pathWithComponents:pathComponents];
-}
-
-/**
- * Create a task given a path relative to the Matter root.
- */
-- (NSTask *)createTaskForPath:(NSString *)path
-{
-    NSTask * task = [[NSTask alloc] init];
-    [task setLaunchPath:[self absolutePathFor:path]];
-    return task;
-}
-
 - (NSError *)generateLogFile:(NSString *)outFile
                         size:(unsigned long long)size
 {
@@ -2641,19 +2618,24 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     NSString * content = @"The quick brown fox jumps over the lazy dog";
     NSFileHandle * handle = [NSFileHandle fileHandleForWritingAtPath:outFile];
-    if (handle == nil)
-    {
+    if (handle == nil) {
         NSLog(@"Failed to generate the log file %@", outFile);
+        return [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil];
     }
 
     NSError * error = nil;
-    unsigned long long offset = 0;
+    unsigned long long count = 0;
 
-    while (offset < size - content.length && error == nil)
-    {
-        if ([handle getOffset:&offset error:nil])
-        {
+    while (count < size && error == nil) {
+        unsigned long long remainingSize = size - count;
+        [handle seekToEndOfFile];
+        if (remainingSize < content.length) {
+            NSString * substr = [content substringToIndex:remainingSize];
+            [handle writeData:[substr dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+            count += remainingSize;
+        } else {
             [handle writeData:[content dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+            count += content.length;
         }
     }
 
@@ -2661,11 +2643,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     return error;
 }
 
-- (void)test029_DownloadEndUserSupportLog_NoTimeout
+- (void)testDownloadLogOfType:(MTRDiagnosticLogType)logType
+                      timeout:(NSTimeInterval)timeout
+                  logFilePath:(NSString *)logFilePath
+                  logFileSize:(unsigned long long)logFileSize
+                  expectation:(XCTestExpectation *)expectation
 {
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
-    XCTestExpectation * expectation = [self expectationWithDescription:@"End User Support Log Transfer Complete"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -2673,97 +2658,65 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         MTRDevice * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:controller];
         XCTAssertNotNil(device);
 
-        NSString * outFile = [NSString stringWithFormat:@"/tmp/endusersupportlog.txt"];
-        NSError * error = [self generateLogFile:outFile size:(10 * 1024)];
+        NSError * error = [self generateLogFile:logFilePath size:logFileSize];
 
         if (error != nil) {
             NSLog(@"Failed to generate log file");
             return;
         }
 
-        [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:0 queue:queue completion:^(NSURL * _Nullable logResult, NSError * error) {
-            XCTAssertNil(error);
-            XCTAssertNotNil(logResult);
-
-            NSError * attributesError = nil;
-            NSDictionary * fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[logResult path] error:&attributesError];
-
-            size_t fileSize = [fileAttributes fileSize];
-            XCTAssertTrue(fileSize > 0);
+        [device downloadLogOfType:logType timeout:timeout queue:queue completion:^(NSURL * _Nullable logResult, NSError * error) {
+            if (timeout > 0) {
+                XCTAssertNotNil(error);
+                XCTAssertNil(logResult);
+            } else {
+                XCTAssertNil(error);
+                XCTAssertNotNil(logResult);
+                XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:logFilePath andPath:[logResult path]]);
+            }
             [expectation fulfill];
         }];
     });
-    [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:kDownloadLogTimeoutInSeconds];
+}
+
+- (void)test029_DownloadEndUserSupportLog_NoTimeout
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"End User Support Log Transfer Complete"];
+    NSString * outFile = [NSString stringWithFormat:@"/tmp/endusersupportlog.txt"];
+
+    // Delay the request to allow the DiagnosticLogsServer to clean up and delete the DiagnosticLogsBDXTransferHandler object.
+    // TODO: Fix #30537 to keep retrying for a number of retry counts until we don't get busy anymore.
+    // Since these tests can be run in any order, we need this on all tests that download the diagnostic logs
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, kDownloadLogDelayTimeoutInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [self testDownloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:0 logFilePath:outFile logFileSize:(10 * 1024) expectation:expectation];
+    });
+    [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:(kDownloadLogTimeoutInSeconds + kDownloadLogDelayTimeoutInSeconds)];
 }
 
 - (void)test030_DownloadNetworkDiagnosticsLog_NoTimeout
 {
-    MTRDeviceController * controller = sController;
-    XCTAssertNotNil(controller);
     XCTestExpectation * expectation = [self expectationWithDescription:@"Network Diagnostics Log Transfer Complete"];
+    NSString * outFile = [NSString stringWithFormat:@"/tmp/networkdiagnosticslog.txt"];
 
-    dispatch_queue_t queue = dispatch_get_main_queue();
-
-    dispatch_async(queue, ^{
-        MTRDevice * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:controller];
-        XCTAssertNotNil(device);
-
-        NSString * outFile = [NSString stringWithFormat:@"/tmp/networkdiagnosticslog.txt"];
-        NSError * error = [self generateLogFile:outFile size:(4 * 1024)];
-
-        if (error != nil) {
-            NSLog(@"Failed to generate log file");
-            return;
-        }
-
-        [device downloadLogOfType:MTRDiagnosticLogTypeNetworkDiagnostics timeout:0 queue:queue completion:^(NSURL * _Nullable logResult, NSError * error) {
-            XCTAssertNil(error);
-            XCTAssertNotNil(logResult);
-
-            NSError * attributesError = nil;
-            NSDictionary * fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[logResult path] error:&attributesError];
-
-            size_t fileSize = [fileAttributes fileSize];
-            XCTAssertTrue(fileSize > 0);
-            [expectation fulfill];
-        }];
+    // Delay the request to allow the DiagnosticLogsServer to clean up and delete the DiagnosticLogsBDXTransferHandler object.
+    // TODO: Fix #30537 to keep retrying for a number of retry counts until we don't get busy anymore.
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, kDownloadLogDelayTimeoutInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [self testDownloadLogOfType:MTRDiagnosticLogTypeNetworkDiagnostics timeout:0 logFilePath:outFile logFileSize:(4 * 1024) expectation:expectation];
     });
-    [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:kDownloadLogTimeoutInSeconds];
+    [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:(kDownloadLogTimeoutInSeconds + kDownloadLogDelayTimeoutInSeconds)];
 }
 
 - (void)test031_DownloadCrashLog_NoTimeout
 {
-    MTRDeviceController * controller = sController;
-    XCTAssertNotNil(controller);
     XCTestExpectation * expectation = [self expectationWithDescription:@"Crash Log Transfer Complete"];
+    NSString * outFile = [NSString stringWithFormat:@"/tmp/crashlog.txt"];
 
-    dispatch_queue_t queue = dispatch_get_main_queue();
-
-    dispatch_async(queue, ^{
-        MTRDevice * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:controller];
-        XCTAssertNotNil(device);
-
-        NSString * outFile = [NSString stringWithFormat:@"/tmp/crashlog.txt"];
-        NSError * error = [self generateLogFile:outFile size:(3 * 1024)];
-
-        if (error != nil) {
-            NSLog(@"Failed to generate log file");
-            return;
-        }
-
-        [device downloadLogOfType:MTRDiagnosticLogTypeCrash timeout:0 queue:queue completion:^(NSURL * _Nullable logResult, NSError * error) {
-            XCTAssertNil(error);
-            XCTAssertNotNil(logResult);
-
-            NSError * attributesError = nil;
-            NSDictionary * fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[logResult path] error:&attributesError];
-
-            size_t fileSize = [fileAttributes fileSize];
-            XCTAssertTrue(fileSize > 0);
-            [expectation fulfill];
-        }];
+    // Delay the request to allow the DiagnosticLogsServer to clean up and delete the DiagnosticLogsBDXTransferHandler object.
+    // TODO: Fix #30537 to keep retrying for a number of retry counts until we don't get busy anymore.
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, kDownloadLogDelayTimeoutInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [self testDownloadLogOfType:MTRDiagnosticLogTypeCrash timeout:0 logFilePath:outFile logFileSize:(3 * 1024) expectation:expectation];
     });
-    [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:kDownloadLogTimeoutInSeconds];
+    [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:(kDownloadLogTimeoutInSeconds + kDownloadLogDelayTimeoutInSeconds)];
 }
 
 - (void)test900_SubscribeAllAttributes

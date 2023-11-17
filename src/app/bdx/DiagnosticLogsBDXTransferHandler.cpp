@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,60 +24,68 @@
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 
-using chip::BitFlags;
-using chip::ByteSpan;
-using chip::CharSpan;
-using chip::FabricIndex;
-using chip::FabricInfo;
-using chip::MutableCharSpan;
-using chip::NodeId;
-using chip::Span;
-using chip::bdx::TransferControlFlags;
-using chip::Protocols::InteractionModel::Status;
-
 using namespace chip;
-using namespace chip::app;
-using namespace chip::bdx;
-using namespace chip::app::Clusters::DiagnosticLogs;
+using namespace app;
+using namespace bdx;
+using namespace app::Clusters::DiagnosticLogs;
 
-// BDX Transfer Params
+// BDX transfer session polling interval.
 constexpr System::Clock::Timeout kBdxPollIntervalMs = System::Clock::Milliseconds32(50);
 
-// Timeout for the BDX transfer session. The OTA Spec mandates this should be >= 5 minutes.
+// Timeout for the BDX transfer session
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
 
 constexpr uint16_t kBdxMaxBlockSize = 1024;
 
-CHIP_ERROR DiagnosticLogsBDXTransferHandler::InitializeTransfer(chip::Messaging::ExchangeContext * exchangeCtx,
-                                                                FabricIndex fabricIndex, NodeId nodeId,
-                                                                LogProviderDelegate * delegate, IntentEnum intent,
-                                                                CharSpan fileDesignator)
+StatusCode GetBdxStatusCodeFromChipError(CHIP_ERROR err)
+{
+    if (err == CHIP_ERROR_INCORRECT_STATE)
+    {
+        return StatusCode::kUnexpectedMessage;
+    }
+    if (err == CHIP_ERROR_INVALID_ARGUMENT)
+    {
+        return StatusCode::kBadMessageContents;
+    }
+    return StatusCode::kUnknown;
+}
+
+CHIP_ERROR DiagnosticLogsBDXTransferHandler::InitializeTransfer(Messaging::ExchangeManager * exchangeMgr,
+                                                                const SessionHandle sessionHandle, FabricIndex fabricIndex,
+                                                                NodeId peerNodeId, LogProviderDelegate * delegate,
+                                                                IntentEnum intent, CharSpan fileDesignator)
 {
     if (mInitialized)
     {
+        // Return busy if we are in a transfer session already with another node.
+        VerifyOrReturnError(mFabricIndex.Value() == fabricIndex && mPeerNodeId.Value() == peerNodeId, CHIP_ERROR_BUSY);
+
         // Reset stale connection from the same Node if exists.
         Reset();
     }
 
-    VerifyOrReturnError(exchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mExchangeCtx = exchangeCtx->GetExchangeMgr()->NewContext(exchangeCtx->GetSessionHandle(), this);
-    VerifyOrReturnError(mExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
+    // Create a new exchange context to use for the BDX transfer session
+    // and send the SendInit message over the exchange.
+    mBDXTransferExchangeCtx = exchangeMgr->NewContext(sessionHandle, this);
+    VerifyOrReturnError(mBDXTransferExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
 
     mIntent   = intent;
     mDelegate = delegate;
     mFabricIndex.SetValue(fabricIndex);
-    mNodeId.SetValue(nodeId);
-    mNumBytesSent = 0;
+    mPeerNodeId.SetValue(peerNodeId);
+    mNumBytesSent     = 0;
+    mIsAcceptReceived = false;
 
     TransferSession::TransferInitData initOptions;
-    initOptions.TransferCtlFlags = bdx::TransferControlFlags::kSenderDrive;
+    initOptions.TransferCtlFlags = TransferControlFlags::kSenderDrive;
     initOptions.MaxBlockSize     = kBdxMaxBlockSize;
     initOptions.FileDesLength    = static_cast<uint16_t>(fileDesignator.size());
-    initOptions.FileDesignator   = reinterpret_cast<const uint8_t *>(fileDesignator.data());
+    initOptions.FileDesignator   = Uint8::from_const_char(fileDesignator.data());
 
-    CHIP_ERROR err = Initiator::InitiateTransfer(&DeviceLayer::SystemLayer(), bdx::TransferRole::kSender, initOptions, kBdxTimeout,
+    CHIP_ERROR err = Initiator::InitiateTransfer(&DeviceLayer::SystemLayer(), TransferRole::kSender, initOptions, kBdxTimeout,
                                                  kBdxPollIntervalMs);
     if (err != CHIP_NO_ERROR)
     {
@@ -87,6 +95,23 @@ CHIP_ERROR DiagnosticLogsBDXTransferHandler::InitializeTransfer(chip::Messaging:
 
     mInitialized = true;
     return CHIP_NO_ERROR;
+}
+
+void DiagnosticLogsBDXTransferHandler::HandleBDXError(CHIP_ERROR error)
+{
+    VerifyOrReturn(error != CHIP_NO_ERROR);
+    LogErrorOnFailure(error);
+
+    // If Send Accept was not received, send a response with status Denied to the RetreiveLogRequest
+    if (!mIsAcceptReceived)
+    {
+        DiagnosticLogsServer::Instance().SendCommandResponse(StatusEnum::kDenied);
+    }
+    Reset();
+    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        delete this;
+        DiagnosticLogsServer::Instance().HandleBDXTransferDone();
+    });
 }
 
 void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
@@ -100,63 +125,59 @@ void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSessi
     switch (event.EventType)
     {
     case TransferSession::OutputEventType::kAckEOFReceived:
-        mStopPolling = true;
         Reset();
+        DeviceLayer::SystemLayer().ScheduleLambda([this] {
+            delete this;
+            DiagnosticLogsServer::Instance().HandleBDXTransferDone();
+        });
         break;
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "Got StatusReport %x", to_underlying(event.statusData.statusCode));
-        DiagnosticLogsServer::Instance().HandleBDXResponse(CHIP_ERROR_INTERNAL);
-        Reset();
-        break;
     case TransferSession::OutputEventType::kInternalError:
-        DiagnosticLogsServer::Instance().HandleBDXResponse(CHIP_ERROR_INTERNAL);
-        Reset();
-        break;
     case TransferSession::OutputEventType::kTransferTimeout:
-        DiagnosticLogsServer::Instance().HandleBDXResponse(CHIP_ERROR_TIMEOUT);
-        Reset();
+        HandleBDXError(CHIP_ERROR_INTERNAL);
         break;
     case TransferSession::OutputEventType::kMsgToSend: {
         Messaging::SendFlags sendFlags;
-        if (!event.msgTypeData.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
+        if (!event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
         {
             // All messages sent from the Sender expect a response, except for a StatusReport which would indicate an error and the
             // end of the transfer.
-            sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
+            sendFlags.Set(Messaging::SendMessageFlags::kExpectResponse);
         }
-        VerifyOrReturn(mExchangeCtx != nullptr);
-        err = mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType, std::move(event.MsgData),
-                                        sendFlags);
+        VerifyOrReturn(mBDXTransferExchangeCtx != nullptr);
+        err = mBDXTransferExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType,
+                                                   std::move(event.MsgData), sendFlags);
 
         if (err == CHIP_NO_ERROR)
         {
-            if (!sendFlags.Has(chip::Messaging::SendMessageFlags::kExpectResponse))
+            if (!sendFlags.Has(Messaging::SendMessageFlags::kExpectResponse))
             {
-                // After sending the StatusReport, exchange context gets closed so, set mExchangeCtx to null
-                mExchangeCtx = nullptr;
+                // After sending the StatusReport, exchange context gets closed so, set mBDXTransferExchangeCtx to null
+                mBDXTransferExchangeCtx = nullptr;
             }
         }
         else
         {
             ChipLogError(BDX, "SendMessage failed: %" CHIP_ERROR_FORMAT, err.Format());
-            DiagnosticLogsServer::Instance().HandleBDXResponse(err);
-            Reset();
+            mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err));
         }
 
         break;
     }
     case TransferSession::OutputEventType::kAcceptReceived: {
+        mIsAcceptReceived = true;
         mLogSessionHandle = mDelegate->StartLogCollection(mIntent);
-
         if (mLogSessionHandle == kInvalidLogSessionHandle)
         {
             ChipLogError(BDX, "No log available for intent enum %d", to_underlying(mIntent));
-            DiagnosticLogsServer::Instance().HandleBDXResponse(CHIP_ERROR_INCORRECT_STATE);
-            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            DiagnosticLogsServer::Instance().SendCommandResponse(StatusEnum::kDenied);
+            mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(CHIP_ERROR_INCORRECT_STATE));
             return;
         }
-        // Send a response to the RetreiveLogRequest, since we got a SendAccept message.
-        DiagnosticLogsServer::Instance().HandleBDXResponse(CHIP_NO_ERROR);
+        // Send a response with status Success to the RetreiveLogRequest, since we got a SendAccept message.
+        DiagnosticLogsServer::Instance().SendCommandResponse(StatusEnum::kSuccess);
+
         [[fallthrough]];
     }
     case TransferSession::OutputEventType::kAckReceived: {
@@ -169,10 +190,10 @@ void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSessi
             bytesToRead = static_cast<uint16_t>(mTransfer.GetTransferLength() - mNumBytesSent);
         }
 
-        chip::System::PacketBufferHandle blockBuf = chip::System::PacketBufferHandle::New(bytesToRead);
+        System::PacketBufferHandle blockBuf = System::PacketBufferHandle::New(bytesToRead);
         if (blockBuf.IsNull())
         {
-            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(CHIP_ERROR_NO_MEMORY));
             return;
         }
 
@@ -183,23 +204,25 @@ void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSessi
         bool isEOF = false;
 
         // Get the log next chunk and see if it fits i.e. if EOF is reported
-        uint64_t bytesRead = mDelegate->GetNextChunk(mLogSessionHandle, buffer, isEOF);
+        err = mDelegate->GetNextChunk(mLogSessionHandle, buffer, isEOF);
 
-        if (bytesRead == 0)
+        if (err != CHIP_NO_ERROR)
         {
-            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err));
             return;
         }
 
+        // If EOF is received, end the log collection session.
         if (isEOF)
         {
             mDelegate->EndLogCollection(mLogSessionHandle);
             mLogSessionHandle = kInvalidLogSessionHandle;
         }
 
+        // Prepare the BDX block to send to the requestor
         TransferSession::BlockData blockData;
         blockData.Data   = blockBuf->Start();
-        blockData.Length = static_cast<size_t>(bytesRead);
+        blockData.Length = static_cast<size_t>(buffer.size());
         blockData.IsEof  = isEOF;
         mNumBytesSent += static_cast<uint32_t>(blockData.Length);
 
@@ -207,7 +230,7 @@ void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSessi
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(BDX, "PrepareBlock failed: %" CHIP_ERROR_FORMAT, err.Format());
-            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err));
         }
         break;
     }
@@ -227,14 +250,14 @@ void DiagnosticLogsBDXTransferHandler::Reset()
     assertChipStackLockedByCurrentThread();
 
     mFabricIndex.ClearValue();
-    mNodeId.ClearValue();
+    mPeerNodeId.ClearValue();
 
     Initiator::ResetTransfer();
 
-    if (mExchangeCtx != nullptr)
+    if (mBDXTransferExchangeCtx != nullptr)
     {
-        mExchangeCtx->Close();
-        mExchangeCtx = nullptr;
+        mBDXTransferExchangeCtx->Close();
+        mBDXTransferExchangeCtx = nullptr;
     }
 
     if (mDelegate != nullptr)
@@ -245,6 +268,7 @@ void DiagnosticLogsBDXTransferHandler::Reset()
     mLogSessionHandle = kInvalidLogSessionHandle;
     mInitialized      = false;
     mNumBytesSent     = 0;
+    mIsAcceptReceived = false;
 }
 
 #endif
