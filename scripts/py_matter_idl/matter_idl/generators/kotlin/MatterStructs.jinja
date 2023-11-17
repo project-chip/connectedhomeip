@@ -15,16 +15,16 @@
 
 {%- macro encode_tlv(encodable, tag, name, depth) %}
   {%- if encodable.is_nullable -%}
-    if ({{name}} != null) {
-      {{encode_tlv(encodable.without_nullable(), tag, name, depth + 1)}}
-    } else {
-      putNull({{tag}})
-    }
+      if ({{name}} != null) {
+        {{encode_tlv(encodable.without_nullable(), tag, name, depth + 1)}}
+      } else {
+        putNull({{tag}})
+      }
   {%- elif encodable.is_optional -%}
-    if ({{name}}.isPresent) {
-      val opt{{name}} = {{name}}.get()
-      {{encode_tlv(encodable.without_optional(), tag, "opt" + name, depth + 1)}}
-    }
+      if ({{name}}.isPresent) {
+        val opt{{name}} = {{name}}.get()
+        {{encode_tlv(encodable.without_optional(), tag, "opt" + name, depth + 1)}}
+      }
   {%- elif encodable.is_list -%}
       startArray({{tag}})
       for (item in {{name}}.iterator()) {
@@ -91,23 +91,22 @@
  */
 package matter.devicecontroller.cluster.structs
 
+import java.util.Optional
 import matter.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class {{cluster.name}}Cluster{{struct.name}} (
-  {%- for field in struct.fields %}
-    {%- set encodable = field | asEncodable(typeLookup) %}
-    val {{field.name}}: {{encode_value(cluster, encodable, 0)}}
-    {%- if loop.index0 < loop.length - 1 -%}{{","}}{%- endif -%}
-  {%- endfor -%}) {
-  override fun toString(): String  = buildString {
+class {{cluster.name}}Cluster{{struct.name}}(
+{%- for field in struct.fields %}
+  {%- set encodable = field | asEncodable(typeLookup) %}
+  val {{field.name}}: {{encode_value(cluster, encodable, 0)}}
+  {%- if loop.index0 < loop.length - 1 -%}{{","}}{%- endif -%}
+{%- endfor %}
+) {
+  override fun toString(): String = buildString {
     append("{{cluster.name}}Cluster{{struct.name}} {\n")
     {%- for field in struct.fields %}
     append("\t{{field.name}} : ${{field.name}}\n")
@@ -132,7 +131,7 @@ class {{cluster.name}}Cluster{{struct.name}} (
     private const val TAG_{{field.name | constcase}} = {{field.code}}
     {%- endfor %}
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : {{cluster.name}}Cluster{{struct.name}} {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): {{cluster.name}}Cluster{{struct.name}} {
       tlvReader.enterStructure(tlvTag)
       {% for field in struct.fields %}
         {%- set decodable = field | asEncodable(typeLookup) %}

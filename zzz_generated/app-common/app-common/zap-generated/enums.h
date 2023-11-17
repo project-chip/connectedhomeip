@@ -24,22 +24,6 @@
 
 // ZCL enums
 
-// Enum for BarrierControlBarrierPosition
-enum EmberAfBarrierControlBarrierPosition : uint8_t
-{
-    EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_CLOSED  = 0,
-    EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_OPEN    = 100,
-    EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_UNKNOWN = 255,
-};
-
-// Enum for BarrierControlMovingState
-enum EmberAfBarrierControlMovingState : uint8_t
-{
-    EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_STOPPED = 0,
-    EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_CLOSING = 1,
-    EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_OPENING = 2,
-};
-
 // Enum for ColorControlOptions
 enum EmberAfColorControlOptions : uint8_t
 {
@@ -61,33 +45,4 @@ enum EmberAfEnhancedColorMode : uint8_t
     EMBER_ZCL_ENHANCED_COLOR_MODE_CURRENT_X_AND_CURRENT_Y                     = 1,
     EMBER_ZCL_ENHANCED_COLOR_MODE_COLOR_TEMPERATURE                           = 2,
     EMBER_ZCL_ENHANCED_COLOR_MODE_ENHANCED_CURRENT_HUE_AND_CURRENT_SATURATION = 3,
-};
-
-// Enum for MoveMode
-enum EmberAfMoveMode : uint8_t
-{
-    EMBER_ZCL_MOVE_MODE_UP   = 0,
-    EMBER_ZCL_MOVE_MODE_DOWN = 1,
-};
-
-// Enum for PHYRateEnum
-enum EmberAfPHYRateEnum : uint8_t
-{
-    EMBER_ZCL_PHY_RATE_ENUM_RATE10_M  = 0,
-    EMBER_ZCL_PHY_RATE_ENUM_RATE100_M = 1,
-    EMBER_ZCL_PHY_RATE_ENUM_RATE1_G   = 2,
-    EMBER_ZCL_PHY_RATE_ENUM_RATE2_5_G = 3,
-    EMBER_ZCL_PHY_RATE_ENUM_RATE5_G   = 4,
-    EMBER_ZCL_PHY_RATE_ENUM_RATE10_G  = 5,
-    EMBER_ZCL_PHY_RATE_ENUM_RATE40_G  = 6,
-    EMBER_ZCL_PHY_RATE_ENUM_RATE100_G = 7,
-    EMBER_ZCL_PHY_RATE_ENUM_RATE200_G = 8,
-    EMBER_ZCL_PHY_RATE_ENUM_RATE400_G = 9,
-};
-
-// Enum for StepMode
-enum EmberAfStepMode : uint8_t
-{
-    EMBER_ZCL_STEP_MODE_UP   = 0,
-    EMBER_ZCL_STEP_MODE_DOWN = 1,
 };

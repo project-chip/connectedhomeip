@@ -186,6 +186,12 @@ public:
         }
         ~SceneData(){};
 
+        bool operator==(const SceneData & other) const
+        {
+            return ((CharSpan(mName, mNameLength).data_equal(CharSpan(other.mName, other.mNameLength))) &&
+                    (mSceneTransitionTimeMs == other.mSceneTransitionTimeMs) && (mExtensionFieldSets == other.mExtensionFieldSets));
+        }
+
         void SetName(const CharSpan & sceneName)
         {
             if (nullptr == sceneName.data())
@@ -204,15 +210,8 @@ public:
         void Clear()
         {
             SetName(CharSpan());
-
             mSceneTransitionTimeMs = 0;
             mExtensionFieldSets.Clear();
-        }
-
-        bool operator==(const SceneData & other)
-        {
-            return (mNameLength == other.mNameLength && !memcmp(mName, other.mName, mNameLength) &&
-                    (mSceneTransitionTimeMs == other.mSceneTransitionTimeMs) && (mExtensionFieldSets == other.mExtensionFieldSets));
         }
 
         void operator=(const SceneData & other)
@@ -285,7 +284,16 @@ public:
     virtual CHIP_ERROR SceneApplyEFS(const SceneTableEntry & scene) = 0;
 
     // Fabrics
+
+    /**
+     * @brief Removes all scenes associated with a fabric index and the stored FabricSceneData that maps them
+     * @param fabric_index Fabric index to remove
+     * @return CHIP_ERROR, CHIP_NO_ERROR if successful or if the Fabric was not found, specific CHIP_ERROR otherwise
+     * @note This function is meant to be used after a fabric is removed from the device, the implementation MUST ensure that it
+     * won't interact with the actual fabric table as it will be removed beforehand.
+     */
     virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index) = 0;
+    virtual CHIP_ERROR RemoveEndpoint()                       = 0;
 
     // Iterators
     using SceneEntryIterator = CommonIterator<SceneTableEntry>;

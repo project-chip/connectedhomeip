@@ -365,6 +365,44 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace RvcOperationalState
 
+namespace BooleanSensorConfiguration {
+namespace Events {
+
+namespace AlarmsStateChanged {
+static constexpr EventId Id = 0x00000000;
+} // namespace AlarmsStateChanged
+
+namespace SensorFault {
+static constexpr EventId Id = 0x00000001;
+} // namespace SensorFault
+
+} // namespace Events
+} // namespace BooleanSensorConfiguration
+
+namespace ValveConfigurationAndControl {
+namespace Events {
+
+namespace ValveStateChanged {
+static constexpr EventId Id = 0x00000000;
+} // namespace ValveStateChanged
+
+namespace ValveFault {
+static constexpr EventId Id = 0x00000001;
+} // namespace ValveFault
+
+} // namespace Events
+} // namespace ValveConfigurationAndControl
+
+namespace DemandResponseLoadControl {
+namespace Events {
+
+namespace LoadControlEventStatusChange {
+static constexpr EventId Id = 0x00000000;
+} // namespace LoadControlEventStatusChange
+
+} // namespace Events
+} // namespace DemandResponseLoadControl
+
 namespace DoorLock {
 namespace Events {
 
