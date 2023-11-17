@@ -29,7 +29,7 @@
 
 #include "access/RequestPath.h"
 #include "access/SubjectDescriptor.h"
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/af-types.h>
 #include <app/util/endpoint-config-api.h>

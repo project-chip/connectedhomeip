@@ -669,6 +669,20 @@ static constexpr CommandId Id = 0x00000003;
 } // namespace Commands
 } // namespace Timer
 
+namespace OvenMode {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace OvenMode
+
 namespace ModeSelect {
 namespace Commands {
 
@@ -868,6 +882,34 @@ static constexpr CommandId Id = 0x00000000;
 
 } // namespace Commands
 } // namespace ActivatedCarbonFilterMonitoring
+
+namespace BooleanSensorConfiguration {
+namespace Commands {
+
+namespace SuppressRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SuppressRequest
+
+} // namespace Commands
+} // namespace BooleanSensorConfiguration
+
+namespace ValveConfigurationAndControl {
+namespace Commands {
+
+namespace Open {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Open
+
+namespace Close {
+static constexpr CommandId Id = 0x00000001;
+} // namespace Close
+
+namespace SetLevel {
+static constexpr CommandId Id = 0x00000002;
+} // namespace SetLevel
+
+} // namespace Commands
+} // namespace ValveConfigurationAndControl
 
 namespace DemandResponseLoadControl {
 namespace Commands {

@@ -62,6 +62,7 @@ source_set("libopenthread-efr32") {
     "${sl_ot_efr32_root}/misc.c",
     "${sl_ot_efr32_root}/radio.c",
     "${sl_ot_efr32_root}/sleep.c",
+    "${sl_ot_efr32_root}/soft_source_match_table.c",
     "${sl_ot_efr32_root}/system.c",
   ]
 

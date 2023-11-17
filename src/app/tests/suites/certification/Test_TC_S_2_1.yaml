@@ -35,7 +35,7 @@ tests:
                 value: nodeId
 
     - label: "Step 2: TH reads from the DUT the (0x0000) SceneCount attribute"
-      PICS: S.S.A0000
+      PICS: S.S.A0000 && (!S.S.F03)
       command: "readAttribute"
       attribute: "SceneCount"
       response:
@@ -43,7 +43,7 @@ tests:
               type: int8u
 
     - label: "Step 3: TH reads from the DUT the (0x0001) CurrentScene attribute"
-      PICS: S.S.A0001
+      PICS: S.S.A0001 && (!S.S.F03)
       command: "readAttribute"
       attribute: "CurrentScene"
       response:
@@ -51,7 +51,7 @@ tests:
               type: int8u
 
     - label: "Step 4: TH reads from the DUT the (0x0002) CurrentGroup attribute"
-      PICS: S.S.A0002
+      PICS: S.S.A0002 && (!S.S.F03)
       command: "readAttribute"
       attribute: "CurrentGroup"
       response:
@@ -59,7 +59,7 @@ tests:
               type: group_id
 
     - label: "Step 5: TH reads from the DUT the (0x0003) SceneValid attribute"
-      PICS: S.S.A0003
+      PICS: S.S.A0003 && (!S.S.F03)
       command: "readAttribute"
       attribute: "SceneValid"
       response:
@@ -67,7 +67,7 @@ tests:
               type: boolean
 
     - label: "Step 6: TH reads from the DUT the (0x0004) NameSupport attribute"
-      PICS: S.S.A0003 && S.S.F00
+      PICS: S.S.A0004 && S.S.F00
       command: "readAttribute"
       attribute: "NameSupport"
       response:
@@ -103,11 +103,10 @@ tests:
               type: int16u
 
     - label:
-          "Step 9: TH reads from the DUT the (0x0007) RemainingCapacity
-          attribute"
+          "Step 9: TH reads from the DUT the (0x0007) FabricSceneInfo attribute"
       PICS: S.S.A0007
       command: "readAttribute"
-      attribute: "RemainingCapacity"
+      attribute: "FabricSceneInfo"
       response:
           constraints:
-              type: int8u
+              type: list

@@ -61,6 +61,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Scenes::Structs
 
 static void Finalize(chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Scenes::Structs::SceneInfoStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Scenes::Structs::SceneInfoStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type & request,
                         Json::Value & value);
 
