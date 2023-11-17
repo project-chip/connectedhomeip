@@ -194,6 +194,6 @@ jobs:
             - name: Check for errors in zap files
               if: always()
               run: |
-                  for zap_file in $(find . -name '*.zap'); do
+                  for zap_file in $(find . -name '*.zap' -not -path "./third_party/*"); do
                       ./scripts/run_in_build_env.sh "./scripts/helpers/check_zap_against_xml.py --zap $zap_file" || exit 1
                   done
