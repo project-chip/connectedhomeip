@@ -1458,11 +1458,11 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_MAX_SCENES_TABLE_SIZE
 
 /**
- * @def CHIP_CONFIG_MAX_SCENES
+ * @def CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
  *
- * @brief This defines enables the automatic registration of default scene handlers in the scene table for each sceneable clusters.
- * If a user want's to use their own scene handlers, they can disable this flag and implement their own handlers.
- * Then they can use ScenesServer::Instance().RegisterSceneHandler() to have their handlers called when a scene is recalled or
+ * @brief This define enables the automatic registration of the default scene handlers in the scene table for each sceneable cluster.
+ * If a user wants to use their own scene handlers, they can disable this flag and implement their own handlers.
+ * They can use ScenesServer::Instance().RegisterSceneHandler() to have their handlers called when a scene is recalled or
  * stored.
  */
 #ifndef CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
