@@ -16,13 +16,18 @@
  */
 package matter.devicecontroller.cluster.structs
 
+import java.util.Optional
 import matter.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ContentLauncherClusterAdditionalInfoStruct(val name: String, val value: String) {
+class ContentLauncherClusterAdditionalInfoStruct(
+  val name: String,
+  val value: String
+) {
   override fun toString(): String = buildString {
     append("ContentLauncherClusterAdditionalInfoStruct {\n")
     append("\tname : $name\n")
@@ -47,7 +52,7 @@ class ContentLauncherClusterAdditionalInfoStruct(val name: String, val value: St
       tlvReader.enterStructure(tlvTag)
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val value = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
-
+      
       tlvReader.exitContainer()
 
       return ContentLauncherClusterAdditionalInfoStruct(name, value)

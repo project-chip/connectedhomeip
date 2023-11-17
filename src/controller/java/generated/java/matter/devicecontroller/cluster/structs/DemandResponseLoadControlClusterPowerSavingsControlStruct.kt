@@ -16,7 +16,9 @@
  */
 package matter.devicecontroller.cluster.structs
 
+import java.util.Optional
 import matter.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -40,10 +42,7 @@ class DemandResponseLoadControlClusterPowerSavingsControlStruct(val powerSavings
   companion object {
     private const val TAG_POWER_SAVINGS = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): DemandResponseLoadControlClusterPowerSavingsControlStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DemandResponseLoadControlClusterPowerSavingsControlStruct {
       tlvReader.enterStructure(tlvTag)
       val powerSavings = tlvReader.getUByte(ContextSpecificTag(TAG_POWER_SAVINGS))
 

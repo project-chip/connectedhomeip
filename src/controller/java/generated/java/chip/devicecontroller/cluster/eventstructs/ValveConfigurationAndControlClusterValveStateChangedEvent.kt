@@ -17,13 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ValveConfigurationAndControlClusterValveStateChangedEvent(val valveState: UInt) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ValveConfigurationAndControlClusterValveStateChangedEvent (
+    val valveState: UInt) {
+  override fun toString(): String  = buildString {
     append("ValveConfigurationAndControlClusterValveStateChangedEvent {\n")
     append("\tvalveState : $valveState\n")
     append("}\n")
@@ -40,13 +45,10 @@ class ValveConfigurationAndControlClusterValveStateChangedEvent(val valveState: 
   companion object {
     private const val TAG_VALVE_STATE = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): ValveConfigurationAndControlClusterValveStateChangedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ValveConfigurationAndControlClusterValveStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val valveState = tlvReader.getUInt(ContextSpecificTag(TAG_VALVE_STATE))
-
+      
       tlvReader.exitContainer()
 
       return ValveConfigurationAndControlClusterValveStateChangedEvent(valveState)

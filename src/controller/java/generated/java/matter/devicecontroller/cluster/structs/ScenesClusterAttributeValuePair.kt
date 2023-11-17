@@ -16,13 +16,18 @@
  */
 package matter.devicecontroller.cluster.structs
 
+import java.util.Optional
 import matter.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ScenesClusterAttributeValuePair(val attributeID: UInt, val attributeValue: UInt) {
+class ScenesClusterAttributeValuePair(
+  val attributeID: UInt,
+  val attributeValue: UInt
+) {
   override fun toString(): String = buildString {
     append("ScenesClusterAttributeValuePair {\n")
     append("\tattributeID : $attributeID\n")
@@ -47,7 +52,7 @@ class ScenesClusterAttributeValuePair(val attributeID: UInt, val attributeValue:
       tlvReader.enterStructure(tlvTag)
       val attributeID = tlvReader.getUInt(ContextSpecificTag(TAG_ATTRIBUTE_I_D))
       val attributeValue = tlvReader.getUInt(ContextSpecificTag(TAG_ATTRIBUTE_VALUE))
-
+      
       tlvReader.exitContainer()
 
       return ScenesClusterAttributeValuePair(attributeID, attributeValue)

@@ -17,13 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DemandResponseLoadControlClusterHeatingSourceControlStruct(val heatingSource: UInt) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class DemandResponseLoadControlClusterHeatingSourceControlStruct (
+    val heatingSource: UInt) {
+  override fun toString(): String  = buildString {
     append("DemandResponseLoadControlClusterHeatingSourceControlStruct {\n")
     append("\theatingSource : $heatingSource\n")
     append("}\n")
@@ -40,13 +45,10 @@ class DemandResponseLoadControlClusterHeatingSourceControlStruct(val heatingSour
   companion object {
     private const val TAG_HEATING_SOURCE = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): DemandResponseLoadControlClusterHeatingSourceControlStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DemandResponseLoadControlClusterHeatingSourceControlStruct {
       tlvReader.enterStructure(tlvTag)
       val heatingSource = tlvReader.getUInt(ContextSpecificTag(TAG_HEATING_SOURCE))
-
+      
       tlvReader.exitContainer()
 
       return DemandResponseLoadControlClusterHeatingSourceControlStruct(heatingSource)

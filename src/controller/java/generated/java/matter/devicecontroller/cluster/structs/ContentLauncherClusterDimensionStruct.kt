@@ -16,7 +16,9 @@
  */
 package matter.devicecontroller.cluster.structs
 
+import java.util.Optional
 import matter.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -55,7 +57,7 @@ class ContentLauncherClusterDimensionStruct(
       val width = tlvReader.getDouble(ContextSpecificTag(TAG_WIDTH))
       val height = tlvReader.getDouble(ContextSpecificTag(TAG_HEIGHT))
       val metric = tlvReader.getUInt(ContextSpecificTag(TAG_METRIC))
-
+      
       tlvReader.exitContainer()
 
       return ContentLauncherClusterDimensionStruct(width, height, metric)
