@@ -126,8 +126,10 @@ bool IsSupportedCalendarType(CalendarTypeEnum newType, CalendarTypeEnum & validT
     AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
     VerifyOrReturnValue(it.IsValid(), false);
 
-    while (it.Next(validType))
+    CalendarTypeEnum type;
+    while (it.Next(type))
     {
+        validType = type;
         if (validType == newType)
         {
             return true;
