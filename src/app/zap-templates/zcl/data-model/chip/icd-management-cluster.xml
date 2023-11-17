@@ -81,7 +81,7 @@ limitations under the License.
         <attribute side="server" code="0x07" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="char_string" length="128" writable="false" optional="true" isNullable="false">UserActiveModeTriggerInstruction</attribute>
 
         <command source="client" code="0x00" name="RegisterClient" response="RegisterClientResponse" isFabricScoped="true" optional="true">
-            <description> Register a client to the end device </description>
+            <description>Register a client to the end device</description>
             <arg name="CheckInNodeID" type="node_id" optional="false"/>
             <arg name="MonitoredSubject" type="int64u" optional="false"/>
             <arg name="Key" type="octet_string" length="16" optional="false"/>
@@ -89,24 +89,24 @@ limitations under the License.
             <access op="invoke" privilege="manage"/>
         </command>
 
-        <command source="server" code="0x01" name="RegisterClientResponse" optional="false" disableDefaultResponse="true">
-            <description> RegisterClient response command</description>
+        <command source="server" code="0x01" name="RegisterClientResponse" optional="true" disableDefaultResponse="true">
+            <description>RegisterClient response command</description>
             <arg name="ICDCounter" type="int32u" isNullable="false"/>
         </command>
 
         <command source="client" code="0x02" name="UnregisterClient" isFabricScoped="true" optional="true">
-            <description> Unregister a client from an end device</description>
+            <description>Unregister a client from an end device</description>
             <arg name="CheckInNodeID" type="node_id"/>
             <arg name="VerificationKey" type="octet_string" length="16" optional="true"/>
             <access op="invoke" privilege="manage"/>
         </command>
 
-        <command source="client" code="0x03" name="StayActiveRequest" optional="true">
+        <command source="client" code="0x03" name="StayActiveRequest" response="StayActiveResponse" optional="true">
             <description>Request the end device to stay in Active Mode for an additional ActiveModeThreshold</description>
             <access op="invoke" privilege="manage"/>
         </command>
 
-        <command source="server" code="0x04" name="StayActiveResponse" optional="true">
+        <command source="server" code="0x04" name="StayActiveResponse" optional="true" disableDefaultResponse="true">
             <description>StayActiveRequest response command</description>
             <arg name="PromisedActiveDuration" type="int32u" isNullable="false"/>
         </command>
