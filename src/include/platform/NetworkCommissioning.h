@@ -295,8 +295,8 @@ public:
      * @param clientIdentityNetworkIndex    If present, the index of the existing network configuration of which the Client
      *                                      Identity is to be re-used. Otherwise a new Client Identity shall be generated.
      * @param outStatus                     The application-level status code (Status::kSuccess on success).
-     * @param outDebugText                  A debug text buffer that may be populated by the driver when a Status is returned.
-     *                                      The size of the span must be reduced to the length of text emitted (or 0, if none).
+     * @param outDebugText                  A debug text buffer that may be populated by the driver. The size of the span
+     *                                      must be reduced to the length of text emitted (or 0, if none).
      * @param outClientIdentity             On success, the Client Identity that was generated or copied, depending on the
      *                                      presence of `clientIdentityNetworkIndex`.
      * @param outNextworkIndex              On success, the index of the network entry that was added or updated.
