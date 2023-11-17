@@ -276,7 +276,7 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
 /// @param[out] index index of the corresponding SceneInfoStruct if found, otherwise the index value will be invalid and
 /// should not be used. This is safe to store in a uint8_t because the index is guaranteed to be smaller than
 /// CHIP_CONFIG_MAX_FABRICS.
-/// @return CHIP_NO_ERROR or CHIP_ERROR_NOT_FOUND, CHIP_ERROR_INVALID_ARGUMENT if invalid fabric or endpointt8_t & index)
+/// @return CHIP_NO_ERROR or CHIP_ERROR_NOT_FOUND, CHIP_ERROR_INVALID_ARGUMENT if invalid fabric or endpointIndex are provided
 CHIP_ERROR ScenesServer::FabricSceneInfo::FindSceneInfoStructIndex(FabricIndex fabric, size_t endpointIndex, uint8_t & index)
 {
     VerifyOrReturnError(endpointIndex < ArraySize(mSceneInfoStructs), CHIP_ERROR_INVALID_ARGUMENT);
@@ -604,7 +604,7 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
                             const SceneId & sceneID, const Optional<DataModel::Nullable<uint16_t>> & transitionTime,
                             GroupDataProvider * groupProvider)
 {
-    // Make the SceneValid false for all fabrics before recalling a scene
+    // Make SceneValid false for all fabrics before recalling a scene
     ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpointID);
 
     uint16_t endpointTableSize = 0;
@@ -1165,8 +1165,7 @@ void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
         ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, status);
     }
 
-    // Initialize the FabricSceneInfo by getting the number of scenes and the remaining capacity for fabric scene data saved in the
-    // persistant storage
+    // Initialize the FabricSceneInfo by getting the number of scenes and the remaining capacity for storing fabric scene data
     for (auto & info : chip::Server::GetInstance().GetFabricTable())
     {
         auto fabric = info.GetFabricIndex();
