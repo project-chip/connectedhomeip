@@ -7464,7 +7464,6 @@
           Scenes:
               # New scenes bits not stable yet.
               - SceneTableSize
-              - RemainingCapacity
           FanControl:
               # New Fan Control bits not stable yet.
               - AirflowDirection
@@ -7737,6 +7736,7 @@
           GeneralDiagnostics:
               # Not in the spec yet.
               - AverageWearCount
+              # New things, not quite finalized.
   renames:
       enums:
           OTASoftwareUpdateProvider:
@@ -7817,6 +7817,14 @@
               OptionsBitmap:
                   - ExecuteIfOff
                   - CoupleColorTempToLevel
+      attributes:
+          Scenes:
+              - FabricSceneInfo
+              # Targeting Spring 2024 Matter release
+      structs:
+          Scenes:
+              - SceneInfoStruct
+              # Targeting Spring 2024 Matter release
   deprecated:
       event fields:
           WiFiNetworkDiagnostics:

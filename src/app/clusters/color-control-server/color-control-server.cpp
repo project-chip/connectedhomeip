@@ -1608,7 +1608,7 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
     }
     Status status = moveToHueAndSaturation(hue, saturation, transitionTime, isEnhanced, commandPath.mEndpointId);
 #ifdef EMBER_AF_PLUGIN_SCENES
-    Scenes::ScenesServer::Instance().MakeSceneInvalid(commandPath.mEndpointId);
+    Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
 #endif // EMBER_AF_PLUGIN_SCENES
     commandObj->AddStatus(commandPath, status);
     return true;
@@ -1813,7 +1813,7 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
     }
     Status status = moveToSaturation(commandData.saturation, commandData.transitionTime, commandPath.mEndpointId);
 #ifdef EMBER_AF_PLUGIN_SCENES
-    Scenes::ScenesServer::Instance().MakeSceneInvalid(commandPath.mEndpointId);
+    Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
 #endif // EMBER_AF_PLUGIN_SCENES
     commandObj->AddStatus(commandPath, status);
     return true;
@@ -1997,7 +1997,7 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
 
 exit:
 #ifdef EMBER_AF_PLUGIN_SCENES
-    Scenes::ScenesServer::Instance().MakeSceneInvalid(endpoint);
+    Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
 #endif // EMBER_AF_PLUGIN_SCENES
     commandObj->AddStatus(commandPath, status);
     return true;
@@ -2206,7 +2206,7 @@ bool ColorControlServer::moveToColorCommand(app::CommandHandler * commandObj, co
 
     Status status = moveToColor(commandData.colorX, commandData.colorY, commandData.transitionTime, commandPath.mEndpointId);
 #ifdef EMBER_AF_PLUGIN_SCENES
-    Scenes::ScenesServer::Instance().MakeSceneInvalid(commandPath.mEndpointId);
+    Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
 #endif // EMBER_AF_PLUGIN_SCENES
     commandObj->AddStatus(commandPath, status);
     return true;
@@ -2733,7 +2733,7 @@ bool ColorControlServer::moveToColorTempCommand(app::CommandHandler * commandObj
 
     Status status = moveToColorTemp(commandPath.mEndpointId, commandData.colorTemperatureMireds, commandData.transitionTime);
 #ifdef EMBER_AF_PLUGIN_SCENES
-    Scenes::ScenesServer::Instance().MakeSceneInvalid(commandPath.mEndpointId);
+    Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
 #endif // EMBER_AF_PLUGIN_SCENES
     commandObj->AddStatus(commandPath, status);
     return true;

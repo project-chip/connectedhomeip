@@ -184,6 +184,8 @@ if (current_os == "android" || matter_enable_java_compilation) {
       "jni/OtaSoftwareUpdateProviderClient-ReadImpl.cpp",
       "jni/OtaSoftwareUpdateRequestorClient-InvokeSubscribeImpl.cpp",
       "jni/OtaSoftwareUpdateRequestorClient-ReadImpl.cpp",
+      "jni/OvenModeClient-InvokeSubscribeImpl.cpp",
+      "jni/OvenModeClient-ReadImpl.cpp",
       "jni/OzoneConcentrationMeasurementClient-InvokeSubscribeImpl.cpp",
       "jni/OzoneConcentrationMeasurementClient-ReadImpl.cpp",
       "jni/Pm10ConcentrationMeasurementClient-InvokeSubscribeImpl.cpp",
@@ -270,7 +272,7 @@ if (current_os == "android" || matter_enable_java_compilation) {
 
     deps = [
       ":data_model",
-      "${chip_root}/src/platform:platform_buildconfig",
+      "${chip_root}/src/platform:platform_config_header",
     ]
 
     public_configs = [ ":java-build-config" ]
