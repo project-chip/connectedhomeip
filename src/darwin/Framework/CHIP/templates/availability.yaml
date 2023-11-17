@@ -7890,6 +7890,13 @@
               NetworkInfoStruct:
                   - networkIdentifier
                   - clientIdentifier
+      enum values:
+          # Targeting Spring 2024 Matter release
+          TimeFormatLocalization:
+              CalendarTypeEnum:
+                  - UseActiveLocale
+              HourFormatEnum:
+                  - UseActiveLocale
       bitmaps:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
