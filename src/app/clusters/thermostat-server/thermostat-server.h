@@ -20,6 +20,8 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
+#include <app/util/af-enums.h>
+
 
 using namespace chip::app::Clusters::Thermostat::Structs;
 
@@ -37,11 +39,10 @@ struct ThermostatMatterScheduleManager
      */
     using onEditStartCb  = void (*)(ThermostatMatterScheduleManager *, editType aType);
     using onEditCancelCb = onEditStartCb;
-    using onEditCommitCb = onEditStartCb;
+    using onEditCommitCb = EmberAfStatus (*)(ThermostatMatterScheduleManager *, editType);
 
     using getPresetTypeAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, PresetTypeStruct::Type &presetType);
     using getPresetAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, PresetStruct::Type &preset);
-    using setPresetAtIndexCB = getPresetAtIndexCB;
     using clearPresetsCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *);
     using appendPresetCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, const PresetStruct::DecodableType &preset);
 
@@ -130,4 +131,8 @@ struct ThermostatMatterScheduleManager
     bool hasNext() { return this->nextEditor != nullptr; }
     ThermostatMatterScheduleManager * next() { return this->nextEditor; }
     void setNext(ThermostatMatterScheduleManager * inst) { this->nextEditor = inst; }
+
+    EmberAfStatus ValidatePresetsForCommitting(chip::Span<PresetStruct::Type> &oldlist, chip::Span<PresetStruct::Type> &newlist);
+//    static CHIP_ERROR ValidateSchedulesForCommitting(oldlist, newlist);
 };
+

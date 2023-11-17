@@ -320,6 +320,12 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
         ]
+      } else if (cluster == "thermostat-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/thermostat-preset-commit-validation.cpp",
+        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }

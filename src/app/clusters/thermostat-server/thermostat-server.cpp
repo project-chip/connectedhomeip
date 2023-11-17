@@ -1352,7 +1352,9 @@ static bool CommitEditRequest(chip::app::CommandHandler * commandObj, const chip
     {
         VerifyOrExit(currentlyEditing == true, status=EMBER_ZCL_STATUS_INVALID_IN_STATE);
 
-        manager->mOnEditCommitCb(manager, editType);
+        status = manager->mOnEditCommitCb(manager, editType);
+        SuccessOrExit(status);
+
         if (editType == ThermostatMatterScheduleManager::Presets)
             status = PresetsEditable::Set(commandPath.mEndpointId, false);
         else
