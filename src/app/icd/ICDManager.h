@@ -128,8 +128,8 @@ protected:
      */
     static void OnTransitionToIdle(System::Layer * aLayer, void * appState);
 
-    static uint8_t OpenExchangeContextCount;
-    static uint8_t CheckInRequestCount;
+    uint8_t OpenExchangeContextCount;
+    uint8_t CheckInRequestCount;
 
 private:
     // SIT ICDs should have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)
