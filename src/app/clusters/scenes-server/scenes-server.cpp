@@ -274,7 +274,7 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
 /// @param[in] endpointIndex index of the corresponding FabricSceneInfo for an endpoint, corresponds to a row in the
 /// mSceneInfoStructs array
 /// @param[out] index index of the corresponding SceneInfoStruct if found, otherwise the index value will be invalid and
-/// should not be used. This os safe to store in a uint8_t because the index is guaranteed to be smaller than
+/// should not be used. This is safe to store in a uint8_t because the index is guaranteed to be smaller than
 /// CHIP_CONFIG_MAX_FABRICS.
 /// @return CHIP_NO_ERROR or CHIP_ERROR_NOT_FOUND, CHIP_ERROR_INVALID_ARGUMENT if invalid fabric or endpointt8_t & index)
 CHIP_ERROR ScenesServer::FabricSceneInfo::FindSceneInfoStructIndex(FabricIndex fabric, size_t endpointIndex, uint8_t & index)
@@ -543,7 +543,7 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
 CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & endpointID, const GroupId & groupID,
                            const SceneId & sceneID, GroupDataProvider * groupProvider)
 {
-    // Make current fabric's SceneValid false before storing a scene
+    // Make the current fabric's SceneValid false before storing a scene
     ScenesServer::Instance().MakeSceneInvalid(endpointID, fabricIdx);
 
     uint16_t endpointTableSize = 0;
@@ -604,7 +604,7 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
                             const SceneId & sceneID, const Optional<DataModel::Nullable<uint16_t>> & transitionTime,
                             GroupDataProvider * groupProvider)
 {
-    // Make SceneValid false for all fabrics before recalling a scenes
+    // Make the SceneValid false for all fabrics before recalling a scene
     ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpointID);
 
     uint16_t endpointTableSize = 0;
@@ -1165,7 +1165,7 @@ void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
         ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, status);
     }
 
-    // Initialize the FabricSceneInfo by getting the number of scene and the remaining capacity for fabric scene data saved in the
+    // Initialize the FabricSceneInfo by getting the number of scenes and the remaining capacity for fabric scene data saved in the
     // persistant storage
     for (auto & info : chip::Server::GetInstance().GetFabricTable())
     {

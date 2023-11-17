@@ -61,7 +61,7 @@ public:
         /// @param[in] endpointIndex index of the corresponding FabricSceneInfo for an endpoint, corresponds to a row in the
         /// mSceneInfoStructs array
         /// @param[out] index index of the corresponding SceneInfoStruct if found, otherwise the index value will be invalid and
-        /// should not be used. This os safe to store in a uint8_t because the index is guaranteed to be smaller than
+        /// should not be used. This is safe to store in a uint8_t because the index is guaranteed to be smaller than
         /// CHIP_CONFIG_MAX_FABRICS.
         /// @return CHIP_NO_ERROR or CHIP_ERROR_NOT_FOUND, CHIP_ERROR_INVALID_ARGUMENT if invalid fabric or endpoint
         CHIP_ERROR FindSceneInfoStructIndex(FabricIndex fabric, size_t endpointIndex, uint8_t & index);
