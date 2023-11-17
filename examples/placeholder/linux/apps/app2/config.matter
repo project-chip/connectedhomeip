@@ -5783,7 +5783,7 @@ client cluster LowPower = 1288 {
 
 /** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
 client cluster KeypadInput = 1289 {
-  enum CecKeyCodeEnum : enum8 {
+  enum CECKeyCodeEnum : enum8 {
     kSelect = 0;
     kUp = 1;
     kDown = 2;
@@ -5892,7 +5892,7 @@ client cluster KeypadInput = 1289 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SendKeyRequest {
-    CecKeyCodeEnum keyCode = 0;
+    CECKeyCodeEnum keyCode = 0;
   }
 
   response struct SendKeyResponse = 1 {
@@ -5905,7 +5905,7 @@ client cluster KeypadInput = 1289 {
 
 /** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
 server cluster KeypadInput = 1289 {
-  enum CecKeyCodeEnum : enum8 {
+  enum CECKeyCodeEnum : enum8 {
     kSelect = 0;
     kUp = 1;
     kDown = 2;

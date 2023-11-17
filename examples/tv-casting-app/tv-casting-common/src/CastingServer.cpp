@@ -1100,7 +1100,7 @@ CHIP_ERROR CastingServer::TargetNavigator_SubscribeToCurrentTarget(
  * @brief Keypad Input cluster
  */
 CHIP_ERROR CastingServer::KeypadInput_SendKey(TargetEndpointInfo * endpoint,
-                                              const chip::app::Clusters::KeypadInput::CecKeyCodeEnum keyCode,
+                                              const chip::app::Clusters::KeypadInput::CECKeyCodeEnum keyCode,
                                               std::function<void(CHIP_ERROR)> responseCallback)
 {
     ReturnErrorOnFailure(mSendKeyCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));

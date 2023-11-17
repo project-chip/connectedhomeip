@@ -303,7 +303,7 @@ public:
     /**
      * @brief Keypad Input cluster
      */
-    CHIP_ERROR KeypadInput_SendKey(TargetEndpointInfo * endpoint, const chip::app::Clusters::KeypadInput::CecKeyCodeEnum keyCode,
+    CHIP_ERROR KeypadInput_SendKey(TargetEndpointInfo * endpoint, const chip::app::Clusters::KeypadInput::CECKeyCodeEnum keyCode,
                                    std::function<void(CHIP_ERROR)> responseCallback);
 
     /**
