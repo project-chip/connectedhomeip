@@ -38,7 +38,7 @@ StringBuilderBase & Tag::AppendTo(StringBuilderBase & out)
     }
     else
     {
-        out.AddFormat("UnknownTag(0x%" PRIX64 ")", mVal);
+        out.AddFormat("UnknownTag(0x" ChipLogFormatX64 ")", ChipLogValueX64(mVal));
     }
 
     return out;

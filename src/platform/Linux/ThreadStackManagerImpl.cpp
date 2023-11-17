@@ -663,9 +663,9 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
                                    &joiner_udp_port, &channel, &rssi, &lqi, &version, &is_native, &is_joinable))
         {
             ChipLogProgress(DeviceLayer,
-                            "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %d LQI %u"
+                            "Thread Network: %s (" ChipLogFormatX64 ") ExtPanId(" ChipLogFormatX64 ") RSSI %d LQI %u"
                             " Version %u",
-                            network_name, ext_address, ext_panid, rssi, lqi, version);
+                            network_name, ChipLogValueX64(ext_address), ChipLogValueX64(ext_panid), rssi, lqi, version);
             NetworkCommissioning::ThreadScanResponse networkScanned;
             networkScanned.panId         = panid;
             networkScanned.extendedPanId = ext_panid;
