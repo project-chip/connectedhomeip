@@ -73,7 +73,6 @@
 #include <transport/raw/BLE.h>
 #endif
 
-
 #include <errno.h>
 #include <inttypes.h>
 #include <memory>
