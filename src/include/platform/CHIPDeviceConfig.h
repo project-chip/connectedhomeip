@@ -862,7 +862,7 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_THREAD_SSED
+ * CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
  *
  * Enable Thread Border Router service.
  * Users should ensure OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE is set accordingly within their thread stack
