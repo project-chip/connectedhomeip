@@ -543,8 +543,8 @@ int OTAImageProcessorImpl::ProgramMemory()
     }
     ChipLogProgress(SoftwareUpdate,
                     "Secondary slot program with offset: "
-                    "0x%" PRIx64,
-                    mParams.downloadedBytes);
+                    "0x" ChipLogFormatX64,
+                    ChipLogValueX64(mParams.downloadedBytes));
     mParams.downloadedBytes += mBlock.size();
 
     return ret;
