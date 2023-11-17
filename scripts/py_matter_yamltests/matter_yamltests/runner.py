@@ -70,11 +70,15 @@ class TestRunnerConfig:
     hooks: A configurable set of hooks to be called at various steps while
            running. It may may allow the callers to gain insights about the
            current running state.
+
+    auto_start_stop: Indicates whether the run method should start and stop
+            the runner of if that will be handled outside of that method.
     """
     adapter: TestAdapter = None
     pseudo_clusters: PseudoClusters = PseudoClusters([])
     options: TestRunnerOptions = field(default_factory=TestRunnerOptions)
     hooks: TestRunnerHooks = TestRunnerHooks()
+    auto_start_stop: bool = True
 
 
 class TestRunnerBase(ABC):
@@ -109,7 +113,7 @@ class TestRunnerBase(ABC):
         pass
 
     @abstractmethod
-    def run(self, config: TestRunnerConfig) -> bool:
+    def run(self, parser_builder_config: TestParserBuilderConfig, runner_config: TestRunnerConfig) -> bool:
         """
         This method runs a test suite.
 
@@ -156,12 +160,14 @@ class TestRunner(TestRunnerBase):
     async def _run_with_timeout(self, parser: TestParser, config: TestRunnerConfig):
         status = True
         try:
-            await self.start()
+            if config.auto_start_stop:
+                await self.start()
             status = await asyncio.wait_for(self._run(parser, config), parser.timeout)
         except (Exception, CancelledError) as exception:
             status = exception
         finally:
-            await self.stop()
+            if config.auto_start_stop:
+                await self.stop()
             return status
 
     async def _run(self, parser: TestParser, config: TestRunnerConfig):

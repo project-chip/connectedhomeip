@@ -72,7 +72,7 @@ limitations under the License.
     <description>This cluster provides attributes and events for determining basic information about Nodes, which supports both
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location.</description>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0"  define="DATA_MODEL_REVISION"       type="int16u"                                                                             >DataModelRevision</attribute>
     <attribute side="server" code="1"  define="VENDOR_NAME"               type="char_string"               length="32"                                              >VendorName</attribute>
@@ -107,6 +107,8 @@ limitations under the License.
     <attribute side="server" code="18" define="UNIQUE_ID"                 type="char_string"               length="32"                               optional="true">UniqueID</attribute>
     <attribute side="server" code="19" define="CAPABILITY_MINIMA"         type="CapabilityMinimaStruct"                              writable="false"               >CapabilityMinima</attribute>
     <attribute side="server" code="20" define="PRODUCT_APPEARANCE"        type="ProductAppearanceStruct"                                             optional="true">ProductAppearance</attribute>
+    <attribute side="server" code="21" define="SPECIFICATION_VERSION"     type="int32u"                                                                             >SpecificationVersion</attribute>
+    <attribute side="server" code="22" define="MAX_PATHS_PER_INVOKE"      type="int16u"                                                                             >MaxPathsPerInvoke</attribute>
 
     <event side="server" code="0x00" name="StartUp" priority="critical" optional="false">
       <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>

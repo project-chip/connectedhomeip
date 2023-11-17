@@ -1076,7 +1076,7 @@
                                              void (^callback)(uint32_t) =
                                                  [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
                                                      objectForKey:@"contentLauncher_subscribeSupportedStreamingProtocols"];
-                                             callback(supportedStreamingProtocols);
+                                             callback(supportedStreamingProtocols.Raw());
                                          },
                                          [](void * context, CHIP_ERROR err) {
                                              void (^callback)(MatterError *) =
@@ -1121,7 +1121,7 @@
                                      [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
                                      return castingServer->LevelControl_Step(&endpoint,
-                                         static_cast<chip::app::Clusters::LevelControl::StepMode>(stepMode), stepSize,
+                                         static_cast<chip::app::Clusters::LevelControl::StepModeEnum>(stepMode), stepSize,
                                          transitionTime, optionMask, optionOverride, responseFunction);
                                  }];
 }

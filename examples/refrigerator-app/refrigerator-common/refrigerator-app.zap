@@ -729,6 +729,38 @@
               "reportableChange": 0
             },
             {
+              "name": "SpecificationVersion",
+              "code": 21,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int32u",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 1,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "MaxPathsPerInvoke",
+              "code": 22,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 1,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -802,7 +834,7 @@
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "3",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -2269,14 +2301,6 @@
               "isEnabled": 1
             },
             {
-              "name": "OpenBasicCommissioningWindow",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
               "name": "RevokeCommissioning",
               "code": 2,
               "mfgCode": null,
@@ -3733,5 +3757,6 @@
       "endpointId": 3,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }

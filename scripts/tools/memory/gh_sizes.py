@@ -154,13 +154,17 @@ def main(argv):
         else:
             output = pathlib.Path(binary).parent / output_base
 
-        config = Config().init({
+        config_desc = {
             **memdf.util.config.CONFIG,
             **memdf.collect.CONFIG,
             **memdf.select.CONFIG,
             **memdf.report.OUTPUT_CONFIG,
             **CONFIG,
-        })
+        }
+        # In case there is no platform configuration file, default to using a popular set of section names.
+        config_desc['section.select']['default'] = ['.text', '.rodata', '.data', '.bss']
+
+        config = Config().init(config_desc)
         config.put('output.file', output)
         config.put('output.format', 'json_records')
         if config_file.is_file():
@@ -181,7 +185,7 @@ def main(argv):
 
         collected: DFs = memdf.collect.collect_files(config, [binary])
 
-        # Aggregate loaded segments, by writable (flash) or not (RAM).
+        # Aggregate loaded segments, by writable (RAM) or not (flash).
         segments = collected[SegmentDF.name]
         segments['segment'] = segments.index
         segments['wr'] = ((segments['flags'] & 2) != 0).convert_dtypes(

@@ -15,16 +15,22 @@
 #    limitations under the License.
 #
 
+import asyncio
 import json
 import os
-from typing import Dict
+from typing import IO, Dict
 
 from capture.base import EcosystemCapture, UnsupportedCapturePlatformException
-from capture.file_utils import create_standard_log_name
 from capture.platform.android import Android
+from capture.platform.android.streams.logcat import LogcatStreamer
+from utils.artifact import create_standard_log_name, log
 
-from .analysis import PlayServicesAnalysis
+from . import config
 from .command_map import dumpsys, getprop
+from .play_services_analysis import PlayServicesAnalysis
+from .prober import PlayServicesProber
+
+logger = log.get_logger(__file__)
 
 
 class PlayServices(EcosystemCapture):
@@ -33,7 +39,6 @@ class PlayServices(EcosystemCapture):
     """
 
     def __init__(self, platform: Android, artifact_dir: str) -> None:
-
         self.artifact_dir = artifact_dir
 
         if not isinstance(platform, Android):
@@ -52,10 +57,12 @@ class PlayServices(EcosystemCapture):
                             '305',  # Thread
                             '168',  # mDNS
                             ]
+        self.logcat_stream: LogcatStreamer = self.platform.streams["LogcatStreamer"]
+        self.logcat_file: IO = None
 
     def _write_standard_info_file(self) -> None:
         for k, v in self.standard_info_data.items():
-            print(f"{k}: {v}")
+            logger.info(f"{k}: {v}")
         standard_info_data_json = json.dumps(self.standard_info_data, indent=2)
         with open(self.standard_info_file_path, mode='w+') as standard_info_file:
             standard_info_file.write(standard_info_data_json)
@@ -87,10 +94,24 @@ class PlayServices(EcosystemCapture):
             verbose_command = f"shell setprop log.tag.gms_svc_id:{service_id} VERBOSE"
             self.platform.run_adb_command(verbose_command)
         self._get_standard_info()
-        await self.platform.start_streaming()
+
+    async def analyze_capture(self):
+        try:
+            self.logcat_file = open(self.logcat_stream.logcat_artifact, "r")
+            while True:
+                self.analysis.do_analysis(self.logcat_file.readlines())
+                # Releasing async event loop for other analysis / monitor topics
+                await asyncio.sleep(0.5)
+        except asyncio.CancelledError:
+            logger.info("Closing logcat stream")
+            if self.logcat_file:
+                self.logcat_file.close()
 
     async def stop_capture(self) -> None:
-        await self.platform.stop_streaming()
+        self.analysis.show_analysis()
 
-    async def analyze_capture(self) -> None:
-        self.analysis.do_analysis()
+    async def probe_capture(self) -> None:
+        if config.enable_foyer_probers:
+            await PlayServicesProber(self.platform, self.artifact_dir).probe_services()
+        else:
+            logger.critical("Foyer probers disabled in config!")

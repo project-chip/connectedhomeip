@@ -3074,8 +3074,12 @@
               - EffectIdentifierEnum
               - StartUpOnOffEnum
           LevelControl:
-              - MoveMode
-              - StepMode
+              # MoveModeEnum and StepModeEnum were originally named MoveMode and
+              # StepMode, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - MoveModeEnum
+              - StepModeEnum
           AccessControl:
               - AuthMode
               - ChangeTypeEnum
@@ -3245,7 +3249,10 @@
               - StatusEnum
               - LineupInfoTypeEnum
           TargetNavigator:
-              - TargetNavigatorStatusEnum
+              # StatusEnum was originally named TargetNavigatorStatusEnum, but
+              # we generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
           MediaPlayback:
               # StatusEnum was originally named MediaPlaybackStatusEnum, but we
               # generate the same API for the names with/without the cluster
@@ -3256,7 +3263,10 @@
               - InputTypeEnum
           KeypadInput:
               - CecKeyCode
-              - KeypadInputStatusEnum
+              # StatusEnum was originally named KeypadInputStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
           ContentLauncher:
               - ContentLaunchStatusEnum
               - MetricTypeEnum
@@ -3320,10 +3330,14 @@
                   - On
                   - TogglePreviousOnOff
           LevelControl:
-              MoveMode:
+              # MoveModeEnum and StepModeEnum were originally named MoveMode and
+              # StepMode, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              MoveModeEnum:
                   - Up
                   - Down
-              StepMode:
+              StepModeEnum:
                   - Up
                   - Down
           AccessControl:
@@ -3995,7 +4009,10 @@
               LineupInfoTypeEnum:
                   - Mso
           TargetNavigator:
-              TargetNavigatorStatusEnum:
+              # StatusEnum was originally named TargetNavigatorStatusEnum, but
+              # we generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - TargetNotFound
                   - NotAllowed
@@ -4117,7 +4134,10 @@
                   - F4Yellow
                   - F5
                   - Data
-              KeypadInputStatusEnum:
+              # StatusEnum was originally named KeypadInputStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - UnsupportedKey
                   - InvalidKeyInCurrentState
@@ -7444,7 +7464,6 @@
           Scenes:
               # New scenes bits not stable yet.
               - SceneTableSize
-              - RemainingCapacity
           FanControl:
               # New Fan Control bits not stable yet.
               - AirflowDirection
@@ -7717,6 +7736,7 @@
           GeneralDiagnostics:
               # Not in the spec yet.
               - AverageWearCount
+              # New things, not quite finalized.
   renames:
       enums:
           OTASoftwareUpdateProvider:
@@ -7751,7 +7771,15 @@
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   - associationFailureCause
+      enums:
+          ContentLauncher:
+              - StatusEnum
       enum values:
+          ContentLauncher:
+              StatusEnum:
+                  - Success
+                  - URLNotAvailable
+                  - AuthFailed
           FanControl:
               FanModeSequenceEnum:
                   - OffHighAuto
@@ -7762,6 +7790,10 @@
               - NameSupportBitmap
           AdministratorCommissioning:
               - Feature
+          ContentLauncher:
+              - SupportedProtocolsBitmap
+          LevelControl:
+              - OptionsBitmap
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7777,11 +7809,31 @@
           AdministratorCommissioning:
               Feature:
                   - Basic
+          ContentLauncher:
+              SupportedProtocolsBitmap:
+                  - DASH
+                  - HLS
+          LevelControl:
+              OptionsBitmap:
+                  - ExecuteIfOff
+                  - CoupleColorTempToLevel
+      attributes:
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - FabricSceneInfo
+      structs:
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - SceneInfoStruct
+
   deprecated:
       event fields:
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   - associationFailure
+      enums:
+          ContentLauncher:
+              - ContentLaunchStatusEnum
       enum values:
           FanControl:
               FanModeSequenceEnum:
@@ -7790,6 +7842,10 @@
       bitmaps:
           Scenes:
               - ScenesCopyMode
+          ContentLauncher:
+              - SupportedStreamingProtocol
+          LevelControl:
+              - LevelControlOptions
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7802,17 +7858,47 @@
           # Targeting Spring 2024 Matter release
           - MicrowaveOvenControl
           - MicrowaveOvenMode
+          - DemandResponseLoadControl
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
               - SupportedWiFiBands
               - SupportedThreadFeatures
               - ThreadVersion
+          WakeOnLAN:
+              # Targeting Spring 2024 Matter release
+              - LinkLocalAddress
       commands:
           GeneralDiagnostics:
               # Targeting Spring 2024 Matter release
               - TimeSnapshot
               - TimeSnapshotResponse
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              - QueryIdentity
+              - QueryIdentityResponse
+      command fields:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              AddOrUpdateWiFiNetwork:
+                  - networkIdentity
+                  - clientIdentifier
+                  - possessionNonce
+              NetworkConfigResponse:
+                  - clientIdentity
+                  - possessionSignature
+              QueryIdentity:
+                  - keyIdentifier
+                  - possessionNonce
+              QueryIdentityResponse:
+                  - identity
+                  - possessionSignature
+      struct fields:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              NetworkInfoStruct:
+                  - networkIdentifier
+                  - clientIdentifier
       bitmaps:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -7822,12 +7908,27 @@
               Feature:
                   # Targeting Spring 2024 Matter release
                   - OffOnly
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              Feature:
+                  - PerDeviceCredentials
+              WiFiSecurityBitmap:
+                  - WPA3MatterPDC
   renames:
       event fields:
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   associationFailureCause: associationFailure
+      enums:
+          ContentLauncher:
+              StatusEnum: ContentLaunchStatusEnum
       enum values:
+          ContentLauncher:
+              # The URLNotAvailable value got renamed at the same time
+              # as the enum.  Record the rename here so that the old
+              # value name is generated for the old enum name.
+              ContentLaunchStatusEnum:
+                  URLNotAvailable: UrlNotAvailable
           FanControl:
               FanModeSequenceEnum:
                   OffHighAuto: OffOnAuto
@@ -7842,6 +7943,10 @@
       bitmaps:
           Scenes:
               CopyModeBitmap: ScenesCopyMode
+          ContentLauncher:
+              SupportedProtocolsBitmap: SupportedStreamingProtocol
+          LevelControl:
+              OptionsBitmap: LevelControlOptions
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7849,3 +7954,10 @@
           SoftwareDiagnostics:
               Feature:
                   Watermarks: WaterMarks
+  removed:
+      enum values:
+          ContentLauncher:
+              # The URLNotAvailable value got renamed at the same time
+              # as the enum.  The old enum name never had the new value name.
+              ContentLaunchStatusEnum:
+                  - URLNotAvailable

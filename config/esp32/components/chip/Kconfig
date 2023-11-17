@@ -640,6 +640,16 @@ menu "CHIP Device Layer"
 
                 When set, WoBLE advertisements will stop while a WoBLE connection is active.
 
+        config CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART
+            int "Enable CHIPoBLE advertising start automatically after device power-up"
+            range 0 1
+            default 0
+            depends on ENABLE_CHIPOBLE
+            help
+                CHIPs device may start advertising automatically only if its all primary device
+                functions are within a CHIP network. Device providing unrelated to CHIP functionalities
+                should not start advertising automatically after power-up.
+
         config USE_BLE_ONLY_FOR_COMMISSIONING
 	    bool "Use BLE only for commissioning"
 	    default y
