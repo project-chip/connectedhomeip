@@ -90,7 +90,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
          IsUnsafeSpan(params.GetPAI(), mParams.GetPAI()) || IsUnsafeSpan(params.GetDAC(), mParams.GetDAC()) ||
          IsUnsafeSpan(params.GetTimeZone(), mParams.GetTimeZone()) ||
          IsUnsafeSpan(params.GetDSTOffsets(), mParams.GetDSTOffsets())) ||
-        IsUnsafeSpan(params.GetICDSymmetricKey(), mParams.GetICDSymmetricKey());
+         IsUnsafeSpan(params.GetICDSymmetricKey(), mParams.GetICDSymmetricKey());
 
     mParams = params;
 
@@ -213,7 +213,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         ChipLogProgress(Controller, "Checking ICD registration parameters");
         if (!params.GetICDSymmetricKey().HasValue())
         {
-            ChipLogError(Controller, "Unexpected ICD symmetric key!");
+            ChipLogError(Controller, "Missing ICD symmetric key!");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         VerifyOrReturnError(params.GetICDSymmetricKey().Value().size() == sizeof(mICDSymmetricKey), CHIP_ERROR_INVALID_ARGUMENT);
@@ -732,7 +732,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                     if (commissioningInfo.isIcd && commissioningInfo.checkInProtocolSupport)
                     {
                         mNeedIcdRegistraion = true;
-                        ChipLogDetail(Controller, "AutoCommissioner: Device supports check-in protocol.");
+                        ChipLogDetail(Controller, "AutoCommissioner: ICD supports the check-in protocol.");
                     }
                 }
             }
