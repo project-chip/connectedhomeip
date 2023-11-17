@@ -1216,6 +1216,26 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Timer::TimerStatusEnum 
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenMode::ModeTag val)
+{
+    using EnumType = OvenMode::ModeTag;
+    switch (val)
+    {
+    case EnumType::kBake:
+    case EnumType::kConvection:
+    case EnumType::kGrill:
+    case EnumType::kRoast:
+    case EnumType::kClean:
+    case EnumType::kConvectionBake:
+    case EnumType::kConvectionRoast:
+    case EnumType::kWarming:
+    case EnumType::kProofing:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherControls::NumberOfRinsesEnum val)
 {
     using EnumType = LaundryWasherControls::NumberOfRinsesEnum;

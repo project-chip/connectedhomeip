@@ -1533,6 +1533,34 @@ enum class Feature : uint32_t
 };
 } // namespace Timer
 
+namespace OvenMode {
+
+// Enum for ModeTag
+enum class ModeTag : uint16_t
+{
+    kBake            = 0x4000,
+    kConvection      = 0x4001,
+    kGrill           = 0x4002,
+    kRoast           = 0x4003,
+    kClean           = 0x4004,
+    kConvectionBake  = 0x4005,
+    kConvectionRoast = 0x4006,
+    kWarming         = 0x4007,
+    kProofing        = 0x4008,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOnOff = 0x1,
+};
+} // namespace OvenMode
+
 namespace ModeSelect {
 
 // Bitmap for Feature
