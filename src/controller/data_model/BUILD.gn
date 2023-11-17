@@ -272,7 +272,7 @@ if (current_os == "android" || matter_enable_java_compilation) {
 
     deps = [
       ":data_model",
-      "${chip_root}/src/platform:platform_buildconfig",
+      "${chip_root}/src/platform:platform_config_header",
     ]
 
     public_configs = [ ":java-build-config" ]
