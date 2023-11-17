@@ -138,6 +138,8 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
 
         ReturnErrorOnFailure(aReader.Get(value_s64));
 
+        // TODO: Figure out how to not use PRId64 here, since it's not supported
+        // on all libcs.
         PRETTY_PRINT_SAMELINE("%" PRId64 ", ", value_s64);
         break;
     }
@@ -147,6 +149,8 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
 
         ReturnErrorOnFailure(aReader.Get(value_u64));
 
+        // TODO: Figure out how to not use PRIu64 here, since it's not supported
+        // on all libcs.
         PRETTY_PRINT_SAMELINE("%" PRIu64 ", ", value_u64);
         break;
     }

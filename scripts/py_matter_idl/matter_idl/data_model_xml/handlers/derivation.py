@@ -88,13 +88,16 @@ def merge_attribute_into(a: Attribute, cluster: Cluster):
             break
 
     if existing:
-        # Do not provide merging as it seems only conformance is changed from
-        # the base cluster
+        # Merge examples:
+        #   UserLabelCluster::LabelList changes qualities (access, mandatory)
         #
-        # This should fix the correct types
+        # TODO: add more examples and handle accordingly, sometimes just the
+        #       conformance is changed
         #
-        # LOGGER.error("TODO: Do not know how to merge attribute for %s::%s", cluster.name, existing.definition.name)
-        cluster.attributes.remove(existing)
+        # To replace we could do:
+        #    cluster.attributes.remove(existing)
+        # However then we lose any overrides
+        return
 
     cluster.attributes.append(a)
 
