@@ -52,44 +52,47 @@ private:
     CHIP_ERROR ReadSupportedCalendarTypes(AttributeValueEncoder & aEncoder);
 };
 
+class AutoReleaseIterator
+{
+public:
+    using Iterator = DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator;
+
+    AutoReleaseIterator(Iterator * value) : mIterator(value) {}
+    ~AutoReleaseIterator()
+    {
+        if (mIterator != nullptr)
+        {
+            mIterator->Release();
+        }
+    }
+
+    bool IsValid() const { return mIterator != nullptr; }
+    bool Next(CalendarTypeEnum & value) { return (mIterator == nullptr) ? false : mIterator->Next(value); }
+
+private:
+    Iterator * mIterator;
+};
+
 TimeFormatLocalizationAttrAccess gAttrAccess;
 
 CHIP_ERROR TimeFormatLocalizationAttrAccess::ReadSupportedCalendarTypes(AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+    VerifyOrReturnValue(provider != nullptr, aEncoder.EncodeEmptyList());
 
-    if (provider)
-    {
-        DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator * it = provider->IterateSupportedCalendarTypes();
+    AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
+    VerifyOrReturnValue(it.IsValid(), aEncoder.EncodeEmptyList());
 
-        if (it)
+    return aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+        CalendarTypeEnum type;
+
+        while (it.Next(type))
         {
-            err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
-                CalendarTypeEnum type;
-
-                while (it->Next(type))
-                {
-                    ReturnErrorOnFailure(encoder.Encode(type));
-                }
-
-                return CHIP_NO_ERROR;
-            });
-
-            it->Release();
+            ReturnErrorOnFailure(encoder.Encode(type));
         }
-        else
-        {
-            err = aEncoder.EncodeEmptyList();
-        }
-    }
-    else
-    {
-        err = aEncoder.EncodeEmptyList();
-    }
 
-    return err;
+        return CHIP_NO_ERROR;
+    });
 }
 
 CHIP_ERROR TimeFormatLocalizationAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -111,30 +114,25 @@ CHIP_ERROR TimeFormatLocalizationAttrAccess::Read(const ConcreteReadAttributePat
 bool IsSupportedCalendarType(CalendarTypeEnum newType, CalendarTypeEnum & validType)
 {
     // Reset valid type if no supported calendar types found.
-    validType = CalendarTypeEnum::kBuddhist;
+    validType = CalendarTypeEnum::kUseActiveLocale;
+    if (newType == CalendarTypeEnum::kUseActiveLocale)
+    {
+        return true;
+    }
 
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+    VerifyOrReturnValue(provider != nullptr, false);
 
-    if (provider)
+    AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
+    VerifyOrReturnValue(it.IsValid(), false);
+
+    CalendarTypeEnum type;
+    while (it.Next(type))
     {
-        DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator * it = provider->IterateSupportedCalendarTypes();
-
-        if (it)
+        validType = type;
+        if (validType == newType)
         {
-            CalendarTypeEnum type;
-
-            while (it->Next(type))
-            {
-                validType = type;
-
-                if (validType == newType)
-                {
-                    it->Release();
-                    return true;
-                }
-            }
-
-            it->Release();
+            return true;
         }
     }
 
