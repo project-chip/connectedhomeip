@@ -29,7 +29,7 @@ TEST_WIFI_PASSWORD = "password"
 TEST_PIN_CODE = 20202021
 TEST_DISCRIMINATOR = 3840
 
-if "AVH_API_TOKEN" not in os.environ:
+if "AVH_API_TOKEN" not in os.environ or len(os.environ["AVH_API_TOKEN"]) == 0:
     raise Exception("Please set AVH_API_TOKEN environment variable value")
 
 
