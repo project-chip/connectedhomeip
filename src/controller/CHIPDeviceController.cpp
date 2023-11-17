@@ -1626,13 +1626,13 @@ static void NonConcurrentTimeout(void * context, CHIP_ERROR error)
     }
 }
 
-static void NonConcurrentNetworkResponse(
-    void * context, const NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
+static void NonConcurrentNetworkResponse(void * context,
+                                         const NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
 {
     // In Non Concurrent mode the commissioning network should have been shut down and not sent the
     // ConnectNetworkResponse. In case it does send it this handles the message
     ChipLogError(Controller, "Non-concurrent Mode : Received Unexpected ConnectNetwork response, ignoring. Status=%u",
-                    to_underlying(data.networkingStatus));
+                 to_underlying(data.networkingStatus));
 }
 
 void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
