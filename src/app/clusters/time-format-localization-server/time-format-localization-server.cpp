@@ -110,7 +110,8 @@ bool IsSupportedCalendarType(CalendarTypeEnum newType, CalendarTypeEnum & validT
 {
     // Reset valid type if no supported calendar types found.
     validType = CalendarTypeEnum::kUseActiveLocale;
-    if (newType == CalendarTypeEnum::kUseActiveLocale) {
+    if (newType == CalendarTypeEnum::kUseActiveLocale)
+    {
         return true;
     }
 
