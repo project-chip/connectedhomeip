@@ -2841,9 +2841,6 @@ static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId a
 {
     using namespace Clusters::DemandResponseLoadControl;
     switch (aAttributeId) {
-    case Attributes::DeviceClass::Id: {
-        return YES;
-    }
     case Attributes::LoadControlPrograms::Id: {
         return YES;
     }
@@ -2859,7 +2856,7 @@ static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId a
     case Attributes::NumberOfEventsPerProgram::Id: {
         return YES;
     }
-    case Attributes::NumberOfTransistions::Id: {
+    case Attributes::NumberOfTransitions::Id: {
         return YES;
     }
     case Attributes::DefaultRandomStart::Id: {

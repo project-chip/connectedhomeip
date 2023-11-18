@@ -14253,8 +14253,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::DeviceClass::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, deviceClass);
     case Attributes::LoadControlPrograms::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, loadControlPrograms);
     case Attributes::NumberOfLoadControlPrograms::TypeInfo::GetAttributeId():
@@ -14265,8 +14263,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, activeEvents);
     case Attributes::NumberOfEventsPerProgram::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, numberOfEventsPerProgram);
-    case Attributes::NumberOfTransistions::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfTransistions);
+    case Attributes::NumberOfTransitions::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, numberOfTransitions);
     case Attributes::DefaultRandomStart::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, defaultRandomStart);
     case Attributes::DefaultRandomDuration::TypeInfo::GetAttributeId():
