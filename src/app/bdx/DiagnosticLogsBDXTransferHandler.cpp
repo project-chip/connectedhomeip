@@ -133,6 +133,7 @@ void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSessi
         break;
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "Got StatusReport %x", to_underlying(event.statusData.statusCode));
+        [[fallthrough]];
     case TransferSession::OutputEventType::kInternalError:
     case TransferSession::OutputEventType::kTransferTimeout:
         HandleBDXError(CHIP_ERROR_INTERNAL);

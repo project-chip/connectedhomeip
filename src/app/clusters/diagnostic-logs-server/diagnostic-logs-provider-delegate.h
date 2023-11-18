@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/enums.h>
 #include <app/util/af.h>
 
 namespace chip {

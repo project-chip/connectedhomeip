@@ -15,8 +15,10 @@
  *    limitations under the License.
  */
 
-#import "MTRDevice.h"
 #import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
+
+#import "MTRDevice.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -26,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
  * messages and transfer events and downloads the file.
  *
  */
+MTR_HIDDEN
 @interface MTRDiagnosticsLogDownloadTask : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -39,3 +42,4 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+

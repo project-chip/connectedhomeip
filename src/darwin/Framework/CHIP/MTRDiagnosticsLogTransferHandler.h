@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#import <Foundation/Foundation.h>
+
 #include <protocols/bdx/TransferFacilitator.h>
 
 /**
