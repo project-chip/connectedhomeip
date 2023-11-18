@@ -7542,7 +7542,7 @@ static id _Nullable DecodeAttributeValueForDemandResponseLoadControlCluster(Attr
                         }
                         if (entry_2.powerSavingsControl.HasValue()) {
                             newElement_2.powerSavingsControl = [MTRDemandResponseLoadControlClusterPowerSavingsControlStruct new];
-                            newElement_2.powerSavingsControl.powerSavings = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.powerSavingsControl.Value().powerSavings)];
+                            newElement_2.powerSavingsControl.powerSavings = [NSNumber numberWithUnsignedChar:entry_2.powerSavingsControl.Value().powerSavings];
                         } else {
                             newElement_2.powerSavingsControl = nil;
                         }
@@ -7670,7 +7670,7 @@ static id _Nullable DecodeAttributeValueForDemandResponseLoadControlCluster(Attr
                         }
                         if (entry_2.powerSavingsControl.HasValue()) {
                             newElement_2.powerSavingsControl = [MTRDemandResponseLoadControlClusterPowerSavingsControlStruct new];
-                            newElement_2.powerSavingsControl.powerSavings = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.powerSavingsControl.Value().powerSavings)];
+                            newElement_2.powerSavingsControl.powerSavings = [NSNumber numberWithUnsignedChar:entry_2.powerSavingsControl.Value().powerSavings];
                         } else {
                             newElement_2.powerSavingsControl = nil;
                         }

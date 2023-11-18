@@ -1557,19 +1557,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadContr
         return static_cast<EnumType>(13);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::PowerSavingsEnum val)
-{
-    using EnumType = DemandResponseLoadControl::PowerSavingsEnum;
-    switch (val)
-    {
-    case EnumType::kLow:
-    case EnumType::kMedium:
-    case EnumType::kHigh:
-        return val;
-    default:
-        return static_cast<EnumType>(3);
-    }
-}
 
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {

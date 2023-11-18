@@ -21676,16 +21676,6 @@ class DemandResponseLoadControl(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 13,
 
-        class PowerSavingsEnum(MatterIntEnum):
-            kLow = 0x00
-            kMedium = 0x01
-            kHigh = 0x02
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 3,
-
     class Bitmaps:
         class CancelControlBitmap(IntFlag):
             kRandomEnd = 0x1
@@ -21743,10 +21733,10 @@ class DemandResponseLoadControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="powerSavings", Tag=0, Type=DemandResponseLoadControl.Enums.PowerSavingsEnum),
+                        ClusterObjectFieldDescriptor(Label="powerSavings", Tag=0, Type=uint),
                     ])
 
-            powerSavings: 'DemandResponseLoadControl.Enums.PowerSavingsEnum' = 0
+            powerSavings: 'uint' = 0
 
         @dataclass
         class DutyCycleControlStruct(ClusterObject):

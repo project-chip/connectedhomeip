@@ -19625,7 +19625,7 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    PowerSavingsEnum powerSavings = static_cast<PowerSavingsEnum>(0);
+    chip::Percent powerSavings = static_cast<chip::Percent>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
