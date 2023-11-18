@@ -27,7 +27,7 @@ import matter.tlv.TlvWriter
 import java.util.Optional
 
 class ThermostatClusterScheduleStruct (
-    val sceduleHandle: ByteArray,
+    val scheduleHandle: ByteArray,
     val systemMode: UInt,
     val name: String?,
     val presetHandle: ByteArray,
@@ -35,7 +35,7 @@ class ThermostatClusterScheduleStruct (
     val builtIn: Boolean) {
   override fun toString(): String  = buildString {
     append("ThermostatClusterScheduleStruct {\n")
-    append("\tsceduleHandle : $sceduleHandle\n")
+    append("\tscheduleHandle : $scheduleHandle\n")
     append("\tsystemMode : $systemMode\n")
     append("\tname : $name\n")
     append("\tpresetHandle : $presetHandle\n")
@@ -47,7 +47,7 @@ class ThermostatClusterScheduleStruct (
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_SCEDULE_HANDLE), sceduleHandle)
+      put(ContextSpecificTag(TAG_SCHEDULE_HANDLE), scheduleHandle)
       put(ContextSpecificTag(TAG_SYSTEM_MODE), systemMode)
       if (name != null) {
       put(ContextSpecificTag(TAG_NAME), name)
@@ -66,7 +66,7 @@ class ThermostatClusterScheduleStruct (
   }
 
   companion object {
-    private const val TAG_SCEDULE_HANDLE = 0
+    private const val TAG_SCHEDULE_HANDLE = 0
     private const val TAG_SYSTEM_MODE = 1
     private const val TAG_NAME = 2
     private const val TAG_PRESET_HANDLE = 3
@@ -75,7 +75,7 @@ class ThermostatClusterScheduleStruct (
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThermostatClusterScheduleStruct {
       tlvReader.enterStructure(tlvTag)
-      val sceduleHandle = tlvReader.getByteArray(ContextSpecificTag(TAG_SCEDULE_HANDLE))
+      val scheduleHandle = tlvReader.getByteArray(ContextSpecificTag(TAG_SCHEDULE_HANDLE))
       val systemMode = tlvReader.getUInt(ContextSpecificTag(TAG_SYSTEM_MODE))
       val name = if (!tlvReader.isNull()) {
       tlvReader.getString(ContextSpecificTag(TAG_NAME))
@@ -95,7 +95,7 @@ class ThermostatClusterScheduleStruct (
       
       tlvReader.exitContainer()
 
-      return ThermostatClusterScheduleStruct(sceduleHandle, systemMode, name, presetHandle, transitions, builtIn)
+      return ThermostatClusterScheduleStruct(scheduleHandle, systemMode, name, presetHandle, transitions, builtIn)
     }
   }
 }

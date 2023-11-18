@@ -1392,7 +1392,7 @@ bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
 
         while (manager->mGetScheduleAtIndexCb(manager, index, schedule) != CHIP_ERROR_NOT_FOUND)
         {
-            if (scheduleHandle.data_equal(schedule.sceduleHandle))
+            if (scheduleHandle.data_equal(schedule.scheduleHandle))
             {
                 status = ActiveScheduleHandle::Set(commandPath.mEndpointId, scheduleHandle);
                 SuccessOrExit(status);

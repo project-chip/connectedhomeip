@@ -23594,12 +23594,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_sceduleHandle;
-                jbyteArray newElement_0_sceduleHandleByteArray =
-                    env->NewByteArray(static_cast<jsize>(entry_0.sceduleHandle.size()));
-                env->SetByteArrayRegion(newElement_0_sceduleHandleByteArray, 0, static_cast<jsize>(entry_0.sceduleHandle.size()),
-                                        reinterpret_cast<const jbyte *>(entry_0.sceduleHandle.data()));
-                newElement_0_sceduleHandle = newElement_0_sceduleHandleByteArray;
+                jobject newElement_0_scheduleHandle;
+                jbyteArray newElement_0_scheduleHandleByteArray =
+                    env->NewByteArray(static_cast<jsize>(entry_0.scheduleHandle.size()));
+                env->SetByteArrayRegion(newElement_0_scheduleHandleByteArray, 0, static_cast<jsize>(entry_0.scheduleHandle.size()),
+                                        reinterpret_cast<const jbyte *>(entry_0.scheduleHandle.data()));
+                newElement_0_scheduleHandle = newElement_0_scheduleHandleByteArray;
                 jobject newElement_0_systemMode;
                 std::string newElement_0_systemModeClassName     = "java/lang/Integer";
                 std::string newElement_0_systemModeCtorSignature = "(I)V";
@@ -23720,7 +23720,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(scheduleStructStructClass_1, scheduleStructStructCtor_1, newElement_0_sceduleHandle,
+                newElement_0 = env->NewObject(scheduleStructStructClass_1, scheduleStructStructCtor_1, newElement_0_scheduleHandle,
                                               newElement_0_systemMode, newElement_0_name, newElement_0_presetHandle,
                                               newElement_0_transitions, newElement_0_builtIn);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);

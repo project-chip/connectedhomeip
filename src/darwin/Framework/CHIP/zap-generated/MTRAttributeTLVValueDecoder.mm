@@ -9704,7 +9704,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
                 auto & entry_0 = iter_0.GetValue();
                 MTRThermostatClusterScheduleStruct * newElement_0;
                 newElement_0 = [MTRThermostatClusterScheduleStruct new];
-                newElement_0.sceduleHandle = AsData(entry_0.sceduleHandle);
+                newElement_0.scheduleHandle = AsData(entry_0.scheduleHandle);
                 newElement_0.systemMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.systemMode)];
                 if (entry_0.name.IsNull()) {
                     newElement_0.name = nil;

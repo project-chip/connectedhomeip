@@ -1427,7 +1427,7 @@ client cluster Thermostat = 513 {
   }
 
   struct ScheduleStruct {
-    octet_string<16> sceduleHandle = 0;
+    octet_string<16> scheduleHandle = 0;
     ThermostatSystemMode systemMode = 1;
     nullable char_string<64> name = 2;
     octet_string<16> presetHandle = 3;

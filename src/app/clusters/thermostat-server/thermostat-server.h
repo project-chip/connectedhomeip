@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 #include <app/util/af-enums.h>
@@ -133,6 +132,7 @@ struct ThermostatMatterScheduleManager
     void setNext(ThermostatMatterScheduleManager * inst) { this->nextEditor = inst; }
 
     EmberAfStatus ValidatePresetsForCommitting(chip::Span<PresetStruct::Type> &oldlist, chip::Span<PresetStruct::Type> &newlist);
+    EmberAfStatus ValidateSchedulesForCommitting(chip::Span<ScheduleStruct::Type> &oldlist, chip::Span<ScheduleStruct::Type> &newlist);
 //    static CHIP_ERROR ValidateSchedulesForCommitting(oldlist, newlist);
 };
 

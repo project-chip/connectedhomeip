@@ -5176,7 +5176,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _sceduleHandle = [NSData data];
+        _scheduleHandle = [NSData data];
 
         _systemMode = @(0);
 
@@ -5195,7 +5195,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRThermostatClusterScheduleStruct alloc] init];
 
-    other.sceduleHandle = self.sceduleHandle;
+    other.scheduleHandle = self.scheduleHandle;
     other.systemMode = self.systemMode;
     other.name = self.name;
     other.presetHandle = self.presetHandle;
@@ -5207,7 +5207,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sceduleHandle:%@; systemMode:%@; name:%@; presetHandle:%@; transitions:%@; builtIn:%@; >", NSStringFromClass([self class]), [_sceduleHandle base64EncodedStringWithOptions:0], _systemMode, _name, [_presetHandle base64EncodedStringWithOptions:0], _transitions, _builtIn];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: scheduleHandle:%@; systemMode:%@; name:%@; presetHandle:%@; transitions:%@; builtIn:%@; >", NSStringFromClass([self class]), [_scheduleHandle base64EncodedStringWithOptions:0], _systemMode, _name, [_presetHandle base64EncodedStringWithOptions:0], _transitions, _builtIn];
     return descriptionString;
 }
 

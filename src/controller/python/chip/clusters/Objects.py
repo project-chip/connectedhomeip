@@ -26274,7 +26274,7 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="sceduleHandle", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="scheduleHandle", Tag=0, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="systemMode", Tag=1, Type=Thermostat.Enums.ThermostatSystemMode),
                         ClusterObjectFieldDescriptor(Label="name", Tag=2, Type=typing.Union[Nullable, str]),
                         ClusterObjectFieldDescriptor(Label="presetHandle", Tag=3, Type=bytes),
@@ -26282,7 +26282,7 @@ class Thermostat(Cluster):
                         ClusterObjectFieldDescriptor(Label="builtIn", Tag=5, Type=bool),
                     ])
 
-            sceduleHandle: 'bytes' = b""
+            scheduleHandle: 'bytes' = b""
             systemMode: 'Thermostat.Enums.ThermostatSystemMode' = 0
             name: 'typing.Union[Nullable, str]' = NullValue
             presetHandle: 'bytes' = b""

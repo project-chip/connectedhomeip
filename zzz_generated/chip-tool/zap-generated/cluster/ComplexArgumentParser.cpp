@@ -2693,8 +2693,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.sceduleHandle", "sceduleHandle", value.isMember("sceduleHandle")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.scheduleHandle", "scheduleHandle",
+                                                                  value.isMember("scheduleHandle")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.systemMode", "systemMode", value.isMember("systemMode")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.name", "name", value.isMember("name")));
@@ -2705,9 +2705,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.builtIn", "builtIn", value.isMember("builtIn")));
 
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "sceduleHandle");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.sceduleHandle, value["sceduleHandle"]));
-    valueCopy.removeMember("sceduleHandle");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "scheduleHandle");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.scheduleHandle, value["scheduleHandle"]));
+    valueCopy.removeMember("scheduleHandle");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "systemMode");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.systemMode, value["systemMode"]));
@@ -2734,7 +2734,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.sceduleHandle);
+    ComplexArgumentParser::Finalize(request.scheduleHandle);
     ComplexArgumentParser::Finalize(request.systemMode);
     ComplexArgumentParser::Finalize(request.name);
     ComplexArgumentParser::Finalize(request.presetHandle);

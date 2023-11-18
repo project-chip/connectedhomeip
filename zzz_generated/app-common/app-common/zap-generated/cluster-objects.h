@@ -23891,18 +23891,18 @@ using DecodableType = Type;
 namespace ScheduleStruct {
 enum class Fields : uint8_t
 {
-    kSceduleHandle = 0,
-    kSystemMode    = 1,
-    kName          = 2,
-    kPresetHandle  = 3,
-    kTransitions   = 4,
-    kBuiltIn       = 5,
+    kScheduleHandle = 0,
+    kSystemMode     = 1,
+    kName           = 2,
+    kPresetHandle   = 3,
+    kTransitions    = 4,
+    kBuiltIn        = 5,
 };
 
 struct Type
 {
 public:
-    chip::ByteSpan sceduleHandle;
+    chip::ByteSpan scheduleHandle;
     ThermostatSystemMode systemMode = static_cast<ThermostatSystemMode>(0);
     DataModel::Nullable<chip::CharSpan> name;
     chip::ByteSpan presetHandle;
@@ -23917,7 +23917,7 @@ public:
 struct DecodableType
 {
 public:
-    chip::ByteSpan sceduleHandle;
+    chip::ByteSpan scheduleHandle;
     ThermostatSystemMode systemMode = static_cast<ThermostatSystemMode>(0);
     DataModel::Nullable<chip::CharSpan> name;
     chip::ByteSpan presetHandle;
