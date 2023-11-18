@@ -33,14 +33,13 @@ namespace app {
 // Used in unit tests
 class TestICDManager;
 
-// This structure is used for the creation an ObjectPool of ICDStateObserver pointers
-
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
 class ICDManager : public ICDListener
 {
 public:
+    // This structure is used for the creation an ObjectPool of ICDStateObserver pointers
     struct ObserverPointer
     {
         ObserverPointer(ICDStateObserver * obs) : mObserver(obs) {}

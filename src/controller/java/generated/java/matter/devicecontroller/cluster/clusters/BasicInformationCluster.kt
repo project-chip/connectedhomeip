@@ -319,6 +319,28 @@ class BasicInformationCluster(private val controller: MatterController, private 
     // Implementation needs to be added here
   }
 
+  suspend fun readSpecificationVersionAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSpecificationVersionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMaxPathsPerInvokeAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMaxPathsPerInvokeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }

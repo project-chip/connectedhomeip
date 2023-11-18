@@ -163,6 +163,7 @@ template("chip_data_model") {
       "${_app_root}/clusters/on-off-server/on-off-server.h",
       "${_app_root}/clusters/scenes-server/ExtensionFieldSets.h",
       "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.h",
+      "${_app_root}/clusters/scenes-server/SceneHandlerImpl.h",
       "${_app_root}/clusters/scenes-server/SceneTable.h",
       "${_app_root}/clusters/scenes-server/SceneTableImpl.h",
       "${_app_root}/clusters/scenes-server/scenes-server.h",
@@ -177,7 +178,6 @@ template("chip_data_model") {
     if (!chip_build_controller_dynamic_server) {
       sources += [
         "${_app_root}/util/DataModelHandler.cpp",
-        "${_app_root}/util/attribute-size-util.cpp",
         "${_app_root}/util/attribute-storage.cpp",
         "${_app_root}/util/attribute-table.cpp",
         "${_app_root}/util/ember-compatibility-functions.cpp",
@@ -278,6 +278,7 @@ template("chip_data_model") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
+          "${_app_root}/clusters/scenes-server/SceneHandlerImpl.cpp",
           "${_app_root}/clusters/scenes-server/SceneTableImpl.cpp",
         ]
       } else if (cluster == "operational-state-server") {

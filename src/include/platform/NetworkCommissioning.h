@@ -23,10 +23,14 @@
 
 #pragma once
 
+#include <credentials/CHIPCert.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/Optional.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/Variant.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 #include <app-common/zap-generated/cluster-enums.h>
@@ -79,8 +83,12 @@ protected:
 struct Network
 {
     uint8_t networkID[kMaxNetworkIDLen];
-    uint8_t networkIDLen;
-    bool connected;
+    uint8_t networkIDLen = 0;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    Optional<Credentials::CertificateKeyIdStorage> networkIdentifier;
+    Optional<Credentials::CertificateKeyIdStorage> clientIdentifier;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    bool connected = false;
 };
 
 static_assert(sizeof(Network::networkID) <= std::numeric_limits<decltype(Network::networkIDLen)>::max(),
@@ -275,6 +283,72 @@ public:
      * @param callback    Callback that will be invoked upon finishing the scan
      */
     virtual void ScanNetworks(ByteSpan ssid, ScanCallback * callback) = 0;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    virtual bool SupportsPerDeviceCredentials() { return false; };
+
+    /**
+     * @brief Adds or updates a WiFi network with Per-Device Credentials on the device.
+     *
+     * @param ssid                          The SSID of the network to be added / updated.
+     * @param networkIdentity               The Network Identity of the network, in compact-pdc-identity format.
+     * @param clientIdentityNetworkIndex    If present, the index of the existing network configuration of which the Client
+     *                                      Identity is to be re-used. Otherwise a new Client Identity shall be generated.
+     * @param outStatus                     The application-level status code (Status::kSuccess on success).
+     * @param outDebugText                  A debug text buffer that may be populated by the driver. The size of the span
+     *                                      must be reduced to the length of text emitted (or 0, if none).
+     * @param outClientIdentity             On success, the Client Identity that was generated or copied, depending on the
+     *                                      presence of `clientIdentityNetworkIndex`.
+     * @param outNextworkIndex              On success, the index of the network entry that was added or updated.
+     *
+     * @retval CHIP_NO_ERROR and outStatus == kSuccess on success.
+     * @retval CHIP_NO_ERROR and outStatus != kSuccess for application-level errors. outDebugText should be populated.
+     * @retval CHIP_ERROR_* on internal errors. None of the output parameters will be examined in this case.
+     */
+    virtual CHIP_ERROR AddOrUpdateNetworkWithPDC(ByteSpan ssid, ByteSpan networkIdentity,
+                                                 Optional<uint8_t> clientIdentityNetworkIndex, Status & outStatus,
+                                                 MutableCharSpan & outDebugText, MutableByteSpan & outClientIdentity,
+                                                 uint8_t & outNetworkIndex)
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    /**
+     * @brief Retrieves the Network Identity associated with a network.
+     *
+     * @param networkIndex          The 0-based index of the network.
+     * @param outNetworkIdentity    The output buffer to be populated with the Network
+     *                              Identity in compact-pdc-identity TLV format.
+     *
+     * @return CHIP_NO_ERROR on success or a CHIP_ERROR on failure.
+     */
+    virtual CHIP_ERROR GetNetworkIdentity(uint8_t networkIndex, MutableByteSpan & outNetworkIdentity)
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    /**
+     * @brief Retrieves the Network Client Identity associated with a network.
+     *
+     * @param networkIndex          The 0-based index of the network.
+     * @param outNetworkIdentity    The output buffer to be populated with the Network
+     *                              Client Identity in compact-pdc-identity TLV format.
+     *
+     * @return CHIP_NO_ERROR on success or a CHIP_ERROR on failure.
+     */
+    virtual CHIP_ERROR GetClientIdentity(uint8_t networkIndex, MutableByteSpan & outClientIdentity)
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    /**
+     * @brief Signs the specified message with the private key of a Network Client Identity.
+     */
+    virtual CHIP_ERROR SignWithClientIdentity(uint8_t networkIndex, ByteSpan & message, Crypto::P256ECDSASignature & outSignature)
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
     ~WiFiDriver() override = default;
 };

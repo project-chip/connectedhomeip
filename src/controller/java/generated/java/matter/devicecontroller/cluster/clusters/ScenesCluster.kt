@@ -85,6 +85,10 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     val value: ULong?
   )
 
+  class FabricSceneInfoAttribute(
+    val value: List<ScenesClusterSceneInfoStruct>
+  )
+
   class GeneratedCommandListAttribute(
     val value: List<UInt>
   )
@@ -278,14 +282,21 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     // Implementation needs to be added here
   }
 
-  suspend fun readRemainingCapacityAttribute(): UByte {
+  suspend fun readFabricSceneInfoAttribute(): FabricSceneInfoAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRemainingCapacityAttribute(
+  suspend fun readFabricSceneInfoAttributeWithFabricFilter(
+    isFabricFiltered: Boolean
+  ): FabricSceneInfoAttribute {
+    // Implementation needs to be added here
+  }
+
+
+  suspend fun subscribeFabricSceneInfoAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): UByte {
+  ): FabricSceneInfoAttribute {
     // Implementation needs to be added here
   }
 
