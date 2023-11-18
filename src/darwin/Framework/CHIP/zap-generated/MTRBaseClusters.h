@@ -327,11 +327,11 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeSceneTableSizeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeFabricSceneInfoWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+- (void)readAttributeFabricSceneInfoWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeFabricSceneInfoWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeFabricSceneInfoWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeFabricSceneInfoWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -14471,8 +14471,8 @@ typedef NS_OPTIONS(uint32_t, MTRScenesFeature) {
 } MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 typedef NS_OPTIONS(uint8_t, MTRScenesNameSupportBitmap) {
-    MTRScenesNameSupportBitmapSceneNames MTR_NEWLY_AVAILABLE = 0x80,
-} MTR_NEWLY_AVAILABLE;
+    MTRScenesNameSupportBitmapSceneNames MTR_PROVISIONALLY_AVAILABLE = 0x80,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROnOffDelayedAllOffEffectVariant) {
     MTROnOffDelayedAllOffEffectVariantDelayedOffFastFade MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x00,
@@ -16668,23 +16668,23 @@ typedef NS_OPTIONS(uint8_t, MTRFanControlWindSupportMask) {
 } MTR_DEPRECATED("Please use MTRFanControlWindBitmap", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0));
 
 typedef NS_ENUM(uint8_t, MTRThermostatUserInterfaceConfigurationKeypadLockout) {
-    MTRThermostatUserInterfaceConfigurationKeypadLockoutNoLockout MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRThermostatUserInterfaceConfigurationKeypadLockoutLockout1 MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRThermostatUserInterfaceConfigurationKeypadLockoutLockout2 MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRThermostatUserInterfaceConfigurationKeypadLockoutLockout3 MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRThermostatUserInterfaceConfigurationKeypadLockoutLockout4 MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTRThermostatUserInterfaceConfigurationKeypadLockoutLockout5 MTR_PROVISIONALLY_AVAILABLE = 0x05,
-} MTR_PROVISIONALLY_AVAILABLE;
+    MTRThermostatUserInterfaceConfigurationKeypadLockoutNoLockout MTR_NEWLY_AVAILABLE = 0x00,
+    MTRThermostatUserInterfaceConfigurationKeypadLockoutLockout1 MTR_NEWLY_AVAILABLE = 0x01,
+    MTRThermostatUserInterfaceConfigurationKeypadLockoutLockout2 MTR_NEWLY_AVAILABLE = 0x02,
+    MTRThermostatUserInterfaceConfigurationKeypadLockoutLockout3 MTR_NEWLY_AVAILABLE = 0x03,
+    MTRThermostatUserInterfaceConfigurationKeypadLockoutLockout4 MTR_NEWLY_AVAILABLE = 0x04,
+    MTRThermostatUserInterfaceConfigurationKeypadLockoutLockout5 MTR_NEWLY_AVAILABLE = 0x05,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRThermostatUserInterfaceConfigurationScheduleProgrammingVisibility) {
-    MTRThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityScheduleProgrammingPermitted MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityScheduleProgrammingDenied MTR_PROVISIONALLY_AVAILABLE = 0x01,
-} MTR_PROVISIONALLY_AVAILABLE;
+    MTRThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityScheduleProgrammingPermitted MTR_NEWLY_AVAILABLE = 0x00,
+    MTRThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityScheduleProgrammingDenied MTR_NEWLY_AVAILABLE = 0x01,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRThermostatUserInterfaceConfigurationTemperatureDisplayMode) {
-    MTRThermostatUserInterfaceConfigurationTemperatureDisplayModeCelsius MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRThermostatUserInterfaceConfigurationTemperatureDisplayModeFahrenheit MTR_PROVISIONALLY_AVAILABLE = 0x01,
-} MTR_PROVISIONALLY_AVAILABLE;
+    MTRThermostatUserInterfaceConfigurationTemperatureDisplayModeCelsius MTR_NEWLY_AVAILABLE = 0x00,
+    MTRThermostatUserInterfaceConfigurationTemperatureDisplayModeFahrenheit MTR_NEWLY_AVAILABLE = 0x01,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRColorControlColorLoopAction) {
     MTRColorControlColorLoopActionDeactivate MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
