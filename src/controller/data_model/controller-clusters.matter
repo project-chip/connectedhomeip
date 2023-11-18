@@ -3929,12 +3929,6 @@ provisional client cluster DemandResponseLoadControl = 150 {
     kFailed = 12;
   }
 
-  enum PowerSavingsEnum : enum8 {
-    kLow = 0;
-    kMedium = 1;
-    kHigh = 2;
-  }
-
   bitmap CancelControlBitmap : bitmap16 {
     kRandomEnd = 0x1;
   }
@@ -3983,7 +3977,7 @@ provisional client cluster DemandResponseLoadControl = 150 {
   }
 
   struct PowerSavingsControlStruct {
-    PowerSavingsEnum powerSavings = 0;
+    percent powerSavings = 0;
   }
 
   struct DutyCycleControlStruct {

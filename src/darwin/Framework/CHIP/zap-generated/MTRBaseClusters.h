@@ -15845,12 +15845,6 @@ typedef NS_ENUM(uint8_t, MTRDemandResponseLoadControlLoadControlEventStatus) {
     MTRDemandResponseLoadControlLoadControlEventStatusFailed MTR_PROVISIONALLY_AVAILABLE = 0x0C,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRDemandResponseLoadControlPowerSavings) {
-    MTRDemandResponseLoadControlPowerSavingsLow MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRDemandResponseLoadControlPowerSavingsMedium MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRDemandResponseLoadControlPowerSavingsHigh MTR_PROVISIONALLY_AVAILABLE = 0x02,
-} MTR_PROVISIONALLY_AVAILABLE;
-
 typedef NS_OPTIONS(uint16_t, MTRDemandResponseLoadControlCancelControlBitmap) {
     MTRDemandResponseLoadControlCancelControlBitmapRandomEnd MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
