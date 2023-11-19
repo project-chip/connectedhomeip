@@ -76,7 +76,8 @@ static chip::System::Clock::ClockBase * gRealClock;
 class TestContext : public chip::Test::AppContext
 {
 public:
-    static int SetUp(void * context)
+    // Performs shared setup for all tests in the test suite
+    static int SetUpTestSuite(void * context)
     {
         gRealClock = &chip::System::SystemClock();
         chip::System::Clock::Internal::SetSystemClockForTesting(&gMockClock);
@@ -85,7 +86,8 @@ public:
         return SUCCESS;
     }
 
-    static int TearDown(void * context)
+    // Performs shared teardown for all tests in the test suite
+    static int TearDownTestSuite(void * context)
     {
         chip::System::Clock::Internal::SetSystemClockForTesting(gRealClock);
         if (AppContext::Finalize(context) != SUCCESS)
@@ -93,7 +95,8 @@ public:
         return SUCCESS;
     }
 
-    static int Initialize(void * context)
+    // Performs setup for each individual test in the test suite
+    static int SetUp(void * context)
     {
         const chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
@@ -107,7 +110,8 @@ public:
         return SUCCESS;
     }
 
-    static int Terminate(void * context)
+    // Performs teardown for each individual test in the test suite
+    static int TearDown(void * context)
     {
         chip::app::EventManagement::DestroyEventManagement();
         return SUCCESS;
@@ -4999,10 +5003,10 @@ const nlTest sTests[] = {
 nlTestSuite sSuite = {
     "TestReadInteraction",
     &sTests[0],
+    TestContext::SetUpTestSuite,
+    TestContext::TearDownTestSuite,
     TestContext::SetUp,
     TestContext::TearDown,
-    TestContext::Initialize,
-    TestContext::Terminate,
 };
 // clang-format on
 
