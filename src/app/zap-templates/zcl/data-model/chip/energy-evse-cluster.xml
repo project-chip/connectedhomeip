@@ -137,42 +137,44 @@ limitations under the License.
     <attribute code="0x0043" side="server" type="int64s" define="SESSION_ENERGY_DISCHARGED" isNullable="false" default="0" min="0" max="500000000" writable="false" optional="true">SessionEnergyDischarged</attribute>
     <command source="client" code="0x0001" name="Disable" optional="false" mustUseTimedInvoke="true" apiMaturity="provisional">
       <access op="invoke" role="operate"/>
-      <description>Upon receipt of the Disable command the EVSE will stop power flow between the EV and EVSE.</description>
+      <description>Allows a client to disable the EVSE from charging and discharging.</description>
     </command>
     <command source="client" code="0x0002" name="EnableCharging" optional="false" mustUseTimedInvoke="true" apiMaturity="provisional">
       <access op="invoke" role="operate"/>
       <arg name="ChargingEnabledUntil" type="epoch_s" isNullable="true" apiMaturity="provisional"/>
       <arg name="MinimumChargeCurrent" type="int64s" min="0" max="80000" apiMaturity="provisional"/>
       <arg name="MaximumChargeCurrent" type="int64s" min="0" max="80000" apiMaturity="provisional"/>
-      <description>ID</description>
+      <description>Allows a client to enable the EVSE to charge an EV.</description>
     </command>
     <command source="client" code="0x0003" name="EnableDischarging" optional="true" mustUseTimedInvoke="true" apiMaturity="provisional">
       <access op="invoke" role="operate"/>
       <arg name="DischargingEnabledUntil" type="epoch_s" isNullable="true" apiMaturity="provisional"/>
       <arg name="MaximumDischargeCurrent" type="int64s" min="0" max="80000" apiMaturity="provisional"/>
-      <description>ID</description>
+      <description>Allows a client to enable the EVSE to discharge an EV.</description>
     </command>
     <command source="client" code="0x0004" name="StartDiagnostics" optional="true" mustUseTimedInvoke="true" apiMaturity="provisional">
       <access op="invoke" role="operate"/>
-      <description>Upon receipt of the StartDiagnostics command, the EVSE SHALL enter a Diagnostics state only if the SupplyState attribute is in the Disabled state.</description>
+      <description>Allows a client to put the EVSE into a self-diagnostics mode.</description>
     </command>
     <command source="client" code="0x0005" name="SetTargets" optional="true" mustUseTimedInvoke="true" apiMaturity="provisional">
       <access op="invoke" role="operate"/>
       <arg name="DayOfWeekforSequence" type="TargetDayOfWeekBitmap" apiMaturity="provisional"/>
       <arg name="ChargingTargets" array="true" type="ChargingTargetStruct" apiMaturity="provisional"/>
-      <description>ID</description>
+      <description>Allows a client to set the user specified charging targets.</description>
     </command>
     <command source="client" code="0x0006" name="GetTargets" optional="true" response="GetTargetsResponse" mustUseTimedInvoke="true" apiMaturity="provisional">
       <access op="invoke" role="operate"/>
       <arg name="DaysToReturn" type="TargetDayOfWeekBitmap" apiMaturity="provisional"/>
-      <description>ID</description>
+      <description>Allows a client to retrieve the user specified charging targets.</description>
     </command>
     <command source="client" code="0x0007" name="ClearTargets" optional="true" mustUseTimedInvoke="true" apiMaturity="provisional">
       <access op="invoke" role="operate"/>
-      <description>Upon receipt, all weekly targets that are currently stored SHALL be cleared and a default response of SUCCESS SHALL be sent in response. There are no error responses to this command.</description>
+      <description>Allows a client to clear all stored charging targets.</description>
     </command>
     <command source="server" code="0x0000" name="GetTargetsResponse" optional="true" apiMaturity="provisional">
       <description>The GetTargetsResponse is sent in response to the GetTargets Command.</description>
+      <arg name="DayOfWeekforSequence" type="TargetDayOfWeekBitmap" apiMaturity="provisional"/>
+      <arg name="ChargingTargets" array="true" type="ChargingTargetStruct" apiMaturity="provisional"/>
     </command>
     <event code="0x0000" name="EVConnected" priority="info" side="server" apiMaturity="provisional">
       <description>EVConnected</description>
