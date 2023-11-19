@@ -101,7 +101,7 @@ limitations under the License.
       <access op="write" privilege="manage"/>
       <description>UserMaximumChargeCurrent</description>
     </attribute>
-    <attribute code="0x000A" side="server" type="elapsed_s" define="RANDOMIZATION_DELAY_WINDOW" isNullable="false" default="600" min="0" max="86400" writable="true" optional="true">
+    <attribute code="0x000A" side="server" type="elapsed_s" define="RANDOMIZATION_DELAY_WINDOW" isNullable="false" default="600" writable="true" optional="true">
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
       <description>RandomizationDelayWindow</description>
