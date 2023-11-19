@@ -26,7 +26,6 @@
 #include "ConfigurationManagerImpl.h"
 
 #include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/Tizen/PosixConfig.h>

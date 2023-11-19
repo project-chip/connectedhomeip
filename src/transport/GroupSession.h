@@ -59,9 +59,9 @@ public:
 
     bool RequireMRP() const override { return false; }
 
-    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const override
+    const SessionParameters & GetRemoteSessionParameters() const override
     {
-        static const ReliableMessageProtocolConfig cfg(GetDefaultMRPConfig());
+        static const SessionParameters cfg(GetDefaultMRPConfig());
         VerifyOrDie(false);
         return cfg;
     }
@@ -110,9 +110,9 @@ public:
 
     bool RequireMRP() const override { return false; }
 
-    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const override
+    const SessionParameters & GetRemoteSessionParameters() const override
     {
-        static const ReliableMessageProtocolConfig cfg(GetDefaultMRPConfig());
+        static const SessionParameters cfg(GetDefaultMRPConfig());
         VerifyOrDie(false);
         return cfg;
     }

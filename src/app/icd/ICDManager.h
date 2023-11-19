@@ -33,14 +33,13 @@ namespace app {
 // Used in unit tests
 class TestICDManager;
 
-// This structure is used for the creation an ObjectPool of ICDStateObserver pointers
-
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
 class ICDManager : public ICDListener
 {
 public:
+    // This structure is used for the creation an ObjectPool of ICDStateObserver pointers
     struct ObserverPointer
     {
         ObserverPointer(ICDStateObserver * obs) : mObserver(obs) {}
@@ -142,7 +141,8 @@ private:
 
     BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
 
-    OperationalState mOperationalState             = OperationalState::IdleMode;
+    // Initialize mOperationalState to ActiveMode so the init sequence at bootup triggers the IdleMode behaviour first.
+    OperationalState mOperationalState             = OperationalState::ActiveMode;
     ICDMode mICDMode                               = ICDMode::SIT;
     PersistentStorageDelegate * mStorage           = nullptr;
     FabricTable * mFabricTable                     = nullptr;
