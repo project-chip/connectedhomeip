@@ -6045,6 +6045,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterICDManagementCommandRegisterClientResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterICDManagementCommandUnregisterClientID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
     MTRCommandIDTypeClusterICDManagementCommandStayActiveRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterICDManagementCommandStayActiveResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
 
     // Cluster Timer commands
     MTRCommandIDTypeClusterTimerCommandSetTimerID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,

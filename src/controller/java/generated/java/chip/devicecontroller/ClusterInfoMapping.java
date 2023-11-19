@@ -6521,6 +6521,28 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
+
+  public static class DelegatedIcdManagementClusterStayActiveResponseCallback implements ChipClusters.IcdManagementCluster.StayActiveResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Long promisedActiveDuration) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo promisedActiveDurationResponseValue = new CommandResponseInfo("promisedActiveDuration", "Long");
+      responseValues.put(promisedActiveDurationResponseValue, promisedActiveDuration);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
   public static class DelegatedIcdManagementClusterRegisteredClientsAttributeCallback implements ChipClusters.IcdManagementCluster.RegisteredClientsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -20597,12 +20619,12 @@ public class ClusterInfoMapping {
     InteractionInfo icdManagementstayActiveRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.IcdManagementCluster) cluster)
-        .stayActiveRequest((DefaultClusterCallback) callback
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
+          .stayActiveRequest((ChipClusters.IcdManagementCluster.StayActiveResponseCallback) callback
+            );
+        },
+        () -> new DelegatedIcdManagementClusterStayActiveResponseCallback(),
         icdManagementstayActiveRequestCommandParams
-    );
+      );
     icdManagementClusterInteractionInfoMap.put("stayActiveRequest", icdManagementstayActiveRequestInteractionInfo);
 
     commandMap.put("icdManagement", icdManagementClusterInteractionInfoMap);

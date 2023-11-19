@@ -14124,6 +14124,11 @@ struct Type;
 struct DecodableType;
 } // namespace StayActiveRequest
 
+namespace StayActiveResponse {
+struct Type;
+struct DecodableType;
+} // namespace StayActiveResponse
+
 } // namespace Commands
 
 namespace Commands {
@@ -14249,7 +14254,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -14263,6 +14268,38 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StayActiveRequest
+namespace StayActiveResponse {
+enum class Fields : uint8_t
+{
+    kPromisedActiveDuration = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::StayActiveResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+
+    uint32_t promisedActiveDuration = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::StayActiveResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+
+    uint32_t promisedActiveDuration = static_cast<uint32_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StayActiveResponse
 } // namespace Commands
 
 namespace Attributes {

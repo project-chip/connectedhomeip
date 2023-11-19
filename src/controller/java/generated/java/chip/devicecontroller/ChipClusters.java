@@ -19094,11 +19094,11 @@ public class ChipClusters {
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
-    public void stayActiveRequest(DefaultClusterCallback callback) {
+    public void stayActiveRequest(StayActiveResponseCallback callback) {
       stayActiveRequest(callback, 0);
     }
 
-    public void stayActiveRequest(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+    public void stayActiveRequest(StayActiveResponseCallback callback, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -19106,12 +19106,26 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
+          final long promisedActiveDurationFieldID = 0L;
+          Long promisedActiveDuration = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == promisedActiveDurationFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                promisedActiveDuration = castingValue.value(Long.class);
+              }
+            }
+          }
+          callback.onSuccess(promisedActiveDuration);
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
     public interface RegisterClientResponseCallback extends BaseClusterCallback {
       void onSuccess(Long ICDCounter);
+    }
+
+    public interface StayActiveResponseCallback extends BaseClusterCallback {
+      void onSuccess(Long promisedActiveDuration);
     }
 
     public interface RegisteredClientsAttributeCallback extends BaseAttributeCallback {

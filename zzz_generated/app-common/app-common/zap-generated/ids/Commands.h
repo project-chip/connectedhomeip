@@ -644,6 +644,10 @@ namespace StayActiveRequest {
 static constexpr CommandId Id = 0x00000003;
 } // namespace StayActiveRequest
 
+namespace StayActiveResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace StayActiveResponse
+
 } // namespace Commands
 } // namespace IcdManagement
 
