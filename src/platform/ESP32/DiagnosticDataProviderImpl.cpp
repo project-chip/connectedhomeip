@@ -23,7 +23,6 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <app-common/zap-generated/enums.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CHIPMemString.h>
 #include <platform/DiagnosticDataProvider.h>

@@ -1557,19 +1557,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadContr
         return static_cast<EnumType>(13);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::PowerSavingsEnum val)
-{
-    using EnumType = DemandResponseLoadControl::PowerSavingsEnum;
-    switch (val)
-    {
-    case EnumType::kLow:
-    case EnumType::kMedium:
-    case EnumType::kHigh:
-        return val;
-    default:
-        return static_cast<EnumType>(3);
-    }
-}
 
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
@@ -2186,17 +2173,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorMode
     using EnumType = ColorControl::ColorMode;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kCurrentHueAndCurrentSaturation:
     case EnumType::kCurrentXAndCurrentY:
     case EnumType::kColorTemperature:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION:
-    case EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y:
-    case EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(3);

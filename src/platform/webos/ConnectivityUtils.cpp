@@ -21,7 +21,6 @@
  *          statistics(extracted from /proc/net/wireless) on webOS platforms.
  */
 
-#include <app-common/zap-generated/enums.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/webos/ConnectivityUtils.h>
 
