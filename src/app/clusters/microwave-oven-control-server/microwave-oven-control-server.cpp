@@ -228,7 +228,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         else
         {
             // set Microwave Oven cooking power to max power(default).
-            reqCookTime = mDelegate->GetMaxPower();
+            reqPowerSetting = mDelegate->GetMaxPower();
         }
         status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTime, reqPowerSetting);
         goto exit;
