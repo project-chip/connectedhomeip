@@ -20298,7 +20298,8 @@ void CHIPOvenModeOnModeAttributeCallback::CallbackFn(void * context, const chip:
 
 CHIPOvenModeGeneratedCommandListAttributeCallback::CHIPOvenModeGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPOvenModeClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPOvenModeClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -20369,7 +20370,8 @@ void CHIPOvenModeGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPOvenModeAcceptedCommandListAttributeCallback::CHIPOvenModeAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPOvenModeClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPOvenModeClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -20864,7 +20866,8 @@ void CHIPLaundryDryerControlsAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPLaundryDryerControlsEventListAttributeCallback::CHIPLaundryDryerControlsEventListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPLaundryDryerControlsClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPLaundryDryerControlsClusterEventListAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
