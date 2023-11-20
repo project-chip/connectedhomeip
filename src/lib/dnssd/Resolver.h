@@ -353,17 +353,15 @@ public:
     virtual void OnNodeDiscovered(const DiscoveredNodeData & nodeData) = 0;
 };
 
-class DiscoveryDelegate : public ReferenceCounted<DiscoveryDelegate>, public CommissioningResolveDelegate
+class DiscoveryContext : public ReferenceCounted<DiscoveryContext>
 {
 public:
-    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) { mCommissioningDelegate = delegate; }
-
     void SetBrowseIdentifier(intptr_t identifier) { mBrowseIdentifier.Emplace(identifier); }
     void ClearBrowseIdentifier() { mBrowseIdentifier.ClearValue(); }
     const Optional<intptr_t> & GetBrowseIdentifier() const { return mBrowseIdentifier; }
 
-    // CommissioningResolveDelegate
-    void OnNodeDiscovered(const DiscoveredNodeData & nodeData) override
+    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) { mCommissioningDelegate = delegate; }
+    void OnNodeDiscovered(const DiscoveredNodeData & nodeData)
     {
         if (mCommissioningDelegate != nullptr)
         {
@@ -455,21 +453,25 @@ public:
      * Finds all commissionable nodes matching the given filter.
      *
      * Whenever a new matching node is found, the node information is passed to
-     * the delegate's `OnNodeDiscoveryComplete` method. The method is expected
-     * to increase the delegate's reference count for as long as it takes to
-     * complete the request.
+     * the `OnNodeDiscovered` method of the commissioning delegate configured
+     * in the context object.
+     *
+     * This method is expected to increase the reference count of the context
+     * object for as long as it takes to complete the discovery request.
      */
-    virtual CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryDelegate & delegate) = 0;
+    virtual CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context) = 0;
 
     /**
      * Finds all commissioner nodes matching the given filter.
      *
      * Whenever a new matching node is found, the node information is passed to
-     * the delegate's `OnNodeDiscoveryComplete` method. The method is expected
-     * to increase the delegate's reference count for as long as it takes to
-     * complete the request.
+     * the `OnNodeDiscovered` method of the commissioning delegate configured
+     * in the context object.
+     *
+     * This method is expected to increase the reference count of the context
+     * object for as long as it takes to complete the discovery request.
      */
-    virtual CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryDelegate & delegate) = 0;
+    virtual CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) = 0;
 
     /**
      * Stop discovery (of commissionable or commissioner nodes).
@@ -477,7 +479,7 @@ public:
      * Some back ends may not support stopping discovery, so consumers should
      * not assume they will stop getting callbacks after calling this.
      */
-    virtual CHIP_ERROR StopDiscovery(DiscoveryDelegate & delegate) = 0;
+    virtual CHIP_ERROR StopDiscovery(DiscoveryContext & context) = 0;
 
     /**
      * Verify the validity of an address that appears to be out of date (for example

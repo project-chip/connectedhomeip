@@ -29,42 +29,42 @@ ResolverProxy::~ResolverProxy()
 
 CHIP_ERROR ResolverProxy::Init(Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPoint)
 {
-    VerifyOrReturnError(mDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mContext == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(mResolver.Init(udpEndPoint));
-    mDelegate = Platform::New<DiscoveryDelegate>();
-    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_NO_MEMORY);
+    mContext = Platform::New<DiscoveryContext>();
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_NO_MEMORY);
 
     return CHIP_NO_ERROR;
 }
 
 void ResolverProxy::Shutdown()
 {
-    VerifyOrReturn(mDelegate != nullptr);
-    mDelegate->SetCommissioningDelegate(nullptr);
-    mDelegate->Release();
-    mDelegate = nullptr;
+    VerifyOrReturn(mContext != nullptr);
+    mContext->SetCommissioningDelegate(nullptr);
+    mContext->Release();
+    mContext = nullptr;
 }
 
 CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
 {
-    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    return mResolver.DiscoverCommissionableNodes(filter, *mDelegate);
+    return mResolver.DiscoverCommissionableNodes(filter, *mContext);
 }
 
 CHIP_ERROR ResolverProxy::DiscoverCommissioners(DiscoveryFilter filter)
 {
-    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    return mResolver.DiscoverCommissioners(filter, *mDelegate);
+    return mResolver.DiscoverCommissioners(filter, *mContext);
 }
 
 CHIP_ERROR ResolverProxy::StopDiscovery()
 {
-    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    return mResolver.StopDiscovery(*mDelegate);
+    return mResolver.StopDiscovery(*mContext);
 }
 
 } // namespace Dnssd

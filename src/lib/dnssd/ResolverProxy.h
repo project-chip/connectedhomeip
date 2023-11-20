@@ -33,9 +33,9 @@ public:
 
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate)
     {
-        if (mDelegate != nullptr)
+        if (mContext != nullptr)
         {
-            mDelegate->SetCommissioningDelegate(delegate);
+            mContext->SetCommissioningDelegate(delegate);
         }
     }
 
@@ -45,7 +45,7 @@ public:
 
 private:
     Resolver & mResolver;
-    DiscoveryDelegate * mDelegate = nullptr;
+    DiscoveryContext * mContext = nullptr;
 };
 
 } // namespace Dnssd

@@ -38,12 +38,12 @@ public:
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override { return ResolveNodeIdStatus; }
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override {}
-    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryDelegate &) override { return DiscoverCommissionersStatus; }
-    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryDelegate &) override
+    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext &) override { return DiscoverCommissionersStatus; }
+    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext &) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-    CHIP_ERROR StopDiscovery(DiscoveryDelegate &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StopDiscovery(DiscoveryContext &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;

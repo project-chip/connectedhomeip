@@ -39,11 +39,11 @@ namespace {
 
 static void HandleNodeResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & addresses, CHIP_ERROR error)
 {
-    DiscoveryDelegate * delegate = static_cast<DiscoveryDelegate *>(context);
+    DiscoveryContext * discoveryContext = static_cast<DiscoveryContext *>(context);
 
     if (error != CHIP_NO_ERROR)
     {
-        delegate->Release();
+        discoveryContext->Release();
         return;
     }
 
@@ -51,24 +51,24 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
     result->ToDiscoveredNodeData(addresses, nodeData);
 
     nodeData.LogDetail();
-    delegate->OnNodeDiscovered(nodeData);
-    delegate->Release();
+    discoveryContext->OnNodeDiscovered(nodeData);
+    discoveryContext->Release();
 }
 
 static void HandleNodeBrowse(void * context, DnssdService * services, size_t servicesSize, bool finalBrowse, CHIP_ERROR error)
 {
-    DiscoveryDelegate * delegate = static_cast<DiscoveryDelegate *>(context);
+    DiscoveryContext * discoveryContext = static_cast<DiscoveryContext *>(context);
 
     if (error != CHIP_NO_ERROR)
     {
-        delegate->ClearBrowseIdentifier();
-        delegate->Release();
+        discoveryContext->ClearBrowseIdentifier();
+        discoveryContext->Release();
         return;
     }
 
     for (size_t i = 0; i < servicesSize; ++i)
     {
-        delegate->Retain();
+        discoveryContext->Retain();
         // For some platforms browsed services are already resolved, so verify if resolve is really needed or call resolve callback
 
         // Check if SRV, TXT and AAAA records were received in DNS responses
@@ -85,8 +85,8 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
 
     if (finalBrowse)
     {
-        delegate->ClearBrowseIdentifier();
-        delegate->Release();
+        discoveryContext->ClearBrowseIdentifier();
+        discoveryContext->Release();
     }
 }
 
@@ -642,10 +642,10 @@ void DiscoveryImplPlatform::NodeIdResolutionNoLongerNeeded(const PeerId & peerId
     ChipDnssdResolveNoLongerNeeded(name);
 }
 
-CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryDelegate & delegate)
+CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context)
 {
     ReturnErrorOnFailure(InitImpl());
-    StopDiscovery(delegate);
+    StopDiscovery(context);
 
     if (filter.type == DiscoveryFilterType::kInstanceName)
     {
@@ -657,12 +657,12 @@ CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter fi
         service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolUdp;
         service.mAddressType = Inet::IPAddressType::kAny;
 
-        // Increase the delegate's reference count to keep it alive until HandleNodeResolve is called back.
-        CHIP_ERROR error = ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeResolve, delegate.Retain());
+        // Increase the reference count of the context to keep it alive until HandleNodeResolve is called back.
+        CHIP_ERROR error = ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeResolve, context.Retain());
 
         if (error != CHIP_NO_ERROR)
         {
-            delegate.Release();
+            context.Release();
         }
 
         return error;
@@ -671,27 +671,27 @@ CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter fi
     char serviceName[kMaxCommissionableServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
 
-    // Increase the delegate's reference count to keep it alive until HandleNodeBrowse is called back.
     intptr_t browseIdentifier;
+    // Increase the reference count of the context to keep it alive until HandleNodeBrowse is called back.
     CHIP_ERROR error = ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
-                                       Inet::InterfaceId::Null(), HandleNodeBrowse, delegate.Retain(), &browseIdentifier);
+                                       Inet::InterfaceId::Null(), HandleNodeBrowse, context.Retain(), &browseIdentifier);
 
     if (error == CHIP_NO_ERROR)
     {
-        delegate.SetBrowseIdentifier(browseIdentifier);
+        context.SetBrowseIdentifier(browseIdentifier);
     }
     else
     {
-        delegate.Release();
+        context.Release();
     }
 
     return error;
 }
 
-CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissioners(DiscoveryFilter filter, DiscoveryDelegate & delegate)
+CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context)
 {
     ReturnErrorOnFailure(InitImpl());
-    StopDiscovery(delegate);
+    StopDiscovery(context);
 
     if (filter.type == DiscoveryFilterType::kInstanceName)
     {
@@ -703,45 +703,45 @@ CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissioners(DiscoveryFilter filter, 
         service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolUdp;
         service.mAddressType = Inet::IPAddressType::kAny;
 
-        // Increase the delegate's reference count to keep it alive until HandleNodeResolve is called back.
-        CHIP_ERROR error = ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeResolve, delegate.Retain());
+        // Increase the reference count of the context to keep it alive until HandleNodeResolve is called back.
+        CHIP_ERROR error = ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeResolve, context.Retain());
 
         if (error != CHIP_NO_ERROR)
         {
-            delegate.Release();
+            context.Release();
         }
     }
 
     char serviceName[kMaxCommissionerServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));
 
-    // Increase the delegate's reference count to keep it alive until HandleNodeBrowse is called back.
     intptr_t browseIdentifier;
+    // Increase the reference count of the context to keep it alive until HandleNodeBrowse is called back.
     CHIP_ERROR error = ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
-                                       Inet::InterfaceId::Null(), HandleNodeBrowse, delegate.Retain(), &browseIdentifier);
+                                       Inet::InterfaceId::Null(), HandleNodeBrowse, context.Retain(), &browseIdentifier);
 
     if (error == CHIP_NO_ERROR)
     {
-        delegate.SetBrowseIdentifier(browseIdentifier);
+        context.SetBrowseIdentifier(browseIdentifier);
     }
     else
     {
-        delegate.Release();
+        context.Release();
     }
 
     return error;
 }
 
-CHIP_ERROR DiscoveryImplPlatform::StopDiscovery(DiscoveryDelegate & delegate)
+CHIP_ERROR DiscoveryImplPlatform::StopDiscovery(DiscoveryContext & context)
 {
-    if (!delegate.GetBrowseIdentifier().HasValue())
+    if (!context.GetBrowseIdentifier().HasValue())
     {
         // No discovery going on.
         return CHIP_NO_ERROR;
     }
 
-    const auto browseIdentifier = delegate.GetBrowseIdentifier().Value();
-    delegate.ClearBrowseIdentifier();
+    const auto browseIdentifier = context.GetBrowseIdentifier().Value();
+    context.ClearBrowseIdentifier();
 
     return ChipDnssdStopBrowse(browseIdentifier);
 }

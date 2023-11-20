@@ -273,7 +273,7 @@ public:
     {
         GlobalMinimalMdnsServer::Instance().SetResponseDelegate(this);
     }
-    ~MinMdnsResolver() { SetDiscoveryDelegate(nullptr); }
+    ~MinMdnsResolver() { SetDiscoveryContext(nullptr); }
 
     //// MdnsPacketDelegate implementation
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
@@ -285,19 +285,19 @@ public:
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
-    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryDelegate & delegate) override;
-    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryDelegate & delegate) override;
-    CHIP_ERROR StopDiscovery(DiscoveryDelegate & delegate) override;
+    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context) override;
+    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) override;
+    CHIP_ERROR StopDiscovery(DiscoveryContext & context) override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
 
 private:
     OperationalResolveDelegate * mOperationalDelegate = nullptr;
-    DiscoveryDelegate * mDiscoveryDelegate            = nullptr;
+    DiscoveryContext * mDiscoveryContext              = nullptr;
     System::Layer * mSystemLayer                      = nullptr;
     ActiveResolveAttempts mActiveResolves;
     PacketParser mPacketParser;
 
-    void SetDiscoveryDelegate(DiscoveryDelegate * delegate);
+    void SetDiscoveryContext(DiscoveryContext * context);
     void ScheduleIpAddressResolve(SerializedQNameIterator hostName);
 
     CHIP_ERROR SendAllPendingQueries();
@@ -332,19 +332,19 @@ private:
     char qnameStorage[kMaxQnameSize];
 };
 
-void MinMdnsResolver::SetDiscoveryDelegate(DiscoveryDelegate * delegate)
+void MinMdnsResolver::SetDiscoveryContext(DiscoveryContext * context)
 {
-    if (mDiscoveryDelegate != nullptr)
+    if (mDiscoveryContext != nullptr)
     {
-        mDiscoveryDelegate->Release();
+        mDiscoveryContext->Release();
     }
 
-    if (delegate != nullptr)
+    if (context != nullptr)
     {
-        delegate->Retain();
+        context->Retain();
     }
 
-    mDiscoveryDelegate = delegate;
+    mDiscoveryContext = context;
 }
 
 void MinMdnsResolver::ScheduleIpAddressResolve(SerializedQNameIterator hostName)
@@ -424,9 +424,9 @@ void MinMdnsResolver::AdvancePendingResolverStates()
 
             if (discoveredNodeIsRelevant)
             {
-                if (mDiscoveryDelegate != nullptr)
+                if (mDiscoveryContext != nullptr)
                 {
-                    mDiscoveryDelegate->OnNodeDiscovered(nodeData);
+                    mDiscoveryContext->OnNodeDiscovered(nodeData);
                 }
                 else
                 {
@@ -685,23 +685,23 @@ void MinMdnsResolver::ExpireIncrementalResolvers()
     }
 }
 
-CHIP_ERROR MinMdnsResolver::DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryDelegate & delegate)
+CHIP_ERROR MinMdnsResolver::DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context)
 {
-    SetDiscoveryDelegate(&delegate);
+    SetDiscoveryContext(&context);
 
     return BrowseNodes(DiscoveryType::kCommissionableNode, filter);
 }
 
-CHIP_ERROR MinMdnsResolver::DiscoverCommissioners(DiscoveryFilter filter, DiscoveryDelegate & delegate)
+CHIP_ERROR MinMdnsResolver::DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context)
 {
-    SetDiscoveryDelegate(&delegate);
+    SetDiscoveryContext(&context);
 
     return BrowseNodes(DiscoveryType::kCommissionerNode, filter);
 }
 
-CHIP_ERROR MinMdnsResolver::StopDiscovery(DiscoveryDelegate & delegate)
+CHIP_ERROR MinMdnsResolver::StopDiscovery(DiscoveryContext & context)
 {
-    SetDiscoveryDelegate(nullptr);
+    SetDiscoveryContext(nullptr);
 
     return mActiveResolves.CompleteAllBrowses();
 }

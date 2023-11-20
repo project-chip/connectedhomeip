@@ -40,15 +40,15 @@ public:
     {
         ChipLogError(Discovery, "Failed to stop resolving node ID: dnssd resolving not available");
     }
-    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryDelegate & delegate) override
+    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryDelegate & delegate) override
+    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-    CHIP_ERROR StopDiscovery(DiscoveryDelegate & delegate) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StopDiscovery(DiscoveryContext & context) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
