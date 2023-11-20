@@ -21,8 +21,6 @@
 
 #include <stdint.h>
 
-#include <app-common/zap-generated/enums.h>
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -2209,19 +2207,6 @@ enum class LoadControlEventStatusEnum : uint8_t
     kUnknownEnumValue = 13,
 };
 
-// Enum for PowerSavingsEnum
-enum class PowerSavingsEnum : uint8_t
-{
-    kLow    = 0x00,
-    kMedium = 0x01,
-    kHigh   = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
-
 // Bitmap for CancelControlBitmap
 enum class CancelControlBitmap : uint16_t
 {
@@ -3228,9 +3213,6 @@ enum class ColorLoopDirection : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ColorMode
 enum class ColorMode : uint8_t
 {
@@ -3243,10 +3225,6 @@ enum class ColorMode : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ColorMode                                                      = EmberAfColorMode;
-static ColorMode __attribute__((unused)) kColorModekUnknownEnumValue = static_cast<ColorMode>(3);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Enum for HueDirection
 enum class HueDirection : uint8_t
