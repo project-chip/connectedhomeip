@@ -2839,9 +2839,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(MediaInput::InputTypeEn
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CecKeyCode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CECKeyCodeEnum val)
 {
-    using EnumType = KeypadInput::CecKeyCode;
+    using EnumType = KeypadInput::CECKeyCodeEnum;
     switch (val)
     {
     case EnumType::kSelect:

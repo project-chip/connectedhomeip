@@ -7774,6 +7774,8 @@
       enums:
           ContentLauncher:
               - StatusEnum
+          KeypadInput:
+              - CECKeyCodeEnum
           ThermostatUserInterfaceConfiguration:
               - KeypadLockoutEnum
               - ScheduleProgrammingVisibilityEnum
@@ -7788,6 +7790,94 @@
               FanModeSequenceEnum:
                   - OffHighAuto
                   - OffHigh
+          KeypadInput:
+              CECKeyCodeEnum:
+                  - Select
+                  - Up
+                  - Down
+                  - Left
+                  - Right
+                  - RightUp
+                  - RightDown
+                  - LeftUp
+                  - LeftDown
+                  - RootMenu
+                  - SetupMenu
+                  - ContentsMenu
+                  - FavoriteMenu
+                  - Exit
+                  - MediaTopMenu
+                  - MediaContextSensitiveMenu
+                  - NumberEntryMode
+                  - Number11
+                  - Number12
+                  - Number0OrNumber10
+                  - Numbers1
+                  - Numbers2
+                  - Numbers3
+                  - Numbers4
+                  - Numbers5
+                  - Numbers6
+                  - Numbers7
+                  - Numbers8
+                  - Numbers9
+                  - Dot
+                  - Enter
+                  - Clear
+                  - NextFavorite
+                  - ChannelUp
+                  - ChannelDown
+                  - PreviousChannel
+                  - SoundSelect
+                  - InputSelect
+                  - DisplayInformation
+                  - Help
+                  - PageUp
+                  - PageDown
+                  - Power
+                  - VolumeUp
+                  - VolumeDown
+                  - Mute
+                  - Play
+                  - Stop
+                  - Pause
+                  - Record
+                  - Rewind
+                  - FastForward
+                  - Eject
+                  - Forward
+                  - Backward
+                  - StopRecord
+                  - PauseRecord
+                  - Reserved
+                  - Angle
+                  - SubPicture
+                  - VideoOnDemand
+                  - ElectronicProgramGuide
+                  - TimerProgramming
+                  - InitialConfiguration
+                  - SelectBroadcastType
+                  - SelectSoundPresentation
+                  - PlayFunction
+                  - PausePlayFunction
+                  - RecordFunction
+                  - PauseRecordFunction
+                  - StopFunction
+                  - MuteFunction
+                  - RestoreVolumeFunction
+                  - TuneFunction
+                  - SelectMediaFunction
+                  - SelectAvInputFunction
+                  - SelectAudioInputFunction
+                  - PowerToggleFunction
+                  - PowerOffFunction
+                  - PowerOnFunction
+                  - F1Blue
+                  - F2Red
+                  - F3Green
+                  - F4Yellow
+                  - F5
+                  - Data
           ThermostatUserInterfaceConfiguration:
               KeypadLockoutEnum:
                   - NoLockout
@@ -7840,6 +7930,8 @@
       enums:
           ContentLauncher:
               - ContentLaunchStatusEnum
+          KeypadInput:
+              - CecKeyCode
       enum values:
           FanControl:
               FanModeSequenceEnum:
@@ -7946,6 +8038,8 @@
       enums:
           ContentLauncher:
               StatusEnum: ContentLaunchStatusEnum
+          KeypadInput:
+              CECKeyCodeEnum: CecKeyCode
       enum values:
           ContentLauncher:
               # The URLNotAvailable value got renamed at the same time

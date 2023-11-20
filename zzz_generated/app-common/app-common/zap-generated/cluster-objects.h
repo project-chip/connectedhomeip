@@ -31615,7 +31615,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKey::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    CecKeyCode keyCode = static_cast<CecKeyCode>(0);
+    CECKeyCodeEnum keyCode = static_cast<CECKeyCodeEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -31630,7 +31630,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKey::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    CecKeyCode keyCode = static_cast<CecKeyCode>(0);
+    CECKeyCodeEnum keyCode = static_cast<CECKeyCodeEnum>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SendKey
