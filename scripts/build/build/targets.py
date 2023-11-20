@@ -136,7 +136,9 @@ def BuildHostTarget():
         TargetPart('refrigerator', app=HostApp.REFRIGERATOR),
         TargetPart('rvc', app=HostApp.RVC),
         TargetPart('air-purifier', app=HostApp.AIR_PURIFIER),
-        TargetPart('lit-icd', app=HostApp.LIT_ICD)
+        TargetPart('lit-icd', app=HostApp.LIT_ICD),
+        TargetPart('air-quality-sensor', app=HostApp.AIR_QUALITY_SENSOR),
+        TargetPart('resource-monitoring', app=HostApp.RESOURCE_MONITORING)
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
