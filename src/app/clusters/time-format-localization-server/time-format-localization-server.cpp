@@ -172,7 +172,8 @@ Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPre
 
         // IM logic should convert any unrecognized value to Unknown and we do not allow
         // processing those.
-        VerifyOrReturnValue(calendarType != CalendarTypeEnum::kUnknownEnumValue, Protocols::InteractionModel::Status::ConstraintError);
+        VerifyOrReturnValue(calendarType != CalendarTypeEnum::kUnknownEnumValue,
+                            Protocols::InteractionModel::Status::ConstraintError);
 
         return emberAfPluginTimeFormatLocalizationOnCalendarTypeChange(attributePath.mEndpointId, calendarType);
     }
