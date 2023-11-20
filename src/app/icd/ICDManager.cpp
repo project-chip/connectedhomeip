@@ -41,7 +41,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
-              "ICDManager::OpenExchangeContextCount cannot hold count for the max exchange count");
+              "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
 void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore)
 {
@@ -278,14 +278,14 @@ void ICDManager::OnKeepActiveRequest(KeepActiveFlags request)
     {
         // There can be multiple open exchange contexts at the same time.
         // Keep track of the requests count.
-        this->OpenExchangeContextCount++;
+        this->mOpenExchangeContextCount++;
     }
 
     if (request.Has(KeepActiveFlag::kCheckInInProgress))
     {
         // There can be multiple check-in at the same time.
         // Keep track of the requests count.
-        this->CheckInRequestCount++;
+        this->mCheckInRequestCount++;
     }
 
     this->SetKeepActiveModeRequirements(request, true /* state */);
@@ -301,16 +301,16 @@ void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
     {
         // There can be multiple open exchange contexts at the same time.
         // Keep track of the requests count.
-        if (this->OpenExchangeContextCount > 0)
+        if (this->mOpenExchangeContextCount > 0)
         {
-            this->OpenExchangeContextCount--;
+            this->mOpenExchangeContextCount--;
         }
         else
         {
             ChipLogError(DeviceLayer, "The ICD Manager did not account for ExchangeContext closure");
         }
 
-        if (this->OpenExchangeContextCount == 0)
+        if (this->mOpenExchangeContextCount == 0)
         {
             this->SetKeepActiveModeRequirements(KeepActiveFlag::kExchangeContextOpen, false /* state */);
         }
@@ -320,16 +320,16 @@ void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
     {
         // There can be multiple open exchange contexts at the same time.
         // Keep track of the requests count.
-        if (this->CheckInRequestCount > 0)
+        if (this->mCheckInRequestCount > 0)
         {
-            this->CheckInRequestCount--;
+            this->mCheckInRequestCount--;
         }
         else
         {
             ChipLogError(DeviceLayer, "The ICD Manager did not account for Check-In Sender start");
         }
 
-        if (this->CheckInRequestCount == 0)
+        if (this->mCheckInRequestCount == 0)
         {
             this->SetKeepActiveModeRequirements(KeepActiveFlag::kCheckInInProgress, false /* state */);
         }
