@@ -5959,6 +5959,82 @@ public static class DemandResponseLoadControlClusterLoadControlProgramStruct {
     return output.toString();
   }
 }
+public static class EnergyEvseClusterChargingTargetStruct {
+  public Integer targetTime;
+  public Optional<Integer> targetSoC;
+  public Optional<Long> addedEnergy;
+  private static final long TARGET_TIME_ID = 0L;
+  private static final long TARGET_SO_C_ID = 1L;
+  private static final long ADDED_ENERGY_ID = 2L;
+
+  public EnergyEvseClusterChargingTargetStruct(
+    Integer targetTime,
+    Optional<Integer> targetSoC,
+    Optional<Long> addedEnergy
+  ) {
+    this.targetTime = targetTime;
+    this.targetSoC = targetSoC;
+    this.addedEnergy = addedEnergy;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(TARGET_TIME_ID, new UIntType(targetTime)));
+    values.add(new StructElement(TARGET_SO_C_ID, targetSoC.<BaseTLVType>map((nonOptionaltargetSoC) -> new UIntType(nonOptionaltargetSoC)).orElse(new EmptyType())));
+    values.add(new StructElement(ADDED_ENERGY_ID, addedEnergy.<BaseTLVType>map((nonOptionaladdedEnergy) -> new IntType(nonOptionaladdedEnergy)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static EnergyEvseClusterChargingTargetStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer targetTime = null;
+    Optional<Integer> targetSoC = Optional.empty();
+    Optional<Long> addedEnergy = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == TARGET_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          targetTime = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TARGET_SO_C_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          targetSoC = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == ADDED_ENERGY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          addedEnergy = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new EnergyEvseClusterChargingTargetStruct(
+      targetTime,
+      targetSoC,
+      addedEnergy
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EnergyEvseClusterChargingTargetStruct {\n");
+    output.append("\ttargetTime: ");
+    output.append(targetTime);
+    output.append("\n");
+    output.append("\ttargetSoC: ");
+    output.append(targetSoC);
+    output.append("\n");
+    output.append("\taddedEnergy: ");
+    output.append(addedEnergy);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DoorLockClusterCredentialStruct {
   public Integer credentialType;
   public Integer credentialIndex;

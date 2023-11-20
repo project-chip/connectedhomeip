@@ -3637,6 +3637,136 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace DemandResponseLoadControl
 
+namespace EnergyEvse {
+namespace Attributes {
+
+namespace State {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace State
+
+namespace SupplyState {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace SupplyState
+
+namespace FaultState {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace FaultState
+
+namespace ChargingEnabledUntil {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace ChargingEnabledUntil
+
+namespace DischargingEnabledUntil {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace DischargingEnabledUntil
+
+namespace CircuitCapacity {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace CircuitCapacity
+
+namespace MinimumChargeCurrent {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace MinimumChargeCurrent
+
+namespace MaximumChargeCurrent {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace MaximumChargeCurrent
+
+namespace MaximumDischargeCurrent {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace MaximumDischargeCurrent
+
+namespace UserMaximumChargeCurrent {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace UserMaximumChargeCurrent
+
+namespace RandomizationDelayWindow {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace RandomizationDelayWindow
+
+namespace NumberOfWeeklyTargets {
+static constexpr AttributeId Id = 0x00000021;
+} // namespace NumberOfWeeklyTargets
+
+namespace NumberOfDailyTargets {
+static constexpr AttributeId Id = 0x00000022;
+} // namespace NumberOfDailyTargets
+
+namespace NextChargeStartTime {
+static constexpr AttributeId Id = 0x00000023;
+} // namespace NextChargeStartTime
+
+namespace NextChargeTargetTime {
+static constexpr AttributeId Id = 0x00000024;
+} // namespace NextChargeTargetTime
+
+namespace NextChargeRequiredEnergy {
+static constexpr AttributeId Id = 0x00000025;
+} // namespace NextChargeRequiredEnergy
+
+namespace NextChargeTargetSoC {
+static constexpr AttributeId Id = 0x00000026;
+} // namespace NextChargeTargetSoC
+
+namespace ApproximateEVEfficiency {
+static constexpr AttributeId Id = 0x00000027;
+} // namespace ApproximateEVEfficiency
+
+namespace StateOfCharge {
+static constexpr AttributeId Id = 0x00000030;
+} // namespace StateOfCharge
+
+namespace BatteryCapacity {
+static constexpr AttributeId Id = 0x00000031;
+} // namespace BatteryCapacity
+
+namespace VehicleID {
+static constexpr AttributeId Id = 0x00000032;
+} // namespace VehicleID
+
+namespace SessionID {
+static constexpr AttributeId Id = 0x00000040;
+} // namespace SessionID
+
+namespace SessionDuration {
+static constexpr AttributeId Id = 0x00000041;
+} // namespace SessionDuration
+
+namespace SessionEnergyCharged {
+static constexpr AttributeId Id = 0x00000042;
+} // namespace SessionEnergyCharged
+
+namespace SessionEnergyDischarged {
+static constexpr AttributeId Id = 0x00000043;
+} // namespace SessionEnergyDischarged
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace EnergyEvse
+
 namespace DoorLock {
 namespace Attributes {
 
