@@ -99,17 +99,6 @@ class DemandResponseLoadControlCluster(private val controller: MatterController,
     }    
   }
 
-  suspend fun readDeviceClassAttribute(): UInt {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeDeviceClassAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
-    // Implementation needs to be added here
-  }
-
   suspend fun readLoadControlProgramsAttribute(): LoadControlProgramsAttribute {
     // Implementation needs to be added here
   }
@@ -165,11 +154,11 @@ class DemandResponseLoadControlCluster(private val controller: MatterController,
     // Implementation needs to be added here
   }
 
-  suspend fun readNumberOfTransistionsAttribute(): UByte {
+  suspend fun readNumberOfTransitionsAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNumberOfTransistionsAttribute(
+  suspend fun subscribeNumberOfTransitionsAttribute(
     minInterval: Int,
     maxInterval: Int
   ): UByte {
