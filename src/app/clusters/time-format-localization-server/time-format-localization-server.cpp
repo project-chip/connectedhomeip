@@ -170,11 +170,9 @@ Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPre
 
         CalendarTypeEnum calendarType = static_cast<CalendarTypeEnum>(*value);
 
-        // Valid range is from 0 to unknown. This relies that unknown value is
-        // the first unused value and values increase over time
-        VerifyOrReturnValue(((calendarType == CalendarTypeEnum::kUseActiveLocale) ||
-                             (to_underlying(calendarType) < to_underlying(CalendarTypeEnum::kUnknownEnumValue))),
-                            Protocols::InteractionModel::Status::ConstraintError);
+        // IM logic should convert any unrecognized value to Unknown and we do not allow
+        // processing those.
+        VerifyOrReturnValue(calendarType != CalendarTypeEnum::kUnknownEnumValue, Protocols::InteractionModel::Status::ConstraintError);
 
         return emberAfPluginTimeFormatLocalizationOnCalendarTypeChange(attributePath.mEndpointId, calendarType);
     }
@@ -183,12 +181,9 @@ Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPre
 
         HourFormatEnum hourFormat = static_cast<HourFormatEnum>(*value);
 
-        // Valid range is from 0 to unknown. This relies that unknown value is
-        // the first unused value and values increase over time
-        VerifyOrReturnValue(((hourFormat == HourFormatEnum::kUseActiveLocale) ||
-                             (to_underlying(hourFormat) < to_underlying(HourFormatEnum::kUnknownEnumValue))),
-                            Protocols::InteractionModel::Status::ConstraintError);
-
+        // IM logic should convert any unrecognized value to Unknown and we do not allow
+        // processing those.
+        VerifyOrReturnValue(hourFormat != HourFormatEnum::kUnknownEnumValue, Protocols::InteractionModel::Status::ConstraintError);
         return Protocols::InteractionModel::Status::Success;
     }
     default:
