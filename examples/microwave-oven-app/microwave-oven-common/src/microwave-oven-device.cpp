@@ -25,8 +25,8 @@ using namespace chip::app::Clusters::MicrowaveOvenControl;
 using OperationalStateEnum = chip::app::Clusters::OperationalState::OperationalStateEnum;
 using Status               = Protocols::InteractionModel::Status;
 
-
-Protocols::InteractionModel::Status MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime, uint8_t powerSetting)
+Protocols::InteractionModel::Status
+MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime, uint8_t powerSetting)
 {
     // placeholder implementation
     // TODO: set Microwave Oven cooking mode by cookMode.Value().
@@ -102,7 +102,6 @@ app::DataModel::Nullable<uint32_t> MicrowaveOvenDevice::HandleMicrowaveOvenOpSta
 {
     return static_cast<app::DataModel::Nullable<uint32_t>>(mMicrowaveOvenControlInstance.GetCookTime());
 }
-
 
 void MicrowaveOvenDevice::Init(EndpointId aEndpoint)
 {

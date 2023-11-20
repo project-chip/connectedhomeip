@@ -29,7 +29,9 @@ namespace Clusters {
 
 class MicrowaveOvenDevice;
 
-typedef Protocols::InteractionModel::Status (MicrowaveOvenDevice::*HandleSetCookingParametersCommand)(uint8_t cookMode, uint32_t cookTime, uint8_t powerSetting);
+typedef Protocols::InteractionModel::Status (MicrowaveOvenDevice::*HandleSetCookingParametersCommand)(uint8_t cookMode,
+                                                                                                      uint32_t cookTime,
+                                                                                                      uint8_t powerSetting);
 typedef Protocols::InteractionModel::Status (MicrowaveOvenDevice::*HandleAddMoreTimeCommand)(uint32_t addedCookTime);
 
 namespace MicrowaveOvenControl {
@@ -40,7 +42,6 @@ class MicrowaveOvenControlDelegate : public MicrowaveOvenControl::Delegate
 {
 
 private:
-
     MicrowaveOvenDevice * mSetCookingParametersInstance;
     HandleSetCookingParametersCommand mSetCookingParametersCommandCallback;
     MicrowaveOvenDevice * mAddMoreTimeInstance;
@@ -76,14 +77,14 @@ public:
     /**
      * Set callback function for set cooking parameters
      */
-    void SetMicrowaveOvenControlSetCookingParametersCallback(HandleSetCookingParametersCommand aCallback, MicrowaveOvenDevice * aInstance);
+    void SetMicrowaveOvenControlSetCookingParametersCallback(HandleSetCookingParametersCommand aCallback,
+                                                             MicrowaveOvenDevice * aInstance);
 
     /**
      * Set callback function for add more time
      */
     void SetMicrowaveOvenControlAddMoreTimeCallback(HandleAddMoreTimeCommand aCallback, MicrowaveOvenDevice * aInstance);
 };
-
 
 } // namespace MicrowaveOvenControl
 } // namespace Clusters

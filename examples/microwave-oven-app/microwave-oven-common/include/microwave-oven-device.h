@@ -20,22 +20,26 @@ private:
 
 public:
     /**
-     * This class is responsible for initialising all the microwave oven device clusters and manging the interactions between them as required by
-     * the specific "business logic". See the state machine diagram.
+     * This class is responsible for initialising all the microwave oven device clusters and manging the interactions between them
+     * as required by the specific "business logic". See the state machine diagram.
      * @param aClustersEndpoint The endpoint ID where all the microwave oven clusters exist.
      */
     explicit MicrowaveOvenDevice(EndpointId aClustersEndpoint) :
-        mMicrowaveOvenControlDelegate(), mMicrowaveOvenControlInstance(&mMicrowaveOvenControlDelegate, aClustersEndpoint, MicrowaveOvenControl::Id),
-        mOperationalStateDelegate(),mOperationalStateInstance(&mOperationalStateDelegate, aClustersEndpoint, OperationalState::Id)
+        mMicrowaveOvenControlDelegate(),
+        mMicrowaveOvenControlInstance(&mMicrowaveOvenControlDelegate, aClustersEndpoint, MicrowaveOvenControl::Id),
+        mOperationalStateDelegate(), mOperationalStateInstance(&mOperationalStateDelegate, aClustersEndpoint, OperationalState::Id)
     {
         // set callback functions
-        mMicrowaveOvenControlDelegate.SetMicrowaveOvenControlSetCookingParametersCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCallback, this);
-        mMicrowaveOvenControlDelegate.SetMicrowaveOvenControlAddMoreTimeCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenAddMoreTimeCallback, this);
+        mMicrowaveOvenControlDelegate.SetMicrowaveOvenControlSetCookingParametersCallback(
+            &MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCallback, this);
+        mMicrowaveOvenControlDelegate.SetMicrowaveOvenControlAddMoreTimeCallback(
+            &MicrowaveOvenDevice::HandleMicrowaveOvenAddMoreTimeCallback, this);
         mOperationalStateDelegate.SetOpStatePauseCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStatePasueCallback, this);
         mOperationalStateDelegate.SetOpStateResumeCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateResumeCallback, this);
         mOperationalStateDelegate.SetOpStateStartCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateStartCallback, this);
         mOperationalStateDelegate.SetOpStateStopCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateStopCallback, this);
-        mOperationalStateDelegate.SetOpStateGetCountdownTimeCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateGetCountdownTime, this);
+        mOperationalStateDelegate.SetOpStateGetCountdownTimeCallback(
+            &MicrowaveOvenDevice::HandleMicrowaveOvenOpStateGetCountdownTime, this);
     }
 
     /**
@@ -46,7 +50,8 @@ public:
     /**
      * handle command for microwave oven control: set cooking parameters
      */
-    Protocols::InteractionModel::Status HandleMicrowaveOvenSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime, uint8_t powerSetting);
+    Protocols::InteractionModel::Status HandleMicrowaveOvenSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
+                                                                                        uint8_t powerSetting);
 
     /**
      * handle command for microwave oven control: add more time

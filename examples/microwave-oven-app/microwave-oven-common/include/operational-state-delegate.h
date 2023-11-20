@@ -45,8 +45,7 @@ private:
         GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
     };
 
-    app::DataModel::List<const GenericOperationalState> mOperationalStateList =
-        Span<const GenericOperationalState>(opStateList);
+    app::DataModel::List<const GenericOperationalState> mOperationalStateList = Span<const GenericOperationalState>(opStateList);
 
     const GenericOperationalPhase opPhaseList[1] = {
         // Phase List is null
@@ -65,7 +64,6 @@ private:
     HandleOpStateCommand mStopCallback;
     MicrowaveOvenDevice * mGetCountdownTimeMicrowaveOvenInstance;
     HandleGetCountdownTimeCommand mGetCountdownTimeCallback;
-
 
 public:
     /**

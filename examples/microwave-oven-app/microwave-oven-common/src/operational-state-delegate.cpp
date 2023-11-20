@@ -23,7 +23,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalState;
 using OperationalStateEnum = chip::app::Clusters::OperationalState::OperationalStateEnum;
 
-
 // Operational State command callbacks
 app::DataModel::Nullable<uint32_t> OperationalStateDelegate::GetCountdownTime()
 {
@@ -49,7 +48,6 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Ge
     operationalPhase = mOperationalPhaseList[index];
     return CHIP_NO_ERROR;
 }
-
 
 void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
@@ -77,13 +75,11 @@ void OperationalStateDelegate::SetOpStatePauseCallback(HandleOpStateCommand aCal
     mPauseCallback              = aCallback;
 }
 
-
 void OperationalStateDelegate::SetOpStateResumeCallback(HandleOpStateCommand aCallback, MicrowaveOvenDevice * aInstance)
 {
     mResumeMicrowaveOvenInstance = aInstance;
     mResumeCallback              = aCallback;
 }
-
 
 void OperationalStateDelegate::SetOpStateStartCallback(HandleOpStateCommand aCallback, MicrowaveOvenDevice * aInstance)
 {
@@ -91,15 +87,15 @@ void OperationalStateDelegate::SetOpStateStartCallback(HandleOpStateCommand aCal
     mStartCallback              = aCallback;
 }
 
-
 void OperationalStateDelegate::SetOpStateStopCallback(HandleOpStateCommand aCallback, MicrowaveOvenDevice * aInstance)
 {
-    mStopMicrowaveOvenInstance  = aInstance;
-    mStopCallback               = aCallback;
+    mStopMicrowaveOvenInstance = aInstance;
+    mStopCallback              = aCallback;
 }
 
-void OperationalStateDelegate::SetOpStateGetCountdownTimeCallback(HandleGetCountdownTimeCommand aCallback, MicrowaveOvenDevice * aInstance)
+void OperationalStateDelegate::SetOpStateGetCountdownTimeCallback(HandleGetCountdownTimeCommand aCallback,
+                                                                  MicrowaveOvenDevice * aInstance)
 {
-    mGetCountdownTimeMicrowaveOvenInstance  = aInstance;
-    mGetCountdownTimeCallback               = aCallback;
+    mGetCountdownTimeMicrowaveOvenInstance = aInstance;
+    mGetCountdownTimeCallback              = aCallback;
 }
