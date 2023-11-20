@@ -61,7 +61,7 @@ void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError
     (mResumeMicrowaveOvenInstance->*mResumeCallback)(err);
 }
 
-void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err) 
+void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
 {
     (mStartMicrowaveOvenInstance->*mStartCallback)(err);
 }

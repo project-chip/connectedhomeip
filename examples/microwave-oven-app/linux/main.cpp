@@ -26,7 +26,7 @@ using namespace chip::app::Clusters;
 
 MicrowaveOvenDevice * gMicrowaveOvenDevice = nullptr;
 
-void ApplicationInit() 
+void ApplicationInit()
 {
     gMicrowaveOvenDevice = new MicrowaveOvenDevice(MICROWAVE_OVEN_ENDPOINT);
     gMicrowaveOvenDevice->Init(MICROWAVE_OVEN_ENDPOINT);

@@ -25,7 +25,7 @@ public:
      * @param aClustersEndpoint The endpoint ID where all the microwave oven clusters exist.
      */
     explicit MicrowaveOvenDevice(EndpointId aClustersEndpoint) :
-        mMicrowaveOvenControlDelegate(), mMicrowaveOvenControlInstance(&mMicrowaveOvenControlDelegate, aClustersEndpoint, MicrowaveOvenControl::Id), 
+        mMicrowaveOvenControlDelegate(), mMicrowaveOvenControlInstance(&mMicrowaveOvenControlDelegate, aClustersEndpoint, MicrowaveOvenControl::Id),
         mOperationalStateDelegate(),mOperationalStateInstance(&mOperationalStateDelegate, aClustersEndpoint, OperationalState::Id)
     {
         // set callback functions
