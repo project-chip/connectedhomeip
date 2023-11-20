@@ -687,6 +687,7 @@ void MinMdnsResolver::ExpireIncrementalResolvers()
 
 CHIP_ERROR MinMdnsResolver::DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context)
 {
+    // minmdns currently supports only one discovery context at a time so override the previous context
     SetDiscoveryContext(&context);
 
     return BrowseNodes(DiscoveryType::kCommissionableNode, filter);
@@ -694,6 +695,7 @@ CHIP_ERROR MinMdnsResolver::DiscoverCommissionableNodes(DiscoveryFilter filter, 
 
 CHIP_ERROR MinMdnsResolver::DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context)
 {
+    // minmdns currently supports only one discovery context at a time so override the previous context
     SetDiscoveryContext(&context);
 
     return BrowseNodes(DiscoveryType::kCommissionerNode, filter);

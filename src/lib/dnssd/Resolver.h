@@ -353,6 +353,18 @@ public:
     virtual void OnNodeDiscovered(const DiscoveredNodeData & nodeData) = 0;
 };
 
+/**
+ * Node discovery context class.
+ *
+ * This class enables multiple clients of the global DNS-SD resolver to start simultaneous
+ * discovery operations.
+ *
+ * An object of this class is shared between a resolver client and the concrete resolver
+ * implementation. The client is responsible for allocating the context and passing it to
+ * the resolver when initiating a discovery operation. The resolver, in turn, is supposed to retain
+ * the context until the operation is finished. This allows the client to release the ownership of
+ * the context at any time without putting the resolver at risk of using a deleted object.
+ */
 class DiscoveryContext : public ReferenceCounted<DiscoveryContext>
 {
 public:

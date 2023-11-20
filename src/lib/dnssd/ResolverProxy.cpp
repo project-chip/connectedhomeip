@@ -22,11 +22,6 @@
 namespace chip {
 namespace Dnssd {
 
-ResolverProxy::~ResolverProxy()
-{
-    Shutdown();
-}
-
 CHIP_ERROR ResolverProxy::Init(Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPoint)
 {
     VerifyOrReturnError(mContext == nullptr, CHIP_ERROR_INCORRECT_STATE);

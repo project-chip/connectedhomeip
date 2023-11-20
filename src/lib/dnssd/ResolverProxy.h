@@ -22,11 +22,24 @@
 namespace chip {
 namespace Dnssd {
 
+/**
+ * Convenience class for discovering Matter commissioners and commissionable nodes.
+ *
+ * The class simplifies the usage of the global DNS-SD resolver to discover Matter nodes by managing
+ * the lifetime of the discovery context object.
+ *
+ * The proxy provides a method to register an external commissioning delegate whose
+ * `OnNodeDiscovered` method is called whenever a new node is discovered. The delegate is
+ * automatically unregistered when the proxy is shut down or destroyed.
+ *
+ * The proxy can be safely shut down or destroyed even if the last discovery operation has not
+ * finished yet.
+ */
 class ResolverProxy
 {
 public:
     explicit ResolverProxy(Resolver * resolver = nullptr) : mResolver(resolver != nullptr ? *resolver : Resolver::Instance()) {}
-    ~ResolverProxy();
+    ~ResolverProxy() { Shutdown(); }
 
     CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPoint = nullptr);
     void Shutdown();
