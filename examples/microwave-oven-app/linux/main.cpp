@@ -15,18 +15,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "microwave-oven-delegates-impl.h"
+#include "microwave-oven-device.h"
 #include <AppMain.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-void ApplicationInit() {}
+#define MICROWAVE_OVEN_ENDPOINT 1
+
+MicrowaveOvenDevice * gMicrowaveOvenDevice = nullptr;
+
+void ApplicationInit() 
+{
+    gMicrowaveOvenDevice = new MicrowaveOvenDevice(MICROWAVE_OVEN_ENDPOINT);
+    gMicrowaveOvenDevice->Init(MICROWAVE_OVEN_ENDPOINT);
+}
 
 void ApplicationShutdown()
 {
-    MicrowaveOvenControl::Shutdown();
+    delete gMicrowaveOvenDevice;
+    gMicrowaveOvenDevice = nullptr;
 }
 
 int main(int argc, char * argv[])
