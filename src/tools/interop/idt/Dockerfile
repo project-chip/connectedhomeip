@@ -21,6 +21,12 @@ RUN apt-get update && \
     adb \
     aircrack-ng \
     apt-utils \
+    bison \
+    byacc \
+    dnsutils \
+    flex \
+    gcc-aarch64-linux-gnu \
+    gcc-arm-linux-gnueabi \
     git \
     glib-2.0 \
     kmod \

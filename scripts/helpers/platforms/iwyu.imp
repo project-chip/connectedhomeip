@@ -11,6 +11,16 @@
     { symbol: [ 'declval', private, '<utility>', public ] },
     { symbol: [ 'tm', private, '<sys/time.h>', public ] },
 
+    ## GLib/GIO
+    { include: [ '"gio/gdbusinterface.h"', private, '<gio/gio.h>', public ] },
+    { include: [ '"gio/gdbusinterfaceskeleton.h"', private, '<gio/gio.h>', public ] },
+    { include: [ '"gio/gdbusobject.h"', private, '<gio/gio.h>', public ] },
+    { include: [ '"gio/gdbusobjectmanager.h"', private, '<gio/gio.h>', public ] },
+    { include: [ '"gio/gdbusobjectmanagerclient.h"', private, '<gio/gio.h>', public ] },
+    { include: [ '"gio/gdbusobjectmanagerserver.h"', private, '<gio/gio.h>', public ] },
+    { include: [ '"gio/gdbusobjectskeleton.h"', private, '<gio/gio.h>', public ] },
+    { include: [ '"gobject/gclosure.h"', private, '<glib-object.h>', public ] },
+
     ## ble/*
     { include: [ '"ble/CHIPBleServiceData.h"', private, '<ble/CHIPBleServiceData.h>', public ] },
     { include: [ '@"ble/Ble.*.h"', private, '<ble/Ble.h>', public ] },

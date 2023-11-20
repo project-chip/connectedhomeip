@@ -22,7 +22,6 @@
  *          for nxp platform.
  */
 
-#include <app-common/zap-generated/enums.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "DiagnosticDataProviderImpl.h"

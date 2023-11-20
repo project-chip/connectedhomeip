@@ -39,6 +39,7 @@ struct AppEvent
         kEventType_Install,
         kEventType_Contact,
         kEventType_Start,
+        kEventType_Lock
     };
 
     uint16_t Type;

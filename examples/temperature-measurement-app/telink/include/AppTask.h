@@ -28,8 +28,8 @@ private:
 
     CHIP_ERROR Init(void);
 
-    static void TemperatureMeasurementTimerTimeoutCallback(k_timer * timer);
-    static void TemperatureMeasurementTimerEventHandler(AppEvent * aEvent);
+    static void TemperatureMeasurementUpdateTimerTimeoutCallback(k_timer * timer);
+    static void TemperatureMeasurementUpdateTimerEventHandler(AppEvent * aEvent);
 
     static AppTask sAppTask;
 };

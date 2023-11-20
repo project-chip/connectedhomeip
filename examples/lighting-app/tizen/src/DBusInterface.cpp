@@ -94,8 +94,8 @@ void DBusInterface::SetCurrentLevel(uint8_t value)
 void DBusInterface::SetColorMode(chip::app::Clusters::ColorControl::ColorMode colorMode)
 {
     InternalSetGuard guard(this);
-    if (light_app_color_control_get_color_mode(mIfaceColorControl) != colorMode)
-        light_app_color_control_set_color_mode(mIfaceColorControl, colorMode);
+    if (light_app_color_control_get_color_mode(mIfaceColorControl) != chip::to_underlying(colorMode))
+        light_app_color_control_set_color_mode(mIfaceColorControl, chip::to_underlying(colorMode));
 }
 
 void DBusInterface::SetColorTemperature(uint16_t value)
@@ -173,8 +173,8 @@ gboolean DBusInterface::OnCurrentLevelChanged(LightAppLevelControl * levelContro
 
     Clusters::LevelControl::Commands::MoveToLevel::DecodableType data;
     data.level = light_app_level_control_get_current_level(levelControl);
-    data.optionsMask.Set(Clusters::LevelControl::LevelControlOptions::kExecuteIfOff);
-    data.optionsOverride.Set(Clusters::LevelControl::LevelControlOptions::kExecuteIfOff);
+    data.optionsMask.Set(Clusters::LevelControl::OptionsBitmap::kExecuteIfOff);
+    data.optionsOverride.Set(Clusters::LevelControl::OptionsBitmap::kExecuteIfOff);
 
     chip::DeviceLayer::StackLock lock;
     LevelControlServer::MoveToLevel(self->mEndpointId, data);

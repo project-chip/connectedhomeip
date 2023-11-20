@@ -18,7 +18,6 @@
 #include <access/AccessControl.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/enums.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
