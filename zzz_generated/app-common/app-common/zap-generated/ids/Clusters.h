@@ -151,6 +151,9 @@ static constexpr ClusterId Id = 0x00000046;
 namespace Timer {
 static constexpr ClusterId Id = 0x00000047;
 } // namespace Timer
+namespace OvenCavityOperationalState {
+static constexpr ClusterId Id = 0x00000048;
+} // namespace OvenCavityOperationalState
 namespace OvenMode {
 static constexpr ClusterId Id = 0x00000049;
 } // namespace OvenMode
