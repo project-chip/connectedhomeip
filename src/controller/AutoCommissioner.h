@@ -74,6 +74,9 @@ private:
     EndpointId GetEndpoint(const CommissioningStage & stage) const;
     CommissioningStage GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr);
 
+    // The application may set this when Commissioner requires one, but it should be valid if the application provides one.
+    CHIP_ERROR VerifyICDRegistraionInfo(const CommissioningParameters & params);
+
     // Helper function to determine whether next stage should be kWiFiNetworkSetup,
     // kThreadNetworkSetup or kCleanup, depending whether network information has
     // been provided that matches the thread/wifi endpoint of the target.

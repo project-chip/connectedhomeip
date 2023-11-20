@@ -116,6 +116,20 @@ public:
     virtual void OnScanNetworksFailure(CHIP_ERROR error) {}
 
     /**
+     * @brief
+     *  Called when the ICD symmetric key is required.
+     *
+     * The DeviceCommissioner will be waiting in the kICDGetRegistraionInfo step and not advancing the commissioning process.
+     *
+     * The implementation should set the ICD registraion info on the CommissioningParameters of the CommissioningDelegate
+     * using CommissioningDelegate.SetCommissioningParameters(), and then call DeviceCommissioner.ICDRegistraionInfoReady()
+     * in order to resume the commissioning process.
+     *
+     * The implementation may set the credentials before start commissioning, and call ICDRegistraionInfoReady() directly.
+     */
+    virtual void OnICDRegistraionInfoRequired() {}
+
+    /**
      * @bried
      *   Called when the registration flow for the ICD completes.
      *

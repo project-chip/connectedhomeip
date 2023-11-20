@@ -135,6 +135,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
     if (!mSkipICDRegistration.ValueOr(false))
     {
         params.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+
         if (!mICDSymmetricKey.HasValue())
         {
             chip::Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
@@ -148,7 +149,6 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         {
             mICDMonitoredSubject.SetValue(mICDCheckInNodeId.Value());
         }
-
         // These Optional-s must have values now.
         // The commissioner will verify these values.
         params.SetICDSymmetricKey(mICDSymmetricKey.Value());
@@ -389,6 +389,12 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     }
 
     SetCommandExitStatus(err);
+}
+
+void PairingCommand::OnICDRegistraionInfoRequired()
+{
+    // As we have set the ICD Registraion info before, we can call ICDRegistraionInfoReady() directly.
+    CurrentCommissioner().ICDRegistraionInfoReady();
 }
 
 void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounter)

@@ -65,6 +65,28 @@ static bool IsUnsafeSpan(const Optional<SpanType> & maybeUnsafeSpan, const Optio
     return maybeUnsafeSpan.Value().data() != knownSafeSpan.Value().data();
 }
 
+CHIP_ERROR AutoCommissioner::VerifyICDRegistraionInfo(const CommissioningParameters & params)
+{
+    ChipLogProgress(Controller, "Checking ICD registration parameters");
+    if (!params.GetICDSymmetricKey().HasValue())
+    {
+        ChipLogError(Controller, "Unexpected ICD symmetric key!");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    VerifyOrReturnError(params.GetICDSymmetricKey().Value().size() == sizeof(mICDSymmetricKey), CHIP_ERROR_INVALID_ARGUMENT);
+    if (!params.GetICDCheckInNodeId().HasValue())
+    {
+        ChipLogError(Controller, "Missing ICD check-in node id!");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (!params.GetICDMonitoredSubject().HasValue())
+    {
+        ChipLogError(Controller, "Missing ICD monitored subject!");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
 {
     // Make sure any members that point to buffers that we are not pointing to
@@ -208,29 +230,13 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         mParams.SetTimeZone(list);
     }
 
-    if (params.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
+    if (params.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore && params.GetICDSymmetricKey().HasValue())
     {
-        ChipLogProgress(Controller, "Checking ICD registration parameters");
-        if (!params.GetICDSymmetricKey().HasValue())
-        {
-            ChipLogError(Controller, "Missing ICD symmetric key!");
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        VerifyOrReturnError(params.GetICDSymmetricKey().Value().size() == sizeof(mICDSymmetricKey), CHIP_ERROR_INVALID_ARGUMENT);
+        // The application may set this when Commissioner requires one, but it should be valid if the application provides one.
+        ReturnErrorOnFailure(VerifyICDRegistraionInfo(params));
+
+        // The values are valid now.
         memcpy(mICDSymmetricKey, params.GetICDSymmetricKey().Value().data(), params.GetICDSymmetricKey().Value().size());
-
-        if (!params.GetICDCheckInNodeId().HasValue())
-        {
-            ChipLogError(Controller, "Missing ICD check-in node id!");
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        if (!params.GetICDMonitoredSubject().HasValue())
-        {
-            ChipLogError(Controller, "Missing ICD monitored subject!");
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-
-        // The above values are valid now.
         mParams.SetICDSymmetricKey(ByteSpan(mICDSymmetricKey, sizeof(mICDSymmetricKey)));
         mParams.SetICDCheckInNodeId(params.GetICDCheckInNodeId().Value());
         mParams.SetICDMonitoredSubject(params.GetICDMonitoredSubject().Value());
@@ -285,7 +291,7 @@ CommissioningStage AutoCommissioner::GetNextStateAfterNetworkCommissioning()
 {
     if (mNeedIcdRegistraion)
     {
-        return CommissioningStage::kICDRegistration;
+        return CommissioningStage::kNeedICDRegistraionInfo;
     }
     return CommissioningStage::kFindOperational;
 }
@@ -458,6 +464,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             return CommissioningStage::kCleanup;
         }
         return GetNextStateAfterNetworkCommissioning();
+    case CommissioningStage::kNeedICDRegistraionInfo:
+        return CommissioningStage::kICDRegistration;
     case CommissioningStage::kICDRegistration:
         return CommissioningStage::kFindOperational;
     case CommissioningStage::kFindOperational:

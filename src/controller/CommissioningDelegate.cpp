@@ -133,6 +133,10 @@ const char * StageToString(CommissioningStage stage)
         return "ThreadNetworkEnable";
         break;
 
+    case kNeedICDRegistraionInfo:
+        return "NeedICDRegistrationInfo";
+        break;
+
     case kICDRegistration: ///< Register for ICD management
         return "ICDRegistration";
         break;

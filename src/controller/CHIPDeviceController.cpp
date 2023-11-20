@@ -2344,6 +2344,16 @@ CHIP_ERROR DeviceCommissioner::NetworkCredentialsReady()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceCommissioner::ICDRegistraionInfoReady()
+{
+    ReturnErrorCodeIf(mCommissioningStage != CommissioningStage::kNeedICDRegistraionInfo, CHIP_ERROR_INCORRECT_STATE);
+
+    // need to advance to next step
+    CommissioningStageComplete(CHIP_NO_ERROR);
+
+    return CHIP_NO_ERROR;
+}
+
 void DeviceCommissioner::OnNetworkConfigResponse(void * context,
                                                  const NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
 {
@@ -2967,6 +2977,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(err);
             return;
         }
+    }
+    break;
+    case CommissioningStage::kNeedICDRegistraionInfo: {
+        GetPairingDelegate()->OnICDRegistraionInfoRequired();
+        return;
     }
     break;
     case CommissioningStage::kICDRegistration: {
