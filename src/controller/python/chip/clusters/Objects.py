@@ -14959,13 +14959,29 @@ class IcdManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000046
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[str] = 'StayActiveResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                     ])
+
+        @dataclass
+        class StayActiveResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000046
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="promisedActiveDuration", Tag=0, Type=uint),
+                    ])
+
+            promisedActiveDuration: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -21757,15 +21773,14 @@ class DemandResponseLoadControl(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="deviceClass", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="loadControlPrograms", Tag=0x00000001, Type=typing.List[DemandResponseLoadControl.Structs.LoadControlProgramStruct]),
-                ClusterObjectFieldDescriptor(Label="numberOfLoadControlPrograms", Tag=0x00000002, Type=uint),
-                ClusterObjectFieldDescriptor(Label="events", Tag=0x00000003, Type=typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]),
-                ClusterObjectFieldDescriptor(Label="activeEvents", Tag=0x00000004, Type=typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]),
-                ClusterObjectFieldDescriptor(Label="numberOfEventsPerProgram", Tag=0x00000005, Type=uint),
-                ClusterObjectFieldDescriptor(Label="numberOfTransistions", Tag=0x00000006, Type=uint),
-                ClusterObjectFieldDescriptor(Label="defaultRandomStart", Tag=0x00000007, Type=uint),
-                ClusterObjectFieldDescriptor(Label="defaultRandomDuration", Tag=0x00000008, Type=uint),
+                ClusterObjectFieldDescriptor(Label="loadControlPrograms", Tag=0x00000000, Type=typing.List[DemandResponseLoadControl.Structs.LoadControlProgramStruct]),
+                ClusterObjectFieldDescriptor(Label="numberOfLoadControlPrograms", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="events", Tag=0x00000002, Type=typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]),
+                ClusterObjectFieldDescriptor(Label="activeEvents", Tag=0x00000003, Type=typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]),
+                ClusterObjectFieldDescriptor(Label="numberOfEventsPerProgram", Tag=0x00000004, Type=uint),
+                ClusterObjectFieldDescriptor(Label="numberOfTransitions", Tag=0x00000005, Type=uint),
+                ClusterObjectFieldDescriptor(Label="defaultRandomStart", Tag=0x00000006, Type=uint),
+                ClusterObjectFieldDescriptor(Label="defaultRandomDuration", Tag=0x00000007, Type=uint),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -21774,13 +21789,12 @@ class DemandResponseLoadControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    deviceClass: 'uint' = None
     loadControlPrograms: 'typing.List[DemandResponseLoadControl.Structs.LoadControlProgramStruct]' = None
     numberOfLoadControlPrograms: 'uint' = None
     events: 'typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]' = None
     activeEvents: 'typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]' = None
     numberOfEventsPerProgram: 'uint' = None
-    numberOfTransistions: 'uint' = None
+    numberOfTransitions: 'uint' = None
     defaultRandomStart: 'uint' = None
     defaultRandomDuration: 'uint' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -21847,16 +21861,6 @@ class DemandResponseLoadControl(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 13,
 
-        class PowerSavingsEnum(MatterIntEnum):
-            kLow = 0x00
-            kMedium = 0x01
-            kHigh = 0x02
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 3,
-
     class Bitmaps:
         class CancelControlBitmap(IntFlag):
             kRandomEnd = 0x1
@@ -21914,10 +21918,10 @@ class DemandResponseLoadControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="powerSavings", Tag=0, Type=DemandResponseLoadControl.Enums.PowerSavingsEnum),
+                        ClusterObjectFieldDescriptor(Label="powerSavings", Tag=0, Type=uint),
                     ])
 
-            powerSavings: 'DemandResponseLoadControl.Enums.PowerSavingsEnum' = 0
+            powerSavings: 'uint' = 0
 
         @dataclass
         class DutyCycleControlStruct(ClusterObject):
@@ -22107,22 +22111,6 @@ class DemandResponseLoadControl(Cluster):
 
     class Attributes:
         @dataclass
-        class DeviceClass(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000096
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000000
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-            value: 'uint' = 0
-
-        @dataclass
         class LoadControlPrograms(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -22130,7 +22118,7 @@ class DemandResponseLoadControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000001
+                return 0x00000000
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -22146,7 +22134,7 @@ class DemandResponseLoadControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000002
+                return 0x00000001
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -22162,7 +22150,7 @@ class DemandResponseLoadControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000003
+                return 0x00000002
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -22178,7 +22166,7 @@ class DemandResponseLoadControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000004
+                return 0x00000003
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -22194,7 +22182,7 @@ class DemandResponseLoadControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000005
+                return 0x00000004
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -22203,14 +22191,14 @@ class DemandResponseLoadControl(Cluster):
             value: 'uint' = 0
 
         @dataclass
-        class NumberOfTransistions(ClusterAttributeDescriptor):
+        class NumberOfTransitions(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000096
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000006
+                return 0x00000005
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -22226,7 +22214,7 @@ class DemandResponseLoadControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000007
+                return 0x00000006
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -22242,7 +22230,7 @@ class DemandResponseLoadControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000008
+                return 0x00000007
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -36628,7 +36616,7 @@ class KeypadInput(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class CecKeyCode(MatterIntEnum):
+        class CECKeyCodeEnum(MatterIntEnum):
             kSelect = 0x00
             kUp = 0x01
             kDown = 0x02
@@ -36749,10 +36737,10 @@ class KeypadInput(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="keyCode", Tag=0, Type=KeypadInput.Enums.CecKeyCode),
+                        ClusterObjectFieldDescriptor(Label="keyCode", Tag=0, Type=KeypadInput.Enums.CECKeyCodeEnum),
                     ])
 
-            keyCode: 'KeypadInput.Enums.CecKeyCode' = 0
+            keyCode: 'KeypadInput.Enums.CECKeyCodeEnum' = 0
 
         @dataclass
         class SendKeyResponse(ClusterCommand):

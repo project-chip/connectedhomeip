@@ -7438,17 +7438,6 @@ static id _Nullable DecodeAttributeValueForDemandResponseLoadControlCluster(Attr
 {
     using namespace Clusters::DemandResponseLoadControl;
     switch (aAttributeId) {
-    case Attributes::DeviceClass::Id: {
-        using TypeInfo = Attributes::DeviceClass::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
-        return value;
-    }
     case Attributes::LoadControlPrograms::Id: {
         using TypeInfo = Attributes::LoadControlPrograms::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -7606,7 +7595,7 @@ static id _Nullable DecodeAttributeValueForDemandResponseLoadControlCluster(Attr
                         }
                         if (entry_2.powerSavingsControl.HasValue()) {
                             newElement_2.powerSavingsControl = [MTRDemandResponseLoadControlClusterPowerSavingsControlStruct new];
-                            newElement_2.powerSavingsControl.powerSavings = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.powerSavingsControl.Value().powerSavings)];
+                            newElement_2.powerSavingsControl.powerSavings = [NSNumber numberWithUnsignedChar:entry_2.powerSavingsControl.Value().powerSavings];
                         } else {
                             newElement_2.powerSavingsControl = nil;
                         }
@@ -7734,7 +7723,7 @@ static id _Nullable DecodeAttributeValueForDemandResponseLoadControlCluster(Attr
                         }
                         if (entry_2.powerSavingsControl.HasValue()) {
                             newElement_2.powerSavingsControl = [MTRDemandResponseLoadControlClusterPowerSavingsControlStruct new];
-                            newElement_2.powerSavingsControl.powerSavings = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.powerSavingsControl.Value().powerSavings)];
+                            newElement_2.powerSavingsControl.powerSavings = [NSNumber numberWithUnsignedChar:entry_2.powerSavingsControl.Value().powerSavings];
                         } else {
                             newElement_2.powerSavingsControl = nil;
                         }
@@ -7775,8 +7764,8 @@ static id _Nullable DecodeAttributeValueForDemandResponseLoadControlCluster(Attr
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
-    case Attributes::NumberOfTransistions::Id: {
-        using TypeInfo = Attributes::NumberOfTransistions::TypeInfo;
+    case Attributes::NumberOfTransitions::Id: {
+        using TypeInfo = Attributes::NumberOfTransitions::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

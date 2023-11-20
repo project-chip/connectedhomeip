@@ -10679,6 +10679,40 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace StayActiveRequest.
+namespace StayActiveResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kPromisedActiveDuration), promisedActiveDuration);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kPromisedActiveDuration))
+        {
+            err = DataModel::Decode(reader, promisedActiveDuration);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace StayActiveResponse.
 } // namespace Commands
 
 namespace Attributes {
@@ -14287,8 +14321,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::DeviceClass::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, deviceClass);
     case Attributes::LoadControlPrograms::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, loadControlPrograms);
     case Attributes::NumberOfLoadControlPrograms::TypeInfo::GetAttributeId():
@@ -14299,8 +14331,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, activeEvents);
     case Attributes::NumberOfEventsPerProgram::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, numberOfEventsPerProgram);
-    case Attributes::NumberOfTransistions::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfTransistions);
+    case Attributes::NumberOfTransitions::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, numberOfTransitions);
     case Attributes::DefaultRandomStart::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, defaultRandomStart);
     case Attributes::DefaultRandomDuration::TypeInfo::GetAttributeId():

@@ -1572,19 +1572,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadContr
         return static_cast<EnumType>(13);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::PowerSavingsEnum val)
-{
-    using EnumType = DemandResponseLoadControl::PowerSavingsEnum;
-    switch (val)
-    {
-    case EnumType::kLow:
-    case EnumType::kMedium:
-    case EnumType::kHigh:
-        return val;
-    default:
-        return static_cast<EnumType>(3);
-    }
-}
 
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
@@ -2867,9 +2854,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(MediaInput::InputTypeEn
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CecKeyCode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CECKeyCodeEnum val)
 {
-    using EnumType = KeypadInput::CecKeyCode;
+    using EnumType = KeypadInput::CECKeyCodeEnum;
     switch (val)
     {
     case EnumType::kSelect:

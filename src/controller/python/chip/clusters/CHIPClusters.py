@@ -6278,57 +6278,51 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "DeviceClass",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
                 "attributeName": "LoadControlPrograms",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000002: {
+            0x00000001: {
                 "attributeName": "NumberOfLoadControlPrograms",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000002: {
                 "attributeName": "Events",
+                "attributeId": 0x00000002,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "ActiveEvents",
                 "attributeId": 0x00000003,
                 "type": "",
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "ActiveEvents",
+                "attributeName": "NumberOfEventsPerProgram",
                 "attributeId": 0x00000004,
-                "type": "",
+                "type": "int",
                 "reportable": True,
             },
             0x00000005: {
-                "attributeName": "NumberOfEventsPerProgram",
+                "attributeName": "NumberOfTransitions",
                 "attributeId": 0x00000005,
                 "type": "int",
                 "reportable": True,
             },
             0x00000006: {
-                "attributeName": "NumberOfTransistions",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
                 "attributeName": "DefaultRandomStart",
-                "attributeId": 0x00000007,
+                "attributeId": 0x00000006,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000008: {
+            0x00000007: {
                 "attributeName": "DefaultRandomDuration",
-                "attributeId": 0x00000008,
+                "attributeId": 0x00000007,
                 "type": "int",
                 "reportable": True,
                 "writable": True,

@@ -59,7 +59,7 @@ constexpr uint8_t kExecuteIfOff = 1;
 } // namespace app
 } // namespace chip
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 class DefaultColorControlSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
@@ -380,7 +380,7 @@ private:
     }
 };
 static DefaultColorControlSceneHandler sColorControlSceneHandler;
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
 /**********************************************************
  * Matter timer scheduling glue logic
@@ -434,11 +434,11 @@ ColorControlServer & ColorControlServer::Instance()
 chip::scenes::SceneHandler * ColorControlServer::GetSceneHandler()
 {
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     return &sColorControlSceneHandler;
 #else
     return nullptr;
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 }
 
 bool ColorControlServer::HasFeature(chip::EndpointId endpoint, Feature feature)
@@ -3084,11 +3084,11 @@ void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     ColorControlServer::Instance().startUpColorTempCommand(endpoint);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-#ifdef EMBER_AF_PLUGIN_SCENES
+#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     // Registers Scene handlers for the color control cluster on the server
     app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(endpoint,
                                                                          ColorControlServer::Instance().GetSceneHandler());
-#endif
+#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 }
 
 void MatterColorControlClusterServerShutdownCallback(EndpointId endpoint)

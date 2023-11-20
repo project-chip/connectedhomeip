@@ -14124,6 +14124,11 @@ struct Type;
 struct DecodableType;
 } // namespace StayActiveRequest
 
+namespace StayActiveResponse {
+struct Type;
+struct DecodableType;
+} // namespace StayActiveResponse
+
 } // namespace Commands
 
 namespace Commands {
@@ -14249,7 +14254,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -14263,6 +14268,38 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StayActiveRequest
+namespace StayActiveResponse {
+enum class Fields : uint8_t
+{
+    kPromisedActiveDuration = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::StayActiveResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+
+    uint32_t promisedActiveDuration = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::StayActiveResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+
+    uint32_t promisedActiveDuration = static_cast<uint32_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StayActiveResponse
 } // namespace Commands
 
 namespace Attributes {
@@ -19711,7 +19748,7 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    PowerSavingsEnum powerSavings = static_cast<PowerSavingsEnum>(0);
+    chip::Percent powerSavings = static_cast<chip::Percent>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -20098,18 +20135,6 @@ public:
 
 namespace Attributes {
 
-namespace DeviceClass {
-struct TypeInfo
-{
-    using Type             = chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap>;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::DemandResponseLoadControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DeviceClass::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DeviceClass
 namespace LoadControlPrograms {
 struct TypeInfo
 {
@@ -20179,7 +20204,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumberOfEventsPerProgram
-namespace NumberOfTransistions {
+namespace NumberOfTransitions {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -20187,10 +20212,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DemandResponseLoadControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfTransistions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfTransitions::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace NumberOfTransistions
+} // namespace NumberOfTransitions
 namespace DefaultRandomStart {
 struct TypeInfo
 {
@@ -20260,14 +20285,12 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::DeviceClass::TypeInfo::DecodableType deviceClass =
-            static_cast<chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap>>(0);
         Attributes::LoadControlPrograms::TypeInfo::DecodableType loadControlPrograms;
         Attributes::NumberOfLoadControlPrograms::TypeInfo::DecodableType numberOfLoadControlPrograms = static_cast<uint8_t>(0);
         Attributes::Events::TypeInfo::DecodableType events;
         Attributes::ActiveEvents::TypeInfo::DecodableType activeEvents;
         Attributes::NumberOfEventsPerProgram::TypeInfo::DecodableType numberOfEventsPerProgram = static_cast<uint8_t>(0);
-        Attributes::NumberOfTransistions::TypeInfo::DecodableType numberOfTransistions         = static_cast<uint8_t>(0);
+        Attributes::NumberOfTransitions::TypeInfo::DecodableType numberOfTransitions           = static_cast<uint8_t>(0);
         Attributes::DefaultRandomStart::TypeInfo::DecodableType defaultRandomStart             = static_cast<uint8_t>(0);
         Attributes::DefaultRandomDuration::TypeInfo::DecodableType defaultRandomDuration       = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
@@ -31678,7 +31701,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKey::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    CecKeyCode keyCode = static_cast<CecKeyCode>(0);
+    CECKeyCodeEnum keyCode = static_cast<CECKeyCodeEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -31693,7 +31716,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKey::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    CecKeyCode keyCode = static_cast<CecKeyCode>(0);
+    CECKeyCodeEnum keyCode = static_cast<CECKeyCodeEnum>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SendKey
