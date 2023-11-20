@@ -158,7 +158,10 @@ class DemandResponseLoadControlCluster(private val controller: MatterController,
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNumberOfTransitionsAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeNumberOfTransitionsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 

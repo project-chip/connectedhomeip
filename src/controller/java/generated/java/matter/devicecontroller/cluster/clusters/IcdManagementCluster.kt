@@ -25,7 +25,9 @@ class IcdManagementCluster(private val controller: MatterController, private val
     val ICDCounter: UInt
   )
 
-  class StayActiveResponse(val promisedActiveDuration: UInt)
+  class StayActiveResponse(
+    val promisedActiveDuration: UInt
+  )
 
   class RegisteredClientsAttribute(
     val value: List<IcdManagementClusterMonitoringRegistrationStruct>?
