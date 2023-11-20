@@ -40,7 +40,7 @@ public:
 
     void OnTransitionToIdle() override;
 
-    bool IsReportScheduled();
+    bool IsReportScheduled(ReadHandler * ReadHandler) override;
 
     void TimerFired() override;
 

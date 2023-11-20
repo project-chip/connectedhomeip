@@ -96,6 +96,7 @@ public:
                      IsEngineRunScheduled()));
         }
 
+        bool IsChunkedReport() const { return mReadHandler->IsChunkedReport(); }
         bool IsEngineRunScheduled() const { return mFlags.Has(ReadHandlerNodeFlags::EngineRunScheduled); }
         void SetEngineRunScheduled(bool aEngineRunScheduled)
         {

@@ -517,7 +517,7 @@ public:
         NL_TEST_ASSERT(aSuite, syncScheduler.GetNumReadHandlers() == 2);
 
         // Confirm that a report emission is scheduled
-        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportScheduled());
+        NL_TEST_ASSERT(aSuite, syncScheduler.IsReportScheduled(readHandler1));
 
         // Validates that the lowest max is selected as the common max timestamp
         NL_TEST_ASSERT(aSuite, syncScheduler.mNextMaxTimestamp == node1->GetMaxTimestamp());
