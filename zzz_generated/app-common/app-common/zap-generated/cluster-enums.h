@@ -1552,6 +1552,23 @@ enum class Feature : uint32_t
 };
 } // namespace OvenMode
 
+namespace LaundryDryerControls {
+
+// Enum for DrynessLevelEnum
+enum class DrynessLevelEnum : uint8_t
+{
+    kLow    = 0x00,
+    kNormal = 0x01,
+    kExtra  = 0x02,
+    kMax    = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+} // namespace LaundryDryerControls
+
 namespace ModeSelect {
 
 // Bitmap for Feature
@@ -2205,19 +2222,6 @@ enum class LoadControlEventStatusEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 13,
-};
-
-// Enum for PowerSavingsEnum
-enum class PowerSavingsEnum : uint8_t
-{
-    kLow    = 0x00,
-    kMedium = 0x01,
-    kHigh   = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
 };
 
 // Bitmap for CancelControlBitmap
@@ -3095,6 +3099,18 @@ enum class PresetTypeFeaturesBitmap : uint8_t
 {
     kAutomatic     = 0x1,
     kSupportsNames = 0x2,
+};
+
+// Bitmap for RelayStateBitmap
+enum class RelayStateBitmap : uint16_t
+{
+    kHeat       = 0x1,
+    kCool       = 0x2,
+    kFan        = 0x4,
+    kHeatStage2 = 0x8,
+    kCoolStage2 = 0x10,
+    kFanStage2  = 0x20,
+    kFanStage3  = 0x40,
 };
 
 // Bitmap for ScheduleTypeFeaturesBitmap
@@ -4181,8 +4197,8 @@ namespace LowPower {} // namespace LowPower
 
 namespace KeypadInput {
 
-// Enum for CecKeyCode
-enum class CecKeyCode : uint8_t
+// Enum for CECKeyCodeEnum
+enum class CECKeyCodeEnum : uint8_t
 {
     kSelect                    = 0x00,
     kUp                        = 0x01,

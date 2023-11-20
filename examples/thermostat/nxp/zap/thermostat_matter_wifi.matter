@@ -1711,6 +1711,16 @@ server cluster Thermostat = 513 {
     kSupportsNames = 0x2;
   }
 
+  bitmap RelayStateBitmap : bitmap16 {
+    kHeat = 0x1;
+    kCool = 0x2;
+    kFan = 0x4;
+    kHeatStage2 = 0x8;
+    kCoolStage2 = 0x10;
+    kFanStage2 = 0x20;
+    kFanStage3 = 0x40;
+  }
+
   bitmap ScheduleTypeFeaturesBitmap : bitmap8 {
     kSupportsPresets = 0x1;
     kSupportsSetpoints = 0x2;

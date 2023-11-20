@@ -333,6 +333,7 @@ public:
     static void TestReadClientGenerateOneEventPaths(nlTestSuite * apSuite, void * apContext);
     static void TestReadClientGenerateTwoEventPaths(nlTestSuite * apSuite, void * apContext);
     static void TestReadClientInvalidReport(nlTestSuite * apSuite, void * apContext);
+    static void TestReadClientInvalidAttributeId(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext);
     static void TestProcessSubscribeRequest(nlTestSuite * apSuite, void * apContext);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -390,12 +391,19 @@ public:
     static void TestReadHandlerMalformedSubscribeRequest(nlTestSuite * apSuite, void * apContext);
 
 private:
+    enum class ReportType : uint8_t
+    {
+        kValid,
+        kInvalidNoAttributeId,
+        kInvalidOutOfRangeAttributeId,
+    };
+
     static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
-                                   bool aNeedInvalidReport, bool aSuppressResponse, bool aHasSubscriptionId);
+                                   ReportType aReportType, bool aSuppressResponse, bool aHasSubscriptionId);
 };
 
 void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
-                                             bool aNeedInvalidReport, bool aSuppressResponse, bool aHasSubscriptionId = false)
+                                             ReportType aReportType, bool aSuppressResponse, bool aHasSubscriptionId = false)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
@@ -428,12 +436,17 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
     AttributePathIB::Builder & attributePathBuilder = attributeDataIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributeDataIBBuilder.GetError() == CHIP_NO_ERROR);
 
-    if (aNeedInvalidReport)
+    if (aReportType == ReportType::kInvalidNoAttributeId)
     {
         attributePathBuilder.Node(1).Endpoint(2).Cluster(3).ListIndex(5).EndOfAttributePathIB();
     }
+    else if (aReportType == ReportType::kInvalidOutOfRangeAttributeId)
+    {
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(0xFFF18000).EndOfAttributePathIB();
+    }
     else
     {
+        NL_TEST_ASSERT(apSuite, aReportType == ReportType::kValid);
         attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).EndOfAttributePathIB();
     }
 
@@ -496,7 +509,7 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     ctx.GetLoopback().mNumMessagesToDrop = 1;
     ctx.DrainAndServiceIO();
 
-    GenerateReportData(apSuite, apContext, buf, false /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
+    GenerateReportData(apSuite, apContext, buf, ReportType::kValid, true /* aSuppressResponse*/);
     err = readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
@@ -521,8 +534,7 @@ void TestReadInteraction::TestReadUnexpectedSubscriptionId(nlTestSuite * apSuite
     ctx.DrainAndServiceIO();
 
     // For read, we don't expect there is subscription id in report data.
-    GenerateReportData(apSuite, apContext, buf, false /*aNeedInvalidReport*/, true /* aSuppressResponse*/,
-                       true /*aHasSubscriptionId*/);
+    GenerateReportData(apSuite, apContext, buf, ReportType::kValid, true /* aSuppressResponse*/, true /*aHasSubscriptionId*/);
     err = readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 }
@@ -547,7 +559,7 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
         ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
                                 app::reporting::GetDefaultReportScheduler());
 
-        GenerateReportData(apSuite, apContext, reportDatabuf, false /*aNeedInvalidReport*/, false /* aSuppressResponse*/);
+        GenerateReportData(apSuite, apContext, reportDatabuf, ReportType::kValid, false /* aSuppressResponse*/);
         err = readHandler.SendReportData(std::move(reportDatabuf), false);
         NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
@@ -665,10 +677,44 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     ctx.GetLoopback().mNumMessagesToDrop = 1;
     ctx.DrainAndServiceIO();
 
-    GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
+    GenerateReportData(apSuite, apContext, buf, ReportType::kInvalidNoAttributeId, true /* aSuppressResponse*/);
 
     err = readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
+}
+
+void TestReadInteraction::TestReadClientInvalidAttributeId(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    MockInteractionModelApp delegate;
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Read);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    err = readClient.SendRequest(readPrepareParams);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    // We don't actually want to deliver that message, because we want to
+    // synthesize the read response.  But we don't want it hanging around
+    // forever either.
+    ctx.GetLoopback().mNumMessagesToDrop = 1;
+    ctx.DrainAndServiceIO();
+
+    GenerateReportData(apSuite, apContext, buf, ReportType::kInvalidOutOfRangeAttributeId, true /* aSuppressResponse*/);
+
+    err = readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction);
+    // Overall processing should succeed.
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    // We should not have gotten any attribute reports or errors.
+    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+    NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
+    NL_TEST_ASSERT(apSuite, !delegate.mGotReport);
+    NL_TEST_ASSERT(apSuite, !delegate.mReadError);
 }
 
 void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext)
@@ -691,7 +737,7 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
         ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
                                 app::reporting::GetDefaultReportScheduler());
 
-        GenerateReportData(apSuite, apContext, reportDatabuf, false /*aNeedInvalidReport*/, false /* aSuppressResponse*/);
+        GenerateReportData(apSuite, apContext, reportDatabuf, ReportType::kValid, false /* aSuppressResponse*/);
         err = readHandler.SendReportData(std::move(reportDatabuf), false);
         NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
@@ -4941,6 +4987,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadClientGenerateOneEventPaths", chip::app::TestReadInteraction::TestReadClientGenerateOneEventPaths),
     NL_TEST_DEF("TestReadClientGenerateTwoEventPaths", chip::app::TestReadInteraction::TestReadClientGenerateTwoEventPaths),
     NL_TEST_DEF("TestReadClientInvalidReport", chip::app::TestReadInteraction::TestReadClientInvalidReport),
+    NL_TEST_DEF("TestReadClientInvalidAttributeId", chip::app::TestReadInteraction::TestReadClientInvalidAttributeId),
     NL_TEST_DEF("TestReadHandlerInvalidAttributePath", chip::app::TestReadInteraction::TestReadHandlerInvalidAttributePath),
     NL_TEST_DEF("TestProcessSubscribeRequest", chip::app::TestReadInteraction::TestProcessSubscribeRequest),
     /*

@@ -6236,6 +6236,98 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readLaundryDryerControlsInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readLaundryDryerControlsSupportedDrynessLevelsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readLaundryDryerControlsSupportedDrynessLevelsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.LaundryDryerControlsCluster) cluster).readSupportedDrynessLevelsAttribute(
+              (ChipClusters.LaundryDryerControlsCluster.SupportedDrynessLevelsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLaundryDryerControlsClusterSupportedDrynessLevelsAttributeCallback(),
+          readLaundryDryerControlsSupportedDrynessLevelsCommandParams
+        );
+        result.put("readSupportedDrynessLevelsAttribute", readLaundryDryerControlsSupportedDrynessLevelsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readLaundryDryerControlsSelectedDrynessLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readLaundryDryerControlsSelectedDrynessLevelAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.LaundryDryerControlsCluster) cluster).readSelectedDrynessLevelAttribute(
+              (ChipClusters.LaundryDryerControlsCluster.SelectedDrynessLevelAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLaundryDryerControlsClusterSelectedDrynessLevelAttributeCallback(),
+          readLaundryDryerControlsSelectedDrynessLevelCommandParams
+        );
+        result.put("readSelectedDrynessLevelAttribute", readLaundryDryerControlsSelectedDrynessLevelAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readLaundryDryerControlsGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readLaundryDryerControlsGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.LaundryDryerControlsCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.LaundryDryerControlsCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLaundryDryerControlsClusterGeneratedCommandListAttributeCallback(),
+          readLaundryDryerControlsGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readLaundryDryerControlsGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readLaundryDryerControlsAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readLaundryDryerControlsAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.LaundryDryerControlsCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.LaundryDryerControlsCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLaundryDryerControlsClusterAcceptedCommandListAttributeCallback(),
+          readLaundryDryerControlsAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readLaundryDryerControlsAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readLaundryDryerControlsEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readLaundryDryerControlsEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.LaundryDryerControlsCluster) cluster).readEventListAttribute(
+              (ChipClusters.LaundryDryerControlsCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLaundryDryerControlsClusterEventListAttributeCallback(),
+          readLaundryDryerControlsEventListCommandParams
+        );
+        result.put("readEventListAttribute", readLaundryDryerControlsEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readLaundryDryerControlsAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readLaundryDryerControlsAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.LaundryDryerControlsCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.LaundryDryerControlsCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLaundryDryerControlsClusterAttributeListAttributeCallback(),
+          readLaundryDryerControlsAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readLaundryDryerControlsAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readLaundryDryerControlsFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readLaundryDryerControlsFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.LaundryDryerControlsCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readLaundryDryerControlsFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readLaundryDryerControlsFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readLaundryDryerControlsClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readLaundryDryerControlsClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.LaundryDryerControlsCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readLaundryDryerControlsClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readLaundryDryerControlsClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readModeSelectInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readModeSelectDescriptionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readModeSelectDescriptionAttributeInteractionInfo = new InteractionInfo(
@@ -18576,6 +18668,7 @@ public class ClusterReadMapping {
             put("icdManagement", readIcdManagementInteractionInfo());
             put("timer", readTimerInteractionInfo());
             put("ovenMode", readOvenModeInteractionInfo());
+            put("laundryDryerControls", readLaundryDryerControlsInteractionInfo());
             put("modeSelect", readModeSelectInteractionInfo());
             put("laundryWasherMode", readLaundryWasherModeInteractionInfo());
             put("refrigeratorAndTemperatureControlledCabinetMode", readRefrigeratorAndTemperatureControlledCabinetModeInteractionInfo());

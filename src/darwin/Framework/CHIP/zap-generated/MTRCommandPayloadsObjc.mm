@@ -12065,6 +12065,85 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation MTRICDManagementClusterStayActiveResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _promisedActiveDuration = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRICDManagementClusterStayActiveResponseParams alloc] init];
+
+    other.promisedActiveDuration = self.promisedActiveDuration;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: promisedActiveDuration:%@; >", NSStringFromClass([self class]), _promisedActiveDuration];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRICDManagementClusterStayActiveResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType &)decodableStruct
+{
+    {
+        self.promisedActiveDuration = [NSNumber numberWithUnsignedInt:decodableStruct.promisedActiveDuration];
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
 @implementation MTRTimerClusterSetTimerParams
 - (instancetype)init
 {
@@ -15536,7 +15615,7 @@ NS_ASSUME_NONNULL_BEGIN
                     }
                     if (element_1.powerSavingsControl != nil) {
                         auto & definedValue_3 = listHolder_1->mList[i_1].powerSavingsControl.Emplace();
-                        definedValue_3.powerSavings = static_cast<std::remove_reference_t<decltype(definedValue_3.powerSavings)>>(element_1.powerSavingsControl.powerSavings.unsignedCharValue);
+                        definedValue_3.powerSavings = element_1.powerSavingsControl.powerSavings.unsignedCharValue;
                     }
                     if (element_1.heatingSourceControl != nil) {
                         auto & definedValue_3 = listHolder_1->mList[i_1].heatingSourceControl.Emplace();
@@ -19309,6 +19388,115 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return decodedObj;
 }
+@end
+
+@implementation MTRThermostatClusterGetRelayStatusLogResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _timeOfDay = @(0);
+
+        _relayStatus = @(0);
+
+        _localTemperature = @(0);
+
+        _humidityInPercentage = @(0);
+
+        _setpoint = @(0);
+
+        _unreadEntries = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatClusterGetRelayStatusLogResponseParams alloc] init];
+
+    other.timeOfDay = self.timeOfDay;
+    other.relayStatus = self.relayStatus;
+    other.localTemperature = self.localTemperature;
+    other.humidityInPercentage = self.humidityInPercentage;
+    other.setpoint = self.setpoint;
+    other.unreadEntries = self.unreadEntries;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeOfDay:%@; relayStatus:%@; localTemperature:%@; humidityInPercentage:%@; setpoint:%@; unreadEntries:%@; >", NSStringFromClass([self class]), _timeOfDay, _relayStatus, _localTemperature, _humidityInPercentage, _setpoint, _unreadEntries];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRThermostatClusterGetRelayStatusLogResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType &)decodableStruct
+{
+    {
+        self.timeOfDay = [NSNumber numberWithUnsignedShort:decodableStruct.timeOfDay];
+    }
+    {
+        self.relayStatus = [NSNumber numberWithUnsignedShort:decodableStruct.relayStatus.Raw()];
+    }
+    {
+        self.localTemperature = [NSNumber numberWithShort:decodableStruct.localTemperature];
+    }
+    {
+        self.humidityInPercentage = [NSNumber numberWithUnsignedChar:decodableStruct.humidityInPercentage];
+    }
+    {
+        self.setpoint = [NSNumber numberWithShort:decodableStruct.setpoint];
+    }
+    {
+        self.unreadEntries = [NSNumber numberWithUnsignedShort:decodableStruct.unreadEntries];
+    }
+    return CHIP_NO_ERROR;
+}
+
 @end
 
 @implementation MTRThermostatClusterGetWeeklyScheduleParams

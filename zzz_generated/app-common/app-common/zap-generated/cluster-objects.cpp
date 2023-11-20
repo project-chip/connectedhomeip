@@ -10679,6 +10679,40 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace StayActiveRequest.
+namespace StayActiveResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kPromisedActiveDuration), promisedActiveDuration);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kPromisedActiveDuration))
+        {
+            err = DataModel::Decode(reader, promisedActiveDuration);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace StayActiveResponse.
 } // namespace Commands
 
 namespace Attributes {
@@ -10995,6 +11029,40 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace OvenMode
+namespace LaundryDryerControls {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::SupportedDrynessLevels::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedDrynessLevels);
+    case Attributes::SelectedDrynessLevel::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, selectedDrynessLevel);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace LaundryDryerControls
 namespace ModeSelect {
 namespace Structs {
 
@@ -17232,6 +17300,65 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace SetWeeklySchedule.
+namespace GetRelayStatusLogResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kTimeOfDay), timeOfDay);
+    encoder.Encode(to_underlying(Fields::kRelayStatus), relayStatus);
+    encoder.Encode(to_underlying(Fields::kLocalTemperature), localTemperature);
+    encoder.Encode(to_underlying(Fields::kHumidityInPercentage), humidityInPercentage);
+    encoder.Encode(to_underlying(Fields::kSetpoint), setpoint);
+    encoder.Encode(to_underlying(Fields::kUnreadEntries), unreadEntries);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kTimeOfDay))
+        {
+            err = DataModel::Decode(reader, timeOfDay);
+        }
+        else if (__context_tag == to_underlying(Fields::kRelayStatus))
+        {
+            err = DataModel::Decode(reader, relayStatus);
+        }
+        else if (__context_tag == to_underlying(Fields::kLocalTemperature))
+        {
+            err = DataModel::Decode(reader, localTemperature);
+        }
+        else if (__context_tag == to_underlying(Fields::kHumidityInPercentage))
+        {
+            err = DataModel::Decode(reader, humidityInPercentage);
+        }
+        else if (__context_tag == to_underlying(Fields::kSetpoint))
+        {
+            err = DataModel::Decode(reader, setpoint);
+        }
+        else if (__context_tag == to_underlying(Fields::kUnreadEntries))
+        {
+            err = DataModel::Decode(reader, unreadEntries);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace GetRelayStatusLogResponse.
 namespace GetWeeklySchedule {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {

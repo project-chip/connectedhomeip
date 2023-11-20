@@ -50,6 +50,17 @@ limitations under the License.
     <field name="CoolSetpointPresent" mask="0x02"/>
   </bitmap>
 
+  <bitmap name="RelayStateBitmap" type="bitmap16">
+    <cluster code="0x0201"/>
+    <field name="Heat" mask="0x0001"/>
+    <field name="Cool" mask="0x0002"/>
+    <field name="Fan" mask="0x0004"/>
+    <field name="HeatStage2" mask="0x0008"/>
+    <field name="CoolStage2" mask="0x0010"/>
+    <field name="FanStage2" mask="0x0020"/>
+    <field name="FanStage3" mask="0x0040"/>    
+  </bitmap>
+
   <enum name="ThermostatSystemMode" type="enum8">
     <cluster code="0x0201"/>
     <item name="Off" value="0x0"/>
@@ -499,5 +510,17 @@ limitations under the License.
       <arg name="ModeForSequence" type="ModeForSequence"/>
       <arg name="Transitions" type="ThermostatScheduleTransition" array="true"/>
     </command>
+    <command source="server" code="0x01" name="GetRelayStatusLogResponse" optional="true">
+      <description>
+        Response to the GetRelayStatusLog command.
+      </description>
+      <arg name="TimeOfDay" type="int16u" min="0" max="1439"/>
+      <arg name="RelayStatus" type="RelayStateBitmap"/>
+      <arg name="LocalTemperature" type="int16s" min="0x954D" max="0x7FFF"/>
+      <arg name="HumidityInPercentage" type="int8u" min="0" max="100"/>
+      <arg name="Setpoint" type="int16s" min="0x954D" max="0x7FFF"/>
+      <arg name="UnreadEntries" type="int16u"/>
+    </command>
+
   </cluster>
 </configurator>

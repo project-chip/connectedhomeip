@@ -1405,6 +1405,16 @@ client cluster Thermostat = 513 {
     kSupportsNames = 0x2;
   }
 
+  bitmap RelayStateBitmap : bitmap16 {
+    kHeat = 0x1;
+    kCool = 0x2;
+    kFan = 0x4;
+    kHeatStage2 = 0x8;
+    kCoolStage2 = 0x10;
+    kFanStage2 = 0x20;
+    kFanStage3 = 0x40;
+  }
+
   bitmap ScheduleTypeFeaturesBitmap : bitmap8 {
     kSupportsPresets = 0x1;
     kSupportsSetpoints = 0x2;
@@ -1555,6 +1565,15 @@ client cluster Thermostat = 513 {
     DayOfWeek dayOfWeekForSequence = 1;
     ModeForSequence modeForSequence = 2;
     ThermostatScheduleTransition transitions[] = 3;
+  }
+
+  response struct GetRelayStatusLogResponse = 1 {
+    int16u timeOfDay = 0;
+    RelayStateBitmap relayStatus = 1;
+    int16s localTemperature = 2;
+    int8u humidityInPercentage = 3;
+    int16s setpoint = 4;
+    int16u unreadEntries = 5;
   }
 
   request struct GetWeeklyScheduleRequest {

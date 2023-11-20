@@ -644,6 +644,10 @@ namespace StayActiveRequest {
 static constexpr CommandId Id = 0x00000003;
 } // namespace StayActiveRequest
 
+namespace StayActiveResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace StayActiveResponse
+
 } // namespace Commands
 } // namespace IcdManagement
 
@@ -1105,6 +1109,10 @@ static constexpr CommandId Id = 0x00000000;
 namespace SetWeeklySchedule {
 static constexpr CommandId Id = 0x00000001;
 } // namespace SetWeeklySchedule
+
+namespace GetRelayStatusLogResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace GetRelayStatusLogResponse
 
 namespace GetWeeklySchedule {
 static constexpr CommandId Id = 0x00000002;

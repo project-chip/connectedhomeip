@@ -494,6 +494,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPIcdManagementClusterStayActiveResponseCallback
+    : public Callback::Callback<CHIPIcdManagementClusterStayActiveResponseCallbackType>
+{
+public:
+    CHIPIcdManagementClusterStayActiveResponseCallback(jobject javaCallback);
+
+    ~CHIPIcdManagementClusterStayActiveResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPOvenModeClusterChangeToModeResponseCallback
     : public Callback::Callback<CHIPOvenModeClusterChangeToModeResponseCallbackType>
 {
@@ -715,6 +730,21 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPThermostatClusterGetRelayStatusLogResponseCallback
+    : public Callback::Callback<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>
+{
+public:
+    CHIPThermostatClusterGetRelayStatusLogResponseCallback(jobject javaCallback);
+
+    ~CHIPThermostatClusterGetRelayStatusLogResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

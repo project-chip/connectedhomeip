@@ -1353,6 +1353,31 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace OvenMode
 
+namespace LaundryDryerControls {
+namespace Attributes {
+
+namespace SelectedDrynessLevel {
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  DataModel::Nullable<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum> & value); // DrynessLevelEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum> & value);
+} // namespace SelectedDrynessLevel
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace LaundryDryerControls
+
 namespace ModeSelect {
 namespace Attributes {
 

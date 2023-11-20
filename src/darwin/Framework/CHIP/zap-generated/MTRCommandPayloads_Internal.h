@@ -748,6 +748,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRICDManagementClusterStayActiveResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRTimerClusterSetTimerParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -1231,6 +1237,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRThermostatClusterSetWeeklyScheduleParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterGetRelayStatusLogResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType &)decodableStruct;
 
 @end
 

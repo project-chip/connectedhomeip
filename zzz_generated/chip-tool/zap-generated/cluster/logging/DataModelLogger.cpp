@@ -5506,6 +5506,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const IcdManagement::Commands::StayActiveResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("promisedActiveDuration", indent + 1, value.promisedActiveDuration));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const OvenMode::Commands::ChangeToModeResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -5663,6 +5671,19 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     ReturnErrorOnFailure(DataModelLogger::LogValue("dayOfWeekForSequence", indent + 1, value.dayOfWeekForSequence));
     ReturnErrorOnFailure(DataModelLogger::LogValue("modeForSequence", indent + 1, value.modeForSequence));
     ReturnErrorOnFailure(DataModelLogger::LogValue("transitions", indent + 1, value.transitions));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("timeOfDay", indent + 1, value.timeOfDay));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("relayStatus", indent + 1, value.relayStatus));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("localTemperature", indent + 1, value.localTemperature));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("humidityInPercentage", indent + 1, value.humidityInPercentage));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("setpoint", indent + 1, value.setpoint));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("unreadEntries", indent + 1, value.unreadEntries));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -8967,6 +8988,52 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
         case OvenMode::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case LaundryDryerControls::Id: {
+        switch (path.mAttributeId)
+        {
+        case LaundryDryerControls::Attributes::SupportedDrynessLevels::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedDrynessLevels", 1, value);
+        }
+        case LaundryDryerControls::Attributes::SelectedDrynessLevel::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SelectedDrynessLevel", 1, value);
+        }
+        case LaundryDryerControls::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case LaundryDryerControls::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case LaundryDryerControls::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case LaundryDryerControls::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case LaundryDryerControls::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case LaundryDryerControls::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -15133,6 +15200,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RegisterClientResponse", 1, value);
         }
+        case IcdManagement::Commands::StayActiveResponse::Id: {
+            IcdManagement::Commands::StayActiveResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StayActiveResponse", 1, value);
+        }
         }
         break;
     }
@@ -15267,6 +15339,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetWeeklyScheduleResponse", 1, value);
+        }
+        case Thermostat::Commands::GetRelayStatusLogResponse::Id: {
+            Thermostat::Commands::GetRelayStatusLogResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetRelayStatusLogResponse", 1, value);
         }
         }
         break;

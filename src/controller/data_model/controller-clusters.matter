@@ -2827,12 +2827,16 @@ client cluster IcdManagement = 70 {
     optional octet_string<16> verificationKey = 1;
   }
 
+  response struct StayActiveResponse = 4 {
+    int32u promisedActiveDuration = 0;
+  }
+
   /** Register a client to the end device */
   fabric command access(invoke: manage) RegisterClient(RegisterClientRequest): RegisterClientResponse = 0;
   /** Unregister a client from an end device */
   fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
   /** Request the end device to stay in Active Mode for an additional ActiveModeThreshold */
-  command access(invoke: manage) StayActiveRequest(): DefaultSuccess = 3;
+  command access(invoke: manage) StayActiveRequest(): StayActiveResponse = 3;
 }
 
 /** This cluster supports creating a simple timer functionality. */
@@ -2932,6 +2936,26 @@ provisional client cluster OvenMode = 73 {
   /** This command is used to change device modes.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
+/** This cluster supports remotely monitoring and controling the different typs of
+            functionality available to a drying device, such as a laundry dryer. */
+client cluster LaundryDryerControls = 74 {
+  enum DrynessLevelEnum : enum8 {
+    kLow = 0;
+    kNormal = 1;
+    kExtra = 2;
+    kMax = 3;
+  }
+
+  readonly attribute DrynessLevelEnum supportedDrynessLevels[] = 0;
+  attribute nullable DrynessLevelEnum selectedDrynessLevel = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
@@ -3929,12 +3953,6 @@ provisional client cluster DemandResponseLoadControl = 150 {
     kFailed = 12;
   }
 
-  enum PowerSavingsEnum : enum8 {
-    kLow = 0;
-    kMedium = 1;
-    kHigh = 2;
-  }
-
   bitmap CancelControlBitmap : bitmap16 {
     kRandomEnd = 0x1;
   }
@@ -3983,7 +4001,7 @@ provisional client cluster DemandResponseLoadControl = 150 {
   }
 
   struct PowerSavingsControlStruct {
-    PowerSavingsEnum powerSavings = 0;
+    percent powerSavings = 0;
   }
 
   struct DutyCycleControlStruct {
@@ -5100,6 +5118,16 @@ client cluster Thermostat = 513 {
     kSupportsNames = 0x2;
   }
 
+  bitmap RelayStateBitmap : bitmap16 {
+    kHeat = 0x1;
+    kCool = 0x2;
+    kFan = 0x4;
+    kHeatStage2 = 0x8;
+    kCoolStage2 = 0x10;
+    kFanStage2 = 0x20;
+    kFanStage3 = 0x40;
+  }
+
   bitmap ScheduleTypeFeaturesBitmap : bitmap8 {
     kSupportsPresets = 0x1;
     kSupportsSetpoints = 0x2;
@@ -5250,6 +5278,15 @@ client cluster Thermostat = 513 {
     DayOfWeek dayOfWeekForSequence = 1;
     ModeForSequence modeForSequence = 2;
     ThermostatScheduleTransition transitions[] = 3;
+  }
+
+  response struct GetRelayStatusLogResponse = 1 {
+    int16u timeOfDay = 0;
+    RelayStateBitmap relayStatus = 1;
+    int16s localTemperature = 2;
+    int8u humidityInPercentage = 3;
+    int16s setpoint = 4;
+    int16u unreadEntries = 5;
   }
 
   request struct GetWeeklyScheduleRequest {
@@ -6717,7 +6754,7 @@ client cluster LowPower = 1288 {
 
 /** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
 client cluster KeypadInput = 1289 {
-  enum CecKeyCode : enum8 {
+  enum CECKeyCodeEnum : enum8 {
     kSelect = 0;
     kUp = 1;
     kDown = 2;
@@ -6826,7 +6863,7 @@ client cluster KeypadInput = 1289 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SendKeyRequest {
-    CecKeyCode keyCode = 0;
+    CECKeyCodeEnum keyCode = 0;
   }
 
   response struct SendKeyResponse = 1 {

@@ -14124,6 +14124,11 @@ struct Type;
 struct DecodableType;
 } // namespace StayActiveRequest
 
+namespace StayActiveResponse {
+struct Type;
+struct DecodableType;
+} // namespace StayActiveResponse
+
 } // namespace Commands
 
 namespace Commands {
@@ -14249,7 +14254,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -14263,6 +14268,38 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StayActiveRequest
+namespace StayActiveResponse {
+enum class Fields : uint8_t
+{
+    kPromisedActiveDuration = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::StayActiveResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+
+    uint32_t promisedActiveDuration = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::StayActiveResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+
+    uint32_t promisedActiveDuration = static_cast<uint32_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StayActiveResponse
 } // namespace Commands
 
 namespace Attributes {
@@ -14882,6 +14919,92 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace OvenMode
+namespace LaundryDryerControls {
+
+namespace Attributes {
+
+namespace SupportedDrynessLevels {
+struct TypeInfo
+{
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryDryerControls::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedDrynessLevels::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedDrynessLevels
+namespace SelectedDrynessLevel {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryDryerControls::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SelectedDrynessLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SelectedDrynessLevel
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryDryerControls::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryDryerControls::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryDryerControls::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryDryerControls::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryDryerControls::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryDryerControls::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::LaundryDryerControls::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::SupportedDrynessLevels::TypeInfo::DecodableType supportedDrynessLevels;
+        Attributes::SelectedDrynessLevel::TypeInfo::DecodableType selectedDrynessLevel;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace LaundryDryerControls
 namespace ModeSelect {
 namespace Structs {
 namespace SemanticTagStruct {
@@ -19625,7 +19748,7 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    PowerSavingsEnum powerSavings = static_cast<PowerSavingsEnum>(0);
+    chip::Percent powerSavings = static_cast<chip::Percent>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -24065,6 +24188,11 @@ struct Type;
 struct DecodableType;
 } // namespace SetWeeklySchedule
 
+namespace GetRelayStatusLogResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetRelayStatusLogResponse
+
 namespace GetWeeklySchedule {
 struct Type;
 struct DecodableType;
@@ -24250,6 +24378,53 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetWeeklySchedule
+namespace GetRelayStatusLogResponse {
+enum class Fields : uint8_t
+{
+    kTimeOfDay            = 0,
+    kRelayStatus          = 1,
+    kLocalTemperature     = 2,
+    kHumidityInPercentage = 3,
+    kSetpoint             = 4,
+    kUnreadEntries        = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetRelayStatusLogResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    uint16_t timeOfDay                          = static_cast<uint16_t>(0);
+    chip::BitMask<RelayStateBitmap> relayStatus = static_cast<chip::BitMask<RelayStateBitmap>>(0);
+    int16_t localTemperature                    = static_cast<int16_t>(0);
+    uint8_t humidityInPercentage                = static_cast<uint8_t>(0);
+    int16_t setpoint                            = static_cast<int16_t>(0);
+    uint16_t unreadEntries                      = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetRelayStatusLogResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    uint16_t timeOfDay                          = static_cast<uint16_t>(0);
+    chip::BitMask<RelayStateBitmap> relayStatus = static_cast<chip::BitMask<RelayStateBitmap>>(0);
+    int16_t localTemperature                    = static_cast<int16_t>(0);
+    uint8_t humidityInPercentage                = static_cast<uint8_t>(0);
+    int16_t setpoint                            = static_cast<int16_t>(0);
+    uint16_t unreadEntries                      = static_cast<uint16_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetRelayStatusLogResponse
 namespace GetWeeklySchedule {
 enum class Fields : uint8_t
 {
@@ -32351,7 +32526,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKey::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    CecKeyCode keyCode = static_cast<CecKeyCode>(0);
+    CECKeyCodeEnum keyCode = static_cast<CECKeyCodeEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -32366,7 +32541,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKey::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    CecKeyCode keyCode = static_cast<CecKeyCode>(0);
+    CECKeyCodeEnum keyCode = static_cast<CECKeyCodeEnum>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SendKey

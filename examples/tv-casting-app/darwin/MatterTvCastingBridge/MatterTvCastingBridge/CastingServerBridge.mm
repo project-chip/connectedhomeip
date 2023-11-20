@@ -2154,7 +2154,7 @@
                                      [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
                                      return castingServer->KeypadInput_SendKey(&endpoint,
-                                         static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(keyCode), responseFunction);
+                                         static_cast<chip::app::Clusters::KeypadInput::CECKeyCodeEnum>(keyCode), responseFunction);
                                  }];
 }
 

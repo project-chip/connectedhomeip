@@ -14959,13 +14959,29 @@ class IcdManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000046
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[str] = 'StayActiveResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
                     ])
+
+        @dataclass
+        class StayActiveResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000046
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="promisedActiveDuration", Tag=0, Type=uint),
+                    ])
+
+            promisedActiveDuration: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -15712,6 +15728,175 @@ class OvenMode(Cluster):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000049
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+
+@dataclass
+class LaundryDryerControls(Cluster):
+    id: typing.ClassVar[int] = 0x0000004A
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="supportedDrynessLevels", Tag=0x00000000, Type=typing.List[LaundryDryerControls.Enums.DrynessLevelEnum]),
+                ClusterObjectFieldDescriptor(Label="selectedDrynessLevel", Tag=0x00000001, Type=typing.Union[Nullable, LaundryDryerControls.Enums.DrynessLevelEnum]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    supportedDrynessLevels: 'typing.List[LaundryDryerControls.Enums.DrynessLevelEnum]' = None
+    selectedDrynessLevel: 'typing.Union[Nullable, LaundryDryerControls.Enums.DrynessLevelEnum]' = None
+    generatedCommandList: 'typing.List[uint]' = None
+    acceptedCommandList: 'typing.List[uint]' = None
+    eventList: 'typing.List[uint]' = None
+    attributeList: 'typing.List[uint]' = None
+    featureMap: 'uint' = None
+    clusterRevision: 'uint' = None
+
+    class Enums:
+        class DrynessLevelEnum(MatterIntEnum):
+            kLow = 0x00
+            kNormal = 0x01
+            kExtra = 0x02
+            kMax = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 4,
+
+    class Attributes:
+        @dataclass
+        class SupportedDrynessLevels(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000004A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[LaundryDryerControls.Enums.DrynessLevelEnum])
+
+            value: 'typing.List[LaundryDryerControls.Enums.DrynessLevelEnum]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class SelectedDrynessLevel(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000004A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, LaundryDryerControls.Enums.DrynessLevelEnum])
+
+            value: 'typing.Union[Nullable, LaundryDryerControls.Enums.DrynessLevelEnum]' = NullValue
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000004A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000004A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class EventList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000004A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFA
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000004A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000004A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000004A
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -21676,16 +21861,6 @@ class DemandResponseLoadControl(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 13,
 
-        class PowerSavingsEnum(MatterIntEnum):
-            kLow = 0x00
-            kMedium = 0x01
-            kHigh = 0x02
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 3,
-
     class Bitmaps:
         class CancelControlBitmap(IntFlag):
             kRandomEnd = 0x1
@@ -21743,10 +21918,10 @@ class DemandResponseLoadControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="powerSavings", Tag=0, Type=DemandResponseLoadControl.Enums.PowerSavingsEnum),
+                        ClusterObjectFieldDescriptor(Label="powerSavings", Tag=0, Type=uint),
                     ])
 
-            powerSavings: 'DemandResponseLoadControl.Enums.PowerSavingsEnum' = 0
+            powerSavings: 'uint' = 0
 
         @dataclass
         class DutyCycleControlStruct(ClusterObject):
@@ -26218,6 +26393,15 @@ class Thermostat(Cluster):
             kAutomatic = 0x1
             kSupportsNames = 0x2
 
+        class RelayStateBitmap(IntFlag):
+            kHeat = 0x1
+            kCool = 0x2
+            kFan = 0x4
+            kHeatStage2 = 0x8
+            kCoolStage2 = 0x10
+            kFanStage2 = 0x20
+            kFanStage3 = 0x40
+
         class ScheduleTypeFeaturesBitmap(IntFlag):
             kSupportsPresets = 0x1
             kSupportsSetpoints = 0x2
@@ -26412,6 +26596,32 @@ class Thermostat(Cluster):
             dayOfWeekForSequence: 'uint' = 0
             modeForSequence: 'uint' = 0
             transitions: 'typing.List[Thermostat.Structs.ThermostatScheduleTransition]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class GetRelayStatusLogResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="timeOfDay", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="relayStatus", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="localTemperature", Tag=2, Type=int),
+                        ClusterObjectFieldDescriptor(Label="humidityInPercentage", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="setpoint", Tag=4, Type=int),
+                        ClusterObjectFieldDescriptor(Label="unreadEntries", Tag=5, Type=uint),
+                    ])
+
+            timeOfDay: 'uint' = 0
+            relayStatus: 'uint' = 0
+            localTemperature: 'int' = 0
+            humidityInPercentage: 'uint' = 0
+            setpoint: 'int' = 0
+            unreadEntries: 'uint' = 0
 
         @dataclass
         class GetWeeklySchedule(ClusterCommand):
@@ -37009,7 +37219,7 @@ class KeypadInput(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class CecKeyCode(MatterIntEnum):
+        class CECKeyCodeEnum(MatterIntEnum):
             kSelect = 0x00
             kUp = 0x01
             kDown = 0x02
@@ -37130,10 +37340,10 @@ class KeypadInput(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="keyCode", Tag=0, Type=KeypadInput.Enums.CecKeyCode),
+                        ClusterObjectFieldDescriptor(Label="keyCode", Tag=0, Type=KeypadInput.Enums.CECKeyCodeEnum),
                     ])
 
-            keyCode: 'KeypadInput.Enums.CecKeyCode' = 0
+            keyCode: 'KeypadInput.Enums.CECKeyCodeEnum' = 0
 
         @dataclass
         class SendKeyResponse(ClusterCommand):

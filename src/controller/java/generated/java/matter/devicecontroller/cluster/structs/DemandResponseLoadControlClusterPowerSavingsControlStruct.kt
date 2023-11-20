@@ -25,7 +25,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class DemandResponseLoadControlClusterPowerSavingsControlStruct(
-  val powerSavings: UInt
+  val powerSavings: UByte
 ) {
   override fun toString(): String = buildString {
     append("DemandResponseLoadControlClusterPowerSavingsControlStruct {\n")
@@ -46,7 +46,7 @@ class DemandResponseLoadControlClusterPowerSavingsControlStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DemandResponseLoadControlClusterPowerSavingsControlStruct {
       tlvReader.enterStructure(tlvTag)
-      val powerSavings = tlvReader.getUInt(ContextSpecificTag(TAG_POWER_SAVINGS))
+      val powerSavings = tlvReader.getUByte(ContextSpecificTag(TAG_POWER_SAVINGS))
       
       tlvReader.exitContainer()
 

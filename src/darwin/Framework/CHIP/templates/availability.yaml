@@ -7774,6 +7774,12 @@
       enums:
           ContentLauncher:
               - StatusEnum
+          KeypadInput:
+              - CECKeyCodeEnum
+          ThermostatUserInterfaceConfiguration:
+              - KeypadLockoutEnum
+              - ScheduleProgrammingVisibilityEnum
+              - TemperatureDisplayModeEnum
       enum values:
           ContentLauncher:
               StatusEnum:
@@ -7784,10 +7790,111 @@
               FanModeSequenceEnum:
                   - OffHighAuto
                   - OffHigh
+          KeypadInput:
+              CECKeyCodeEnum:
+                  - Select
+                  - Up
+                  - Down
+                  - Left
+                  - Right
+                  - RightUp
+                  - RightDown
+                  - LeftUp
+                  - LeftDown
+                  - RootMenu
+                  - SetupMenu
+                  - ContentsMenu
+                  - FavoriteMenu
+                  - Exit
+                  - MediaTopMenu
+                  - MediaContextSensitiveMenu
+                  - NumberEntryMode
+                  - Number11
+                  - Number12
+                  - Number0OrNumber10
+                  - Numbers1
+                  - Numbers2
+                  - Numbers3
+                  - Numbers4
+                  - Numbers5
+                  - Numbers6
+                  - Numbers7
+                  - Numbers8
+                  - Numbers9
+                  - Dot
+                  - Enter
+                  - Clear
+                  - NextFavorite
+                  - ChannelUp
+                  - ChannelDown
+                  - PreviousChannel
+                  - SoundSelect
+                  - InputSelect
+                  - DisplayInformation
+                  - Help
+                  - PageUp
+                  - PageDown
+                  - Power
+                  - VolumeUp
+                  - VolumeDown
+                  - Mute
+                  - Play
+                  - Stop
+                  - Pause
+                  - Record
+                  - Rewind
+                  - FastForward
+                  - Eject
+                  - Forward
+                  - Backward
+                  - StopRecord
+                  - PauseRecord
+                  - Reserved
+                  - Angle
+                  - SubPicture
+                  - VideoOnDemand
+                  - ElectronicProgramGuide
+                  - TimerProgramming
+                  - InitialConfiguration
+                  - SelectBroadcastType
+                  - SelectSoundPresentation
+                  - PlayFunction
+                  - PausePlayFunction
+                  - RecordFunction
+                  - PauseRecordFunction
+                  - StopFunction
+                  - MuteFunction
+                  - RestoreVolumeFunction
+                  - TuneFunction
+                  - SelectMediaFunction
+                  - SelectAvInputFunction
+                  - SelectAudioInputFunction
+                  - PowerToggleFunction
+                  - PowerOffFunction
+                  - PowerOnFunction
+                  - F1Blue
+                  - F2Red
+                  - F3Green
+                  - F4Yellow
+                  - F5
+                  - Data
+          ThermostatUserInterfaceConfiguration:
+              KeypadLockoutEnum:
+                  - NoLockout
+                  - Lockout1
+                  - Lockout2
+                  - Lockout3
+                  - Lockout4
+                  - Lockout5
+              ScheduleProgrammingVisibilityEnum:
+                  - ScheduleProgrammingPermitted
+                  - ScheduleProgrammingDenied
+              TemperatureDisplayModeEnum:
+                  - Celsius
+                  - Fahrenheit
       bitmaps:
           Scenes:
               - CopyModeBitmap
-              - NameSupportBitmap
           AdministratorCommissioning:
               - Feature
           ContentLauncher:
@@ -7801,8 +7908,6 @@
           Scenes:
               CopyModeBitmap:
                   - CopyAllScenes
-              NameSupportBitmap:
-                  - SceneNames
           SoftwareDiagnostics:
               Feature:
                   - Watermarks
@@ -7817,15 +7922,6 @@
               OptionsBitmap:
                   - ExecuteIfOff
                   - CoupleColorTempToLevel
-      attributes:
-          Scenes:
-              # Targeting Spring 2024 Matter release
-              - FabricSceneInfo
-      structs:
-          Scenes:
-              # Targeting Spring 2024 Matter release
-              - SceneInfoStruct
-
   deprecated:
       event fields:
           WiFiNetworkDiagnostics:
@@ -7834,6 +7930,8 @@
       enums:
           ContentLauncher:
               - ContentLaunchStatusEnum
+          KeypadInput:
+              - CecKeyCode
       enum values:
           FanControl:
               FanModeSequenceEnum:
@@ -7859,6 +7957,10 @@
           - MicrowaveOvenControl
           - MicrowaveOvenMode
           - DemandResponseLoadControl
+          - BooleanSensorConfiguration
+          - ValveConfigurationAndControl
+          - Timer
+          - OvenMode
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -7868,6 +7970,13 @@
           WakeOnLAN:
               # Targeting Spring 2024 Matter release
               - LinkLocalAddress
+          BasicInformation:
+              # Targeting Spring 2024 Matter release
+              - SpecificationVersion
+              - MaxPathsPerInvoke
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - FabricSceneInfo
       commands:
           GeneralDiagnostics:
               # Targeting Spring 2024 Matter release
@@ -7893,6 +8002,10 @@
               QueryIdentityResponse:
                   - identity
                   - possessionSignature
+      structs:
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - SceneInfoStruct
       struct fields:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -7903,6 +8016,9 @@
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
               - ThreadCapabilitiesBitmap
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - NameSupportBitmap
       bitmap values:
           OnOff:
               Feature:
@@ -7922,6 +8038,8 @@
       enums:
           ContentLauncher:
               StatusEnum: ContentLaunchStatusEnum
+          KeypadInput:
+              CECKeyCodeEnum: CecKeyCode
       enum values:
           ContentLauncher:
               # The URLNotAvailable value got renamed at the same time
