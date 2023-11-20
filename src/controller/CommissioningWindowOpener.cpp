@@ -126,7 +126,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
 CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Messaging::ExchangeManager & exchangeMgr,
                                                                       const SessionHandle & sessionHandle)
 {
-    ChipLogProgress(Controller, "OpenCommissioningWindow for device ID %" PRIu64, mNodeId);
+    ChipLogProgress(Controller, "OpenCommissioningWindow for device ID 0x" ChipLogFormatX64, ChipLogValueX64(mNodeId));
 
     constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
 

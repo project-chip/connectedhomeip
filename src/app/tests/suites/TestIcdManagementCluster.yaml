@@ -28,6 +28,12 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Read Feature Map"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0x07
+
     - label: "Read IdleModeDuration"
       command: "readAttribute"
       attribute: "IdleModeDuration"

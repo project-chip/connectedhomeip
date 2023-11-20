@@ -5,18 +5,6 @@ DarwinForceWritable:
     - ContentLauncher::SupportedStreamingProtocols
     - FanControl::FanModeSequence
 
-WeakEnums:
-    # Allow-list of enums that we generate as enums, not enum classes.
-    # The goal is to drive this down to 0.
-    - BarrierControlBarrierPosition
-    - BarrierControlMovingState
-    - ColorControlOptions
-    - ColorMode
-    - EnhancedColorMode
-    - MoveMode
-    - PHYRateEnum
-    - StepMode
-
 EnumsNotUsedAsTypeInXML:
     # List of enums that are not used as a type in XML. By adding an enum
     # to this list you prevent incorrectly assuming from code that you are
@@ -64,6 +52,7 @@ ClustersWithInitFunctions:
     - Thermostat
     - Mode Select
     - Sample MEI
+    - Scenes
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic
@@ -80,6 +69,7 @@ ClustersWithShutdownFunctions:
     - Level Control
     - Color Control
     - Sample MEI
+    - Scenes
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock

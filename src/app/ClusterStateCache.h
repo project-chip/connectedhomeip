@@ -21,7 +21,7 @@
 #include "lib/core/CHIPError.h"
 #include "system/SystemPacketBuffer.h"
 #include "system/TLVPacketBufferBackingStore.h"
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/BufferedReadCallback.h>
 #include <app/ReadClient.h>

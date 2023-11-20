@@ -3074,8 +3074,12 @@
               - EffectIdentifierEnum
               - StartUpOnOffEnum
           LevelControl:
-              - MoveMode
-              - StepMode
+              # MoveModeEnum and StepModeEnum were originally named MoveMode and
+              # StepMode, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - MoveModeEnum
+              - StepModeEnum
           AccessControl:
               - AuthMode
               - ChangeTypeEnum
@@ -3245,7 +3249,10 @@
               - StatusEnum
               - LineupInfoTypeEnum
           TargetNavigator:
-              - TargetNavigatorStatusEnum
+              # StatusEnum was originally named TargetNavigatorStatusEnum, but
+              # we generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
           MediaPlayback:
               # StatusEnum was originally named MediaPlaybackStatusEnum, but we
               # generate the same API for the names with/without the cluster
@@ -3256,7 +3263,10 @@
               - InputTypeEnum
           KeypadInput:
               - CecKeyCode
-              - KeypadInputStatusEnum
+              # StatusEnum was originally named KeypadInputStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
           ContentLauncher:
               - ContentLaunchStatusEnum
               - MetricTypeEnum
@@ -3320,10 +3330,14 @@
                   - On
                   - TogglePreviousOnOff
           LevelControl:
-              MoveMode:
+              # MoveModeEnum and StepModeEnum were originally named MoveMode and
+              # StepMode, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              MoveModeEnum:
                   - Up
                   - Down
-              StepMode:
+              StepModeEnum:
                   - Up
                   - Down
           AccessControl:
@@ -3995,7 +4009,10 @@
               LineupInfoTypeEnum:
                   - Mso
           TargetNavigator:
-              TargetNavigatorStatusEnum:
+              # StatusEnum was originally named TargetNavigatorStatusEnum, but
+              # we generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - TargetNotFound
                   - NotAllowed
@@ -4117,7 +4134,10 @@
                   - F4Yellow
                   - F5
                   - Data
-              KeypadInputStatusEnum:
+              # StatusEnum was originally named KeypadInputStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - UnsupportedKey
                   - InvalidKeyInCurrentState
@@ -7444,7 +7464,6 @@
           Scenes:
               # New scenes bits not stable yet.
               - SceneTableSize
-              - RemainingCapacity
           FanControl:
               # New Fan Control bits not stable yet.
               - AirflowDirection
@@ -7717,6 +7736,7 @@
           GeneralDiagnostics:
               # Not in the spec yet.
               - AverageWearCount
+              # New things, not quite finalized.
   renames:
       enums:
           OTASoftwareUpdateProvider:
@@ -7754,6 +7774,10 @@
       enums:
           ContentLauncher:
               - StatusEnum
+          ThermostatUserInterfaceConfiguration:
+              - KeypadLockoutEnum
+              - ScheduleProgrammingVisibilityEnum
+              - TemperatureDisplayModeEnum
       enum values:
           ContentLauncher:
               StatusEnum:
@@ -7764,14 +7788,29 @@
               FanModeSequenceEnum:
                   - OffHighAuto
                   - OffHigh
+          ThermostatUserInterfaceConfiguration:
+              KeypadLockoutEnum:
+                  - NoLockout
+                  - Lockout1
+                  - Lockout2
+                  - Lockout3
+                  - Lockout4
+                  - Lockout5
+              ScheduleProgrammingVisibilityEnum:
+                  - ScheduleProgrammingPermitted
+                  - ScheduleProgrammingDenied
+              TemperatureDisplayModeEnum:
+                  - Celsius
+                  - Fahrenheit
       bitmaps:
           Scenes:
               - CopyModeBitmap
-              - NameSupportBitmap
           AdministratorCommissioning:
               - Feature
           ContentLauncher:
               - SupportedProtocolsBitmap
+          LevelControl:
+              - OptionsBitmap
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7779,8 +7818,6 @@
           Scenes:
               CopyModeBitmap:
                   - CopyAllScenes
-              NameSupportBitmap:
-                  - SceneNames
           SoftwareDiagnostics:
               Feature:
                   - Watermarks
@@ -7791,6 +7828,10 @@
               SupportedProtocolsBitmap:
                   - DASH
                   - HLS
+          LevelControl:
+              OptionsBitmap:
+                  - ExecuteIfOff
+                  - CoupleColorTempToLevel
   deprecated:
       event fields:
           WiFiNetworkDiagnostics:
@@ -7809,6 +7850,8 @@
               - ScenesCopyMode
           ContentLauncher:
               - SupportedStreamingProtocol
+          LevelControl:
+              - LevelControlOptions
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7821,12 +7864,27 @@
           # Targeting Spring 2024 Matter release
           - MicrowaveOvenControl
           - MicrowaveOvenMode
+          - DemandResponseLoadControl
+          - BooleanSensorConfiguration
+          - ValveConfigurationAndControl
+          - Timer
+          - OvenMode
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
               - SupportedWiFiBands
               - SupportedThreadFeatures
               - ThreadVersion
+          WakeOnLAN:
+              # Targeting Spring 2024 Matter release
+              - LinkLocalAddress
+          BasicInformation:
+              # Targeting Spring 2024 Matter release
+              - SpecificationVersion
+              - MaxPathsPerInvoke
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - FabricSceneInfo
       commands:
           GeneralDiagnostics:
               # Targeting Spring 2024 Matter release
@@ -7852,6 +7910,10 @@
               QueryIdentityResponse:
                   - identity
                   - possessionSignature
+      structs:
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - SceneInfoStruct
       struct fields:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -7862,6 +7924,9 @@
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
               - ThreadCapabilitiesBitmap
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - NameSupportBitmap
       bitmap values:
           OnOff:
               Feature:
@@ -7904,6 +7969,8 @@
               CopyModeBitmap: ScenesCopyMode
           ContentLauncher:
               SupportedProtocolsBitmap: SupportedStreamingProtocol
+          LevelControl:
+              OptionsBitmap: LevelControlOptions
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:

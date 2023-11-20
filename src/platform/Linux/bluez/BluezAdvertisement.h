@@ -33,7 +33,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-struct BluezEndpoint;
+class BluezEndpoint;
 
 class BluezAdvertisement
 {
@@ -41,7 +41,7 @@ public:
     BluezAdvertisement() = default;
     ~BluezAdvertisement() { Shutdown(); }
 
-    CHIP_ERROR Init(BluezEndpoint * apEndpoint, ChipAdvType aAdvType, const char * aAdvUUID, uint32_t aAdvDurationMs);
+    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, ChipAdvType aAdvType, const char * aAdvUUID, uint32_t aAdvDurationMs);
     void Shutdown();
 
     /// Start BLE advertising.

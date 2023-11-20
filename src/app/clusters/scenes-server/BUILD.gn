@@ -20,6 +20,8 @@ static_library("scenes") {
     "ExtensionFieldSets.h",
     "ExtensionFieldSetsImpl.cpp",
     "ExtensionFieldSetsImpl.h",
+    "SceneHandlerImpl.cpp",
+    "SceneHandlerImpl.h",
     "SceneTable.h",
     "SceneTableImpl.cpp",
     "SceneTableImpl.h",
