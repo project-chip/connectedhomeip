@@ -6,6 +6,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Thermostat;
 
+// built in presets will be prefixed with B
 constexpr const char * kBuiltInOneHandle = "B1";
 constexpr const char * kOccupiedName = "Occupied Default";
 
@@ -13,6 +14,10 @@ constexpr const char * kBuiltinTwoHandle = "B2";
 constexpr const char * kUnoccupiedName = "Unoccupied Default";
 
 constexpr const int kMaxPresets = 10;
+
+// user presets will be prefixed with U 
+static const char * userPresetPrefix = "U";
+static uint32_t nextNewHandle = 0;
 
 static PresetStruct::Type BuiltInPresets[] = 
 {
@@ -63,6 +68,18 @@ onEditCommit(ThermostatMatterScheduleManager * mgr, ThermostatMatterScheduleMana
 	
 	status = mgr->ThermostatMatterScheduleManager::ValidatePresetsForCommitting(oldPresets, newPresets);
 	SuccessOrExit(status);
+
+	// New presets look good, lets generate some new ID's for the new presets.
+	for (unsigned int index=0; index < gsEditingPresetsEmptyIndex; ++index)
+	{
+		if (gsEditingPresets[index].presetHandle.empty())
+		{
+			char handle[16];
+			snprintf(handle, 16, "%s%d", userPresetPrefix, nextNewHandle++);
+			gsEditingPresets[index].presetHandle = ByteSpan((const unsigned char *)handle, strlen(handle));
+		}
+	}
+
 
     gsActivePresets = gsEditingPresets;
 
