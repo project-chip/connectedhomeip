@@ -251,6 +251,8 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
     ConcreteCommandPath concretePath(0, 0, 0);
     TLV::TLVReader commandDataReader;
 
+    SetGroupRequest(false);
+
     // NOTE: errors may occur before the concrete command path is even fully decoded.
 
     err = aCommandElement.GetPath(&commandPath);
@@ -352,6 +354,7 @@ Status CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aComman
     Credentials::GroupDataProvider::GroupEndpoint mapping;
     Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
     Credentials::GroupDataProvider::EndpointIterator * iterator;
+    SetGroupRequest(true);
 
     err = aCommandElement.GetPath(&commandPath);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
@@ -462,7 +465,8 @@ CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aComman
 void CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
                                const char * context)
 {
-
+    // Return prematurely in case of requests targeted to a group that should not add the status for response purposes.
+    VerifyOrReturn(!IsGroupRequest());
     VerifyOrDie(FallibleAddStatus(aCommandPath, aStatus, context) == CHIP_NO_ERROR);
 }
 

@@ -26,6 +26,7 @@
 // ==================== Platform Adaptations ====================
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC 1
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 1
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 #else

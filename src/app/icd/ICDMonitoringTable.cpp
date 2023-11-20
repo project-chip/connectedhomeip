@@ -161,6 +161,25 @@ bool ICDMonitoringEntry::IsKeyEquivalent(ByteSpan keyData)
     return (data == validation) ? true : false;
 }
 
+ICDMonitoringEntry & ICDMonitoringEntry::operator=(const ICDMonitoringEntry & icdMonitoringEntry)
+{
+    if (this == &icdMonitoringEntry)
+    {
+        return *this;
+    }
+
+    fabricIndex       = icdMonitoringEntry.fabricIndex;
+    checkInNodeID     = icdMonitoringEntry.checkInNodeID;
+    monitoredSubject  = icdMonitoringEntry.monitoredSubject;
+    index             = icdMonitoringEntry.index;
+    keyHandleValid    = icdMonitoringEntry.keyHandleValid;
+    symmetricKeystore = icdMonitoringEntry.symmetricKeystore;
+    memcpy(key.AsMutable<Crypto::Aes128KeyByteArray>(), icdMonitoringEntry.key.As<Crypto::Aes128KeyByteArray>(),
+           sizeof(Crypto::Aes128KeyByteArray));
+
+    return *this;
+}
+
 CHIP_ERROR ICDMonitoringTable::Get(uint16_t index, ICDMonitoringEntry & entry) const
 {
     entry.fabricIndex = this->mFabric;
