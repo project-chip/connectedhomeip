@@ -309,7 +309,7 @@ tests:
               type: boolean
 
     - label: "Step 3g: TH reads attribute SceneTableSize from DUT."
-      PICS: S.S.F03 && S.S.F02
+      PICS: PICS_SDK_CI_ONLY && S.S.F03 && S.S.F02
       command: "readAttribute"
       attribute: "SceneTableSize"
       response:
@@ -317,7 +317,6 @@ tests:
           constraints:
               type: int16u
 
-    #FabricSceneInfo attribute not supported
     - label: "Step 3h: TH reads attribute FabricSceneInfo from DUT"
       verification: |
           DUT provides FabricSceneInfo containing (for the current fabric) following fields:
@@ -330,7 +329,7 @@ tests:
 
           SceneValid has the value TRUE.
 
-          if S.S.F02(TS), RemainingCapacity has the value SceneTableSize/2
+          if S.S.F02(TS), RemainingCapacity has the value fabricCapacity - 1
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP && S.S.F03 && S.S.F02
@@ -341,18 +340,21 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    #- label: "Step 3h: TH reads attribute FabricSceneInfo from DUT"
-    #  PICS: S.S.F03 && S.S.F02
-    #  command: "readAttribute"
-    #  attribute: "FabricSceneInfo"
-    #  response:
-    #      value: {
-    #              SceneCount: SceneCountValue,
-    #              CurrentScene: 0x01,
-    #              CurrentGroup: G1,
-    #              SceneValid: true,
-    #              RemainingCapacity: ( SceneTableSizeValue/2 ),
-    #          }
+    - label: "Step 3h: TH reads attribute FabricSceneInfo from DUT"
+      PICS: PICS_SDK_CI_ONLY && S.S.F03 && S.S.F02
+      command: "readAttribute"
+      attribute: "FabricSceneInfo"
+      response:
+          value:
+              [
+                  {
+                      SceneCount: 1,
+                      CurrentScene: 0x01,
+                      CurrentGroup: G1,
+                      SceneValid: true,
+                      RemainingCapacity: fabricCapacity - 1,
+                  },
+              ]
 
     - label: "Step 4a: Reboot target device"
       PICS: PICS_SDK_CI_ONLY

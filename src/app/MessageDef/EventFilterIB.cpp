@@ -57,7 +57,7 @@ CHIP_ERROR EventFilterIB::Parser::PrettyPrint() const
         {
             NodeId node;
             ReturnErrorOnFailure(reader.Get(node));
-            PRETTY_PRINT("\tNode = 0x%" PRIx64 ",", node);
+            PRETTY_PRINT("\tNode = 0x" ChipLogFormatX64 ",", ChipLogValueX64(node));
         }
 #endif // CHIP_DETAIL_LOGGING
         break;
@@ -66,7 +66,7 @@ CHIP_ERROR EventFilterIB::Parser::PrettyPrint() const
         {
             uint64_t eventMin;
             ReturnErrorOnFailure(reader.Get(eventMin));
-            PRETTY_PRINT("\tEventMin = 0x%" PRIx64 ",", eventMin);
+            PRETTY_PRINT("\tEventMin = 0x" ChipLogFormatX64 ",", ChipLogValueX64(eventMin));
         }
 #endif // CHIP_DETAIL_LOGGING
         break;

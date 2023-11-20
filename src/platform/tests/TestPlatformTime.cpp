@@ -67,8 +67,11 @@ static void TestDevice_GetMonotonicMicroseconds(nlTestSuite * inSuite, void * in
         const Clock::Microseconds64 Tend   = System::SystemClock().GetMonotonicMicroseconds64();
         const Clock::Microseconds64 Tdelta = Tend - Tstart;
 
-        ChipLogProgress(DeviceLayer, "Start=%" PRIu64 " End=%" PRIu64 " Delta=%" PRIu64 " Expected=%" PRIu64, Tstart.count(),
-                        Tend.count(), Tdelta.count(), Tdelay.count());
+        ChipLogProgress(DeviceLayer,
+                        "Start=0x" ChipLogFormatX64 " End=0x" ChipLogFormatX64 " Delta=0x" ChipLogFormatX64
+                        " Expected=0x" ChipLogFormatX64,
+                        ChipLogValueX64(Tstart.count()), ChipLogValueX64(Tend.count()), ChipLogValueX64(Tdelta.count()),
+                        ChipLogValueX64(Tdelay.count()));
 
         // verify that timers don't fire early
         NL_TEST_ASSERT(inSuite, Tdelta > (Tdelay - margin));
@@ -98,8 +101,11 @@ static void TestDevice_GetMonotonicMilliseconds(nlTestSuite * inSuite, void * in
         const Clock::Milliseconds64 Tend   = System::SystemClock().GetMonotonicMilliseconds64();
         const Clock::Milliseconds64 Tdelta = Tend - Tstart;
 
-        ChipLogProgress(DeviceLayer, "Start=%" PRIu64 " End=%" PRIu64 " Delta=%" PRIu64 " Expected=%" PRIu64, Tstart.count(),
-                        Tend.count(), Tdelta.count(), Tdelay.count());
+        ChipLogProgress(DeviceLayer,
+                        "Start=0x" ChipLogFormatX64 " End=0x" ChipLogFormatX64 " Delta=0x" ChipLogFormatX64
+                        " Expected=0x" ChipLogFormatX64,
+                        ChipLogValueX64(Tstart.count()), ChipLogValueX64(Tend.count()), ChipLogValueX64(Tdelta.count()),
+                        ChipLogValueX64(Tdelay.count()));
 
         // verify that timers don't fire early
         NL_TEST_ASSERT(inSuite, Tdelta > (Tdelay - margin));
