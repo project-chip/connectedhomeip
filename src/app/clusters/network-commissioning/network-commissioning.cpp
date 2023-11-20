@@ -260,25 +260,19 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         return aEncoder.Encode(mFeatureFlags);
 
     case Attributes::SupportedWiFiBands::Id:
-        if (mpDriver.Valid())
-        {
-            return aEncoder.Encode(mpDriver.Get<WiFiDriver *>()->GetSupportedWiFiBands());
-        }
-        return CHIP_NO_ERROR;
+        VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), CHIP_NO_ERROR);
+        VerifyOrReturnError(mpDriver.Valid(), CHIP_NO_ERROR);
+        return aEncoder.Encode(mpDriver.Get<WiFiDriver *>()->GetSupportedWiFiBands());
 
     case Attributes::SupportedThreadFeatures::Id:
-        if (mpDriver.Valid())
-        {
-            return aEncoder.Encode(mpDriver.Get<ThreadDriver *>()->GetSupportedThreadFeatures());
-        }
-        return CHIP_NO_ERROR;
+        VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_NO_ERROR);
+        VerifyOrReturnError(mpDriver.Valid(), CHIP_NO_ERROR);
+        return aEncoder.Encode(mpDriver.Get<ThreadDriver *>()->GetSupportedThreadFeatures());
 
     case Attributes::ThreadVersion::Id:
-        if (mpDriver.Valid())
-        {
-            return aEncoder.Encode(mpDriver.Get<ThreadDriver *>()->GetThreadVersion());
-        }
-        return CHIP_NO_ERROR;
+        VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_NO_ERROR);
+        VerifyOrReturnError(mpDriver.Valid(), CHIP_NO_ERROR);
+        return aEncoder.Encode(mpDriver.Get<ThreadDriver *>()->GetThreadVersion());
 
     default:
         return CHIP_NO_ERROR;
