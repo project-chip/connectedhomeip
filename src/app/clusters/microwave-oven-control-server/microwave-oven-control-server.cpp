@@ -237,7 +237,6 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
     {
         status = Status::InvalidInState;
         goto exit;
-
     }
 
 exit:
