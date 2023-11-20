@@ -470,7 +470,7 @@ template("ti_simplelink_sdk") {
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/freertos/",
       ]
     } else if (ti_simplelink_device_family == "cc13x4_26x4") {
-      libs += [ "${ti_simplelink_sdk_root}/source/ti/dmm/lib/gcc/m4f/libdmmlib_freertos.a" ]
+      libs += [ "${ti_simplelink_sdk_root}/source/ti/dmm/lib/gcc/m33f/libdmmlib_freertos.a" ]
       if (ti_simplelink_board == "LP_EM_CC1354P10_1" ||
           (ti_simplelink_board == "CC2674" &&
            ti_simplelink_device == "CC2674R10RGZ")) {
