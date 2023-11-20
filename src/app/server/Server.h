@@ -45,6 +45,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/SafeInt.h>
 #include <messaging/ExchangeMgr.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/KvsPersistentStorageDelegate.h>
 #include <protocols/secure_channel/CASEServer.h>
@@ -89,6 +90,15 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
                                               chip::Transport::BLE<kMaxBlePendingPackets>
 #endif
                                               >;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+using UdcTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if INET_CONFIG_ENABLE_IPV4
+                                     ,
+                                     Transport::UDP /* IPv4 */
+#endif
+                                     >;
+#endif
 
 struct ServerInitParams
 {
@@ -587,7 +597,11 @@ private:
     FabricTable mFabrics;
     secure_channel::MessageCounterManager mMessageCounterManager;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
+    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * gUDCClient = nullptr;
+    // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
+    // specifically, the commissioner declaration message (sent by commissioner to commissionee)
+    UdcTransportMgr * mUdcTransportMgr = nullptr;
+    uint16_t mCdcListenPort            = CHIP_UDC_COMMISSIONEE_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     CommissioningWindowManager mCommissioningWindowManager;
 

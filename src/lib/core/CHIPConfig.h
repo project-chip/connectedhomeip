@@ -293,12 +293,23 @@
  *  @def CHIP_UDC_PORT
  *
  *  @brief
- *    chip TCP/UDP port for unsecured user-directed-commissioning traffic.
+ *    chip TCP/UDP port on commissioner for unsecured user-directed-commissioning traffic.
  *
  */
 #ifndef CHIP_UDC_PORT
 #define CHIP_UDC_PORT CHIP_PORT + 10
 #endif // CHIP_UDC_PORT
+
+/**
+ *  @def CHIP_UDC_COMMISSIONEE_PORT
+ *
+ *  @brief
+ *    chip TCP/UDP port on commisionee for unsecured user-directed-commissioning traffic.
+ *
+ */
+#ifndef CHIP_UDC_COMMISSIONEE_PORT
+#define CHIP_UDC_COMMISSIONEE_PORT CHIP_UDC_PORT + 10
+#endif // CHIP_UDC_COMMISSIONEE_PORT
 
 /**
  *  @def CHIP_CONFIG_SECURITY_TEST_MODE

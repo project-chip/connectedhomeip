@@ -81,6 +81,9 @@ public:
     uint16_t GetProductId() const { return mProductId; }
     void SetProductId(uint16_t value) { mProductId = value; }
 
+    uint16_t GetCdPort() const { return mCdPort; }
+    void SetCdPort(uint16_t port) { mCdPort = port; }
+
     const uint8_t * GetRotatingId() const { return mRotatingId; }
     size_t GetRotatingIdLength() const { return mRotatingIdLen; }
     void SetRotatingId(const uint8_t * rotatingId, size_t rotatingIdLen)
@@ -102,12 +105,33 @@ public:
         return (mUDCClientProcessingState != UDCClientProcessingState::kNotInitialized && mExpirationTime > currentTime);
     }
 
+    void SetNoPasscode(bool newValue) { mNoPasscode = newValue; };
+    bool GetNoPasscode() const { return mNoPasscode; };
+
+    void SetCdUponPasscodeDialog(bool newValue) { mCdUponPasscodeDialog = newValue; };
+    bool GetCdUponPasscodeDialog() const { return mCdUponPasscodeDialog; };
+
+    void SetCommissionerPasscode(bool newValue) { mCommissionerPasscode = newValue; };
+    bool GetCommissionerPasscode() const { return mCommissionerPasscode; };
+
+    void SetCommissionerPasscodeReady(bool newValue) { mCommissionerPasscodeReady = newValue; };
+    bool GetCommissionerPasscodeReady() const { return mCommissionerPasscodeReady; };
+
     /**
      *  Reset the connection state to a completely uninitialized status.
      */
     void Reset()
     {
         mPeerAddress              = PeerAddress::Uninitialized();
+        mLongDiscriminator         = 0;
+        mVendorId                  = 0;
+        mProductId                 = 0;
+        mRotatingIdLen             = 0;
+        mCdPort                    = 0;
+        mNoPasscode                = false;
+        mCdUponPasscodeDialog      = false;
+        mCommissionerPasscode      = false;
+        mCommissionerPasscodeReady = false;
         mExpirationTime           = System::Clock::kZero;
         mUDCClientProcessingState = UDCClientProcessingState::kNotInitialized;
     }
@@ -117,10 +141,16 @@ private:
     char mInstanceName[Dnssd::Commission::kInstanceNameMaxLength + 1];
     char mDeviceName[Dnssd::kMaxDeviceNameLen + 1];
     uint16_t mLongDiscriminator = 0;
-    uint16_t mVendorId;
-    uint16_t mProductId;
+    uint16_t mVendorId          = 0;
+    uint16_t mProductId         = 0;
+    uint16_t mCdPort            = 0;
     uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen];
     size_t mRotatingIdLen = 0;
+    bool mNoPasscode                = false;
+    bool mCdUponPasscodeDialog      = false;
+    bool mCommissionerPasscode      = false;
+    bool mCommissionerPasscodeReady = false;
+
     UDCClientProcessingState mUDCClientProcessingState;
     System::Clock::Timestamp mExpirationTime = System::Clock::kZero;
 };

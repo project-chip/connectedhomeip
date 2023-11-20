@@ -359,6 +359,127 @@ void TestUDCClientState(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+void TestUDCIdentificationDeclaration(nlTestSuite * inSuite, void * inContext)
+{
+    IdentificationDeclaration id;
+    IdentificationDeclaration idOut;
+
+    const char * instanceName = "servertest1";
+    uint16_t vendorId         = 1111;
+    uint16_t productId        = 2222;
+    uint16_t port             = 123;
+    const char * deviceName   = "device1";
+    uint16_t vendorIdTemp     = 0;
+
+    // Rotating ID is given as up to 50 hex bytes
+    char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1];
+    uint8_t rotatingId[chip::Dnssd::kMaxRotatingIdLen];
+    size_t rotatingIdLen;
+    strcpy(rotatingIdString, "92873498273948734534");
+    GetRotatingDeviceId(GetSpan(rotatingIdString), rotatingId, &rotatingIdLen);
+
+    id.SetInstanceName(instanceName);
+    id.SetVendorId(vendorId);
+    id.SetProductId(productId);
+    id.SetDeviceName(deviceName);
+    id.SetRotatingId(rotatingId, rotatingIdLen);
+    id.SetCdPort(port);
+
+    id.SetNoPasscode(true);
+    id.AddAppVendorId(1);
+    id.AddAppVendorId(2);
+    id.AddAppVendorId(3);
+    id.SetCdUponPasscodeDialog(true);
+    id.SetCommissionerPasscode(true);
+    id.SetCommissionerPasscodeReady(true);
+
+    NL_TEST_ASSERT(inSuite, id.HasDiscoveryInfo());
+    NL_TEST_ASSERT(inSuite, strcmp(id.GetInstanceName(), instanceName) == 0);
+    NL_TEST_ASSERT(inSuite, vendorId == id.GetVendorId());
+    NL_TEST_ASSERT(inSuite, productId == id.GetProductId());
+    NL_TEST_ASSERT(inSuite, port == id.GetCdPort());
+    NL_TEST_ASSERT(inSuite, strcmp(id.GetDeviceName(), deviceName) == 0);
+    NL_TEST_ASSERT(inSuite, rotatingIdLen == id.GetRotatingIdLength());
+    NL_TEST_ASSERT(inSuite, memcmp(id.GetRotatingId(), rotatingId, rotatingIdLen) == 0);
+
+    NL_TEST_ASSERT(inSuite, id.GetNumAppVendorIds() == 3);
+    NL_TEST_ASSERT(inSuite, id.GetAppVendorId(0, vendorIdTemp) && vendorIdTemp == 1);
+    NL_TEST_ASSERT(inSuite, id.GetAppVendorId(1, vendorIdTemp) && vendorIdTemp == 2);
+    NL_TEST_ASSERT(inSuite, id.GetAppVendorId(2, vendorIdTemp) && vendorIdTemp == 3);
+    NL_TEST_ASSERT(inSuite, id.GetNoPasscode() == true);
+    NL_TEST_ASSERT(inSuite, id.GetCdUponPasscodeDialog() == true);
+    NL_TEST_ASSERT(inSuite, id.GetCommissionerPasscode() == true);
+    NL_TEST_ASSERT(inSuite, id.GetCommissionerPasscodeReady() == true);
+
+    // TODO: add an ip
+
+    uint8_t idBuffer[500];
+    id.WritePayload(idBuffer, sizeof(idBuffer));
+
+    // next, parse this object
+    idOut.ReadPayload(idBuffer, sizeof(idBuffer));
+
+    NL_TEST_ASSERT(inSuite, idOut.HasDiscoveryInfo());
+    NL_TEST_ASSERT(inSuite, strcmp(idOut.GetInstanceName(), instanceName) == 0);
+    NL_TEST_ASSERT(inSuite, vendorId == idOut.GetVendorId());
+    NL_TEST_ASSERT(inSuite, productId == idOut.GetProductId());
+    NL_TEST_ASSERT(inSuite, port == idOut.GetCdPort());
+    NL_TEST_ASSERT(inSuite, strcmp(idOut.GetDeviceName(), deviceName) == 0);
+    NL_TEST_ASSERT(inSuite, rotatingIdLen == idOut.GetRotatingIdLength());
+    NL_TEST_ASSERT(inSuite, memcmp(idOut.GetRotatingId(), rotatingId, rotatingIdLen) == 0);
+
+    NL_TEST_ASSERT(inSuite, id.GetNumAppVendorIds() == idOut.GetNumAppVendorIds());
+    NL_TEST_ASSERT(inSuite, idOut.GetAppVendorId(0, vendorIdTemp) && vendorIdTemp == 1);
+    NL_TEST_ASSERT(inSuite, idOut.GetAppVendorId(1, vendorIdTemp) && vendorIdTemp == 2);
+    NL_TEST_ASSERT(inSuite, idOut.GetAppVendorId(2, vendorIdTemp) && vendorIdTemp == 3);
+
+    NL_TEST_ASSERT(inSuite, id.GetNoPasscode() == idOut.GetNoPasscode());
+    NL_TEST_ASSERT(inSuite, id.GetCdUponPasscodeDialog() == idOut.GetCdUponPasscodeDialog());
+    NL_TEST_ASSERT(inSuite, id.GetCommissionerPasscode() == idOut.GetCommissionerPasscode());
+    NL_TEST_ASSERT(inSuite, id.GetCommissionerPasscodeReady() == idOut.GetCommissionerPasscodeReady());
+
+    // TODO: remove following "force-fail" debug line
+    // NL_TEST_ASSERT(inSuite, rotatingIdLen != id.GetRotatingIdLength());
+}
+
+void TestUDCCommissionerDeclaration(nlTestSuite * inSuite, void * inContext)
+{
+    CommissionerDeclaration id;
+    CommissionerDeclaration idOut;
+
+    CommissionerDeclaration::CdError errorCode = CommissionerDeclaration::kCaseConnectionFailed;
+
+    id.SetErrorCode(errorCode);
+    id.SetNeedsPasscode(true);
+    id.SetNoAppsFound(true);
+    id.SetPasscodeDialogDisplayed(true);
+    id.SetCommissionerPasscode(true);
+    id.SetQRCodeDisplayed(true);
+
+    NL_TEST_ASSERT(inSuite, errorCode == id.GetErrorCode());
+    NL_TEST_ASSERT(inSuite, id.GetNeedsPasscode() == true);
+    NL_TEST_ASSERT(inSuite, id.GetNoAppsFound() == true);
+    NL_TEST_ASSERT(inSuite, id.GetPasscodeDialogDisplayed() == true);
+    NL_TEST_ASSERT(inSuite, id.GetCommissionerPasscode() == true);
+    NL_TEST_ASSERT(inSuite, id.GetQRCodeDisplayed() == true);
+
+    uint8_t idBuffer[500];
+    id.WritePayload(idBuffer, sizeof(idBuffer));
+
+    // next, parse this object
+    idOut.ReadPayload(idBuffer, sizeof(idBuffer));
+
+    NL_TEST_ASSERT(inSuite, errorCode == idOut.GetErrorCode());
+    NL_TEST_ASSERT(inSuite, id.GetNeedsPasscode() == idOut.GetNeedsPasscode());
+    NL_TEST_ASSERT(inSuite, id.GetNoAppsFound() == idOut.GetNoAppsFound());
+    NL_TEST_ASSERT(inSuite, id.GetPasscodeDialogDisplayed() == idOut.GetPasscodeDialogDisplayed());
+    NL_TEST_ASSERT(inSuite, id.GetCommissionerPasscode() == idOut.GetCommissionerPasscode());
+    NL_TEST_ASSERT(inSuite, id.GetQRCodeDisplayed() == idOut.GetQRCodeDisplayed());
+
+    // TODO: remove following "force-fail" debug line
+    // NL_TEST_ASSERT(inSuite, rotatingIdLen != id.GetRotatingIdLength());
+}
+
 // Test Suite
 
 /**
@@ -373,6 +494,8 @@ static const nlTest sTests[] =
     NL_TEST_DEF("TestUserDirectedCommissioningClientMessage", TestUserDirectedCommissioningClientMessage),
     NL_TEST_DEF("TestUDCClients", TestUDCClients),
     NL_TEST_DEF("TestUDCClientState", TestUDCClientState),
+    NL_TEST_DEF("TestUDCIdentificationDeclaration", TestUDCIdentificationDeclaration),
+    NL_TEST_DEF("TestUDCCommissionerDeclaration", TestUDCCommissionerDeclaration),
 
     NL_TEST_SENTINEL()
 };

@@ -459,6 +459,7 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 
     mUdcServer = chip::Platform::New<UserDirectedCommissioningServer>();
     mUdcTransportMgr->SetSessionManager(mUdcServer);
+    mUdcServer->SetTransportManager(mUdcTransportMgr);
 
     mUdcServer->SetInstanceNameResolver(this);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
