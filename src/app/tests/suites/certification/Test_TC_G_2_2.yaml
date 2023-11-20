@@ -1135,16 +1135,16 @@ tests:
           unicast with the following fields: GroupID as 0x0002"
       PICS: G.S.C01.Rsp && G.S.C01.Tx
       verification: |
-          ./chip-tool groups view-group 0x0001 1 0
+          ./chip-tool groups view-group 0x0002 1 0
 
           Verify the ViewGroupResponse with status as NOT_FOUND on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
-          [1653559917.259920][3227:3232] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
-          [1653559917.259993][3227:3232] CHIP:TOO:   ViewGroupResponse: {
-          [1653559917.260040][3227:3232] CHIP:TOO:     status: 139
-          [1653559917.260075][3227:3232] CHIP:TOO:     groupId: 1
-          [1653559917.260107][3227:3232] CHIP:TOO:     groupName:
-          [1653559917.260138][3227:3232] CHIP:TOO:    }
+          [1700468046.366768][31682:31684] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
+          [1700468046.366826][31682:31684] CHIP:TOO:   ViewGroupResponse: {
+          [1700468046.366841][31682:31684] CHIP:TOO:     status: 139
+          [1700468046.366853][31682:31684] CHIP:TOO:     groupID: 2
+          [1700468046.366863][31682:31684] CHIP:TOO:     groupName:
+          [1700468046.366874][31682:31684] CHIP:TOO:    }
       disabled: true
 
     - label:
