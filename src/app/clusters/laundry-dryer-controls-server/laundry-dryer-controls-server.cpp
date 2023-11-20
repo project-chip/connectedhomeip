@@ -23,8 +23,8 @@
 #include "laundry-dryer-controls-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
