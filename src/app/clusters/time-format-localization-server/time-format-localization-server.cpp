@@ -135,6 +135,42 @@ bool IsSupportedCalendarType(CalendarTypeEnum newType, CalendarTypeEnum & validT
     return false;
 }
 
+chip::Optional<HourFormatEnum> SafeCastToKnowHourFormat(uint8_t value)
+{
+    switch (value)
+    {
+    case to_underlying(HourFormatEnum::k12hr):
+    case to_underlying(HourFormatEnum::k24hr):
+    case to_underlying(HourFormatEnum::kUseActiveLocale):
+        return chip::MakeOptional(static_cast<HourFormatEnum>(value));
+    default:
+        return chip::Optional<HourFormatEnum>::Missing();
+    }
+}
+
+chip::Optional<CalendarTypeEnum> SafeCastToKnowCalendarType(uint8_t value)
+{
+    switch (value)
+    {
+    case to_underlying(CalendarTypeEnum::kBuddhist):
+    case to_underlying(CalendarTypeEnum::kChinese):
+    case to_underlying(CalendarTypeEnum::kCoptic):
+    case to_underlying(CalendarTypeEnum::kEthiopian):
+    case to_underlying(CalendarTypeEnum::kGregorian):
+    case to_underlying(CalendarTypeEnum::kHebrew):
+    case to_underlying(CalendarTypeEnum::kIndian):
+    case to_underlying(CalendarTypeEnum::kIslamic):
+    case to_underlying(CalendarTypeEnum::kJapanese):
+    case to_underlying(CalendarTypeEnum::kKorean):
+    case to_underlying(CalendarTypeEnum::kPersian):
+    case to_underlying(CalendarTypeEnum::kTaiwanese):
+    case to_underlying(CalendarTypeEnum::kUseActiveLocale):
+        return chip::MakeOptional(static_cast<CalendarTypeEnum>(value));
+    default:
+        return chip::Optional<CalendarTypeEnum>::Missing();
+    }
+}
+
 } // anonymous namespace
 
 // =============================================================================
@@ -168,23 +204,20 @@ Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPre
     case ActiveCalendarType::Id: {
         VerifyOrReturnValue(sizeof(uint8_t) == size, Protocols::InteractionModel::Status::InvalidValue);
 
-        CalendarTypeEnum calendarType = static_cast<CalendarTypeEnum>(*value);
+        auto calendarType = SafeCastToKnowCalendarType(*value);
+        VerifyOrReturnValue(calendarType.HasValue(), Protocols::InteractionModel::Status::ConstraintError);
 
-        // IM logic should convert any unrecognized value to Unknown and we do not allow
-        // processing those.
-        VerifyOrReturnValue(calendarType != CalendarTypeEnum::kUnknownEnumValue,
-                            Protocols::InteractionModel::Status::ConstraintError);
-
-        return emberAfPluginTimeFormatLocalizationOnCalendarTypeChange(attributePath.mEndpointId, calendarType);
+        return emberAfPluginTimeFormatLocalizationOnCalendarTypeChange(attributePath.mEndpointId, calendarType.Value());
     }
     case HourFormat::Id: {
         VerifyOrReturnValue(sizeof(uint8_t) == size, Protocols::InteractionModel::Status::InvalidValue);
 
-        HourFormatEnum hourFormat = static_cast<HourFormatEnum>(*value);
+        auto hourFormat = SafeCastToKnowHourFormat(*value);
+        if (!hourFormat.HasValue())
+        {
+            return Protocols::InteractionModel::Status::ConstraintError;
+        }
 
-        // IM logic should convert any unrecognized value to Unknown and we do not allow
-        // processing those.
-        VerifyOrReturnValue(hourFormat != HourFormatEnum::kUnknownEnumValue, Protocols::InteractionModel::Status::ConstraintError);
         return Protocols::InteractionModel::Status::Success;
     }
     default:
