@@ -19094,11 +19094,11 @@ public class ChipClusters {
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
-    public void stayActiveRequest(DefaultClusterCallback callback) {
+    public void stayActiveRequest(StayActiveResponseCallback callback) {
       stayActiveRequest(callback, 0);
     }
 
-    public void stayActiveRequest(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+    public void stayActiveRequest(StayActiveResponseCallback callback, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -19106,12 +19106,26 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
+          final long promisedActiveDurationFieldID = 0L;
+          Long promisedActiveDuration = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == promisedActiveDurationFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                promisedActiveDuration = castingValue.value(Long.class);
+              }
+            }
+          }
+          callback.onSuccess(promisedActiveDuration);
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
     public interface RegisterClientResponseCallback extends BaseClusterCallback {
       void onSuccess(Long ICDCounter);
+    }
+
+    public interface StayActiveResponseCallback extends BaseClusterCallback {
+      void onSuccess(Long promisedActiveDuration);
     }
 
     public interface RegisteredClientsAttributeCallback extends BaseAttributeCallback {
@@ -27573,15 +27587,14 @@ public class ChipClusters {
   public static class DemandResponseLoadControlCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 150L;
 
-    private static final long DEVICE_CLASS_ATTRIBUTE_ID = 0L;
-    private static final long LOAD_CONTROL_PROGRAMS_ATTRIBUTE_ID = 1L;
-    private static final long NUMBER_OF_LOAD_CONTROL_PROGRAMS_ATTRIBUTE_ID = 2L;
-    private static final long EVENTS_ATTRIBUTE_ID = 3L;
-    private static final long ACTIVE_EVENTS_ATTRIBUTE_ID = 4L;
-    private static final long NUMBER_OF_EVENTS_PER_PROGRAM_ATTRIBUTE_ID = 5L;
-    private static final long NUMBER_OF_TRANSISTIONS_ATTRIBUTE_ID = 6L;
-    private static final long DEFAULT_RANDOM_START_ATTRIBUTE_ID = 7L;
-    private static final long DEFAULT_RANDOM_DURATION_ATTRIBUTE_ID = 8L;
+    private static final long LOAD_CONTROL_PROGRAMS_ATTRIBUTE_ID = 0L;
+    private static final long NUMBER_OF_LOAD_CONTROL_PROGRAMS_ATTRIBUTE_ID = 1L;
+    private static final long EVENTS_ATTRIBUTE_ID = 2L;
+    private static final long ACTIVE_EVENTS_ATTRIBUTE_ID = 3L;
+    private static final long NUMBER_OF_EVENTS_PER_PROGRAM_ATTRIBUTE_ID = 4L;
+    private static final long NUMBER_OF_TRANSITIONS_ATTRIBUTE_ID = 5L;
+    private static final long DEFAULT_RANDOM_START_ATTRIBUTE_ID = 6L;
+    private static final long DEFAULT_RANDOM_DURATION_ATTRIBUTE_ID = 7L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -27727,31 +27740,6 @@ public class ChipClusters {
       void onSuccess(List<Long> value);
     }
 
-    public void readDeviceClassAttribute(
-        LongAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEVICE_CLASS_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, DEVICE_CLASS_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeDeviceClassAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEVICE_CLASS_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-          }
-        }, DEVICE_CLASS_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readLoadControlProgramsAttribute(
         LoadControlProgramsAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LOAD_CONTROL_PROGRAMS_ATTRIBUTE_ID);
@@ -27877,9 +27865,9 @@ public class ChipClusters {
         }, NUMBER_OF_EVENTS_PER_PROGRAM_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readNumberOfTransistionsAttribute(
+    public void readNumberOfTransitionsAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_TRANSISTIONS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_TRANSITIONS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -27887,19 +27875,19 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, NUMBER_OF_TRANSISTIONS_ATTRIBUTE_ID, true);
+        }, NUMBER_OF_TRANSITIONS_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeNumberOfTransistionsAttribute(
+    public void subscribeNumberOfTransitionsAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_TRANSISTIONS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_TRANSITIONS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
-        }, NUMBER_OF_TRANSISTIONS_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, NUMBER_OF_TRANSITIONS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readDefaultRandomStartAttribute(

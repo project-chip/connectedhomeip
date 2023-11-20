@@ -7774,6 +7774,10 @@
       enums:
           ContentLauncher:
               - StatusEnum
+          ThermostatUserInterfaceConfiguration:
+              - KeypadLockoutEnum
+              - ScheduleProgrammingVisibilityEnum
+              - TemperatureDisplayModeEnum
       enum values:
           ContentLauncher:
               StatusEnum:
@@ -7784,10 +7788,23 @@
               FanModeSequenceEnum:
                   - OffHighAuto
                   - OffHigh
+          ThermostatUserInterfaceConfiguration:
+              KeypadLockoutEnum:
+                  - NoLockout
+                  - Lockout1
+                  - Lockout2
+                  - Lockout3
+                  - Lockout4
+                  - Lockout5
+              ScheduleProgrammingVisibilityEnum:
+                  - ScheduleProgrammingPermitted
+                  - ScheduleProgrammingDenied
+              TemperatureDisplayModeEnum:
+                  - Celsius
+                  - Fahrenheit
       bitmaps:
           Scenes:
               - CopyModeBitmap
-              - NameSupportBitmap
           AdministratorCommissioning:
               - Feature
           ContentLauncher:
@@ -7801,8 +7818,6 @@
           Scenes:
               CopyModeBitmap:
                   - CopyAllScenes
-              NameSupportBitmap:
-                  - SceneNames
           SoftwareDiagnostics:
               Feature:
                   - Watermarks
@@ -7817,14 +7832,6 @@
               OptionsBitmap:
                   - ExecuteIfOff
                   - CoupleColorTempToLevel
-      attributes:
-          Scenes:
-              - FabricSceneInfo
-              # Targeting Spring 2024 Matter release
-      structs:
-          Scenes:
-              - SceneInfoStruct
-              # Targeting Spring 2024 Matter release
   deprecated:
       event fields:
           WiFiNetworkDiagnostics:
@@ -7858,6 +7865,10 @@
           - MicrowaveOvenControl
           - MicrowaveOvenMode
           - DemandResponseLoadControl
+          - BooleanSensorConfiguration
+          - ValveConfigurationAndControl
+          - Timer
+          - OvenMode
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -7867,6 +7878,13 @@
           WakeOnLAN:
               # Targeting Spring 2024 Matter release
               - LinkLocalAddress
+          BasicInformation:
+              # Targeting Spring 2024 Matter release
+              - SpecificationVersion
+              - MaxPathsPerInvoke
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - FabricSceneInfo
       commands:
           GeneralDiagnostics:
               # Targeting Spring 2024 Matter release
@@ -7892,6 +7910,10 @@
               QueryIdentityResponse:
                   - identity
                   - possessionSignature
+      structs:
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - SceneInfoStruct
       struct fields:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -7902,6 +7924,9 @@
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
               - ThreadCapabilitiesBitmap
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - NameSupportBitmap
       bitmap values:
           OnOff:
               Feature:

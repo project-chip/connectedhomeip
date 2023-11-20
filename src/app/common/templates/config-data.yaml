@@ -5,13 +5,6 @@ DarwinForceWritable:
     - ContentLauncher::SupportedStreamingProtocols
     - FanControl::FanModeSequence
 
-WeakEnums:
-    # Allow-list of enums that we generate as enums, not enum classes.
-    # The goal is to drive this down to 0.
-    - ColorControlOptions
-    - ColorMode
-    - EnhancedColorMode
-
 EnumsNotUsedAsTypeInXML:
     # List of enums that are not used as a type in XML. By adding an enum
     # to this list you prevent incorrectly assuming from code that you are

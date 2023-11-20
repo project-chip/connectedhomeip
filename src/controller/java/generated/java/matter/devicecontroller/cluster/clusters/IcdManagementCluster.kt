@@ -26,6 +26,8 @@ class IcdManagementCluster(
 ) {
   class RegisterClientResponse(val ICDCounter: UInt)
 
+  class StayActiveResponse(val promisedActiveDuration: UInt)
+
   class RegisteredClientsAttribute(
     val value: List<IcdManagementClusterMonitoringRegistrationStruct>?
   )
@@ -68,7 +70,7 @@ class IcdManagementCluster(
     }
   }
 
-  suspend fun stayActiveRequest(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun stayActiveRequest(timedInvokeTimeoutMs: Int? = null): StayActiveResponse {
     val commandId = 3L
 
     if (timedInvokeTimeoutMs != null) {

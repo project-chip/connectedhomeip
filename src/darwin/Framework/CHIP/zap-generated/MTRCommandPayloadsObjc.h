@@ -4490,6 +4490,25 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRICDManagementClusterStayActiveResponseParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull promisedActiveDuration MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * Initialize an MTRICDManagementClusterStayActiveResponseParams with a response-value dictionary
+ * of the sort that MTRDeviceResponseHandler would receive.
+ *
+ * Will return nil and hand out an error if the response-value dictionary is not
+ * a command data response or is not the right command response.
+ *
+ * Will return nil and hand out an error if the data response does not match the known
+ * schema for this command.
+ */
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRTimerClusterSetTimerParams : NSObject <NSCopying>
 
 @property (nonatomic, copy, getter=getNewTime) NSNumber * _Nonnull newTime MTR_PROVISIONALLY_AVAILABLE;
