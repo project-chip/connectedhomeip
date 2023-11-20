@@ -203,6 +203,7 @@ matter_clusters_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/clusters/IdentifyCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/clusters/IlluminanceMeasurementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/clusters/KeypadInputCluster.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/clusters/LaundryDryerControlsCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/clusters/LaundryWasherControlsCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/clusters/LaundryWasherModeCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/clusters/LevelControlCluster.kt",
