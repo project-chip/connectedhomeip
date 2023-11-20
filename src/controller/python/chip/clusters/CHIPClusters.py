@@ -4428,6 +4428,83 @@ class ChipClusters:
             },
         },
     }
+    _OVEN_MODE_CLUSTER_INFO = {
+        "clusterName": "OvenMode",
+        "clusterId": 0x00000049,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ChangeToMode",
+                "args": {
+                    "newMode": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedModes",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentMode",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "StartUpMode",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000003: {
+                "attributeName": "OnMode",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _MODE_SELECT_CLUSTER_INFO = {
         "clusterName": "ModeSelect",
         "clusterId": 0x00000050,
@@ -6144,57 +6221,51 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "DeviceClass",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
                 "attributeName": "LoadControlPrograms",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000002: {
+            0x00000001: {
                 "attributeName": "NumberOfLoadControlPrograms",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000002: {
                 "attributeName": "Events",
+                "attributeId": 0x00000002,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "ActiveEvents",
                 "attributeId": 0x00000003,
                 "type": "",
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "ActiveEvents",
+                "attributeName": "NumberOfEventsPerProgram",
                 "attributeId": 0x00000004,
-                "type": "",
+                "type": "int",
                 "reportable": True,
             },
             0x00000005: {
-                "attributeName": "NumberOfEventsPerProgram",
+                "attributeName": "NumberOfTransitions",
                 "attributeId": 0x00000005,
                 "type": "int",
                 "reportable": True,
             },
             0x00000006: {
-                "attributeName": "NumberOfTransistions",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
                 "attributeName": "DefaultRandomStart",
-                "attributeId": 0x00000007,
+                "attributeId": 0x00000006,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000008: {
+            0x00000007: {
                 "attributeName": "DefaultRandomDuration",
-                "attributeId": 0x00000008,
+                "attributeId": 0x00000007,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -12832,6 +12903,7 @@ class ChipClusters:
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
         0x00000046: _ICD_MANAGEMENT_CLUSTER_INFO,
         0x00000047: _TIMER_CLUSTER_INFO,
+        0x00000049: _OVEN_MODE_CLUSTER_INFO,
         0x00000050: _MODE_SELECT_CLUSTER_INFO,
         0x00000051: _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
         0x00000052: _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
@@ -12939,6 +13011,7 @@ class ChipClusters:
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "IcdManagement": _ICD_MANAGEMENT_CLUSTER_INFO,
         "Timer": _TIMER_CLUSTER_INFO,
+        "OvenMode": _OVEN_MODE_CLUSTER_INFO,
         "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
         "LaundryWasherMode": _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
         "RefrigeratorAndTemperatureControlledCabinetMode": _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,

@@ -73,7 +73,7 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     // VerifyOrDie(kFastPollingInterval.count() < activeModeDuration);
 
     UpdateICDMode();
-    UpdateOperationState(OperationalState::ActiveMode);
+    UpdateOperationState(OperationalState::IdleMode);
 }
 
 void ICDManager::Shutdown()
@@ -84,7 +84,7 @@ void ICDManager::Shutdown()
     DeviceLayer::SystemLayer().CancelTimer(OnActiveModeDone, this);
     DeviceLayer::SystemLayer().CancelTimer(OnTransitionToIdle, this);
     mICDMode          = ICDMode::SIT;
-    mOperationalState = OperationalState::IdleMode;
+    mOperationalState = OperationalState::ActiveMode;
     mStorage          = nullptr;
     mFabricTable      = nullptr;
     mStateObserverPool.ReleaseAll();

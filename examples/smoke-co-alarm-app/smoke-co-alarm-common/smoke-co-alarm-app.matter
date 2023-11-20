@@ -1643,7 +1643,7 @@ server cluster IcdManagement = 70 {
 
   fabric command access(invoke: manage) RegisterClient(RegisterClientRequest): RegisterClientResponse = 0;
   fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
-  command access(invoke: manage) StayActiveRequest(): DefaultSuccess = 3;
+  command access(invoke: manage) StayActiveRequest(): StayActiveResponse = 3;
 }
 
 /** This cluster provides an interface for observing and managing the state of smoke and CO alarms. */

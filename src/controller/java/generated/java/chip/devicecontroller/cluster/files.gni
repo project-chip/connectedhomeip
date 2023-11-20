@@ -61,6 +61,8 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/OperationalStateClusterErrorStateStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/OperationalStateClusterOperationalStateStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/OtaSoftwareUpdateRequestorClusterProviderLocation.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/OvenModeClusterModeOptionStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/OvenModeClusterModeTagStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/PowerSourceClusterBatChargeFaultChangeType.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/PowerSourceClusterBatFaultChangeType.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/PowerSourceClusterWiredFaultChangeType.kt",

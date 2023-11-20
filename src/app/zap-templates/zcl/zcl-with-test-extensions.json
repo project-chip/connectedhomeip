@@ -74,6 +74,7 @@
         "operational-credentials-cluster.xml",
         "operational-state-cluster.xml",
         "operational-state-rvc-cluster.xml",
+        "oven-mode-cluster.xml",
         "pressure-measurement-cluster.xml",
         "power-source-cluster.xml",
         "power-source-configuration-cluster.xml",
@@ -112,7 +113,6 @@
         "window-covering.xml",
         "matter-devices.xml",
         "sample-mei-cluster.xml",
-        "types/color-control.xml",
         "types/door-lock.xml",
         "types/occupancy-sensing.xml",
         "types/thermostat-user-interface-configuration.xml"
