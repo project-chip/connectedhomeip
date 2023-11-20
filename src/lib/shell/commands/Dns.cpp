@@ -38,6 +38,7 @@ namespace {
 
 Shell::Engine sShellDnsBrowseSubcommands;
 Shell::Engine sShellDnsSubcommands;
+Dnssd::ResolverProxy sResolverProxy;
 
 class DnsShellResolverDelegate : public Dnssd::CommissioningResolveDelegate, public AddressResolve::NodeListener
 {
@@ -212,13 +213,9 @@ CHIP_ERROR BrowseCommissionableHandler(int argc, char ** argv)
     Dnssd::DiscoveryFilter filter;
     VerifyOrReturnError(ParseSubType(argc, argv, filter), CHIP_ERROR_INVALID_ARGUMENT);
 
-    Dnssd::ResolverProxy resolverProxy;
-    ReturnErrorOnFailure(resolverProxy.Init(DeviceLayer::UDPEndPointManager()));
-    resolverProxy.SetCommissioningDelegate(&sDnsShellResolverDelegate);
-
     streamer_printf(streamer_get(), "Browsing commissionable nodes...\r\n");
 
-    return resolverProxy.DiscoverCommissionableNodes(filter);
+    return sResolverProxy.DiscoverCommissionableNodes(filter);
 }
 
 CHIP_ERROR BrowseCommissionerHandler(int argc, char ** argv)
@@ -226,13 +223,9 @@ CHIP_ERROR BrowseCommissionerHandler(int argc, char ** argv)
     Dnssd::DiscoveryFilter filter;
     VerifyOrReturnError(ParseSubType(argc, argv, filter), CHIP_ERROR_INVALID_ARGUMENT);
 
-    Dnssd::ResolverProxy resolverProxy;
-    ReturnErrorOnFailure(resolverProxy.Init(DeviceLayer::UDPEndPointManager()));
-    resolverProxy.SetCommissioningDelegate(&sDnsShellResolverDelegate);
-
     streamer_printf(streamer_get(), "Browsing commissioners...\r\n");
 
-    return resolverProxy.DiscoverCommissioners(filter);
+    return sResolverProxy.DiscoverCommissioners(filter);
 }
 
 CHIP_ERROR BrowseHandler(int argc, char ** argv)
@@ -242,6 +235,9 @@ CHIP_ERROR BrowseHandler(int argc, char ** argv)
         sShellDnsBrowseSubcommands.ForEachCommand(PrintCommandHelp, nullptr);
         return CHIP_NO_ERROR;
     }
+
+    sResolverProxy.Init(DeviceLayer::UDPEndPointManager());
+    sResolverProxy.SetCommissioningDelegate(&sDnsShellResolverDelegate);
 
     return sShellDnsBrowseSubcommands.ExecCommand(argc, argv);
 }
