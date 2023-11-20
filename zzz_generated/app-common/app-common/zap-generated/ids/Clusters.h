@@ -220,6 +220,9 @@ static constexpr ClusterId Id = 0x00000081;
 namespace DemandResponseLoadControl {
 static constexpr ClusterId Id = 0x00000096;
 } // namespace DemandResponseLoadControl
+namespace DeviceEnergyManagement {
+static constexpr ClusterId Id = 0x00000098;
+} // namespace DeviceEnergyManagement
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock

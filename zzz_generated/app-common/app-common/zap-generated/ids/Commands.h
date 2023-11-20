@@ -941,6 +941,40 @@ static constexpr CommandId Id = 0x00000004;
 } // namespace Commands
 } // namespace DemandResponseLoadControl
 
+namespace DeviceEnergyManagement {
+namespace Commands {
+
+namespace PowerAdjustRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace PowerAdjustRequest
+
+namespace CancelPowerAdjustRequest {
+static constexpr CommandId Id = 0x00000001;
+} // namespace CancelPowerAdjustRequest
+
+namespace StartTimeAdjustRequest {
+static constexpr CommandId Id = 0x00000002;
+} // namespace StartTimeAdjustRequest
+
+namespace PauseRequest {
+static constexpr CommandId Id = 0x00000003;
+} // namespace PauseRequest
+
+namespace ResumeRequest {
+static constexpr CommandId Id = 0x00000004;
+} // namespace ResumeRequest
+
+namespace ModifyForecastRequest {
+static constexpr CommandId Id = 0x00000005;
+} // namespace ModifyForecastRequest
+
+namespace RequestConstraintBasedForecast {
+static constexpr CommandId Id = 0x00000006;
+} // namespace RequestConstraintBasedForecast
+
+} // namespace Commands
+} // namespace DeviceEnergyManagement
+
 namespace DoorLock {
 namespace Commands {
 

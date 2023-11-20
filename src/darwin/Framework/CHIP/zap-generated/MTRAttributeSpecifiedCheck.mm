@@ -2921,6 +2921,54 @@ static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId a
     }
     }
 }
+static BOOL AttributeIsSpecifiedInDeviceEnergyManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DeviceEnergyManagement;
+    switch (aAttributeId) {
+    case Attributes::ESAType::Id: {
+        return YES;
+    }
+    case Attributes::ESACanGenerate::Id: {
+        return YES;
+    }
+    case Attributes::ESAState::Id: {
+        return YES;
+    }
+    case Attributes::AbsMinPower::Id: {
+        return YES;
+    }
+    case Attributes::AbsMaxPower::Id: {
+        return YES;
+    }
+    case Attributes::PowerAdjustmentCapability::Id: {
+        return YES;
+    }
+    case Attributes::Forecast::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInDoorLockCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DoorLock;
@@ -6020,6 +6068,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::DemandResponseLoadControl::Id: {
         return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);
+    }
+    case Clusters::DeviceEnergyManagement::Id: {
+        return AttributeIsSpecifiedInDeviceEnergyManagementCluster(aAttributeId);
     }
     case Clusters::DoorLock::Id: {
         return AttributeIsSpecifiedInDoorLockCluster(aAttributeId);

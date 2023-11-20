@@ -3119,6 +3119,82 @@ public static class DemandResponseLoadControlClusterLoadControlEventStatusChange
     return output.toString();
   }
 }
+public static class DeviceEnergyManagementClusterPowerAdjustEndEvent {
+  public Integer cause;
+  public Long duration;
+  public Long energyUse;
+  private static final long CAUSE_ID = 0L;
+  private static final long DURATION_ID = 1L;
+  private static final long ENERGY_USE_ID = 2L;
+
+  public DeviceEnergyManagementClusterPowerAdjustEndEvent(
+    Integer cause,
+    Long duration,
+    Long energyUse
+  ) {
+    this.cause = cause;
+    this.duration = duration;
+    this.energyUse = energyUse;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CAUSE_ID, new UIntType(cause)));
+    values.add(new StructElement(DURATION_ID, new UIntType(duration)));
+    values.add(new StructElement(ENERGY_USE_ID, new IntType(energyUse)));
+
+    return new StructType(values);
+  }
+
+  public static DeviceEnergyManagementClusterPowerAdjustEndEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer cause = null;
+    Long duration = null;
+    Long energyUse = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CAUSE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          cause = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          duration = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == ENERGY_USE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          energyUse = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new DeviceEnergyManagementClusterPowerAdjustEndEvent(
+      cause,
+      duration,
+      energyUse
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DeviceEnergyManagementClusterPowerAdjustEndEvent {\n");
+    output.append("\tcause: ");
+    output.append(cause);
+    output.append("\n");
+    output.append("\tduration: ");
+    output.append(duration);
+    output.append("\n");
+    output.append("\tenergyUse: ");
+    output.append(energyUse);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DoorLockClusterDoorLockAlarmEvent {
   public Integer alarmCode;
   private static final long ALARM_CODE_ID = 0L;

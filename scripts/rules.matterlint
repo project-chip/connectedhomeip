@@ -22,6 +22,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/color-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/concentration-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/device-energy-management-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/dishwasher-alarm-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/dishwasher-mode-cluster.xml";

@@ -4517,6 +4517,378 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDeviceEnergyManagementClusterCostStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _costType = @(0);
+
+        _value = @(0);
+
+        _decimalPoints = @(0);
+
+        _currency = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementClusterCostStruct alloc] init];
+
+    other.costType = self.costType;
+    other.value = self.value;
+    other.decimalPoints = self.decimalPoints;
+    other.currency = self.currency;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: costType:%@; value:%@; decimalPoints:%@; currency:%@; >", NSStringFromClass([self class]), _costType, _value, _decimalPoints, _currency];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementClusterSlotStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _minDuration = @(0);
+
+        _maxDuration = @(0);
+
+        _defaultDuration = @(0);
+
+        _elapsedSlotTime = @(0);
+
+        _remainingSlotTime = @(0);
+
+        _slotIsPauseable = @(0);
+
+        _minPauseDuration = @(0);
+
+        _maxPauseDuration = @(0);
+
+        _manufacturerESAState = nil;
+
+        _nominalPower = nil;
+
+        _minPower = nil;
+
+        _maxPower = nil;
+
+        _nominalEnergy = nil;
+
+        _costs = nil;
+
+        _minPowerAdjustment = nil;
+
+        _maxPowerAdjustment = nil;
+
+        _minDurationAdjustment = nil;
+
+        _maxDurationAdjustment = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementClusterSlotStruct alloc] init];
+
+    other.minDuration = self.minDuration;
+    other.maxDuration = self.maxDuration;
+    other.defaultDuration = self.defaultDuration;
+    other.elapsedSlotTime = self.elapsedSlotTime;
+    other.remainingSlotTime = self.remainingSlotTime;
+    other.slotIsPauseable = self.slotIsPauseable;
+    other.minPauseDuration = self.minPauseDuration;
+    other.maxPauseDuration = self.maxPauseDuration;
+    other.manufacturerESAState = self.manufacturerESAState;
+    other.nominalPower = self.nominalPower;
+    other.minPower = self.minPower;
+    other.maxPower = self.maxPower;
+    other.nominalEnergy = self.nominalEnergy;
+    other.costs = self.costs;
+    other.minPowerAdjustment = self.minPowerAdjustment;
+    other.maxPowerAdjustment = self.maxPowerAdjustment;
+    other.minDurationAdjustment = self.minDurationAdjustment;
+    other.maxDurationAdjustment = self.maxDurationAdjustment;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: minDuration:%@; maxDuration:%@; defaultDuration:%@; elapsedSlotTime:%@; remainingSlotTime:%@; slotIsPauseable:%@; minPauseDuration:%@; maxPauseDuration:%@; manufacturerESAState:%@; nominalPower:%@; minPower:%@; maxPower:%@; nominalEnergy:%@; costs:%@; minPowerAdjustment:%@; maxPowerAdjustment:%@; minDurationAdjustment:%@; maxDurationAdjustment:%@; >", NSStringFromClass([self class]), _minDuration, _maxDuration, _defaultDuration, _elapsedSlotTime, _remainingSlotTime, _slotIsPauseable, _minPauseDuration, _maxPauseDuration, _manufacturerESAState, _nominalPower, _minPower, _maxPower, _nominalEnergy, _costs, _minPowerAdjustment, _maxPowerAdjustment, _minDurationAdjustment, _maxDurationAdjustment];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementClusterForecastStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _forecastId = @(0);
+
+        _activeSlotNumber = nil;
+
+        _startTime = @(0);
+
+        _endTime = @(0);
+
+        _earliestStartTime = nil;
+
+        _latestEndTime = nil;
+
+        _isPauseable = @(0);
+
+        _slots = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementClusterForecastStruct alloc] init];
+
+    other.forecastId = self.forecastId;
+    other.activeSlotNumber = self.activeSlotNumber;
+    other.startTime = self.startTime;
+    other.endTime = self.endTime;
+    other.earliestStartTime = self.earliestStartTime;
+    other.latestEndTime = self.latestEndTime;
+    other.isPauseable = self.isPauseable;
+    other.slots = self.slots;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastId:%@; activeSlotNumber:%@; startTime:%@; endTime:%@; earliestStartTime:%@; latestEndTime:%@; isPauseable:%@; slots:%@; >", NSStringFromClass([self class]), _forecastId, _activeSlotNumber, _startTime, _endTime, _earliestStartTime, _latestEndTime, _isPauseable, _slots];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementClusterConstraintsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _startTime = @(0);
+
+        _duration = @(0);
+
+        _nominalPower = nil;
+
+        _maximumEnergy = nil;
+
+        _loadControl = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementClusterConstraintsStruct alloc] init];
+
+    other.startTime = self.startTime;
+    other.duration = self.duration;
+    other.nominalPower = self.nominalPower;
+    other.maximumEnergy = self.maximumEnergy;
+    other.loadControl = self.loadControl;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTime:%@; duration:%@; nominalPower:%@; maximumEnergy:%@; loadControl:%@; >", NSStringFromClass([self class]), _startTime, _duration, _nominalPower, _maximumEnergy, _loadControl];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementClusterPowerAdjustStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _minPower = @(0);
+
+        _maxPower = @(0);
+
+        _minDuration = @(0);
+
+        _maxDuration = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementClusterPowerAdjustStruct alloc] init];
+
+    other.minPower = self.minPower;
+    other.maxPower = self.maxPower;
+    other.minDuration = self.minDuration;
+    other.maxDuration = self.maxDuration;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: minPower:%@; maxPower:%@; minDuration:%@; maxDuration:%@; >", NSStringFromClass([self class]), _minPower, _maxPower, _minDuration, _maxDuration];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementClusterSlotAdjustmentStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _slotIndex = @(0);
+
+        _nominalPower = @(0);
+
+        _duration = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementClusterSlotAdjustmentStruct alloc] init];
+
+    other.slotIndex = self.slotIndex;
+    other.nominalPower = self.nominalPower;
+    other.duration = self.duration;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: slotIndex:%@; nominalPower:%@; duration:%@; >", NSStringFromClass([self class]), _slotIndex, _nominalPower, _duration];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementClusterPowerAdjustStartEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementClusterPowerAdjustStartEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementClusterPowerAdjustEndEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _cause = @(0);
+
+        _duration = @(0);
+
+        _energyUse = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementClusterPowerAdjustEndEvent alloc] init];
+
+    other.cause = self.cause;
+    other.duration = self.duration;
+    other.energyUse = self.energyUse;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: cause:%@; duration:%@; energyUse:%@; >", NSStringFromClass([self class]), _cause, _duration, _energyUse];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementClusterPausedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementClusterPausedEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementClusterResumedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementClusterResumedEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDoorLockClusterCredentialStruct
 - (instancetype)init
 {

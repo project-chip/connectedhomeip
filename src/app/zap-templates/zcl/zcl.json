@@ -34,6 +34,7 @@
         "concentration-measurement-cluster.xml",
         "content-launch-cluster.xml",
         "descriptor-cluster.xml",
+        "device-energy-management-cluster.xml",
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
@@ -169,6 +170,7 @@
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Descriptor": ["ClusterRevision"],
+        "Device Energy Management": ["Forecast"],
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",

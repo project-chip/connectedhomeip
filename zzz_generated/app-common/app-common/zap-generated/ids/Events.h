@@ -403,6 +403,28 @@ static constexpr EventId Id = 0x00000000;
 } // namespace Events
 } // namespace DemandResponseLoadControl
 
+namespace DeviceEnergyManagement {
+namespace Events {
+
+namespace PowerAdjustStart {
+static constexpr EventId Id = 0x00000000;
+} // namespace PowerAdjustStart
+
+namespace PowerAdjustEnd {
+static constexpr EventId Id = 0x00000001;
+} // namespace PowerAdjustEnd
+
+namespace Paused {
+static constexpr EventId Id = 0x00000002;
+} // namespace Paused
+
+namespace Resumed {
+static constexpr EventId Id = 0x00000003;
+} // namespace Resumed
+
+} // namespace Events
+} // namespace DeviceEnergyManagement
+
 namespace DoorLock {
 namespace Events {
 

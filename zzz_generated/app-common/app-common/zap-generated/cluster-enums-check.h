@@ -1573,6 +1573,76 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadContr
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::CauseEnum val)
+{
+    using EnumType = DeviceEnergyManagement::CauseEnum;
+    switch (val)
+    {
+    case EnumType::kNormalCompletion:
+    case EnumType::kOffline:
+    case EnumType::kFault:
+    case EnumType::kUserOptOut:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::CostTypeEnum val)
+{
+    using EnumType = DeviceEnergyManagement::CostTypeEnum;
+    switch (val)
+    {
+    case EnumType::kFinancial:
+    case EnumType::kGHGEmissions:
+    case EnumType::kComfort:
+    case EnumType::kTemperature:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::ESAStateEnum val)
+{
+    using EnumType = DeviceEnergyManagement::ESAStateEnum;
+    switch (val)
+    {
+    case EnumType::kOffline:
+    case EnumType::kOnline:
+    case EnumType::kFault:
+    case EnumType::kUserOptOut:
+    case EnumType::kPowerAdjustActive:
+    case EnumType::kPaused:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::ESATypeEnum val)
+{
+    using EnumType = DeviceEnergyManagement::ESATypeEnum;
+    switch (val)
+    {
+    case EnumType::kEvse:
+    case EnumType::kSpaceHeating:
+    case EnumType::kWaterHeating:
+    case EnumType::kSpaceCooling:
+    case EnumType::kSpaceHeatingCooling:
+    case EnumType::kBatteryStorage:
+    case EnumType::kSolarPV:
+    case EnumType::kFridgeFreezer:
+    case EnumType::kWashingMachine:
+    case EnumType::kDishwasher:
+    case EnumType::kCooking:
+    case EnumType::kHomeWaterPump:
+    case EnumType::kIrrigationWaterPump:
+    case EnumType::kPoolPump:
+    case EnumType::kOther:
+        return val;
+    default:
+        return static_cast<EnumType>(14);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
     using EnumType = DoorLock::AlarmCodeEnum;

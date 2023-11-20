@@ -2526,6 +2526,78 @@ static id _Nullable DecodeEventPayloadForDemandResponseLoadControlCluster(EventI
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForDeviceEnergyManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::DeviceEnergyManagement;
+    switch (aEventId) {
+    case Events::PowerAdjustStart::Id: {
+        Events::PowerAdjustStart::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDeviceEnergyManagementClusterPowerAdjustStartEvent new];
+
+        return value;
+    }
+    case Events::PowerAdjustEnd::Id: {
+        Events::PowerAdjustEnd::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDeviceEnergyManagementClusterPowerAdjustEndEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.cause)];
+            value.cause = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.duration];
+            value.duration = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithLongLong:cppValue.energyUse];
+            value.energyUse = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::Paused::Id: {
+        Events::Paused::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDeviceEnergyManagementClusterPausedEvent new];
+
+        return value;
+    }
+    case Events::Resumed::Id: {
+        Events::Resumed::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDeviceEnergyManagementClusterResumedEvent new];
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForDoorLockCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::DoorLock;
@@ -3757,6 +3829,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::DemandResponseLoadControl::Id: {
         return DecodeEventPayloadForDemandResponseLoadControlCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::DeviceEnergyManagement::Id: {
+        return DecodeEventPayloadForDeviceEnergyManagementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);

@@ -7805,6 +7805,242 @@ static id _Nullable DecodeAttributeValueForDemandResponseLoadControlCluster(Attr
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::DeviceEnergyManagement;
+    switch (aAttributeId) {
+    case Attributes::ESAType::Id: {
+        using TypeInfo = Attributes::ESAType::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::ESACanGenerate::Id: {
+        using TypeInfo = Attributes::ESACanGenerate::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::ESAState::Id: {
+        using TypeInfo = Attributes::ESAState::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::AbsMinPower::Id: {
+        using TypeInfo = Attributes::AbsMinPower::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithLongLong:cppValue];
+        return value;
+    }
+    case Attributes::AbsMaxPower::Id: {
+        using TypeInfo = Attributes::AbsMaxPower::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithLongLong:cppValue];
+        return value;
+    }
+    case Attributes::PowerAdjustmentCapability::Id: {
+        using TypeInfo = Attributes::PowerAdjustmentCapability::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = cppValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRDeviceEnergyManagementClusterPowerAdjustStruct * newElement_1;
+                    newElement_1 = [MTRDeviceEnergyManagementClusterPowerAdjustStruct new];
+                    newElement_1.minPower = [NSNumber numberWithLongLong:entry_1.minPower];
+                    newElement_1.maxPower = [NSNumber numberWithLongLong:entry_1.maxPower];
+                    newElement_1.minDuration = [NSNumber numberWithUnsignedInt:entry_1.minDuration];
+                    newElement_1.maxDuration = [NSNumber numberWithUnsignedInt:entry_1.maxDuration];
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_1;
+            }
+        }
+        return value;
+    }
+    case Attributes::Forecast::Id: {
+        using TypeInfo = Attributes::Forecast::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRDeviceEnergyManagementClusterForecastStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRDeviceEnergyManagementClusterForecastStruct new];
+            value.forecastId = [NSNumber numberWithUnsignedShort:cppValue.Value().forecastId];
+            if (cppValue.Value().activeSlotNumber.IsNull()) {
+                value.activeSlotNumber = nil;
+            } else {
+                value.activeSlotNumber = [NSNumber numberWithUnsignedShort:cppValue.Value().activeSlotNumber.Value()];
+            }
+            value.startTime = [NSNumber numberWithUnsignedInt:cppValue.Value().startTime];
+            value.endTime = [NSNumber numberWithUnsignedInt:cppValue.Value().endTime];
+            if (cppValue.Value().earliestStartTime.HasValue()) {
+                if (cppValue.Value().earliestStartTime.Value().IsNull()) {
+                    value.earliestStartTime = nil;
+                } else {
+                    value.earliestStartTime = [NSNumber numberWithUnsignedInt:cppValue.Value().earliestStartTime.Value().Value()];
+                }
+            } else {
+                value.earliestStartTime = nil;
+            }
+            if (cppValue.Value().latestEndTime.HasValue()) {
+                value.latestEndTime = [NSNumber numberWithUnsignedInt:cppValue.Value().latestEndTime.Value()];
+            } else {
+                value.latestEndTime = nil;
+            }
+            value.isPauseable = [NSNumber numberWithBool:cppValue.Value().isPauseable];
+            { // Scope for our temporary variables
+                auto * array_2 = [NSMutableArray new];
+                auto iter_2 = cppValue.Value().slots.begin();
+                while (iter_2.Next()) {
+                    auto & entry_2 = iter_2.GetValue();
+                    MTRDeviceEnergyManagementClusterSlotStruct * newElement_2;
+                    newElement_2 = [MTRDeviceEnergyManagementClusterSlotStruct new];
+                    newElement_2.minDuration = [NSNumber numberWithUnsignedInt:entry_2.minDuration];
+                    newElement_2.maxDuration = [NSNumber numberWithUnsignedInt:entry_2.maxDuration];
+                    newElement_2.defaultDuration = [NSNumber numberWithUnsignedInt:entry_2.defaultDuration];
+                    newElement_2.elapsedSlotTime = [NSNumber numberWithUnsignedInt:entry_2.elapsedSlotTime];
+                    newElement_2.remainingSlotTime = [NSNumber numberWithUnsignedInt:entry_2.remainingSlotTime];
+                    newElement_2.slotIsPauseable = [NSNumber numberWithBool:entry_2.slotIsPauseable];
+                    newElement_2.minPauseDuration = [NSNumber numberWithUnsignedInt:entry_2.minPauseDuration];
+                    newElement_2.maxPauseDuration = [NSNumber numberWithUnsignedInt:entry_2.maxPauseDuration];
+                    if (entry_2.manufacturerESAState.HasValue()) {
+                        newElement_2.manufacturerESAState = [NSNumber numberWithUnsignedShort:entry_2.manufacturerESAState.Value()];
+                    } else {
+                        newElement_2.manufacturerESAState = nil;
+                    }
+                    if (entry_2.nominalPower.HasValue()) {
+                        newElement_2.nominalPower = [NSNumber numberWithLongLong:entry_2.nominalPower.Value()];
+                    } else {
+                        newElement_2.nominalPower = nil;
+                    }
+                    if (entry_2.minPower.HasValue()) {
+                        newElement_2.minPower = [NSNumber numberWithLongLong:entry_2.minPower.Value()];
+                    } else {
+                        newElement_2.minPower = nil;
+                    }
+                    if (entry_2.maxPower.HasValue()) {
+                        newElement_2.maxPower = [NSNumber numberWithLongLong:entry_2.maxPower.Value()];
+                    } else {
+                        newElement_2.maxPower = nil;
+                    }
+                    if (entry_2.nominalEnergy.HasValue()) {
+                        newElement_2.nominalEnergy = [NSNumber numberWithLongLong:entry_2.nominalEnergy.Value()];
+                    } else {
+                        newElement_2.nominalEnergy = nil;
+                    }
+                    if (entry_2.costs.HasValue()) {
+                        { // Scope for our temporary variables
+                            auto * array_5 = [NSMutableArray new];
+                            auto iter_5 = entry_2.costs.Value().begin();
+                            while (iter_5.Next()) {
+                                auto & entry_5 = iter_5.GetValue();
+                                MTRDeviceEnergyManagementClusterCostStruct * newElement_5;
+                                newElement_5 = [MTRDeviceEnergyManagementClusterCostStruct new];
+                                newElement_5.costType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_5.costType)];
+                                newElement_5.value = [NSNumber numberWithInt:entry_5.value];
+                                newElement_5.decimalPoints = [NSNumber numberWithUnsignedChar:entry_5.decimalPoints];
+                                if (entry_5.currency.HasValue()) {
+                                    newElement_5.currency = [NSNumber numberWithUnsignedShort:entry_5.currency.Value()];
+                                } else {
+                                    newElement_5.currency = nil;
+                                }
+                                [array_5 addObject:newElement_5];
+                            }
+                            CHIP_ERROR err = iter_5.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            newElement_2.costs = array_5;
+                        }
+                    } else {
+                        newElement_2.costs = nil;
+                    }
+                    if (entry_2.minPowerAdjustment.HasValue()) {
+                        newElement_2.minPowerAdjustment = [NSNumber numberWithLongLong:entry_2.minPowerAdjustment.Value()];
+                    } else {
+                        newElement_2.minPowerAdjustment = nil;
+                    }
+                    if (entry_2.maxPowerAdjustment.HasValue()) {
+                        newElement_2.maxPowerAdjustment = [NSNumber numberWithLongLong:entry_2.maxPowerAdjustment.Value()];
+                    } else {
+                        newElement_2.maxPowerAdjustment = nil;
+                    }
+                    if (entry_2.minDurationAdjustment.HasValue()) {
+                        newElement_2.minDurationAdjustment = [NSNumber numberWithUnsignedInt:entry_2.minDurationAdjustment.Value()];
+                    } else {
+                        newElement_2.minDurationAdjustment = nil;
+                    }
+                    if (entry_2.maxDurationAdjustment.HasValue()) {
+                        newElement_2.maxDurationAdjustment = [NSNumber numberWithUnsignedInt:entry_2.maxDurationAdjustment.Value()];
+                    } else {
+                        newElement_2.maxDurationAdjustment = nil;
+                    }
+                    [array_2 addObject:newElement_2];
+                }
+                CHIP_ERROR err = iter_2.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value.slots = array_2;
+            }
+        }
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::DoorLock;
@@ -16517,6 +16753,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::DemandResponseLoadControl::Id: {
         return DecodeAttributeValueForDemandResponseLoadControlCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::DeviceEnergyManagement::Id: {
+        return DecodeAttributeValueForDeviceEnergyManagementCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeAttributeValueForDoorLockCluster(aPath.mAttributeId, aReader, aError);
