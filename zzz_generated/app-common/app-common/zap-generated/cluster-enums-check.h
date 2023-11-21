@@ -1221,6 +1221,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OvenMode::ModeTag val)
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryDryerControls::DrynessLevelEnum val)
+{
+    using EnumType = LaundryDryerControls::DrynessLevelEnum;
+    switch (val)
+    {
+    case EnumType::kLow:
+    case EnumType::kNormal:
+    case EnumType::kExtra:
+    case EnumType::kMax:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherControls::NumberOfRinsesEnum val)
 {
     using EnumType = LaundryWasherControls::NumberOfRinsesEnum;
@@ -2839,9 +2854,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(MediaInput::InputTypeEn
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CecKeyCode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CECKeyCodeEnum val)
 {
-    using EnumType = KeypadInput::CecKeyCode;
+    using EnumType = KeypadInput::CECKeyCodeEnum;
     switch (val)
     {
     case EnumType::kSelect:

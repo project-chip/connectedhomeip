@@ -165,15 +165,6 @@ if [ -n "$BASH" ]; then
     . "$_CHIP_ROOT/scripts/helpers/bash-completion.sh"
 fi
 
-# Update relative paths to absolute (if they exist)
-# to make sure loading of paths works in build_examples
-#
-# See https://github.com/project-chip/connectedhomeip/issues/30475
-# for details
-scripts/setup/gni_make_paths_absolute.py \
-    --root "$_CHIP_ROOT" \
-    build_overrides/pigweed_environment.gni
-
 unset -f _bootstrap_or_activate
 unset -f _install_additional_pip_requirements
 
