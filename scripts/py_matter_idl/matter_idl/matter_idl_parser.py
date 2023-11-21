@@ -46,14 +46,6 @@ class PrefixCppDocComment:
         while content[actual_pos] in ' \t\n\r':
             actual_pos += 1
 
-        # Allow to skip api maturity flags
-        for maturity in ["provisional", "internal", "stable", "deprecated"]:
-            if content[actual_pos:].startswith(maturity):
-                actual_pos += len(maturity)
-
-        while content[actual_pos] in ' \t\n\r':
-            actual_pos += 1
-
         # A doc comment will apply to any supported element assuming it immediately
         # preceeds id (skipping whitespace)
         for item in self.supported_types(idl):
@@ -138,7 +130,6 @@ class MatterIdlTransformer(Transformer):
     def __init__(self, skip_meta):
         self.skip_meta = skip_meta
         self.doc_comments = []
-        self._cluster_start_pos = None
 
     def positive_integer(self, tokens):
         """Numbers in the grammar are integers or hex numbers.
@@ -476,7 +467,6 @@ class MatterIdlTransformer(Transformer):
 
     @v_args(inline=True, meta=True)
     def cluster(self, meta, api_maturity, name, code, *content):
-        self._cluster_start_pos = meta and meta.start_pos
         meta = None if self.skip_meta else ParseMetaData(meta)
 
         if api_maturity is None:
