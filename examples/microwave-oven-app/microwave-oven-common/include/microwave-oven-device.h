@@ -12,7 +12,7 @@ namespace Clusters {
 class MicrowaveOvenDevice
 {
 private:
-    MicrowaveOvenControl::MicrowaveOvenControlDelegate mMicrowaveOvenControlDelegate;
+    MicrowaveOvenControl::ExampleMicrowaveOvenControlDelegate mMicrowaveOvenControlDelegate;
     MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
 
     OperationalState::OperationalStateDelegate mOperationalStateDelegate;
@@ -20,7 +20,7 @@ private:
 
 public:
     /**
-     * This class is responsible for initialising all the microwave oven device clusters and manging the interactions between them
+     * This class is responsible for initialising all the microwave oven device clusters and managing the interactions between them
      * as required by the specific "business logic". See the state machine diagram.
      * @param aClustersEndpoint The endpoint ID where all the microwave oven clusters exist.
      */
@@ -34,7 +34,7 @@ public:
             &MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCallback, this);
         mMicrowaveOvenControlDelegate.SetMicrowaveOvenControlAddMoreTimeCallback(
             &MicrowaveOvenDevice::HandleMicrowaveOvenAddMoreTimeCallback, this);
-        mOperationalStateDelegate.SetOpStatePauseCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStatePasueCallback, this);
+        mOperationalStateDelegate.SetOpStatePauseCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStatePauseCallback, this);
         mOperationalStateDelegate.SetOpStateResumeCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateResumeCallback, this);
         mOperationalStateDelegate.SetOpStateStartCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateStartCallback, this);
         mOperationalStateDelegate.SetOpStateStopCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateStopCallback, this);
@@ -56,25 +56,37 @@ public:
     /**
      * handle command for microwave oven control: add more time
      */
-    Protocols::InteractionModel::Status HandleMicrowaveOvenAddMoreTimeCallback(uint32_t addedCookTime);
+    Protocols::InteractionModel::Status HandleMicrowaveOvenAddMoreTimeCallback(uint32_t finalCookTime);
 
     /**
      * handle command for operational state: pause
+     * @param[out] err: get operational error after callback.
+     * this method is called to set operational state to target state.
+     * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
      */
-    void HandleMicrowaveOvenOpStatePasueCallback(OperationalState::GenericOperationalError & err);
+    void HandleMicrowaveOvenOpStatePauseCallback(OperationalState::GenericOperationalError & err);
 
     /**
      * handle command for operational state: resume
+     * @param[out] err: get operational error after callback.
+     * this method is called to set operational state to target state.
+     * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
      */
     void HandleMicrowaveOvenOpStateResumeCallback(OperationalState::GenericOperationalError & err);
 
     /**
      * handle command for operational state: start
+     * @param[out] err: get operational error after callback.
+     * this method is called to set operational state to target state.
+     * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
      */
     void HandleMicrowaveOvenOpStateStartCallback(OperationalState::GenericOperationalError & err);
 
     /**
      * handle command for operational state: stop
+     * @param[out] err: get operational error after callback.
+     * this method is called to set operational state to target state.
+     * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
      */
     void HandleMicrowaveOvenOpStateStopCallback(OperationalState::GenericOperationalError & err);
 

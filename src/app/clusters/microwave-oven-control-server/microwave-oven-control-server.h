@@ -128,7 +128,7 @@ public:
      *   @brief Handle Command Callback in application: AddMoreTime
      *   @return Returns the Interaction Model status code which was user determined in the business logic
      */
-    virtual Protocols::InteractionModel::Status HandleAddMoreTimeCallback(uint32_t addedCookTime) = 0;
+    virtual Protocols::InteractionModel::Status HandleAddMoreTimeCallback(uint32_t finalCookTime) = 0;
 
     /**
      *   @brief get the MinPower

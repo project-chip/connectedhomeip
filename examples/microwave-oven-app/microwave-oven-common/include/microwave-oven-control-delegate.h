@@ -38,7 +38,7 @@ namespace MicrowaveOvenControl {
 
 // This is an application level delegate to handle microwave oven control commands according to the specific
 // business logic.
-class MicrowaveOvenControlDelegate : public MicrowaveOvenControl::Delegate
+class ExampleMicrowaveOvenControlDelegate : public MicrowaveOvenControl::Delegate
 {
 
 private:
@@ -57,7 +57,7 @@ public:
     /**
      * Handle Command Callback in application: add-more-time
      */
-    Protocols::InteractionModel::Status HandleAddMoreTimeCallback(uint32_t addedCookTime) override;
+    Protocols::InteractionModel::Status HandleAddMoreTimeCallback(uint32_t finalCookTime) override;
 
     /**
      * Get the value of MinPower.

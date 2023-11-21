@@ -35,14 +35,14 @@ MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCallback(uint8_t coo
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status MicrowaveOvenDevice::HandleMicrowaveOvenAddMoreTimeCallback(uint32_t addedCookTime)
+Protocols::InteractionModel::Status MicrowaveOvenDevice::HandleMicrowaveOvenAddMoreTimeCallback(uint32_t finalCookTime)
 {
     // placeholder implementation
-    mMicrowaveOvenControlInstance.SetCookTime(addedCookTime);
+    mMicrowaveOvenControlInstance.SetCookTime(finalCookTime);
     return Status::Success;
 }
 
-void MicrowaveOvenDevice::HandleMicrowaveOvenOpStatePasueCallback(OperationalState::GenericOperationalError & err)
+void MicrowaveOvenDevice::HandleMicrowaveOvenOpStatePauseCallback(OperationalState::GenericOperationalError & err)
 {
     // placeholder implementation
     auto error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kPaused));

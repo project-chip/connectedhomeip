@@ -262,13 +262,13 @@ void Instance::HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTi
     if (opState == to_underlying(OperationalStateEnum::kStopped) || opState == to_underlying(OperationalStateEnum::kRunning) ||
         opState == to_underlying(OperationalStateEnum::kPaused))
     {
-        uint32_t addedCookTime;
+        uint32_t finalCookTime;
 
-        addedCookTime = GetCookTime() + req.timeToAdd;
+        finalCookTime = GetCookTime() + req.timeToAdd;
         // if the added cooking time is greater than the max cooking time, the cooking time stay unchanged.
-        if (addedCookTime < kMaxCookTime)
+        if (finalCookTime < kMaxCookTime)
         {
-            status = mDelegate->HandleAddMoreTimeCallback(addedCookTime);
+            status = mDelegate->HandleAddMoreTimeCallback(finalCookTime);
             goto exit;
         }
         else
@@ -300,20 +300,20 @@ bool IsPowerSettingInRange(uint8_t powerSetting, uint8_t minCookPower, uint8_t m
 
 void SetOPInstance(EndpointId aEndpoint, OperationalState::Instance * aInstance)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(aEndpoint, MicrowaveOvenControl::Id,
+    uint16_t aMirowaveOvenEpIndex = emberAfGetClusterServerEndpointIndex(aEndpoint, MicrowaveOvenControl::Id,
                                                        EMBER_AF_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
-    if (ep < kMicrowaveOvenControlInstanceTableSize)
+    if (aMirowaveOvenEpIndex < kMicrowaveOvenControlInstanceTableSize)
     {
-        gOPInstanceTable[aEndpoint] = aInstance;
+        gOPInstanceTable[aMirowaveOvenEpIndex] = aInstance;
     }
 }
 
 OperationalState::Instance * GetOPInstance(EndpointId aEndpoint)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(aEndpoint, MicrowaveOvenControl::Id,
+    uint16_t aMirowaveOvenEpIndex = emberAfGetClusterServerEndpointIndex(aEndpoint, MicrowaveOvenControl::Id,
                                                        EMBER_AF_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kMicrowaveOvenControlInstanceTableSize ? nullptr : gOPInstanceTable[aEndpoint]);
+    return (aMirowaveOvenEpIndex >= kMicrowaveOvenControlInstanceTableSize ? nullptr : gOPInstanceTable[aMirowaveOvenEpIndex]);
 }
 
 } // namespace MicrowaveOvenControl
