@@ -63,7 +63,7 @@ static void onEditCancel(ThermostatMatterScheduleManager * mgr, ThermostatMatter
 
 static EmberAfStatus onEditCommit(ThermostatMatterScheduleManager * mgr, ThermostatMatterScheduleManager::editType type)
 {
-    EmberAfStatus status;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
     if (type == ThermostatMatterScheduleManager::Presets)
     {
