@@ -17,6 +17,8 @@
 
 #include "ICDCheckInSender.h"
 
+#include "ICDNotifier.h"
+
 #include <system/SystemPacketBuffer.h>
 
 #include <protocols/secure_channel/CheckinMessage.h>
@@ -37,15 +39,17 @@ ICDCheckInSender::ICDCheckInSender(Messaging::ExchangeManager * exchangeManager)
 
 void ICDCheckInSender::OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result)
 {
-    mResolveInProgress = false;
+    if (CHIP_NO_ERROR != SendCheckInMsg(result.address))
+    {
+        ChipLogError(AppServer, "Failed to send the ICD Check-In message");
+    }
 
-    VerifyOrReturn(CHIP_NO_ERROR != SendCheckInMsg(result.address),
-                   ChipLogError(AppServer, "Failed to send the ICD Check-In message"));
+    ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(ICDListener::KeepActiveFlag::kCheckInInProgress);
 }
 
 void ICDCheckInSender::OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason)
 {
-    mResolveInProgress = false;
+    ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(ICDListener::KeepActiveFlag::kCheckInInProgress);
     ChipLogProgress(AppServer, "Node Address resolution failed for ICD Check-In with Node ID " ChipLogFormatX64,
                     ChipLogValueX64(peerId.GetNodeId()));
 }
@@ -55,12 +59,13 @@ CHIP_ERROR ICDCheckInSender::SendCheckInMsg(const Transport::PeerAddress & addr)
     System::PacketBufferHandle buffer = MessagePacketBuffer::New(CheckinMessage::sMinPayloadSize);
 
     VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
-    MutableByteSpan output{ buffer->Start(), buffer->DataLength() };
+    MutableByteSpan output{ buffer->Start(), buffer->MaxDataLength() };
 
     // TODO retrieve Check-in counter
     CounterType counter = 0;
 
     ReturnErrorOnFailure(CheckinMessage::GenerateCheckinMessagePayload(mKey, counter, ByteSpan(), output));
+    buffer->SetDataLength(static_cast<uint16_t>(output.size()));
 
     VerifyOrReturnError(mExchangeManager->GetSessionManager() != nullptr, CHIP_ERROR_INTERNAL);
 
@@ -88,13 +93,11 @@ CHIP_ERROR ICDCheckInSender::RequestResolve(ICDMonitoringEntry & entry, FabricTa
     memcpy(mKey.AsMutable<Crypto::Aes128KeyByteArray>(), entry.key.As<Crypto::Aes128KeyByteArray>(),
            sizeof(Crypto::Aes128KeyByteArray));
 
-    // TODO #30492
-    // Device must stay active during MDNS resolution
     CHIP_ERROR err = AddressResolve::Resolver::Instance().LookupNode(request, mAddressLookupHandle);
 
     if (err == CHIP_NO_ERROR)
     {
-        mResolveInProgress = true;
+        ICDNotifier::GetInstance().BroadcastActiveRequestNotification(ICDListener::KeepActiveFlag::kCheckInInProgress);
     }
 
     return err;
