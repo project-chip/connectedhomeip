@@ -10,12 +10,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
-    case app::Clusters::First::Id:
-        emberAfFirstClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::Second::Id:
-        emberAfSecondClusterInitCallback(endpoint);
-        break;
     case app::Clusters::Third::Id:
         emberAfThirdClusterInitCallback(endpoint);
         break;
@@ -23,16 +17,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         // Unrecognized cluster ID
         break;
     }
-}
-void __attribute__((weak)) emberAfFirstClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfSecondClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
 }
 void __attribute__((weak)) emberAfThirdClusterInitCallback(EndpointId endpoint)
 {

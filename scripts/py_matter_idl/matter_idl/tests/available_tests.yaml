@@ -88,6 +88,3 @@ custom-example-proto:
         proto/first_cluster.proto: outputs/proto/first_cluster.proto
         proto/second_cluster.proto: outputs/proto/second_cluster.proto
         proto/third_cluster.proto: outputs/proto/third_cluster.proto
-
-    inputs/large_all_clusters_app.matter:
-        proto/ota_software_update_provider_cluster.proto: outputs/proto/ota_software_update_provider_cluster.proto

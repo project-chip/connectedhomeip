@@ -50,6 +50,7 @@ const Entry<ItemInfo> _OnOff_ScenesFeature[] = {
 };
 
 const Entry<ItemInfo> _all_clusters[] = {
+  { { ClusterTag(0x06), "OnOff", ItemType::kDefault }, 2 },
 
 };
 
