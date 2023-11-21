@@ -158,7 +158,7 @@ class ClusterValidationRule(ErrorAccumulatingRule):
         if not self._idl:
             raise MissingIdlError()
 
-        cluster_definition = self._idl.clusters
+        cluster_definition = [c for c in self._idl.clusters if c.name == name]
         if not cluster_definition:
             self._AddLintError(
                 "Cluster definition for %s not found" % name, location)
@@ -240,7 +240,7 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
         if not self._idl:
             raise MissingIdlError()
 
-        cluster_definition = self._idl.clusters
+        cluster_definition = [c for c in self._idl.clusters if c.name == name]
         if not cluster_definition:
             self._AddLintError(
                 "Cluster definition for %s not found" % name, location)
