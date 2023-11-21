@@ -1,7 +1,6 @@
-/*
+/**
  *
  *    Copyright (c) 2023 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,28 +15,33 @@
  *    limitations under the License.
  */
 
+/**
+ * @file API declarations for valve configuration and control cluster.
+ */
+
 #pragma once
 
-#include <app-common/zap-generated/cluster-enums.h>
-#include <lib/core/CHIPError.h>
+#include "valve-configuration-and-control-delegate.h"
+
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ValveConfigurationAndControl {
 
-/** @brief
- *    Defines methods for implementing application-specific logic for the Valve Configuration and Control Cluster.
- */
-class Delegate
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+Delegate * GetDefaultDelegate(EndpointId endpoint);
+
+inline bool HasFeature(EndpointId ep, Feature feature)
 {
-public:
-    Delegate(){};
-
-    virtual CHIP_ERROR HandleOpenValve() = 0;
-
-    virtual ~Delegate() = default;
-};
+    uint32_t map;
+    bool success = (Attributes::FeatureMap::Get(ep, &map) == EMBER_ZCL_STATUS_SUCCESS);
+    return success ? (map & to_underlying(feature)) : false;
+}
 
 } // namespace ValveConfigurationAndControl
 } // namespace Clusters

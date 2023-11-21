@@ -16,7 +16,7 @@
  *
  */
 
-#include "valve-configuration-and-control-delegate.h"
+#include "valve-configuration-and-control-server.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -130,10 +130,83 @@ bool emberAfValveConfigurationAndControlClusterOpenCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const ValveConfigurationAndControl::Commands::Open::DecodableType & commandData)
 {
-    emitValveStateChangedEvent(commandPath.mEndpointId);
-    emitValveFaultEvent(commandPath.mEndpointId);
-    Delegate * delegate = GetDelegate(commandPath.mEndpointId);
-    isDelegateNull(delegate, commandPath.mEndpointId);
+    emitValveStateChangedEvent(commandPath.mEndpointId); // TODO remove
+    emitValveFaultEvent(commandPath.mEndpointId);        // TODO remove
+
+    const auto & openDuration = commandData.openDuration;
+    const auto & ep           = commandPath.mEndpointId;
+
+    Delegate * delegate     = GetDelegate(ep);
+    Optional<Status> status = Optional<Status>::Missing();
+    DataModel::Nullable<chip::Percent> openLevel;
+    DataModel::Nullable<uint64_t> autoCloseTime;
+    DataModel::Nullable<uint32_t> oDuration, rDuration;
+
+    // set targetstate to open
+    VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == TargetState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kOpen),
+                 status.Emplace(Status::Failure));
+
+    // if has level feature set targetlevel to openlevel
+    if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel) &&
+        EMBER_ZCL_STATUS_SUCCESS == OpenLevel::Get(ep, openLevel) && !openLevel.IsNull())
+    {
+        VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == TargetLevel::Set(ep, openLevel), status.Emplace(Status::Failure));
+    }
+
+    // if has timesync feature and autoclosetime available, set autoclosetime to current UTC + openduration field or attribute
+    if (HasFeature(ep, ValveConfigurationAndControl::Feature::kTimeSync) &&
+        EMBER_ZCL_STATUS_SUCCESS == AutoCloseTime::Get(ep, autoCloseTime))
+    {
+        System::Clock::Microseconds64 utcTime;
+        VerifyOrExit(CHIP_NO_ERROR == System::SystemClock().GetClock_RealTime(utcTime), status.Emplace(Status::Failure));
+        if (openDuration.HasValue())
+        {
+            oDuration.SetNonNull(openDuration.Value());
+        }
+        else
+        {
+            VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == OpenDuration::Get(ep, oDuration), status.Emplace(Status::Failure));
+        }
+
+        uint64_t time = oDuration.Value() * chip::kMicrosecondsPerSecond;
+        autoCloseTime.SetNonNull(utcTime.count() + time);
+        VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == AutoCloseTime::Set(ep, autoCloseTime), status.Emplace(Status::Failure));
+    }
+
+    // if remainingduration available set to openduration field or attribute
+    if (EMBER_ZCL_STATUS_SUCCESS == RemainingDuration::Get(ep, rDuration))
+    {
+        if (openDuration.HasValue())
+        {
+            rDuration.SetNonNull(openDuration.Value());
+        }
+        else
+        {
+            VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == OpenDuration::Get(ep, rDuration), status.Emplace(Status::Failure));
+        }
+        VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == RemainingDuration::Set(ep, rDuration), status.Emplace(Status::Failure));
+    }
+
+    if (openDuration.HasValue())
+    {
+        VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == OpenDuration::Set(ep, openDuration.Value()), status.Emplace(Status::Failure));
+    }
+
+    // start movement towards targets ( delegate )
+    if (!isDelegateNull(delegate, commandPath.mEndpointId))
+    {
+        delegate->HandleOpenValve();
+    }
+
+exit:
+    if (status.HasValue())
+    {
+        commandObj->AddStatus(commandPath, status.Value());
+    }
+    else
+    {
+        commandObj->AddStatus(commandPath, Status::Success);
+    }
     return true;
 }
 
