@@ -585,6 +585,6 @@ void BlockQueryWithSkip::LogMessage(bdx::MessageType messageType) const
 {
     ChipLogAutomation("BlockQueryWithSkip");
     ChipLogAutomation("  Block Counter: %" PRIu32, BlockCounter);
-    ChipLogAutomation("  Bytes To Skip: %" PRIu64, BytesToSkip);
+    ChipLogAutomation("  Bytes To Skip: 0x" ChipLogFormatX64, ChipLogValueX64(BytesToSkip));
 }
 #endif // CHIP_AUTOMATION_LOGGING

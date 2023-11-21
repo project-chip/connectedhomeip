@@ -129,8 +129,9 @@ Davis, CA 95616, USA
         <feature name="CL"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0001" name="Lineup" type="LineupInfoStruct">
+    <attribute id="0x0001" name="Lineup" type="LineupInfoStruct" default="null">
       <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
         <feature name="LI"/>
       </mandatoryConform>

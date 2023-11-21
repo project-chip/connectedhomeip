@@ -81,17 +81,6 @@ class ContentLauncherCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeSupportedStreamingProtocolsAttribute(
-    value: ULong,
-    timedWriteTimeoutMs: Int? = null
-  ) {
-    if (timedWriteTimeoutMs != null) {
-      // Do the action with timedWriteTimeoutMs
-    } else {
-      // Do the action without timedWriteTimeoutMs
-    }
-  }
-
   suspend fun subscribeSupportedStreamingProtocolsAttribute(
     minInterval: Int,
     maxInterval: Int

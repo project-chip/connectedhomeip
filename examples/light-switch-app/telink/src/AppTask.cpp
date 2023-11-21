@@ -45,6 +45,8 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
 {
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
+        LOG_INF("App button pressed");
+
         BindingCommandData * data = chip::Platform::New<BindingCommandData>();
         data->commandId           = chip::app::Clusters::OnOff::Commands::Toggle::Id;
         data->clusterId           = chip::app::Clusters::OnOff::Id;
