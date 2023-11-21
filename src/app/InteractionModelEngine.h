@@ -306,6 +306,9 @@ public:
 
     CHIP_ERROR ResumeSubscriptions();
 
+    // Return the state of a subscription matching a CAT Tag or a NodeId
+    bool IsMatchingSubscriptionActive(const FabricIndex & aFabricIndex, const NodeId & nodeIdOrCAT);
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
     // Get direct access to the underlying read handler pool

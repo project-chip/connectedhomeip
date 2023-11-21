@@ -278,6 +278,37 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(const ScopedNodeId & aPe
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
+bool InteractionModelEngine::IsMatchingSubscriptionActive(const FabricIndex & aFabricIndex, const NodeId & subjectID)
+{
+    for (uint16_t index = 0; index < GetNumActiveReadHandlers(); index++)
+    {
+        ReadHandler * readHandler = ActiveHandlerAt(index);
+        if (readHandler == nullptr)
+        {
+            // Should not happen
+            continue;
+        }
+
+        if (readHandler->IsType(ReadHandler::InteractionType::Subscribe))
+        {
+            Access::SubjectDescriptor subject = readHandler->GetSubjectDescriptor();
+            if (subject.fabricIndex != aFabricIndex)
+            {
+                continue;
+            }
+
+            if (subject.authMode == Access::AuthMode::kCase)
+            {
+                if (subject.cats.CheckSubjectAgainstCATs(subjectID) || subjectID == subject.subject)
+                {
+                    return readHandler->IsActiveSubscription();
+                }
+            }
+        }
+    }
+    return false;
+}
+
 void InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
 {
     assertChipStackLockedByCurrentThread();
