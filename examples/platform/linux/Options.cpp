@@ -85,7 +85,7 @@ enum
     kTraceTo                                            = 0x1021,
     kOptionSimulateNoInternalTime                       = 0x1022,
 #if defined(PW_RPC_ENABLED)
-    kOptionRpcServerPort                                = 0x1023,
+    kOptionRpcServerPort = 0x1023,
 #endif
 };
 
