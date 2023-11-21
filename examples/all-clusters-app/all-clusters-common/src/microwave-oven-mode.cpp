@@ -25,21 +25,21 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
-static MicrowaveOvenModeDelegate * gMicrowaveOvenModeDelegate = nullptr;
-static ModeBase::Instance * gMicrowaveOvenModeInstance        = nullptr;
+static ExampleMicrowaveOvenModeDelegate gMicrowaveOvenModeDelegate;
+static ModeBase::Instance gMicrowaveOvenModeInstance(&gMicrowaveOvenModeDelegate, 0x1, MicrowaveOvenMode::Id, chip::to_underlying(Feature::kOnOff));
 
-CHIP_ERROR MicrowaveOvenModeDelegate::Init()
+CHIP_ERROR ExampleMicrowaveOvenModeDelegate::Init()
 {
     return CHIP_NO_ERROR;
 }
 
 // todo refactor code by making a parent class for all ModeInstance classes to reduce flash usage.
-void MicrowaveOvenModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
+void ExampleMicrowaveOvenModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
-CHIP_ERROR MicrowaveOvenModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
+CHIP_ERROR ExampleMicrowaveOvenModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {
@@ -48,7 +48,7 @@ CHIP_ERROR MicrowaveOvenModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chi
     return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
 }
 
-CHIP_ERROR MicrowaveOvenModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
+CHIP_ERROR ExampleMicrowaveOvenModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {
@@ -58,7 +58,7 @@ CHIP_ERROR MicrowaveOvenModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uin
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MicrowaveOvenModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
+CHIP_ERROR ExampleMicrowaveOvenModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {
@@ -78,28 +78,15 @@ CHIP_ERROR MicrowaveOvenModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List
 
 ModeBase::Instance * MicrowaveOvenMode::Instance()
 {
-    return gMicrowaveOvenModeInstance;
+    return &gMicrowaveOvenModeInstance;
 }
 
 void MicrowaveOvenMode::Shutdown()
 {
-    if (gMicrowaveOvenModeInstance != nullptr)
-    {
-        delete gMicrowaveOvenModeInstance;
-        gMicrowaveOvenModeInstance = nullptr;
-    }
-    if (gMicrowaveOvenModeDelegate != nullptr)
-    {
-        delete gMicrowaveOvenModeDelegate;
-        gMicrowaveOvenModeDelegate = nullptr;
-    }
+
 }
 
 void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(gMicrowaveOvenModeDelegate == nullptr && gMicrowaveOvenModeInstance == nullptr);
-    gMicrowaveOvenModeDelegate = new MicrowaveOvenMode::MicrowaveOvenModeDelegate;
-    gMicrowaveOvenModeInstance =
-        new ModeBase::Instance(gMicrowaveOvenModeDelegate, 0x1, MicrowaveOvenMode::Id, chip::to_underlying(Feature::kOnOff));
-    gMicrowaveOvenModeInstance->Init();
+    gMicrowaveOvenModeInstance.Init();
 }
