@@ -16,9 +16,7 @@
  */
 package matter.devicecontroller.cluster.structs
 
-import java.util.Optional
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -62,7 +60,7 @@ class MediaInputClusterInputInfoStruct(
       val inputType = tlvReader.getUInt(ContextSpecificTag(TAG_INPUT_TYPE))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val description = tlvReader.getString(ContextSpecificTag(TAG_DESCRIPTION))
-      
+
       tlvReader.exitContainer()
 
       return MediaInputClusterInputInfoStruct(index, inputType, name, description)

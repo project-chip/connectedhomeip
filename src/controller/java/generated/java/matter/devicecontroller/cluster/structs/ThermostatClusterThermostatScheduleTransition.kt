@@ -16,9 +16,7 @@
  */
 package matter.devicecontroller.cluster.structs
 
-import java.util.Optional
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -63,22 +61,28 @@ class ThermostatClusterThermostatScheduleTransition(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterThermostatScheduleTransition {
       tlvReader.enterStructure(tlvTag)
       val transitionTime = tlvReader.getUShort(ContextSpecificTag(TAG_TRANSITION_TIME))
-      val heatSetpoint = if (!tlvReader.isNull()) {
-      tlvReader.getShort(ContextSpecificTag(TAG_HEAT_SETPOINT))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_HEAT_SETPOINT))
-      null
-    }
-      val coolSetpoint = if (!tlvReader.isNull()) {
-      tlvReader.getShort(ContextSpecificTag(TAG_COOL_SETPOINT))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_COOL_SETPOINT))
-      null
-    }
-      
+      val heatSetpoint =
+        if (!tlvReader.isNull()) {
+          tlvReader.getShort(ContextSpecificTag(TAG_HEAT_SETPOINT))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_HEAT_SETPOINT))
+          null
+        }
+      val coolSetpoint =
+        if (!tlvReader.isNull()) {
+          tlvReader.getShort(ContextSpecificTag(TAG_COOL_SETPOINT))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_COOL_SETPOINT))
+          null
+        }
+
       tlvReader.exitContainer()
 
-      return ThermostatClusterThermostatScheduleTransition(transitionTime, heatSetpoint, coolSetpoint)
+      return ThermostatClusterThermostatScheduleTransition(
+        transitionTime,
+        heatSetpoint,
+        coolSetpoint
+      )
     }
   }
 }
