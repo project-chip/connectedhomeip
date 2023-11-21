@@ -5,6 +5,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Thermostat;
+using namespace chip::app::Clusters::Thermostat::Structs;
 
 // built in presets will be prefixed with B
 constexpr const char * kBuiltInOneHandle = "B1";
@@ -62,28 +63,39 @@ onEditCommit(ThermostatMatterScheduleManager * mgr, ThermostatMatterScheduleMana
 {
 	EmberAfStatus status;
 
-    ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditCommit %s", type == ThermostatMatterScheduleManager::Presets ? "Presets" : "Schedules");
-	Span<PresetStruct::Type> oldPresets = Span<PresetStruct::Type>(gsActivePresets).SubSpan(0, gsActivePresetsEmptyIndex);
-	Span<PresetStruct::Type> newPresets = Span<PresetStruct::Type>(gsEditingPresets).SubSpan(0, gsEditingPresetsEmptyIndex);
-	
-	status = mgr->ThermostatMatterScheduleManager::ValidatePresetsForCommitting(oldPresets, newPresets);
-	SuccessOrExit(status);
-
-	// New presets look good, lets generate some new ID's for the new presets.
-	for (unsigned int index=0; index < gsEditingPresetsEmptyIndex; ++index)
+	if (type == ThermostatMatterScheduleManager::Presets)
 	{
-		if (gsEditingPresets[index].presetHandle.IsNull() || gsEditingPresets[index].presetHandle.Value().empty())
+	    ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditCommit %s", type == ThermostatMatterScheduleManager::Presets ? "Presets" : "Schedules");
+		Span<PresetStruct::Type> oldPresets = Span<PresetStruct::Type>(gsActivePresets).SubSpan(0, gsActivePresetsEmptyIndex);
+		Span<PresetStruct::Type> newPresets = Span<PresetStruct::Type>(gsEditingPresets).SubSpan(0, gsEditingPresetsEmptyIndex);
+		
+		status = mgr->ThermostatMatterScheduleManager::ValidatePresetsForCommitting(oldPresets, newPresets);
+		SuccessOrExit(status);
+
+		// New presets look good, lets generate some new ID's for the new presets.
+		for (unsigned int index=0; index < gsEditingPresetsEmptyIndex; ++index)
 		{
-			char handle[16];
-			snprintf(handle, 16, "%s%d", userPresetPrefix, nextNewHandle++);
-			gsEditingPresets[index].presetHandle.SetNonNull(ByteSpan((const unsigned char *)handle, strlen(handle)));
+			if (gsEditingPresets[index].presetHandle.IsNull() || gsEditingPresets[index].presetHandle.Value().empty())
+			{
+				char handle[16];
+				snprintf(handle, 16, "%s%d", userPresetPrefix, nextNewHandle++);
+				gsEditingPresets[index].presetHandle.SetNonNull(ByteSpan((const unsigned char *)handle, strlen(handle)));
+			}
 		}
+
+		// copy the presets to the active list.
+	    gsActivePresets = gsEditingPresets;
+
+	    // TODO: update thermostat attributes for new presets.
 	}
-
-
-    gsActivePresets = gsEditingPresets;
-
-    // TODO: update thermostat attributes for new presets.
+	else if (type == ThermostatMatterScheduleManager::Schedules)
+	{
+			// TODO: schedules impl
+	}
+	else
+	{
+		VerifyOrDie(false);
+	}
 
 exit:
     return status;

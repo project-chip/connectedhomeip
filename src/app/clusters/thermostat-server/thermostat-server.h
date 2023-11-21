@@ -21,9 +21,6 @@
 #include <app/util/basic-types.h>
 #include <app/util/af-enums.h>
 
-
-using namespace chip::app::Clusters::Thermostat::Structs;
-
 struct ThermostatMatterScheduleManager
 {
     enum editType
@@ -40,15 +37,15 @@ struct ThermostatMatterScheduleManager
     using onEditCancelCb = onEditStartCb;
     using onEditCommitCb = EmberAfStatus (*)(ThermostatMatterScheduleManager *, editType);
 
-    using getPresetTypeAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, PresetTypeStruct::Type &presetType);
-    using getPresetAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, PresetStruct::Type &preset);
+    using getPresetTypeAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::Type &presetType);
+    using getPresetAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, chip::app::Clusters::Thermostat::Structs::PresetStruct::Type &preset);
     using clearPresetsCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *);
-    using appendPresetCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, const PresetStruct::DecodableType &preset);
+    using appendPresetCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, const chip::app::Clusters::Thermostat::Structs::PresetStruct::DecodableType &preset);
 
-    using getScheduleTypeAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, ScheduleTypeStruct::Type &scheduleType);
-    using getScheduleAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, ScheduleStruct::Type &schedule);
+    using getScheduleTypeAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::Type &scheduleType);
+    using getScheduleAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index, chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type &schedule);
     using clearSchedulesCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *);
-    using appendScheduleCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, const ScheduleStruct::DecodableType &schedule);
+    using appendScheduleCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, const chip::app::Clusters::Thermostat::Structs::ScheduleStruct::DecodableType &schedule);
 
     /**
      * @brief Construct a new ThermostatMatterScheduleManager object
@@ -131,8 +128,8 @@ struct ThermostatMatterScheduleManager
     ThermostatMatterScheduleManager * next() { return this->nextEditor; }
     void setNext(ThermostatMatterScheduleManager * inst) { this->nextEditor = inst; }
 
-    EmberAfStatus ValidatePresetsForCommitting(chip::Span<PresetStruct::Type> &oldlist, chip::Span<PresetStruct::Type> &newlist);
-    EmberAfStatus ValidateSchedulesForCommitting(chip::Span<ScheduleStruct::Type> &oldlist, chip::Span<ScheduleStruct::Type> &newlist);
+    EmberAfStatus ValidatePresetsForCommitting(chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> &oldlist, chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> &newlist);
+    EmberAfStatus ValidateSchedulesForCommitting(chip::Span<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type> &oldlist, chip::Span<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type> &newlist);
 //    static CHIP_ERROR ValidateSchedulesForCommitting(oldlist, newlist);
 };
 

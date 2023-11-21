@@ -19,8 +19,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
-
-using imcode = Protocols::InteractionModel::Status;
+using namespace chip::app::Clusters::Thermostat::Structs;
 
 static EmberAfStatus 
 FindPresetByHandle(const chip::ByteSpan &handle, const Span<PresetStruct::Type> &list, PresetStruct::Type &outPreset)
