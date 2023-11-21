@@ -553,7 +553,8 @@ class ParserWithLines:
         for c in idl.clusters:
             if c.code in clusters:
                 if c != clusters[c.code]:
-                    raise Exception(f"Different cluster definition for {c.name}/{c.code}")
+                    raise Exception(
+                        f"Different cluster definition for {c.name}/{c.code}")
             else:
                 clusters[c.code] = c
         idl.clusters = clusters.values()
