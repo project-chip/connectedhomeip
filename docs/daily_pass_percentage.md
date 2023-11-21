@@ -1,8 +1,9 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
 | codeql                                  |           0 |
-| tests                                   |           0 |
-| builds                                  |           0 |
+| tests                                   |          85 |
+| qemu                                    |          92 |
+| builds                                  |          92 |
 | build-example-linux-standalone          |         100 |
 | build-example-linux-arm                 |         100 |
 | darwin-tests                            |         100 |
@@ -15,7 +16,6 @@
 | bloat-check                             |         100 |
 | build-example-bouffalolab               |         100 |
 | issue-labeler                           |         100 |
-| qemu                                    |         100 |
 | delete-old-artifacts                    |         100 |
 | unit-integration-tests                  |         100 |
 | zap                                     |         100 |
@@ -23,7 +23,7 @@
 | build-example-ti-cc32xx                 |         100 |
 | build-example-ti-cc26x2x7               |         100 |
 | build-example-mw320                     |         100 |
-| build-example-k32w-with-se051           |         100 |
+| build-example-k32w                      |         100 |
 | minimal-build-linux-configure           |         100 |
 | build-example-qpg                       |         100 |
 | validate-gradle-wrapper                 |         100 |
