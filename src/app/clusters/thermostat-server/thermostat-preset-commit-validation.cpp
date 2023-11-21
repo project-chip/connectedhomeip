@@ -21,7 +21,7 @@ using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
 
-static EmberAfStatus 
+static EmberAfStatus
 FindPresetByHandle(const chip::ByteSpan &handle, const Span<PresetStruct::Type> &list, PresetStruct::Type &outPreset)
 {
 	for (auto & preset : list)
@@ -36,7 +36,7 @@ FindPresetByHandle(const chip::ByteSpan &handle, const Span<PresetStruct::Type> 
 	return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-static EmberAfStatus 
+static EmberAfStatus
 CheckPresetHandleUnique(const chip::ByteSpan &handle, Span<PresetStruct::Type> &list)
 {
     int count = 0;
@@ -75,7 +75,7 @@ public:
 };
 #endif
 
-static bool 
+static bool
 IsPresetHandleReferenced(ThermostatMatterScheduleManager &mgr, const chip::ByteSpan &handle)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -166,7 +166,7 @@ enum class PresetTypeFeaturesBitmap : uint8_t
 
 #endif
 
-static EmberAfStatus 
+static EmberAfStatus
 CheckPresetType(ThermostatMatterScheduleManager &mgr, PresetStruct::Type &preset)
 {
 	EmberAfStatus status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -182,7 +182,7 @@ CheckPresetType(ThermostatMatterScheduleManager &mgr, PresetStruct::Type &preset
 			// we have one, check the name requirements
 			if ((preset.name.HasValue() == true) && (preset.name.Value().IsNull() == false) && (preset.name.Value().Value().empty() == false))
 			{
-				const bool nameSupported = presetType.presetTypeFeatures.Has(PresetTypeFeaturesBitmap::kSupportsNames); 
+				const bool nameSupported = presetType.presetTypeFeatures.Has(PresetTypeFeaturesBitmap::kSupportsNames);
 				VerifyOrReturnError(nameSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
 			}
 
@@ -194,7 +194,7 @@ CheckPresetType(ThermostatMatterScheduleManager &mgr, PresetStruct::Type &preset
 	return status;
 }
 
-EmberAfStatus 
+EmberAfStatus
 ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<PresetStruct::Type> &oldlist, Span<PresetStruct::Type> &newlist)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -218,7 +218,7 @@ ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<PresetStruct:
     		VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
             VerifyOrExit(queryPreset.builtIn.IsNull() == false, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
     		VerifyOrExit(queryPreset.builtIn.Value() == true, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
-    	}  
+    	}
 
     	// Check 2 and 3 and 4. -- If the preset is currently being referenced but would be deleted.
 		// if its a builtin preset we don't need to search again, we know it's there from the above check.

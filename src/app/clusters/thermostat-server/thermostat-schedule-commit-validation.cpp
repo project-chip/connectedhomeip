@@ -21,7 +21,7 @@ using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
 
-static EmberAfStatus 
+static EmberAfStatus
 FindScheduleByHandle(const chip::ByteSpan &handle, const Span<ScheduleStruct::Type> &list, ScheduleStruct::Type &outSchedule)
 {
 	for (auto & schedule : list)
@@ -36,7 +36,7 @@ FindScheduleByHandle(const chip::ByteSpan &handle, const Span<ScheduleStruct::Ty
 	return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-static EmberAfStatus 
+static EmberAfStatus
 CheckScheduleHandleUnique(const chip::ByteSpan &handle, Span<ScheduleStruct::Type> &list)
 {
     int count = 0;
@@ -58,7 +58,7 @@ CheckScheduleHandleUnique(const chip::ByteSpan &handle, Span<ScheduleStruct::Typ
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-static bool 
+static bool
 IsScheduleHandleReferenced(ThermostatMatterScheduleManager &mgr, const chip::ByteSpan &handle)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -144,7 +144,7 @@ using DecodableType = Type;
 } // namespace ScheduleTypeStruct
 #endif
 
-static EmberAfStatus 
+static EmberAfStatus
 CheckScheduleTypes(ThermostatMatterScheduleManager &mgr, ScheduleStruct::Type &schedule)
 {
 	EmberAfStatus status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -160,7 +160,7 @@ CheckScheduleTypes(ThermostatMatterScheduleManager &mgr, ScheduleStruct::Type &s
 			// we have one, check the preset requirements (check 6)
 			if (schedule.presetHandle.HasValue() && schedule.presetHandle.Value().empty() == false)
 			{
-				const bool presetsSupported = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsPresets); 
+				const bool presetsSupported = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsPresets);
 				VerifyOrReturnError(presetsSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
 
                 // make sure the preset exists (check 7)
@@ -186,14 +186,14 @@ CheckScheduleTypes(ThermostatMatterScheduleManager &mgr, ScheduleStruct::Type &s
             // Check the name requirements (check 8)
             if (schedule.name.HasValue() == false && schedule.name.Value().empty() == false)
             {
-                const bool nameSupported = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsNames); 
+                const bool nameSupported = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsNames);
                 VerifyOrReturnError(nameSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
             }
 
             // Check the off requirements (check 9)
             if (schedule.systemMode == ThermostatSystemMode::kOff)
             {
-                const bool offSupported = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsOff); 
+                const bool offSupported = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsOff);
                 VerifyOrReturnError(offSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
             }
 
@@ -205,7 +205,7 @@ CheckScheduleTypes(ThermostatMatterScheduleManager &mgr, ScheduleStruct::Type &s
 	return status;
 }
 
-static EmberAfStatus 
+static EmberAfStatus
 CheckNumberOfTransitions(ThermostatMatterScheduleManager &mgr, ScheduleStruct::Type &schedule)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -246,7 +246,7 @@ exit:
     return status;
 }
 
-EmberAfStatus 
+EmberAfStatus
 ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<ScheduleStruct::Type> &oldlist, Span<ScheduleStruct::Type> &newlist)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -267,7 +267,7 @@ ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<ScheduleStr
     		status = FindScheduleByHandle(old_schedule.scheduleHandle, newlist, querySchedule);
     		VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
     		VerifyOrExit(querySchedule.builtIn == true, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
-    	}  
+    	}
 
     	// Check 2 -- If the schedule is currently being referenced but would be deleted.
 		// if its a builtin schedule we don't need to search again, we know it's there from the above check.

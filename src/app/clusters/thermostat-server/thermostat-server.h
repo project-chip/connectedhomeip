@@ -57,19 +57,19 @@ struct ThermostatMatterScheduleManager
      * @param onEditStart callback to indicate to the app to start editing the schedules/presets
      * @param onEditCancel callback to indicate to the app to cancel editing the schedules/presets
      * @param onEditCommit callback to indicate to the app to commit the new schedules/presets
-     * 
+     *
      * @param getPresetTypeAtIndex callback requesting from the app a preset type at a given index.
      * @param getPresetAtIndex callback requesting from the app a preset at a given index.
      * @param setPresetAtIndex callback requesting the app to set a preset at a given index.
-     * 
+     *
      * @param getScheduleTypeAtIndex callback requesting from the app a preset type at a given index.
      * @param getScheduleAtIndex callback requesting from the app a preset at a given index.
      * @param setScheduleAtIndex callback requesting the app to set a preset at a given index.
      */
 
     // If the endpoint supports both editable presets and editable schedules
-    ThermostatMatterScheduleManager( chip::EndpointId endpoint, 
-                                    onEditStartCb onEditStart, 
+    ThermostatMatterScheduleManager( chip::EndpointId endpoint,
+                                    onEditStartCb onEditStart,
                                     onEditCancelCb onEditCancel,
                                     onEditCommitCb onEditCommit,
 
@@ -84,8 +84,8 @@ struct ThermostatMatterScheduleManager
                                     clearSchedulesCB clearSchedules);
 
     // If the endpoint supports editable schedules
-    ThermostatMatterScheduleManager( chip::EndpointId endpoint, 
-                                    onEditStartCb onEditStart, 
+    ThermostatMatterScheduleManager( chip::EndpointId endpoint,
+                                    onEditStartCb onEditStart,
                                     onEditCancelCb onEditCancel,
                                     onEditCommitCb onEditCommit,
 
@@ -95,8 +95,8 @@ struct ThermostatMatterScheduleManager
                                     clearSchedulesCB clearSchedules);
 
     // If the endpoint supports editable presets
-    ThermostatMatterScheduleManager( chip::EndpointId endpoint, 
-                                    onEditStartCb onEditStart, 
+    ThermostatMatterScheduleManager( chip::EndpointId endpoint,
+                                    onEditStartCb onEditStart,
                                     onEditCancelCb onEditCancel,
                                     onEditCommitCb onEditCommit,
 
@@ -132,4 +132,3 @@ struct ThermostatMatterScheduleManager
     EmberAfStatus ValidateSchedulesForCommitting(chip::Span<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type> &oldlist, chip::Span<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type> &newlist);
 //    static CHIP_ERROR ValidateSchedulesForCommitting(oldlist, newlist);
 };
-

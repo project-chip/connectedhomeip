@@ -16,11 +16,11 @@ constexpr const char * kUnoccupiedName = "Unoccupied Default";
 
 constexpr const int kMaxPresets = 10;
 
-// user presets will be prefixed with U 
+// user presets will be prefixed with U
 static const char * userPresetPrefix = "U";
 static uint32_t nextNewHandle = 0;
 
-static PresetStruct::Type BuiltInPresets[] = 
+static PresetStruct::Type BuiltInPresets[] =
 {
 	{
 		.presetHandle = DataModel::Nullable<chip::ByteSpan>(chip::ByteSpan(Uint8::from_const_char(kBuiltInOneHandle), strlen(kBuiltInOneHandle))),
@@ -46,13 +46,13 @@ static std::array<PresetStruct::Type, kMaxPresets> gsActivePresets;
 static unsigned int gsEditingPresetsEmptyIndex = 0;
 static std::array<PresetStruct::Type, kMaxPresets> gsEditingPresets;
 
-static void 
+static void
 onEditStart(ThermostatMatterScheduleManager * mgr, ThermostatMatterScheduleManager::editType type)
 {
     ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditStart %s", type == ThermostatMatterScheduleManager::Presets ? "Presets" : "Schedules");
 }
 
-static void 
+static void
 onEditCancel(ThermostatMatterScheduleManager * mgr, ThermostatMatterScheduleManager::editType type)
 {
     ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditCancel %s", type == ThermostatMatterScheduleManager::Presets ? "Presets" : "Schedules");
@@ -72,7 +72,7 @@ onEditCommit(ThermostatMatterScheduleManager * mgr, ThermostatMatterScheduleMana
 	    ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditCommit %s", type == ThermostatMatterScheduleManager::Presets ? "Presets" : "Schedules");
 		Span<PresetStruct::Type> oldPresets = Span<PresetStruct::Type>(gsActivePresets).SubSpan(0, gsActivePresetsEmptyIndex);
 		Span<PresetStruct::Type> newPresets = Span<PresetStruct::Type>(gsEditingPresets).SubSpan(0, gsEditingPresetsEmptyIndex);
-		
+
 		status = mgr->ThermostatMatterScheduleManager::ValidatePresetsForCommitting(oldPresets, newPresets);
 		SuccessOrExit(status);
 
@@ -154,7 +154,7 @@ getPresetAtIndex(ThermostatMatterScheduleManager * mgr, size_t index, PresetStru
 		preset = gsActivePresets[index];
 		return CHIP_NO_ERROR;
 	}
-	return CHIP_ERROR_NOT_FOUND;	
+	return CHIP_ERROR_NOT_FOUND;
 }
 
 static CHIP_ERROR
@@ -181,12 +181,12 @@ struct ExampleThermostatPresetManager : public ThermostatMatterScheduleManager
 	ExampleThermostatPresetManager(chip::EndpointId endpoint)
 	: ThermostatMatterScheduleManager(
 		endpoint,
-		onEditStart, 
-		onEditCancel, 
-		onEditCommit, 
-		getPresetTypeAtIndex, 
-		getPresetAtIndex, 
-		appendPreset, 
+		onEditStart,
+		onEditCancel,
+		onEditCommit,
+		getPresetTypeAtIndex,
+		getPresetAtIndex,
+		appendPreset,
 		clearPresets)
 	{
 		for (gsActivePresetsEmptyIndex=0; gsActivePresetsEmptyIndex<sizeof(BuiltInPresets)/sizeof(BuiltInPresets[0]); ++gsActivePresetsEmptyIndex)
