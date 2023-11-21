@@ -18,6 +18,7 @@
 
 #include "pw_rpc/server.h"
 #include "pw_rpc_system_server/rpc_server.h"
+#include "pw_rpc_system_server/socket.h"
 
 #include <thread>
 
@@ -116,9 +117,10 @@ void RunRpcService()
     pw::rpc::system_server::Start();
 }
 
-int Init()
+int Init(uint16_t rpcServerPort)
 {
     int err = 0;
+    pw::rpc::system_server::set_socket_port(rpcServerPort);
     std::thread rpc_service(RunRpcService);
     rpc_service.detach();
     return err;

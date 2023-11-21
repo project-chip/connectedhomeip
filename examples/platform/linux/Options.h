@@ -68,7 +68,9 @@ struct LinuxDeviceOptions
     chip::FabricId commissionerFabricId   = chip::kUndefinedFabricId;
     std::vector<std::string> traceTo;
     bool mSimulateNoInternalTime = false;
-
+#if defined(PW_RPC_ENABLED)
+    uint16_t rpcServerPort = 33000;
+#endif
     static LinuxDeviceOptions & GetInstance();
 };
 
