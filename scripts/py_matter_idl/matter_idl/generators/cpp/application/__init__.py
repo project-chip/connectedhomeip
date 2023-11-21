@@ -13,11 +13,10 @@
 # limitations under the License.
 
 import os
-from typing import List
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.generators.cluster_selection import server_side_clusters
-from matter_idl.matter_idl_types import Cluster, Idl
+from matter_idl.matter_idl_types import Idl
 
 
 class CppApplicationGenerator(CodeGenerator):
