@@ -2,7 +2,7 @@
 // It is for view/code review purposes only.
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
-client cluster Identify = 3 {
+cluster Identify = 3 {
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
     kBreathe = 1;
@@ -34,6 +34,7 @@ client cluster Identify = 3 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct IdentifyRequest {
     int16u identifyTime = 0;
   }
@@ -43,6 +44,8 @@ client cluster Identify = 3 {
     EffectVariantEnum effectVariant = 1;
   }
 
+
+
   /** Command description for Identify */
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
   /** Command description for TriggerEffect */
@@ -50,7 +53,7 @@ client cluster Identify = 3 {
 }
 
 /** Attributes and commands for group configuration and manipulation. */
-client cluster Groups = 4 {
+cluster Groups = 4 {
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
   }
@@ -66,6 +69,7 @@ client cluster Groups = 4 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
 
   request struct AddGroupRequest {
     group_id groupID = 0;
@@ -110,6 +114,8 @@ client cluster Groups = 4 {
     char_string<16> groupName = 1;
   }
 
+
+
   /** Command description for AddGroup */
   fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
   /** Command description for ViewGroup */
@@ -125,7 +131,7 @@ client cluster Groups = 4 {
 }
 
 /** Attributes and commands for scene configuration and manipulation. */
-provisional client cluster Scenes = 5 {
+provisional cluster Scenes = 5 {
   bitmap CopyModeBitmap : bitmap8 {
     kCopyAllScenes = 0x1;
   }
@@ -174,6 +180,7 @@ provisional client cluster Scenes = 5 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
 
   request struct AddSceneRequest {
     group_id groupID = 0;
@@ -293,6 +300,8 @@ provisional client cluster Scenes = 5 {
     int8u sceneIdentifierFrom = 2;
   }
 
+
+
   /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}' */
   fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
   /** Retrieves the requested scene entry from its Scene table. */
@@ -316,7 +325,7 @@ provisional client cluster Scenes = 5 {
 }
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
-client cluster OnOff = 6 {
+cluster OnOff = 6 {
   enum DelayedAllOffEffectVariantEnum : enum8 {
     kDelayedOffFastFade = 0;
     kNoFade = 1;
@@ -360,6 +369,7 @@ client cluster OnOff = 6 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct OffWithEffectRequest {
     EffectIdentifierEnum effectIdentifier = 0;
     enum8 effectVariant = 1;
@@ -370,6 +380,8 @@ client cluster OnOff = 6 {
     int16u onTime = 1;
     int16u offWaitTime = 2;
   }
+
+
 
   /** On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0. */
   command Off(): DefaultSuccess = 0;
@@ -386,7 +398,7 @@ client cluster OnOff = 6 {
 }
 
 /** Attributes and commands for configuring On/Off switching devices. */
-client cluster OnOffSwitchConfiguration = 7 {
+cluster OnOffSwitchConfiguration = 7 {
   readonly attribute enum8 switchType = 0;
   attribute enum8 switchActions = 16;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -395,10 +407,13 @@ client cluster OnOffSwitchConfiguration = 7 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
-client cluster LevelControl = 8 {
+cluster LevelControl = 8 {
   enum MoveModeEnum : enum8 {
     kUp = 0;
     kDown = 1;
@@ -440,6 +455,7 @@ client cluster LevelControl = 8 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
 
   request struct MoveToLevelRequest {
     int8u level = 0;
@@ -499,6 +515,8 @@ client cluster LevelControl = 8 {
     int16u frequency = 0;
   }
 
+
+
   /** Command description for MoveToLevel */
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
   /** Command description for Move */
@@ -521,7 +539,7 @@ client cluster LevelControl = 8 {
 }
 
 /** An interface for reading the value of a binary measurement and accessing various characteristics of that measurement. */
-client cluster BinaryInputBasic = 15 {
+cluster BinaryInputBasic = 15 {
   attribute optional char_string<16> activeText = 4;
   attribute optional char_string<16> description = 28;
   attribute optional char_string<16> inactiveText = 46;
@@ -537,20 +555,26 @@ client cluster BinaryInputBasic = 15 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Cluster to control pulse width modulation */
-provisional client cluster PulseWidthModulation = 28 {
+provisional cluster PulseWidthModulation = 28 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
-client cluster Descriptor = 29 {
+cluster Descriptor = 29 {
   bitmap Feature : bitmap32 {
     kTagList = 0x1;
   }
@@ -578,10 +602,13 @@ client cluster Descriptor = 29 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
-client cluster Binding = 30 {
+cluster Binding = 30 {
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
     optional group_id group = 2;
@@ -597,13 +624,16 @@ client cluster Binding = 30 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** The Access Control Cluster exposes a data model view of a
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
-client cluster AccessControl = 31 {
+cluster AccessControl = 31 {
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
     kCASE = 2;
@@ -670,10 +700,13 @@ client cluster AccessControl = 31 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
-client cluster Actions = 37 {
+cluster Actions = 37 {
   enum ActionErrorEnum : enum8 {
     kUnknown = 0;
     kInterrupted = 1;
@@ -756,6 +789,7 @@ client cluster Actions = 37 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct InstantActionRequest {
     int16u actionID = 0;
     optional int32u invokeID = 1;
@@ -821,6 +855,8 @@ client cluster Actions = 37 {
     int32u duration = 2;
   }
 
+
+
   /** This command triggers an action (state change) on the involved endpoints. */
   command InstantAction(InstantActionRequest): DefaultSuccess = 0;
   /** This command triggers an action (state change) on the involved endpoints, with a specified time to transition from the current state to the new state. */
@@ -850,7 +886,7 @@ client cluster Actions = 37 {
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
-client cluster BasicInformation = 40 {
+cluster BasicInformation = 40 {
   enum ColorEnum : enum8 {
     kBlack = 0;
     kNavy = 1;
@@ -939,11 +975,14 @@ client cluster BasicInformation = 40 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
+
+
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
 /** Provides an interface for providing OTA software updates */
-client cluster OtaSoftwareUpdateProvider = 41 {
+cluster OtaSoftwareUpdateProvider = 41 {
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
     kAwaitNextAction = 1;
@@ -970,6 +1009,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
 
   request struct QueryImageRequest {
     vendor_id vendorID = 0;
@@ -1008,6 +1048,8 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     int32u softwareVersion = 1;
   }
 
+
+
   /** Determine availability of a new Software Image */
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
   /** Determine next action to take for a downloaded Software Image */
@@ -1017,7 +1059,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
 }
 
 /** Provides an interface for downloading and applying OTA software updates */
-client cluster OtaSoftwareUpdateRequestor = 42 {
+cluster OtaSoftwareUpdateRequestor = 42 {
   enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
     kUpdateAvailable = 1;
@@ -1080,6 +1122,7 @@ client cluster OtaSoftwareUpdateRequestor = 42 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct AnnounceOTAProviderRequest {
     node_id providerNodeID = 0;
     vendor_id vendorID = 1;
@@ -1087,6 +1130,8 @@ client cluster OtaSoftwareUpdateRequestor = 42 {
     optional octet_string<512> metadataForNode = 3;
     endpoint_no endpoint = 4;
   }
+
+
 
   /** Announce the presence of an OTA Provider */
   command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
@@ -1096,7 +1141,7 @@ client cluster OtaSoftwareUpdateRequestor = 42 {
       may have differing common languages, units of measurements, and numerical formatting
       standards. As such, Nodes that visually or audibly convey information need a mechanism by which
       they can be configured to use a user’s preferred language, units, etc */
-client cluster LocalizationConfiguration = 43 {
+cluster LocalizationConfiguration = 43 {
   attribute access(write: manage) char_string<35> activeLocale = 0;
   readonly attribute char_string supportedLocales[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1105,13 +1150,16 @@ client cluster LocalizationConfiguration = 43 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
       may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
       or audibly convey time information need a mechanism by which they can be configured to use a
       user’s preferred format. */
-client cluster TimeFormatLocalization = 44 {
+cluster TimeFormatLocalization = 44 {
   enum CalendarTypeEnum : enum8 {
     kBuddhist = 0;
     kChinese = 1;
@@ -1145,13 +1193,16 @@ client cluster TimeFormatLocalization = 44 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
       may have differing preferences for the units in which values are conveyed in communication to a
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
-client cluster UnitLocalization = 45 {
+cluster UnitLocalization = 45 {
   enum TempUnitEnum : enum8 {
     kFahrenheit = 0;
     kCelsius = 1;
@@ -1169,10 +1220,13 @@ client cluster UnitLocalization = 45 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** This cluster is used to describe the configuration and capabilities of a Device's power system. */
-client cluster PowerSourceConfiguration = 46 {
+cluster PowerSourceConfiguration = 46 {
   readonly attribute endpoint_no sources[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1180,10 +1234,13 @@ client cluster PowerSourceConfiguration = 46 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
-client cluster PowerSource = 47 {
+cluster PowerSource = 47 {
   enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;
     kAlkaline = 1;
@@ -1437,10 +1494,13 @@ client cluster PowerSource = 47 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
-client cluster GeneralCommissioning = 48 {
+cluster GeneralCommissioning = 48 {
   enum CommissioningErrorEnum : enum8 {
     kOK = 0;
     kValueOutsideRange = 1;
@@ -1472,6 +1532,7 @@ client cluster GeneralCommissioning = 48 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct ArmFailSafeRequest {
     int16u expiryLengthSeconds = 0;
     int64u breadcrumb = 1;
@@ -1498,6 +1559,8 @@ client cluster GeneralCommissioning = 48 {
     char_string debugText = 1;
   }
 
+
+
   /** Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock */
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
   /** Set the regulatory configuration to be used during commissioning */
@@ -1507,7 +1570,7 @@ client cluster GeneralCommissioning = 48 {
 }
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
-client cluster NetworkCommissioning = 49 {
+cluster NetworkCommissioning = 49 {
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
     kOutOfRange = 1;
@@ -1602,6 +1665,7 @@ client cluster NetworkCommissioning = 49 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct ScanNetworksRequest {
     optional nullable octet_string<32> ssid = 0;
     optional int64u breadcrumb = 1;
@@ -1668,6 +1732,8 @@ client cluster NetworkCommissioning = 49 {
     optional OCTET_STRING<64> possessionSignature = 1;
   }
 
+
+
   /** Detemine the set of networks the device sees as available. */
   command access(invoke: administer) ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
   /** Add or update the credentials for a given Wi-Fi network. */
@@ -1685,7 +1751,7 @@ client cluster NetworkCommissioning = 49 {
 }
 
 /** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
-client cluster DiagnosticLogs = 50 {
+cluster DiagnosticLogs = 50 {
   enum IntentEnum : enum8 {
     kEndUserSupport = 0;
     kNetworkDiag = 1;
@@ -1712,6 +1778,7 @@ client cluster DiagnosticLogs = 50 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct RetrieveLogsRequestRequest {
     IntentEnum intent = 0;
     TransferProtocolEnum requestedProtocol = 1;
@@ -1725,12 +1792,14 @@ client cluster DiagnosticLogs = 50 {
     optional systime_us timeSinceBoot = 3;
   }
 
+
+
   /** Retrieving diagnostic logs from a Node */
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
-client cluster GeneralDiagnostics = 51 {
+cluster GeneralDiagnostics = 51 {
   enum BootReasonEnum : enum8 {
     kUnspecified = 0;
     kPowerOnReboot = 1;
@@ -1826,6 +1895,7 @@ client cluster GeneralDiagnostics = 51 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct TestEventTriggerRequest {
     octet_string<16> enableKey = 0;
     int64u eventTrigger = 1;
@@ -1836,6 +1906,8 @@ client cluster GeneralDiagnostics = 51 {
     nullable epoch_us UTCTimeUs = 1;
   }
 
+
+
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   /** Take a snapshot of system time and epoch time. */
@@ -1843,7 +1915,7 @@ client cluster GeneralDiagnostics = 51 {
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
-client cluster SoftwareDiagnostics = 52 {
+cluster SoftwareDiagnostics = 52 {
   bitmap Feature : bitmap32 {
     kWatermarks = 0x1;
   }
@@ -1873,12 +1945,15 @@ client cluster SoftwareDiagnostics = 52 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
+
+
   /** Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute. */
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 }
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
-client cluster ThreadNetworkDiagnostics = 53 {
+cluster ThreadNetworkDiagnostics = 53 {
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
     kNotConnected = 1;
@@ -2037,12 +2112,15 @@ client cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
+
+
   /** Reception of this command SHALL reset the OverrunCount attributes to 0 */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
-client cluster WiFiNetworkDiagnostics = 54 {
+cluster WiFiNetworkDiagnostics = 54 {
   enum AssociationFailureCauseEnum : enum8 {
     kUnknown = 0;
     kAssociationFailed = 1;
@@ -2112,12 +2190,15 @@ client cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
+
+
   /** Reception of this command SHALL reset the Breacon and Packet related count attributes to 0 */
   command ResetCounts(): DefaultSuccess = 0;
 }
 
 /** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
-client cluster EthernetNetworkDiagnostics = 55 {
+cluster EthernetNetworkDiagnostics = 55 {
   enum PHYRateEnum : enum8 {
     kRate10M = 0;
     kRate100M = 1;
@@ -2152,12 +2233,15 @@ client cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
+
+
   /** Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0 */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
 /** Accurate time is required for a number of reasons, including scheduling, display and validating security materials. */
-client cluster TimeSynchronization = 56 {
+cluster TimeSynchronization = 56 {
   enum GranularityEnum : enum8 {
     kNoTimeGranularity = 0;
     kMinutesGranularity = 1;
@@ -2264,6 +2348,7 @@ client cluster TimeSynchronization = 56 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct SetUTCTimeRequest {
     epoch_us UTCTime = 0;
     GranularityEnum granularity = 1;
@@ -2290,6 +2375,8 @@ client cluster TimeSynchronization = 56 {
     nullable char_string<128> defaultNTP = 0;
   }
 
+
+
   /** This command MAY be issued by Administrator to set the time. */
   command access(invoke: administer) SetUTCTime(SetUTCTimeRequest): DefaultSuccess = 0;
   /** This command SHALL set TrustedTimeSource. */
@@ -2306,7 +2393,7 @@ client cluster TimeSynchronization = 56 {
           the Endpoint where it is placed (and its Parts) is bridged from a non-CHIP technology; and provide a centralized
           collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
           such as the vendor name, the model name, or user-assigned name. */
-client cluster BridgedDeviceBasicInformation = 57 {
+cluster BridgedDeviceBasicInformation = 57 {
   enum ColorEnum : enum8 {
     kBlack = 0;
     kNavy = 1;
@@ -2381,12 +2468,15 @@ client cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
-client cluster Switch = 59 {
+cluster Switch = 59 {
   bitmap Feature : bitmap32 {
     kLatchingSwitch = 0x1;
     kMomentarySwitch = 0x2;
@@ -2434,10 +2524,13 @@ client cluster Switch = 59 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
-client cluster AdministratorCommissioning = 60 {
+cluster AdministratorCommissioning = 60 {
   enum CommissioningWindowStatusEnum : enum8 {
     kWindowNotOpen = 0;
     kEnhancedWindowOpen = 1;
@@ -2464,6 +2557,7 @@ client cluster AdministratorCommissioning = 60 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct OpenCommissioningWindowRequest {
     int16u commissioningTimeout = 0;
     octet_string PAKEPasscodeVerifier = 1;
@@ -2476,6 +2570,8 @@ client cluster AdministratorCommissioning = 60 {
     int16u commissioningTimeout = 0;
   }
 
+
+
   /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method. */
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
   /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning method, if the node supports it. */
@@ -2485,7 +2581,7 @@ client cluster AdministratorCommissioning = 60 {
 }
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
-client cluster OperationalCredentials = 62 {
+cluster OperationalCredentials = 62 {
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
     kPAICertificate = 2;
@@ -2531,6 +2627,7 @@ client cluster OperationalCredentials = 62 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
 
   request struct AttestationRequestRequest {
     octet_string<32> attestationNonce = 0;
@@ -2590,6 +2687,8 @@ client cluster OperationalCredentials = 62 {
     octet_string rootCACertificate = 0;
   }
 
+
+
   /** Sender is requesting attestation information from the receiver. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
   /** Sender is requesting a device attestation certificate from the receiver. */
@@ -2609,7 +2708,7 @@ client cluster OperationalCredentials = 62 {
 }
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
-client cluster GroupKeyManagement = 63 {
+cluster GroupKeyManagement = 63 {
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
@@ -2654,6 +2753,7 @@ client cluster GroupKeyManagement = 63 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct KeySetWriteRequest {
     GroupKeySetStruct groupKeySet = 0;
   }
@@ -2674,6 +2774,8 @@ client cluster GroupKeyManagement = 63 {
     int16u groupKeySetIDs[] = 0;
   }
 
+
+
   /** Write a new set of keys for the given key set id. */
   fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
   /** Read the keys for a given key set id. */
@@ -2686,7 +2788,7 @@ client cluster GroupKeyManagement = 63 {
 
 /** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
 labels. */
-client cluster FixedLabel = 64 {
+cluster FixedLabel = 64 {
   struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
@@ -2699,10 +2801,13 @@ client cluster FixedLabel = 64 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
-client cluster UserLabel = 65 {
+cluster UserLabel = 65 {
   struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
@@ -2715,40 +2820,52 @@ client cluster UserLabel = 65 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Cluster to control Proxy Configuration */
-client cluster ProxyConfiguration = 66 {
+cluster ProxyConfiguration = 66 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Cluster to control Proxy Discovery */
-client cluster ProxyDiscovery = 67 {
+cluster ProxyDiscovery = 67 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Cluster to control Proxy Valid */
-client cluster ProxyValid = 68 {
+cluster ProxyValid = 68 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** This cluster provides an interface to a boolean state called StateValue. */
-client cluster BooleanState = 69 {
+cluster BooleanState = 69 {
   info event StateChange = 0 {
     boolean stateValue = 0;
   }
@@ -2760,10 +2877,13 @@ client cluster BooleanState = 69 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Allows servers to ensure that listed clients are notified when a server is available for communication. */
-client cluster IcdManagement = 70 {
+cluster IcdManagement = 70 {
   bitmap Feature : bitmap32 {
     kCheckInProtocolSupport = 0x1;
     kUserActiveModeTrigger = 0x2;
@@ -2811,6 +2931,7 @@ client cluster IcdManagement = 70 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct RegisterClientRequest {
     node_id checkInNodeID = 0;
     int64u monitoredSubject = 1;
@@ -2831,6 +2952,8 @@ client cluster IcdManagement = 70 {
     int32u promisedActiveDuration = 0;
   }
 
+
+
   /** Register a client to the end device */
   fabric command access(invoke: manage) RegisterClient(RegisterClientRequest): RegisterClientResponse = 0;
   /** Unregister a client from an end device */
@@ -2840,7 +2963,7 @@ client cluster IcdManagement = 70 {
 }
 
 /** This cluster supports creating a simple timer functionality. */
-provisional client cluster Timer = 71 {
+provisional cluster Timer = 71 {
   enum TimerStatusEnum : enum8 {
     kRunning = 0;
     kPaused = 1;
@@ -2862,6 +2985,7 @@ provisional client cluster Timer = 71 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct SetTimerRequest {
     elapsed_s newTime = 0;
   }
@@ -2874,6 +2998,8 @@ provisional client cluster Timer = 71 {
     elapsed_s timeReduction = 0;
   }
 
+
+
   /** This command is used to set the timer. */
   command SetTimer(SetTimerRequest): DefaultSuccess = 0;
   /** This command is used to reset the timer to the original value. */
@@ -2885,7 +3011,7 @@ provisional client cluster Timer = 71 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional client cluster OvenMode = 73 {
+provisional cluster OvenMode = 73 {
   enum ModeTag : enum16 {
     kBake = 16384;
     kConvection = 16385;
@@ -2924,6 +3050,7 @@ provisional client cluster OvenMode = 73 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct ChangeToModeRequest {
     int8u newMode = 0;
   }
@@ -2933,6 +3060,8 @@ provisional client cluster OvenMode = 73 {
     optional char_string statusText = 1;
   }
 
+
+
   /** This command is used to change device modes.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
@@ -2940,7 +3069,7 @@ provisional client cluster OvenMode = 73 {
 
 /** This cluster supports remotely monitoring and controling the different typs of
             functionality available to a drying device, such as a laundry dryer. */
-client cluster LaundryDryerControls = 74 {
+cluster LaundryDryerControls = 74 {
   enum DrynessLevelEnum : enum8 {
     kLow = 0;
     kNormal = 1;
@@ -2956,10 +3085,13 @@ client cluster LaundryDryerControls = 74 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-client cluster ModeSelect = 80 {
+cluster ModeSelect = 80 {
   bitmap Feature : bitmap32 {
     kOnOff = 0x1;
   }
@@ -2988,16 +3120,19 @@ client cluster ModeSelect = 80 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct ChangeToModeRequest {
     int8u newMode = 0;
   }
+
+
 
   /** On receipt of this command, if the NewMode field matches the Mode field in an entry of the SupportedModes list, the server SHALL set the CurrentMode attribute to the NewMode value, otherwise, the server SHALL respond with an INVALID_COMMAND status response. */
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-client cluster LaundryWasherMode = 81 {
+cluster LaundryWasherMode = 81 {
   enum ModeTag : enum16 {
     kNormal = 16384;
     kDelicate = 16385;
@@ -3031,6 +3166,7 @@ client cluster LaundryWasherMode = 81 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct ChangeToModeRequest {
     int8u newMode = 0;
   }
@@ -3040,13 +3176,15 @@ client cluster LaundryWasherMode = 81 {
     optional char_string statusText = 1;
   }
 
+
+
   /** This command is used to change device modes.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-client cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
+cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
   enum ModeTag : enum16 {
     kRapidCool = 16384;
     kRapidFreeze = 16385;
@@ -3078,6 +3216,7 @@ client cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct ChangeToModeRequest {
     int8u newMode = 0;
   }
@@ -3087,13 +3226,15 @@ client cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
     optional char_string statusText = 1;
   }
 
+
+
   /** This command is used to change device modes.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 /** This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine. */
-client cluster LaundryWasherControls = 83 {
+cluster LaundryWasherControls = 83 {
   enum NumberOfRinsesEnum : enum8 {
     kNone = 0;
     kNormal = 1;
@@ -3116,10 +3257,13 @@ client cluster LaundryWasherControls = 83 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-client cluster RvcRunMode = 84 {
+cluster RvcRunMode = 84 {
   enum ModeTag : enum16 {
     kIdle = 16384;
     kCleaning = 16385;
@@ -3161,6 +3305,7 @@ client cluster RvcRunMode = 84 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct ChangeToModeRequest {
     int8u newMode = 0;
   }
@@ -3170,13 +3315,15 @@ client cluster RvcRunMode = 84 {
     optional char_string statusText = 1;
   }
 
+
+
   /** This command is used to change device modes.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-client cluster RvcCleanMode = 85 {
+cluster RvcCleanMode = 85 {
   enum ModeTag : enum16 {
     kDeepClean = 16384;
     kVacuum = 16385;
@@ -3212,6 +3359,7 @@ client cluster RvcCleanMode = 85 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct ChangeToModeRequest {
     int8u newMode = 0;
   }
@@ -3221,13 +3369,15 @@ client cluster RvcCleanMode = 85 {
     optional char_string statusText = 1;
   }
 
+
+
   /** This command is used to change device modes.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 /** Attributes and commands for configuring the temperature control, and reporting temperature. */
-client cluster TemperatureControl = 86 {
+cluster TemperatureControl = 86 {
   bitmap Feature : bitmap32 {
     kTemperatureNumber = 0x1;
     kTemperatureLevel = 0x2;
@@ -3247,17 +3397,20 @@ client cluster TemperatureControl = 86 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct SetTemperatureRequest {
     optional temperature targetTemperature = 0;
     optional int8u targetTemperatureLevel = 1;
   }
+
+
 
   /** Set Temperature */
   command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for configuring the Refrigerator alarm. */
-client cluster RefrigeratorAlarm = 87 {
+cluster RefrigeratorAlarm = 87 {
   bitmap AlarmMap : bitmap32 {
     kDoorOpen = 0x1;
   }
@@ -3278,10 +3431,13 @@ client cluster RefrigeratorAlarm = 87 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-client cluster DishwasherMode = 89 {
+cluster DishwasherMode = 89 {
   enum ModeTag : enum16 {
     kNormal = 16384;
     kHeavy = 16385;
@@ -3314,6 +3470,7 @@ client cluster DishwasherMode = 89 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct ChangeToModeRequest {
     int8u newMode = 0;
   }
@@ -3323,13 +3480,15 @@ client cluster DishwasherMode = 89 {
     optional char_string statusText = 1;
   }
 
+
+
   /** This command is used to change device modes.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 /** Attributes for reporting air quality classification */
-client cluster AirQuality = 91 {
+cluster AirQuality = 91 {
   enum AirQualityEnum : enum8 {
     kUnknown = 0;
     kGood = 1;
@@ -3354,10 +3513,13 @@ client cluster AirQuality = 91 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** This cluster provides an interface for observing and managing the state of smoke and CO alarms. */
-client cluster SmokeCoAlarm = 92 {
+cluster SmokeCoAlarm = 92 {
   enum AlarmStateEnum : enum8 {
     kNormal = 0;
     kWarning = 1;
@@ -3462,12 +3624,15 @@ client cluster SmokeCoAlarm = 92 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
+
+
   /** This command SHALL initiate a device self-test. */
   command SelfTestRequest(): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for configuring the Dishwasher alarm. */
-client cluster DishwasherAlarm = 93 {
+cluster DishwasherAlarm = 93 {
   bitmap AlarmMap : bitmap32 {
     kInflowError = 0x1;
     kDrainError = 0x2;
@@ -3499,6 +3664,7 @@ client cluster DishwasherAlarm = 93 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct ResetRequest {
     AlarmMap alarms = 0;
   }
@@ -3507,6 +3673,8 @@ client cluster DishwasherAlarm = 93 {
     AlarmMap mask = 0;
   }
 
+
+
   /** Reset alarm */
   command Reset(ResetRequest): DefaultSuccess = 0;
   /** Modify enabled alarms */
@@ -3514,7 +3682,7 @@ client cluster DishwasherAlarm = 93 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional client cluster MicrowaveOvenMode = 94 {
+provisional cluster MicrowaveOvenMode = 94 {
   enum ModeTag : enum16 {
     kNormal = 16384;
     kDefrost = 16385;
@@ -3543,10 +3711,13 @@ provisional client cluster MicrowaveOvenMode = 94 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes and commands for configuring the microwave oven control, and reporting cooking stats. */
-provisional client cluster MicrowaveOvenControl = 95 {
+provisional cluster MicrowaveOvenControl = 95 {
   readonly attribute elapsed_s cookTime = 1;
   readonly attribute int8u powerSetting = 2;
   readonly attribute optional int8u minPower = 3;
@@ -3559,6 +3730,7 @@ provisional client cluster MicrowaveOvenControl = 95 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct SetCookingParametersRequest {
     optional int8u cookMode = 0;
     optional elapsed_s cookTime = 1;
@@ -3569,6 +3741,8 @@ provisional client cluster MicrowaveOvenControl = 95 {
     elapsed_s timeToAdd = 0;
   }
 
+
+
   /** Set Cooking Parameters */
   command SetCookingParameters(SetCookingParametersRequest): DefaultSuccess = 0;
   /** Add More Cooking Time */
@@ -3576,7 +3750,7 @@ provisional client cluster MicrowaveOvenControl = 95 {
 }
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
-client cluster OperationalState = 96 {
+cluster OperationalState = 96 {
   enum ErrorStateEnum : enum8 {
     kNoError = 0;
     kUnableToStartOrResume = 1;
@@ -3625,9 +3799,12 @@ client cluster OperationalState = 96 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   response struct OperationalCommandResponse = 4 {
     ErrorStateStruct commandResponseState = 0;
   }
+
+
 
   /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
   command Pause(): OperationalCommandResponse = 0;
@@ -3640,7 +3817,7 @@ client cluster OperationalState = 96 {
 }
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
-client cluster RvcOperationalState = 97 {
+cluster RvcOperationalState = 97 {
   enum ErrorStateEnum : enum8 {
     kFailedToFindChargingDock = 64;
     kStuck = 65;
@@ -3692,9 +3869,12 @@ client cluster RvcOperationalState = 97 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   response struct OperationalCommandResponse = 4 {
     ErrorStateStruct commandResponseState = 0;
   }
+
+
 
   /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
   command Pause(): OperationalCommandResponse = 0;
@@ -3707,7 +3887,7 @@ client cluster RvcOperationalState = 97 {
 }
 
 /** Attributes and commands for monitoring HEPA filters in a device */
-client cluster HepaFilterMonitoring = 113 {
+cluster HepaFilterMonitoring = 113 {
   enum ChangeIndicationEnum : enum8 {
     kOK = 0;
     kWarning = 1;
@@ -3750,13 +3930,16 @@ client cluster HepaFilterMonitoring = 113 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 
   /** Reset the condition of the replaceable to the non degraded state */
   command ResetCondition(): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for monitoring activated carbon filters in a device */
-client cluster ActivatedCarbonFilterMonitoring = 114 {
+cluster ActivatedCarbonFilterMonitoring = 114 {
   enum ChangeIndicationEnum : enum8 {
     kOK = 0;
     kWarning = 1;
@@ -3800,12 +3983,15 @@ client cluster ActivatedCarbonFilterMonitoring = 114 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
+
+
   /** Reset the condition of the replaceable to the non degraded state */
   command ResetCondition(): DefaultSuccess = 0;
 }
 
 /** This cluster is used to configure a boolean sensor. */
-provisional client cluster BooleanSensorConfiguration = 128 {
+provisional cluster BooleanSensorConfiguration = 128 {
   enum SensitivityEnum : enum8 {
     kHigh = 0;
     kStandard = 1;
@@ -3843,16 +4029,19 @@ provisional client cluster BooleanSensorConfiguration = 128 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct SuppressRequestRequest {
     AlarmModeBitmap alarmsToSuppress = 0;
   }
+
+
 
   /** This command is used to suppress the specified alarm. */
   command SuppressRequest(SuppressRequestRequest): DefaultSuccess = 0;
 }
 
 /** This cluster is used to configure a valve. */
-provisional client cluster ValveConfigurationAndControl = 129 {
+provisional cluster ValveConfigurationAndControl = 129 {
   enum ValveStateEnum : enum8 {
     kOpen = 0;
     kClosed = 1;
@@ -3894,6 +4083,7 @@ provisional client cluster ValveConfigurationAndControl = 129 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct OpenRequest {
     optional elapsed_s openDuration = 0;
   }
@@ -3902,6 +4092,8 @@ provisional client cluster ValveConfigurationAndControl = 129 {
     percent level = 0;
     optional elapsed_s openDuration = 1;
   }
+
+
 
   /** This command is used to set the valve to its fully open position. */
   command Open(OpenRequest): DefaultSuccess = 0;
@@ -3912,7 +4104,7 @@ provisional client cluster ValveConfigurationAndControl = 129 {
 }
 
 /** This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control. */
-provisional client cluster DemandResponseLoadControl = 150 {
+provisional cluster DemandResponseLoadControl = 150 {
   enum CriticalityLevelEnum : enum8 {
     kUnknown = 0;
     kGreen = 1;
@@ -4076,6 +4268,7 @@ provisional client cluster DemandResponseLoadControl = 150 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct RegisterLoadControlProgramRequestRequest {
     LoadControlProgramStruct loadControlProgram = 0;
   }
@@ -4093,6 +4286,8 @@ provisional client cluster DemandResponseLoadControl = 150 {
     CancelControlBitmap cancelControl = 1;
   }
 
+
+
   /** Upon receipt, this SHALL insert a new LoadControlProgramStruct into LoadControlPrograms, or if the ProgramID matches an existing LoadControlProgramStruct, then the provider SHALL be updated with the provided values. */
   command RegisterLoadControlProgramRequest(RegisterLoadControlProgramRequestRequest): DefaultSuccess = 0;
   /** Upon receipt, this SHALL remove a the LoadControlProgramStruct from LoadControlPrograms with the matching ProgramID. */
@@ -4106,7 +4301,7 @@ provisional client cluster DemandResponseLoadControl = 150 {
 }
 
 /** An interface to a generic way to secure a door */
-client cluster DoorLock = 257 {
+cluster DoorLock = 257 {
   enum AlarmCodeEnum : enum8 {
     kLockJammed = 0;
     kLockFactoryReset = 1;
@@ -4527,6 +4722,7 @@ client cluster DoorLock = 257 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct LockDoorRequest {
     optional octet_string PINCode = 0;
   }
@@ -4685,6 +4881,8 @@ client cluster DoorLock = 257 {
     optional octet_string PINCode = 0;
   }
 
+
+
   /** This command causes the lock device to lock the door. */
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
   /** This command causes the lock device to unlock the door. */
@@ -4726,7 +4924,7 @@ client cluster DoorLock = 257 {
 }
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
-client cluster WindowCovering = 258 {
+cluster WindowCovering = 258 {
   enum EndProductType : enum8 {
     kRollerShade = 0;
     kRomanShade = 1;
@@ -4844,6 +5042,7 @@ client cluster WindowCovering = 258 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct GoToLiftValueRequest {
     int16u liftValue = 0;
   }
@@ -4859,6 +5058,8 @@ client cluster WindowCovering = 258 {
   request struct GoToTiltPercentageRequest {
     percent100ths tiltPercent100thsValue = 0;
   }
+
+
 
   /** Moves window covering to InstalledOpenLimitLift and InstalledOpenLimitTilt */
   command UpOrOpen(): DefaultSuccess = 0;
@@ -4877,7 +5078,7 @@ client cluster WindowCovering = 258 {
 }
 
 /** This cluster provides control of a barrier (garage door). */
-client cluster BarrierControl = 259 {
+cluster BarrierControl = 259 {
   bitmap BarrierControlCapabilities : bitmap8 {
     kPartialBarrier = 0x1;
   }
@@ -4906,9 +5107,12 @@ client cluster BarrierControl = 259 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct BarrierControlGoToPercentRequest {
     int8u percentOpen = 0;
   }
+
+
 
   /** Command to instruct a barrier to go to a percent open state. */
   command BarrierControlGoToPercent(BarrierControlGoToPercentRequest): DefaultSuccess = 0;
@@ -4917,7 +5121,7 @@ client cluster BarrierControl = 259 {
 }
 
 /** An interface for configuring and controlling pumps. */
-client cluster PumpConfigurationAndControl = 512 {
+cluster PumpConfigurationAndControl = 512 {
   enum ControlModeEnum : enum8 {
     kConstantSpeed = 0;
     kConstantPressure = 1;
@@ -5036,10 +5240,13 @@ client cluster PumpConfigurationAndControl = 512 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
-client cluster Thermostat = 513 {
+cluster Thermostat = 513 {
   enum SetpointAdjustMode : enum8 {
     kHeat = 0;
     kCool = 1;
@@ -5161,6 +5368,7 @@ client cluster Thermostat = 513 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct SetpointRaiseLowerRequest {
     SetpointAdjustMode mode = 0;
     int8s amount = 1;
@@ -5185,6 +5393,8 @@ client cluster Thermostat = 513 {
     ModeForSequence modeToReturn = 1;
   }
 
+
+
   /** Command description for SetpointRaiseLower */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
   /** Command description for SetWeeklySchedule */
@@ -5196,7 +5406,7 @@ client cluster Thermostat = 513 {
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */
-provisional client cluster FanControl = 514 {
+provisional cluster FanControl = 514 {
   enum AirflowDirectionEnum : enum8 {
     kForward = 0;
     kReverse = 1;
@@ -5265,18 +5475,21 @@ provisional client cluster FanControl = 514 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct StepRequest {
     StepDirectionEnum direction = 0;
     optional boolean wrap = 1;
     optional boolean lowestOff = 2;
   }
 
+
+
   /** The Step command speeds up or slows down the fan, in steps. */
   command Step(StepRequest): DefaultSuccess = 0;
 }
 
 /** An interface for configuring the user interface of a thermostat (which may be remote from the thermostat). */
-client cluster ThermostatUserInterfaceConfiguration = 516 {
+cluster ThermostatUserInterfaceConfiguration = 516 {
   enum KeypadLockoutEnum : enum8 {
     kNoLockout = 0;
     kLockout1 = 1;
@@ -5305,10 +5518,13 @@ client cluster ThermostatUserInterfaceConfiguration = 516 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
-client cluster ColorControl = 768 {
+cluster ColorControl = 768 {
   enum ColorLoopAction : enum8 {
     kDeactivate = 0;
     kActivateFromColorLoopStartEnhancedHue = 1;
@@ -5436,6 +5652,7 @@ client cluster ColorControl = 768 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
 
   request struct MoveToHueRequest {
     int8u hue = 0;
@@ -5585,6 +5802,8 @@ client cluster ColorControl = 768 {
     bitmap8 optionsOverride = 6;
   }
 
+
+
   /** Move to specified hue. */
   command MoveToHue(MoveToHueRequest): DefaultSuccess = 0;
   /** Move hue up or down at specified rate. */
@@ -5626,7 +5845,7 @@ client cluster ColorControl = 768 {
 }
 
 /** Attributes and commands for configuring a lighting ballast. */
-provisional client cluster BallastConfiguration = 769 {
+provisional cluster BallastConfiguration = 769 {
   bitmap BallastStatusBitmap : bitmap8 {
     kBallastNonOperational = 0x1;
     kLampFailure = 0x2;
@@ -5656,10 +5875,13 @@ provisional client cluster BallastConfiguration = 769 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
-client cluster IlluminanceMeasurement = 1024 {
+cluster IlluminanceMeasurement = 1024 {
   enum LightSensorTypeEnum : enum8 {
     kPhotodiode = 0;
     kCMOS = 1;
@@ -5676,10 +5898,13 @@ client cluster IlluminanceMeasurement = 1024 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
-client cluster TemperatureMeasurement = 1026 {
+cluster TemperatureMeasurement = 1026 {
   readonly attribute nullable temperature measuredValue = 0;
   readonly attribute nullable temperature minMeasuredValue = 1;
   readonly attribute nullable temperature maxMeasuredValue = 2;
@@ -5690,10 +5915,13 @@ client cluster TemperatureMeasurement = 1026 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements. */
-client cluster PressureMeasurement = 1027 {
+cluster PressureMeasurement = 1027 {
   bitmap Feature : bitmap32 {
     kExtended = 0x1;
   }
@@ -5713,10 +5941,13 @@ client cluster PressureMeasurement = 1027 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
-client cluster FlowMeasurement = 1028 {
+cluster FlowMeasurement = 1028 {
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
   readonly attribute nullable int16u maxMeasuredValue = 2;
@@ -5727,10 +5958,13 @@ client cluster FlowMeasurement = 1028 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements. */
-client cluster RelativeHumidityMeasurement = 1029 {
+cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
   readonly attribute nullable int16u maxMeasuredValue = 2;
@@ -5741,10 +5975,13 @@ client cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
-client cluster OccupancySensing = 1030 {
+cluster OccupancySensing = 1030 {
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0;
     kUltrasonic = 1;
@@ -5780,10 +6017,13 @@ client cluster OccupancySensing = 1030 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes for reporting carbon monoxide concentration measurements */
-client cluster CarbonMonoxideConcentrationMeasurement = 1036 {
+cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -5835,10 +6075,13 @@ client cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes for reporting carbon dioxide concentration measurements */
-client cluster CarbonDioxideConcentrationMeasurement = 1037 {
+cluster CarbonDioxideConcentrationMeasurement = 1037 {
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -5890,10 +6133,13 @@ client cluster CarbonDioxideConcentrationMeasurement = 1037 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes for reporting nitrogen dioxide concentration measurements */
-client cluster NitrogenDioxideConcentrationMeasurement = 1043 {
+cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -5945,10 +6191,13 @@ client cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes for reporting ozone concentration measurements */
-client cluster OzoneConcentrationMeasurement = 1045 {
+cluster OzoneConcentrationMeasurement = 1045 {
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -6000,10 +6249,13 @@ client cluster OzoneConcentrationMeasurement = 1045 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes for reporting PM2.5 concentration measurements */
-client cluster Pm25ConcentrationMeasurement = 1066 {
+cluster Pm25ConcentrationMeasurement = 1066 {
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -6055,10 +6307,13 @@ client cluster Pm25ConcentrationMeasurement = 1066 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes for reporting formaldehyde concentration measurements */
-client cluster FormaldehydeConcentrationMeasurement = 1067 {
+cluster FormaldehydeConcentrationMeasurement = 1067 {
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -6110,10 +6365,13 @@ client cluster FormaldehydeConcentrationMeasurement = 1067 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes for reporting PM1 concentration measurements */
-client cluster Pm1ConcentrationMeasurement = 1068 {
+cluster Pm1ConcentrationMeasurement = 1068 {
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -6165,10 +6423,13 @@ client cluster Pm1ConcentrationMeasurement = 1068 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes for reporting PM10 concentration measurements */
-client cluster Pm10ConcentrationMeasurement = 1069 {
+cluster Pm10ConcentrationMeasurement = 1069 {
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -6220,10 +6481,13 @@ client cluster Pm10ConcentrationMeasurement = 1069 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes for reporting total volatile organic compounds concentration measurements */
-client cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
+cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -6275,10 +6539,13 @@ client cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** Attributes for reporting radon concentration measurements */
-client cluster RadonConcentrationMeasurement = 1071 {
+cluster RadonConcentrationMeasurement = 1071 {
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -6330,10 +6597,13 @@ client cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
-client cluster WakeOnLan = 1283 {
+cluster WakeOnLan = 1283 {
   readonly attribute optional char_string<12> MACAddress = 0;
   readonly attribute optional octet_string<16> linkLocalAddress = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -6342,10 +6612,13 @@ client cluster WakeOnLan = 1283 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** This cluster provides an interface for controlling the current Channel on a device. */
-client cluster Channel = 1284 {
+cluster Channel = 1284 {
   enum LineupInfoTypeEnum : enum8 {
     kMSO = 0;
   }
@@ -6386,6 +6659,7 @@ client cluster Channel = 1284 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct ChangeChannelRequest {
     char_string match = 0;
   }
@@ -6404,6 +6678,8 @@ client cluster Channel = 1284 {
     int16s count = 0;
   }
 
+
+
   /** Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. */
   command ChangeChannel(ChangeChannelRequest): ChangeChannelResponse = 0;
   /** Change the channel on the media plaeyer to the channel with the given Number in the ChannelList attribute. */
@@ -6413,7 +6689,7 @@ client cluster Channel = 1284 {
 }
 
 /** This cluster provides an interface for UX navigation within a set of targets on a device or endpoint. */
-client cluster TargetNavigator = 1285 {
+cluster TargetNavigator = 1285 {
   enum StatusEnum : enum8 {
     kSuccess = 0;
     kTargetNotFound = 1;
@@ -6434,6 +6710,7 @@ client cluster TargetNavigator = 1285 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct NavigateTargetRequest {
     int8u target = 0;
     optional char_string data = 1;
@@ -6444,12 +6721,14 @@ client cluster TargetNavigator = 1285 {
     optional char_string data = 1;
   }
 
+
+
   /** Upon receipt, this SHALL navigation the UX to the target identified. */
   command NavigateTarget(NavigateTargetRequest): NavigateTargetResponse = 0;
 }
 
 /** This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker. */
-client cluster MediaPlayback = 1286 {
+cluster MediaPlayback = 1286 {
   enum PlaybackStateEnum : enum8 {
     kPlaying = 0;
     kPaused = 1;
@@ -6490,6 +6769,7 @@ client cluster MediaPlayback = 1286 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct SkipForwardRequest {
     int64u deltaPositionMilliseconds = 0;
   }
@@ -6506,6 +6786,8 @@ client cluster MediaPlayback = 1286 {
   request struct SeekRequest {
     int64u position = 0;
   }
+
+
 
   /** Upon receipt, this SHALL play media. */
   command Play(): PlaybackResponse = 0;
@@ -6532,7 +6814,7 @@ client cluster MediaPlayback = 1286 {
 }
 
 /** This cluster provides an interface for controlling the Input Selector on a media device such as a TV. */
-client cluster MediaInput = 1287 {
+cluster MediaInput = 1287 {
   enum InputTypeEnum : enum8 {
     kInternal = 0;
     kAux = 1;
@@ -6568,6 +6850,7 @@ client cluster MediaInput = 1287 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct SelectInputRequest {
     int8u index = 0;
   }
@@ -6576,6 +6859,8 @@ client cluster MediaInput = 1287 {
     int8u index = 0;
     char_string name = 1;
   }
+
+
 
   /** Upon receipt, this SHALL change the input on the media device to the input at a specific index in the Input List. */
   command SelectInput(SelectInputRequest): DefaultSuccess = 0;
@@ -6588,7 +6873,7 @@ client cluster MediaInput = 1287 {
 }
 
 /** This cluster provides an interface for managing low power mode on a device. */
-client cluster LowPower = 1288 {
+cluster LowPower = 1288 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6596,12 +6881,15 @@ client cluster LowPower = 1288 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
+
+
   /** This command shall put the device into low power mode. */
   command Sleep(): DefaultSuccess = 0;
 }
 
 /** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
-client cluster KeypadInput = 1289 {
+cluster KeypadInput = 1289 {
   enum CECKeyCodeEnum : enum8 {
     kSelect = 0;
     kUp = 1;
@@ -6710,6 +6998,7 @@ client cluster KeypadInput = 1289 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct SendKeyRequest {
     CECKeyCodeEnum keyCode = 0;
   }
@@ -6718,12 +7007,14 @@ client cluster KeypadInput = 1289 {
     StatusEnum status = 0;
   }
 
+
+
   /** Upon receipt, this SHALL process a keycode as input to the media device. */
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
-client cluster ContentLauncher = 1290 {
+cluster ContentLauncher = 1290 {
   enum MetricTypeEnum : enum8 {
     kPixels = 0;
     kPercentage = 1;
@@ -6807,6 +7098,7 @@ client cluster ContentLauncher = 1290 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct LaunchContentRequest {
     ContentSearchStruct search = 0;
     boolean autoPlay = 1;
@@ -6824,6 +7116,8 @@ client cluster ContentLauncher = 1290 {
     optional char_string data = 1;
   }
 
+
+
   /** Upon receipt, this SHALL launch the specified content with optional search criteria. */
   command LaunchContent(LaunchContentRequest): LauncherResponse = 0;
   /** Upon receipt, this SHALL launch content from the specified URL. */
@@ -6831,7 +7125,7 @@ client cluster ContentLauncher = 1290 {
 }
 
 /** This cluster provides an interface for controlling the Output on a media device such as a TV. */
-client cluster AudioOutput = 1291 {
+cluster AudioOutput = 1291 {
   enum OutputTypeEnum : enum8 {
     kHDMI = 0;
     kBT = 1;
@@ -6860,6 +7154,7 @@ client cluster AudioOutput = 1291 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct SelectOutputRequest {
     int8u index = 0;
   }
@@ -6869,6 +7164,8 @@ client cluster AudioOutput = 1291 {
     char_string name = 1;
   }
 
+
+
   /** Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List. */
   command SelectOutput(SelectOutputRequest): DefaultSuccess = 0;
   /** Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus. */
@@ -6876,7 +7173,7 @@ client cluster AudioOutput = 1291 {
 }
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
-client cluster ApplicationLauncher = 1292 {
+cluster ApplicationLauncher = 1292 {
   enum StatusEnum : enum8 {
     kSuccess = 0;
     kAppNotAvailable = 1;
@@ -6906,6 +7203,7 @@ client cluster ApplicationLauncher = 1292 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct LaunchAppRequest {
     optional ApplicationStruct application = 0;
     optional octet_string data = 1;
@@ -6924,6 +7222,8 @@ client cluster ApplicationLauncher = 1292 {
     optional octet_string data = 1;
   }
 
+
+
   /** Upon receipt, this SHALL launch the specified app with optional data. The TV Device SHALL launch and bring to foreground the identified application in the command if the application is not already launched and in foreground. The TV Device SHALL update state attribute on the Application Basic cluster of the Endpoint corresponding to the launched application. This command returns a Launch Response. */
   command LaunchApp(LaunchAppRequest): LauncherResponse = 0;
   /** Upon receipt on a Video Player endpoint this SHALL stop the specified application if it is running. */
@@ -6933,7 +7233,7 @@ client cluster ApplicationLauncher = 1292 {
 }
 
 /** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
-client cluster ApplicationBasic = 1293 {
+cluster ApplicationBasic = 1293 {
   enum ApplicationStatusEnum : enum8 {
     kStopped = 0;
     kActiveVisibleFocus = 1;
@@ -6960,16 +7260,20 @@ client cluster ApplicationBasic = 1293 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+
+
 }
 
 /** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
-client cluster AccountLogin = 1294 {
+cluster AccountLogin = 1294 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
 
   request struct GetSetupPINRequest {
     char_string<100> tempAccountIdentifier = 0;
@@ -6984,6 +7288,8 @@ client cluster AccountLogin = 1294 {
     char_string setupPIN = 1;
   }
 
+
+
   /** Upon receipt, the Content App checks if the account associated with the client Temp Account Identifier Rotating ID is the same acount that is active on the given Content App. If the accounts are the same, then the Content App includes the Setup PIN in the GetSetupPIN Response. */
   fabric timed command access(invoke: administer) GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
   /** Upon receipt, the Content App checks if the account associated with the client’s Temp Account Identifier (Rotating ID) has a current active Setup PIN with the given value. If the Setup PIN is valid for the user account associated with the Temp Account Identifier, then the Content App MAY make that user account active. */
@@ -6993,7 +7299,7 @@ client cluster AccountLogin = 1294 {
 }
 
 /** Attributes related to the electrical properties of a device. This cluster is used by power outlets and other devices that need to provide instantaneous data as opposed to metrology data which should be retrieved from the metering cluster.. */
-client cluster ElectricalMeasurement = 2820 {
+cluster ElectricalMeasurement = 2820 {
   readonly attribute optional bitmap32 measurementType = 0;
   readonly attribute optional int16s dcVoltage = 256;
   readonly attribute optional int16s dcVoltageMin = 257;
@@ -7129,6 +7435,7 @@ client cluster ElectricalMeasurement = 2820 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   response struct GetProfileInfoResponseCommand = 0 {
     int8u profileCount = 0;
     enum8 profileIntervalPeriod = 1;
@@ -7151,6 +7458,8 @@ client cluster ElectricalMeasurement = 2820 {
     enum8 numberOfIntervals = 2;
   }
 
+
+
   /** A function which retrieves the power profiling information from the electrical measurement server. */
   command GetProfileInfoCommand(): DefaultSuccess = 0;
   /** A function which retrieves an electricity measurement profile from the electricity measurement server for a specific attribute Id requested. */
@@ -7158,7 +7467,7 @@ client cluster ElectricalMeasurement = 2820 {
 }
 
 /** The Test Cluster is meant to validate the generated code */
-internal client cluster UnitTesting = 4294048773 {
+internal cluster UnitTesting = 4294048773 {
   enum SimpleEnum : enum8 {
     kUnspecified = 0;
     kValueA = 1;
@@ -7364,6 +7673,7 @@ internal client cluster UnitTesting = 4294048773 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   response struct TestSpecificResponse = 0 {
     int8u returnValue = 0;
   }
@@ -7536,6 +7846,8 @@ internal client cluster UnitTesting = 4294048773 {
     int8u arg1 = 0;
   }
 
+
+
   /** Simple command without any parameters and without a specific response */
   command Test(): DefaultSuccess = 0;
   /** Simple command without any parameters and without a specific response not handled by the server */
@@ -7604,7 +7916,7 @@ internal client cluster UnitTesting = 4294048773 {
 }
 
 /** The Fault Injection Cluster provide a means for a test harness to configure faults(for example triggering a fault in the system). */
-internal client cluster FaultInjection = 4294048774 {
+internal cluster FaultInjection = 4294048774 {
   enum FaultType : enum8 {
     kUnspecified = 0;
     kSystemFault = 1;
@@ -7620,6 +7932,7 @@ internal client cluster FaultInjection = 4294048774 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+
   request struct FailAtFaultRequest {
     FaultType type = 0;
     int32u id = 1;
@@ -7634,6 +7947,8 @@ internal client cluster FaultInjection = 4294048774 {
     int8u percentage = 2;
   }
 
+
+
   /** Configure a fault to be triggered deterministically */
   command access(invoke: manage) FailAtFault(FailAtFaultRequest): DefaultSuccess = 0;
   /** Configure a fault to be triggered randomly, with a given probability defined as a percentage */
@@ -7641,7 +7956,7 @@ internal client cluster FaultInjection = 4294048774 {
 }
 
 /** The Sample MEI cluster showcases a cluster manufacturer extensions */
-client cluster SampleMei = 4294048800 {
+cluster SampleMei = 4294048800 {
   attribute boolean flipFlop = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -7649,6 +7964,7 @@ client cluster SampleMei = 4294048800 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
 
   response struct AddArgumentsResponse = 1 {
     int8u returnValue = 0;
@@ -7658,6 +7974,8 @@ client cluster SampleMei = 4294048800 {
     int8u arg1 = 0;
     int8u arg2 = 1;
   }
+
+
 
   /** Simple command without any parameters and without a response. */
   command Ping(): DefaultSuccess = 0;
