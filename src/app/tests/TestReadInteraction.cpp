@@ -544,7 +544,6 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     ReadRequestMessage::Builder readRequestBuilder;
-    MockInteractionModelApp delegate;
     NullReadHandlerCallback nullCallback;
 
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
@@ -688,7 +687,6 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     ReadRequestMessage::Builder readRequestBuilder;
-    MockInteractionModelApp delegate;
     NullReadHandlerCallback nullCallback;
 
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
@@ -1473,7 +1471,6 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     SubscribeRequestMessage::Builder subscribeRequestBuilder;
-    MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1539,7 +1536,6 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMaxIntervalCeiling(nl
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     SubscribeRequestMessage::Builder subscribeRequestBuilder;
-    MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1615,7 +1611,6 @@ void TestReadInteraction::TestICDProcessSubscribeRequestInfMaxIntervalCeiling(nl
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     SubscribeRequestMessage::Builder subscribeRequestBuilder;
-    MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1691,7 +1686,6 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval(nlTestSui
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     SubscribeRequestMessage::Builder subscribeRequestBuilder;
-    MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1767,7 +1761,6 @@ void TestReadInteraction::TestICDProcessSubscribeRequestMaxMinInterval(nlTestSui
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     SubscribeRequestMessage::Builder subscribeRequestBuilder;
-    MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1841,7 +1834,6 @@ void TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeDuration(
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     SubscribeRequestMessage::Builder subscribeRequestBuilder;
-    MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
