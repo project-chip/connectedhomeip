@@ -782,6 +782,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
 #if CONFIG_NETWORK_LAYER_BLE && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, ConnectNetworkResponse will NOT be sent");
     // Do not send the ConnectNetworkResponse if in non-concurrent mode
+    // Issue #30576 raised to modify CommandHandler to notify it if no response required
 #else
     commandHandle->AddResponse(mPath, response);
 #endif
