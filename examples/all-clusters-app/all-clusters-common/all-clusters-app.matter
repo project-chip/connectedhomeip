@@ -44,10 +44,8 @@ cluster Identify = 3 {
     EffectVariantEnum effectVariant = 1;
   }
 
-
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
-
 
   /** Command description for Identify */
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
@@ -117,14 +115,12 @@ cluster Groups = 4 {
     char_string<16> groupName = 1;
   }
 
-
   fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
   fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
   fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
   fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
   fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
-
 
   /** Command description for AddGroup */
   fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
@@ -310,7 +306,6 @@ provisional cluster Scenes = 5 {
     int8u sceneIdentifierFrom = 2;
   }
 
-
   fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
   fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
   fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
@@ -321,7 +316,6 @@ provisional cluster Scenes = 5 {
   fabric command EnhancedAddScene(EnhancedAddSceneRequest): EnhancedAddSceneResponse = 64;
   fabric command EnhancedViewScene(EnhancedViewSceneRequest): EnhancedViewSceneResponse = 65;
   fabric command CopyScene(CopySceneRequest): CopySceneResponse = 66;
-
 
   /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}' */
   fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
@@ -402,8 +396,6 @@ cluster OnOff = 6 {
     int16u offWaitTime = 2;
   }
 
-
-
   /** On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0. */
   command Off(): DefaultSuccess = 0;
   /** On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. */
@@ -475,14 +467,12 @@ cluster OnOff = 6 {
     int16u offWaitTime = 2;
   }
 
-
   command Off(): DefaultSuccess = 0;
   command On(): DefaultSuccess = 1;
   command Toggle(): DefaultSuccess = 2;
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
   command OnWithRecallGlobalScene(): DefaultSuccess = 65;
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
-
 
   /** On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0. */
   command Off(): DefaultSuccess = 0;
@@ -508,8 +498,6 @@ cluster OnOffSwitchConfiguration = 7 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -616,7 +604,6 @@ cluster LevelControl = 8 {
     int16u frequency = 0;
   }
 
-
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
   command Move(MoveRequest): DefaultSuccess = 1;
   command Step(StepRequest): DefaultSuccess = 2;
@@ -625,7 +612,6 @@ cluster LevelControl = 8 {
   command MoveWithOnOff(MoveWithOnOffRequest): DefaultSuccess = 5;
   command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
   command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
-
 
   /** Command description for MoveToLevel */
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
@@ -666,8 +652,6 @@ cluster BinaryInputBasic = 15 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
@@ -700,8 +684,6 @@ cluster Descriptor = 29 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
@@ -721,8 +703,6 @@ cluster Binding = 30 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -797,8 +777,6 @@ cluster AccessControl = 31 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -952,8 +930,6 @@ cluster Actions = 37 {
     int32u duration = 2;
   }
 
-
-
   /** This command triggers an action (state change) on the involved endpoints. */
   command InstantAction(InstantActionRequest): DefaultSuccess = 0;
   /** This command triggers an action (state change) on the involved endpoints, with a specified time to transition from the current state to the new state. */
@@ -1073,8 +1049,6 @@ cluster BasicInformation = 40 {
   readonly attribute int16u clusterRevision = 65533;
 
 
-
-
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
@@ -1145,9 +1119,7 @@ cluster OtaSoftwareUpdateProvider = 41 {
     int32u softwareVersion = 1;
   }
 
-
   command ApplyUpdateResponse(ApplyUpdateResponseRequest): DefaultSuccess = 3;
-
 
   /** Determine availability of a new Software Image */
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
@@ -1230,9 +1202,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
     endpoint_no endpoint = 4;
   }
 
-
   command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
-
 
   /** Announce the presence of an OTA Provider */
   command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
@@ -1251,8 +1221,6 @@ cluster LocalizationConfiguration = 43 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -1295,8 +1263,6 @@ cluster TimeFormatLocalization = 44 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -1322,8 +1288,6 @@ cluster UnitLocalization = 45 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** This cluster is used to describe the configuration and capabilities of a Device's power system. */
@@ -1335,8 +1299,6 @@ cluster PowerSourceConfiguration = 46 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -1596,8 +1558,6 @@ cluster PowerSource = 47 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
@@ -1660,11 +1620,9 @@ cluster GeneralCommissioning = 48 {
     char_string debugText = 1;
   }
 
-
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
-
 
   /** Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock */
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
@@ -1837,14 +1795,12 @@ cluster NetworkCommissioning = 49 {
     optional OCTET_STRING<64> possessionSignature = 1;
   }
 
-
   command access(invoke: administer) ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
   command access(invoke: administer) AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
   command access(invoke: administer) AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
   command access(invoke: administer) RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
   command access(invoke: administer) ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
   command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
-
 
   /** Detemine the set of networks the device sees as available. */
   command access(invoke: administer) ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
@@ -1904,9 +1860,7 @@ cluster DiagnosticLogs = 50 {
     optional systime_us timeSinceBoot = 3;
   }
 
-
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
-
 
   /** Retrieving diagnostic logs from a Node */
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
@@ -2020,10 +1974,8 @@ cluster GeneralDiagnostics = 51 {
     nullable epoch_us UTCTimeUs = 1;
   }
 
-
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   command TimeSnapshot(): TimeSnapshotResponse = 1;
-
 
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
@@ -2063,9 +2015,7 @@ cluster SoftwareDiagnostics = 52 {
   readonly attribute int16u clusterRevision = 65533;
 
 
-
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
-
 
   /** Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute. */
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
@@ -2232,9 +2182,7 @@ cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int16u clusterRevision = 65533;
 
 
-
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
-
 
   /** Reception of this command SHALL reset the OverrunCount attributes to 0 */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
@@ -2312,9 +2260,7 @@ cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute int16u clusterRevision = 65533;
 
 
-
   command ResetCounts(): DefaultSuccess = 0;
-
 
   /** Reception of this command SHALL reset the Breacon and Packet related count attributes to 0 */
   command ResetCounts(): DefaultSuccess = 0;
@@ -2357,9 +2303,7 @@ cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute int16u clusterRevision = 65533;
 
 
-
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
-
 
   /** Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0 */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
@@ -2500,13 +2444,11 @@ cluster TimeSynchronization = 56 {
     nullable char_string<128> defaultNTP = 0;
   }
 
-
   command access(invoke: administer) SetUTCTime(SetUTCTimeRequest): DefaultSuccess = 0;
   fabric command access(invoke: administer) SetTrustedTimeSource(SetTrustedTimeSourceRequest): DefaultSuccess = 1;
   command access(invoke: manage) SetTimeZone(SetTimeZoneRequest): SetTimeZoneResponse = 2;
   command access(invoke: manage) SetDSTOffset(SetDSTOffsetRequest): DefaultSuccess = 4;
   command access(invoke: administer) SetDefaultNTP(SetDefaultNTPRequest): DefaultSuccess = 5;
-
 
   /** This command MAY be issued by Administrator to set the time. */
   command access(invoke: administer) SetUTCTime(SetUTCTimeRequest): DefaultSuccess = 0;
@@ -2572,8 +2514,6 @@ cluster Switch = 59 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
@@ -2617,11 +2557,9 @@ cluster AdministratorCommissioning = 60 {
     int16u commissioningTimeout = 0;
   }
 
-
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
   timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
-
 
   /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method. */
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
@@ -2738,7 +2676,6 @@ cluster OperationalCredentials = 62 {
     octet_string rootCACertificate = 0;
   }
 
-
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
   command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
@@ -2747,7 +2684,6 @@ cluster OperationalCredentials = 62 {
   fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-
 
   /** Sender is requesting attestation information from the receiver. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
@@ -2834,12 +2770,10 @@ cluster GroupKeyManagement = 63 {
     int16u groupKeySetIDs[] = 0;
   }
 
-
   fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
   fabric command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
   fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
-
 
   /** Write a new set of keys for the given key set id. */
   fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
@@ -2867,8 +2801,6 @@ cluster FixedLabel = 64 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
@@ -2886,8 +2818,6 @@ cluster UserLabel = 65 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** This cluster provides an interface to a boolean state called StateValue. */
@@ -2903,8 +2833,6 @@ cluster BooleanState = 69 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -2944,9 +2872,7 @@ cluster ModeSelect = 80 {
     int8u newMode = 0;
   }
 
-
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
-
 
   /** On receipt of this command, if the NewMode field matches the Mode field in an entry of the SupportedModes list, the server SHALL set the CurrentMode attribute to the NewMode value, otherwise, the server SHALL respond with an INVALID_COMMAND status response. */
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
@@ -2999,9 +2925,7 @@ cluster LaundryWasherMode = 81 {
     optional char_string statusText = 1;
   }
 
-
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
-
 
   /** This command is used to change device modes.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
@@ -3051,9 +2975,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
     optional char_string statusText = 1;
   }
 
-
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
-
 
   /** This command is used to change device modes.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
@@ -3084,8 +3006,6 @@ cluster LaundryWasherControls = 83 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -3142,9 +3062,7 @@ cluster RvcRunMode = 84 {
     optional char_string statusText = 1;
   }
 
-
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
-
 
   /** This command is used to change device modes.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
@@ -3198,9 +3116,7 @@ cluster RvcCleanMode = 85 {
     optional char_string statusText = 1;
   }
 
-
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
-
 
   /** This command is used to change device modes.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
@@ -3234,9 +3150,7 @@ cluster TemperatureControl = 86 {
     optional int8u targetTemperatureLevel = 1;
   }
 
-
   command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
-
 
   /** Set Temperature */
   command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
@@ -3264,8 +3178,6 @@ cluster RefrigeratorAlarm = 87 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -3313,9 +3225,7 @@ cluster DishwasherMode = 89 {
     optional char_string statusText = 1;
   }
 
-
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
-
 
   /** This command is used to change device modes.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
@@ -3348,8 +3258,6 @@ cluster AirQuality = 91 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -3460,9 +3368,7 @@ cluster SmokeCoAlarm = 92 {
   readonly attribute int16u clusterRevision = 65533;
 
 
-
   command SelfTestRequest(): DefaultSuccess = 0;
-
 
   /** This command SHALL initiate a device self-test. */
   command SelfTestRequest(): DefaultSuccess = 0;
@@ -3510,10 +3416,8 @@ cluster DishwasherAlarm = 93 {
     AlarmMap mask = 0;
   }
 
-
   command Reset(ResetRequest): DefaultSuccess = 0;
   command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
-
 
   /** Reset alarm */
   command Reset(ResetRequest): DefaultSuccess = 0;
@@ -3576,12 +3480,10 @@ cluster OperationalState = 96 {
     ErrorStateStruct commandResponseState = 0;
   }
 
-
   command Pause(): OperationalCommandResponse = 0;
   command Stop(): OperationalCommandResponse = 1;
   command Start(): OperationalCommandResponse = 2;
   command Resume(): OperationalCommandResponse = 3;
-
 
   /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
   command Pause(): OperationalCommandResponse = 0;
@@ -3651,10 +3553,8 @@ cluster RvcOperationalState = 97 {
     ErrorStateStruct commandResponseState = 0;
   }
 
-
   command Pause(): OperationalCommandResponse = 0;
   command Resume(): OperationalCommandResponse = 3;
-
 
   /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
   command Pause(): OperationalCommandResponse = 0;
@@ -3712,9 +3612,7 @@ cluster HepaFilterMonitoring = 113 {
   readonly attribute int16u clusterRevision = 65533;
 
 
-
   command ResetCondition(): DefaultSuccess = 0;
-
 
   /** Reset the condition of the replaceable to the non degraded state */
   command ResetCondition(): DefaultSuccess = 0;
@@ -3766,9 +3664,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   readonly attribute int16u clusterRevision = 65533;
 
 
-
   command ResetCondition(): DefaultSuccess = 0;
-
 
   /** Reset the condition of the replaceable to the non degraded state */
   command ResetCondition(): DefaultSuccess = 0;
@@ -3910,7 +3806,6 @@ cluster WindowCovering = 258 {
     percent100ths tiltPercent100thsValue = 0;
   }
 
-
   command UpOrOpen(): DefaultSuccess = 0;
   command DownOrClose(): DefaultSuccess = 1;
   command StopMotion(): DefaultSuccess = 2;
@@ -3918,7 +3813,6 @@ cluster WindowCovering = 258 {
   command GoToLiftPercentage(GoToLiftPercentageRequest): DefaultSuccess = 5;
   command GoToTiltValue(GoToTiltValueRequest): DefaultSuccess = 7;
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
-
 
   /** Moves window covering to InstalledOpenLimitLift and InstalledOpenLimitTilt */
   command UpOrOpen(): DefaultSuccess = 0;
@@ -3971,10 +3865,8 @@ cluster BarrierControl = 259 {
     int8u percentOpen = 0;
   }
 
-
   command BarrierControlGoToPercent(BarrierControlGoToPercentRequest): DefaultSuccess = 0;
   command BarrierControlStop(): DefaultSuccess = 1;
-
 
   /** Command to instruct a barrier to go to a percent open state. */
   command BarrierControlGoToPercent(BarrierControlGoToPercentRequest): DefaultSuccess = 0;
@@ -4102,8 +3994,6 @@ cluster PumpConfigurationAndControl = 512 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -4255,9 +4145,7 @@ cluster Thermostat = 513 {
     ModeForSequence modeToReturn = 1;
   }
 
-
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
-
 
   /** Command description for SetpointRaiseLower */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
@@ -4346,9 +4234,7 @@ provisional cluster FanControl = 514 {
     optional boolean lowestOff = 2;
   }
 
-
   command Step(StepRequest): DefaultSuccess = 0;
-
 
   /** The Step command speeds up or slows down the fan, in steps. */
   command Step(StepRequest): DefaultSuccess = 0;
@@ -4384,8 +4270,6 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -4668,7 +4552,6 @@ cluster ColorControl = 768 {
     bitmap8 optionsOverride = 6;
   }
 
-
   command MoveToHue(MoveToHueRequest): DefaultSuccess = 0;
   command MoveHue(MoveHueRequest): DefaultSuccess = 1;
   command StepHue(StepHueRequest): DefaultSuccess = 2;
@@ -4688,7 +4571,6 @@ cluster ColorControl = 768 {
   command StopMoveStep(StopMoveStepRequest): DefaultSuccess = 71;
   command MoveColorTemperature(MoveColorTemperatureRequest): DefaultSuccess = 75;
   command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
-
 
   /** Move to specified hue. */
   command MoveToHue(MoveToHueRequest): DefaultSuccess = 0;
@@ -4762,8 +4644,6 @@ provisional cluster BallastConfiguration = 769 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
@@ -4785,8 +4665,6 @@ cluster IlluminanceMeasurement = 1024 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
@@ -4801,8 +4679,6 @@ cluster TemperatureMeasurement = 1026 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -4828,8 +4704,6 @@ cluster PressureMeasurement = 1027 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
@@ -4845,8 +4719,6 @@ cluster FlowMeasurement = 1028 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements. */
@@ -4861,8 +4733,6 @@ cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -4903,8 +4773,6 @@ cluster OccupancySensing = 1030 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -4962,8 +4830,6 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** Attributes for reporting carbon dioxide concentration measurements */
@@ -5019,8 +4885,6 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -5078,8 +4942,6 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** Attributes for reporting ozone concentration measurements */
@@ -5135,8 +4997,6 @@ cluster OzoneConcentrationMeasurement = 1045 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -5194,8 +5054,6 @@ cluster Pm25ConcentrationMeasurement = 1066 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** Attributes for reporting formaldehyde concentration measurements */
@@ -5251,8 +5109,6 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -5310,8 +5166,6 @@ cluster Pm1ConcentrationMeasurement = 1068 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** Attributes for reporting PM10 concentration measurements */
@@ -5367,8 +5221,6 @@ cluster Pm10ConcentrationMeasurement = 1069 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -5426,8 +5278,6 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** Attributes for reporting radon concentration measurements */
@@ -5484,8 +5334,6 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
@@ -5499,8 +5347,6 @@ cluster WakeOnLan = 1283 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** This cluster provides an interface for managing low power mode on a device. */
@@ -5513,9 +5359,7 @@ cluster LowPower = 1288 {
   readonly attribute int16u clusterRevision = 65533;
 
 
-
   command Sleep(): DefaultSuccess = 0;
-
 
   /** This command shall put the device into low power mode. */
   command Sleep(): DefaultSuccess = 0;
@@ -5680,8 +5524,6 @@ cluster ElectricalMeasurement = 2820 {
     int32u startTime = 1;
     enum8 numberOfIntervals = 2;
   }
-
-
 
   /** A function which retrieves the power profiling information from the electrical measurement server. */
   command GetProfileInfoCommand(): DefaultSuccess = 0;
@@ -6069,7 +5911,6 @@ internal cluster UnitTesting = 4294048773 {
     int8u arg1 = 0;
   }
 
-
   command Test(): DefaultSuccess = 0;
   command TestNotHandled(): DefaultSuccess = 1;
   command TestSpecific(): TestSpecificResponse = 2;
@@ -6088,7 +5929,6 @@ internal cluster UnitTesting = 4294048773 {
   command TestSimpleOptionalArgumentRequest(TestSimpleOptionalArgumentRequestRequest): DefaultSuccess = 19;
   command TestEmitTestEventRequest(TestEmitTestEventRequestRequest): TestEmitTestEventResponse = 20;
   command TestEmitTestFabricScopedEventRequest(TestEmitTestFabricScopedEventRequestRequest): TestEmitTestFabricScopedEventResponse = 21;
-
 
   /** Simple command without any parameters and without a specific response */
   command Test(): DefaultSuccess = 0;
@@ -6189,10 +6029,8 @@ internal cluster FaultInjection = 4294048774 {
     int8u percentage = 2;
   }
 
-
   command access(invoke: manage) FailAtFault(FailAtFaultRequest): DefaultSuccess = 0;
   command access(invoke: manage) FailRandomlyAtFault(FailRandomlyAtFaultRequest): DefaultSuccess = 1;
-
 
   /** Configure a fault to be triggered deterministically */
   command access(invoke: manage) FailAtFault(FailAtFaultRequest): DefaultSuccess = 0;

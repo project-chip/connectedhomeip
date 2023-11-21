@@ -44,10 +44,8 @@ cluster Identify = 3 {
     EffectVariantEnum effectVariant = 1;
   }
 
-
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
-
 
   /** Command description for Identify */
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
@@ -117,14 +115,12 @@ cluster Groups = 4 {
     char_string<16> groupName = 1;
   }
 
-
   fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
   fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
   fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
   fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
   fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
-
 
   /** Command description for AddGroup */
   fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
@@ -169,8 +165,6 @@ cluster Descriptor = 29 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -245,8 +239,6 @@ cluster AccessControl = 31 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -343,8 +335,6 @@ cluster BasicInformation = 40 {
   readonly attribute int16u clusterRevision = 65533;
 
 
-
-
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
@@ -415,10 +405,8 @@ cluster OtaSoftwareUpdateProvider = 41 {
     int32u softwareVersion = 1;
   }
 
-
   command QueryImageResponse(QueryImageResponseRequest): DefaultSuccess = 1;
   command ApplyUpdateResponse(ApplyUpdateResponseRequest): DefaultSuccess = 3;
-
 
   /** Determine availability of a new Software Image */
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
@@ -501,9 +489,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
     endpoint_no endpoint = 4;
   }
 
-
   command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
-
 
   /** Announce the presence of an OTA Provider */
   command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
@@ -522,8 +508,6 @@ cluster LocalizationConfiguration = 43 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -566,8 +550,6 @@ cluster TimeFormatLocalization = 44 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -592,8 +574,6 @@ cluster UnitLocalization = 45 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -853,8 +833,6 @@ cluster PowerSource = 47 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
@@ -917,11 +895,9 @@ cluster GeneralCommissioning = 48 {
     char_string debugText = 1;
   }
 
-
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
-
 
   /** Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock */
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
@@ -1094,14 +1070,12 @@ cluster NetworkCommissioning = 49 {
     optional OCTET_STRING<64> possessionSignature = 1;
   }
 
-
   command access(invoke: administer) ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
   command access(invoke: administer) AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
   command access(invoke: administer) AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
   command access(invoke: administer) RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
   command access(invoke: administer) ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
   command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
-
 
   /** Detemine the set of networks the device sees as available. */
   command access(invoke: administer) ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
@@ -1227,10 +1201,8 @@ cluster GeneralDiagnostics = 51 {
     nullable epoch_us UTCTimeUs = 1;
   }
 
-
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   command TimeSnapshot(): TimeSnapshotResponse = 1;
-
 
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
@@ -1270,9 +1242,7 @@ cluster SoftwareDiagnostics = 52 {
   readonly attribute int16u clusterRevision = 65533;
 
 
-
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
-
 
   /** Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute. */
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
@@ -1439,9 +1409,7 @@ cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int16u clusterRevision = 65533;
 
 
-
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
-
 
   /** Reception of this command SHALL reset the OverrunCount attributes to 0 */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
@@ -1519,9 +1487,7 @@ cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute int16u clusterRevision = 65533;
 
 
-
   command ResetCounts(): DefaultSuccess = 0;
-
 
   /** Reception of this command SHALL reset the Breacon and Packet related count attributes to 0 */
   command ResetCounts(): DefaultSuccess = 0;
@@ -1562,8 +1528,6 @@ cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 
   /** Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0 */
@@ -1611,11 +1575,9 @@ cluster AdministratorCommissioning = 60 {
     int16u commissioningTimeout = 0;
   }
 
-
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
   timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
-
 
   /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method. */
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
@@ -1732,7 +1694,6 @@ cluster OperationalCredentials = 62 {
     octet_string rootCACertificate = 0;
   }
 
-
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
   command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
@@ -1741,7 +1702,6 @@ cluster OperationalCredentials = 62 {
   fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-
 
   /** Sender is requesting attestation information from the receiver. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
@@ -1828,12 +1788,10 @@ cluster GroupKeyManagement = 63 {
     int16u groupKeySetIDs[] = 0;
   }
 
-
   fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
   fabric command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
   fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
-
 
   /** Write a new set of keys for the given key set id. */
   fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
@@ -1861,8 +1819,6 @@ cluster FixedLabel = 64 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
-
 }
 
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
@@ -1879,8 +1835,6 @@ cluster UserLabel = 65 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-
 
 }
 
@@ -2020,7 +1974,6 @@ cluster WindowCovering = 258 {
     percent100ths tiltPercent100thsValue = 0;
   }
 
-
   command UpOrOpen(): DefaultSuccess = 0;
   command DownOrClose(): DefaultSuccess = 1;
   command StopMotion(): DefaultSuccess = 2;
@@ -2028,7 +1981,6 @@ cluster WindowCovering = 258 {
   command GoToLiftPercentage(GoToLiftPercentageRequest): DefaultSuccess = 5;
   command GoToTiltValue(GoToTiltValueRequest): DefaultSuccess = 7;
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
-
 
   /** Moves window covering to InstalledOpenLimitLift and InstalledOpenLimitTilt */
   command UpOrOpen(): DefaultSuccess = 0;
