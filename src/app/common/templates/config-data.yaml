@@ -1,14 +1,9 @@
-WeakEnums:
-    # Allow-list of enums that we generate as enums, not enum classes.
-    # The goal is to drive this down to 0.
-    - BarrierControlBarrierPosition
-    - BarrierControlMovingState
-    - ColorControlOptions
-    - ColorMode
-    - EnhancedColorMode
-    - MoveMode
-    - PHYRateEnum
-    - StepMode
+DarwinForceWritable:
+    # Work-around for not allowing changes from writable to read-only
+    # happened in https://github.com/project-chip/connectedhomeip/pull/30134
+    - ApplicationLauncher::CurrentApp
+    - ContentLauncher::SupportedStreamingProtocols
+    - FanControl::FanModeSequence
 
 EnumsNotUsedAsTypeInXML:
     # List of enums that are not used as a type in XML. By adding an enum
@@ -57,6 +52,7 @@ ClustersWithInitFunctions:
     - Thermostat
     - Mode Select
     - Sample MEI
+    - Scenes
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic
@@ -73,6 +69,7 @@ ClustersWithShutdownFunctions:
     - Level Control
     - Color Control
     - Sample MEI
+    - Scenes
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock

@@ -66,7 +66,7 @@ CHIP_ERROR AttributePathIB::Parser::PrettyPrint() const
             {
                 NodeId node;
                 reader.Get(node);
-                PRETTY_PRINT("\tNode = 0x%" PRIx64 ",", node);
+                PRETTY_PRINT("\tNode = 0x" ChipLogFormatX64 ",", ChipLogValueX64(node));
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -171,13 +171,17 @@ CHIP_ERROR AttributePathIB::Parser::GetListIndex(DataModel::Nullable<ListIndex> 
     return GetNullableUnsignedInteger(to_underlying(Tag::kListIndex), apListIndex);
 }
 
-CHIP_ERROR AttributePathIB::Parser::GetGroupAttributePath(ConcreteDataAttributePath & aAttributePath) const
+CHIP_ERROR AttributePathIB::Parser::GetGroupAttributePath(ConcreteDataAttributePath & aAttributePath,
+                                                          ValidateIdRanges aValidateRanges) const
 {
     ReturnErrorOnFailure(GetCluster(&aAttributePath.mClusterId));
-    VerifyOrReturnError(IsValidClusterId(aAttributePath.mClusterId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
-
     ReturnErrorOnFailure(GetAttribute(&aAttributePath.mAttributeId));
-    VerifyOrReturnError(IsValidAttributeId(aAttributePath.mAttributeId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+    if (aValidateRanges == ValidateIdRanges::kYes)
+    {
+        VerifyOrReturnError(IsValidClusterId(aAttributePath.mClusterId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+        VerifyOrReturnError(IsValidAttributeId(aAttributePath.mAttributeId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     DataModel::Nullable<ListIndex> listIndex;
@@ -204,9 +208,10 @@ CHIP_ERROR AttributePathIB::Parser::GetGroupAttributePath(ConcreteDataAttributeP
     return err;
 }
 
-CHIP_ERROR AttributePathIB::Parser::GetConcreteAttributePath(ConcreteDataAttributePath & aAttributePath) const
+CHIP_ERROR AttributePathIB::Parser::GetConcreteAttributePath(ConcreteDataAttributePath & aAttributePath,
+                                                             ValidateIdRanges aValidateRanges) const
 {
-    ReturnErrorOnFailure(GetGroupAttributePath(aAttributePath));
+    ReturnErrorOnFailure(GetGroupAttributePath(aAttributePath, aValidateRanges));
 
     // And now read our endpoint.
     return GetEndpoint(&aAttributePath.mEndpointId);

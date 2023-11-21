@@ -1513,23 +1513,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertNotEqual(attributeReportsReceived, 0);
     XCTAssertNotEqual(eventReportsReceived, 0);
 
-    // Check that we can read one of those attributes we received.
-    __auto_type * descriptorCluster = [[MTRClusterDescriptor alloc] initWithDevice:device endpointID:@(0) queue:queue];
-    __auto_type * partsListDictionary = [descriptorCluster readAttributePartsListWithParams:nil];
-    XCTAssertNotNil(partsListDictionary);
-
-    __auto_type * responseValue = @{
-        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)],
-        MTRDataKey : partsListDictionary,
-    };
-
-    NSError * error;
-    __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:responseValue error:&error];
-    XCTAssertNil(error);
-    XCTAssertNotNil(report);
-    XCTAssertNotNil(report.value);
-    XCTAssertTrue([report.value isKindOfClass:NSArray.class]);
-
     // Before resubscribe, first test write failure and expected value effects
     NSNumber * testEndpointID = @(1);
     NSNumber * testClusterID = @(8);

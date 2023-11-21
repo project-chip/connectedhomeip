@@ -95,6 +95,8 @@ source_set("scenes-table-test-srcs") {
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSets.h",
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.h",
+    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.cpp",
+    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.h",
     "${chip_root}/src/app/clusters/scenes-server/SceneTable.h",
     "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.cpp",
     "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.h",
@@ -136,7 +138,6 @@ chip_test_suite_using_nltest("tests") {
     "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
-    "TestExtensionFieldSets.cpp",
     "TestFabricScopedEventLogging.cpp",
     "TestICDManager.cpp",
     "TestICDMonitoringTable.cpp",
@@ -148,7 +149,6 @@ chip_test_suite_using_nltest("tests") {
     "TestPowerSourceCluster.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
-    "TestSceneTable.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTimeSyncDataProvider.cpp",
@@ -196,8 +196,6 @@ chip_test_suite_using_nltest("tests") {
     ":binding-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
-    ":power-cluster-test-srcs",
-    ":scenes-table-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
@@ -208,6 +206,17 @@ chip_test_suite_using_nltest("tests") {
     "${chip_root}/src/lib/support:testing",
     "${nlunit_test_root}:nlunit-test",
   ]
+
+  if (chip_device_platform != "android") {
+    test_sources += [
+      "TestExtensionFieldSets.cpp",
+      "TestSceneTable.cpp",
+    ]
+    public_deps += [
+      ":power-cluster-test-srcs",
+      ":scenes-table-test-srcs",
+    ]
+  }
 
   # Do not run TestCommissionManager when running ICD specific unit tests.
   # ICDManager has a dependency on the Accessors.h file which causes a link error

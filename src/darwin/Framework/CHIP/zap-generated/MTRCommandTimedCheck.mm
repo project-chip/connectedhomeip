@@ -374,6 +374,33 @@ static BOOL CommandNeedsTimedInvokeInICDManagementCluster(AttributeId aAttribute
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInTimerCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Timer;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInOvenModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::OvenMode;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInLaundryDryerControlsCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::LaundryDryerControls;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInModeSelectCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ModeSelect;
@@ -482,6 +509,24 @@ static BOOL CommandNeedsTimedInvokeInDishwasherAlarmCluster(AttributeId aAttribu
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInMicrowaveOvenModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MicrowaveOvenMode;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInMicrowaveOvenControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MicrowaveOvenControl;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInOperationalStateCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OperationalState;
@@ -512,6 +557,33 @@ static BOOL CommandNeedsTimedInvokeInHEPAFilterMonitoringCluster(AttributeId aAt
 static BOOL CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ActivatedCarbonFilterMonitoring;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInBooleanSensorConfigurationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::BooleanSensorConfiguration;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInValveConfigurationAndControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ValveConfigurationAndControl;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DemandResponseLoadControl;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1035,6 +1107,15 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::IcdManagement::Id: {
         return CommandNeedsTimedInvokeInICDManagementCluster(commandID);
     }
+    case Clusters::Timer::Id: {
+        return CommandNeedsTimedInvokeInTimerCluster(commandID);
+    }
+    case Clusters::OvenMode::Id: {
+        return CommandNeedsTimedInvokeInOvenModeCluster(commandID);
+    }
+    case Clusters::LaundryDryerControls::Id: {
+        return CommandNeedsTimedInvokeInLaundryDryerControlsCluster(commandID);
+    }
     case Clusters::ModeSelect::Id: {
         return CommandNeedsTimedInvokeInModeSelectCluster(commandID);
     }
@@ -1071,6 +1152,12 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::DishwasherAlarm::Id: {
         return CommandNeedsTimedInvokeInDishwasherAlarmCluster(commandID);
     }
+    case Clusters::MicrowaveOvenMode::Id: {
+        return CommandNeedsTimedInvokeInMicrowaveOvenModeCluster(commandID);
+    }
+    case Clusters::MicrowaveOvenControl::Id: {
+        return CommandNeedsTimedInvokeInMicrowaveOvenControlCluster(commandID);
+    }
     case Clusters::OperationalState::Id: {
         return CommandNeedsTimedInvokeInOperationalStateCluster(commandID);
     }
@@ -1082,6 +1169,15 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(commandID);
+    }
+    case Clusters::BooleanSensorConfiguration::Id: {
+        return CommandNeedsTimedInvokeInBooleanSensorConfigurationCluster(commandID);
+    }
+    case Clusters::ValveConfigurationAndControl::Id: {
+        return CommandNeedsTimedInvokeInValveConfigurationAndControlCluster(commandID);
+    }
+    case Clusters::DemandResponseLoadControl::Id: {
+        return CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(commandID);
     }
     case Clusters::DoorLock::Id: {
         return CommandNeedsTimedInvokeInDoorLockCluster(commandID);

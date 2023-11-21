@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include <app-common/zap-generated/enums.h>
 #include <app/app-platform/ContentApp.h>
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/util/attribute-storage.h>
@@ -61,7 +60,7 @@ using ContentLauncherDelegate     = app::Clusters::ContentLauncher::Delegate;
 using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
-using SupportedStreamingProtocol  = app::Clusters::ContentLauncher::SupportedStreamingProtocol;
+using SupportedProtocolsBitmap    = app::Clusters::ContentLauncher::SupportedProtocolsBitmap;
 
 static const int kCatalogVendorId = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
 
@@ -75,9 +74,9 @@ public:
                    const char * szApplicationVersion, const char * setupPIN) :
         mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
-        mAccountLoginDelegate(setupPIN), mContentLauncherDelegate({ "image/*", "video/*" },
-                                                                  to_underlying(SupportedStreamingProtocol::kDash) |
-                                                                      to_underlying(SupportedStreamingProtocol::kHls)),
+        mAccountLoginDelegate(setupPIN),
+        mContentLauncherDelegate({ "image/*", "video/*" },
+                                 to_underlying(SupportedProtocolsBitmap::kDash) | to_underlying(SupportedProtocolsBitmap::kHls)),
         mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
 

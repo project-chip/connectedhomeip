@@ -327,6 +327,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPNetworkCommissioningClusterQueryIdentityResponseCallback
+    : public Callback::Callback<CHIPNetworkCommissioningClusterQueryIdentityResponseCallbackType>
+{
+public:
+    CHIPNetworkCommissioningClusterQueryIdentityResponseCallback(jobject javaCallback);
+
+    ~CHIPNetworkCommissioningClusterQueryIdentityResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::NetworkCommissioning::Commands::QueryIdentityResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback
     : public Callback::Callback<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType>
 {
@@ -337,6 +352,21 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback
+    : public Callback::Callback<CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallbackType>
+{
+public:
+    CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback(jobject javaCallback);
+
+    ~CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
@@ -459,6 +489,36 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPIcdManagementClusterStayActiveResponseCallback
+    : public Callback::Callback<CHIPIcdManagementClusterStayActiveResponseCallbackType>
+{
+public:
+    CHIPIcdManagementClusterStayActiveResponseCallback(jobject javaCallback);
+
+    ~CHIPIcdManagementClusterStayActiveResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPOvenModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPOvenModeClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPOvenModeClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPOvenModeClusterChangeToModeResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::OvenMode::Commands::ChangeToModeResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

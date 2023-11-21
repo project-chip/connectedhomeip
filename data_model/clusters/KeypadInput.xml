@@ -72,6 +72,266 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
+    <enum name="CECKeyCodeEnum">
+      <item value="0" name="Select">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Up">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Down">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Left">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Right">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="RightUp">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="RightDown">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="LeftUp">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="LeftDown">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="RootMenu">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="SetupMenu">
+        <mandatoryConform/>
+      </item>
+      <item value="11" name="ContentsMenu">
+        <mandatoryConform/>
+      </item>
+      <item value="12" name="FavoriteMenu">
+        <mandatoryConform/>
+      </item>
+      <item value="13" name="Exit">
+        <mandatoryConform/>
+      </item>
+      <item value="16" name="MediaTopMenu">
+        <mandatoryConform/>
+      </item>
+      <item value="17" name="MediaContextSensitiveMenu">
+        <mandatoryConform/>
+      </item>
+      <item value="29" name="NumberEntryMode">
+        <mandatoryConform/>
+      </item>
+      <item value="30" name="Number11">
+        <mandatoryConform/>
+      </item>
+      <item value="31" name="Number12">
+        <mandatoryConform/>
+      </item>
+      <item value="32" name="Number0OrNumber10">
+        <mandatoryConform/>
+      </item>
+      <item value="33" name="Numbers1">
+        <mandatoryConform/>
+      </item>
+      <item value="34" name="Numbers2">
+        <mandatoryConform/>
+      </item>
+      <item value="35" name="Numbers3">
+        <mandatoryConform/>
+      </item>
+      <item value="36" name="Numbers4">
+        <mandatoryConform/>
+      </item>
+      <item value="37" name="Numbers5">
+        <mandatoryConform/>
+      </item>
+      <item value="38" name="Numbers6">
+        <mandatoryConform/>
+      </item>
+      <item value="39" name="Numbers7">
+        <mandatoryConform/>
+      </item>
+      <item value="40" name="Numbers8">
+        <mandatoryConform/>
+      </item>
+      <item value="41" name="Numbers9">
+        <mandatoryConform/>
+      </item>
+      <item value="42" name="Dot">
+        <mandatoryConform/>
+      </item>
+      <item value="43" name="Enter">
+        <mandatoryConform/>
+      </item>
+      <item value="44" name="Clear">
+        <mandatoryConform/>
+      </item>
+      <item value="47" name="NextFavorite">
+        <mandatoryConform/>
+      </item>
+      <item value="48" name="ChannelUp">
+        <mandatoryConform/>
+      </item>
+      <item value="49" name="ChannelDown">
+        <mandatoryConform/>
+      </item>
+      <item value="50" name="PreviousChannel">
+        <mandatoryConform/>
+      </item>
+      <item value="51" name="SoundSelect">
+        <mandatoryConform/>
+      </item>
+      <item value="52" name="InputSelect">
+        <mandatoryConform/>
+      </item>
+      <item value="53" name="DisplayInformation">
+        <mandatoryConform/>
+      </item>
+      <item value="54" name="Help">
+        <mandatoryConform/>
+      </item>
+      <item value="55" name="PageUp">
+        <mandatoryConform/>
+      </item>
+      <item value="56" name="PageDown">
+        <mandatoryConform/>
+      </item>
+      <item value="64" name="Power">
+        <mandatoryConform/>
+      </item>
+      <item value="65" name="VolumeUp">
+        <mandatoryConform/>
+      </item>
+      <item value="66" name="VolumeDown">
+        <mandatoryConform/>
+      </item>
+      <item value="67" name="Mute">
+        <mandatoryConform/>
+      </item>
+      <item value="68" name="Play">
+        <mandatoryConform/>
+      </item>
+      <item value="69" name="Stop">
+        <mandatoryConform/>
+      </item>
+      <item value="70" name="Pause">
+        <mandatoryConform/>
+      </item>
+      <item value="71" name="Record">
+        <mandatoryConform/>
+      </item>
+      <item value="72" name="Rewind">
+        <mandatoryConform/>
+      </item>
+      <item value="73" name="FastForward">
+        <mandatoryConform/>
+      </item>
+      <item value="74" name="Eject">
+        <mandatoryConform/>
+      </item>
+      <item value="75" name="Forward">
+        <mandatoryConform/>
+      </item>
+      <item value="76" name="Backward">
+        <mandatoryConform/>
+      </item>
+      <item value="77" name="StopRecord">
+        <mandatoryConform/>
+      </item>
+      <item value="78" name="PauseRecord">
+        <mandatoryConform/>
+      </item>
+      <item value="79" name="Reserved">
+        <mandatoryConform/>
+      </item>
+      <item value="80" name="Angle">
+        <mandatoryConform/>
+      </item>
+      <item value="81" name="SubPicture">
+        <mandatoryConform/>
+      </item>
+      <item value="82" name="VideoOnDemand">
+        <mandatoryConform/>
+      </item>
+      <item value="83" name="ElectronicProgramGuide">
+        <mandatoryConform/>
+      </item>
+      <item value="84" name="TimerProgramming">
+        <mandatoryConform/>
+      </item>
+      <item value="85" name="InitialConfiguration">
+        <mandatoryConform/>
+      </item>
+      <item value="86" name="SelectBroadcastType">
+        <mandatoryConform/>
+      </item>
+      <item value="87" name="SelectSoundPresentation">
+        <mandatoryConform/>
+      </item>
+      <item value="96" name="PlayFunction">
+        <mandatoryConform/>
+      </item>
+      <item value="97" name="PausePlayFunction">
+        <mandatoryConform/>
+      </item>
+      <item value="98" name="RecordFunction">
+        <mandatoryConform/>
+      </item>
+      <item value="99" name="PauseRecordFunction">
+        <mandatoryConform/>
+      </item>
+      <item value="100" name="StopFunction">
+        <mandatoryConform/>
+      </item>
+      <item value="101" name="MuteFunction">
+        <mandatoryConform/>
+      </item>
+      <item value="102" name="RestoreVolumeFunction">
+        <mandatoryConform/>
+      </item>
+      <item value="103" name="TuneFunction">
+        <mandatoryConform/>
+      </item>
+      <item value="104" name="SelectMediaFunction">
+        <mandatoryConform/>
+      </item>
+      <item value="105" name="SelectAvInputFunction">
+        <mandatoryConform/>
+      </item>
+      <item value="106" name="SelectAudioInputFunction">
+        <mandatoryConform/>
+      </item>
+      <item value="107" name="PowerToggleFunction">
+        <mandatoryConform/>
+      </item>
+      <item value="108" name="PowerOffFunction">
+        <mandatoryConform/>
+      </item>
+      <item value="109" name="PowerOnFunction">
+        <mandatoryConform/>
+      </item>
+      <item value="113" name="F1Blue">
+        <mandatoryConform/>
+      </item>
+      <item value="114" name="F2Red">
+        <mandatoryConform/>
+      </item>
+      <item value="115" name="F3Green">
+        <mandatoryConform/>
+      </item>
+      <item value="116" name="F4Yellow">
+        <mandatoryConform/>
+      </item>
+      <item value="117" name="F5">
+        <mandatoryConform/>
+      </item>
+      <item value="118" name="Data">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <enum name="StatusEnum">
       <item value="0" name="Success" summary="Succeeded">
         <mandatoryConform/>
@@ -88,7 +348,7 @@ Davis, CA 95616, USA
     <command id="0x00" name="SendKey" response="SendKeyResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="KeyCode" type="uint8">
+      <field id="0" name="KeyCode" type="CECKeyCodeEnum">
         <mandatoryConform/>
       </field>
     </command>

@@ -266,6 +266,57 @@ class TlvReader(bytes: ByteArray) : Iterable<Element> {
   }
 
   /**
+   * Retrieves a Boolean value associated with the given tag.
+   *
+   * @param tag The Tag to query for.
+   * @return The Boolean value associated with the tag.
+   */
+  fun getBoolean(tag: Tag): Boolean {
+    return getBool(tag)
+  }
+
+  /**
+   * Retrieves a String value associated with the given tag. The returned string is in UTF-8 format.
+   *
+   * @param tag The Tag to query for.
+   * @return The String value associated with the tag.
+   */
+  fun getString(tag: Tag): String {
+    return getUtf8String(tag)
+  }
+
+  /**
+   * Retrieves a ByteArray value associated with the given tag.
+   *
+   * @param tag The Tag to query for.
+   * @return The ByteArray value associated with the tag.
+   */
+  fun getByteArray(tag: Tag): ByteArray {
+    return getByteString(tag)
+  }
+
+  /**
+   * Checks if the current element's value is of type NullValue.
+   *
+   * @return True if the current element's value is NullValue, otherwise false.
+   */
+  fun isNull(): Boolean {
+    val value = peekElement().value
+    return (value is NullValue)
+  }
+
+  /**
+   * Checks if the next tag in sequence matches the provided tag.
+   *
+   * @param tag The Tag to compare against the next tag.
+   * @return True if the next tag matches the provided tag, otherwise false.
+   */
+  fun isNextTag(tag: Tag): Boolean {
+    val nextTag = peekElement().tag
+    return (nextTag == tag)
+  }
+
+  /**
    * Verifies that the current element is a start of a Structure and advances to the next element.
    *
    * @throws TlvParsingException if the element is not of the expected type or tag

@@ -68,11 +68,25 @@ Davis, CA 95616, USA
     <feature bit="1" code="BAT" name="Battery" summary="A battery power source">
       <optionalConform/>
     </feature>
-    <feature bit="2" code="RECHG" name="Rechargeable" summary="A rechargeable battery power source (requires Battery feature)">
-      <optionalConform/>
+    <feature bit="2" code="RECHG" name="Rechargeable" summary="A rechargeable battery power source">
+      <mandatoryConform>
+        <feature name="BAT"/>
+      </mandatoryConform>
     </feature>
-    <feature bit="3" code="REPLC" name="Replaceable" summary="A replaceable battery power source (requires Battery feature)">
-      <optionalConform/>
+    <feature bit="3" code="REPLC" name="Replaceable" summary="A replaceable battery power source">
+      <mandatoryConform>
+        <feature name="BAT"/>
+      </mandatoryConform>
+    </feature>
+    <feature bit="4" code="CHGM" name="ChargeManagement" summary="A battery with charging management">
+      <mandatoryConform>
+        <feature name="BAT"/>
+      </mandatoryConform>
+    </feature>
+    <feature bit="5" code="DCHGM" name="DischargeManagement" summary="A battery with discharging management">
+      <mandatoryConform>
+        <feature name="BAT"/>
+      </mandatoryConform>
     </feature>
   </features>
   <dataTypes>
@@ -211,6 +225,24 @@ Davis, CA 95616, USA
       <item value="10" name="SafetyTimeout" summary="The Node detects a charging safety timeout for this battery source.">
         <mandatoryConform/>
       </item>
+      <item value="11" name="ChargerOverCurrent" summary="The Node detects the charger for this battery source is over current.">
+        <mandatoryConform/>
+      </item>
+      <item value="12" name="UnexpectedVoltage" summary="The Node detects a voltage when it expected none.">
+        <mandatoryConform/>
+      </item>
+      <item value="13" name="ExpectedVoltage" summary="The Node detects no voltage when it expected one.">
+        <mandatoryConform/>
+      </item>
+      <item value="14" name="GroundFault" summary="The Node detects an unbalanced current supply.">
+        <mandatoryConform/>
+      </item>
+      <item value="15" name="ChargeSignalFailure" summary="The Node detects a failure in the signal to control charging.">
+        <mandatoryConform/>
+      </item>
+      <item value="16" name="SafetyTimeout" summary="The Node detects a charging safety timeout for this battery source.">
+        <mandatoryConform/>
+      </item>
     </enum>
     <enum name="BatChargeLevelEnum">
       <item value="0" name="OK" summary="Charge level is nominal">
@@ -220,6 +252,23 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
       <item value="2" name="Critical" summary="Charge level is critical, immediate intervention is required">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="BatChargePermissionsEnum">
+      <item value="0" name="Disabled" summary="The battery is not currently allowed to charge or discharge">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="ChargingEnabled" summary="The battery is currently allowed to charge">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="DischargingEnabled" summary="The battery is currently allowed to discharge">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="DisabledError" summary="The battery is not currently allowed to charge or discharge due to an error.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="DisabledDiagnostics" summary="The battery is not currently allowed to charge or discharge due to Diagnostics Mode.">
         <mandatoryConform/>
       </item>
     </enum>
@@ -234,6 +283,12 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
       <item value="3" name="IsNotCharging" summary="The battery is not charging">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="IsDischarging" summary="The battery is discharging">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="IsTransitioning" summary="The battery is transitioning from one charging state to another">
         <mandatoryConform/>
       </item>
     </enum>
@@ -482,6 +537,17 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
+    <enum name="BatEnergyTransferStopReasonEnum">
+      <item value="0" name="BatteryStopped" summary="The battery stopped the energy transfer">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="PowerSourceStopped" summary="The power source stopped the energy transfer">
+        <mandatoryConform/>
+      </item>
+      <item value="255" name="Other" summary="The energy transfer stopped for some unknown reason">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <enum name="BatFaultEnum">
       <item value="0" name="Unspecified" summary="The Node detects an unspecified fault on this battery power source.">
         <mandatoryConform/>
@@ -552,11 +618,11 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0002" name="Description" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+    <attribute id="0x0002" name="Description" type="string">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="max" value="60"/>
+      <constraint type="maxLength" value="60"/>
     </attribute>
     <attribute id="0x0003" name="WiredAssessedInputVoltage" type="uint32">
       <access read="true" readPrivilege="view"/>
@@ -607,12 +673,11 @@ Davis, CA 95616, USA
         <feature name="WIRED"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x000a" name="ActiveWiredFaults" type="&lt;&lt;ref_DataTypeList&gt;&gt;[WiredFaultEnum Type]">
+    <attribute id="0x000a" name="ActiveWiredFaults" type="list[WiredFaultEnum Type]">
       <access read="true" readPrivilege="view"/>
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
-      <constraint type="max" value="8"/>
     </attribute>
     <attribute id="0x000b" name="BatVoltage" type="uint32">
       <access read="true" readPrivilege="view"/>
@@ -662,20 +727,19 @@ Davis, CA 95616, USA
         <feature name="BAT"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x0012" name="ActiveBatFaults" type="&lt;&lt;ref_DataTypeList&gt;&gt;[BatFaultEnum Type]">
+    <attribute id="0x0012" name="ActiveBatFaults" type="list[BatFaultEnum Type]">
       <access read="true" readPrivilege="view"/>
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
-      <constraint type="max" value="8"/>
     </attribute>
-    <attribute id="0x0013" name="BatReplacementDescription" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+    <attribute id="0x0013" name="BatReplacementDescription" type="string">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
         <feature name="REPLC"/>
       </mandatoryConform>
-      <constraint type="max" value="60"/>
+      <constraint type="maxLength" value="60"/>
     </attribute>
     <attribute id="0x0014" name="BatCommonDesignation" type="BatCommonDesignationEnum">
       <access read="true" readPrivilege="view"/>
@@ -685,21 +749,21 @@ Davis, CA 95616, USA
       </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0015" name="BatANSIDesignation" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+    <attribute id="0x0015" name="BatANSIDesignation" type="string">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <optionalConform>
         <feature name="REPLC"/>
       </optionalConform>
-      <constraint type="max" value="20"/>
+      <constraint type="maxLength" value="20"/>
     </attribute>
-    <attribute id="0x0016" name="BatIECDesignation" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+    <attribute id="0x0016" name="BatIECDesignation" type="string">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <optionalConform>
         <feature name="REPLC"/>
       </optionalConform>
-      <constraint type="max" value="20"/>
+      <constraint type="maxLength" value="20"/>
     </attribute>
     <attribute id="0x0017" name="BatApprovedChemistry" type="BatApprovedChemistryEnum">
       <access read="true" readPrivilege="view"/>
@@ -713,7 +777,10 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <optionalConform>
-        <feature name="REPLC"/>
+        <orTerm>
+          <feature name="REPLC"/>
+          <feature name="RECHG"/>
+        </orTerm>
       </optionalConform>
     </attribute>
     <attribute id="0x0019" name="BatQuantity" type="uint8">
@@ -750,7 +817,7 @@ Davis, CA 95616, USA
         <feature name="RECHG"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x001e" name="ActiveBatChargeFaults" type="&lt;&lt;ref_DataTypeList&gt;&gt;[BatChargeFaultEnum Type]">
+    <attribute id="0x001e" name="ActiveBatChargeFaults" type="list[BatChargeFaultEnum Type]">
       <access read="true" readPrivilege="view"/>
       <optionalConform>
         <feature name="RECHG"/>
@@ -762,7 +829,122 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
+    <attribute id="0x0020" name="BatAbsMaxChargeCurrent" type="uint32" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="CHGM"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0021" name="BatAbsMinChargeCurrent" type="uint32" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="CHGM"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0022" name="BatAbsMaxDischargeCurrent" type="uint32" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="DCHGM"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0023" name="BatMaxChargeCurrent" type="uint32" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="CHGM"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0024" name="BatMinChargeCurrent" type="uint32" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="CHGM"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0025" name="BatMaxDischargeCurrent" type="uint32" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="DCHGM"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0026" name="BatChargePermissions" type="BatChargePermissionsEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0027" name="BatEnableChargeTime" type="uint16" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="CHGM"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0028" name="BatEnableDischargeTime" type="uint16" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="DCHGM"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0029" name="WiredMaxAmperage" type="uint32" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <optionalConform>
+        <feature name="WIRED"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x002a" name="WiredAbsMaxAmperage" type="uint32" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <optionalConform>
+        <feature name="WIRED"/>
+      </optionalConform>
+    </attribute>
   </attributes>
+  <commands>
+    <command id="0x01" name="DisableBattery" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="CHGM"/>
+      </mandatoryConform>
+    </command>
+    <command id="0x02" name="EnableBatteryCharging" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="CHGM"/>
+      </mandatoryConform>
+      <field id="0" name="EnableTime" type="uint16" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MinimumChargeCurrent" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="MaximumChargeCurrent" type="uint16">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x03" name="EnableBatteryDischarging" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="DCHGM"/>
+      </mandatoryConform>
+      <field id="0" name="EnableTime" type="uint16" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MaximumDischargeCurrent" type="uint16">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x04" name="StartBatteryDiagnostics" response="Y">
+      <access invokePrivilege="operate"/>
+      <optionalConform/>
+    </command>
+  </commands>
   <events>
     <event id="0x00" name="WiredFaultChange" priority="info">
       <access readPrivilege="view"/>
@@ -804,6 +986,78 @@ Davis, CA 95616, USA
       <field id="1" name="Previous" type="&lt;&lt;ref_DataTypeList&gt;&gt;[BatChargeFaultEnum Type]" default="empty">
         <mandatoryConform/>
         <constraint type="max" value="16"/>
+      </field>
+    </event>
+    <event id="0x03" name="BatConnected" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform>
+        <feature name="BAT"/>
+      </optionalConform>
+      <field id="0" name="SessionID" type="uint32" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ChargeState" type="BatChargeStateEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x04" name="BatDisconnected" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform>
+        <feature name="BAT"/>
+      </optionalConform>
+      <field id="0" name="SessionID" type="uint32" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ChargeState" type="BatChargeStateEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="SessionDuration" type="elapsed-s" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="SessionEnergyCharged" type="int64" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="SessionEnergyDischarged" type="int64" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x05" name="BatEnergyTransferStarted" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform>
+        <feature name="RECHG"/>
+      </optionalConform>
+      <field id="0" name="SessionID" type="uint32" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ChargeState" type="BatChargeStateEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x06" name="BatEnergyTransferStopped" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform>
+        <feature name="RECHG"/>
+      </optionalConform>
+      <field id="0" name="SessionID" type="uint32" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ChargeState" type="BatChargeStateEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Reason" type="BatEnergyTransferStopReasonEnum" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="EnergyTransferred" type="int64" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
       </field>
     </event>
   </events>

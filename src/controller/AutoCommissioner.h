@@ -113,9 +113,14 @@ private:
     static constexpr size_t kMaxSupportedDstStructs = 10;
     app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type mDstOffsetsBuf[kMaxSupportedDstStructs];
 
+    static constexpr size_t kMaxDefaultNtpSize = 128;
+    char mDefaultNtp[kMaxDefaultNtpSize];
+
     bool mNeedsNetworkSetup = false;
     ReadCommissioningInfo mDeviceCommissioningInfo;
     bool mNeedsDST = false;
+
+    bool mNeedIcdRegistraion = false;
 
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
     uint8_t * mDAC   = nullptr;

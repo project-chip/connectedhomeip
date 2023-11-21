@@ -11,7 +11,8 @@
         "darwin/Framework/CHIP/templates/helper.js"
     ],
     "resources": {
-        "availability-data": "availability.yaml"
+        "availability-data": "availability.yaml",
+        "config-data": "../../../../app/common/templates/config-data.yaml"
     },
     "override": "../../../../../src/app/zap-templates/common/override.js",
     "partials": [
@@ -80,11 +81,6 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters.mm"
         },
         {
-            "path": "MTRClusters-swift.zapt",
-            "name": "Swift ZCL synchronous API Header extensions",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters.swift"
-        },
-        {
             "path": "MTRStructsObjc.zapt",
             "name": "Objc reflections of MTR spec structs header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRStructsObjc.h"
@@ -133,6 +129,11 @@
             "path": "MTRCommandTimedCheck-src.zapt",
             "name": "Function to check if command needs timed invoke",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandTimedCheck.mm"
+        },
+        {
+            "path": "MTRDeviceTypeMetadata-src.zapt",
+            "name": "Functions to ask for information about device types",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRDeviceTypeMetadata.mm"
         }
     ]
 }

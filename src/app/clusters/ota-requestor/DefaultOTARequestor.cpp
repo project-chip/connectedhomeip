@@ -761,7 +761,7 @@ CHIP_ERROR DefaultOTARequestor::SendQueryImageRequest(Messaging::ExchangeManager
     else
     {
         // Country code unavailable or invalid, use default
-        args.location.SetValue(CharSpan("XX", strlen("XX")));
+        args.location.SetValue(CharSpan::fromCharString("XX"));
     }
 
     args.metadataForProvider = mMetadataForProvider;

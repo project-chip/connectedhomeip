@@ -166,6 +166,8 @@ class BouffalolabBuilder(GnBuilder):
         self.argsOpt.append(f'chip_inet_config_enable_ipv4={str(enable_ethernet or enable_wifi).lower()}')
 
         if enable_thread:
+            self.argsOpt.append('chip_system_config_use_open_thread_inet_endpoints=true')
+            self.argsOpt.append('chip_with_lwip=false')
             self.argsOpt.append(f'openthread_project_core_config_file="{bouffalo_chip}-openthread-core-bl-config.h"')
             if not use_matter_openthread:
                 self.argsOpt.append(
