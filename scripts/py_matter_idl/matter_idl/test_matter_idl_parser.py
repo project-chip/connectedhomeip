@@ -84,7 +84,7 @@ class TestParser(unittest.TestCase):
             }
 
             /** Documentation for MyCluster #2 */
-            client cluster MyCluster = 0x321 {
+            client cluster MyCluster2 = 0x322 {
                 /* NOT a doc comment */
                 command WithoutArg(): DefaultSuccess = 123;
 
