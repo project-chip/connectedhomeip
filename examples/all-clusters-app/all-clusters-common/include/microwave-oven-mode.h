@@ -34,7 +34,7 @@ const uint8_t ModeNormal  = 0;
 const uint8_t ModeDefrost = 1;
 
 /// This is an application level delegate to handle MicrowaveOvenMode commands according to the specific business logic.
-class MicrowaveOvenModeDelegate : public ModeBase::Delegate
+class ExampleMicrowaveOvenModeDelegate : public ModeBase::Delegate
 {
 private:
     using ModeTagStructType              = detail::Structs::ModeTagStruct::Type;
@@ -58,7 +58,7 @@ private:
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
 
 public:
-    ~MicrowaveOvenModeDelegate() override = default;
+    ~ExampleMicrowaveOvenModeDelegate() override = default;
 };
 
 ModeBase::Instance * Instance();
