@@ -17,6 +17,8 @@ runs:
   steps:
     - name: Dump disk info
       uses: ./.github/actions/dump-disk-info
+    - name: Set git safe directory for local act runs
+      uses: ./.github/actions/git-safe-directory
     - name: Checkout submodules
       uses: ./.github/actions/checkout-submodules
       with:
