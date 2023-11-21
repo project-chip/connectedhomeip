@@ -16,6 +16,7 @@ import os
 from typing import List
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
+from matter_idl.generators.cluster_selection import server_side_clusters
 from matter_idl.matter_idl_types import Cluster, Idl
 
 
@@ -41,7 +42,7 @@ class CppApplicationGenerator(CodeGenerator):
             template_path="PluginApplicationCallbacksHeader.jinja",
             output_file_name="app/PluginApplicationCallbacks.h",
             vars={
-                'clusters': self.idl.clusters,
+                'clusters': server_side_clusters(self.idl)
             }
         )
 
@@ -51,6 +52,6 @@ class CppApplicationGenerator(CodeGenerator):
             template_path="CallbackStubSource.jinja",
             output_file_name="app/callback-stub.cpp",
             vars={
-                'clusters': self.idl.clusters,
+                'clusters': server_side_clusters(self.idl)
             }
         )
