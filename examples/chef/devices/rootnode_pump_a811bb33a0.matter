@@ -1035,7 +1035,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster AccessControl {
@@ -1048,20 +1048,20 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster BasicInformation {
-    callback attribute dataModelRevision;
+    callback attribute dataModelRevision default = 17;
     callback attribute vendorName;
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
     persist  attribute nodeLabel;
-    callback attribute location;
-    callback attribute hardwareVersion;
+    callback attribute location default = "XX";
+    callback attribute hardwareVersion default = 0;
     callback attribute hardwareVersionString;
-    callback attribute softwareVersion;
+    callback attribute softwareVersion default = 0;
     callback attribute softwareVersionString;
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
@@ -1103,9 +1103,9 @@ endpoint 0 {
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
-    callback attribute regulatoryConfig;
-    callback attribute locationCapability;
-    callback attribute supportsConcurrentConnection;
+    callback attribute regulatoryConfig default = 0;
+    callback attribute locationCapability default = 0;
+    callback attribute supportsConcurrentConnection default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -1148,8 +1148,8 @@ endpoint 0 {
 
   server cluster GeneralDiagnostics {
     callback attribute networkInterfaces;
-    callback attribute rebootCount;
-    callback attribute upTime;
+    callback attribute rebootCount default = 0x0000;
+    callback attribute upTime default = 0x0000000000000000;
     callback attribute testEventTriggersEnabled default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -1163,9 +1163,9 @@ endpoint 0 {
   }
 
   server cluster AdministratorCommissioning {
-    callback attribute windowStatus;
-    callback attribute adminFabricIndex;
-    callback attribute adminVendorId;
+    callback attribute windowStatus default = 0;
+    callback attribute adminFabricIndex default = 1;
+    callback attribute adminVendorId default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -1212,8 +1212,8 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
-    callback attribute clusterRevision;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision default = 1;
 
     handle command KeySetWrite;
     handle command KeySetRead;
@@ -1262,7 +1262,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster PumpConfigurationAndControl {
