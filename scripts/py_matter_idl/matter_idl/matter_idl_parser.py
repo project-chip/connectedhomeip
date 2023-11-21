@@ -2,7 +2,7 @@
 
 import functools
 import logging
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 from lark import Lark
 from lark.lexer import Token
