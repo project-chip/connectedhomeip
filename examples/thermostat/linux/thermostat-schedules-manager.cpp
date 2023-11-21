@@ -22,20 +22,20 @@ static uint32_t nextNewHandle = 0;
 static PresetStruct::Type BuiltInPresets[] = 
 {
 	{
-		.presetHandle = chip::ByteSpan(Uint8::from_const_char(kBuiltInOneHandle), strlen(kBuiltInOneHandle)),
+		.presetHandle = DataModel::Nullable<chip::ByteSpan>(chip::ByteSpan(Uint8::from_const_char(kBuiltInOneHandle), strlen(kBuiltInOneHandle))),
 		.presetScenario = PresetScenarioEnum::kOccupied,
-		.name = DataModel::Nullable<chip::CharSpan>(chip::CharSpan(kOccupiedName, strlen(kOccupiedName))),
-		.coolingSetpoint = 2400,
-		.heatingSetpoint = 1800,
-		.builtIn = true
+		.name = Optional<DataModel::Nullable<chip::CharSpan>>(DataModel::Nullable<chip::CharSpan>(chip::CharSpan(kOccupiedName, strlen(kOccupiedName)))),
+		.coolingSetpoint = Optional<int16_t>(2400),
+		.heatingSetpoint = Optional<int16_t>(1800),
+		.builtIn = DataModel::Nullable<bool>(true)
 	},
 	{
-		.presetHandle = chip::ByteSpan(Uint8::from_const_char(kBuiltinTwoHandle), strlen(kBuiltinTwoHandle)),
+		.presetHandle = DataModel::Nullable<chip::ByteSpan>(chip::ByteSpan(Uint8::from_const_char(kBuiltinTwoHandle), strlen(kBuiltinTwoHandle))),
 		.presetScenario = PresetScenarioEnum::kUnoccupied,
-		.name = DataModel::Nullable<chip::CharSpan>(chip::CharSpan(kUnoccupiedName, strlen(kUnoccupiedName))),
-		.coolingSetpoint = 3200,
-		.heatingSetpoint = 1000,
-		.builtIn = true
+		.name = Optional<DataModel::Nullable<chip::CharSpan>>(DataModel::Nullable<chip::CharSpan>(chip::CharSpan(kUnoccupiedName, strlen(kUnoccupiedName)))),
+		.coolingSetpoint = Optional<int16_t>(3200),
+		.heatingSetpoint = Optional<int16_t>(1000),
+		.builtIn = DataModel::Nullable<bool>(true)
 	}
 };
 
@@ -72,11 +72,11 @@ onEditCommit(ThermostatMatterScheduleManager * mgr, ThermostatMatterScheduleMana
 	// New presets look good, lets generate some new ID's for the new presets.
 	for (unsigned int index=0; index < gsEditingPresetsEmptyIndex; ++index)
 	{
-		if (gsEditingPresets[index].presetHandle.empty())
+		if (gsEditingPresets[index].presetHandle.IsNull() || gsEditingPresets[index].presetHandle.Value().empty())
 		{
 			char handle[16];
 			snprintf(handle, 16, "%s%d", userPresetPrefix, nextNewHandle++);
-			gsEditingPresets[index].presetHandle = ByteSpan((const unsigned char *)handle, strlen(handle));
+			gsEditingPresets[index].presetHandle.SetNonNull(ByteSpan((const unsigned char *)handle, strlen(handle)));
 		}
 	}
 

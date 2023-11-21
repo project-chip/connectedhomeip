@@ -2637,14 +2637,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("ScheduleTransitionStruct.dayOfWeek", "dayOfWeek", value.isMember("dayOfWeek")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleTransitionStruct.transitionTime", "transitionTime",
                                                                   value.isMember("transitionTime")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleTransitionStruct.presetHandle", "presetHandle",
-                                                                  value.isMember("presetHandle")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleTransitionStruct.systemMode", "systemMode",
-                                                                  value.isMember("systemMode")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleTransitionStruct.coolingSetpoint", "coolingSetpoint",
-                                                                  value.isMember("coolingSetpoint")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleTransitionStruct.heatingSetpoint", "heatingSetpoint",
-                                                                  value.isMember("heatingSetpoint")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dayOfWeek");
@@ -2655,20 +2647,32 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transitionTime, value["transitionTime"]));
     valueCopy.removeMember("transitionTime");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presetHandle");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presetHandle, value["presetHandle"]));
+    if (value.isMember("presetHandle"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presetHandle");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presetHandle, value["presetHandle"]));
+    }
     valueCopy.removeMember("presetHandle");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "systemMode");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.systemMode, value["systemMode"]));
+    if (value.isMember("systemMode"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "systemMode");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.systemMode, value["systemMode"]));
+    }
     valueCopy.removeMember("systemMode");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "coolingSetpoint");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.coolingSetpoint, value["coolingSetpoint"]));
+    if (value.isMember("coolingSetpoint"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "coolingSetpoint");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.coolingSetpoint, value["coolingSetpoint"]));
+    }
     valueCopy.removeMember("coolingSetpoint");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatingSetpoint");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.heatingSetpoint, value["heatingSetpoint"]));
+    if (value.isMember("heatingSetpoint"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatingSetpoint");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.heatingSetpoint, value["heatingSetpoint"]));
+    }
     valueCopy.removeMember("heatingSetpoint");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
@@ -2697,12 +2701,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("scheduleHandle")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.systemMode", "systemMode", value.isMember("systemMode")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.name", "name", value.isMember("name")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.presetHandle", "presetHandle", value.isMember("presetHandle")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.transitions", "transitions", value.isMember("transitions")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ScheduleStruct.builtIn", "builtIn", value.isMember("builtIn")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "scheduleHandle");
@@ -2713,20 +2713,29 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.systemMode, value["systemMode"]));
     valueCopy.removeMember("systemMode");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    if (value.isMember("name"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    }
     valueCopy.removeMember("name");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presetHandle");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presetHandle, value["presetHandle"]));
+    if (value.isMember("presetHandle"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presetHandle");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presetHandle, value["presetHandle"]));
+    }
     valueCopy.removeMember("presetHandle");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transitions");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transitions, value["transitions"]));
     valueCopy.removeMember("transitions");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "builtIn");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.builtIn, value["builtIn"]));
+    if (value.isMember("builtIn"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "builtIn");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.builtIn, value["builtIn"]));
+    }
     valueCopy.removeMember("builtIn");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
@@ -2754,11 +2763,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
         ComplexArgumentParser::EnsureMemberExist("PresetStruct.presetHandle", "presetHandle", value.isMember("presetHandle")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PresetStruct.presetScenario", "presetScenario",
                                                                   value.isMember("presetScenario")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PresetStruct.name", "name", value.isMember("name")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PresetStruct.coolingSetpoint", "coolingSetpoint",
-                                                                  value.isMember("coolingSetpoint")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PresetStruct.heatingSetpoint", "heatingSetpoint",
-                                                                  value.isMember("heatingSetpoint")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PresetStruct.builtIn", "builtIn", value.isMember("builtIn")));
 
     char labelWithMember[kMaxLabelLength];
@@ -2770,16 +2774,25 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presetScenario, value["presetScenario"]));
     valueCopy.removeMember("presetScenario");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    if (value.isMember("name"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    }
     valueCopy.removeMember("name");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "coolingSetpoint");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.coolingSetpoint, value["coolingSetpoint"]));
+    if (value.isMember("coolingSetpoint"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "coolingSetpoint");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.coolingSetpoint, value["coolingSetpoint"]));
+    }
     valueCopy.removeMember("coolingSetpoint");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatingSetpoint");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.heatingSetpoint, value["heatingSetpoint"]));
+    if (value.isMember("heatingSetpoint"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatingSetpoint");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.heatingSetpoint, value["heatingSetpoint"]));
+    }
     valueCopy.removeMember("heatingSetpoint");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "builtIn");

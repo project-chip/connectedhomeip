@@ -27,10 +27,10 @@ import matter.tlv.TlvWriter
 class ThermostatClusterScheduleTransitionStruct(
   val dayOfWeek: UInt,
   val transitionTime: UShort,
-  val presetHandle: ByteArray,
-  val systemMode: UInt,
-  val coolingSetpoint: Short,
-  val heatingSetpoint: Short
+  val presetHandle: Optional<ByteArray>,
+  val systemMode: Optional<UInt>,
+  val coolingSetpoint: Optional<Short>,
+  val heatingSetpoint: Optional<Short>
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterScheduleTransitionStruct {\n")
@@ -48,10 +48,22 @@ class ThermostatClusterScheduleTransitionStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_DAY_OF_WEEK), dayOfWeek)
       put(ContextSpecificTag(TAG_TRANSITION_TIME), transitionTime)
-      put(ContextSpecificTag(TAG_PRESET_HANDLE), presetHandle)
-      put(ContextSpecificTag(TAG_SYSTEM_MODE), systemMode)
-      put(ContextSpecificTag(TAG_COOLING_SETPOINT), coolingSetpoint)
-      put(ContextSpecificTag(TAG_HEATING_SETPOINT), heatingSetpoint)
+      if (presetHandle.isPresent) {
+        val optpresetHandle = presetHandle.get()
+        put(ContextSpecificTag(TAG_PRESET_HANDLE), optpresetHandle)
+      }
+      if (systemMode.isPresent) {
+        val optsystemMode = systemMode.get()
+        put(ContextSpecificTag(TAG_SYSTEM_MODE), optsystemMode)
+      }
+      if (coolingSetpoint.isPresent) {
+        val optcoolingSetpoint = coolingSetpoint.get()
+        put(ContextSpecificTag(TAG_COOLING_SETPOINT), optcoolingSetpoint)
+      }
+      if (heatingSetpoint.isPresent) {
+        val optheatingSetpoint = heatingSetpoint.get()
+        put(ContextSpecificTag(TAG_HEATING_SETPOINT), optheatingSetpoint)
+      }
       endStructure()
     }
   }
@@ -68,10 +80,26 @@ class ThermostatClusterScheduleTransitionStruct(
       tlvReader.enterStructure(tlvTag)
       val dayOfWeek = tlvReader.getUInt(ContextSpecificTag(TAG_DAY_OF_WEEK))
       val transitionTime = tlvReader.getUShort(ContextSpecificTag(TAG_TRANSITION_TIME))
-      val presetHandle = tlvReader.getByteArray(ContextSpecificTag(TAG_PRESET_HANDLE))
-      val systemMode = tlvReader.getUInt(ContextSpecificTag(TAG_SYSTEM_MODE))
-      val coolingSetpoint = tlvReader.getShort(ContextSpecificTag(TAG_COOLING_SETPOINT))
-      val heatingSetpoint = tlvReader.getShort(ContextSpecificTag(TAG_HEATING_SETPOINT))
+      val presetHandle = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRESET_HANDLE))) {
+      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_PRESET_HANDLE)))
+    } else {
+      Optional.empty()
+    }
+      val systemMode = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SYSTEM_MODE))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_SYSTEM_MODE)))
+    } else {
+      Optional.empty()
+    }
+      val coolingSetpoint = if (tlvReader.isNextTag(ContextSpecificTag(TAG_COOLING_SETPOINT))) {
+      Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_COOLING_SETPOINT)))
+    } else {
+      Optional.empty()
+    }
+      val heatingSetpoint = if (tlvReader.isNextTag(ContextSpecificTag(TAG_HEATING_SETPOINT))) {
+      Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_HEATING_SETPOINT)))
+    } else {
+      Optional.empty()
+    }
       
       tlvReader.exitContainer()
 

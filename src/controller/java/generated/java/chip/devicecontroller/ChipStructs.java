@@ -6023,10 +6023,10 @@ public static class DoorLockClusterCredentialStruct {
 public static class ThermostatClusterScheduleTransitionStruct {
   public Integer dayOfWeek;
   public Integer transitionTime;
-  public byte[] presetHandle;
-  public Integer systemMode;
-  public Integer coolingSetpoint;
-  public Integer heatingSetpoint;
+  public Optional<byte[]> presetHandle;
+  public Optional<Integer> systemMode;
+  public Optional<Integer> coolingSetpoint;
+  public Optional<Integer> heatingSetpoint;
   private static final long DAY_OF_WEEK_ID = 0L;
   private static final long TRANSITION_TIME_ID = 1L;
   private static final long PRESET_HANDLE_ID = 2L;
@@ -6037,10 +6037,10 @@ public static class ThermostatClusterScheduleTransitionStruct {
   public ThermostatClusterScheduleTransitionStruct(
     Integer dayOfWeek,
     Integer transitionTime,
-    byte[] presetHandle,
-    Integer systemMode,
-    Integer coolingSetpoint,
-    Integer heatingSetpoint
+    Optional<byte[]> presetHandle,
+    Optional<Integer> systemMode,
+    Optional<Integer> coolingSetpoint,
+    Optional<Integer> heatingSetpoint
   ) {
     this.dayOfWeek = dayOfWeek;
     this.transitionTime = transitionTime;
@@ -6054,10 +6054,10 @@ public static class ThermostatClusterScheduleTransitionStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(DAY_OF_WEEK_ID, new UIntType(dayOfWeek)));
     values.add(new StructElement(TRANSITION_TIME_ID, new UIntType(transitionTime)));
-    values.add(new StructElement(PRESET_HANDLE_ID, new ByteArrayType(presetHandle)));
-    values.add(new StructElement(SYSTEM_MODE_ID, new UIntType(systemMode)));
-    values.add(new StructElement(COOLING_SETPOINT_ID, new IntType(coolingSetpoint)));
-    values.add(new StructElement(HEATING_SETPOINT_ID, new IntType(heatingSetpoint)));
+    values.add(new StructElement(PRESET_HANDLE_ID, presetHandle.<BaseTLVType>map((nonOptionalpresetHandle) -> new ByteArrayType(nonOptionalpresetHandle)).orElse(new EmptyType())));
+    values.add(new StructElement(SYSTEM_MODE_ID, systemMode.<BaseTLVType>map((nonOptionalsystemMode) -> new UIntType(nonOptionalsystemMode)).orElse(new EmptyType())));
+    values.add(new StructElement(COOLING_SETPOINT_ID, coolingSetpoint.<BaseTLVType>map((nonOptionalcoolingSetpoint) -> new IntType(nonOptionalcoolingSetpoint)).orElse(new EmptyType())));
+    values.add(new StructElement(HEATING_SETPOINT_ID, heatingSetpoint.<BaseTLVType>map((nonOptionalheatingSetpoint) -> new IntType(nonOptionalheatingSetpoint)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -6068,10 +6068,10 @@ public static class ThermostatClusterScheduleTransitionStruct {
     }
     Integer dayOfWeek = null;
     Integer transitionTime = null;
-    byte[] presetHandle = null;
-    Integer systemMode = null;
-    Integer coolingSetpoint = null;
-    Integer heatingSetpoint = null;
+    Optional<byte[]> presetHandle = Optional.empty();
+    Optional<Integer> systemMode = Optional.empty();
+    Optional<Integer> coolingSetpoint = Optional.empty();
+    Optional<Integer> heatingSetpoint = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == DAY_OF_WEEK_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -6086,22 +6086,22 @@ public static class ThermostatClusterScheduleTransitionStruct {
       } else if (element.contextTagNum() == PRESET_HANDLE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
-          presetHandle = castingValue.value(byte[].class);
+          presetHandle = Optional.of(castingValue.value(byte[].class));
         }
       } else if (element.contextTagNum() == SYSTEM_MODE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          systemMode = castingValue.value(Integer.class);
+          systemMode = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == COOLING_SETPOINT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
           IntType castingValue = element.value(IntType.class);
-          coolingSetpoint = castingValue.value(Integer.class);
+          coolingSetpoint = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == HEATING_SETPOINT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
           IntType castingValue = element.value(IntType.class);
-          heatingSetpoint = castingValue.value(Integer.class);
+          heatingSetpoint = Optional.of(castingValue.value(Integer.class));
         }
       }
     }
@@ -6126,7 +6126,7 @@ public static class ThermostatClusterScheduleTransitionStruct {
     output.append(transitionTime);
     output.append("\n");
     output.append("\tpresetHandle: ");
-    output.append(Arrays.toString(presetHandle));
+    output.append(presetHandle.isPresent() ? Arrays.toString(presetHandle.get()) : "");
     output.append("\n");
     output.append("\tsystemMode: ");
     output.append(systemMode);
@@ -6144,10 +6144,10 @@ public static class ThermostatClusterScheduleTransitionStruct {
 public static class ThermostatClusterScheduleStruct {
   public byte[] scheduleHandle;
   public Integer systemMode;
-  public @Nullable String name;
-  public byte[] presetHandle;
+  public Optional<String> name;
+  public Optional<byte[]> presetHandle;
   public ArrayList<ChipStructs.ThermostatClusterScheduleTransitionStruct> transitions;
-  public Boolean builtIn;
+  public Optional<Boolean> builtIn;
   private static final long SCHEDULE_HANDLE_ID = 0L;
   private static final long SYSTEM_MODE_ID = 1L;
   private static final long NAME_ID = 2L;
@@ -6158,10 +6158,10 @@ public static class ThermostatClusterScheduleStruct {
   public ThermostatClusterScheduleStruct(
     byte[] scheduleHandle,
     Integer systemMode,
-    @Nullable String name,
-    byte[] presetHandle,
+    Optional<String> name,
+    Optional<byte[]> presetHandle,
     ArrayList<ChipStructs.ThermostatClusterScheduleTransitionStruct> transitions,
-    Boolean builtIn
+    Optional<Boolean> builtIn
   ) {
     this.scheduleHandle = scheduleHandle;
     this.systemMode = systemMode;
@@ -6175,10 +6175,10 @@ public static class ThermostatClusterScheduleStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(SCHEDULE_HANDLE_ID, new ByteArrayType(scheduleHandle)));
     values.add(new StructElement(SYSTEM_MODE_ID, new UIntType(systemMode)));
-    values.add(new StructElement(NAME_ID, name != null ? new StringType(name) : new NullType()));
-    values.add(new StructElement(PRESET_HANDLE_ID, new ByteArrayType(presetHandle)));
+    values.add(new StructElement(NAME_ID, name.<BaseTLVType>map((nonOptionalname) -> new StringType(nonOptionalname)).orElse(new EmptyType())));
+    values.add(new StructElement(PRESET_HANDLE_ID, presetHandle.<BaseTLVType>map((nonOptionalpresetHandle) -> new ByteArrayType(nonOptionalpresetHandle)).orElse(new EmptyType())));
     values.add(new StructElement(TRANSITIONS_ID, ArrayType.generateArrayType(transitions, (elementtransitions) -> elementtransitions.encodeTlv())));
-    values.add(new StructElement(BUILT_IN_ID, new BooleanType(builtIn)));
+    values.add(new StructElement(BUILT_IN_ID, builtIn.<BaseTLVType>map((nonOptionalbuiltIn) -> new BooleanType(nonOptionalbuiltIn)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -6189,10 +6189,10 @@ public static class ThermostatClusterScheduleStruct {
     }
     byte[] scheduleHandle = null;
     Integer systemMode = null;
-    @Nullable String name = null;
-    byte[] presetHandle = null;
+    Optional<String> name = Optional.empty();
+    Optional<byte[]> presetHandle = Optional.empty();
     ArrayList<ChipStructs.ThermostatClusterScheduleTransitionStruct> transitions = null;
-    Boolean builtIn = null;
+    Optional<Boolean> builtIn = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SCHEDULE_HANDLE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -6207,12 +6207,12 @@ public static class ThermostatClusterScheduleStruct {
       } else if (element.contextTagNum() == NAME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
           StringType castingValue = element.value(StringType.class);
-          name = castingValue.value(String.class);
+          name = Optional.of(castingValue.value(String.class));
         }
       } else if (element.contextTagNum() == PRESET_HANDLE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
-          presetHandle = castingValue.value(byte[].class);
+          presetHandle = Optional.of(castingValue.value(byte[].class));
         }
       } else if (element.contextTagNum() == TRANSITIONS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
@@ -6222,7 +6222,7 @@ public static class ThermostatClusterScheduleStruct {
       } else if (element.contextTagNum() == BUILT_IN_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
-          builtIn = castingValue.value(Boolean.class);
+          builtIn = Optional.of(castingValue.value(Boolean.class));
         }
       }
     }
@@ -6250,7 +6250,7 @@ public static class ThermostatClusterScheduleStruct {
     output.append(name);
     output.append("\n");
     output.append("\tpresetHandle: ");
-    output.append(Arrays.toString(presetHandle));
+    output.append(presetHandle.isPresent() ? Arrays.toString(presetHandle.get()) : "");
     output.append("\n");
     output.append("\ttransitions: ");
     output.append(transitions);
@@ -6263,12 +6263,12 @@ public static class ThermostatClusterScheduleStruct {
   }
 }
 public static class ThermostatClusterPresetStruct {
-  public byte[] presetHandle;
+  public @Nullable byte[] presetHandle;
   public Integer presetScenario;
-  public @Nullable String name;
-  public Integer coolingSetpoint;
-  public Integer heatingSetpoint;
-  public Boolean builtIn;
+  public @Nullable Optional<String> name;
+  public Optional<Integer> coolingSetpoint;
+  public Optional<Integer> heatingSetpoint;
+  public @Nullable Boolean builtIn;
   private static final long PRESET_HANDLE_ID = 0L;
   private static final long PRESET_SCENARIO_ID = 1L;
   private static final long NAME_ID = 2L;
@@ -6277,12 +6277,12 @@ public static class ThermostatClusterPresetStruct {
   private static final long BUILT_IN_ID = 5L;
 
   public ThermostatClusterPresetStruct(
-    byte[] presetHandle,
+    @Nullable byte[] presetHandle,
     Integer presetScenario,
-    @Nullable String name,
-    Integer coolingSetpoint,
-    Integer heatingSetpoint,
-    Boolean builtIn
+    @Nullable Optional<String> name,
+    Optional<Integer> coolingSetpoint,
+    Optional<Integer> heatingSetpoint,
+    @Nullable Boolean builtIn
   ) {
     this.presetHandle = presetHandle;
     this.presetScenario = presetScenario;
@@ -6294,12 +6294,12 @@ public static class ThermostatClusterPresetStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PRESET_HANDLE_ID, new ByteArrayType(presetHandle)));
+    values.add(new StructElement(PRESET_HANDLE_ID, presetHandle != null ? new ByteArrayType(presetHandle) : new NullType()));
     values.add(new StructElement(PRESET_SCENARIO_ID, new UIntType(presetScenario)));
-    values.add(new StructElement(NAME_ID, name != null ? new StringType(name) : new NullType()));
-    values.add(new StructElement(COOLING_SETPOINT_ID, new IntType(coolingSetpoint)));
-    values.add(new StructElement(HEATING_SETPOINT_ID, new IntType(heatingSetpoint)));
-    values.add(new StructElement(BUILT_IN_ID, new BooleanType(builtIn)));
+    values.add(new StructElement(NAME_ID, name != null ? name.<BaseTLVType>map((nonOptionalname) -> new StringType(nonOptionalname)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(COOLING_SETPOINT_ID, coolingSetpoint.<BaseTLVType>map((nonOptionalcoolingSetpoint) -> new IntType(nonOptionalcoolingSetpoint)).orElse(new EmptyType())));
+    values.add(new StructElement(HEATING_SETPOINT_ID, heatingSetpoint.<BaseTLVType>map((nonOptionalheatingSetpoint) -> new IntType(nonOptionalheatingSetpoint)).orElse(new EmptyType())));
+    values.add(new StructElement(BUILT_IN_ID, builtIn != null ? new BooleanType(builtIn) : new NullType()));
 
     return new StructType(values);
   }
@@ -6308,12 +6308,12 @@ public static class ThermostatClusterPresetStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    byte[] presetHandle = null;
+    @Nullable byte[] presetHandle = null;
     Integer presetScenario = null;
-    @Nullable String name = null;
-    Integer coolingSetpoint = null;
-    Integer heatingSetpoint = null;
-    Boolean builtIn = null;
+    @Nullable Optional<String> name = null;
+    Optional<Integer> coolingSetpoint = Optional.empty();
+    Optional<Integer> heatingSetpoint = Optional.empty();
+    @Nullable Boolean builtIn = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == PRESET_HANDLE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -6328,17 +6328,17 @@ public static class ThermostatClusterPresetStruct {
       } else if (element.contextTagNum() == NAME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
           StringType castingValue = element.value(StringType.class);
-          name = castingValue.value(String.class);
+          name = Optional.of(castingValue.value(String.class));
         }
       } else if (element.contextTagNum() == COOLING_SETPOINT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
           IntType castingValue = element.value(IntType.class);
-          coolingSetpoint = castingValue.value(Integer.class);
+          coolingSetpoint = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == HEATING_SETPOINT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
           IntType castingValue = element.value(IntType.class);
-          heatingSetpoint = castingValue.value(Integer.class);
+          heatingSetpoint = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == BUILT_IN_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
@@ -6460,14 +6460,14 @@ public static class ThermostatClusterPresetTypeStruct {
   }
 }
 public static class ThermostatClusterQueuedPresetStruct {
-  public byte[] presetHandle;
-  public Long transitionTimestamp;
+  public @Nullable byte[] presetHandle;
+  public @Nullable Long transitionTimestamp;
   private static final long PRESET_HANDLE_ID = 0L;
   private static final long TRANSITION_TIMESTAMP_ID = 1L;
 
   public ThermostatClusterQueuedPresetStruct(
-    byte[] presetHandle,
-    Long transitionTimestamp
+    @Nullable byte[] presetHandle,
+    @Nullable Long transitionTimestamp
   ) {
     this.presetHandle = presetHandle;
     this.transitionTimestamp = transitionTimestamp;
@@ -6475,8 +6475,8 @@ public static class ThermostatClusterQueuedPresetStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PRESET_HANDLE_ID, new ByteArrayType(presetHandle)));
-    values.add(new StructElement(TRANSITION_TIMESTAMP_ID, new UIntType(transitionTimestamp)));
+    values.add(new StructElement(PRESET_HANDLE_ID, presetHandle != null ? new ByteArrayType(presetHandle) : new NullType()));
+    values.add(new StructElement(TRANSITION_TIMESTAMP_ID, transitionTimestamp != null ? new UIntType(transitionTimestamp) : new NullType()));
 
     return new StructType(values);
   }
@@ -6485,8 +6485,8 @@ public static class ThermostatClusterQueuedPresetStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    byte[] presetHandle = null;
-    Long transitionTimestamp = null;
+    @Nullable byte[] presetHandle = null;
+    @Nullable Long transitionTimestamp = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == PRESET_HANDLE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {

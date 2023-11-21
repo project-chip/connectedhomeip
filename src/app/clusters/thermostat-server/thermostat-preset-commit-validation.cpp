@@ -27,7 +27,7 @@ FindPresetByHandle(const chip::ByteSpan &handle, const Span<PresetStruct::Type> 
 {
 	for (auto & preset : list)
 	{
-	    if (handle.data_equal(preset.presetHandle))
+	    if ((preset.presetHandle.IsNull() == false) && handle.data_equal(preset.presetHandle.Value()))
 	    {
 	    	outPreset = preset;
 	    	return EMBER_ZCL_STATUS_SUCCESS;
@@ -43,7 +43,7 @@ CheckPresetHandleUnique(const chip::ByteSpan &handle, Span<PresetStruct::Type> &
     int count = 0;
     for (auto & preset : list)
     {
-        if (handle.data_equal(preset.presetHandle))
+        if ((preset.presetHandle.IsNull() == false) && handle.data_equal(preset.presetHandle.Value()))
         {
             if (count == 0)
             {
@@ -111,12 +111,12 @@ IsPresetHandleReferenced(ThermostatMatterScheduleManager &mgr, const chip::ByteS
     	ScheduleStruct::Type schedule;
     	while (mgr.mGetScheduleAtIndexCb(&mgr, index, schedule) != CHIP_ERROR_NOT_FOUND)
     	{
-    		if (schedule.presetHandle.data_equal(handle))
+    		if (schedule.presetHandle.HasValue() && schedule.presetHandle.Value().data_equal(handle))
     			return true;
 
     		for (auto transition : schedule.transitions)
     		{
-    			if (transition.presetHandle.data_equal(handle))
+    			if (transition.presetHandle.HasValue() && transition.presetHandle.Value().data_equal(handle))
     				return true;
     		}
     		index++;
@@ -181,7 +181,7 @@ CheckPresetType(ThermostatMatterScheduleManager &mgr, PresetStruct::Type &preset
 		if (presetType.presetScenario == preset.presetScenario)
 		{
 			// we have one, check the name requirements
-			if (preset.name.IsNull() == false && preset.name.Value().empty() == false)
+			if ((preset.name.HasValue() == true) && (preset.name.Value().IsNull() == false) && (preset.name.Value().Value().empty() == false))
 			{
 				const bool nameSupported = presetType.presetTypeFeatures.Has(PresetTypeFeaturesBitmap::kSupportsNames); 
 				VerifyOrReturnError(nameSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
@@ -210,19 +210,22 @@ ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<PresetStruct:
     // For all exisiting presets -- Walk the old list
     for (auto & old_preset : oldlist)
     {
+        VerifyOrDie(old_preset.presetHandle.IsNull() == false);
+
     	// Check 1. -- for each existing built in preset, make sure it's still in the new list
-    	if (old_preset.builtIn)
+    	if (old_preset.builtIn.IsNull() == false && old_preset.builtIn.Value())
     	{
-    		status = FindPresetByHandle(old_preset.presetHandle, newlist, queryPreset);
+    		status = FindPresetByHandle(old_preset.presetHandle.Value(), newlist, queryPreset);
     		VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
-    		VerifyOrExit(queryPreset.builtIn == true, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+            VerifyOrExit(queryPreset.builtIn.IsNull() == false, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+    		VerifyOrExit(queryPreset.builtIn.Value() == true, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
     	}  
 
     	// Check 2 and 3 and 4. -- If the preset is currently being referenced but would be deleted.
 		// if its a builtin preset we don't need to search again, we know it's there from the above check.
-		if (old_preset.builtIn == false && IsPresetHandleReferenced(*this, old_preset.presetHandle))
+		if ((old_preset.builtIn.IsNull() || old_preset.builtIn.Value() == false) && IsPresetHandleReferenced(*this, old_preset.presetHandle.Value()))
     	{
-    		status = FindPresetByHandle(old_preset.presetHandle, newlist, queryPreset);
+    		status = FindPresetByHandle(old_preset.presetHandle.Value(), newlist, queryPreset);
     		VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_INVALID_IN_STATE);
     	}
     }
@@ -230,17 +233,17 @@ ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<PresetStruct:
     // Walk the new list
     for (auto & new_preset : newlist)
     {
-        if (new_preset.presetHandle.empty() == false)
+        if (new_preset.presetHandle.IsNull() == false && new_preset.presetHandle.Value().empty() == false)
         {
             // Existing Preset checks
 
             // Make sure it's unique to the list
-            status = CheckPresetHandleUnique(new_preset.presetHandle, newlist);
+            status = CheckPresetHandleUnique(new_preset.presetHandle.Value(), newlist);
             SuccessOrExit(status);
 
             // Look for it in the old list
             PresetStruct::Type existingPreset;
-            status = FindPresetByHandle(new_preset.presetHandle, oldlist, existingPreset);
+            status = FindPresetByHandle(new_preset.presetHandle.Value(), oldlist, existingPreset);
             SuccessOrExit(status);
 
 	        // Check BuiltIn

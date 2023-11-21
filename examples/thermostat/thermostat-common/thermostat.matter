@@ -1621,7 +1621,7 @@ server cluster Thermostat = 513 {
     kCoolSetpointPresent = 0x2;
   }
 
-  bitmap PresetTypeFeaturesBitmap : bitmap8 {
+  bitmap PresetTypeFeaturesBitmap : bitmap16 {
     kAutomatic = 0x1;
     kSupportsNames = 0x2;
   }
@@ -1636,11 +1636,11 @@ server cluster Thermostat = 513 {
     kFanStage3 = 0x40;
   }
 
-  bitmap ScheduleTypeFeaturesBitmap : bitmap8 {
+  bitmap ScheduleTypeFeaturesBitmap : bitmap16 {
     kSupportsPresets = 0x1;
     kSupportsSetpoints = 0x2;
-    kSupportsNames = 0x3;
-    kSupportsOff = 0x4;
+    kSupportsNames = 0x4;
+    kSupportsOff = 0x8;
   }
 
   bitmap TemperatureSetpointHoldPolicy : bitmap8 {
@@ -1651,28 +1651,28 @@ server cluster Thermostat = 513 {
   struct ScheduleTransitionStruct {
     DayOfWeek dayOfWeek = 0;
     int16u transitionTime = 1;
-    octet_string<16> presetHandle = 2;
-    ThermostatSystemMode systemMode = 3;
-    int16s coolingSetpoint = 4;
-    int16s heatingSetpoint = 5;
+    optional octet_string<16> presetHandle = 2;
+    optional ThermostatSystemMode systemMode = 3;
+    optional int16s coolingSetpoint = 4;
+    optional int16s heatingSetpoint = 5;
   }
 
   struct ScheduleStruct {
     octet_string<16> scheduleHandle = 0;
     ThermostatSystemMode systemMode = 1;
-    nullable char_string<64> name = 2;
-    octet_string<16> presetHandle = 3;
+    optional char_string<64> name = 2;
+    optional octet_string<16> presetHandle = 3;
     ScheduleTransitionStruct transitions[] = 4;
-    boolean builtIn = 5;
+    optional boolean builtIn = 5;
   }
 
   struct PresetStruct {
-    octet_string<16> presetHandle = 0;
+    nullable octet_string<16> presetHandle = 0;
     PresetScenarioEnum presetScenario = 1;
-    nullable char_string<64> name = 2;
-    int16s coolingSetpoint = 3;
-    int16s heatingSetpoint = 4;
-    boolean builtIn = 5;
+    optional nullable char_string<64> name = 2;
+    optional int16s coolingSetpoint = 3;
+    optional int16s heatingSetpoint = 4;
+    nullable boolean builtIn = 5;
   }
 
   struct PresetTypeStruct {
@@ -1682,8 +1682,8 @@ server cluster Thermostat = 513 {
   }
 
   struct QueuedPresetStruct {
-    octet_string<16> presetHandle = 0;
-    epoch_s transitionTimestamp = 1;
+    nullable octet_string<16> presetHandle = 0;
+    nullable epoch_s transitionTimestamp = 1;
   }
 
   struct ScheduleTypeStruct {
@@ -1771,7 +1771,7 @@ server cluster Thermostat = 513 {
   command access(invoke: manage) CancelPresetsEditRequest(): DefaultSuccess = 11;
   command access(invoke: manage) CommitPresetsEditRequest(): DefaultSuccess = 12;
   command access(invoke: manage) CancelSetActivePresetRequest(): DefaultSuccess = 14;
-  command access(invoke: manage) SetTemperatureSetpointHoldPolicy(SetTemperatureSetpointHoldPolicyRequest): DefaultSuccess = 15;
+  command SetTemperatureSetpointHoldPolicy(SetTemperatureSetpointHoldPolicyRequest): DefaultSuccess = 15;
 }
 
 /** An interface for configuring the user interface of a thermostat (which may be remote from the thermostat). */

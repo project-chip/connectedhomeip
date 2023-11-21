@@ -26405,8 +26405,8 @@ class Thermostat(Cluster):
         class ScheduleTypeFeaturesBitmap(IntFlag):
             kSupportsPresets = 0x1
             kSupportsSetpoints = 0x2
-            kSupportsNames = 0x3
-            kSupportsOff = 0x4
+            kSupportsNames = 0x4
+            kSupportsOff = 0x8
 
         class TemperatureSetpointHoldPolicy(IntFlag):
             kHoldDurationElapsed = 0x1
@@ -26421,18 +26421,18 @@ class Thermostat(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="dayOfWeek", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="transitionTime", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=2, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="systemMode", Tag=3, Type=Thermostat.Enums.ThermostatSystemMode),
-                        ClusterObjectFieldDescriptor(Label="coolingSetpoint", Tag=4, Type=int),
-                        ClusterObjectFieldDescriptor(Label="heatingSetpoint", Tag=5, Type=int),
+                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=2, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="systemMode", Tag=3, Type=typing.Optional[Thermostat.Enums.ThermostatSystemMode]),
+                        ClusterObjectFieldDescriptor(Label="coolingSetpoint", Tag=4, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="heatingSetpoint", Tag=5, Type=typing.Optional[int]),
                     ])
 
             dayOfWeek: 'uint' = 0
             transitionTime: 'uint' = 0
-            presetHandle: 'bytes' = b""
-            systemMode: 'Thermostat.Enums.ThermostatSystemMode' = 0
-            coolingSetpoint: 'int' = 0
-            heatingSetpoint: 'int' = 0
+            presetHandle: 'typing.Optional[bytes]' = None
+            systemMode: 'typing.Optional[Thermostat.Enums.ThermostatSystemMode]' = None
+            coolingSetpoint: 'typing.Optional[int]' = None
+            heatingSetpoint: 'typing.Optional[int]' = None
 
         @dataclass
         class ScheduleStruct(ClusterObject):
@@ -26442,18 +26442,18 @@ class Thermostat(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="scheduleHandle", Tag=0, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="systemMode", Tag=1, Type=Thermostat.Enums.ThermostatSystemMode),
-                        ClusterObjectFieldDescriptor(Label="name", Tag=2, Type=typing.Union[Nullable, str]),
-                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=3, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="name", Tag=2, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=3, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="transitions", Tag=4, Type=typing.List[Thermostat.Structs.ScheduleTransitionStruct]),
-                        ClusterObjectFieldDescriptor(Label="builtIn", Tag=5, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="builtIn", Tag=5, Type=typing.Optional[bool]),
                     ])
 
             scheduleHandle: 'bytes' = b""
             systemMode: 'Thermostat.Enums.ThermostatSystemMode' = 0
-            name: 'typing.Union[Nullable, str]' = NullValue
-            presetHandle: 'bytes' = b""
+            name: 'typing.Optional[str]' = None
+            presetHandle: 'typing.Optional[bytes]' = None
             transitions: 'typing.List[Thermostat.Structs.ScheduleTransitionStruct]' = field(default_factory=lambda: [])
-            builtIn: 'bool' = False
+            builtIn: 'typing.Optional[bool]' = None
 
         @dataclass
         class PresetStruct(ClusterObject):
@@ -26461,20 +26461,20 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=0, Type=typing.Union[Nullable, bytes]),
                         ClusterObjectFieldDescriptor(Label="presetScenario", Tag=1, Type=Thermostat.Enums.PresetScenarioEnum),
-                        ClusterObjectFieldDescriptor(Label="name", Tag=2, Type=typing.Union[Nullable, str]),
-                        ClusterObjectFieldDescriptor(Label="coolingSetpoint", Tag=3, Type=int),
-                        ClusterObjectFieldDescriptor(Label="heatingSetpoint", Tag=4, Type=int),
-                        ClusterObjectFieldDescriptor(Label="builtIn", Tag=5, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="name", Tag=2, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="coolingSetpoint", Tag=3, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="heatingSetpoint", Tag=4, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="builtIn", Tag=5, Type=typing.Union[Nullable, bool]),
                     ])
 
-            presetHandle: 'bytes' = b""
+            presetHandle: 'typing.Union[Nullable, bytes]' = NullValue
             presetScenario: 'Thermostat.Enums.PresetScenarioEnum' = 0
-            name: 'typing.Union[Nullable, str]' = NullValue
-            coolingSetpoint: 'int' = 0
-            heatingSetpoint: 'int' = 0
-            builtIn: 'bool' = False
+            name: 'typing.Union[None, Nullable, str]' = None
+            coolingSetpoint: 'typing.Optional[int]' = None
+            heatingSetpoint: 'typing.Optional[int]' = None
+            builtIn: 'typing.Union[Nullable, bool]' = NullValue
 
         @dataclass
         class PresetTypeStruct(ClusterObject):
@@ -26497,12 +26497,12 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=0, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="transitionTimestamp", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=0, Type=typing.Union[Nullable, bytes]),
+                        ClusterObjectFieldDescriptor(Label="transitionTimestamp", Tag=1, Type=typing.Union[Nullable, uint]),
                     ])
 
-            presetHandle: 'bytes' = b""
-            transitionTimestamp: 'uint' = 0
+            presetHandle: 'typing.Union[Nullable, bytes]' = NullValue
+            transitionTimestamp: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class ScheduleTypeStruct(ClusterObject):

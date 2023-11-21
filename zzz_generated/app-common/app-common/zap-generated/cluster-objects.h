@@ -23982,10 +23982,10 @@ struct Type
 public:
     chip::BitMask<DayOfWeek> dayOfWeek = static_cast<chip::BitMask<DayOfWeek>>(0);
     uint16_t transitionTime            = static_cast<uint16_t>(0);
-    chip::ByteSpan presetHandle;
-    ThermostatSystemMode systemMode = static_cast<ThermostatSystemMode>(0);
-    int16_t coolingSetpoint         = static_cast<int16_t>(0);
-    int16_t heatingSetpoint         = static_cast<int16_t>(0);
+    Optional<chip::ByteSpan> presetHandle;
+    Optional<ThermostatSystemMode> systemMode;
+    Optional<int16_t> coolingSetpoint;
+    Optional<int16_t> heatingSetpoint;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -24013,10 +24013,10 @@ struct Type
 public:
     chip::ByteSpan scheduleHandle;
     ThermostatSystemMode systemMode = static_cast<ThermostatSystemMode>(0);
-    DataModel::Nullable<chip::CharSpan> name;
-    chip::ByteSpan presetHandle;
+    Optional<chip::CharSpan> name;
+    Optional<chip::ByteSpan> presetHandle;
     DataModel::List<const Structs::ScheduleTransitionStruct::Type> transitions;
-    bool builtIn = static_cast<bool>(0);
+    Optional<bool> builtIn;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -24028,10 +24028,10 @@ struct DecodableType
 public:
     chip::ByteSpan scheduleHandle;
     ThermostatSystemMode systemMode = static_cast<ThermostatSystemMode>(0);
-    DataModel::Nullable<chip::CharSpan> name;
-    chip::ByteSpan presetHandle;
+    Optional<chip::CharSpan> name;
+    Optional<chip::ByteSpan> presetHandle;
     DataModel::DecodableList<Structs::ScheduleTransitionStruct::DecodableType> transitions;
-    bool builtIn = static_cast<bool>(0);
+    Optional<bool> builtIn;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -24053,12 +24053,12 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    chip::ByteSpan presetHandle;
+    DataModel::Nullable<chip::ByteSpan> presetHandle;
     PresetScenarioEnum presetScenario = static_cast<PresetScenarioEnum>(0);
-    DataModel::Nullable<chip::CharSpan> name;
-    int16_t coolingSetpoint = static_cast<int16_t>(0);
-    int16_t heatingSetpoint = static_cast<int16_t>(0);
-    bool builtIn            = static_cast<bool>(0);
+    Optional<DataModel::Nullable<chip::CharSpan>> name;
+    Optional<int16_t> coolingSetpoint;
+    Optional<int16_t> heatingSetpoint;
+    DataModel::Nullable<bool> builtIn;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -24105,8 +24105,8 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    chip::ByteSpan presetHandle;
-    uint32_t transitionTimestamp = static_cast<uint32_t>(0);
+    DataModel::Nullable<chip::ByteSpan> presetHandle;
+    DataModel::Nullable<uint32_t> transitionTimestamp;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

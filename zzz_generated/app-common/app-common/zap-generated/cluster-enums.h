@@ -3095,7 +3095,7 @@ enum class ModeForSequence : uint8_t
 };
 
 // Bitmap for PresetTypeFeaturesBitmap
-enum class PresetTypeFeaturesBitmap : uint8_t
+enum class PresetTypeFeaturesBitmap : uint16_t
 {
     kAutomatic     = 0x1,
     kSupportsNames = 0x2,
@@ -3114,12 +3114,12 @@ enum class RelayStateBitmap : uint16_t
 };
 
 // Bitmap for ScheduleTypeFeaturesBitmap
-enum class ScheduleTypeFeaturesBitmap : uint8_t
+enum class ScheduleTypeFeaturesBitmap : uint16_t
 {
     kSupportsPresets   = 0x1,
     kSupportsSetpoints = 0x2,
-    kSupportsNames     = 0x3,
-    kSupportsOff       = 0x4,
+    kSupportsNames     = 0x4,
+    kSupportsOff       = 0x8,
 };
 
 // Bitmap for TemperatureSetpointHoldPolicy

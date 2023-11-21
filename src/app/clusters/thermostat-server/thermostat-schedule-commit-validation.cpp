@@ -159,7 +159,7 @@ CheckScheduleTypes(ThermostatMatterScheduleManager &mgr, ScheduleStruct::Type &s
 		if (scheduleType.systemMode == schedule.systemMode)
 		{
 			// we have one, check the preset requirements (check 6)
-			if (schedule.presetHandle.empty() == false)
+			if (schedule.presetHandle.HasValue() && schedule.presetHandle.Value().empty() == false)
 			{
 				const bool presetsSupported = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsPresets); 
 				VerifyOrReturnError(presetsSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
@@ -172,7 +172,8 @@ CheckScheduleTypes(ThermostatMatterScheduleManager &mgr, ScheduleStruct::Type &s
                     bool presetFound = false;
                     while (mgr.mGetPresetAtIndexCb(&mgr, preset_index, preset) != CHIP_ERROR_NOT_FOUND)
                     {
-                        if (preset.presetHandle.data_equal(schedule.presetHandle))
+                        VerifyOrDie(preset.presetHandle.IsNull() == false);
+                        if (preset.presetHandle.Value().data_equal(schedule.presetHandle.Value()))
                         {
                             presetFound = true;
                             break;
@@ -184,7 +185,7 @@ CheckScheduleTypes(ThermostatMatterScheduleManager &mgr, ScheduleStruct::Type &s
 			}
 
             // Check the name requirements (check 8)
-            if (schedule.name.IsNull() == false && schedule.name.Value().empty() == false)
+            if (schedule.name.HasValue() == false && schedule.name.Value().empty() == false)
             {
                 const bool nameSupported = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsNames); 
                 VerifyOrReturnError(nameSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
@@ -262,7 +263,7 @@ ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<ScheduleStr
     for (auto & old_schedule : oldlist)
     {
     	// Check 1. -- for each existing built in schedule, make sure it's still in the new list
-    	if (old_schedule.builtIn)
+    	if (old_schedule.builtIn.HasValue() && old_schedule.builtIn.Value())
     	{
     		status = FindScheduleByHandle(old_schedule.scheduleHandle, newlist, querySchedule);
     		VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);

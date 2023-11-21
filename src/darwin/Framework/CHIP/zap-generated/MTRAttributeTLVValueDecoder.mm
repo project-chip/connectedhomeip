@@ -9575,7 +9575,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
                 newElement_0 = [MTRThermostatClusterPresetTypeStruct new];
                 newElement_0.presetScenario = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.presetScenario)];
                 newElement_0.numberOfPresets = [NSNumber numberWithUnsignedChar:entry_0.numberOfPresets];
-                newElement_0.presetTypeFeatures = [NSNumber numberWithUnsignedChar:entry_0.presetTypeFeatures.Raw()];
+                newElement_0.presetTypeFeatures = [NSNumber numberWithUnsignedShort:entry_0.presetTypeFeatures.Raw()];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -9604,7 +9604,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
                 newElement_0 = [MTRThermostatClusterScheduleTypeStruct new];
                 newElement_0.systemMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.systemMode)];
                 newElement_0.numberOfSchedules = [NSNumber numberWithUnsignedChar:entry_0.numberOfSchedules];
-                newElement_0.scheduleTypeFeatures = [NSNumber numberWithUnsignedChar:entry_0.scheduleTypeFeatures.Raw()];
+                newElement_0.scheduleTypeFeatures = [NSNumber numberWithUnsignedShort:entry_0.scheduleTypeFeatures.Raw()];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -9679,21 +9679,41 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
                 auto & entry_0 = iter_0.GetValue();
                 MTRThermostatClusterPresetStruct * newElement_0;
                 newElement_0 = [MTRThermostatClusterPresetStruct new];
-                newElement_0.presetHandle = AsData(entry_0.presetHandle);
-                newElement_0.presetScenario = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.presetScenario)];
-                if (entry_0.name.IsNull()) {
-                    newElement_0.name = nil;
+                if (entry_0.presetHandle.IsNull()) {
+                    newElement_0.presetHandle = nil;
                 } else {
-                    newElement_0.name = AsString(entry_0.name.Value());
-                    if (newElement_0.name == nil) {
-                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                        *aError = err;
-                        return nil;
-                    }
+                    newElement_0.presetHandle = AsData(entry_0.presetHandle.Value());
                 }
-                newElement_0.coolingSetpoint = [NSNumber numberWithShort:entry_0.coolingSetpoint];
-                newElement_0.heatingSetpoint = [NSNumber numberWithShort:entry_0.heatingSetpoint];
-                newElement_0.builtIn = [NSNumber numberWithBool:entry_0.builtIn];
+                newElement_0.presetScenario = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.presetScenario)];
+                if (entry_0.name.HasValue()) {
+                    if (entry_0.name.Value().IsNull()) {
+                        newElement_0.name = nil;
+                    } else {
+                        newElement_0.name = AsString(entry_0.name.Value().Value());
+                        if (newElement_0.name == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                    }
+                } else {
+                    newElement_0.name = nil;
+                }
+                if (entry_0.coolingSetpoint.HasValue()) {
+                    newElement_0.coolingSetpoint = [NSNumber numberWithShort:entry_0.coolingSetpoint.Value()];
+                } else {
+                    newElement_0.coolingSetpoint = nil;
+                }
+                if (entry_0.heatingSetpoint.HasValue()) {
+                    newElement_0.heatingSetpoint = [NSNumber numberWithShort:entry_0.heatingSetpoint.Value()];
+                } else {
+                    newElement_0.heatingSetpoint = nil;
+                }
+                if (entry_0.builtIn.IsNull()) {
+                    newElement_0.builtIn = nil;
+                } else {
+                    newElement_0.builtIn = [NSNumber numberWithBool:entry_0.builtIn.Value()];
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -9748,17 +9768,21 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
                 newElement_0 = [MTRThermostatClusterScheduleStruct new];
                 newElement_0.scheduleHandle = AsData(entry_0.scheduleHandle);
                 newElement_0.systemMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.systemMode)];
-                if (entry_0.name.IsNull()) {
-                    newElement_0.name = nil;
-                } else {
+                if (entry_0.name.HasValue()) {
                     newElement_0.name = AsString(entry_0.name.Value());
                     if (newElement_0.name == nil) {
                         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                         *aError = err;
                         return nil;
                     }
+                } else {
+                    newElement_0.name = nil;
                 }
-                newElement_0.presetHandle = AsData(entry_0.presetHandle);
+                if (entry_0.presetHandle.HasValue()) {
+                    newElement_0.presetHandle = AsData(entry_0.presetHandle.Value());
+                } else {
+                    newElement_0.presetHandle = nil;
+                }
                 { // Scope for our temporary variables
                     auto * array_2 = [NSMutableArray new];
                     auto iter_2 = entry_0.transitions.begin();
@@ -9768,10 +9792,26 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
                         newElement_2 = [MTRThermostatClusterScheduleTransitionStruct new];
                         newElement_2.dayOfWeek = [NSNumber numberWithUnsignedChar:entry_2.dayOfWeek.Raw()];
                         newElement_2.transitionTime = [NSNumber numberWithUnsignedShort:entry_2.transitionTime];
-                        newElement_2.presetHandle = AsData(entry_2.presetHandle);
-                        newElement_2.systemMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.systemMode)];
-                        newElement_2.coolingSetpoint = [NSNumber numberWithShort:entry_2.coolingSetpoint];
-                        newElement_2.heatingSetpoint = [NSNumber numberWithShort:entry_2.heatingSetpoint];
+                        if (entry_2.presetHandle.HasValue()) {
+                            newElement_2.presetHandle = AsData(entry_2.presetHandle.Value());
+                        } else {
+                            newElement_2.presetHandle = nil;
+                        }
+                        if (entry_2.systemMode.HasValue()) {
+                            newElement_2.systemMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.systemMode.Value())];
+                        } else {
+                            newElement_2.systemMode = nil;
+                        }
+                        if (entry_2.coolingSetpoint.HasValue()) {
+                            newElement_2.coolingSetpoint = [NSNumber numberWithShort:entry_2.coolingSetpoint.Value()];
+                        } else {
+                            newElement_2.coolingSetpoint = nil;
+                        }
+                        if (entry_2.heatingSetpoint.HasValue()) {
+                            newElement_2.heatingSetpoint = [NSNumber numberWithShort:entry_2.heatingSetpoint.Value()];
+                        } else {
+                            newElement_2.heatingSetpoint = nil;
+                        }
                         [array_2 addObject:newElement_2];
                     }
                     CHIP_ERROR err = iter_2.GetStatus();
@@ -9781,7 +9821,11 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
                     }
                     newElement_0.transitions = array_2;
                 }
-                newElement_0.builtIn = [NSNumber numberWithBool:entry_0.builtIn];
+                if (entry_0.builtIn.HasValue()) {
+                    newElement_0.builtIn = [NSNumber numberWithBool:entry_0.builtIn.Value()];
+                } else {
+                    newElement_0.builtIn = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -9857,8 +9901,16 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             value = nil;
         } else {
             value = [MTRThermostatClusterQueuedPresetStruct new];
-            value.presetHandle = AsData(cppValue.Value().presetHandle);
-            value.transitionTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().transitionTimestamp];
+            if (cppValue.Value().presetHandle.IsNull()) {
+                value.presetHandle = nil;
+            } else {
+                value.presetHandle = AsData(cppValue.Value().presetHandle.Value());
+            }
+            if (cppValue.Value().transitionTimestamp.IsNull()) {
+                value.transitionTimestamp = nil;
+            } else {
+                value.transitionTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().transitionTimestamp.Value()];
+            }
         }
         return value;
     }

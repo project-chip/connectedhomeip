@@ -1434,7 +1434,8 @@ bool emberAfThermostatClusterSetActivePresetRequestCallback(
 
         while (manager->mGetPresetAtIndexCb(manager, index, preset) != CHIP_ERROR_NOT_FOUND)
         {
-            if (presetHandle.data_equal(preset.presetHandle))
+            VerifyOrDie(preset.presetHandle.IsNull() == false);
+            if (presetHandle.data_equal(preset.presetHandle.Value()))
             {
                 status = ActivePresetHandle::Set(commandPath.mEndpointId, presetHandle);
                 SuccessOrExit(status);

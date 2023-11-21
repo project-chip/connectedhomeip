@@ -29,10 +29,10 @@ import java.util.Optional
 class ThermostatClusterScheduleStruct (
     val scheduleHandle: ByteArray,
     val systemMode: UInt,
-    val name: String?,
-    val presetHandle: ByteArray,
+    val name: Optional<String>,
+    val presetHandle: Optional<ByteArray>,
     val transitions: List<ThermostatClusterScheduleTransitionStruct>,
-    val builtIn: Boolean) {
+    val builtIn: Optional<Boolean>) {
   override fun toString(): String  = buildString {
     append("ThermostatClusterScheduleStruct {\n")
     append("\tscheduleHandle : $scheduleHandle\n")
@@ -49,18 +49,23 @@ class ThermostatClusterScheduleStruct (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_SCHEDULE_HANDLE), scheduleHandle)
       put(ContextSpecificTag(TAG_SYSTEM_MODE), systemMode)
-      if (name != null) {
-      put(ContextSpecificTag(TAG_NAME), name)
-    } else {
-      putNull(ContextSpecificTag(TAG_NAME))
+      if (name.isPresent) {
+      val optname = name.get()
+      put(ContextSpecificTag(TAG_NAME), optname)
     }
-      put(ContextSpecificTag(TAG_PRESET_HANDLE), presetHandle)
+      if (presetHandle.isPresent) {
+      val optpresetHandle = presetHandle.get()
+      put(ContextSpecificTag(TAG_PRESET_HANDLE), optpresetHandle)
+    }
       startArray(ContextSpecificTag(TAG_TRANSITIONS))
       for (item in transitions.iterator()) {
         item.toTlv(AnonymousTag, this)
       }
       endArray()
-      put(ContextSpecificTag(TAG_BUILT_IN), builtIn)
+      if (builtIn.isPresent) {
+      val optbuiltIn = builtIn.get()
+      put(ContextSpecificTag(TAG_BUILT_IN), optbuiltIn)
+    }
       endStructure()
     }
   }
@@ -77,13 +82,16 @@ class ThermostatClusterScheduleStruct (
       tlvReader.enterStructure(tlvTag)
       val scheduleHandle = tlvReader.getByteArray(ContextSpecificTag(TAG_SCHEDULE_HANDLE))
       val systemMode = tlvReader.getUInt(ContextSpecificTag(TAG_SYSTEM_MODE))
-      val name = if (!tlvReader.isNull()) {
-      tlvReader.getString(ContextSpecificTag(TAG_NAME))
+      val name = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
     } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_NAME))
-      null
+      Optional.empty()
     }
-      val presetHandle = tlvReader.getByteArray(ContextSpecificTag(TAG_PRESET_HANDLE))
+      val presetHandle = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRESET_HANDLE))) {
+      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_PRESET_HANDLE)))
+    } else {
+      Optional.empty()
+    }
       val transitions = buildList<ThermostatClusterScheduleTransitionStruct> {
       tlvReader.enterArray(ContextSpecificTag(TAG_TRANSITIONS))
       while(!tlvReader.isEndOfContainer()) {
@@ -91,7 +99,11 @@ class ThermostatClusterScheduleStruct (
       }
       tlvReader.exitContainer()
     }
-      val builtIn = tlvReader.getBoolean(ContextSpecificTag(TAG_BUILT_IN))
+      val builtIn = if (tlvReader.isNextTag(ContextSpecificTag(TAG_BUILT_IN))) {
+      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_BUILT_IN)))
+    } else {
+      Optional.empty()
+    }
       
       tlvReader.exitContainer()
 

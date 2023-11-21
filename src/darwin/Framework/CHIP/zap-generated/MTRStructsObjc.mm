@@ -5138,13 +5138,13 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-        _presetHandle = [NSData data];
+        _presetHandle = nil;
 
-        _systemMode = @(0);
+        _systemMode = nil;
 
-        _coolingSetpoint = @(0);
+        _coolingSetpoint = nil;
 
-        _heatingSetpoint = @(0);
+        _heatingSetpoint = nil;
     }
     return self;
 }
@@ -5182,11 +5182,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _name = nil;
 
-        _presetHandle = [NSData data];
+        _presetHandle = nil;
 
         _transitions = [NSArray array];
 
-        _builtIn = @(0);
+        _builtIn = nil;
     }
     return self;
 }
@@ -5218,17 +5218,17 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _presetHandle = [NSData data];
+        _presetHandle = nil;
 
         _presetScenario = @(0);
 
         _name = nil;
 
-        _coolingSetpoint = @(0);
+        _coolingSetpoint = nil;
 
-        _heatingSetpoint = @(0);
+        _heatingSetpoint = nil;
 
-        _builtIn = @(0);
+        _builtIn = nil;
     }
     return self;
 }
@@ -5293,9 +5293,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _presetHandle = [NSData data];
+        _presetHandle = nil;
 
-        _transitionTimestamp = @(0);
+        _transitionTimestamp = nil;
     }
     return self;
 }

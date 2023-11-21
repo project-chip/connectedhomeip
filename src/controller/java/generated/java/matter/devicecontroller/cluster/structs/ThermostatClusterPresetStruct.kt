@@ -25,12 +25,12 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ThermostatClusterPresetStruct(
-  val presetHandle: ByteArray,
+  val presetHandle: ByteArray?,
   val presetScenario: UInt,
-  val name: String?,
-  val coolingSetpoint: Short,
-  val heatingSetpoint: Short,
-  val builtIn: Boolean
+  val name: Optional<String>?,
+  val coolingSetpoint: Optional<Short>,
+  val heatingSetpoint: Optional<Short>,
+  val builtIn: Boolean?
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterPresetStruct {\n")
@@ -46,16 +46,33 @@ class ThermostatClusterPresetStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_PRESET_HANDLE), presetHandle)
+      if (presetHandle != null) {
+        put(ContextSpecificTag(TAG_PRESET_HANDLE), presetHandle)
+      } else {
+        putNull(ContextSpecificTag(TAG_PRESET_HANDLE))
+      }
       put(ContextSpecificTag(TAG_PRESET_SCENARIO), presetScenario)
       if (name != null) {
-        put(ContextSpecificTag(TAG_NAME), name)
+        if (name.isPresent) {
+        val optname = name.get()
+        put(ContextSpecificTag(TAG_NAME), optname)
+      }
       } else {
         putNull(ContextSpecificTag(TAG_NAME))
       }
-      put(ContextSpecificTag(TAG_COOLING_SETPOINT), coolingSetpoint)
-      put(ContextSpecificTag(TAG_HEATING_SETPOINT), heatingSetpoint)
-      put(ContextSpecificTag(TAG_BUILT_IN), builtIn)
+      if (coolingSetpoint.isPresent) {
+        val optcoolingSetpoint = coolingSetpoint.get()
+        put(ContextSpecificTag(TAG_COOLING_SETPOINT), optcoolingSetpoint)
+      }
+      if (heatingSetpoint.isPresent) {
+        val optheatingSetpoint = heatingSetpoint.get()
+        put(ContextSpecificTag(TAG_HEATING_SETPOINT), optheatingSetpoint)
+      }
+      if (builtIn != null) {
+        put(ContextSpecificTag(TAG_BUILT_IN), builtIn)
+      } else {
+        putNull(ContextSpecificTag(TAG_BUILT_IN))
+      }
       endStructure()
     }
   }
@@ -70,17 +87,39 @@ class ThermostatClusterPresetStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterPresetStruct {
       tlvReader.enterStructure(tlvTag)
-      val presetHandle = tlvReader.getByteArray(ContextSpecificTag(TAG_PRESET_HANDLE))
+      val presetHandle = if (!tlvReader.isNull()) {
+      tlvReader.getByteArray(ContextSpecificTag(TAG_PRESET_HANDLE))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_PRESET_HANDLE))
+      null
+    }
       val presetScenario = tlvReader.getUInt(ContextSpecificTag(TAG_PRESET_SCENARIO))
       val name = if (!tlvReader.isNull()) {
-      tlvReader.getString(ContextSpecificTag(TAG_NAME))
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
+    } else {
+      Optional.empty()
+    }
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_NAME))
       null
     }
-      val coolingSetpoint = tlvReader.getShort(ContextSpecificTag(TAG_COOLING_SETPOINT))
-      val heatingSetpoint = tlvReader.getShort(ContextSpecificTag(TAG_HEATING_SETPOINT))
-      val builtIn = tlvReader.getBoolean(ContextSpecificTag(TAG_BUILT_IN))
+      val coolingSetpoint = if (tlvReader.isNextTag(ContextSpecificTag(TAG_COOLING_SETPOINT))) {
+      Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_COOLING_SETPOINT)))
+    } else {
+      Optional.empty()
+    }
+      val heatingSetpoint = if (tlvReader.isNextTag(ContextSpecificTag(TAG_HEATING_SETPOINT))) {
+      Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_HEATING_SETPOINT)))
+    } else {
+      Optional.empty()
+    }
+      val builtIn = if (!tlvReader.isNull()) {
+      tlvReader.getBoolean(ContextSpecificTag(TAG_BUILT_IN))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_BUILT_IN))
+      null
+    }
       
       tlvReader.exitContainer()
 

@@ -25,8 +25,8 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ThermostatClusterQueuedPresetStruct(
-  val presetHandle: ByteArray,
-  val transitionTimestamp: UInt
+  val presetHandle: ByteArray?,
+  val transitionTimestamp: UInt?
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterQueuedPresetStruct {\n")
@@ -38,8 +38,16 @@ class ThermostatClusterQueuedPresetStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_PRESET_HANDLE), presetHandle)
-      put(ContextSpecificTag(TAG_TRANSITION_TIMESTAMP), transitionTimestamp)
+      if (presetHandle != null) {
+        put(ContextSpecificTag(TAG_PRESET_HANDLE), presetHandle)
+      } else {
+        putNull(ContextSpecificTag(TAG_PRESET_HANDLE))
+      }
+      if (transitionTimestamp != null) {
+        put(ContextSpecificTag(TAG_TRANSITION_TIMESTAMP), transitionTimestamp)
+      } else {
+        putNull(ContextSpecificTag(TAG_TRANSITION_TIMESTAMP))
+      }
       endStructure()
     }
   }
@@ -50,8 +58,18 @@ class ThermostatClusterQueuedPresetStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterQueuedPresetStruct {
       tlvReader.enterStructure(tlvTag)
-      val presetHandle = tlvReader.getByteArray(ContextSpecificTag(TAG_PRESET_HANDLE))
-      val transitionTimestamp = tlvReader.getUInt(ContextSpecificTag(TAG_TRANSITION_TIMESTAMP))
+      val presetHandle = if (!tlvReader.isNull()) {
+      tlvReader.getByteArray(ContextSpecificTag(TAG_PRESET_HANDLE))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_PRESET_HANDLE))
+      null
+    }
+      val transitionTimestamp = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_TRANSITION_TIMESTAMP))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_TRANSITION_TIMESTAMP))
+      null
+    }
       
       tlvReader.exitContainer()
 

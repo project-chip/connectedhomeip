@@ -16847,7 +16847,7 @@ typedef NS_OPTIONS(uint8_t, MTRThermostatModeForSequence) {
     MTRThermostatModeForSequenceCoolSetpointFieldPresent MTR_DEPRECATED("Please use MTRThermostatModeForSequenceCoolSetpointPresent", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x2,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-typedef NS_OPTIONS(uint8_t, MTRThermostatPresetTypeFeaturesBitmap) {
+typedef NS_OPTIONS(uint16_t, MTRThermostatPresetTypeFeaturesBitmap) {
     MTRThermostatPresetTypeFeaturesBitmapAutomatic MTR_PROVISIONALLY_AVAILABLE = 0x1,
     MTRThermostatPresetTypeFeaturesBitmapSupportsNames MTR_PROVISIONALLY_AVAILABLE = 0x2,
 } MTR_PROVISIONALLY_AVAILABLE;
@@ -16862,11 +16862,11 @@ typedef NS_OPTIONS(uint16_t, MTRThermostatRelayStateBitmap) {
     MTRThermostatRelayStateBitmapFanStage3 MTR_PROVISIONALLY_AVAILABLE = 0x40,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint8_t, MTRThermostatScheduleTypeFeaturesBitmap) {
+typedef NS_OPTIONS(uint16_t, MTRThermostatScheduleTypeFeaturesBitmap) {
     MTRThermostatScheduleTypeFeaturesBitmapSupportsPresets MTR_PROVISIONALLY_AVAILABLE = 0x1,
     MTRThermostatScheduleTypeFeaturesBitmapSupportsSetpoints MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRThermostatScheduleTypeFeaturesBitmapSupportsNames MTR_PROVISIONALLY_AVAILABLE = 0x3,
-    MTRThermostatScheduleTypeFeaturesBitmapSupportsOff MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRThermostatScheduleTypeFeaturesBitmapSupportsNames MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRThermostatScheduleTypeFeaturesBitmapSupportsOff MTR_PROVISIONALLY_AVAILABLE = 0x8,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint8_t, MTRThermostatTemperatureSetpointHoldPolicy) {
