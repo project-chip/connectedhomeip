@@ -239,12 +239,15 @@ public:
         // TODO : Implement action on frequency when frequency not provisional anymore
         // if(LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency)){}
 
-        CommandId command = LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff) ? Commands::MoveToLevelWithOnOff::Id
-                                                                                            : Commands::MoveToLevel::Id;
+        if (!chip::app::NumericAttributeTraits<uint8_t>::IsNullValue(level))
+        {
+            CommandId command = LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff) ? Commands::MoveToLevelWithOnOff::Id
+                                                                                                : Commands::MoveToLevel::Id;
 
-        moveToLevelHandler(endpoint, command, level, app::DataModel::MakeNullable(static_cast<uint16_t>(timeMs / 100)),
-                           chip::Optional<BitMask<OptionsBitmap>>(), chip::Optional<BitMask<OptionsBitmap>>(),
-                           INVALID_STORED_LEVEL);
+            moveToLevelHandler(endpoint, command, level, app::DataModel::MakeNullable(static_cast<uint16_t>(timeMs / 100)),
+                               chip::Optional<BitMask<OptionsBitmap>>(), chip::Optional<BitMask<OptionsBitmap>>(),
+                               INVALID_STORED_LEVEL);
+        }
 
         return CHIP_NO_ERROR;
     }
