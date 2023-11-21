@@ -34,7 +34,6 @@ cluster Identify = 3 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct IdentifyRequest {
     int16u identifyTime = 0;
   }
@@ -67,7 +66,6 @@ cluster Groups = 4 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct AddGroupRequest {
     group_id groupID = 0;
@@ -176,7 +174,6 @@ provisional cluster Scenes = 5 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct AddSceneRequest {
     group_id groupID = 0;
@@ -363,7 +360,6 @@ cluster OnOff = 6 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct OffWithEffectRequest {
     EffectIdentifierEnum effectIdentifier = 0;
     enum8 effectVariant = 1;
@@ -399,7 +395,6 @@ cluster OnOffSwitchConfiguration = 7 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
@@ -445,7 +440,6 @@ cluster LevelControl = 8 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct MoveToLevelRequest {
     int8u level = 0;
@@ -543,7 +537,6 @@ cluster BinaryInputBasic = 15 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Cluster to control pulse width modulation */
@@ -554,7 +547,6 @@ provisional cluster PulseWidthModulation = 28 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
@@ -586,7 +578,6 @@ cluster Descriptor = 29 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
@@ -606,7 +597,6 @@ cluster Binding = 30 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** The Access Control Cluster exposes a data model view of a
@@ -680,7 +670,6 @@ cluster AccessControl = 31 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
@@ -766,7 +755,6 @@ cluster Actions = 37 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct InstantActionRequest {
     int16u actionID = 0;
@@ -951,7 +939,6 @@ cluster BasicInformation = 40 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
@@ -983,7 +970,6 @@ cluster OtaSoftwareUpdateProvider = 41 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct QueryImageRequest {
     vendor_id vendorID = 0;
@@ -1094,7 +1080,6 @@ cluster OtaSoftwareUpdateRequestor = 42 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct AnnounceOTAProviderRequest {
     node_id providerNodeID = 0;
     vendor_id vendorID = 1;
@@ -1120,7 +1105,6 @@ cluster LocalizationConfiguration = 43 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -1161,7 +1145,6 @@ cluster TimeFormatLocalization = 44 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -1186,7 +1169,6 @@ cluster UnitLocalization = 45 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** This cluster is used to describe the configuration and capabilities of a Device's power system. */
@@ -1198,7 +1180,6 @@ cluster PowerSourceConfiguration = 46 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
@@ -1456,7 +1437,6 @@ cluster PowerSource = 47 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
@@ -1491,7 +1471,6 @@ cluster GeneralCommissioning = 48 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct ArmFailSafeRequest {
     int16u expiryLengthSeconds = 0;
@@ -1623,7 +1602,6 @@ cluster NetworkCommissioning = 49 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct ScanNetworksRequest {
     optional nullable octet_string<32> ssid = 0;
     optional int64u breadcrumb = 1;
@@ -1733,7 +1711,6 @@ cluster DiagnosticLogs = 50 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct RetrieveLogsRequestRequest {
     IntentEnum intent = 0;
@@ -1849,7 +1826,6 @@ cluster GeneralDiagnostics = 51 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct TestEventTriggerRequest {
     octet_string<16> enableKey = 0;
     int64u eventTrigger = 1;
@@ -1896,7 +1872,6 @@ cluster SoftwareDiagnostics = 52 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   /** Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute. */
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
@@ -2062,7 +2037,6 @@ cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   /** Reception of this command SHALL reset the OverrunCount attributes to 0 */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
@@ -2138,7 +2112,6 @@ cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   /** Reception of this command SHALL reset the Breacon and Packet related count attributes to 0 */
   command ResetCounts(): DefaultSuccess = 0;
 }
@@ -2178,7 +2151,6 @@ cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   /** Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0 */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
@@ -2291,7 +2263,6 @@ cluster TimeSynchronization = 56 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct SetUTCTimeRequest {
     epoch_us UTCTime = 0;
@@ -2410,7 +2381,6 @@ cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
@@ -2464,7 +2434,6 @@ cluster Switch = 59 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
@@ -2494,7 +2463,6 @@ cluster AdministratorCommissioning = 60 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct OpenCommissioningWindowRequest {
     int16u commissioningTimeout = 0;
@@ -2563,7 +2531,6 @@ cluster OperationalCredentials = 62 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct AttestationRequestRequest {
     octet_string<32> attestationNonce = 0;
@@ -2687,7 +2654,6 @@ cluster GroupKeyManagement = 63 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct KeySetWriteRequest {
     GroupKeySetStruct groupKeySet = 0;
   }
@@ -2733,7 +2699,6 @@ cluster FixedLabel = 64 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
@@ -2750,7 +2715,6 @@ cluster UserLabel = 65 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Cluster to control Proxy Configuration */
@@ -2761,7 +2725,6 @@ cluster ProxyConfiguration = 66 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Cluster to control Proxy Discovery */
@@ -2772,7 +2735,6 @@ cluster ProxyDiscovery = 67 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Cluster to control Proxy Valid */
@@ -2783,7 +2745,6 @@ cluster ProxyValid = 68 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** This cluster provides an interface to a boolean state called StateValue. */
@@ -2799,7 +2760,6 @@ cluster BooleanState = 69 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Allows servers to ensure that listed clients are notified when a server is available for communication. */
@@ -2851,7 +2811,6 @@ cluster IcdManagement = 70 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct RegisterClientRequest {
     node_id checkInNodeID = 0;
     int64u monitoredSubject = 1;
@@ -2902,7 +2861,6 @@ provisional cluster Timer = 71 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct SetTimerRequest {
     elapsed_s newTime = 0;
@@ -2966,7 +2924,6 @@ provisional cluster OvenMode = 73 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct ChangeToModeRequest {
     int8u newMode = 0;
   }
@@ -2999,7 +2956,6 @@ cluster LaundryDryerControls = 74 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
@@ -3031,7 +2987,6 @@ cluster ModeSelect = 80 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct ChangeToModeRequest {
     int8u newMode = 0;
@@ -3075,7 +3030,6 @@ cluster LaundryWasherMode = 81 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct ChangeToModeRequest {
     int8u newMode = 0;
@@ -3124,7 +3078,6 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct ChangeToModeRequest {
     int8u newMode = 0;
   }
@@ -3163,7 +3116,6 @@ cluster LaundryWasherControls = 83 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
@@ -3208,7 +3160,6 @@ cluster RvcRunMode = 84 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct ChangeToModeRequest {
     int8u newMode = 0;
@@ -3261,7 +3212,6 @@ cluster RvcCleanMode = 85 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct ChangeToModeRequest {
     int8u newMode = 0;
   }
@@ -3297,7 +3247,6 @@ cluster TemperatureControl = 86 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct SetTemperatureRequest {
     optional temperature targetTemperature = 0;
     optional int8u targetTemperatureLevel = 1;
@@ -3329,7 +3278,6 @@ cluster RefrigeratorAlarm = 87 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
@@ -3365,7 +3313,6 @@ cluster DishwasherMode = 89 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct ChangeToModeRequest {
     int8u newMode = 0;
@@ -3407,7 +3354,6 @@ cluster AirQuality = 91 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** This cluster provides an interface for observing and managing the state of smoke and CO alarms. */
@@ -3516,7 +3462,6 @@ cluster SmokeCoAlarm = 92 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   /** This command SHALL initiate a device self-test. */
   command SelfTestRequest(): DefaultSuccess = 0;
 }
@@ -3553,7 +3498,6 @@ cluster DishwasherAlarm = 93 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct ResetRequest {
     AlarmMap alarms = 0;
@@ -3599,7 +3543,6 @@ provisional cluster MicrowaveOvenMode = 94 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes and commands for configuring the microwave oven control, and reporting cooking stats. */
@@ -3615,7 +3558,6 @@ provisional cluster MicrowaveOvenControl = 95 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct SetCookingParametersRequest {
     optional int8u cookMode = 0;
@@ -3682,7 +3624,6 @@ cluster OperationalState = 96 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   response struct OperationalCommandResponse = 4 {
     ErrorStateStruct commandResponseState = 0;
@@ -3751,7 +3692,6 @@ cluster RvcOperationalState = 97 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   response struct OperationalCommandResponse = 4 {
     ErrorStateStruct commandResponseState = 0;
   }
@@ -3811,7 +3751,6 @@ cluster HepaFilterMonitoring = 113 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   /** Reset the condition of the replaceable to the non degraded state */
   command ResetCondition(): DefaultSuccess = 0;
 }
@@ -3861,7 +3800,6 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   /** Reset the condition of the replaceable to the non degraded state */
   command ResetCondition(): DefaultSuccess = 0;
 }
@@ -3904,7 +3842,6 @@ provisional cluster BooleanSensorConfiguration = 128 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct SuppressRequestRequest {
     AlarmModeBitmap alarmsToSuppress = 0;
@@ -3956,7 +3893,6 @@ provisional cluster ValveConfigurationAndControl = 129 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct OpenRequest {
     optional elapsed_s openDuration = 0;
@@ -4139,7 +4075,6 @@ provisional cluster DemandResponseLoadControl = 150 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct RegisterLoadControlProgramRequestRequest {
     LoadControlProgramStruct loadControlProgram = 0;
@@ -4592,7 +4527,6 @@ cluster DoorLock = 257 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct LockDoorRequest {
     optional octet_string PINCode = 0;
   }
@@ -4910,7 +4844,6 @@ cluster WindowCovering = 258 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct GoToLiftValueRequest {
     int16u liftValue = 0;
   }
@@ -4972,7 +4905,6 @@ cluster BarrierControl = 259 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct BarrierControlGoToPercentRequest {
     int8u percentOpen = 0;
@@ -5104,7 +5036,6 @@ cluster PumpConfigurationAndControl = 512 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
@@ -5230,7 +5161,6 @@ cluster Thermostat = 513 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct SetpointRaiseLowerRequest {
     SetpointAdjustMode mode = 0;
     int8s amount = 1;
@@ -5335,7 +5265,6 @@ provisional cluster FanControl = 514 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct StepRequest {
     StepDirectionEnum direction = 0;
     optional boolean wrap = 1;
@@ -5376,7 +5305,6 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
@@ -5508,7 +5436,6 @@ cluster ColorControl = 768 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct MoveToHueRequest {
     int8u hue = 0;
@@ -5729,7 +5656,6 @@ provisional cluster BallastConfiguration = 769 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
@@ -5750,7 +5676,6 @@ cluster IlluminanceMeasurement = 1024 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
@@ -5765,7 +5690,6 @@ cluster TemperatureMeasurement = 1026 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements. */
@@ -5789,7 +5713,6 @@ cluster PressureMeasurement = 1027 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
@@ -5804,7 +5727,6 @@ cluster FlowMeasurement = 1028 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements. */
@@ -5819,7 +5741,6 @@ cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
@@ -5859,7 +5780,6 @@ cluster OccupancySensing = 1030 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes for reporting carbon monoxide concentration measurements */
@@ -5915,7 +5835,6 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes for reporting carbon dioxide concentration measurements */
@@ -5971,7 +5890,6 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes for reporting nitrogen dioxide concentration measurements */
@@ -6027,7 +5945,6 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes for reporting ozone concentration measurements */
@@ -6083,7 +6000,6 @@ cluster OzoneConcentrationMeasurement = 1045 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes for reporting PM2.5 concentration measurements */
@@ -6139,7 +6055,6 @@ cluster Pm25ConcentrationMeasurement = 1066 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes for reporting formaldehyde concentration measurements */
@@ -6195,7 +6110,6 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes for reporting PM1 concentration measurements */
@@ -6251,7 +6165,6 @@ cluster Pm1ConcentrationMeasurement = 1068 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes for reporting PM10 concentration measurements */
@@ -6307,7 +6220,6 @@ cluster Pm10ConcentrationMeasurement = 1069 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes for reporting total volatile organic compounds concentration measurements */
@@ -6363,7 +6275,6 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes for reporting radon concentration measurements */
@@ -6419,7 +6330,6 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
@@ -6432,7 +6342,6 @@ cluster WakeOnLan = 1283 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** This cluster provides an interface for controlling the current Channel on a device. */
@@ -6476,7 +6385,6 @@ cluster Channel = 1284 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct ChangeChannelRequest {
     char_string match = 0;
@@ -6525,7 +6433,6 @@ cluster TargetNavigator = 1285 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct NavigateTargetRequest {
     int8u target = 0;
@@ -6582,7 +6489,6 @@ cluster MediaPlayback = 1286 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct SkipForwardRequest {
     int64u deltaPositionMilliseconds = 0;
@@ -6662,7 +6568,6 @@ cluster MediaInput = 1287 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct SelectInputRequest {
     int8u index = 0;
   }
@@ -6690,7 +6595,6 @@ cluster LowPower = 1288 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   /** This command shall put the device into low power mode. */
   command Sleep(): DefaultSuccess = 0;
@@ -6806,7 +6710,6 @@ cluster KeypadInput = 1289 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct SendKeyRequest {
     CECKeyCodeEnum keyCode = 0;
   }
@@ -6904,7 +6807,6 @@ cluster ContentLauncher = 1290 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct LaunchContentRequest {
     ContentSearchStruct search = 0;
     boolean autoPlay = 1;
@@ -6958,7 +6860,6 @@ cluster AudioOutput = 1291 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct SelectOutputRequest {
     int8u index = 0;
   }
@@ -7004,7 +6905,6 @@ cluster ApplicationLauncher = 1292 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct LaunchAppRequest {
     optional ApplicationStruct application = 0;
@@ -7060,7 +6960,6 @@ cluster ApplicationBasic = 1293 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
@@ -7071,7 +6970,6 @@ cluster AccountLogin = 1294 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct GetSetupPINRequest {
     char_string<100> tempAccountIdentifier = 0;
@@ -7230,7 +7128,6 @@ cluster ElectricalMeasurement = 2820 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   response struct GetProfileInfoResponseCommand = 0 {
     int8u profileCount = 0;
@@ -7466,7 +7363,6 @@ internal cluster UnitTesting = 4294048773 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   response struct TestSpecificResponse = 0 {
     int8u returnValue = 0;
@@ -7724,7 +7620,6 @@ internal cluster FaultInjection = 4294048774 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct FailAtFaultRequest {
     FaultType type = 0;
     int32u id = 1;
@@ -7754,7 +7649,6 @@ cluster SampleMei = 4294048800 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   response struct AddArgumentsResponse = 1 {
     int8u returnValue = 0;

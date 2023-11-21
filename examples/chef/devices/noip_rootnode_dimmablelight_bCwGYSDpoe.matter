@@ -34,7 +34,6 @@ cluster Identify = 3 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct IdentifyRequest {
     int16u identifyTime = 0;
   }
@@ -69,7 +68,6 @@ cluster Groups = 4 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct AddGroupRequest {
     group_id groupID = 0;
@@ -180,7 +178,6 @@ cluster OnOff = 6 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct OffWithEffectRequest {
     EffectIdentifierEnum effectIdentifier = 0;
     enum8 effectVariant = 1;
@@ -253,7 +250,6 @@ cluster LevelControl = 8 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct MoveToLevelRequest {
     int8u level = 0;
@@ -372,7 +368,6 @@ cluster Descriptor = 29 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
@@ -392,7 +387,6 @@ cluster Binding = 30 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** The Access Control Cluster exposes a data model view of a
@@ -466,7 +460,6 @@ cluster AccessControl = 31 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
@@ -561,7 +554,6 @@ cluster BasicInformation = 40 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
@@ -593,7 +585,6 @@ cluster OtaSoftwareUpdateProvider = 41 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct QueryImageRequest {
     vendor_id vendorID = 0;
@@ -707,7 +698,6 @@ cluster OtaSoftwareUpdateRequestor = 42 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct AnnounceOTAProviderRequest {
     node_id providerNodeID = 0;
     vendor_id vendorID = 1;
@@ -735,7 +725,6 @@ cluster LocalizationConfiguration = 43 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -776,7 +765,6 @@ cluster TimeFormatLocalization = 44 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
@@ -811,7 +799,6 @@ cluster GeneralCommissioning = 48 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct ArmFailSafeRequest {
     int16u expiryLengthSeconds = 0;
@@ -878,7 +865,6 @@ cluster DiagnosticLogs = 50 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct RetrieveLogsRequestRequest {
     IntentEnum intent = 0;
@@ -996,7 +982,6 @@ cluster GeneralDiagnostics = 51 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct TestEventTriggerRequest {
     octet_string<16> enableKey = 0;
     int64u eventTrigger = 1;
@@ -1046,7 +1031,6 @@ cluster SoftwareDiagnostics = 52 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 
@@ -1214,7 +1198,6 @@ cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 
   /** Reception of this command SHALL reset the OverrunCount attributes to 0 */
@@ -1292,7 +1275,6 @@ cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   command ResetCounts(): DefaultSuccess = 0;
 
   /** Reception of this command SHALL reset the Breacon and Packet related count attributes to 0 */
@@ -1335,7 +1317,6 @@ cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 
   /** Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0 */
@@ -1369,7 +1350,6 @@ cluster AdministratorCommissioning = 60 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct OpenCommissioningWindowRequest {
     int16u commissioningTimeout = 0;
@@ -1442,7 +1422,6 @@ cluster OperationalCredentials = 62 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 
   request struct AttestationRequestRequest {
     octet_string<32> attestationNonce = 0;
@@ -1575,7 +1554,6 @@ cluster GroupKeyManagement = 63 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-
   request struct KeySetWriteRequest {
     GroupKeySetStruct groupKeySet = 0;
   }
@@ -1626,7 +1604,6 @@ cluster FixedLabel = 64 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
@@ -1666,7 +1643,6 @@ cluster OccupancySensing = 1030 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
 }
 
 endpoint 0 {
