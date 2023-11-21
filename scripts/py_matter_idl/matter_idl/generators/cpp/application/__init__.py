@@ -16,11 +16,7 @@ import os
 from typing import List
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl
-
-
-def serverClustersOnly(clusters: List[Cluster]) -> List[Cluster]:
-    return [c for c in clusters if c.side == ClusterSide.SERVER]
+from matter_idl.matter_idl_types import Cluster, Idl
 
 
 class CppApplicationGenerator(CodeGenerator):
@@ -34,8 +30,6 @@ class CppApplicationGenerator(CodeGenerator):
         filters as required by the java .jinja templates to function.
         """
         super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
-
-        self.jinja_env.filters['serverClustersOnly'] = serverClustersOnly
 
     def internal_render_all(self):
         """

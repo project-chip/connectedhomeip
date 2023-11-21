@@ -15,7 +15,7 @@
 import logging
 from typing import Any, Optional
 
-from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
+from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, Command, CommandQuality, ConstantEntry, DataType,
                                          Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct, StructQuality,
                                          StructTag)
 
@@ -490,7 +490,6 @@ class ClusterHandler(BaseHandler):
     def __init__(self, context: Context, idl: Optional[Idl]):
         super().__init__(context)
         self._cluster = Cluster(
-            side=ClusterSide.CLIENT,
             name="NAME-MISSING",
             code=-1,
             parse_meta=context.GetCurrentLocationMeta()

@@ -19,7 +19,7 @@ except ModuleNotFoundError:
     from matter_idl.matter_idl_types import AccessPrivilege
 
 from matter_idl.matter_idl_types import (ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
-                                         AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandInstantiation,
+                                         AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation,
                                          CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority,
                                          EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
                                          StructQuality, StructTag)
@@ -282,16 +282,6 @@ class MatterIdlTransformer(Transformer):
             field.api_maturity = args[0]
         return field
 
-    @v_args(meta=True)
-    def server_cluster(self, meta, unused_args):
-        self._cluster_start_pos = meta and meta.start_pos
-        return ClusterSide.SERVER
-
-    @v_args(meta=True, inline=True)
-    def client_cluster(self, meta, *unused_args):
-        self._cluster_start_pos = meta and meta.start_pos
-        return ClusterSide.CLIENT
-
     def command_access(self, privilege):
         return privilege[0]
 
@@ -485,17 +475,14 @@ class MatterIdlTransformer(Transformer):
         return element
 
     @v_args(inline=True, meta=True)
-    def cluster(self, meta, api_maturity, side, name, code, *content):
+    def cluster(self, meta, api_maturity, name, code, *content):
+        self._cluster_start_pos = meta and meta.start_pos
         meta = None if self.skip_meta else ParseMetaData(meta)
-
-        # shift actual starting position where the doc comment would start
-        if meta and self._cluster_start_pos:
-            meta.start_pos = self._cluster_start_pos
 
         if api_maturity is None:
             api_maturity = ApiMaturity.STABLE
 
-        result = Cluster(parse_meta=meta, side=side, name=name,
+        result = Cluster(parse_meta=meta, name=name,
                          code=code, api_maturity=api_maturity)
 
         for item in content:

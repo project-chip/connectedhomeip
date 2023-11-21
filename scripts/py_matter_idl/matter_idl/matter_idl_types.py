@@ -74,12 +74,6 @@ class EventQuality(enum.Flag):
     NONE = 0
     FABRIC_SENSITIVE = enum.auto()
 
-
-class ClusterSide(enum.Enum):
-    CLIENT = enum.auto()
-    SERVER = enum.auto()
-
-
 class StructTag(enum.Enum):
     REQUEST = enum.auto()
     RESPONSE = enum.auto()
@@ -229,7 +223,6 @@ class Command:
 
 @dataclass
 class Cluster:
-    side: ClusterSide
     name: str
     code: int
     enums: List[Enum] = field(default_factory=list)

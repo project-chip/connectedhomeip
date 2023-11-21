@@ -22,7 +22,7 @@ from typing import List, Optional, Set
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.generators.type_definitions import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
                                                     ParseDataType, TypeLookupContext)
-from matter_idl.matter_idl_types import (Attribute, Cluster, ClusterSide, Command, DataType, Field, FieldQuality, Idl, Struct,
+from matter_idl.matter_idl_types import (Attribute, Cluster, Command, DataType, Field, FieldQuality, Idl, Struct,
                                          StructQuality, StructTag)
 from stringcase import capitalcase
 
@@ -781,7 +781,7 @@ class JavaJNIGenerator(__JavaCodeGenerator):
                 output_file_name=target.output_name,
                 vars={
                     'idl': self.idl,
-                    'clientClusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
+                    'clientClusters': self.idl.clusters,
                     'globalTypes': _GLOBAL_TYPES,
                 }
             )
@@ -798,16 +798,13 @@ class JavaJNIGenerator(__JavaCodeGenerator):
             output_file_name="jni/CHIPCallbackTypes.h",
             vars={
                 'idl': self.idl,
-                'clientClusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
+                'clientClusters': self.idl.clusters,
             }
         )
 
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
-            if cluster.side != ClusterSide.CLIENT:
-                continue
-
             for target in cluster_targets:
                 self.internal_render_one_output(
                     template_path=target.template,
@@ -832,8 +829,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         Renders .java files required for java matter support
         """
 
-        clientClusters = [
-            c for c in self.idl.clusters if c.side == ClusterSide.CLIENT]
+        clientClusters = self.idl.clusters
 
         self.internal_render_one_output(
             template_path="ClusterReadMapping.jinja",
@@ -910,9 +906,6 @@ class JavaClassGenerator(__JavaCodeGenerator):
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
-            if cluster.side != ClusterSide.CLIENT:
-                continue
-
             for struct in cluster.structs:
                 if struct.tag:
                     continue

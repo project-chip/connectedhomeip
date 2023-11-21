@@ -15,7 +15,7 @@
 import os
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Cluster, ClusterSide, Command, Field, Idl
+from matter_idl.matter_idl_types import Cluster, Command, Field, Idl
 
 
 def toUpperSnakeCase(s):
@@ -230,9 +230,6 @@ class CustomGenerator(CodeGenerator):
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
-            if cluster.side != ClusterSide.CLIENT:
-                continue
-
             filename = "proto/%s_cluster.proto" % toLowerSnakeCase(
                 cluster.name)
 
