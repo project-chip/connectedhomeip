@@ -1709,7 +1709,7 @@ endpoint 0 {
     callback attribute clientList;
     callback attribute partsList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster AccessControl {
@@ -1722,25 +1722,25 @@ endpoint 0 {
     callback attribute accessControlEntriesPerFabric;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster BasicInformation {
     emits event StartUp;
     emits event ShutDown;
     emits event Leave;
-    callback attribute dataModelRevision default = 10;
+    callback attribute dataModelRevision;
     callback attribute vendorName;
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
     persist  attribute nodeLabel;
-    callback attribute location default = "XX";
-    callback attribute hardwareVersion default = 0;
+    callback attribute location;
+    callback attribute hardwareVersion;
     callback attribute hardwareVersionString;
-    callback attribute softwareVersion default = 0;
+    callback attribute softwareVersion;
     callback attribute softwareVersionString;
-    callback attribute manufacturingDate default = "20210614123456ZZ";
+    callback attribute manufacturingDate;
     callback attribute partNumber;
     callback attribute productURL;
     callback attribute productLabel;
@@ -1786,9 +1786,9 @@ endpoint 0 {
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
-    callback attribute regulatoryConfig default = 0;
-    callback attribute locationCapability default = 0;
-    callback attribute supportsConcurrentConnection default = 1;
+    callback attribute regulatoryConfig;
+    callback attribute locationCapability;
+    callback attribute supportsConcurrentConnection;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
 
@@ -1833,9 +1833,9 @@ endpoint 0 {
   server cluster GeneralDiagnostics {
     emits event BootReason;
     callback attribute networkInterfaces;
-    callback attribute rebootCount default = 0x0000;
-    callback attribute upTime default = 0x0000000000000000;
-    callback attribute totalOperationalHours default = 0x00000000;
+    callback attribute rebootCount;
+    callback attribute upTime;
+    callback attribute totalOperationalHours;
     callback attribute bootReason;
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
@@ -1851,19 +1851,19 @@ endpoint 0 {
 
   server cluster SoftwareDiagnostics {
     callback attribute threadMetrics;
-    callback attribute currentHeapFree default = 0x0000000000000000;
-    callback attribute currentHeapUsed default = 0x0000000000000000;
-    callback attribute currentHeapHighWatermark default = 0x0000000000000000;
-    callback attribute featureMap default = 1;
+    callback attribute currentHeapFree;
+    callback attribute currentHeapUsed;
+    callback attribute currentHeapHighWatermark;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 0x0001;
 
     handle command ResetWatermarks;
   }
 
   server cluster AdministratorCommissioning {
-    callback attribute windowStatus default = 0;
-    callback attribute adminFabricIndex default = 1;
-    callback attribute adminVendorId default = 0;
+    callback attribute windowStatus;
+    callback attribute adminFabricIndex;
+    callback attribute adminVendorId;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
 
@@ -1901,8 +1901,8 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command KeySetWrite;
     handle command KeySetRead;
@@ -1945,16 +1945,16 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 
   server cluster AirQuality {
-    callback attribute airQuality default = 0;
+    callback attribute airQuality;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 15;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1985,202 +1985,202 @@ endpoint 1 {
   }
 
   server cluster CarbonMonoxideConcentrationMeasurement {
-    callback attribute measuredValue default = 401;
-    callback attribute minMeasuredValue default = 50;
-    callback attribute maxMeasuredValue default = 1500;
-    callback attribute peakMeasuredValue default = 511;
-    callback attribute peakMeasuredValueWindow default = 3600;
-    callback attribute averageMeasuredValue default = 213;
-    callback attribute averageMeasuredValueWindow default = 3600;
-    callback attribute uncertainty default = 10;
-    callback attribute measurementUnit default = 1;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 3;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 63;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster CarbonDioxideConcentrationMeasurement {
-    callback attribute measuredValue default = 458;
-    callback attribute minMeasuredValue default = 300;
-    callback attribute maxMeasuredValue default = 2000;
-    callback attribute peakMeasuredValue default = 523;
-    callback attribute peakMeasuredValueWindow default = 3600;
-    callback attribute averageMeasuredValue default = 421;
-    callback attribute averageMeasuredValueWindow default = 3600;
-    callback attribute uncertainty default = 5;
-    callback attribute measurementUnit default = 0;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 1;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 63;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
-    callback attribute measuredValue default = 3;
-    callback attribute minMeasuredValue default = 1;
-    callback attribute maxMeasuredValue default = 150;
-    callback attribute peakMeasuredValue default = 3;
-    callback attribute peakMeasuredValueWindow default = 120;
-    callback attribute averageMeasuredValue default = 3;
-    callback attribute averageMeasuredValueWindow default = 120;
-    callback attribute uncertainty default = 1;
-    callback attribute measurementUnit default = 1;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 1;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 63;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster OzoneConcentrationMeasurement {
-    callback attribute measuredValue default = 10;
-    callback attribute minMeasuredValue default = 3;
-    callback attribute maxMeasuredValue default = 300;
-    callback attribute peakMeasuredValue default = 50;
-    callback attribute peakMeasuredValueWindow default = 3600;
-    callback attribute averageMeasuredValue default = 20;
-    callback attribute averageMeasuredValueWindow default = 3600;
-    callback attribute uncertainty default = 0;
-    callback attribute measurementUnit default = 0;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 1;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 63;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster Pm25ConcentrationMeasurement {
-    callback attribute measuredValue default = 42;
-    callback attribute minMeasuredValue default = 1;
-    callback attribute maxMeasuredValue default = 400;
-    callback attribute peakMeasuredValue default = 90;
-    callback attribute peakMeasuredValueWindow default = 3600;
-    callback attribute averageMeasuredValue default = 35;
-    callback attribute averageMeasuredValueWindow default = 3600;
-    callback attribute uncertainty default = 4;
-    callback attribute measurementUnit default = 4;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 2;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 63;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
-    callback attribute measuredValue default = 10;
-    callback attribute minMeasuredValue default = 0;
-    callback attribute maxMeasuredValue default = 200;
-    callback attribute peakMeasuredValue default = 10;
-    callback attribute peakMeasuredValueWindow default = 7200;
-    callback attribute averageMeasuredValue default = 2;
-    callback attribute averageMeasuredValueWindow default = 7200;
-    callback attribute uncertainty default = 0;
-    callback attribute measurementUnit default = 3;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 2;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 63;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster Pm1ConcentrationMeasurement {
-    callback attribute measuredValue default = 39;
-    callback attribute minMeasuredValue default = 1;
-    callback attribute maxMeasuredValue default = 400;
-    callback attribute peakMeasuredValue default = 70;
-    callback attribute peakMeasuredValueWindow default = 3600;
-    callback attribute averageMeasuredValue default = 41;
-    callback attribute averageMeasuredValueWindow default = 3600;
-    callback attribute uncertainty default = 4;
-    callback attribute measurementUnit default = 4;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 1;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 63;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster Pm10ConcentrationMeasurement {
-    callback attribute measuredValue default = 7;
-    callback attribute minMeasuredValue default = 2;
-    callback attribute maxMeasuredValue default = 400;
-    callback attribute peakMeasuredValue default = 49;
-    callback attribute peakMeasuredValueWindow default = 3600;
-    callback attribute averageMeasuredValue default = 43;
-    callback attribute averageMeasuredValueWindow default = 3600;
-    callback attribute uncertainty default = 2;
-    callback attribute measurementUnit default = 4;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 1;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 63;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
-    callback attribute measuredValue default = 5;
-    callback attribute minMeasuredValue default = 1;
-    callback attribute maxMeasuredValue default = 100;
-    callback attribute peakMeasuredValue default = 8;
-    callback attribute peakMeasuredValueWindow default = 3600;
-    callback attribute averageMeasuredValue default = 2;
-    callback attribute averageMeasuredValueWindow default = 3600;
-    callback attribute uncertainty default = 1;
-    callback attribute measurementUnit default = 1;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 1;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 63;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster RadonConcentrationMeasurement {
-    callback attribute measuredValue default = 5;
-    callback attribute minMeasuredValue default = 1;
-    callback attribute maxMeasuredValue default = 100;
-    callback attribute peakMeasuredValue default = 8;
-    callback attribute peakMeasuredValueWindow default = 3600;
-    callback attribute averageMeasuredValue default = 2;
-    callback attribute averageMeasuredValueWindow default = 3600;
-    callback attribute uncertainty default = 1;
-    callback attribute measurementUnit default = 1;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 1;
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 63;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 }
