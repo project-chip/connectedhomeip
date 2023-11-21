@@ -75,7 +75,6 @@ class HostApp(Enum):
     AIR_PURIFIER = auto()
     LIT_ICD = auto()
     AIR_QUALITY_SENSOR = auto()
-    RESOURCE_MONITORING = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -134,8 +133,6 @@ class HostApp(Enum):
             return 'lit-icd-app/linux'
         elif self == HostApp.AIR_QUALITY_SENSOR:
             return 'air-quality-sensor-app/linux'
-        elif self == HostApp.RESOURCE_MONITORING:
-            return 'resource-monitoring-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 

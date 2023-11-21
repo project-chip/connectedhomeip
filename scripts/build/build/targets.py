@@ -138,7 +138,6 @@ def BuildHostTarget():
         TargetPart('air-purifier', app=HostApp.AIR_PURIFIER),
         TargetPart('lit-icd', app=HostApp.LIT_ICD),
         TargetPart('air-quality-sensor', app=HostApp.AIR_QUALITY_SENSOR),
-        TargetPart('resource-monitoring', app=HostApp.RESOURCE_MONITORING)
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -720,7 +719,6 @@ def BuildTelinkTarget():
         TargetPart('ota-requestor', app=TelinkApp.OTA_REQUESTOR),
         TargetPart('pump', app=TelinkApp.PUMP),
         TargetPart('pump-controller', app=TelinkApp.PUMP_CONTROLLER),
-        TargetPart('resource-monitoring', app=TelinkApp.RESOURCE_MONITORING),
         TargetPart('shell', app=TelinkApp.SHELL),
         TargetPart('smoke-co-alarm', app=TelinkApp.SMOKE_CO_ALARM),
         TargetPart('temperature-measurement',
