@@ -2247,6 +2247,9 @@ void TestReadInteraction::TestSubscribeEarlyReport(nlTestSuite * apSuite, void *
         NL_TEST_ASSERT(apSuite, reportScheduler->IsReportScheduled(delegate.mpReadHandler));
         NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
     }
+
+    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite, void * apContext)
@@ -2340,7 +2343,6 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
 
         // Advance monotonic timestamp for min interval to elapse
-        startTime = gMockClock.GetMonotonicTimestamp();
         gMockClock.AdvanceMonotonic(System::Clock::Milliseconds32(800));
 
         // Service Timer expired event
@@ -2355,14 +2357,14 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
 
-        // Since we just sent a report for our urgent subscription, the min interval of the urgent subcription should have been
+        // Since we just sent a report for our urgent subscription, the min interval of the urgent subscription should have been
         // updated
         NL_TEST_ASSERT(apSuite,
                        reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) > gMockClock.GetMonotonicTimestamp());
         NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
         delegate.mGotEventResponse = false;
 
-        // For our non-urgent subscription, we did not send anything, so the min interval should of the non urgent subcription
+        // For our non-urgent subscription, we did not send anything, so the min interval should of the non urgent subscription
         // should be in the past
         NL_TEST_ASSERT(apSuite,
                        reportScheduler->GetMinTimestampForHandler(nonUrgentDelegate.mpReadHandler) <
