@@ -200,8 +200,7 @@ bool LinuxThreadDriver::ThreadNetworkIterator::Next(Network & item)
 ThreadCapabilities LinuxThreadDriver::GetSupportedThreadFeatures()
 {
     BitMask<ThreadCapabilities> capabilites = 0;
-    capabilites.SetField(ThreadCapabilities::kIsBorderRouterCapable,
-                         CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER /*OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE*/);
+    capabilites.SetField(ThreadCapabilities::kIsBorderRouterCapable, CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER);
     capabilites.SetField(ThreadCapabilities::kIsRouterCapable, CHIP_DEVICE_CONFIG_THREAD_FTD);
     capabilites.SetField(ThreadCapabilities::kIsSleepyEndDeviceCapable, !CHIP_DEVICE_CONFIG_THREAD_FTD);
     capabilites.SetField(ThreadCapabilities::kIsFullThreadDevice, CHIP_DEVICE_CONFIG_THREAD_FTD);
@@ -212,7 +211,8 @@ ThreadCapabilities LinuxThreadDriver::GetSupportedThreadFeatures()
 
 uint16_t LinuxThreadDriver::GetThreadVersion()
 {
-    // TODO Needs to be implemented with DBUS io.openthread.BorderRouter Thread API
+    // TODO https://github.com/project-chip/connectedhomeip/issues/30602
+    // Needs to be implemented with DBUS io.openthread.BorderRouter Thread API
     return 0;
 }
 
