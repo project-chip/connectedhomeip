@@ -540,6 +540,24 @@ class ParserWithLines:
         idl = self.transformer.transform(self.parser.parse(file))
         idl.parse_file_name = file_name
 
+        # ZAP may generate the same definition of clusters several times.
+        # Validate that if a cluster is defined, its definition is IDENTICAL
+        #
+        # TODO: this is not ideal and zap provides some iteration that seems
+        #       to not care about side: `all_user_clusters_irrespective_of_side`
+        #       however that one loses at least `description` and switches
+        #       ordering.
+        #
+        # As a result, for now allow multiple definitions IF AND ONLY IF identical
+        clusters = {}
+        for c in idl.clusters:
+            if c.code in clusters:
+                if c != clusters[c.code]:
+                    raise Exception(f"Different cluster definition for {c.name}/{c.code}")
+            else:
+                clusters[c.code] = c
+        idl.clusters = clusters.values()
+
         for comment in self.transformer.doc_comments:
             comment.appply_to_idl(idl, file)
 
