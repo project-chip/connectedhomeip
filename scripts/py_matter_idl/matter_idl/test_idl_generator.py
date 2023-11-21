@@ -17,6 +17,7 @@
 import os
 import sys
 import unittest
+from difflib import unified_diff
 from typing import Optional
 
 try:
@@ -73,6 +74,20 @@ def SkipLeadingComments(txt: str) -> str:
 
 
 class TestIdlRendering(unittest.TestCase):
+    def assertTextEqual(self, a: str, b: str):
+        if a == b:
+            # seems the same. This will just pass
+            self.assertEqual(a, b)
+            return
+
+        # Not the same. Try to make a human readable diff:
+        delta = unified_diff(a.splitlines(keepends=True),
+                             b.splitlines(keepends=True),
+                             fromfile='actual.matter',
+                             tofile='expected.matter',
+                             )
+        self.assertEqual(a, b, '\n' + ''.join(delta))
+
     def test_client_clusters(self):
         # IDL renderer was updated to have IDENTICAL output for client side
         # cluster rendering, so this diff will be verbatim
@@ -86,7 +101,7 @@ class TestIdlRendering(unittest.TestCase):
         original = SkipLeadingComments(ReadMatterIdl(path))
         generated = SkipLeadingComments(RenderAsIdlTxt(ParseMatterIdl(path, skip_meta=False)))
 
-        self.assertEqual(original, generated)
+        self.assertTextEqual(original, generated)
 
     def test_app_rendering(self):
         # When endpoints are involved, default value formatting is lost
@@ -108,7 +123,7 @@ class TestIdlRendering(unittest.TestCase):
             idl2 = CreateParser(skip_meta=True).parse(txt)
 
             # checks that data types and content is the same
-            self.assertEqual(idl, idl2)
+            self.assertTextEqual(idl, idl2)
 
 
 if __name__ == '__main__':
