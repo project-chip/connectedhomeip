@@ -34,15 +34,15 @@ Protocols::InteractionModel::Status ExampleMicrowaveOvenControlDelegate::HandleA
     return (mAddMoreTimeInstance->*mAddMoreTimeCommandCallback)(finalCookTime);
 }
 
-void ExampleMicrowaveOvenControlDelegate::SetMicrowaveOvenControlSetCookingParametersCallback(HandleSetCookingParametersCommand aCallback,
-                                                                                       MicrowaveOvenDevice * aInstance)
+void ExampleMicrowaveOvenControlDelegate::SetMicrowaveOvenControlSetCookingParametersCallback(
+    HandleSetCookingParametersCommand aCallback, MicrowaveOvenDevice * aInstance)
 {
     mSetCookingParametersCommandCallback = aCallback;
     mSetCookingParametersInstance        = aInstance;
 }
 
 void ExampleMicrowaveOvenControlDelegate::SetMicrowaveOvenControlAddMoreTimeCallback(HandleAddMoreTimeCommand aCallback,
-                                                                              MicrowaveOvenDevice * aInstance)
+                                                                                     MicrowaveOvenDevice * aInstance)
 {
     mAddMoreTimeCommandCallback = aCallback;
     mAddMoreTimeInstance        = aInstance;
