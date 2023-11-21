@@ -19251,7 +19251,7 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::ByteSpan>>>(
             Id, "active-schedule-handle", Attributes::ActiveScheduleHandle::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicy>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>>>(
             Id, "temperature-setpoint-hold-policy", 0, UINT8_MAX, Attributes::TemperatureSetpointHoldPolicy::Id,
             WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(

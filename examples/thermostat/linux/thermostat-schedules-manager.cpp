@@ -56,6 +56,10 @@ static void
 onEditCancel(ThermostatMatterScheduleManager * mgr, ThermostatMatterScheduleManager::editType type)
 {
     ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditCancel %s", type == ThermostatMatterScheduleManager::Presets ? "Presets" : "Schedules");
+    if (type == ThermostatMatterScheduleManager::Presets)
+    {
+    	gsEditingPresetsEmptyIndex = 0;
+    }
 }
 
 static EmberAfStatus
@@ -85,6 +89,7 @@ onEditCommit(ThermostatMatterScheduleManager * mgr, ThermostatMatterScheduleMana
 
 		// copy the presets to the active list.
 	    gsActivePresets = gsEditingPresets;
+	    gsEditingPresetsEmptyIndex = 0;
 
 	    // TODO: update thermostat attributes for new presets.
 	}

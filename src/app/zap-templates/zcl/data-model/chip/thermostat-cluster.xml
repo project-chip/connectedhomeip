@@ -196,7 +196,7 @@ limitations under the License.
     <item fieldId="5" name="BuiltIn" type="boolean" default="false" optional="true"/>
   </struct>
 
-  <bitmap name="TemperatureSetpointHoldPolicy" type="bitmap8">
+  <bitmap name="TemperatureSetpointHoldPolicyBitmap" type="bitmap8">
     <cluster code="0x0201"/>
     <field name="HoldDurationElapsed" mask="0x01"/>
     <field name="HoldDurationElapsedOrPresetChanged" mask="0x02"/>
@@ -393,7 +393,7 @@ limitations under the License.
     <attribute side="server" code="0x0053" define="ACTIVE_SCHEDULE_HANDLE" type="octet_string" length="16" writable="false" default="null" isNullable="true" optional="true" apiMaturity="provisional">
       <description>ActiveScheduleHandle</description>
     </attribute>
-    <attribute side="server" code="0x0054" define="TEMPERATURE_SETPOINT_HOLD_POLICY" type="TemperatureSetpointHoldPolicy" writable="false" default="0" optional="true" apiMaturity="provisional">
+    <attribute side="server" code="0x0054" define="TEMPERATURE_SETPOINT_HOLD_POLICY" type="TemperatureSetpointHoldPolicyBitmap" writable="false" default="0" optional="true" apiMaturity="provisional">
       <description>TemperatureSetpointHoldPolicy</description>
     </attribute>
     <attribute side="server" code="0x0055" define="SETPOINT_HOLD_EXPIRY_TIMESTAMP" type="epoch_s" writable="false" default="" isNullable="true" optional="true" apiMaturity="provisional">
@@ -498,7 +498,7 @@ limitations under the License.
       <description>
         Set the set point hold policy
       </description>
-      <arg name="TemperatureSetpointHoldPolicy" type="TemperatureSetpointHoldPolicy"/>
+      <arg name="TemperatureSetpointHoldPolicy" type="TemperatureSetpointHoldPolicyBitmap"/>
     </command>
     <command source="server" code="0x00" name="GetWeeklyScheduleResponse" optional="true" >
       <description>

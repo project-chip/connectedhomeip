@@ -26408,7 +26408,7 @@ class Thermostat(Cluster):
             kSupportsNames = 0x4
             kSupportsOff = 0x8
 
-        class TemperatureSetpointHoldPolicy(IntFlag):
+        class TemperatureSetpointHoldPolicyBitmap(IntFlag):
             kHoldDurationElapsed = 0x1
             kHoldDurationElapsedOrPresetChanged = 0x2
 

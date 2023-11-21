@@ -2897,10 +2897,11 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace ActiveScheduleHandle
 
 namespace TemperatureSetpointHoldPolicy {
-EmberAfStatus
-Get(chip::EndpointId endpoint,
-    chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicy> * value); // TemperatureSetpointHoldPolicy
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicy> value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> *
+                      value); // TemperatureSetpointHoldPolicyBitmap
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> value);
 } // namespace TemperatureSetpointHoldPolicy
 
 namespace SetpointHoldPolicyExpiryTimestamp {

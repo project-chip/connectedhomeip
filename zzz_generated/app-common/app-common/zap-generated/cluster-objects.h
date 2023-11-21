@@ -24800,8 +24800,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetTemperatureSetpointHoldPolicy::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    chip::BitMask<TemperatureSetpointHoldPolicy> temperatureSetpointHoldPolicy =
-        static_cast<chip::BitMask<TemperatureSetpointHoldPolicy>>(0);
+    chip::BitMask<TemperatureSetpointHoldPolicyBitmap> temperatureSetpointHoldPolicy =
+        static_cast<chip::BitMask<TemperatureSetpointHoldPolicyBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -24816,8 +24816,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetTemperatureSetpointHoldPolicy::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    chip::BitMask<TemperatureSetpointHoldPolicy> temperatureSetpointHoldPolicy =
-        static_cast<chip::BitMask<TemperatureSetpointHoldPolicy>>(0);
+    chip::BitMask<TemperatureSetpointHoldPolicyBitmap> temperatureSetpointHoldPolicy =
+        static_cast<chip::BitMask<TemperatureSetpointHoldPolicyBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetTemperatureSetpointHoldPolicy
@@ -25570,9 +25570,9 @@ struct TypeInfo
 namespace TemperatureSetpointHoldPolicy {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicy>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicy>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicy>;
+    using Type             = chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureSetpointHoldPolicy::Id; }
@@ -25714,7 +25714,7 @@ struct TypeInfo
         Attributes::SchedulesEditable::TypeInfo::DecodableType schedulesEditable = static_cast<bool>(0);
         Attributes::ActiveScheduleHandle::TypeInfo::DecodableType activeScheduleHandle;
         Attributes::TemperatureSetpointHoldPolicy::TypeInfo::DecodableType temperatureSetpointHoldPolicy =
-            static_cast<chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicy>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>>(0);
         Attributes::SetpointHoldPolicyExpiryTimestamp::TypeInfo::DecodableType setpointHoldPolicyExpiryTimestamp;
         Attributes::QueuedPreset::TypeInfo::DecodableType queuedPreset;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;

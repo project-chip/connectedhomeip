@@ -11264,7 +11264,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ActiveScheduleHandle", 1, value);
         }
         case Thermostat::Attributes::TemperatureSetpointHoldPolicy::Id: {
-            chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicy> value;
+            chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TemperatureSetpointHoldPolicy", 1, value);
         }

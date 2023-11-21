@@ -16869,9 +16869,9 @@ typedef NS_OPTIONS(uint16_t, MTRThermostatScheduleTypeFeaturesBitmap) {
     MTRThermostatScheduleTypeFeaturesBitmapSupportsOff MTR_PROVISIONALLY_AVAILABLE = 0x8,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint8_t, MTRThermostatTemperatureSetpointHoldPolicy) {
-    MTRThermostatTemperatureSetpointHoldPolicyHoldDurationElapsed MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRThermostatTemperatureSetpointHoldPolicyHoldDurationElapsedOrPresetChanged MTR_PROVISIONALLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint8_t, MTRThermostatTemperatureSetpointHoldPolicyBitmap) {
+    MTRThermostatTemperatureSetpointHoldPolicyBitmapHoldDurationElapsed MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRThermostatTemperatureSetpointHoldPolicyBitmapHoldDurationElapsedOrPresetChanged MTR_PROVISIONALLY_AVAILABLE = 0x2,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRFanControlAirflowDirection) {

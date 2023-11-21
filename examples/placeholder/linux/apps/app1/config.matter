@@ -4348,7 +4348,7 @@ client cluster Thermostat = 513 {
     kSupportsOff = 0x8;
   }
 
-  bitmap TemperatureSetpointHoldPolicy : bitmap8 {
+  bitmap TemperatureSetpointHoldPolicyBitmap : bitmap8 {
     kHoldDurationElapsed = 0x1;
     kHoldDurationElapsedOrPresetChanged = 0x2;
   }
@@ -4464,7 +4464,7 @@ client cluster Thermostat = 513 {
   readonly attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
   readonly attribute optional boolean schedulesEditable = 82;
   readonly attribute optional nullable octet_string<16> activeScheduleHandle = 83;
-  readonly attribute optional TemperatureSetpointHoldPolicy temperatureSetpointHoldPolicy = 84;
+  readonly attribute optional TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 84;
   readonly attribute optional nullable epoch_s setpointHoldPolicyExpiryTimestamp = 85;
   readonly attribute optional nullable QueuedPresetStruct queuedPreset = 86;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -4525,7 +4525,7 @@ client cluster Thermostat = 513 {
   }
 
   request struct SetTemperatureSetpointHoldPolicyRequest {
-    TemperatureSetpointHoldPolicy temperatureSetpointHoldPolicy = 0;
+    TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 0;
   }
 
   /** Command description for SetpointRaiseLower */
@@ -4657,7 +4657,7 @@ server cluster Thermostat = 513 {
     kSupportsOff = 0x8;
   }
 
-  bitmap TemperatureSetpointHoldPolicy : bitmap8 {
+  bitmap TemperatureSetpointHoldPolicyBitmap : bitmap8 {
     kHoldDurationElapsed = 0x1;
     kHoldDurationElapsedOrPresetChanged = 0x2;
   }

@@ -16070,9 +16070,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 namespace TemperatureSetpointHoldPolicy {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicy> * value)
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicy>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
@@ -16084,9 +16085,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicy> value)
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicy>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;

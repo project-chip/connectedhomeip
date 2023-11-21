@@ -3122,8 +3122,8 @@ enum class ScheduleTypeFeaturesBitmap : uint16_t
     kSupportsOff       = 0x8,
 };
 
-// Bitmap for TemperatureSetpointHoldPolicy
-enum class TemperatureSetpointHoldPolicy : uint8_t
+// Bitmap for TemperatureSetpointHoldPolicyBitmap
+enum class TemperatureSetpointHoldPolicyBitmap : uint8_t
 {
     kHoldDurationElapsed                = 0x1,
     kHoldDurationElapsedOrPresetChanged = 0x2,

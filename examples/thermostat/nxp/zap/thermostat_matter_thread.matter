@@ -1819,7 +1819,7 @@ server cluster Thermostat = 513 {
     kSupportsOff = 0x8;
   }
 
-  bitmap TemperatureSetpointHoldPolicy : bitmap8 {
+  bitmap TemperatureSetpointHoldPolicyBitmap : bitmap8 {
     kHoldDurationElapsed = 0x1;
     kHoldDurationElapsedOrPresetChanged = 0x2;
   }
