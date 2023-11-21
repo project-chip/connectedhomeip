@@ -21,23 +21,22 @@ using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
 
-static EmberAfStatus
-FindScheduleByHandle(const chip::ByteSpan &handle, const Span<ScheduleStruct::Type> &list, ScheduleStruct::Type &outSchedule)
+static EmberAfStatus FindScheduleByHandle(const chip::ByteSpan & handle, const Span<ScheduleStruct::Type> & list,
+                                          ScheduleStruct::Type & outSchedule)
 {
-	for (auto & schedule : list)
-	{
-	    if (handle.data_equal(schedule.scheduleHandle))
-	    {
-	    	outSchedule = schedule;
-	    	return EMBER_ZCL_STATUS_SUCCESS;
-	    }
-	}
+    for (auto & schedule : list)
+    {
+        if (handle.data_equal(schedule.scheduleHandle))
+        {
+            outSchedule = schedule;
+            return EMBER_ZCL_STATUS_SUCCESS;
+        }
+    }
 
-	return EMBER_ZCL_STATUS_NOT_FOUND;
+    return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-static EmberAfStatus
-CheckScheduleHandleUnique(const chip::ByteSpan &handle, Span<ScheduleStruct::Type> &list)
+static EmberAfStatus CheckScheduleHandleUnique(const chip::ByteSpan & handle, Span<ScheduleStruct::Type> & list)
 {
     int count = 0;
     for (auto & schedule : list)
@@ -50,7 +49,7 @@ CheckScheduleHandleUnique(const chip::ByteSpan &handle, Span<ScheduleStruct::Typ
             }
             else
             {
-            	return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+                return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
             }
         }
     }
@@ -58,19 +57,18 @@ CheckScheduleHandleUnique(const chip::ByteSpan &handle, Span<ScheduleStruct::Typ
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-static bool
-IsScheduleHandleReferenced(ThermostatMatterScheduleManager &mgr, const chip::ByteSpan &handle)
+static bool IsScheduleHandleReferenced(ThermostatMatterScheduleManager & mgr, const chip::ByteSpan & handle)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
-	// Check Active Preset Handle
-	DataModel::Nullable<chip::MutableByteSpan> activeScheduleHandle;
-	status = ActiveScheduleHandle::Get(mgr.mEndpoint, activeScheduleHandle);
-	VerifyOrDie(status == EMBER_ZCL_STATUS_SUCCESS);
-	if ((activeScheduleHandle.IsNull() == false) && activeScheduleHandle.Value().data_equal(handle))
-		return true;
+    // Check Active Preset Handle
+    DataModel::Nullable<chip::MutableByteSpan> activeScheduleHandle;
+    status = ActiveScheduleHandle::Get(mgr.mEndpoint, activeScheduleHandle);
+    VerifyOrDie(status == EMBER_ZCL_STATUS_SUCCESS);
+    if ((activeScheduleHandle.IsNull() == false) && activeScheduleHandle.Value().data_equal(handle))
+        return true;
 
-	return false;
+    return false;
 }
 
 #if 0
@@ -144,24 +142,23 @@ using DecodableType = Type;
 } // namespace ScheduleTypeStruct
 #endif
 
-static EmberAfStatus
-CheckScheduleTypes(ThermostatMatterScheduleManager &mgr, ScheduleStruct::Type &schedule)
+static EmberAfStatus CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, ScheduleStruct::Type & schedule)
 {
-	EmberAfStatus status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-	size_t index = 0;
-	ScheduleTypeStruct::Type scheduleType;
+    EmberAfStatus status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    size_t index         = 0;
+    ScheduleTypeStruct::Type scheduleType;
 
-	VerifyOrDie(mgr.mGetScheduleTypeAtIndexCb);
-	while (mgr.mGetScheduleTypeAtIndexCb(&mgr, index, scheduleType) != CHIP_ERROR_NOT_FOUND)
-	{
-		// look for the schedule type that supports this scenario (check 3)
-		if (scheduleType.systemMode == schedule.systemMode)
-		{
-			// we have one, check the preset requirements (check 6)
-			if (schedule.presetHandle.HasValue() && schedule.presetHandle.Value().empty() == false)
-			{
-				const bool presetsSupported = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsPresets);
-				VerifyOrReturnError(presetsSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrDie(mgr.mGetScheduleTypeAtIndexCb);
+    while (mgr.mGetScheduleTypeAtIndexCb(&mgr, index, scheduleType) != CHIP_ERROR_NOT_FOUND)
+    {
+        // look for the schedule type that supports this scenario (check 3)
+        if (scheduleType.systemMode == schedule.systemMode)
+        {
+            // we have one, check the preset requirements (check 6)
+            if (schedule.presetHandle.HasValue() && schedule.presetHandle.Value().empty() == false)
+            {
+                const bool presetsSupported = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsPresets);
+                VerifyOrReturnError(presetsSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
 
                 // make sure the preset exists (check 7)
                 VerifyOrDie(mgr.mGetPresetAtIndexCb);
@@ -181,7 +178,7 @@ CheckScheduleTypes(ThermostatMatterScheduleManager &mgr, ScheduleStruct::Type &s
                     }
                     VerifyOrReturnError(presetFound == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
                 }
-			}
+            }
 
             // Check the name requirements (check 8)
             if (schedule.name.HasValue() == false && schedule.name.Value().empty() == false)
@@ -197,16 +194,15 @@ CheckScheduleTypes(ThermostatMatterScheduleManager &mgr, ScheduleStruct::Type &s
                 VerifyOrReturnError(offSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
             }
 
-			return EMBER_ZCL_STATUS_SUCCESS;
-		}
-		index++;
-	}
+            return EMBER_ZCL_STATUS_SUCCESS;
+        }
+        index++;
+    }
 
-	return status;
+    return status;
 }
 
-static EmberAfStatus
-CheckNumberOfTransitions(ThermostatMatterScheduleManager &mgr, ScheduleStruct::Type &schedule)
+static EmberAfStatus CheckNumberOfTransitions(ThermostatMatterScheduleManager & mgr, ScheduleStruct::Type & schedule)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
 
@@ -223,7 +219,7 @@ CheckNumberOfTransitions(ThermostatMatterScheduleManager &mgr, ScheduleStruct::T
 
     if (numberOfScheduleTransitionsPerDay.IsNull() == false)
     {
-        int weekDayTransitionCounts[7] = {0};
+        int weekDayTransitionCounts[7] = { 0 };
 
         for (auto transition : schedule.transitions)
         {
@@ -238,7 +234,8 @@ CheckNumberOfTransitions(ThermostatMatterScheduleManager &mgr, ScheduleStruct::T
 
         for (int weekDayIndex = 0; weekDayIndex < 7; weekDayIndex++)
         {
-            VerifyOrExit(weekDayTransitionCounts[weekDayIndex] <= numberOfScheduleTransitionsPerDay.Value(), status = EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED);
+            VerifyOrExit(weekDayTransitionCounts[weekDayIndex] <= numberOfScheduleTransitionsPerDay.Value(),
+                         status = EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED);
         }
     }
 
@@ -246,8 +243,8 @@ exit:
     return status;
 }
 
-EmberAfStatus
-ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<ScheduleStruct::Type> &oldlist, Span<ScheduleStruct::Type> &newlist)
+EmberAfStatus ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<ScheduleStruct::Type> & oldlist,
+                                                                              Span<ScheduleStruct::Type> & newlist)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     ScheduleStruct::Type querySchedule; // manager storage used for queries.
@@ -261,21 +258,21 @@ ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<ScheduleStr
     // For all exisiting schedules -- Walk the old list
     for (auto & old_schedule : oldlist)
     {
-    	// Check 1. -- for each existing built in schedule, make sure it's still in the new list
-    	if (old_schedule.builtIn.HasValue() && old_schedule.builtIn.Value())
-    	{
-    		status = FindScheduleByHandle(old_schedule.scheduleHandle, newlist, querySchedule);
-    		VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
-    		VerifyOrExit(querySchedule.builtIn == true, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
-    	}
+        // Check 1. -- for each existing built in schedule, make sure it's still in the new list
+        if (old_schedule.builtIn.HasValue() && old_schedule.builtIn.Value())
+        {
+            status = FindScheduleByHandle(old_schedule.scheduleHandle, newlist, querySchedule);
+            VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+            VerifyOrExit(querySchedule.builtIn == true, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+        }
 
-    	// Check 2 -- If the schedule is currently being referenced but would be deleted.
-		// if its a builtin schedule we don't need to search again, we know it's there from the above check.
-		if (old_schedule.builtIn == false && IsScheduleHandleReferenced(*this, old_schedule.scheduleHandle))
-    	{
-    		status = FindScheduleByHandle(old_schedule.scheduleHandle, newlist, querySchedule);
-    		VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_INVALID_IN_STATE);
-    	}
+        // Check 2 -- If the schedule is currently being referenced but would be deleted.
+        // if its a builtin schedule we don't need to search again, we know it's there from the above check.
+        if (old_schedule.builtIn == false && IsScheduleHandleReferenced(*this, old_schedule.scheduleHandle))
+        {
+            status = FindScheduleByHandle(old_schedule.scheduleHandle, newlist, querySchedule);
+            VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_INVALID_IN_STATE);
+        }
     }
 
     // Walk the new list
@@ -294,13 +291,13 @@ ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<ScheduleStr
             status = FindScheduleByHandle(new_schedule.scheduleHandle, oldlist, existingSchedule);
             SuccessOrExit(status);
 
-	        // Check BuiltIn
-	        VerifyOrExit(new_schedule.builtIn == existingSchedule.builtIn, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+            // Check BuiltIn
+            VerifyOrExit(new_schedule.builtIn == existingSchedule.builtIn, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
         }
         else
         {
-        	// new schedule checks
-        	VerifyOrExit(new_schedule.builtIn == false, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+            // new schedule checks
+            VerifyOrExit(new_schedule.builtIn == false, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
         }
 
         // Check for system mode in Schedule Types
@@ -310,7 +307,6 @@ ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<ScheduleStr
         // Make sure the number of transitions does not exceed out limits
         status = CheckNumberOfTransitions(*this, new_schedule);
         SuccessOrExit(status);
-
     }
 
 exit:

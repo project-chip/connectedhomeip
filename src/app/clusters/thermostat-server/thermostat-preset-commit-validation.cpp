@@ -21,23 +21,22 @@ using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
 
-static EmberAfStatus
-FindPresetByHandle(const chip::ByteSpan &handle, const Span<PresetStruct::Type> &list, PresetStruct::Type &outPreset)
+static EmberAfStatus FindPresetByHandle(const chip::ByteSpan & handle, const Span<PresetStruct::Type> & list,
+                                        PresetStruct::Type & outPreset)
 {
-	for (auto & preset : list)
-	{
-	    if ((preset.presetHandle.IsNull() == false) && handle.data_equal(preset.presetHandle.Value()))
-	    {
-	    	outPreset = preset;
-	    	return EMBER_ZCL_STATUS_SUCCESS;
-	    }
-	}
+    for (auto & preset : list)
+    {
+        if ((preset.presetHandle.IsNull() == false) && handle.data_equal(preset.presetHandle.Value()))
+        {
+            outPreset = preset;
+            return EMBER_ZCL_STATUS_SUCCESS;
+        }
+    }
 
-	return EMBER_ZCL_STATUS_NOT_FOUND;
+    return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-static EmberAfStatus
-CheckPresetHandleUnique(const chip::ByteSpan &handle, Span<PresetStruct::Type> &list)
+static EmberAfStatus CheckPresetHandleUnique(const chip::ByteSpan & handle, Span<PresetStruct::Type> & list)
 {
     int count = 0;
     for (auto & preset : list)
@@ -50,7 +49,7 @@ CheckPresetHandleUnique(const chip::ByteSpan &handle, Span<PresetStruct::Type> &
             }
             else
             {
-            	return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+                return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
             }
         }
     }
@@ -75,54 +74,53 @@ public:
 };
 #endif
 
-static bool
-IsPresetHandleReferenced(ThermostatMatterScheduleManager &mgr, const chip::ByteSpan &handle)
+static bool IsPresetHandleReferenced(ThermostatMatterScheduleManager & mgr, const chip::ByteSpan & handle)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     uint32_t ourFeatureMap;
-	FeatureMap::Get(mgr.mEndpoint, &ourFeatureMap);
+    FeatureMap::Get(mgr.mEndpoint, &ourFeatureMap);
     const bool enhancedSchedulesSupported = ourFeatureMap & to_underlying(Feature::kMatterScheduleConfiguration);
-    const bool queuedPresetsSupported = ourFeatureMap & to_underlying(Feature::kQueuedPresetsSupported);
+    const bool queuedPresetsSupported     = ourFeatureMap & to_underlying(Feature::kQueuedPresetsSupported);
 
-	// Check Active Preset Handle
-	DataModel::Nullable<chip::MutableByteSpan> activePresetHandle;
-	status = ActivePresetHandle::Get(mgr.mEndpoint, activePresetHandle);
-	VerifyOrDie(status == EMBER_ZCL_STATUS_SUCCESS);
-	if ((activePresetHandle.IsNull() == false) && activePresetHandle.Value().data_equal(handle))
-		return true;
+    // Check Active Preset Handle
+    DataModel::Nullable<chip::MutableByteSpan> activePresetHandle;
+    status = ActivePresetHandle::Get(mgr.mEndpoint, activePresetHandle);
+    VerifyOrDie(status == EMBER_ZCL_STATUS_SUCCESS);
+    if ((activePresetHandle.IsNull() == false) && activePresetHandle.Value().data_equal(handle))
+        return true;
 
-	// Check Queued Preset Handle
-	if (queuedPresetsSupported)
-	{
-		/* TODO: Queued Preset */
-		#if 0
+    // Check Queued Preset Handle
+    if (queuedPresetsSupported)
+    {
+/* TODO: Queued Preset */
+#if 0
 		status = QueuedPresetHandle::Get(mgr.mEndpoint, activePresetHandle);
 		VerifyOrDie(status == EMBER_ZCL_STATUS_SUCCESS);
 		if (activePresetHandle.data_equal(handle))
 			return true;
-		#endif
-	}
-
-	// Check for the preset on the Schedules
-    if (enhancedSchedulesSupported && mgr.mGetScheduleAtIndexCb)
-    {
-    	size_t index = 0;
-    	ScheduleStruct::Type schedule;
-    	while (mgr.mGetScheduleAtIndexCb(&mgr, index, schedule) != CHIP_ERROR_NOT_FOUND)
-    	{
-    		if (schedule.presetHandle.HasValue() && schedule.presetHandle.Value().data_equal(handle))
-    			return true;
-
-    		for (auto transition : schedule.transitions)
-    		{
-    			if (transition.presetHandle.HasValue() && transition.presetHandle.Value().data_equal(handle))
-    				return true;
-    		}
-    		index++;
-    	}
+#endif
     }
 
-	return false;
+    // Check for the preset on the Schedules
+    if (enhancedSchedulesSupported && mgr.mGetScheduleAtIndexCb)
+    {
+        size_t index = 0;
+        ScheduleStruct::Type schedule;
+        while (mgr.mGetScheduleAtIndexCb(&mgr, index, schedule) != CHIP_ERROR_NOT_FOUND)
+        {
+            if (schedule.presetHandle.HasValue() && schedule.presetHandle.Value().data_equal(handle))
+                return true;
+
+            for (auto transition : schedule.transitions)
+            {
+                if (transition.presetHandle.HasValue() && transition.presetHandle.Value().data_equal(handle))
+                    return true;
+            }
+            index++;
+        }
+    }
+
+    return false;
 }
 
 #if 0
@@ -166,36 +164,36 @@ enum class PresetTypeFeaturesBitmap : uint8_t
 
 #endif
 
-static EmberAfStatus
-CheckPresetType(ThermostatMatterScheduleManager &mgr, PresetStruct::Type &preset)
+static EmberAfStatus CheckPresetType(ThermostatMatterScheduleManager & mgr, PresetStruct::Type & preset)
 {
-	EmberAfStatus status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-	size_t index = 0;
-	PresetTypeStruct::Type presetType;
+    EmberAfStatus status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    size_t index         = 0;
+    PresetTypeStruct::Type presetType;
 
-	VerifyOrDie(mgr.mGetPresetTypeAtIndexCb);
-	while (mgr.mGetPresetTypeAtIndexCb(&mgr, index, presetType) != CHIP_ERROR_NOT_FOUND)
-	{
-		// look for the preset type that supports this scenario
-		if (presetType.presetScenario == preset.presetScenario)
-		{
-			// we have one, check the name requirements
-			if ((preset.name.HasValue() == true) && (preset.name.Value().IsNull() == false) && (preset.name.Value().Value().empty() == false))
-			{
-				const bool nameSupported = presetType.presetTypeFeatures.Has(PresetTypeFeaturesBitmap::kSupportsNames);
-				VerifyOrReturnError(nameSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
-			}
+    VerifyOrDie(mgr.mGetPresetTypeAtIndexCb);
+    while (mgr.mGetPresetTypeAtIndexCb(&mgr, index, presetType) != CHIP_ERROR_NOT_FOUND)
+    {
+        // look for the preset type that supports this scenario
+        if (presetType.presetScenario == preset.presetScenario)
+        {
+            // we have one, check the name requirements
+            if ((preset.name.HasValue() == true) && (preset.name.Value().IsNull() == false) &&
+                (preset.name.Value().Value().empty() == false))
+            {
+                const bool nameSupported = presetType.presetTypeFeatures.Has(PresetTypeFeaturesBitmap::kSupportsNames);
+                VerifyOrReturnError(nameSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+            }
 
-			return EMBER_ZCL_STATUS_SUCCESS;
-		}
-		index++;
-	}
+            return EMBER_ZCL_STATUS_SUCCESS;
+        }
+        index++;
+    }
 
-	return status;
+    return status;
 }
 
-EmberAfStatus
-ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<PresetStruct::Type> &oldlist, Span<PresetStruct::Type> &newlist)
+EmberAfStatus ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<PresetStruct::Type> & oldlist,
+                                                                            Span<PresetStruct::Type> & newlist)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     PresetStruct::Type queryPreset; // preset storage used for queries.
@@ -211,22 +209,23 @@ ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<PresetStruct:
     {
         VerifyOrDie(old_preset.presetHandle.IsNull() == false);
 
-    	// Check 1. -- for each existing built in preset, make sure it's still in the new list
-    	if (old_preset.builtIn.IsNull() == false && old_preset.builtIn.Value())
-    	{
-    		status = FindPresetByHandle(old_preset.presetHandle.Value(), newlist, queryPreset);
-    		VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+        // Check 1. -- for each existing built in preset, make sure it's still in the new list
+        if (old_preset.builtIn.IsNull() == false && old_preset.builtIn.Value())
+        {
+            status = FindPresetByHandle(old_preset.presetHandle.Value(), newlist, queryPreset);
+            VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
             VerifyOrExit(queryPreset.builtIn.IsNull() == false, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
-    		VerifyOrExit(queryPreset.builtIn.Value() == true, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
-    	}
+            VerifyOrExit(queryPreset.builtIn.Value() == true, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+        }
 
-    	// Check 2 and 3 and 4. -- If the preset is currently being referenced but would be deleted.
-		// if its a builtin preset we don't need to search again, we know it's there from the above check.
-		if ((old_preset.builtIn.IsNull() || old_preset.builtIn.Value() == false) && IsPresetHandleReferenced(*this, old_preset.presetHandle.Value()))
-    	{
-    		status = FindPresetByHandle(old_preset.presetHandle.Value(), newlist, queryPreset);
-    		VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_INVALID_IN_STATE);
-    	}
+        // Check 2 and 3 and 4. -- If the preset is currently being referenced but would be deleted.
+        // if its a builtin preset we don't need to search again, we know it's there from the above check.
+        if ((old_preset.builtIn.IsNull() || old_preset.builtIn.Value() == false) &&
+            IsPresetHandleReferenced(*this, old_preset.presetHandle.Value()))
+        {
+            status = FindPresetByHandle(old_preset.presetHandle.Value(), newlist, queryPreset);
+            VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_INVALID_IN_STATE);
+        }
     }
 
     // Walk the new list
@@ -245,19 +244,18 @@ ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<PresetStruct:
             status = FindPresetByHandle(new_preset.presetHandle.Value(), oldlist, existingPreset);
             SuccessOrExit(status);
 
-	        // Check BuiltIn
-	        VerifyOrExit(new_preset.builtIn == existingPreset.builtIn, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+            // Check BuiltIn
+            VerifyOrExit(new_preset.builtIn == existingPreset.builtIn, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
         }
         else
         {
-        	// new preset checks
-        	VerifyOrExit(new_preset.builtIn == false, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+            // new preset checks
+            VerifyOrExit(new_preset.builtIn == false, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
         }
 
         // Check for Preset Scenario in Preset Types and that the Name support is valid (3 and 4)
         status = CheckPresetType(*this, new_preset);
         SuccessOrExit(status);
-
     }
 
 exit:
