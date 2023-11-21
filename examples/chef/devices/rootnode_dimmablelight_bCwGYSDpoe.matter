@@ -1381,7 +1381,7 @@ endpoint 0 {
     callback attribute clientList;
     callback attribute partsList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster AccessControl {
@@ -1396,25 +1396,25 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster BasicInformation {
     emits event StartUp;
     emits event ShutDown;
     emits event Leave;
-    callback attribute dataModelRevision default = 10;
+    callback attribute dataModelRevision;
     callback attribute vendorName;
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
     persist  attribute nodeLabel;
-    callback attribute location default = "XX";
-    callback attribute hardwareVersion default = 0;
+    callback attribute location;
+    callback attribute hardwareVersion;
     callback attribute hardwareVersionString;
-    callback attribute softwareVersion default = 0;
+    callback attribute softwareVersion;
     callback attribute softwareVersionString;
-    callback attribute manufacturingDate default = "20210614123456ZZ";
+    callback attribute manufacturingDate;
     callback attribute partNumber;
     callback attribute productURL;
     callback attribute productLabel;
@@ -1460,9 +1460,9 @@ endpoint 0 {
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
-    callback attribute regulatoryConfig default = 0;
-    callback attribute locationCapability default = 0;
-    callback attribute supportsConcurrentConnection default = 1;
+    callback attribute regulatoryConfig;
+    callback attribute locationCapability;
+    callback attribute supportsConcurrentConnection;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
 
@@ -1507,9 +1507,9 @@ endpoint 0 {
   server cluster GeneralDiagnostics {
     emits event BootReason;
     callback attribute networkInterfaces;
-    callback attribute rebootCount default = 0x0000;
-    callback attribute upTime default = 0x0000000000000000;
-    callback attribute totalOperationalHours default = 0x00000000;
+    callback attribute rebootCount;
+    callback attribute upTime;
+    callback attribute totalOperationalHours;
     callback attribute bootReason;
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
@@ -1525,19 +1525,19 @@ endpoint 0 {
 
   server cluster SoftwareDiagnostics {
     callback attribute threadMetrics;
-    callback attribute currentHeapFree default = 0x0000000000000000;
-    callback attribute currentHeapUsed default = 0x0000000000000000;
-    callback attribute currentHeapHighWatermark default = 0x0000000000000000;
-    callback attribute featureMap default = 1;
+    callback attribute currentHeapFree;
+    callback attribute currentHeapUsed;
+    callback attribute currentHeapHighWatermark;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 0x0001;
 
     handle command ResetWatermarks;
   }
 
   server cluster AdministratorCommissioning {
-    callback attribute windowStatus default = 0;
-    callback attribute adminFabricIndex default = 1;
-    callback attribute adminVendorId default = 0;
+    callback attribute windowStatus;
+    callback attribute adminFabricIndex;
+    callback attribute adminVendorId;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
 
@@ -1575,8 +1575,8 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command KeySetWrite;
     handle command KeySetRead;
@@ -1601,9 +1601,9 @@ endpoint 1 {
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x0;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
 
@@ -1612,9 +1612,9 @@ endpoint 1 {
 
   server cluster Groups {
     ram      attribute nameSupport default = 0;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
 
@@ -1636,9 +1636,9 @@ endpoint 1 {
     ram      attribute onTime default = 0;
     ram      attribute offWaitTime default = 0;
     ram      attribute startUpOnOff default = 0;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x1;
     ram      attribute clusterRevision default = 5;
 
@@ -1655,9 +1655,9 @@ endpoint 1 {
     ram      attribute options default = 0x03;
     ram      attribute onLevel default = 0xFE;
     ram      attribute startUpCurrentLevel default = 0x00;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x03;
     ram      attribute clusterRevision default = 5;
 
@@ -1672,15 +1672,15 @@ endpoint 1 {
   }
 
   server cluster Descriptor {
-    callback attribute deviceTypeList default = 0;
-    callback attribute serverList default = 0;
-    callback attribute clientList default = 0;
-    callback attribute partsList default = 0;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 }
 
