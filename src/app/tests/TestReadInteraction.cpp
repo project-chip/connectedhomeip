@@ -105,6 +105,12 @@ public:
         };
         auto * ctx = static_cast<TestContext *>(context);
         VerifyOrReturnError(ctx->mEventCounter.Init(0) == CHIP_NO_ERROR, FAILURE);
+
+        // Reinitialize the exchange manager before running each test, so the context
+        // pool will be guaranteed to be empty.
+        ctx->GetExchangeManager().Shutdown();
+        VerifyOrReturnError(ctx->GetExchangeManager().Init(&ctx->GetSecureSessionManager()) == CHIP_NO_ERROR, FAILURE);
+
         chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
         return SUCCESS;
