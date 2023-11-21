@@ -27,32 +27,15 @@ SubscriptionResumptionHelper::SubscriptionResumptionHelper() :
 CHIP_ERROR SubscriptionResumptionHelper::ResumeSubscription(CASESessionManager & caseSessionManager,
                                                             SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo)
 {
-    mNodeId                  = subscriptionInfo.mNodeId;
-    mFabricIndex             = subscriptionInfo.mFabricIndex;
-    mSubscriptionId          = subscriptionInfo.mSubscriptionId;
-    mMinIntervalFloorSeconds = subscriptionInfo.mMinInterval;
-    mMaxInterval             = subscriptionInfo.mMaxInterval;
-    mFabricFiltered          = subscriptionInfo.mFabricFiltered;
+    mNodeId         = subscriptionInfo.mNodeId;
+    mFabricIndex    = subscriptionInfo.mFabricIndex;
+    mSubscriptionId = subscriptionInfo.mSubscriptionId;
+    mMinInterval    = subscriptionInfo.mMinInterval;
+    mMaxInterval    = subscriptionInfo.mMaxInterval;
+    mFabricFiltered = subscriptionInfo.mFabricFiltered;
+    mAttributePaths = std::move(subscriptionInfo.mAttributePaths);
+    mEventPaths     = std::move(subscriptionInfo.mEventPaths);
 
-    if (subscriptionInfo.mAttributePaths.AllocatedSize() > 0)
-    {
-        mAttributePaths.Alloc(subscriptionInfo.mAttributePaths.AllocatedSize());
-        ReturnErrorCodeIf(mAttributePaths.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
-        for (size_t i = 0; i < subscriptionInfo.mAttributePaths.AllocatedSize(); i++)
-        {
-            mAttributePaths[i] = subscriptionInfo.mAttributePaths[i].GetParams();
-        }
-    }
-
-    if (subscriptionInfo.mEventPaths.AllocatedSize() > 0)
-    {
-        mEventPaths.Alloc(subscriptionInfo.mEventPaths.AllocatedSize());
-        ReturnErrorCodeIf(mEventPaths.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
-        for (size_t i = 0; i < subscriptionInfo.mEventPaths.AllocatedSize(); i++)
-        {
-            mEventPaths[i] = subscriptionInfo.mEventPaths[i].GetParams();
-        }
-    }
     ScopedNodeId peerNode = ScopedNodeId(mNodeId, mFabricIndex);
     caseSessionManager.FindOrEstablishSession(peerNode, &mOnConnectedCallback, &mOnConnectionFailureCallback);
     return CHIP_NO_ERROR;
@@ -83,7 +66,9 @@ void SubscriptionResumptionHelper::HandleDeviceConnectionFailure(void * context,
     Platform::UniquePtr<SubscriptionResumptionHelper> _this(static_cast<SubscriptionResumptionHelper *>(context));
     ChipLogError(DataManagement, "Failed to establish CASE for subscription-resumption with error '%" CHIP_ERROR_FORMAT "'",
                  error.Format());
-    // Delete the persistent subscription information
+    // If the device fails to establish the session, the subscriber might be offline and its subscription read client will
+    // be deleted after the device reconnect to the subscriber. This subscription will be never used again. So clean up
+    // the persistent subscription information storage.
     auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
     if (subscriptionResumptionStorage)
     {

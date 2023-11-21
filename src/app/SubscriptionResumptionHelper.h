@@ -26,7 +26,7 @@ namespace app {
 class InteractionModelEngine;
 class ReadHandler;
 
-class SubscriptionResumptionHelper
+class SubscriptionResumptionHelper : private SubscriptionResumptionStorage::SubscriptionInfo
 {
 public:
     SubscriptionResumptionHelper();
@@ -44,15 +44,6 @@ private:
     static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
                                       const SessionHandle & sessionHandle);
     static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
-
-    NodeId mNodeId;
-    FabricIndex mFabricIndex;
-    SubscriptionId mSubscriptionId    = 0;
-    uint16_t mMinIntervalFloorSeconds = 0;
-    uint16_t mMaxInterval             = 0;
-    bool mFabricFiltered              = false;
-    Platform::ScopedMemoryBufferWithSize<AttributePathParams> mAttributePaths;
-    Platform::ScopedMemoryBufferWithSize<EventPathParams> mEventPaths;
 
     // Callbacks to handle server-initiated session success/failure
     chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;

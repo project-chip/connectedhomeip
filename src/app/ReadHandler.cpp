@@ -91,7 +91,7 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
 void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle, SubscriptionResumptionHelper & helper)
 {
     mSubscriptionId          = helper.mSubscriptionId;
-    mMinIntervalFloorSeconds = helper.mMinIntervalFloorSeconds;
+    mMinIntervalFloorSeconds = helper.mMinInterval;
     mMaxInterval             = helper.mMaxInterval;
     SetStateFlag(ReadHandlerFlags::FabricFiltered, helper.mFabricFiltered);
 
@@ -99,8 +99,8 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle, Sub
     // the object pool managed by the IM engine
     for (size_t i = 0; i < helper.mAttributePaths.AllocatedSize(); i++)
     {
-        CHIP_ERROR err =
-            InteractionModelEngine::GetInstance()->PushFrontAttributePathList(mpAttributePathList, helper.mAttributePaths[i]);
+        AttributePathParams params = helper.mAttributePaths[i].GetParams();
+        CHIP_ERROR err             = InteractionModelEngine::GetInstance()->PushFrontAttributePathList(mpAttributePathList, params);
         if (err != CHIP_NO_ERROR)
         {
             Close();
@@ -109,8 +109,8 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle, Sub
     }
     for (size_t i = 0; i < helper.mEventPaths.AllocatedSize(); i++)
     {
-        CHIP_ERROR err =
-            InteractionModelEngine::GetInstance()->PushFrontEventPathParamsList(mpEventPathList, helper.mEventPaths[i]);
+        EventPathParams params = helper.mEventPaths[i].GetParams();
+        CHIP_ERROR err         = InteractionModelEngine::GetInstance()->PushFrontEventPathParamsList(mpEventPathList, params);
         if (err != CHIP_NO_ERROR)
         {
             Close();
