@@ -26,7 +26,8 @@ using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
 static ExampleMicrowaveOvenModeDelegate gMicrowaveOvenModeDelegate;
-static ModeBase::Instance gMicrowaveOvenModeInstance(&gMicrowaveOvenModeDelegate, 0x1, MicrowaveOvenMode::Id, chip::to_underlying(Feature::kOnOff));
+static ModeBase::Instance gMicrowaveOvenModeInstance(&gMicrowaveOvenModeDelegate, 0x1, MicrowaveOvenMode::Id,
+                                                     chip::to_underlying(Feature::kOnOff));
 
 CHIP_ERROR ExampleMicrowaveOvenModeDelegate::Init()
 {
@@ -34,7 +35,8 @@ CHIP_ERROR ExampleMicrowaveOvenModeDelegate::Init()
 }
 
 // todo refactor code by making a parent class for all ModeInstance classes to reduce flash usage.
-void ExampleMicrowaveOvenModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
+void ExampleMicrowaveOvenModeDelegate::HandleChangeToMode(uint8_t NewMode,
+                                                          ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
@@ -81,10 +83,7 @@ ModeBase::Instance * MicrowaveOvenMode::Instance()
     return &gMicrowaveOvenModeInstance;
 }
 
-void MicrowaveOvenMode::Shutdown()
-{
-
-}
+void MicrowaveOvenMode::Shutdown() {}
 
 void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
 {
