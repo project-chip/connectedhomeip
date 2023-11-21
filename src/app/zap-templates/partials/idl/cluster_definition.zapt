@@ -69,9 +69,6 @@ cluster {{asUpperCamelCase name}} = {{!}}
     {{~>idl_command_response_struct}}
     {{/if}}
   {{/zcl_commands}}
-  {{#all_incoming_commands_for_cluster name side}}
-    {{~>idl_command_request_response}}{{~new_line 1~}}
-  {{/all_incoming_commands_for_cluster}}
   {{#zcl_commands_source_client}}
     {{~>idl_command_request_response}}{{~new_line 1~}}
   {{/zcl_commands_source_client}}

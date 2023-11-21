@@ -57,10 +57,6 @@ cluster OnOff = 6 {
     int16u offWaitTime = 2;
   }
 
-  command Off(): DefaultSuccess = 0;
-  command On(): DefaultSuccess = 1;
-  command Toggle(): DefaultSuccess = 2;
-
   /** On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0. */
   command Off(): DefaultSuccess = 0;
   /** On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. */
@@ -340,9 +336,6 @@ cluster OtaSoftwareUpdateProvider = 41 {
     int32u softwareVersion = 1;
   }
 
-  command QueryImageResponse(QueryImageResponseRequest): DefaultSuccess = 1;
-  command ApplyUpdateResponse(ApplyUpdateResponseRequest): DefaultSuccess = 3;
-
   /** Determine availability of a new Software Image */
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
   /** Determine next action to take for a downloaded Software Image */
@@ -422,8 +415,6 @@ cluster OtaSoftwareUpdateRequestor = 42 {
     optional octet_string<512> metadataForNode = 3;
     endpoint_no endpoint = 4;
   }
-
-  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 
   /** Announce the presence of an OTA Provider */
   command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
@@ -542,10 +533,6 @@ cluster GeneralCommissioning = 48 {
     CommissioningErrorEnum errorCode = 0;
     char_string debugText = 1;
   }
-
-  command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
-  command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
-  fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
 
   /** Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock */
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
@@ -717,13 +704,6 @@ cluster NetworkCommissioning = 49 {
     optional OCTET_STRING<64> possessionSignature = 1;
   }
 
-  command access(invoke: administer) ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
-  command access(invoke: administer) AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
-  command access(invoke: administer) AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
-  command access(invoke: administer) RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
-  command access(invoke: administer) ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
-  command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
-
   /** Detemine the set of networks the device sees as available. */
   command access(invoke: administer) ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
   /** Add or update the credentials for a given Wi-Fi network. */
@@ -780,8 +760,6 @@ cluster DiagnosticLogs = 50 {
     optional epoch_us UTCTimeStamp = 2;
     optional systime_us timeSinceBoot = 3;
   }
-
-  command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 
   /** Retrieving diagnostic logs from a Node */
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
@@ -894,9 +872,6 @@ cluster GeneralDiagnostics = 51 {
     nullable epoch_us UTCTimeUs = 1;
   }
 
-  command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
-  command TimeSnapshot(): TimeSnapshotResponse = 1;
-
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   /** Take a snapshot of system time and epoch time. */
@@ -933,8 +908,6 @@ cluster SoftwareDiagnostics = 52 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 
   /** Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute. */
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
@@ -979,10 +952,6 @@ cluster AdministratorCommissioning = 60 {
   request struct OpenBasicCommissioningWindowRequest {
     int16u commissioningTimeout = 0;
   }
-
-  timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 
   /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method. */
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
@@ -1098,15 +1067,6 @@ cluster OperationalCredentials = 62 {
     octet_string rootCACertificate = 0;
   }
 
-  command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
-  command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
-  command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
-  fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-  fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
-  command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
-  command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-
   /** Sender is requesting attestation information from the receiver. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
   /** Sender is requesting a device attestation certificate from the receiver. */
@@ -1190,11 +1150,6 @@ cluster GroupKeyManagement = 63 {
   response struct KeySetReadAllIndicesResponse = 5 {
     int16u groupKeySetIDs[] = 0;
   }
-
-  fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
-  fabric command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
-  fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
-  fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 
   /** Write a new set of keys for the given key set id. */
   fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
@@ -1295,10 +1250,6 @@ cluster Channel = 1284 {
     int16s count = 0;
   }
 
-  command ChangeChannel(ChangeChannelRequest): ChangeChannelResponse = 0;
-  command ChangeChannelByNumber(ChangeChannelByNumberRequest): DefaultSuccess = 2;
-  command SkipChannel(SkipChannelRequest): DefaultSuccess = 3;
-
   /** Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. */
   command ChangeChannel(ChangeChannelRequest): ChangeChannelResponse = 0;
   /** Change the channel on the media plaeyer to the channel with the given Number in the ChannelList attribute. */
@@ -1338,8 +1289,6 @@ cluster TargetNavigator = 1285 {
     StatusEnum status = 0;
     optional char_string data = 1;
   }
-
-  command NavigateTarget(NavigateTargetRequest): NavigateTargetResponse = 0;
 
   /** Upon receipt, this SHALL navigation the UX to the target identified. */
   command NavigateTarget(NavigateTargetRequest): NavigateTargetResponse = 0;
@@ -1403,10 +1352,6 @@ cluster MediaPlayback = 1286 {
   request struct SeekRequest {
     int64u position = 0;
   }
-
-  command Play(): PlaybackResponse = 0;
-  command Pause(): PlaybackResponse = 1;
-  command Stop(): PlaybackResponse = 2;
 
   /** Upon receipt, this SHALL play media. */
   command Play(): PlaybackResponse = 0;
@@ -1478,10 +1423,6 @@ cluster MediaInput = 1287 {
     char_string name = 1;
   }
 
-  command SelectInput(SelectInputRequest): DefaultSuccess = 0;
-  command ShowInputStatus(): DefaultSuccess = 1;
-  command HideInputStatus(): DefaultSuccess = 2;
-
   /** Upon receipt, this SHALL change the input on the media device to the input at a specific index in the Input List. */
   command SelectInput(SelectInputRequest): DefaultSuccess = 0;
   /** Upon receipt, this SHALL display the active status of the input list on screen. */
@@ -1500,8 +1441,6 @@ cluster LowPower = 1288 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  command Sleep(): DefaultSuccess = 0;
 
   /** This command shall put the device into low power mode. */
   command Sleep(): DefaultSuccess = 0;
@@ -1625,8 +1564,6 @@ cluster KeypadInput = 1289 {
     StatusEnum status = 0;
   }
 
-  command SendKey(SendKeyRequest): SendKeyResponse = 0;
-
   /** Upon receipt, this SHALL process a keycode as input to the media device. */
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
@@ -1669,8 +1606,6 @@ cluster AudioOutput = 1291 {
     int8u index = 0;
     char_string name = 1;
   }
-
-  command SelectOutput(SelectOutputRequest): DefaultSuccess = 0;
 
   /** Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List. */
   command SelectOutput(SelectOutputRequest): DefaultSuccess = 0;
