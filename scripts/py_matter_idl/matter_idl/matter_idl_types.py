@@ -74,6 +74,7 @@ class EventQuality(enum.Flag):
     NONE = 0
     FABRIC_SENSITIVE = enum.auto()
 
+
 class StructTag(enum.Enum):
     REQUEST = enum.auto()
     RESPONSE = enum.auto()

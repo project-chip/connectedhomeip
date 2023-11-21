@@ -27,9 +27,9 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.zapxml import ParseSource, ParseXmls
 
-from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, Command,
-                                         ConstantEntry, DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality,
-                                         Idl, Struct, StructQuality, StructTag)
+from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, Command, ConstantEntry,
+                                         DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct,
+                                         StructQuality, StructTag)
 
 
 def XmlToIdl(what: Union[str, List[str]]) -> Idl:

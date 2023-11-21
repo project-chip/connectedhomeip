@@ -19,10 +19,10 @@ except ModuleNotFoundError:
     from matter_idl.matter_idl_types import AccessPrivilege
 
 from matter_idl.matter_idl_types import (ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
-                                         AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation,
-                                         CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority,
-                                         EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
-                                         StructQuality, StructTag)
+                                         AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
+                                         ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
+                                         Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructQuality,
+                                         StructTag)
 
 
 def UnionOfAllFlags(flags_list):

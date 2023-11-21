@@ -44,7 +44,8 @@ class TestCaseStorage(GeneratorStorage):
 
     def write_new_data(self, relative_path: str, content: str):
         if self.content:
-            raise Exception("Unexpected extra data: single file generation expected")
+            raise Exception(
+                "Unexpected extra data: single file generation expected")
         self.content = content
 
 
@@ -99,7 +100,8 @@ class TestIdlRendering(unittest.TestCase):
 
         # Files MUST be identical except the header comments which are different
         original = SkipLeadingComments(ReadMatterIdl(path))
-        generated = SkipLeadingComments(RenderAsIdlTxt(ParseMatterIdl(path, skip_meta=False)))
+        generated = SkipLeadingComments(RenderAsIdlTxt(
+            ParseMatterIdl(path, skip_meta=False)))
 
         self.assertTextEqual(original, generated)
 
