@@ -2,7 +2,7 @@
 
 import functools
 import logging
-from typing import Optional
+from typing import Optional, Dict
 
 from lark import Lark
 from lark.lexer import Token
@@ -549,7 +549,7 @@ class ParserWithLines:
         #       ordering.
         #
         # As a result, for now allow multiple definitions IF AND ONLY IF identical
-        clusters = {}
+        clusters: Dict[int, Cluster] = {}
         for c in idl.clusters:
             if c.code in clusters:
                 if c != clusters[c.code]:
