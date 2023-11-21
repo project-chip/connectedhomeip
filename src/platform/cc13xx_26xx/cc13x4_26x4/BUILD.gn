@@ -52,6 +52,11 @@ static_library("cc13x4_26x4") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+
+  # TODO: platform should NOT depend on default_address_resolve_config. This should
+  #       be removed. See https://github.com/project-chip/connectedhomeip/issues/30596
+  #
+  #       Currently this exists because OpenThread platform includes src/app/Server.h
   public_configs =
       [ "${chip_root}/src/lib/address_resolve:default_address_resolve_config" ]
 
