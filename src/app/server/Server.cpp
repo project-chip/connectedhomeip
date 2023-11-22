@@ -408,6 +408,16 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
         ResumeSubscriptions();
 #endif
         break;
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+    case DeviceEventType::kThreadConnectivityChange:
+        if (event.ThreadConnectivityChange.Result == kConnectivity_Established)
+        {
+            // Refresh Multicast listening
+            ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
+            RejoinExistingMulticastGroups();
+        }
+        break;
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     default:
         break;
     }
