@@ -816,7 +816,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
     uint8_t extendedAddressBuffer[Thread::kSizeExtendedPanId];
 
     SuccessOrExit(err = commandHandle->PrepareCommand(
-                      ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
+                      mPath, ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
     VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     SuccessOrExit(err = writer->Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), status));
@@ -928,7 +928,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
     size_t networksEncoded = 0;
 
     SuccessOrExit(err = commandHandle->PrepareCommand(
-                      ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
+                      mPath, ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
     VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     SuccessOrExit(err = writer->Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), status));

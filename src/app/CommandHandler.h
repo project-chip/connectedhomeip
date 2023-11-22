@@ -30,6 +30,8 @@
 
 #pragma once
 
+#include "CommandRefLookupTable.h"
+
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
@@ -190,7 +192,10 @@ public:
     CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 
     Protocols::InteractionModel::Status ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
-    CHIP_ERROR PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct = true);
+    CHIP_ERROR PrepareCommand(const ConcreteCommandPath & aRequestCommandPath, const ConcreteCommandPath & aCommandPath,
+                              bool aStartDataStruct = true);
+    [[deprecated("PrepareCommand now needs the requested command path. Without it device cannot support batch invoke")]] CHIP_ERROR
+    PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct = true);
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     CHIP_ERROR PrepareStatus(const ConcreteCommandPath & aCommandPath);
     CHIP_ERROR FinishStatus();
@@ -363,6 +368,11 @@ private:
      */
     CHIP_ERROR AllocateBuffer();
 
+    CHIP_ERROR ValidateCommands(TLV::TLVReader & invokeRequestsReader);
+
+    CHIP_ERROR PrepareCommand(const CommandRefLookupTable::CommandRefTableEntry * apCommandRefTableEntry,
+                              const ConcreteCommandPath & aCommandPath, bool aStartDataStruct);
+
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
 
     /**
@@ -398,7 +408,7 @@ private:
     CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
         ConcreteCommandPath path = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId, CommandData::GetCommandId() };
-        ReturnErrorOnFailure(PrepareCommand(path, false));
+        ReturnErrorOnFailure(PrepareCommand(aRequestCommandPath, path, false));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
@@ -428,8 +438,13 @@ private:
 
     State mState       = State::Idle;
     bool mGroupRequest = false;
+    Optional<uint16_t> mRefForResponse;
+
+    CommandRefLookupTable mCommandRefLookupTable;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     TLV::TLVWriter mBackupWriter;
+    State mBackupState;
+
     bool mBufferAllocated = false;
     // If mGoneAsync is true, we have finished out initial processing of the
     // incoming invoke.  After this point, our session could go away at any

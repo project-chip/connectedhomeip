@@ -32,6 +32,7 @@
 #include <app/RequiredPrivilege.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVData.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/TypeTraits.h>
@@ -97,6 +98,54 @@ void CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, con
     mGoneAsync = true;
 }
 
+CHIP_ERROR CommandHandler::ValidateCommands(TLV::TLVReader & invokeRequestsReader)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    size_t commandCount     = 0;
+    bool commandRefExpected = false;
+
+    TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */);
+    VerifyOrReturnError(commandCount <= CHIP_CONFIG_MAX_PATHS_PER_INVOKE, CHIP_ERROR_INVALID_ARGUMENT);
+    commandRefExpected = commandCount > 1;
+
+    while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
+    {
+        VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_ARGUMENT);
+        CommandDataIB::Parser commandData;
+        ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
+
+        CommandPathIB::Parser commandPath;
+        ConcreteCommandPath concretePath(0, 0, 0);
+
+        ReturnErrorOnFailure(commandData.GetPath(&commandPath));
+        ReturnErrorOnFailure(commandPath.GetConcreteCommandPath(concretePath));
+
+        Optional<uint16_t> commandRef;
+        uint16_t ref;
+        err = commandData.GetRef(&ref);
+        VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, err);
+        if (err == CHIP_END_OF_TLV && commandRefExpected)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        if (err == CHIP_NO_ERROR)
+        {
+            commandRef = MakeOptional(ref);
+        }
+
+        VerifyOrReturnError(!mCommandRefLookupTable.IsRequestedPathAndRefUnique(concretePath, commandRef),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(mCommandRefLookupTable.Add(concretePath, commandRef));
+    }
+
+    // if we have exhausted this container
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    return err;
+}
+
 Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -116,13 +165,9 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
     VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::UnsupportedAccess);
     invokeRequests.GetReader(&invokeRequestsReader);
 
-    {
-        // We don't support handling multiple commands but the protocol is ready to support it in the future, reject all of them and
-        // IM Engine will send a status response.
-        size_t commandCount = 0;
-        TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */);
-        VerifyOrReturnError(commandCount == 1, Status::InvalidAction);
-    }
+    VerifyOrReturnError(ValidateCommands(invokeRequestsReader) == CHIP_NO_ERROR, Status::InvalidAction);
+    // Reset the reader
+    invokeRequests.GetReader(&invokeRequestsReader);
 
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
@@ -500,15 +545,43 @@ CHIP_ERROR CommandHandler::AddClusterSpecificFailure(const ConcreteCommandPath &
     return AddStatusInternal(aCommandPath, StatusIB(Status::Failure, aClusterStatus));
 }
 
+CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aRequestCommandPath, const ConcreteCommandPath & aCommandPath,
+                                          bool aStartDataStruct)
+{
+    auto * commandRefTableEntry = mCommandRefLookupTable.Find(aRequestCommandPath);
+    return PrepareCommand(commandRefTableEntry, aCommandPath, aStartDataStruct);
+}
+
 CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct)
 {
+    // Legacy code is calling the deprecated version of PrepareCommand. If we are in a case where
+    // there was a single command in the request, we can just assume this response is triggered by
+    // the single command.
+    auto * commandRefTableEntry = mCommandRefLookupTable.GetCommandRefTableEntryIfSingleRequest();
+
+    // At this point application supports Batch Invoke Commands since there does not exist a single command in table,
+    // but application is calling the depricated PrepareCommand. We have no way to determine the associated CommandRef
+    // to put into the InvokeResponse.
+    VerifyOrDieWithMsg(commandRefTableEntry, DataManagement,
+                       "Seemingly device supports batch commands, but is calling the deprecated PrepareCommand API");
+    return PrepareCommand(commandRefTableEntry, aCommandPath, aStartDataStruct);
+}
+
+CHIP_ERROR CommandHandler::PrepareCommand(const CommandRefLookupTable::CommandRefTableEntry * apCommandRefTableEntry,
+                                          const ConcreteCommandPath & aCommandPath, bool aStartDataStruct)
+{
+    VerifyOrReturnError(apCommandRefTableEntry, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(AllocateBuffer());
 
     mInvokeResponseBuilder.Checkpoint(mBackupWriter);
+    mBackupState = mState;
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
-    VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Idle || mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+
+    mRefForResponse = apCommandRefTableEntry->ref;
+
     MoveToState(State::Preparing);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
     InvokeResponseIB::Builder & invokeResponse   = invokeResponses.CreateInvokeResponse();
@@ -536,10 +609,14 @@ CHIP_ERROR CommandHandler::FinishCommand(bool aStartDataStruct)
     {
         ReturnErrorOnFailure(commandData.GetWriter()->EndContainer(mDataElementContainerType));
     }
+
+    if (mRefForResponse.HasValue())
+    {
+        ReturnErrorOnFailure(commandData.Ref(mRefForResponse.Value()));
+    }
+
     ReturnErrorOnFailure(commandData.EndOfCommandDataIB());
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage());
     MoveToState(State::AddedCommand);
     return CHIP_NO_ERROR;
 }
@@ -550,7 +627,12 @@ CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPat
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
-    VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Idle || mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+
+    auto * commandRefTableEntry = mCommandRefLookupTable.Find(aCommandPath);
+    VerifyOrReturnError(commandRefTableEntry, CHIP_ERROR_INCORRECT_STATE);
+    mRefForResponse = commandRefTableEntry->ref;
+
     MoveToState(State::Preparing);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
     InvokeResponseIB::Builder & invokeResponse   = invokeResponses.CreateInvokeResponse();
@@ -567,10 +649,15 @@ CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPat
 CHIP_ERROR CommandHandler::FinishStatus()
 {
     VerifyOrReturnError(mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
+
+    CommandStatusIB::Builder & commandStatus = mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus();
+    if (mRefForResponse.HasValue())
+    {
+        ReturnErrorOnFailure(commandStatus.Ref(mRefForResponse.Value()));
+    }
+
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus().EndOfCommandStatusIB());
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage());
     MoveToState(State::AddedCommand);
     return CHIP_NO_ERROR;
 }
@@ -579,9 +666,7 @@ CHIP_ERROR CommandHandler::RollbackResponse()
 {
     VerifyOrReturnError(mState == State::Preparing || mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
     mInvokeResponseBuilder.Rollback(mBackupWriter);
-    // Note: We only support one command per request, so we reset the state to Idle here, need to review the states when adding
-    // supports of having multiple requests in the same transaction.
-    MoveToState(State::Idle);
+    MoveToState(mBackupState);
     return CHIP_NO_ERROR;
 }
 
@@ -635,6 +720,8 @@ CommandHandler::Handle::Handle(CommandHandler * handle)
 CHIP_ERROR CommandHandler::Finalize(System::PacketBufferHandle & commandPacket)
 {
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses());
+    ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage());
     return mCommandMessageWriter.Finalize(&commandPacket);
 }
 
