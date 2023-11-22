@@ -21,9 +21,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
 #include <app/util/af-enums.h>
-#include <protocols/interaction_model/StatusCode.h>
 #include <functional>
-
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -36,7 +35,7 @@ class ExampleMicrowaveOvenControlDelegate : public MicrowaveOvenControl::Delegat
 {
 
 private:
-    std::function<Protocols::InteractionModel::Status(uint8_t,uint32_t,uint8_t)> mHandleSetCookingParametersCallback;
+    std::function<Protocols::InteractionModel::Status(uint8_t, uint32_t, uint8_t)> mHandleSetCookingParametersCallback;
     std::function<Protocols::InteractionModel::Status(uint32_t)> mHandleAddMoreTimeCallback;
 
 public:
@@ -69,7 +68,8 @@ public:
     /**
      * Set callback function for set cooking parameters
      */
-    void SetMicrowaveOvenControlSetCookingParametersCallback(std::function<Protocols::InteractionModel::Status(uint8_t,uint32_t,uint8_t)> aCallback);
+    void SetMicrowaveOvenControlSetCookingParametersCallback(
+        std::function<Protocols::InteractionModel::Status(uint8_t, uint32_t, uint8_t)> aCallback);
 
     /**
      * Set callback function for add more time

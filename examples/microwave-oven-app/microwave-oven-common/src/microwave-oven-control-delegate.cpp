@@ -34,14 +34,14 @@ Protocols::InteractionModel::Status ExampleMicrowaveOvenControlDelegate::HandleA
     return mHandleAddMoreTimeCallback(finalCookTime);
 }
 
-
 void ExampleMicrowaveOvenControlDelegate::SetMicrowaveOvenControlSetCookingParametersCallback(
-                                        std::function<Protocols::InteractionModel::Status(uint8_t,uint32_t,uint8_t)> aCallback)
+    std::function<Protocols::InteractionModel::Status(uint8_t, uint32_t, uint8_t)> aCallback)
 {
     mHandleSetCookingParametersCallback = aCallback;
 }
 
-void ExampleMicrowaveOvenControlDelegate::SetMicrowaveOvenControlAddMoreTimeCallback(std::function<Protocols::InteractionModel::Status(uint32_t)> aCallback)
+void ExampleMicrowaveOvenControlDelegate::SetMicrowaveOvenControlAddMoreTimeCallback(
+    std::function<Protocols::InteractionModel::Status(uint32_t)> aCallback)
 {
-    mHandleAddMoreTimeCallback          = aCallback;
+    mHandleAddMoreTimeCallback = aCallback;
 }

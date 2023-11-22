@@ -31,7 +31,8 @@ public:
     {
         // set callback functions
         mMicrowaveOvenControlDelegate.SetMicrowaveOvenControlSetCookingParametersCallback(
-            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCallback, this,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3));
+            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCallback, this, std::placeholders::_1,
+                      std::placeholders::_2, std::placeholders::_3));
         mMicrowaveOvenControlDelegate.SetMicrowaveOvenControlAddMoreTimeCallback(
             std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenAddMoreTimeCallback, this, std::placeholders::_1));
         mOperationalStateDelegate.SetOpStatePauseCallback(
