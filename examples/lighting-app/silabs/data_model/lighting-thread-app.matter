@@ -2531,15 +2531,15 @@ endpoint 1 {
   }
 
   server cluster Scenes {
-    callback attribute nameSupport default = 0x80;
-    callback attribute lastConfiguredBy;
-    callback attribute sceneTableSize default = 16;
+    ram      attribute nameSupport default = 0x80;
+    ram      attribute lastConfiguredBy;
+    ram      attribute sceneTableSize default = 16;
     callback attribute fabricSceneInfo;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 15;
+    ram      attribute featureMap default = 15;
     ram      attribute clusterRevision default = 5;
 
     handle command AddScene;
