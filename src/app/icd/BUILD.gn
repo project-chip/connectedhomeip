@@ -64,10 +64,11 @@ source_set("manager") {
   deps = [ ":icd_config" ]
 
   public_deps = [
-    ":cluster",
+    ":data",
     ":notifier",
     ":observer",
     ":sender",
+    ":table",
     "${chip_root}/src/credentials:credentials",
   ]
 }
@@ -79,29 +80,29 @@ source_set("sender") {
   ]
 
   public_deps = [
-    ":cluster",
     ":notifier",
+    ":table",
     "${chip_root}/src/credentials:credentials",
     "${chip_root}/src/lib/address_resolve:address_resolve",
     "${chip_root}/src/protocols/secure_channel",
   ]
 }
 
-# ICD management cluster source-set is broken out of the main source-set to enable unit tests
-# All sources and configurations used by the ICD management cluster need to go in this source-set
-source_set("cluster") {
+# ICDMonitoringTable source-set is broken out of the main source-set to enable unit tests
+# All sources and configurations used by the ICDMonitoringTable need to go in this source-set
+source_set("table") {
   sources = [
-    "ICDManagementServer.cpp",
-    "ICDManagementServer.h",
     "ICDMonitoringTable.cpp",
     "ICDMonitoringTable.h",
   ]
 
-  deps = [ ":notifier" ]
-
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform:platform",
-    "${chip_root}/src/protocols:im_status",
   ]
+}
+
+source_set("data") {
+  sources = [ "ICDData.h" ]
+  deps = [ "${chip_root}/src/lib/core" ]
 }

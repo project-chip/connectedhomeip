@@ -42,6 +42,10 @@ public:
             return FAILURE;
         }
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        chip::app::ReadHandler::SetICDData(ctx->mICDData);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
         return SUCCESS;
     }
 
@@ -54,6 +58,10 @@ public:
 
         return SUCCESS;
     }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::ICDData mICDData;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 private:
     chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;

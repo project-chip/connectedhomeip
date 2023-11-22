@@ -29,6 +29,7 @@
 #include <app/InteractionModelHelper.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/EventDataIB.h>
+#include <app/icd/ICDData.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
@@ -113,6 +114,11 @@ public:
 
         chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        chip::app::ReadHandler::SetICDData(ctx->mICDData);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
         return SUCCESS;
     }
 
@@ -122,6 +128,10 @@ public:
         chip::app::EventManagement::DestroyEventManagement();
         return SUCCESS;
     }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::ICDData mICDData;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 private:
     chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;

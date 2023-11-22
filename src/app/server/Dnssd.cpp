@@ -38,8 +38,6 @@
 #include <setup_payload/SetupPayload.h>
 #include <system/TimeSource.h>
 
-#include <app/server/Server.h>
-
 namespace chip {
 namespace app {
 namespace {
@@ -149,11 +147,13 @@ CHIP_ERROR DnssdServer::SetEphemeralDiscriminator(Optional<uint16_t> discriminat
 template <class AdvertisingParams>
 void DnssdServer::AddICDKeyToAdvertisement(AdvertisingParams & advParams)
 {
+    VerifyOrDieWithMsg(mICDManager != nullptr, Discovery,
+                       "Invalid pointer to the ICDManager which is required for the LIT operating mode");
+
     // Only advertise the ICD key if the device can operate as a LIT
-    if (Server::GetInstance().GetICDManager().SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
+    if (mICDManager->SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
     {
-        advParams.SetICDOperatingAsLIT(
-            Optional<bool>(Server::GetInstance().GetICDManager().GetICDMode() == ICDManager::ICDMode::LIT));
+        advParams.SetICDOperatingAsLIT(Optional<bool>(mICDManager->GetICDMode() == ICDManager::ICDMode::LIT));
     }
 }
 #endif
@@ -371,8 +371,12 @@ void DnssdServer::StartServer()
 
 void DnssdServer::StopServer()
 {
-    // Make sure we don't hold on to a dangling fabric table pointer.
+    // Make sure we don't hold on to dangling pointers.
     mFabricTable = nullptr;
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    mICDManager = nullptr;
+#endif
 
     DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
 

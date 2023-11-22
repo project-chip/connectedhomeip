@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/ICDCheckInSender.h>
+#include <app/icd/ICDData.h>
 #include <app/icd/ICDMonitoringTable.h>
 #include <app/icd/ICDNotifier.h>
 #include <app/icd/ICDStateObserver.h>
@@ -71,7 +72,7 @@ public:
 
     ICDManager() {}
     void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore,
-              Messaging::ExchangeManager * exchangeManager);
+              Messaging::ExchangeManager * exchangeManager, ICDData * icdData);
     void Shutdown();
     void UpdateICDMode();
     void UpdateOperationState(OperationalState state);
@@ -156,6 +157,7 @@ private:
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
     ObjectPool<ICDCheckInSender, (CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS)> mICDSenderPool;
+    ICDData * mICDData = nullptr;
 
 #ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // feature map that can be changed at runtime for testing purposes

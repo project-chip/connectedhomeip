@@ -19,7 +19,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/icd/ICDConfig.h>
-#include <app/icd/ICDManagementServer.h>
+#include <app/icd/ICDData.h>
 #include <app/icd/ICDManager.h>
 #include <app/icd/ICDMonitoringTable.h>
 #include <lib/support/CodeUtils.h>
@@ -47,12 +47,13 @@ static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
 void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore,
-                      Messaging::ExchangeManager * exchangeManager)
+                      Messaging::ExchangeManager * exchangeManager, ICDData * icdData)
 {
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
     VerifyOrDie(symmetricKeystore != nullptr);
     VerifyOrDie(exchangeManager != nullptr);
+    VerifyOrDie(icdData != nullptr);
 
     bool supportLIT = SupportsFeature(Feature::kLongIdleTimeSupport);
     VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kCheckInProtocolSupport), AppServer,
@@ -69,12 +70,11 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
     mSymmetricKeystore = symmetricKeystore;
     mExchangeManager   = exchangeManager;
-
-    ICDManagementServer::GetInstance().SetSymmetricKeystore(mSymmetricKeystore);
+    mICDData           = icdData;
 
     // Removing the check for now since it is possible for the Fast polling
     // to be larger than the ActiveModeDuration for now
-    // uint32_t activeModeDuration = ICDManagementServer::GetInstance().GetActiveModeDurationMs();
+    // uint32_t activeModeDuration = mICDData->GetActiveModeDurationMs();
     // VerifyOrDie(kFastPollingInterval.count() < activeModeDuration);
 
     UpdateICDMode();
@@ -92,6 +92,7 @@ void ICDManager::Shutdown()
     mOperationalState = OperationalState::ActiveMode;
     mStorage          = nullptr;
     mFabricTable      = nullptr;
+    mICDData          = nullptr;
     mStateObserverPool.ReleaseAll();
     mICDSenderPool.ReleaseAll();
 }
@@ -210,9 +211,9 @@ void ICDManager::UpdateOperationState(OperationalState state)
         mOperationalState = OperationalState::IdleMode;
 
         // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
-        if (ICDManagementServer::GetInstance().GetActiveModeDurationMs() > 0)
+        if (mICDData->GetActiveModeDurationMs() > 0)
         {
-            uint32_t idleModeDuration = ICDManagementServer::GetInstance().GetIdleModeDurationSec();
+            uint32_t idleModeDuration = mICDData->GetIdleModeDurationSec();
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(idleModeDuration), OnIdleModeDone, this);
         }
 
@@ -244,13 +245,13 @@ void ICDManager::UpdateOperationState(OperationalState state)
             DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
 
             mOperationalState           = OperationalState::ActiveMode;
-            uint32_t activeModeDuration = ICDManagementServer::GetInstance().GetActiveModeDurationMs();
+            uint32_t activeModeDuration = mICDData->GetActiveModeDurationMs();
 
             if (activeModeDuration == 0 && !mKeepActiveFlags.HasAny())
             {
                 // A Network Activity triggered the active mode and activeModeDuration is 0.
                 // Stay active for at least Active Mode Threshold.
-                activeModeDuration = ICDManagementServer::GetInstance().GetActiveModeThresholdMs();
+                activeModeDuration = mICDData->GetActiveModeThresholdMs();
             }
 
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeDuration), OnActiveModeDone, this);
@@ -274,7 +275,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
         }
         else
         {
-            uint16_t activeModeThreshold = ICDManagementServer::GetInstance().GetActiveModeThresholdMs();
+            uint16_t activeModeThreshold = mICDData->GetActiveModeThresholdMs();
             DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeThreshold), OnActiveModeDone, this);
             uint16_t activeModeJitterThreshold =
                 (activeModeThreshold >= ICD_ACTIVE_TIME_JITTER_MS) ? activeModeThreshold - ICD_ACTIVE_TIME_JITTER_MS : 0;

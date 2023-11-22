@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,27 +17,20 @@
 
 #pragma once
 
-#include <app/util/basic-types.h>
-#include <crypto/SessionKeystore.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/core/Optional.h>
-#include <lib/support/Span.h>
-#include <protocols/interaction_model/StatusCode.h>
-
-#include <app/icd/ICDMonitoringTable.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 
-using chip::Protocols::InteractionModel::Status;
-
-class ICDManagementServer
+class ICDData
 {
+
 public:
+    ICDData() = default;
+
     uint32_t GetIdleModeDurationSec() { return mIdleInterval_s; }
 
     uint32_t GetActiveModeDurationMs() { return mActiveInterval_ms; }
-
-    void SetSymmetricKeystore(Crypto::SymmetricKeystore * keyStore) { mSymmetricKeystore = keyStore; }
 
     uint16_t GetActiveModeThresholdMs() { return mActiveThreshold_ms; }
 
@@ -47,28 +40,7 @@ public:
 
     uint16_t GetClientsSupportedPerFabric() { return mFabricClientsSupported; }
 
-    Status RegisterClient(PersistentStorageDelegate & storage, FabricIndex fabric_index, chip::NodeId node_id,
-                          uint64_t monitored_subject, chip::ByteSpan key, Optional<chip::ByteSpan> verification_key, bool is_admin);
-
-    Status UnregisterClient(PersistentStorageDelegate & storage, FabricIndex fabric_index, chip::NodeId node_id,
-                            Optional<chip::ByteSpan> verificationKey, bool is_admin);
-
-    /**
-     * @brief Triggers table update events to notify subscribers that an entry was added or removed
-     *        from the ICDMonitoringTable.
-     */
-    void TriggerICDMTableUpdatedEvent();
-
-    Status StayActiveRequest(FabricIndex fabric_index);
-
-    static ICDManagementServer & GetInstance() { return mInstance; }
-
 private:
-    ICDManagementServer() = default;
-
-    static ICDManagementServer mInstance;
-    Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
-
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) <= 64800,
                   "Spec requires the IdleModeDuration to be equal or inferior to 64800s.");
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) >= 1,

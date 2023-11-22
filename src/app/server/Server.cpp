@@ -321,12 +321,18 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     // ICD Init needs to be after data model init and InteractionModel Init
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr);
+    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr, &mICDData);
+
     // Register the ICDStateObservers. All observers are released at mICDManager.Shutdown()
     // They can be released individually with ReleaseObserver
     mICDManager.RegisterObserver(mReportScheduler);
     mICDManager.RegisterObserver(&app::DnssdServer::Instance());
+
+    chip::app::InteractionModelEngine::GetInstance()->SetICDData(mICDData);
+    app::DnssdServer::Instance().SetICDManager(mICDManager);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+
 
     // This code is necessary to restart listening to existing groups after a reboot
     // Each manufacturer needs to validate that they can rejoin groups by placing this code at the appropriate location for them

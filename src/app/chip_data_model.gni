@@ -157,7 +157,6 @@ template("chip_data_model") {
       "${_app_root}/clusters/color-control-server/color-control-server.h",
       "${_app_root}/clusters/door-lock-server/door-lock-server.h",
       "${_app_root}/clusters/groups-server/groups-server.h",
-      "${_app_root}/clusters/icd-management-server/icd-management-server.h",
       "${_app_root}/clusters/identify-server/identify-server.h",
       "${_app_root}/clusters/level-control/level-control.h",
       "${_app_root}/clusters/on-off-server/on-off-server.h",
@@ -294,10 +293,15 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/dishwasher-alarm-delegate.h",
         ]
       } else if (cluster == "icd-management-server") {
-        sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+        ]
         deps += [
-          "${chip_root}/src/app/icd:cluster",
+          "${chip_root}/src/app/icd:data",
           "${chip_root}/src/app/icd:icd_config",
+          "${chip_root}/src/app/icd:notifier",
+          "${chip_root}/src/app/icd:table",
         ]
       } else if (cluster == "resource-monitoring-server") {
         sources += [
