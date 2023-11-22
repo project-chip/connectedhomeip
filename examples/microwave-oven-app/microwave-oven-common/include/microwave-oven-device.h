@@ -97,6 +97,7 @@ public:
 
     /**
      * handle command for operational state: get count down time
+     * return actual cook time.
      */
     app::DataModel::Nullable<uint32_t> HandleMicrowaveOvenOpStateGetCountdownTime();
 };
