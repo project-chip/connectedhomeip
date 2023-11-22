@@ -55,7 +55,7 @@ private:
     std::function<void(Clusters::OperationalState::GenericOperationalError & err)> mStopCallback;
     std::function<app::DataModel::Nullable<uint32_t>(void)> mGetCountdownTimeCallback;
 
-    
+
 public:
     /**
      * Get the countdown time.

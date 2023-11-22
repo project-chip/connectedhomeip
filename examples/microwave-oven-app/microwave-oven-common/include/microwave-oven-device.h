@@ -29,7 +29,7 @@ public:
         mMicrowaveOvenControlInstance(&mMicrowaveOvenControlDelegate, aClustersEndpoint, MicrowaveOvenControl::Id),
         mOperationalStateDelegate(), mOperationalStateInstance(&mOperationalStateDelegate, aClustersEndpoint, OperationalState::Id)
     {
-        // set callback functions   
+        // set callback functions
         mMicrowaveOvenControlDelegate.SetMicrowaveOvenControlSetCookingParametersCallback(
             std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCallback, this,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3));
         mMicrowaveOvenControlDelegate.SetMicrowaveOvenControlAddMoreTimeCallback(
