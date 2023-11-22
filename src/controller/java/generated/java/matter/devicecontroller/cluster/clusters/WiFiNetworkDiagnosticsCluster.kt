@@ -20,43 +20,74 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class WiFiNetworkDiagnosticsCluster(
-  private val controller: MatterController,
-  private val endpointId: UShort
-) {
-  class BssidAttribute(val value: ByteArray?)
+class WiFiNetworkDiagnosticsCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class BssidAttribute(
+    val value: ByteArray?
+  )
 
-  class SecurityTypeAttribute(val value: UInt?)
+  class SecurityTypeAttribute(
+    val value: UInt?
+  )
 
-  class WiFiVersionAttribute(val value: UInt?)
+  class WiFiVersionAttribute(
+    val value: UInt?
+  )
 
-  class ChannelNumberAttribute(val value: UShort?)
+  class ChannelNumberAttribute(
+    val value: UShort?
+  )
 
-  class RssiAttribute(val value: Byte?)
+  class RssiAttribute(
+    val value: Byte?
+  )
 
-  class BeaconLostCountAttribute(val value: UInt?)
+  class BeaconLostCountAttribute(
+    val value: UInt?
+  )
 
-  class BeaconRxCountAttribute(val value: UInt?)
+  class BeaconRxCountAttribute(
+    val value: UInt?
+  )
 
-  class PacketMulticastRxCountAttribute(val value: UInt?)
+  class PacketMulticastRxCountAttribute(
+    val value: UInt?
+  )
 
-  class PacketMulticastTxCountAttribute(val value: UInt?)
+  class PacketMulticastTxCountAttribute(
+    val value: UInt?
+  )
 
-  class PacketUnicastRxCountAttribute(val value: UInt?)
+  class PacketUnicastRxCountAttribute(
+    val value: UInt?
+  )
 
-  class PacketUnicastTxCountAttribute(val value: UInt?)
+  class PacketUnicastTxCountAttribute(
+    val value: UInt?
+  )
 
-  class CurrentMaxRateAttribute(val value: ULong?)
+  class CurrentMaxRateAttribute(
+    val value: ULong?
+  )
 
-  class OverrunCountAttribute(val value: ULong?)
+  class OverrunCountAttribute(
+    val value: ULong?
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
   suspend fun resetCounts(timedInvokeTimeoutMs: Int? = null) {
     val commandId = 0L
@@ -65,14 +96,17 @@ class WiFiNetworkDiagnosticsCluster(
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
   suspend fun readBssidAttribute(): BssidAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBssidAttribute(minInterval: Int, maxInterval: Int): BssidAttribute {
+  suspend fun subscribeBssidAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): BssidAttribute {
     // Implementation needs to be added here
   }
 
@@ -113,7 +147,10 @@ class WiFiNetworkDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRssiAttribute(minInterval: Int, maxInterval: Int): RssiAttribute {
+  suspend fun subscribeRssiAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): RssiAttribute {
     // Implementation needs to be added here
   }
 
@@ -231,7 +268,10 @@ class WiFiNetworkDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -250,7 +290,10 @@ class WiFiNetworkDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -258,7 +301,10 @@ class WiFiNetworkDiagnosticsCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

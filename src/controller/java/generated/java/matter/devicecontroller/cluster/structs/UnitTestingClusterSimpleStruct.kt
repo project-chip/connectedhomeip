@@ -16,7 +16,9 @@
  */
 package matter.devicecontroller.cluster.structs
 
+import java.util.Optional
 import matter.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -80,7 +82,7 @@ class UnitTestingClusterSimpleStruct(
       val f = tlvReader.getUInt(ContextSpecificTag(TAG_F))
       val g = tlvReader.getFloat(ContextSpecificTag(TAG_G))
       val h = tlvReader.getDouble(ContextSpecificTag(TAG_H))
-
+      
       tlvReader.exitContainer()
 
       return UnitTestingClusterSimpleStruct(a, b, c, d, e, f, g, h)

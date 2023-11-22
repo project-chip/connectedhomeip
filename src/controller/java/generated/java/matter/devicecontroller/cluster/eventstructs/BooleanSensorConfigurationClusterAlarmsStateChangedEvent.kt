@@ -18,6 +18,7 @@ package matter.devicecontroller.cluster.eventstructs
 
 import java.util.Optional
 import matter.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -50,25 +51,18 @@ class BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
     private const val TAG_ALARMS_ACTIVE = 0
     private const val TAG_ALARMS_SUPPRESSED = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val alarmsActive = tlvReader.getUInt(ContextSpecificTag(TAG_ALARMS_ACTIVE))
-      val alarmsSuppressed =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ALARMS_SUPPRESSED))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ALARMS_SUPPRESSED)))
-        } else {
-          Optional.empty()
-        }
-
+      val alarmsSuppressed = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ALARMS_SUPPRESSED))) {
+        Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ALARMS_SUPPRESSED)))
+      } else {
+        Optional.empty()
+      }
+      
       tlvReader.exitContainer()
 
-      return BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
-        alarmsActive,
-        alarmsSuppressed
-      )
+      return BooleanSensorConfigurationClusterAlarmsStateChangedEvent(alarmsActive, alarmsSuppressed)
     }
   }
 }

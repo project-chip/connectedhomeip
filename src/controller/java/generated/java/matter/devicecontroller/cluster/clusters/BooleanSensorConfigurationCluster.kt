@@ -20,17 +20,22 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class BooleanSensorConfigurationCluster(
-  private val controller: MatterController,
-  private val endpointId: UShort
-) {
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+class BooleanSensorConfigurationCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
   suspend fun suppressRequest(alarmsToSuppress: UInt, timedInvokeTimeoutMs: Int? = null) {
     val commandId = 0L
@@ -39,22 +44,28 @@ class BooleanSensorConfigurationCluster(
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
   suspend fun readSensitivityLevelAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun writeSensitivityLevelAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeSensitivityLevelAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeSensitivityLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeSensitivityLevelAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -62,7 +73,10 @@ class BooleanSensorConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAlarmsActiveAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeAlarmsActiveAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -70,7 +84,10 @@ class BooleanSensorConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAlarmsSuppressedAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeAlarmsSuppressedAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -78,15 +95,21 @@ class BooleanSensorConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeAlarmsEnabledAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeAlarmsEnabledAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeAlarmsEnabledAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeAlarmsEnabledAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -116,7 +139,10 @@ class BooleanSensorConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -135,7 +161,10 @@ class BooleanSensorConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -143,7 +172,10 @@ class BooleanSensorConfigurationCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
