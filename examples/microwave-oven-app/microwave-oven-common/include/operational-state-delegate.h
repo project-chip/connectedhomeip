@@ -50,7 +50,7 @@ private:
     Span<const GenericOperationalPhase> mOperationalPhaseList = Span<const GenericOperationalPhase>(opPhaseList);
 
     /**
-     * define callback binding function 
+     * define callback binding function
      */
     std::function<void(Clusters::OperationalState::GenericOperationalError & err)> mPauseCallback;
     std::function<void(Clusters::OperationalState::GenericOperationalError & err)> mResumeCallback;
