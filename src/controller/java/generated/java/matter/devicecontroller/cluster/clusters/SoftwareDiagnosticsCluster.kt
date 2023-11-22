@@ -20,26 +20,19 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class SoftwareDiagnosticsCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class ThreadMetricsAttribute(
-    val value: List<SoftwareDiagnosticsClusterThreadMetricsStruct>?
-  )
+class SoftwareDiagnosticsCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
+  class ThreadMetricsAttribute(val value: List<SoftwareDiagnosticsClusterThreadMetricsStruct>?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun resetWatermarks(timedInvokeTimeoutMs: Int? = null) {
     val commandId = 0L
@@ -48,7 +41,7 @@ class SoftwareDiagnosticsCluster(private val controller: MatterController, priva
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun readThreadMetricsAttribute(): ThreadMetricsAttribute {
@@ -66,10 +59,7 @@ class SoftwareDiagnosticsCluster(private val controller: MatterController, priva
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentHeapFreeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): ULong {
+  suspend fun subscribeCurrentHeapFreeAttribute(minInterval: Int, maxInterval: Int): ULong {
     // Implementation needs to be added here
   }
 
@@ -77,10 +67,7 @@ class SoftwareDiagnosticsCluster(private val controller: MatterController, priva
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentHeapUsedAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): ULong {
+  suspend fun subscribeCurrentHeapUsedAttribute(minInterval: Int, maxInterval: Int): ULong {
     // Implementation needs to be added here
   }
 
@@ -121,10 +108,7 @@ class SoftwareDiagnosticsCluster(private val controller: MatterController, priva
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -143,10 +127,7 @@ class SoftwareDiagnosticsCluster(private val controller: MatterController, priva
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -154,10 +135,7 @@ class SoftwareDiagnosticsCluster(private val controller: MatterController, priva
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

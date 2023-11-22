@@ -21,29 +21,17 @@ import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
 class ActionsCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class ActionListAttribute(
-    val value: List<ActionsClusterActionStruct>
-  )
+  class ActionListAttribute(val value: List<ActionsClusterActionStruct>)
 
-  class EndpointListsAttribute(
-    val value: List<ActionsClusterEndpointListStruct>
-  )
+  class EndpointListsAttribute(val value: List<ActionsClusterEndpointListStruct>)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun instantAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
     val commandId = 0L
@@ -52,17 +40,22 @@ class ActionsCluster(private val controller: MatterController, private val endpo
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun instantActionWithTransition(actionID: UShort, invokeID: UInt?, transitionTime: UShort, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun instantActionWithTransition(
+    actionID: UShort,
+    invokeID: UInt?,
+    transitionTime: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 1L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun startAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
@@ -72,17 +65,22 @@ class ActionsCluster(private val controller: MatterController, private val endpo
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun startActionWithDuration(actionID: UShort, invokeID: UInt?, duration: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun startActionWithDuration(
+    actionID: UShort,
+    invokeID: UInt?,
+    duration: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 3L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun stopAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
@@ -92,7 +90,7 @@ class ActionsCluster(private val controller: MatterController, private val endpo
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun pauseAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
@@ -102,17 +100,22 @@ class ActionsCluster(private val controller: MatterController, private val endpo
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun pauseActionWithDuration(actionID: UShort, invokeID: UInt?, duration: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun pauseActionWithDuration(
+    actionID: UShort,
+    invokeID: UInt?,
+    duration: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 6L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun resumeAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
@@ -122,7 +125,7 @@ class ActionsCluster(private val controller: MatterController, private val endpo
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun enableAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
@@ -132,17 +135,22 @@ class ActionsCluster(private val controller: MatterController, private val endpo
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun enableActionWithDuration(actionID: UShort, invokeID: UInt?, duration: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun enableActionWithDuration(
+    actionID: UShort,
+    invokeID: UInt?,
+    duration: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 9L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun disableAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
@@ -152,17 +160,22 @@ class ActionsCluster(private val controller: MatterController, private val endpo
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun disableActionWithDuration(actionID: UShort, invokeID: UInt?, duration: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun disableActionWithDuration(
+    actionID: UShort,
+    invokeID: UInt?,
+    duration: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 11L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun readActionListAttribute(): ActionListAttribute {
@@ -191,10 +204,7 @@ class ActionsCluster(private val controller: MatterController, private val endpo
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSetupURLAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): CharString {
+  suspend fun subscribeSetupURLAttribute(minInterval: Int, maxInterval: Int): CharString {
     // Implementation needs to be added here
   }
 
@@ -224,10 +234,7 @@ class ActionsCluster(private val controller: MatterController, private val endpo
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -246,10 +253,7 @@ class ActionsCluster(private val controller: MatterController, private val endpo
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -257,10 +261,7 @@ class ActionsCluster(private val controller: MatterController, private val endpo
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
