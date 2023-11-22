@@ -291,7 +291,7 @@ CommissioningStage AutoCommissioner::GetNextStateAfterNetworkCommissioning()
 {
     if (mNeedIcdRegistraion)
     {
-        return CommissioningStage::kNeedICDRegistraionInfo;
+        return CommissioningStage::kICDGetRegistraionInfo;
     }
     return CommissioningStage::kFindOperational;
 }
@@ -464,7 +464,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             return CommissioningStage::kCleanup;
         }
         return GetNextStateAfterNetworkCommissioning();
-    case CommissioningStage::kNeedICDRegistraionInfo:
+    case CommissioningStage::kICDGetRegistraionInfo:
         return CommissioningStage::kICDRegistration;
     case CommissioningStage::kICDRegistration:
         return CommissioningStage::kFindOperational;

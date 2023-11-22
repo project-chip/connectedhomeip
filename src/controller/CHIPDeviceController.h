@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <app/AppConfig.h>
+#include <app/AppBuildConfig.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/ClusterStateCache.h>
@@ -620,10 +620,10 @@ public:
      * method after obtaining required parameters for ICD registration using asyncronous methods (like RPC call etc).
      *
      * The DevicePairingDelegate can exit the commissioning process by calling StopPairing.
-     *
+     * 
      * When the ICD Registration completed, OnICDRegistrationComplete will be called.
      *
-     * @return CHIP_ERROR   The return status. Returns CHIP_ERROR_INCORRECT_STATE if not in the correct state (kNeedsNetworkCreds).
+     * @return CHIP_ERROR   The return status. Returns CHIP_ERROR_INCORRECT_STATE if not in the correct state (kICDGetRegistraionInfo).
      */
     CHIP_ERROR ICDRegistraionInfoReady();
 

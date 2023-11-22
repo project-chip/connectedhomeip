@@ -58,7 +58,7 @@ enum CommissioningStage : uint8_t
     kFailsafeBeforeThreadEnable, ///< Extend the fail-safe before doing kThreadNetworkEnable
     kWiFiNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
     kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
-    kNeedICDRegistraionInfo,     ///< Waiting for the higher layer to provide ICD registraion informations.
+    kICDGetRegistraionInfo,     ///< Waiting for the higher layer to provide ICD registraion informations.
     kICDRegistration,            ///< Register for ICD management
     kFindOperational,            ///< Perform operational discovery and establish a CASE session with the device
     kSendComplete,               ///< Send CommissioningComplete (0x30:4) command to the device
