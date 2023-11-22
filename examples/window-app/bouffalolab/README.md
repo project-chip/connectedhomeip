@@ -88,8 +88,6 @@ The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
     ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-window-covering build
     ./scripts/build/build_examples.py --target bouffalolab-bl706dk-window-covering build
-    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-window-covering-ethernet build
-    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-window-covering-wifi build
     ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-window-covering build
     ```
 
