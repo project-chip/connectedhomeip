@@ -1304,36 +1304,36 @@ endpoint 0 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster AccessControl {
     emits event AccessControlEntryChanged;
     callback attribute acl;
     callback attribute extension;
-    callback attribute subjectsPerAccessControlEntry;
-    callback attribute targetsPerAccessControlEntry;
-    callback attribute accessControlEntriesPerFabric;
+    callback attribute subjectsPerAccessControlEntry default = 4;
+    callback attribute targetsPerAccessControlEntry default = 3;
+    callback attribute accessControlEntriesPerFabric default = 4;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster BasicInformation {
     emits event StartUp;
-    callback attribute dataModelRevision;
+    callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
     persist  attribute nodeLabel;
-    callback attribute location;
-    callback attribute hardwareVersion;
+    callback attribute location default = "XX";
+    callback attribute hardwareVersion default = 0;
     callback attribute hardwareVersionString;
-    callback attribute softwareVersion;
+    callback attribute softwareVersion default = 0;
     callback attribute softwareVersionString;
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
@@ -1350,7 +1350,7 @@ endpoint 0 {
     emits event StateTransition;
     emits event VersionApplied;
     emits event DownloadError;
-    callback attribute defaultOTAProviders;
+    callback attribute defaultOTAProviders default = 0;
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
     ram      attribute updateStateProgress default = 0;
@@ -1372,9 +1372,9 @@ endpoint 0 {
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
-    callback attribute regulatoryConfig;
-    callback attribute locationCapability;
-    callback attribute supportsConcurrentConnection;
+    callback attribute regulatoryConfig default = 0;
+    callback attribute locationCapability default = 0;
+    callback attribute supportsConcurrentConnection default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -1419,7 +1419,7 @@ endpoint 0 {
 
   server cluster GeneralDiagnostics {
     callback attribute networkInterfaces;
-    callback attribute rebootCount;
+    callback attribute rebootCount default = 0x0000;
     callback attribute testEventTriggersEnabled;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -1436,9 +1436,9 @@ endpoint 0 {
   server cluster ThreadNetworkDiagnostics {
     callback attribute channel;
     callback attribute routingRole;
-    callback attribute networkName;
-    callback attribute panId;
-    callback attribute extendedPanId;
+    callback attribute networkName default = "0";
+    callback attribute panId default = 0x0000;
+    callback attribute extendedPanId default = 0x0000000000000000;
     callback attribute meshLocalPrefix;
     callback attribute neighborTable;
     callback attribute routeTable;
@@ -1448,7 +1448,7 @@ endpoint 0 {
     callback attribute stableDataVersion;
     callback attribute leaderRouterId;
     callback attribute securityPolicy;
-    callback attribute channelPage0Mask;
+    callback attribute channelPage0Mask default = "0x0000";
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0;
@@ -1459,22 +1459,22 @@ endpoint 0 {
     callback attribute bssid;
     callback attribute securityType;
     callback attribute wiFiVersion;
-    callback attribute channelNumber;
-    callback attribute rssi;
+    callback attribute channelNumber default = 0x0000;
+    callback attribute rssi default = 0x00;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster EthernetNetworkDiagnostics {
     callback attribute PHYRate;
-    callback attribute fullDuplex;
-    callback attribute packetRxCount;
-    callback attribute packetTxCount;
-    callback attribute txErrCount;
-    callback attribute collisionCount;
-    callback attribute overrunCount;
-    callback attribute carrierDetect;
-    callback attribute timeSinceReset;
+    callback attribute fullDuplex default = 0x00;
+    callback attribute packetRxCount default = 0x0000000000000000;
+    callback attribute packetTxCount default = 0x0000000000000000;
+    callback attribute txErrCount default = 0x0000000000000000;
+    callback attribute collisionCount default = 0x0000000000000000;
+    callback attribute overrunCount default = 0x0000000000000000;
+    callback attribute carrierDetect default = 0x00;
+    callback attribute timeSinceReset default = 0x0000000000000000;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
 
@@ -1482,9 +1482,9 @@ endpoint 0 {
   }
 
   server cluster AdministratorCommissioning {
-    callback attribute windowStatus;
-    callback attribute adminFabricIndex;
-    callback attribute adminVendorId;
+    callback attribute windowStatus default = 0;
+    callback attribute adminFabricIndex default = 1;
+    callback attribute adminVendorId default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -1533,8 +1533,8 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap;
-    callback attribute clusterRevision;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision default = 1;
 
     handle command KeySetWrite;
     handle command KeySetRead;
@@ -1557,14 +1557,14 @@ endpoint 0 {
   }
 
   server cluster IcdManagement {
-    callback attribute idleModeDuration;
-    callback attribute activeModeDuration;
-    callback attribute activeModeThreshold;
+    callback attribute idleModeDuration default = 1;
+    callback attribute activeModeDuration default = 300;
+    callback attribute activeModeThreshold default = 300;
     callback attribute registeredClients;
-    callback attribute ICDCounter;
-    callback attribute clientsSupportedPerFabric;
-    callback attribute userActiveModeTriggerHint;
-    callback attribute userActiveModeTriggerInstruction;
+    callback attribute ICDCounter default = 0;
+    callback attribute clientsSupportedPerFabric default = 2;
+    callback attribute userActiveModeTriggerHint default = 5;
+    callback attribute userActiveModeTriggerInstruction default = "This is a test";
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
