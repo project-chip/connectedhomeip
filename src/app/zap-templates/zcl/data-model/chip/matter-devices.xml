@@ -2001,6 +2001,22 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-extractor-hood</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Extractor Hood</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x007A</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="HEPA Filter Monitoring" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Activated Carbon Filter Monitoring" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Fan Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-robotic-vacuum-cleaner</name>
         <domain>CHIP</domain>
         <typeName>Matter Robotic Vacuum Cleaner</typeName>
