@@ -2240,6 +2240,7 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo2 & info)
         // This key is optional so not an error
         err        = CHIP_NO_ERROR;
         info.isIcd = false;
+        err        = CHIP_NO_ERROR;
     }
     else if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
     {
