@@ -221,7 +221,7 @@ static EmberAfStatus CheckNumberOfTransitions(ThermostatMatterScheduleManager & 
     {
         int weekDayTransitionCounts[7] = { 0 };
 
-        for (auto transition : schedule.transitions)
+        for (auto const &transition : schedule.transitions)
         {
             weekDayTransitionCounts[0] += transition.dayOfWeek.Has(DayOfWeek::kSunday) ? 1 : 0;
             weekDayTransitionCounts[1] += transition.dayOfWeek.Has(DayOfWeek::kMonday) ? 1 : 0;
