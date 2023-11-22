@@ -162,33 +162,29 @@ CHIP_ERROR WiFiManager::Init()
     VerifyOrReturnError(mNetIf != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
 
     // TODO: consider moving these to ConnectivityManagerImpl to be prepared for handling multiple interfaces on a single device.
-    Inet::UDPEndPointImplSockets::SetJoinMulticastGroupHandler([](Inet::InterfaceId interfaceId, const Inet::IPAddress & address) {
-        const in6_addr addr = InetUtils::ToZephyrAddr(address);
-        net_if * iface      = InetUtils::GetInterface(interfaceId);
-        VerifyOrReturnError(iface != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+    Inet::UDPEndPointImplSockets::SetMulticastGroupHandler(
+        [](Inet::InterfaceId interfaceId, const Inet::IPAddress & address, bool join) {
+            const in6_addr addr = InetUtils::ToZephyrAddr(address);
+            net_if * iface      = InetUtils::GetInterface(interfaceId);
+            VerifyOrReturnError(iface != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
 
-        net_if_mcast_addr * maddr = net_if_ipv6_maddr_add(iface, &addr);
+            if (join)
+            {
+                net_if_mcast_addr * maddr = net_if_ipv6_maddr_add(iface, &addr);
 
-        if (maddr && !net_if_ipv6_maddr_is_joined(maddr) && !net_ipv6_is_addr_mcast_link_all_nodes(&addr))
-        {
-            net_if_ipv6_maddr_join(iface, maddr);
-        }
+                if (maddr && !net_if_ipv6_maddr_is_joined(maddr) && !net_ipv6_is_addr_mcast_link_all_nodes(&addr))
+                {
+                    net_if_ipv6_maddr_join(iface, maddr);
+                }
+            }
+            else
+            {
+                VerifyOrReturnError(net_ipv6_is_addr_mcast_link_all_nodes(&addr) || net_if_ipv6_maddr_rm(iface, &addr),
+                                    CHIP_ERROR_INVALID_ADDRESS);
+            }
 
-        return CHIP_NO_ERROR;
-    });
-
-    Inet::UDPEndPointImplSockets::SetLeaveMulticastGroupHandler([](Inet::InterfaceId interfaceId, const Inet::IPAddress & address) {
-        const in6_addr addr = InetUtils::ToZephyrAddr(address);
-        net_if * iface      = InetUtils::GetInterface(interfaceId);
-        VerifyOrReturnError(iface != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
-
-        if (!net_ipv6_is_addr_mcast_link_all_nodes(&addr) && !net_if_ipv6_maddr_rm(iface, &addr))
-        {
-            return CHIP_ERROR_INVALID_ADDRESS;
-        }
-
-        return CHIP_NO_ERROR;
-    });
+            return CHIP_NO_ERROR;
+        });
 
     net_mgmt_init_event_callback(&mWiFiMgmtClbk, WifiMgmtEventHandler, kWifiManagementEvents);
     net_mgmt_add_event_callback(&mWiFiMgmtClbk);
