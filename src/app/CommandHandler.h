@@ -436,15 +436,15 @@ private:
 
     bool mSentStatusResponse = false;
 
-    State mState       = State::Idle;
-    bool mGroupRequest = false;
-    Optional<uint16_t> mRefForResponse;
+    State mState = State::Idle;
 
-    CommandRefLookupTable mCommandRefLookupTable;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     TLV::TLVWriter mBackupWriter;
     State mBackupState;
+    CommandRefLookupTable mCommandRefLookupTable;
+    Optional<uint16_t> mRefForResponse;
 
+    bool mGroupRequest    = false;
     bool mBufferAllocated = false;
     // If mGoneAsync is true, we have finished out initial processing of the
     // incoming invoke.  After this point, our session could go away at any

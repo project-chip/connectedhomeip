@@ -105,6 +105,12 @@ CHIP_ERROR CommandHandler::ValidateCommands(TLV::TLVReader & invokeRequestsReade
     bool commandRefExpected = false;
 
     TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */);
+    if (IsGroupRequest())
+    {
+        VerifyOrReturnError(commandCount == 1, CHIP_ERROR_INVALID_ARGUMENT);
+        return CHIP_NO_ERROR;
+    }
+
     VerifyOrReturnError(commandCount <= CHIP_CONFIG_MAX_PATHS_PER_INVOKE, CHIP_ERROR_INVALID_ARGUMENT);
     commandRefExpected = commandCount > 1;
 
@@ -158,6 +164,10 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
 #if CHIP_CONFIG_IM_PRETTY_PRINT
     invokeRequestMessage.PrettyPrint();
 #endif
+    if (mExchangeCtx->IsGroupExchangeContext())
+    {
+        SetGroupRequest(true);
+    }
 
     VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
@@ -175,7 +185,7 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
         CommandDataIB::Parser commandData;
         VerifyOrReturnError(commandData.Init(invokeRequestsReader) == CHIP_NO_ERROR, Status::InvalidAction);
         Status status = Status::Success;
-        if (mExchangeCtx->IsGroupExchangeContext())
+        if (IsGroupRequest())
         {
             status = ProcessGroupCommandDataIB(commandData);
         }
@@ -245,7 +255,7 @@ void CommandHandler::DecrementHoldOff()
         {
             ChipLogProgress(DataManagement, "Skipping command response: exchange context is null");
         }
-        else if (!mExchangeCtx->IsGroupExchangeContext())
+        else if (!IsGroupRequest())
         {
             CHIP_ERROR err = SendCommandResponse();
             if (err != CHIP_NO_ERROR)
@@ -295,8 +305,6 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
     CommandPathIB::Parser commandPath;
     ConcreteCommandPath concretePath(0, 0, 0);
     TLV::TLVReader commandDataReader;
-
-    SetGroupRequest(false);
 
     // NOTE: errors may occur before the concrete command path is even fully decoded.
 
@@ -399,7 +407,6 @@ Status CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aComman
     Credentials::GroupDataProvider::GroupEndpoint mapping;
     Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
     Credentials::GroupDataProvider::EndpointIterator * iterator;
-    SetGroupRequest(true);
 
     err = aCommandElement.GetPath(&commandPath);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
@@ -548,12 +555,17 @@ CHIP_ERROR CommandHandler::AddClusterSpecificFailure(const ConcreteCommandPath &
 CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aRequestCommandPath, const ConcreteCommandPath & aCommandPath,
                                           bool aStartDataStruct)
 {
+    // Return prematurely in case of requests targeted to a group that should not add command for response purposes.
+    VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
     auto * commandRefTableEntry = mCommandRefLookupTable.Find(aRequestCommandPath);
     return PrepareCommand(commandRefTableEntry, aCommandPath, aStartDataStruct);
 }
 
 CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct)
 {
+    // Return prematurely in case of requests targeted to a group that should not add command for response purposes.
+    VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
+
     // Legacy code is calling the deprecated version of PrepareCommand. If we are in a case where
     // there was a single command in the request, we can just assume this response is triggered by
     // the single command.
