@@ -28,6 +28,8 @@ static_library("nrfconnect") {
     "../Zephyr/ConfigurationManagerImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.h",
+    "../Zephyr/InetUtils.cpp",
+    "../Zephyr/InetUtils.h",
     "../Zephyr/KeyValueStoreManagerImpl.cpp",
     "../Zephyr/Logging.cpp",
     "../Zephyr/PlatformManagerImpl.cpp",
@@ -96,8 +98,6 @@ static_library("nrfconnect") {
 
   if (chip_enable_wifi) {
     sources += [
-      "../Zephyr/InetUtils.cpp",
-      "../Zephyr/InetUtils.h",
       "OTAImageProcessorImplWiFi.h",
       "wifi/ConnectivityManagerImplWiFi.cpp",
       "wifi/ConnectivityManagerImplWiFi.h",
