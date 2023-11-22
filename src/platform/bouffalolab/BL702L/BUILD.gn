@@ -88,11 +88,16 @@ static_library("BL702L") {
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
+
+    # TODO: platform should NOT depend on default_address_resolve_config. This should
+    #       be removed. See https://github.com/project-chip/connectedhomeip/issues/30596
+    #
+    #       Currently this exists because OpenThread platform includes src/app/Server.h
+    public_configs = [
+      "${chip_root}/src/lib/address_resolve:default_address_resolve_config",
+    ]
   }
 
   deps += [ "${chip_root}/src/credentials:credentials_header" ]
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
-
-  public_configs =
-      [ "${chip_root}/src/lib/address_resolve:default_address_resolve_config" ]
 }
