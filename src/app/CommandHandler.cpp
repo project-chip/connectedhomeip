@@ -133,7 +133,7 @@ CHIP_ERROR CommandHandler::ValidateCommands(TLV::TLVReader & invokeRequestsReade
             commandRef = MakeOptional(ref);
         }
 
-        VerifyOrReturnError(!mCommandRefLookupTable.IsRequestedPathAndRefUnique(concretePath, commandRef),
+        VerifyOrReturnError(mCommandRefLookupTable.IsRequestedPathAndRefUnique(concretePath, commandRef),
                             CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(mCommandRefLookupTable.Add(concretePath, commandRef));
     }

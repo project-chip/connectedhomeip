@@ -274,7 +274,8 @@ private:
     {
     public:
         CommandHandlerWithOutstandingCommand(CommandHandler::Callback * apCallback, const ConcreteCommandPath & aRequestCommandPath,
-                                             const Optional<uint16_t> & aRef) : CommandHandler(apCallback)
+                                             const Optional<uint16_t> & aRef) :
+            CommandHandler(apCallback)
         {
             this->mCommandRefLookupTable.Add(aRequestCommandPath, aRef);
         }
@@ -696,8 +697,8 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
 
 void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite * apSuite, void * apContext)
 {
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err          = CHIP_NO_ERROR;
     auto path               = MakeTestCommandPath();
     auto requestCommandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
     CommandHandlerWithOutstandingCommand commandHandler(nullptr, requestCommandPath, NullOptional);
@@ -1104,8 +1105,8 @@ void TestCommandInteraction::TestCommandHandlerInvalidMessageAsync(nlTestSuite *
 
 void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTestSuite * apSuite, void * apContext)
 {
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err          = CHIP_NO_ERROR;
     auto path               = MakeTestCommandPath();
     auto requestCommandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
     CommandHandlerWithOutstandingCommand commandHandler(nullptr, requestCommandPath, NullOptional);

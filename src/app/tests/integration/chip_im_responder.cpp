@@ -78,7 +78,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
 {
     static bool statusCodeFlipper = false;
 
-    if (ServerClusterCommandExists(aCommandPath) != Protocols::InteractionModel::Status::Success)
+    if (ServerClusterCommandExists(aRequestCommandPath) != Protocols::InteractionModel::Status::Success)
     {
         return;
     }
