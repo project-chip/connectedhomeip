@@ -303,6 +303,19 @@
 #endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
 /**
+ * The device shall check every WIFI_START_CHECK_TIME_USEC whether Wi-Fi management
+ * has been fully initialized. If after WIFI_START_CHECK_ATTEMPTS Wi-Fi management
+ * still hasn't been initialized, the device configuration is reset, and device
+ * needs to be paired again.
+ */
+#ifndef WIFI_START_CHECK_TIME_USEC
+#define WIFI_START_CHECK_TIME_USEC 100000 // 100ms
+#endif
+#ifndef WIFI_START_CHECK_ATTEMPTS
+#define WIFI_START_CHECK_ATTEMPTS 5
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC
  *
  * The default amount of time (in whole seconds) that the device will remain in "user selected"
@@ -344,6 +357,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+ *
+ * Enable support for WiFi Per-Device Credentials
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC 0
 #endif
 
 /**

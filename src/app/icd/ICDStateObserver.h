@@ -33,6 +33,7 @@ public:
     virtual ~ICDStateObserver() {}
     virtual void OnEnterActiveMode()  = 0;
     virtual void OnTransitionToIdle() = 0;
+    virtual void OnICDModeChange()    = 0;
 };
 
 } // namespace app

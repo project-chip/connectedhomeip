@@ -20,6 +20,7 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/ConnectivityUtils.h>
 #include <platform/Linux/DiagnosticDataProviderImpl.h>
@@ -765,6 +766,23 @@ bool ConnectivityManagerImpl::IsWiFiManagementStarted()
     return ret;
 }
 
+void ConnectivityManagerImpl::StartNonConcurrentWiFiManagement()
+{
+    StartWiFiManagement();
+
+    for (int cnt = 0; cnt < WIFI_START_CHECK_ATTEMPTS; cnt++)
+    {
+        if (IsWiFiManagementStarted())
+        {
+            DeviceControlServer::DeviceControlSvr().PostWiFiDeviceAvailableNetworkEvent();
+            ChipLogProgress(DeviceLayer, "Non-concurrent mode Wi-Fi Management Started.");
+            return;
+        }
+        usleep(WIFI_START_CHECK_TIME_USEC);
+    }
+    ChipLogError(Ble, "Non-concurrent mode Wi-Fi Management taking too long to start.");
+}
+
 void ConnectivityManagerImpl::DriveAPState()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1017,7 +1035,7 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     memcpy(keyStr, credentials.data(), credentials.size());
     g_variant_builder_add(&builder, "{sv}", "ssid", g_variant_new_string(ssidStr));
     g_variant_builder_add(&builder, "{sv}", "psk", g_variant_new_string(keyStr));
-    g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("WPA-PSK"));
+    g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("SAE WPA-PSK"));
     args = g_variant_builder_end(&builder);
 
     result = wpa_fi_w1_wpa_supplicant1_interface_call_add_network_sync(mWpaSupplicant.iface, args, &mWpaSupplicant.networkPath,

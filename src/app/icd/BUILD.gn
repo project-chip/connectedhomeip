@@ -42,7 +42,23 @@ source_set("manager") {
     ":cluster",
     ":notifier",
     ":observer",
+    ":sender",
     "${chip_root}/src/credentials:credentials",
+  ]
+}
+
+source_set("sender") {
+  sources = [
+    "ICDCheckInSender.cpp",
+    "ICDCheckInSender.h",
+  ]
+
+  public_deps = [
+    ":cluster",
+    ":notifier",
+    "${chip_root}/src/credentials:credentials",
+    "${chip_root}/src/lib/address_resolve:address_resolve",
+    "${chip_root}/src/protocols/secure_channel",
   ]
 }
 

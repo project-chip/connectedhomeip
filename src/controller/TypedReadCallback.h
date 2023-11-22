@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/BufferedReadCallback.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Decode.h>

@@ -231,6 +231,8 @@ server cluster BasicInformation = 40 {
   attribute access(write: manage) boolean localConfigDisabled = 16;
   readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
+  readonly attribute int32u specificationVersion = 21;
+  readonly attribute int16u maxPathsPerInvoke = 22;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -483,13 +485,13 @@ server cluster GeneralCommissioning = 48 {
 
   request struct SetRegulatoryConfigRequest {
     RegulatoryLocationTypeEnum newRegulatoryConfig = 0;
-    char_string countryCode = 1;
+    char_string<2> countryCode = 1;
     int64u breadcrumb = 2;
   }
 
   response struct ArmFailSafeResponse = 1 {
     CommissioningErrorEnum errorCode = 0;
-    char_string debugText = 1;
+    char_string<128> debugText = 1;
   }
 
   response struct SetRegulatoryConfigResponse = 3 {
@@ -1173,7 +1175,7 @@ server cluster Channel = 1284 {
 
 /** This cluster provides an interface for UX navigation within a set of targets on a device or endpoint. */
 server cluster TargetNavigator = 1285 {
-  enum TargetNavigatorStatusEnum : enum8 {
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kTargetNotFound = 1;
     kNotAllowed = 2;
@@ -1181,7 +1183,7 @@ server cluster TargetNavigator = 1285 {
 
   struct TargetInfoStruct {
     int8u identifier = 0;
-    char_string<32> name = 1;
+    char_string name = 1;
   }
 
   readonly attribute TargetInfoStruct targetList[] = 0;
@@ -1198,7 +1200,7 @@ server cluster TargetNavigator = 1285 {
   }
 
   response struct NavigateTargetResponse = 1 {
-    TargetNavigatorStatusEnum status = 0;
+    StatusEnum status = 0;
     optional char_string data = 1;
   }
 
@@ -1311,7 +1313,7 @@ server cluster LowPower = 1288 {
 
 /** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
 server cluster KeypadInput = 1289 {
-  enum CecKeyCode : enum8 {
+  enum CECKeyCodeEnum : enum8 {
     kSelect = 0;
     kUp = 1;
     kDown = 2;
@@ -1420,7 +1422,7 @@ server cluster KeypadInput = 1289 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SendKeyRequest {
-    CecKeyCode keyCode = 0;
+    CECKeyCodeEnum keyCode = 0;
   }
 
   response struct SendKeyResponse = 1 {
@@ -1517,8 +1519,10 @@ endpoint 0 {
     persist  attribute localConfigDisabled default = 0;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
+    callback attribute specificationVersion;
+    callback attribute maxPathsPerInvoke;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster OtaSoftwareUpdateRequestor {

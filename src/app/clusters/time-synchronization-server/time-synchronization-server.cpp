@@ -551,7 +551,7 @@ void TimeSynchronizationServer::InitTimeZone()
     for (auto & tzStore : mTimeZoneObj.timeZoneList)
     {
         memset(tzStore.name, 0, sizeof(tzStore.name));
-        tzStore.timeZone = { .offset = 0, .validAt = 0, .name = MakeOptional(CharSpan(tzStore.name, sizeof(tzStore.name))) };
+        tzStore.timeZone = { .offset = 0, .validAt = 0, .name = chip::NullOptional };
     }
 }
 
@@ -1284,24 +1284,19 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
             commandObj->AddStatus(commandPath, Status::ConstraintError);
             return true;
         }
-        if (!GetDelegate()->IsNTPAddressValid(dNtpChar.Value()))
+        bool dnsResolve;
+        if (EMBER_ZCL_STATUS_SUCCESS != SupportsDNSResolve::Get(commandPath.mEndpointId, &dnsResolve))
+        {
+            commandObj->AddStatus(commandPath, Status::Failure);
+            return true;
+        }
+        bool isDomain = GetDelegate()->IsNTPAddressDomain(dNtpChar.Value());
+        bool isIPv6   = GetDelegate()->IsNTPAddressValid(dNtpChar.Value());
+        bool useable  = isIPv6 || (isDomain && dnsResolve);
+        if (!useable)
         {
             commandObj->AddStatus(commandPath, Status::InvalidCommand);
             return true;
-        }
-        if (GetDelegate()->IsNTPAddressDomain(dNtpChar.Value()))
-        {
-            bool dnsResolve;
-            if (EMBER_ZCL_STATUS_SUCCESS != SupportsDNSResolve::Get(commandPath.mEndpointId, &dnsResolve))
-            {
-                commandObj->AddStatus(commandPath, Status::Failure);
-                return true;
-            }
-            if (!dnsResolve)
-            {
-                commandObj->AddStatus(commandPath, Status::InvalidCommand);
-                return true;
-            }
         }
     }
 

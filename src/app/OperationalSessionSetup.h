@@ -275,6 +275,14 @@ private:
     bool mPerformingAddressUpdate = false;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    // When we TryNextResult on the resolver, it will synchronously call back
+    // into our OnNodeAddressResolved when it succeeds.  We need to track
+    // whether the OnNodeAddressResolved is coming from handling a session
+    // establishment error or whether it's happening because we didn't even
+    // manage to start a session establishment at all.  Use this member to keep
+    // track of that.
+    bool mTryingNextResultDueToSessionEstablishmentError = false;
+
     uint8_t mRemainingAttempts = 0;
     uint8_t mAttemptsDone      = 0;
 
