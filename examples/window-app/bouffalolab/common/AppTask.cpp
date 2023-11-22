@@ -245,14 +245,14 @@ void AppTask::CloseHandler(void)
 
 void AppTask::ToggleMoveType(void)
 {
-    if (WindowCovering::Instance().GetMoveType() == WindowCoveringType::Lift)
+    if (WindowCovering::Instance().GetMoveType() == WindowCovering::MoveType::LIFT)
     {
-        WindowCovering::Instance().SetMoveType(WindowCoveringType::Tilt);
+        WindowCovering::Instance().SetMoveType(WindowCovering::MoveType::LIFT);
         ChipLogProgress(NotSpecified,"Window covering move: tilt");
     }
     else
     {
-        WindowCovering::Instance().SetMoveType(WindowCoveringType::Lift);
+        WindowCovering::Instance().SetMoveType(WindowCovering::MoveType::TILT);
         ChipLogProgress(NotSpecified,"Window covering move: lift");
     }
 }

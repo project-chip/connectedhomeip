@@ -32,7 +32,7 @@ if (chip_enable_pw_rpc) {
 
 assert(current_os == "freertos")
 
-example_dir = "${chip_root}/examples/lighting-app/bouffalolab"
+example_dir = "${chip_root}/examples/window-app/bouffalolab"
 examples_plat_dir = "${chip_root}/examples/platform/bouffalolab"
 
 declare_args() {
@@ -78,6 +78,7 @@ bl_iot_sdk("sdk") {
     "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_seconds}",
     "OTA_AUTO_REBOOT_DELAY=${ota_auto_reboot_delay_seconds}",
     "PRINT_DEBUG=0",
+    "APP_WINDOW_ENABLE",
   ]
 
   defines += [ "PW_RPC_ENABLED=${chip_enable_pw_rpc}" ]
@@ -97,15 +98,15 @@ bl_iot_sdk("sdk") {
   }
 }
 
-chip_data_model("bouffalolab-lighting") {
-  zap_file = "${example_dir}/data_model/lighting-app-wifi.zap"
+chip_data_model("bouffalolab-window") {
+  zap_file = "${example_dir}/data_model/window-app.zap"
 
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
+  zap_pregenerated_dir = "${chip_root}/zzz_generated/window-app/zap-generated"
   is_server = true
 }
 
-bouffalolab_executable("lighting_app") {
-  output_name = "chip-bl702l-lighting-example.out"
+bouffalolab_executable("window-app") {
+  output_name = "chip-bl702l-window-example.out"
   bl_plat_name = "bl702l"
 
   defines = [
@@ -135,18 +136,17 @@ bouffalolab_executable("lighting_app") {
   sources = [
     "${example_dir}/common/AppTask.cpp",
     "${example_dir}/common/ZclCallbacks.cpp",
+    "${example_dir}/common/WindowCovering.cpp",
     "${examples_plat_dir}/common/iot_sdk/aos_task.c",
-    "${examples_plat_dir}/common/iot_sdk/demo_pwm.c",
     "${examples_plat_dir}/common/iot_sdk/platform_port.cpp",
     "${examples_plat_dir}/common/iot_sdk/uart.cpp",
-    "${examples_plat_dir}/common/plat/LEDWidget.cpp",
     "${examples_plat_dir}/common/plat/OTAConfig.cpp",
     "${examples_plat_dir}/common/plat/main.cpp",
     "${examples_plat_dir}/common/plat/platform.cpp",
   ]
 
   deps = [
-    ":bouffalolab-lighting",
+    ":bouffalolab-window",
     ":sdk",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
@@ -285,7 +285,7 @@ bouffalolab_executable("lighting_app") {
 }
 
 group("bl702l") {
-  deps = [ ":lighting_app" ]
+  deps = [ ":window-app" ]
 }
 
 group("default") {

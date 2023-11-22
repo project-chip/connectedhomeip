@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,22 +20,17 @@
 #include <app/util/af.h>
 #include <platform/CHIPDeviceLayer.h>
 
+
+
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters::WindowCovering;
 
-#define TILT_OPEN_LIMIT 0
-#define TILT_CLOSED_LIMIT 100
-
 static constexpr uint32_t sMoveTimeoutMs{ 200 };
-constexpr uint16_t sPercentDelta   = 500;
 constexpr uint8_t kDefaultMinLevel = 0;
 constexpr uint8_t kDefaultMaxLevel = 254;
-
 WindowCovering::WindowCovering()
 {
-    Attributes::InstalledOpenLimitTilt::Set(Endpoint(), TILT_OPEN_LIMIT);
-    Attributes::InstalledClosedLimitTilt::Set(Endpoint(), TILT_CLOSED_LIMIT);
 
 }
 
@@ -48,9 +43,24 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
     VerifyOrReturn(Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), current) == EMBER_ZCL_STATUS_SUCCESS);
     VerifyOrReturn(Attributes::TargetPositionLiftPercent100ths::Get(Endpoint(), target) == EMBER_ZCL_STATUS_SUCCESS);
 
-    UpdateOperationalStatus(WindowCoveringType::Lift, ComputeOperationalState(target, current));
+    OperationalState state = ComputeOperationalState(target, current);
+    UpdateOperationalStatus(MoveType::LIFT, state);
 
-    positionToSet.SetNonNull(CalculateSingleStep(WindowCoveringType::Lift));
+    chip::Percent100ths position = CalculateNextPosition(MoveType::LIFT);
+
+    if (state == OperationalState::MovingUpOrOpen)
+    {
+        positionToSet.SetNonNull(position > target.Value() ? position : target.Value());
+    }
+    else if (state == OperationalState::MovingDownOrClose)
+    {
+        positionToSet.SetNonNull(position < target.Value() ? position : target.Value());
+    }
+    else
+    {
+        positionToSet.SetNonNull(current.Value());
+    }
+
     LiftPositionSet(Endpoint(), positionToSet);
 
     // assume single move completed
@@ -58,33 +68,31 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
 
     VerifyOrReturn(Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), current) == EMBER_ZCL_STATUS_SUCCESS);
 
-    if (!TargetCompleted(WindowCoveringType::Lift, current, target))
+    if (!TargetCompleted(MoveType::LIFT, current, target))
     {
         // continue to move
-        printf("1111\r\n");
-        StartTimer(WindowCoveringType::Lift, sMoveTimeoutMs);
+        StartTimer(MoveType::LIFT, sMoveTimeoutMs);
     }
     else
     {
-        printf("22222222\r\n");
         // the OperationalStatus should indicate no-lift-movement after the target is completed
-        UpdateOperationalStatus(WindowCoveringType::Lift, ComputeOperationalState(target, current));
+        UpdateOperationalStatus(MoveType::LIFT, ComputeOperationalState(target, current));
     }
 }
 
-chip::Percent100ths WindowCovering::CalculateSingleStep(WindowCoveringType aMoveType)
+chip::Percent100ths WindowCovering::CalculateNextPosition(MoveType aMoveType)
 {
     EmberAfStatus status{};
     chip::Percent100ths percent100ths{};
     NPercent100ths current{};
-    OperationalState opState = OperationalState::Stall;
+    OperationalState opState{};
 
-    if (aMoveType == WindowCoveringType::Lift)
+    if (aMoveType == MoveType::LIFT)
     {
         status  = Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), current);
         opState = OperationalStateGet(Endpoint(), OperationalStatus::kLift);
     }
-    else if (aMoveType == WindowCoveringType::Tilt)
+    else if (aMoveType == MoveType::TILT)
     {
         status  = Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), current);
         opState = OperationalStateGet(Endpoint(), OperationalStatus::kTilt);
@@ -92,24 +100,25 @@ chip::Percent100ths WindowCovering::CalculateSingleStep(WindowCoveringType aMove
 
     if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
     {
+        static constexpr auto sPercentDelta{ WC_PERCENT100THS_MAX_CLOSED / 20 };
         percent100ths = ComputePercent100thsStep(opState, current.Value(), sPercentDelta);
     }
     else
     {
-        ChipLogError(NotSpecified,"Cannot read the current lift position. Error: %d", static_cast<uint8_t>(status));
+        //LOG_ERR("Cannot read the current lift position. Error: %d", static_cast<uint8_t>(status));
     }
 
     return percent100ths;
 }
 
-bool WindowCovering::TargetCompleted(WindowCoveringType aMoveType, NPercent100ths aCurrent, NPercent100ths aTarget)
+bool WindowCovering::TargetCompleted(MoveType aMoveType, NPercent100ths aCurrent, NPercent100ths aTarget)
 {
     return (OperationalState::Stall == ComputeOperationalState(aTarget, aCurrent));
 }
 
-void WindowCovering::StartTimer(WindowCoveringType aMoveType, uint32_t aTimeoutMs)
+void WindowCovering::StartTimer(MoveType aMoveType, uint32_t aTimeoutMs)
 {
-    WindowCoveringType * moveType = chip::Platform::New<WindowCoveringType>();
+    MoveType * moveType = chip::Platform::New<MoveType>();
     VerifyOrReturn(moveType != nullptr);
 
     *moveType = aMoveType;
@@ -119,14 +128,14 @@ void WindowCovering::StartTimer(WindowCoveringType aMoveType, uint32_t aTimeoutM
 
 void WindowCovering::MoveTimerTimeoutCallback(chip::System::Layer * systemLayer, void * appState)
 {
-    WindowCoveringType * moveType = reinterpret_cast<WindowCoveringType *>(appState);
+    MoveType * moveType = reinterpret_cast<MoveType *>(appState);
     VerifyOrReturn(moveType != nullptr);
 
-    if (*moveType == WindowCoveringType::Lift)
+    if (*moveType == MoveType::LIFT)
     {
         chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCovering::DriveCurrentLiftPosition);
     }
-    else if (*moveType == WindowCoveringType::Tilt)
+    else if (*moveType == MoveType::TILT)
     {
         chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCovering::DriveCurrentTiltPosition);
     }
@@ -143,9 +152,24 @@ void WindowCovering::DriveCurrentTiltPosition(intptr_t)
     VerifyOrReturn(Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), current) == EMBER_ZCL_STATUS_SUCCESS);
     VerifyOrReturn(Attributes::TargetPositionTiltPercent100ths::Get(Endpoint(), target) == EMBER_ZCL_STATUS_SUCCESS);
 
-    UpdateOperationalStatus(WindowCoveringType::Lift, ComputeOperationalState(target, current));
+    OperationalState state = ComputeOperationalState(target, current);
+    UpdateOperationalStatus(MoveType::TILT, state);
 
-    positionToSet.SetNonNull(CalculateSingleStep(WindowCoveringType::Tilt));
+    chip::Percent100ths position = CalculateNextPosition(MoveType::TILT);
+
+    if (state == OperationalState::MovingUpOrOpen)
+    {
+        positionToSet.SetNonNull(position > target.Value() ? position : target.Value());
+    }
+    else if (state == OperationalState::MovingDownOrClose)
+    {
+        positionToSet.SetNonNull(position < target.Value() ? position : target.Value());
+    }
+    else
+    {
+        positionToSet.SetNonNull(current.Value());
+    }
+
     TiltPositionSet(Endpoint(), positionToSet);
 
     // assume single move completed
@@ -153,30 +177,30 @@ void WindowCovering::DriveCurrentTiltPosition(intptr_t)
 
     VerifyOrReturn(Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), current) == EMBER_ZCL_STATUS_SUCCESS);
 
-    if (!TargetCompleted(WindowCoveringType::Tilt, current, target))
+    if (!TargetCompleted(MoveType::TILT, current, target))
     {
         // continue to move
-        StartTimer(WindowCoveringType::Tilt, sMoveTimeoutMs);
+        StartTimer(MoveType::TILT, sMoveTimeoutMs);
     }
     else
     {
         // the OperationalStatus should indicate no-tilt-movement after the target is completed
-        UpdateOperationalStatus(WindowCoveringType::Tilt, ComputeOperationalState(target, current));
+        UpdateOperationalStatus(MoveType::TILT, ComputeOperationalState(target, current));
     }
 }
 
-void WindowCovering::StartMove(WindowCoveringType aMoveType)
+void WindowCovering::StartMove(MoveType aMoveType)
 {
     switch (aMoveType)
     {
-    case WindowCoveringType::Lift:
+    case MoveType::LIFT:
         if (!mInLiftMove)
         {
             mInLiftMove = true;
             StartTimer(aMoveType, sMoveTimeoutMs);
         }
         break;
-    case WindowCoveringType::Tilt:
+    case MoveType::TILT:
         if (!mInTiltMove)
         {
             mInTiltMove = true;
@@ -191,20 +215,20 @@ void WindowCovering::StartMove(WindowCoveringType aMoveType)
 void WindowCovering::SetSingleStepTarget(OperationalState aDirection)
 {
     UpdateOperationalStatus(mCurrentUIMoveType, aDirection);
-    SetTargetPosition(aDirection, CalculateSingleStep(mCurrentUIMoveType));
+    SetTargetPosition(aDirection, CalculateNextPosition(mCurrentUIMoveType));
 }
 
-void WindowCovering::UpdateOperationalStatus(WindowCoveringType aMoveType, OperationalState aDirection)
+void WindowCovering::UpdateOperationalStatus(MoveType aMoveType, OperationalState aDirection)
 {
     switch (aMoveType)
     {
-    case WindowCoveringType::Lift:
+    case MoveType::LIFT:
         OperationalStateSet(Endpoint(), OperationalStatus::kLift, aDirection);
         break;
-    case WindowCoveringType::Tilt:
+    case MoveType::TILT:
         OperationalStateSet(Endpoint(), OperationalStatus::kTilt, aDirection);
         break;
-    case WindowCoveringType::Reserved:
+    case MoveType::NONE:
         break;
     default:
         break;
@@ -214,69 +238,70 @@ void WindowCovering::UpdateOperationalStatus(WindowCoveringType aMoveType, Opera
 void WindowCovering::SetTargetPosition(OperationalState aDirection, chip::Percent100ths aPosition)
 {
     EmberAfStatus status{};
-    if (Instance().mCurrentUIMoveType == WindowCoveringType::Lift)
+    if (Instance().mCurrentUIMoveType == MoveType::LIFT)
     {
         status = Attributes::TargetPositionLiftPercent100ths::Set(Endpoint(), aPosition);
     }
-    else if (Instance().mCurrentUIMoveType == WindowCoveringType::Tilt)
+    else if (Instance().mCurrentUIMoveType == MoveType::TILT)
     {
         status = Attributes::TargetPositionTiltPercent100ths::Set(Endpoint(), aPosition);
     }
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified,"Cannot set the target position. Error: %d", static_cast<uint8_t>(status));
+        //LOG_ERR("Cannot set the target position. Error: %d", static_cast<uint8_t>(status));
     }
 }
 
-void WindowCovering::PositionLEDUpdate(WindowCoveringType aMoveType)
+void WindowCovering::PositionLEDUpdate(MoveType aMoveType)
 {
     EmberAfStatus status{};
     NPercent100ths currentPosition{};
 
-    if (aMoveType == WindowCoveringType::Lift)
+    if (aMoveType == MoveType::LIFT)
     {
         status = Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), currentPosition);
         if (EMBER_ZCL_STATUS_SUCCESS == status && !currentPosition.IsNull())
         {
-            Instance().SetBrightness(WindowCoveringType::Lift, currentPosition.Value());
+            Instance().SetBrightness(MoveType::LIFT, currentPosition.Value());
         }
     }
-    else if (aMoveType == WindowCoveringType::Tilt)
+    else if (aMoveType == MoveType::TILT)
     {
         status = Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), currentPosition);
         if (EMBER_ZCL_STATUS_SUCCESS == status && !currentPosition.IsNull())
         {
-            Instance().SetBrightness(WindowCoveringType::Tilt, currentPosition.Value());
+            Instance().SetBrightness(MoveType::TILT, currentPosition.Value());
         }
     }
 }
 
-void WindowCovering::SetBrightness(WindowCoveringType aMoveType, uint16_t aPosition)
+void WindowCovering::SetBrightness(MoveType aMoveType, uint16_t aPosition)
 {
     uint8_t brightness = PositionToBrightness(aPosition, aMoveType);
-    if (aMoveType == WindowCoveringType::Lift)
+    if (aMoveType == MoveType::LIFT)
     {
-        ChipLogProgress(NotSpecified, "Move Lift brightness %d",brightness);
+        ChipLogProgress(NotSpecified, " MoveType::LIFT brightness %d\r\n",brightness);
     }
-    else if (aMoveType == WindowCoveringType::Tilt)
+    else if (aMoveType == MoveType::TILT)
     {
-        ChipLogProgress(NotSpecified, "Move Tilt brightness %d",brightness);
+        ChipLogProgress(NotSpecified, " MoveType::TILT brightness %d\r\n",brightness);
     }
 }
 
-uint8_t WindowCovering::PositionToBrightness(uint16_t aPosition, WindowCoveringType aMoveType)
+uint8_t WindowCovering::PositionToBrightness(uint16_t aPosition, MoveType aMoveType)
 {
     AbsoluteLimits pwmLimits{};
-    if (aMoveType == WindowCoveringType::Lift)
+
+    if (aMoveType == MoveType::LIFT)
     {
-        pwmLimits.open   = GetMinLevel();
-        pwmLimits.closed = GetMaxLevel();
+        pwmLimits.open=kDefaultMinLevel;
+        pwmLimits.open=kDefaultMaxLevel;
     }
-    else if (aMoveType == WindowCoveringType::Tilt)
+    else if (aMoveType == MoveType::TILT)
     {
-        pwmLimits.open   = GetMinLevel();
-        pwmLimits.closed = GetMaxLevel();
+        pwmLimits.open=kDefaultMinLevel;
+        pwmLimits.open=kDefaultMaxLevel;
     }
 
     return Percent100thsToValue(pwmLimits, aPosition);

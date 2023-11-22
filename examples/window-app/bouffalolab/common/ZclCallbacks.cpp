@@ -58,16 +58,16 @@ void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::Concre
         switch (attributePath.mAttributeId)
         {
         case Attributes::TargetPositionLiftPercent100ths::Id:
-            WindowCovering::Instance().StartMove(WindowCoveringType::Lift);
+            WindowCovering::Instance().StartMove(WindowCovering::MoveType::LIFT);
             break;
         case Attributes::TargetPositionTiltPercent100ths::Id:
-            WindowCovering::Instance().StartMove(WindowCoveringType::Tilt);
+            WindowCovering::Instance().StartMove(WindowCovering::MoveType::TILT);
             break;
         case Attributes::CurrentPositionLiftPercent100ths::Id:
-            WindowCovering::Instance().PositionLEDUpdate(WindowCoveringType::Lift);
+            WindowCovering::Instance().PositionLEDUpdate(WindowCovering::MoveType::LIFT);
             break;
         case Attributes::CurrentPositionTiltPercent100ths::Id:
-            WindowCovering::Instance().PositionLEDUpdate(WindowCoveringType::Tilt);
+            WindowCovering::Instance().PositionLEDUpdate(WindowCovering::MoveType::TILT);
             break;
         default:
             WindowCovering::Instance().SchedulePostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);

@@ -87,33 +87,23 @@ The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
 
     ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-window-covering build
-    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light build
-    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-ethernet build
-    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-wifi build
-    ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light build
+    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-window-covering build
+    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-window-covering-ethernet build
+    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-window-covering-wifi build
+    ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-window-covering build
     ```
 
 -   Build lighting app with UART baudrate 115200
 
     ```
-    ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-115200 build
-    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-light-115200 build
-    ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light-light-115200 build
+    ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-window-covering-115200 build
+    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-window-covering-115200 build
+    ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-window-covering-115200 build
     ```
-
--   Build lighting app with RPC enabled and UART baudrate 115200.
-
-    ```
-    ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-rpc build
-    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-light-rpc build
-    ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light-light-rpc build
-    ```
-
 ### Build options with build_examples.py
 
 -   `-shell`, enable UART command line
 -   `-115200`, set UART baudrate to 115200 for log and command line
--   `-rpc`, enable Pigweed RPC feature
 -   `-cdc`, enable USB CDC feature, only support for BL706, and can't work with
     Ethernet Board
 -   `-resetCnt`, enable feature to do factory reset when continues power cycle
@@ -143,9 +133,9 @@ The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
     After building gets done, python script `*.flash.py` will generate under
     build output folder, such as
 
-    -   `chip-bl602-lighting-example.flash.py` for BL602
-    -   `chip-bl702-lighting-example.flash.py` for BL702
-    -   `chip-bl702l-lighting-example.flash.py` for BL702L
+    -   `chip-bl602-window-example.flash.py` for BL602
+    -   `chip-bl702-window-example.flash.py` for BL702
+    -   `chip-bl702l-window-example.flash.py` for BL702L
 
     > Note 1, `*.flash.py` should be ran under Matter build environment; if
     > python module `bflb_iot_tool` is not found, please try to do
@@ -171,24 +161,24 @@ The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
             build options
 
             ```shell
-            ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0
-            ./out/bouffalolab-bl706dk-light/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0
-            ./out/bouffalolab-bl704ldk-light/chip-bl702l-lighting-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-window-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl706dk-light/chip-bl702-window-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl704ldk-light/chip-bl702l-window-example.flash.py --port /dev/ttyACM0
             ```
 
         -   `bl706dk` with 115200 baudrate setting
 
             ```shell
-            ./out/bouffalolab-bl706dk-light-115200/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl706dk-window-covering-115200/chip-bl702-window-example.flash.py --port /dev/ttyACM0
             ```
 
         -   To wipe out flash and download image, please append `--erase` to the
             above command.
 
             ```shell
-            ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0 --erase
-            ./out/bouffalolab-bl706dk-light-115200/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0 --erase
-            ./out/bouffalolab-bl704ldk-light/chip-bl702l-lighting-example.flash.py --port /dev/ttyACM0 --erase
+            ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-window-example.flash.py --port /dev/ttyACM0 --erase
+            ./out/bouffalolab-bl706dk-window-covering-115200/chip-bl702-window-example.flash.py --port /dev/ttyACM0 --erase
+            ./out/bouffalolab-bl704ldk-light/chip-bl702l-window-example.flash.py --port /dev/ttyACM0 --erase
             ```
 
             > Note, better to append --erase option to download image for BL602
@@ -267,41 +257,19 @@ sudo ot-ctl dataset active -x
     > credential which running `sudo ot-ctl dataset active -x` command on border
     > router to get.
 
-### Cluster control
+### Window control
 
 After successful commissioning, cluster commands available to control the board.
 
--   OnOff cluster
+-   Window cluster
 
     The following command shows to toggle the LED on the board
 
     ```
-    $ ./chip-tool onoff toggle <node_id> 1
+    $ ./chip-tool windowcovering up-or-open <node_id> 1
+    $ ./chip-tool windowcovering down-or-close <node_id> 1
     ```
 
--   Level cluster
-
-    The following command shows to move level to 128.
-
-    ```
-    $ ./chip-tool levelcontrol move-to-level 128 10 0 0 <node_id> 1
-    ```
-
--   Color cluster
-
-    The following command shows to change hue and saturation to 240 and 100
-
-    ```
-    $ ./chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 <node_id> 1
-    ```
-
--   Identify Light
-
-    The following command shows to identify the board 10 seconds
-
-    ```shell
-    ./chip-tool identify identify 10 <node_id> 1
-    ```
 
 ## Test OTA software upgrade with ota-provider-app
 
@@ -330,23 +298,23 @@ ota-provider-app build and usage.
     **connectedhomeip** repo folder
 
     ```shell
-    $ ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 10 -vs "1.0" -da sha256 <FW_OTA.bin.xz.hash> lighting-app.ota
+    $ ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 10 -vs "1.0" -da sha256 <FW_OTA.bin.xz.hash> window-app.ota
 
     ```
 
-    > lighting-app.ota should have greater software version which is defined by
+    > window-app.ota should have greater software version which is defined by
     > macro `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION` in CHIPProjectConfig.h
 
 ### Start ota-provider-app
 
--   Start ota-provider-app for lighting-app.ota
+-   Start ota-provider-app for window-app.ota
 
     ```shell
     $ rm -r /tmp/chip_*
-    $ ./chip-ota-provider-app -f <path_to_ota_bin>/lighting-app.ota
+    $ ./chip-ota-provider-app -f <path_to_ota_bin>/window-app.ota
     ```
 
-    where `<path_to_ota_bin>` is the folder for lighting-app.ota.
+    where `<path_to_ota_bin>` is the folder for window-app.ota.
 
 -   Provision ota-provider-app with assigned node id to 1
     ```shell
@@ -364,20 +332,3 @@ ota-provider-app build and usage.
     where `<node_id_to_lighting_app>` is node id of BL602/BL702 lighting app.
 -   After OTA software upgrade gets done, BL602/BL702 will get reboot
     automatically.
-
-## Run RPC Console
-
--   Build chip-console following this
-    [guide](../../common/pigweed/rpc_console/README.md)
-
--   Start the console
-
-    ```
-    $ chip-console --device /dev/ttyUSB0 -b 2000000
-    ```
-
--   Get or Set the light state
-
-    `rpcs.chip.rpc.Lighting.Get()`
-
-    `rpcs.chip.rpc.Lighting.Set(on=True, level=128)`
