@@ -33,25 +33,30 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="4"/>
     <description>This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server.</description>
     <!--Attributes-->
+    
     <attribute code="0x0000" side="server" define="MEASURED" type="boolean" writable="false" optional="false">Measured</attribute>
     <attribute code="0x0001" side="server" define="ACCURACY" type="MeasurementAccuracyStruct" writable="false" optional="false">Accuracy</attribute>
     <!--Conformance feature IMPE & CUME - for now optional-->
+    
     <attribute code="0x0002" side="server" define="CUMULATIVE_ENERGY_IMPORTED" type="EnergyMeasurementStruct" isNullable="true" writable="false" optional="true">CumulativeEnergyImported</attribute>
     <!--Conformance feature EXPE & CUME - for now optional-->
+    
     <attribute code="0x0003" side="server" define="CUMULATIVE_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" writable="false" optional="true">CumulativeEnergyExported</attribute>
     <!--Conformance feature IMPE & PERE - for now optional-->
+    
     <attribute code="0x0004" side="server" define="PERIODIC_ENERGY_IMPORTED" type="EnergyMeasurementStruct" isNullable="true" writable="false" optional="true">PeriodicEnergyImported</attribute>
     <!--Conformance feature EXPE & PERE - for now optional-->
+    
     <attribute code="0x0005" side="server" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" writable="false" optional="true">PeriodicEnergyExported</attribute>
     <event code="0x0000" name="CumulativeEnergyMeasured" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>CumulativeEnergyMeasured</description>
-      <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true" apiMaturity="provisional"/>
-      <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true" apiMaturity="provisional"/>
+      <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
+      <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
     </event>
     <event code="0x0001" name="PeriodicEnergyMeasured" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>PeriodicEnergyMeasured</description>
-      <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true" apiMaturity="provisional"/>
-      <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true" apiMaturity="provisional"/>
+      <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
+      <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
     </event>
   </cluster>
   <enum name="MeasurementTypeEnum" type="enum16" apiMaturity="provisional">
@@ -97,6 +102,6 @@ limitations under the License.
     <item fieldId="4" name="PercentTypical" type="percent100ths" optional="true"/>
     <item fieldId="5" name="FixedMax" type="int64u" max="0x3FFFFFFFFFFFFFFF" optional="true"/>
     <item fieldId="6" name="FixedMin" type="int64u" max="0x3FFFFFFFFFFFFFFF" optional="true"/>
-    <item fieldId="7" name="FixedTypical" type="int64u" optional="true"/>
+    <item fieldId="7" name="FixedTypical" type="int64u" max="0x3FFFFFFFFFFFFFFF" optional="true"/>
   </struct>
 </configurator>
