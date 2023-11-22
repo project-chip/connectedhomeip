@@ -158,7 +158,11 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
         break;
     case DeviceEventType::kCommissioningComplete:
         ChipLogProgress(NotSpecified, "Commissioning complete");
-        GetAppTask().PostEvent(AppTask::APP_EVENT_LIGHTING_MASK);
+        #ifdef APP_WINDOW_ENABLE
+            GetAppTask().PostEvent(AppTask::APP_EVENT_WINDOW_MASK);
+        #else
+            GetAppTask().PostEvent(AppTask::APP_EVENT_LIGHTING_MASK);
+        #endif
         break;
     default:
         break;

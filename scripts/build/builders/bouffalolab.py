@@ -21,22 +21,29 @@ from .gn import GnBuilder
 
 class BouffalolabApp(Enum):
     LIGHT = auto()
+    WINDOW_COVERING = auto()
 
     def ExampleName(self):
         if self == BouffalolabApp.LIGHT:
             return 'lighting-app'
+        elif self == BouffalolabApp.WINDOW_COVERING:
+            return 'window-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self, chip_name):
         if self == BouffalolabApp.LIGHT:
             return ('chip-%s-lighting-example' % chip_name)
+        elif self == BouffalolabApp.WINDOW_COVERING:
+            return ('chip-%s-window-example' % chip_name)
         else:
             raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
         if self == BouffalolabApp.LIGHT:
             return 'lighting_app.flashbundle.txt'
+        elif self == BouffalolabApp.WINDOW_COVERING:
+            return 'window_app.flashbundle.txt'
         else:
             raise Exception('Unknown app type: %r' % self)
 

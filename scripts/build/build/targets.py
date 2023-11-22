@@ -640,6 +640,7 @@ def BuildBouffalolabTarget():
     # Apps
     target.AppendFixedTargets([
         TargetPart('light', app=BouffalolabApp.LIGHT),
+        TargetPart('window-covering', app=BouffalolabApp.WINDOW_COVERING), 
     ])
 
     target.AppendModifier('shell', enable_shell=True)
