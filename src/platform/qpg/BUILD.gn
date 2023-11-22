@@ -70,6 +70,10 @@ static_library("qpg") {
       public_deps += [ "${openthread_root}:libopenthread-mtd" ]
     }
 
+    public_configs += [
+      "${chip_root}/third_party/openthread/platforms/qpg:openthread_qpg_config",
+    ]
+
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",
       "ThreadStackManagerImpl.cpp",
