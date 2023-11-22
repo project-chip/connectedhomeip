@@ -170,7 +170,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
     auto & CookTime     = req.cookTime;
     auto & PowerSetting = req.powerSetting;
 
-    // TODO: check if the input cook mode value is invalid
+    // TODO(#30609): check if the input cook mode value is invalid
 
     if (CookTime.HasValue() && (!IsCookTimeInRange(CookTime.Value())))
     {

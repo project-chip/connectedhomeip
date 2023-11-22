@@ -29,17 +29,21 @@ public:
         mMicrowaveOvenControlInstance(&mMicrowaveOvenControlDelegate, aClustersEndpoint, MicrowaveOvenControl::Id),
         mOperationalStateDelegate(), mOperationalStateInstance(&mOperationalStateDelegate, aClustersEndpoint, OperationalState::Id)
     {
-        // set callback functions
+        // set callback functions   
         mMicrowaveOvenControlDelegate.SetMicrowaveOvenControlSetCookingParametersCallback(
-            &MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCallback, this);
+            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCallback, this,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3));
         mMicrowaveOvenControlDelegate.SetMicrowaveOvenControlAddMoreTimeCallback(
-            &MicrowaveOvenDevice::HandleMicrowaveOvenAddMoreTimeCallback, this);
-        mOperationalStateDelegate.SetOpStatePauseCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStatePauseCallback, this);
-        mOperationalStateDelegate.SetOpStateResumeCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateResumeCallback, this);
-        mOperationalStateDelegate.SetOpStateStartCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateStartCallback, this);
-        mOperationalStateDelegate.SetOpStateStopCallback(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateStopCallback, this);
+            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenAddMoreTimeCallback, this, std::placeholders::_1));
+        mOperationalStateDelegate.SetOpStatePauseCallback(
+            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStatePauseCallback, this, std::placeholders::_1));
+        mOperationalStateDelegate.SetOpStateResumeCallback(
+            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateResumeCallback, this, std::placeholders::_1));
+        mOperationalStateDelegate.SetOpStateStartCallback(
+            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateStartCallback, this, std::placeholders::_1));
+        mOperationalStateDelegate.SetOpStateStopCallback(
+            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateStopCallback, this, std::placeholders::_1));
         mOperationalStateDelegate.SetOpStateGetCountdownTimeCallback(
-            &MicrowaveOvenDevice::HandleMicrowaveOvenOpStateGetCountdownTime, this);
+            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateGetCountdownTime, this));
     }
 
     /**

@@ -29,7 +29,7 @@ Protocols::InteractionModel::Status
 MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime, uint8_t powerSetting)
 {
     // placeholder implementation
-    // TODO: set Microwave Oven cooking mode by cookMode.Value().
+    // TODO(#30609): set Microwave Oven cooking mode by cookMode.Value().
     mMicrowaveOvenControlInstance.SetCookTime(cookTime);
     mMicrowaveOvenControlInstance.SetPowerSetting(powerSetting);
     return Status::Success;

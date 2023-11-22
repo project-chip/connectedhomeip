@@ -24,11 +24,6 @@ using namespace chip::app::Clusters::OperationalState;
 using OperationalStateEnum = chip::app::Clusters::OperationalState::OperationalStateEnum;
 
 // Operational State command callbacks
-app::DataModel::Nullable<uint32_t> OperationalStateDelegate::GetCountdownTime()
-{
-    return (mGetCountdownTimeMicrowaveOvenInstance->*mGetCountdownTimeCallback)();
-}
-
 CHIP_ERROR OperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
     if (index > mOperationalStateList.size() - 1)
@@ -49,53 +44,53 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Ge
     return CHIP_NO_ERROR;
 }
 
+
+void OperationalStateDelegate::SetOpStatePauseCallback(std::function<void(Clusters::OperationalState::GenericOperationalError & err)> aCallback)
+{
+    mPauseCallback = aCallback;
+}
+
+void OperationalStateDelegate::SetOpStateResumeCallback(std::function<void(Clusters::OperationalState::GenericOperationalError & err)> aCallback)
+{
+    mResumeCallback = aCallback;
+}
+
+void OperationalStateDelegate::SetOpStateStartCallback(std::function<void(Clusters::OperationalState::GenericOperationalError & err)> aCallback)
+{
+    mStartCallback = aCallback;
+}
+
+void OperationalStateDelegate::SetOpStateStopCallback(std::function<void(Clusters::OperationalState::GenericOperationalError & err)> aCallback)
+{
+    mStopCallback = aCallback;
+}
+
+void OperationalStateDelegate::SetOpStateGetCountdownTimeCallback(std::function<app::DataModel::Nullable<uint32_t>(void)> aCallback)
+{
+    mGetCountdownTimeCallback = aCallback;
+}
+
+app::DataModel::Nullable<uint32_t> OperationalStateDelegate::OperationalStateDelegate::GetCountdownTime()
+{
+    return mGetCountdownTimeCallback();
+}
+
 void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
-    (mPauseMicrowaveOvenInstance->*mPauseCallback)(err);
+    mPauseCallback(err);
 }
 
 void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
 {
-    (mResumeMicrowaveOvenInstance->*mResumeCallback)(err);
+    mResumeCallback(err);
 }
 
 void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
 {
-    (mStartMicrowaveOvenInstance->*mStartCallback)(err);
+    mStartCallback(err);
 }
 
 void OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
 {
-    (mStopMicrowaveOvenInstance->*mStopCallback)(err);
-}
-
-void OperationalStateDelegate::SetOpStatePauseCallback(HandleOpStateCommand aCallback, MicrowaveOvenDevice * aInstance)
-{
-    mPauseMicrowaveOvenInstance = aInstance;
-    mPauseCallback              = aCallback;
-}
-
-void OperationalStateDelegate::SetOpStateResumeCallback(HandleOpStateCommand aCallback, MicrowaveOvenDevice * aInstance)
-{
-    mResumeMicrowaveOvenInstance = aInstance;
-    mResumeCallback              = aCallback;
-}
-
-void OperationalStateDelegate::SetOpStateStartCallback(HandleOpStateCommand aCallback, MicrowaveOvenDevice * aInstance)
-{
-    mStartMicrowaveOvenInstance = aInstance;
-    mStartCallback              = aCallback;
-}
-
-void OperationalStateDelegate::SetOpStateStopCallback(HandleOpStateCommand aCallback, MicrowaveOvenDevice * aInstance)
-{
-    mStopMicrowaveOvenInstance = aInstance;
-    mStopCallback              = aCallback;
-}
-
-void OperationalStateDelegate::SetOpStateGetCountdownTimeCallback(HandleGetCountdownTimeCommand aCallback,
-                                                                  MicrowaveOvenDevice * aInstance)
-{
-    mGetCountdownTimeMicrowaveOvenInstance = aInstance;
-    mGetCountdownTimeCallback              = aCallback;
+    mStopCallback(err);
 }

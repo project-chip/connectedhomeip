@@ -22,18 +22,12 @@
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
 #include <app/util/af-enums.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <functional>
+
 
 namespace chip {
 namespace app {
 namespace Clusters {
-
-class MicrowaveOvenDevice;
-
-typedef Protocols::InteractionModel::Status (MicrowaveOvenDevice::*HandleSetCookingParametersCommand)(uint8_t cookMode,
-                                                                                                      uint32_t cookTime,
-                                                                                                      uint8_t powerSetting);
-typedef Protocols::InteractionModel::Status (MicrowaveOvenDevice::*HandleAddMoreTimeCommand)(uint32_t addedCookTime);
-
 namespace MicrowaveOvenControl {
 
 // This is an application level delegate to handle microwave oven control commands according to the specific
@@ -42,10 +36,8 @@ class ExampleMicrowaveOvenControlDelegate : public MicrowaveOvenControl::Delegat
 {
 
 private:
-    MicrowaveOvenDevice * mSetCookingParametersInstance;
-    HandleSetCookingParametersCommand mSetCookingParametersCommandCallback;
-    MicrowaveOvenDevice * mAddMoreTimeInstance;
-    HandleAddMoreTimeCommand mAddMoreTimeCommandCallback;
+    std::function<Protocols::InteractionModel::Status(uint8_t,uint32_t,uint8_t)> mHandleSetCookingParametersCallback;
+    std::function<Protocols::InteractionModel::Status(uint32_t)> mHandleAddMoreTimeCallback;
 
 public:
     /**
@@ -77,13 +69,12 @@ public:
     /**
      * Set callback function for set cooking parameters
      */
-    void SetMicrowaveOvenControlSetCookingParametersCallback(HandleSetCookingParametersCommand aCallback,
-                                                             MicrowaveOvenDevice * aInstance);
+    void SetMicrowaveOvenControlSetCookingParametersCallback(std::function<Protocols::InteractionModel::Status(uint8_t,uint32_t,uint8_t)> aCallback);
 
     /**
      * Set callback function for add more time
      */
-    void SetMicrowaveOvenControlAddMoreTimeCallback(HandleAddMoreTimeCommand aCallback, MicrowaveOvenDevice * aInstance);
+    void SetMicrowaveOvenControlAddMoreTimeCallback(std::function<Protocols::InteractionModel::Status(uint32_t)> aCallback);
 };
 
 } // namespace MicrowaveOvenControl

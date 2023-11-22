@@ -22,16 +22,11 @@
 #include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app/util/af-enums.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <functional>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-
-class MicrowaveOvenDevice;
-
-typedef void (MicrowaveOvenDevice::*HandleOpStateCommand)(Clusters::OperationalState::GenericOperationalError & err);
-typedef app::DataModel::Nullable<uint32_t> (MicrowaveOvenDevice::*HandleGetCountdownTimeCommand)(void);
-
 namespace OperationalState {
 
 // This is an application level delegate to handle operational state commands according to the specific business logic.
@@ -54,17 +49,13 @@ private:
 
     Span<const GenericOperationalPhase> mOperationalPhaseList = Span<const GenericOperationalPhase>(opPhaseList);
 
-    MicrowaveOvenDevice * mPauseMicrowaveOvenInstance;
-    HandleOpStateCommand mPauseCallback;
-    MicrowaveOvenDevice * mResumeMicrowaveOvenInstance;
-    HandleOpStateCommand mResumeCallback;
-    MicrowaveOvenDevice * mStartMicrowaveOvenInstance;
-    HandleOpStateCommand mStartCallback;
-    MicrowaveOvenDevice * mStopMicrowaveOvenInstance;
-    HandleOpStateCommand mStopCallback;
-    MicrowaveOvenDevice * mGetCountdownTimeMicrowaveOvenInstance;
-    HandleGetCountdownTimeCommand mGetCountdownTimeCallback;
+    std::function<void(Clusters::OperationalState::GenericOperationalError & err)> mPauseCallback;
+    std::function<void(Clusters::OperationalState::GenericOperationalError & err)> mResumeCallback;
+    std::function<void(Clusters::OperationalState::GenericOperationalError & err)> mStartCallback;
+    std::function<void(Clusters::OperationalState::GenericOperationalError & err)> mStopCallback;
+    std::function<app::DataModel::Nullable<uint32_t>(void)> mGetCountdownTimeCallback;
 
+    
 public:
     /**
      * Get the countdown time.
@@ -120,27 +111,27 @@ public:
     /**
      * Set callback function for pause
      */
-    void SetOpStatePauseCallback(HandleOpStateCommand aCallback, MicrowaveOvenDevice * aInstance);
+    void SetOpStatePauseCallback(std::function<void(Clusters::OperationalState::GenericOperationalError & err)> aCallback);
 
     /**
      * Set callback function for resume
      */
-    void SetOpStateResumeCallback(HandleOpStateCommand aCallback, MicrowaveOvenDevice * aInstance);
+    void SetOpStateResumeCallback(std::function<void(Clusters::OperationalState::GenericOperationalError & err)> aCallback);
 
     /**
      * Set callback function for start
      */
-    void SetOpStateStartCallback(HandleOpStateCommand aCallback, MicrowaveOvenDevice * aInstance);
+    void SetOpStateStartCallback(std::function<void(Clusters::OperationalState::GenericOperationalError & err)> aCallback);
 
     /**
      * Set callback function for stop
      */
-    void SetOpStateStopCallback(HandleOpStateCommand aCallback, MicrowaveOvenDevice * aInstance);
+    void SetOpStateStopCallback(std::function<void(Clusters::OperationalState::GenericOperationalError & err)> aCallback);
 
     /**
      * Set callback function for get count down time
      */
-    void SetOpStateGetCountdownTimeCallback(HandleGetCountdownTimeCommand aCallback, MicrowaveOvenDevice * aInstance);
+    void SetOpStateGetCountdownTimeCallback(std::function<app::DataModel::Nullable<uint32_t>(void)> aCallback);
 };
 
 } // namespace OperationalState
