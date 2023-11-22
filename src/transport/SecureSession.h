@@ -158,7 +158,7 @@ public:
 
     bool AllowsMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
 
-    bool IsTransportTCP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kTcp; }
+    bool AllowsLargePayload() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kTcp; }
 
     System::Clock::Milliseconds32 GetAckTimeout() const override
     {

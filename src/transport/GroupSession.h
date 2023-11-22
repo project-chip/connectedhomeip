@@ -58,7 +58,7 @@ public:
     }
 
     bool AllowsMRP() const override { return false; }
-    bool IsTransportTCP() const override { return false; }
+    bool AllowsLargePayload() const override { return false; }
 
     const SessionParameters & GetRemoteSessionParameters() const override
     {
@@ -110,7 +110,7 @@ public:
     }
 
     bool AllowsMRP() const override { return false; }
-    bool IsTransportTCP() const override { return false; }
+    bool AllowsLargePayload() const override { return false; }
 
     const SessionParameters & GetRemoteSessionParameters() const override
     {

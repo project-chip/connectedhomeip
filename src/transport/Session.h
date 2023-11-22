@@ -196,7 +196,7 @@ public:
     virtual ScopedNodeId GetLocalScopedNodeId() const                    = 0;
     virtual Access::SubjectDescriptor GetSubjectDescriptor() const       = 0;
     virtual bool AllowsMRP() const                                       = 0;
-    virtual bool IsTransportTCP() const                                  = 0;
+    virtual bool AllowsLargePayload() const                              = 0;
     virtual const SessionParameters & GetRemoteSessionParameters() const = 0;
     virtual System::Clock::Timestamp GetMRPBaseTimeout() const           = 0;
     virtual System::Clock::Milliseconds32 GetAckTimeout() const          = 0;
