@@ -51,10 +51,6 @@
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDData.h> //nogncheck
-#endif
-
 // https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/61a9d19e6af12fdfb0872bcff26d19de6c680a1a/src/Ch02_Architecture.adoc#1122-subscribe-interaction-limits
 inline constexpr uint16_t kSubscriptionMaxIntervalPublisherLimit = 3600; // seconds (60 minutes)
 
@@ -256,10 +252,6 @@ public:
         mMaxInterval = aMaxInterval;
         return CHIP_NO_ERROR;
     }
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    static void SetICDData(ICDData * icdData) { mICDData = icdData; }
-#endif
 
 private:
     PriorityLevel GetCurrentPriority() const { return mCurrentPriority; }
@@ -584,10 +576,6 @@ private:
     // Callbacks to handle server-initiated session success/failure
     chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
-#endif
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    static ICDData * mICDData;
 #endif
 };
 } // namespace app

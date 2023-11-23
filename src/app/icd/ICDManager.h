@@ -66,7 +66,7 @@ public:
 
     ICDManager() {}
     void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore,
-              Messaging::ExchangeManager * exchangeManager, ICDData * icdData);
+              Messaging::ExchangeManager * exchangeManager);
     void Shutdown();
     void UpdateICDMode();
     void UpdateOperationState(OperationalState state);

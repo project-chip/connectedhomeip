@@ -35,19 +35,18 @@
 #include <app/ReadHandler.h>
 #include <app/reporting/Engine.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDData.h> //nogncheck
+#endif
+
 namespace chip {
 namespace app {
 using Status = Protocols::InteractionModel::Status;
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-ICDData * ReadHandler::mICDData;
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    VerifyOrDieWithMsg(mICDData != nullptr, DataManagement, "Requires ICDData when running as an ICD server");
-    return static_cast<uint16_t>(mICDData->GetIdleModeDurationSec());
+    return static_cast<uint16_t>(ICDData::GetInstance().GetIdleModeDurationSec());
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
 #endif

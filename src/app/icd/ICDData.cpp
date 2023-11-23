@@ -19,6 +19,8 @@
 
 namespace chip {
 
+ICDData ICDData::instance;
+
 System::Clock::Milliseconds32 ICDData::GetSlowPollingInterval()
 {
 #if ICD_ENFORCE_SIT_SLOW_POLL_LIMIT

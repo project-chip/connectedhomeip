@@ -69,7 +69,6 @@
 #include <transport/raw/UDP.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDData.h>    // nogncheck
 #include <app/icd/ICDManager.h> // nogncheck
 #endif
 
@@ -353,7 +352,6 @@ public:
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::ICDManager & GetICDManager() { return mICDManager; }
-    ICDData & GetICDData() { return mICDData; };
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     /**
@@ -626,7 +624,6 @@ private:
     System::Clock::Microseconds64 mInitTimestamp;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::ICDManager mICDManager;
-    ICDData mICDData;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 };
 

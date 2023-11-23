@@ -41,13 +41,12 @@ static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
 void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore,
-                      Messaging::ExchangeManager * exchangeManager, ICDData * icdData)
+                      Messaging::ExchangeManager * exchangeManager)
 {
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
     VerifyOrDie(symmetricKeystore != nullptr);
     VerifyOrDie(exchangeManager != nullptr);
-    VerifyOrDie(icdData != nullptr);
 
     bool supportLIT = SupportsFeature(Feature::kLongIdleTimeSupport);
     VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kCheckInProtocolSupport), AppServer,
@@ -64,7 +63,7 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
     mSymmetricKeystore = symmetricKeystore;
     mExchangeManager   = exchangeManager;
-    mICDData           = icdData;
+    mICDData           = &ICDData::GetInstance();
 
     // Removing the check for now since it is possible for the Fast polling
     // to be larger than the ActiveModeDuration for now

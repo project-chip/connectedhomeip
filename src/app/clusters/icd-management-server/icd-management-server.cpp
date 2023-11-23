@@ -118,15 +118,12 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoi
 {
     uint16_t supported_clients = mICDData->GetClientsSupportedPerFabric();
 
-    return encoder.EncodeList([supported_clients](const auto & subEncoder) -> CHIP_ERROR {
-        Crypto::SessionKeystore * keyStore = Server::GetInstance().GetSessionKeystore();
-        ICDMonitoringEntry e(keyStore);
+    return encoder.EncodeList([supported_clients, mStorage, mSessionKeystore, mFabricTable](const auto & subEncoder) -> CHIP_ERROR {
+        ICDMonitoringEntry e(mSessionKeystore);
 
-        const auto & fabricTable            = Server::GetInstance().GetFabricTable();
-        PersistentStorageDelegate & storage = Server::GetInstance().GetPersistentStorage();
-        for (const auto & fabricInfo : fabricTable)
+        for (const auto & fabricInfo : mFabricTable)
         {
-            ICDMonitoringTable table(storage, fabricInfo.GetFabricIndex(), supported_clients, keyStore);
+            ICDMonitoringTable table(mStorage, fabricInfo.GetFabricIndex(), supported_clients, mSessionKeystore);
             for (uint16_t i = 0; i < table.Limit(); ++i)
             {
                 CHIP_ERROR err = table.Get(i, e);
@@ -160,7 +157,7 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadClientsSupportedPerFabric(EndpointI
 /**
  * @brief Implementation of Fabric Delegate for ICD Management cluster
  */
-class IcdManagementFabricDelegate : public chip::FabricTable::Delegate
+class IcdManagementFabricDelegate : public FabricTable::Delegate
 {
 public:
     void Init(PersistentStorageDelegate & storage, Crypto::SessionKeystore * sessionKeystore, ICDData icdData)
@@ -197,8 +194,8 @@ PersistentStorageDelegate * ICDManagementServer::mStorage           = nullptr;
 Crypto::SymmetricKeystore * ICDManagementServer::mSymmetricKeystore = nullptr;
 ICDData * ICDManagementServer::mICDData                             = nullptr;
 
-Status ICDManagementServer::RegisterClient(FabricIndex fabric_index, chip::NodeId node_id, uint64_t monitored_subject,
-                                           chip::ByteSpan key, Optional<chip::ByteSpan> verification_key, bool isAdmin,
+Status ICDManagementServer::RegisterClient(FabricIndex fabric_index, NodeId node_id, uint64_t monitored_subject,
+                                           ByteSpan key, Optional<ByteSpan> verification_key, bool isAdmin,
                                            uint32_t & icdCounter)
 {
     bool isFirstEntryForFabric = false;
@@ -262,8 +259,8 @@ Status ICDManagementServer::RegisterClient(FabricIndex fabric_index, chip::NodeI
     return InteractionModel::Status::Success;
 }
 
-Status ICDManagementServer::UnregisterClient(FabricIndex fabric_index, chip::NodeId node_id,
-                                             Optional<chip::ByteSpan> verificationKey, bool isAdmin)
+Status ICDManagementServer::UnregisterClient(FabricIndex fabric_index, NodeId node_id,
+                                             Optional<ByteSpan> verificationKey, bool isAdmin)
 {
     ICDMonitoringTable table(*mStorage, fabric_index, mICDData->GetClientsSupportedPerFabric(), mSymmetricKeystore);
 
@@ -304,8 +301,8 @@ void ICDManagementServer::TriggerICDMTableUpdatedEvent()
     app::ICDNotifier::GetInstance().BroadcastICDManagementEvent(app::ICDListener::ICDManagementEvents::kTableUpdated);
 }
 
-CHIP_ERROR ICDManagementServer::CheckAdmin(chip::app::CommandHandler * commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath, bool & isAdmin)
+CHIP_ERROR ICDManagementServer::CheckAdmin(app::CommandHandler * commandObj,
+                                           const app::ConcreteCommandPath & commandPath, bool & isAdmin)
 {
     RequestPath requestPath{ .cluster = commandPath.mClusterId, .endpoint = commandPath.mEndpointId };
     CHIP_ERROR err = GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, Privilege::kAdminister);
@@ -337,8 +334,8 @@ void ICDManagementServer::Init(PersistentStorageDelegate & storage, Crypto::Symm
  * @brief ICD Management Cluster RegisterClient Command callback (from client)
  *
  */
-bool emberAfIcdManagementClusterRegisterClientCallback(chip::app::CommandHandler * commandObj,
-                                                       const chip::app::ConcreteCommandPath & commandPath,
+bool emberAfIcdManagementClusterRegisterClientCallback(app::CommandHandler * commandObj,
+                                                       const app::ConcreteCommandPath & commandPath,
                                                        const Commands::RegisterClient::DecodableType & commandData)
 {
     InteractionModel::Status status = InteractionModel::Status::Failure;
@@ -370,8 +367,8 @@ bool emberAfIcdManagementClusterRegisterClientCallback(chip::app::CommandHandler
  * @brief ICD Management Cluster UregisterClient Command callback (from client)
  *
  */
-bool emberAfIcdManagementClusterUnregisterClientCallback(chip::app::CommandHandler * commandObj,
-                                                         const chip::app::ConcreteCommandPath & commandPath,
+bool emberAfIcdManagementClusterUnregisterClientCallback(app::CommandHandler * commandObj,
+                                                         const app::ConcreteCommandPath & commandPath,
                                                          const Commands::UnregisterClient::DecodableType & commandData)
 {
     InteractionModel::Status status = InteractionModel::Status::Failure;
@@ -391,8 +388,8 @@ bool emberAfIcdManagementClusterUnregisterClientCallback(chip::app::CommandHandl
 /**
  * @brief ICD Management Cluster StayActiveRequest Command callback (from client)
  */
-bool emberAfIcdManagementClusterStayActiveRequestCallback(chip::app::CommandHandler * commandObj,
-                                                          const chip::app::ConcreteCommandPath & commandPath,
+bool emberAfIcdManagementClusterStayActiveRequestCallback(app::CommandHandler * commandObj,
+                                                          const app::ConcreteCommandPath & commandPath,
                                                           const Commands::StayActiveRequest::DecodableType & commandData)
 {
     ICDManagementServer server;
@@ -404,10 +401,10 @@ bool emberAfIcdManagementClusterStayActiveRequestCallback(chip::app::CommandHand
 
 void MatterIcdManagementPluginServerInitCallback()
 {
-    PersistentStorageDelegate & storage       = chip::Server::GetInstance().GetPersistentStorage();
-    FabricTable & fabricTable                 = chip::Server::GetInstance().GetFabricTable();
-    Crypto::SessionKeystore * sessionKeystore = chip::Server::GetInstance().GetSessionKeystore();
-    ICDData & icdData                         = chip::Server::GetInstance().GetICDData();
+    PersistentStorageDelegate & storage       = Server::GetInstance().GetPersistentStorage();
+    FabricTable & fabricTable                 = Server::GetInstance().GetFabricTable();
+    Crypto::SessionKeystore * sessionKeystore = Server::GetInstance().GetSessionKeystore();
+    ICDData & icdData                         = ICDData::GetInstance().GetInstance();
 
     // Configure and register Fabric delegate
     gFabricDelegate.Init(storage, sessionKeystore, icdData);

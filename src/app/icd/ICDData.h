@@ -48,7 +48,7 @@ public:
         LIT, // Long Interval Time ICD
     };
 
-    ICDData() = default;
+    static ICDData & GetInstance() { return instance; };
 
     uint32_t GetIdleModeDurationSec() { return mIdleInterval_s; }
 
@@ -81,6 +81,10 @@ public:
     ICDMode GetICDMode() { return mICDMode; }
 
 private:
+    // Singleton Object
+    ICDData() = default;
+    static ICDData instance;
+
     // ICD related information is managed by the ICDManager but stored in the ICDData to enable consummers to access it without
     // creating a circular dependency. To avoid allowing consummers changing the state of the ICD mode without going through the
     // ICDManager, the ICDManager is a friend that can access the private setters. If a consummer needs to be notified when a value

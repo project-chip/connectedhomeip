@@ -64,10 +64,6 @@
 
 #include <app/CASESessionManager.h>
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDData.h> //nogncheck
-#endif
-
 namespace chip {
 namespace app {
 
@@ -312,9 +308,6 @@ public:
 
     // Check if a given subject (CAT or NodeId) has at least 1 active subscription
     bool SubjectHasActiveSubscription(const FabricIndex aFabricIndex, const NodeId & subject);
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    void SetICDData(ICDData * data);
-#endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
@@ -581,10 +574,6 @@ private:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
 
     CommandHandlerInterface * mCommandHandlerList = nullptr;
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    ICDData * mICDData = nullptr;
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     ObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
     ObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
