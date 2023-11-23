@@ -1,15 +1,16 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
 | codeql                                  |           0 |
+| tests                                   |          86 |
 | build-example-linux-standalone          |         100 |
-| zap                                     |         100 |
 | build-example-linux-arm                 |         100 |
 | darwin-tests                            |         100 |
 | builds                                  |         100 |
+| run-misspell                            |         100 |
 | cirque                                  |         100 |
 | documentation-build                     |         100 |
+| zap                                     |         100 |
 | build-example-open-iot-sdk              |         100 |
-| build-example-esp32                     |         100 |
 | recent-fail-summary                     |         100 |
 | build-example-efr32                     |         100 |
 | bloat-check                             |         100 |
@@ -18,10 +19,10 @@
 | qemu                                    |         100 |
 | delete-old-artifacts                    |         100 |
 | unit-integration-tests                  |         100 |
+| build-example-esp32                     |         100 |
 | build-example-infineon                  |         100 |
 | full-builds-android                     |         100 |
 | build-example-ti-cc32xx                 |         100 |
-| build-example-nrf-connect-sdk           |         100 |
 | build-example-mw320                     |         100 |
 | build-example-k32w                      |         100 |
 | minimal-build-linux-configure           |         100 |
@@ -35,8 +36,8 @@
 | java-tests                              |         100 |
 | build-example-stm32                     |         100 |
 | build-example-i-mx-linux                |         100 |
-| tests                                   |         100 |
 | build-example-mbed-os                   |         100 |
 | lint-code-base                          |         100 |
+| build-example-nrf-connect-sdk           |         100 |
 | build-example-telink                    |         100 |
 | darwin                                  |         100 |
