@@ -36,13 +36,13 @@ public:
     void Shutdown() override;
 
     // Performs shared setup for all tests in the test suite
-    CHIP_ERROR SetUpTestSuite();
+    virtual CHIP_ERROR SetUpTestSuite();
     // Performs shared teardown for all tests in the test suite
-    void TearDownTestSuite();
+    virtual void TearDownTestSuite();
     // Performs setup for each individual test in the test suite
-    CHIP_ERROR SetUp();
+    virtual CHIP_ERROR SetUp();
     // Performs teardown for each individual test in the test suite
-    void TearDown();
+    virtual void TearDown();
 
     // Helpers that can be used directly by the nlTestSuite
 
