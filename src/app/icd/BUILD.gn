@@ -103,6 +103,10 @@ source_set("table") {
 }
 
 source_set("data") {
-  sources = [ "ICDData.h" ]
+  sources = [
+    "ICDData.cpp",
+    "ICDData.h",
+  ]
+
   deps = [ "${chip_root}/src/lib/core" ]
 }

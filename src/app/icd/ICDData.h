@@ -20,12 +20,27 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <system/SystemClock.h>
 
+#ifndef ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
+// Set to 1 to enforce SIT Slow Polling Max value to 15seconds (spec 9.16.1.5)
+#define ICD_ENFORCE_SIT_SLOW_POLL_LIMIT 0
+#endif
+
 namespace chip {
+
+namespace app {
+// Forward declaration of ICDManager to allow it to be friend with ICDData
+class ICDManager;
+} // namespace app
 
 class ICDData
 {
-
 public:
+    enum class ICDMode : uint8_t
+    {
+        SIT, // Short Interval Time ICD
+        LIT, // Long Interval Time ICD
+    };
+
     ICDData() = default;
 
     uint32_t GetIdleModeDurationSec() { return mIdleInterval_s; }
@@ -40,7 +55,22 @@ public:
 
     uint16_t GetClientsSupportedPerFabric() { return mFabricClientsSupported; }
 
+    System::Clock::Milliseconds32 GetSITPollingThreshold() { return kSITPollingThreshold; }
+
+    System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
+
+    System::Clock::Milliseconds32 GetSlowPollingInterval();
+
+    ICDMode GetICDMode() { return mICDMode; }
+
 private:
+    // ICD Operating mode is managed by the ICDManager but stored in the ICDData to enable consummers to access it without creating
+    // a circular dependency To avoid allowing consummers changing the state of the ICD mode without going through the ICDManager;
+    // making the ICDManager a friend.
+    friend class chip::app::ICDManager;
+
+    void SetICDMode(ICDMode mode) { mICDMode = mode; };
+
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) <= 64800,
                   "Spec requires the IdleModeDuration to be equal or inferior to 64800s.");
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) >= 1,
@@ -60,6 +90,18 @@ private:
     static_assert((CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC) >= 1,
                   "Spec requires the minimum of supported clients per fabric be equal or greater to 1.");
     uint16_t mFabricClientsSupported = CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC;
+
+    // SIT ICDs should have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)
+    static constexpr System::Clock::Milliseconds32 kSITPollingThreshold = System::Clock::Milliseconds32(15000);
+    System::Clock::Milliseconds32 kSlowPollingInterval                  = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+    System::Clock::Milliseconds32 kFastPollingInterval                  = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
+
+    // Minimal constraint value of the the ICD attributes.
+    static constexpr uint32_t kMinIdleModeDuration    = 500;
+    static constexpr uint32_t kMinActiveModeDuration  = 300;
+    static constexpr uint16_t kMinActiveModeThreshold = 300;
+
+    ICDMode mICDMode = ICDMode::SIT;
 };
 
 } // namespace chip

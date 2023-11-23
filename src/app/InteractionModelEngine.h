@@ -66,7 +66,7 @@
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/ICDData.h> //nogncheck
-#endif                       // CHIP_CONFIG_ENABLE_ICD_SERVER
+#endif
 
 namespace chip {
 namespace app {

@@ -153,7 +153,7 @@ void DnssdServer::AddICDKeyToAdvertisement(AdvertisingParams & advParams)
     // Only advertise the ICD key if the device can operate as a LIT
     if (mICDManager->SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
     {
-        advParams.SetICDOperatingAsLIT(Optional<bool>(mICDManager->GetICDMode() == ICDManager::ICDMode::LIT));
+        advParams.SetICDOperatingAsLIT(Optional<bool>(mICDManager->GetICDMode() == ICDData::ICDMode::LIT));
     }
 }
 #endif

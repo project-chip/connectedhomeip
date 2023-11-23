@@ -228,13 +228,13 @@ public:
         ctx->mICDManager.SetTestFeatureMapValue(0x07);
 
         // Check ICDManager starts in SIT mode if no entries are present
-        NL_TEST_ASSERT(aSuite, ctx->mICDManager.GetICDMode() == ICDManager::ICDMode::SIT);
+        NL_TEST_ASSERT(aSuite, ctx->mICDData.GetICDMode() == ICDData::ICDMode::SIT);
 
         // Trigger a "fake" register, ICDManager shoudl remain in SIT mode
         notifier.BroadcastICDManagementEvent(ICDMEvent::kTableUpdated);
 
         // Check ICDManager stayed in SIT mode
-        NL_TEST_ASSERT(aSuite, ctx->mICDManager.GetICDMode() == ICDManager::ICDMode::SIT);
+        NL_TEST_ASSERT(aSuite, ctx->mICDData.GetICDMode() == ICDData::ICDMode::SIT);
 
         // Create tables with different fabrics
         ICDMonitoringTable table1(ctx->testStorage, kTestFabricIndex1, kMaxTestClients, &(ctx->mKeystore));
@@ -251,7 +251,7 @@ public:
         notifier.BroadcastICDManagementEvent(ICDMEvent::kTableUpdated);
 
         // Check ICDManager is now in the LIT operating mode
-        NL_TEST_ASSERT(aSuite, ctx->mICDManager.GetICDMode() == ICDManager::ICDMode::LIT);
+        NL_TEST_ASSERT(aSuite, ctx->mICDData.GetICDMode() == ICDData::ICDMode::LIT);
 
         // Add second entry to the first fabric
         ICDMonitoringEntry entry2(&(ctx->mKeystore));
@@ -264,7 +264,7 @@ public:
         notifier.BroadcastICDManagementEvent(ICDMEvent::kTableUpdated);
 
         // Check ICDManager is now in the LIT operating mode
-        NL_TEST_ASSERT(aSuite, ctx->mICDManager.GetICDMode() == ICDManager::ICDMode::LIT);
+        NL_TEST_ASSERT(aSuite, ctx->mICDData.GetICDMode() == ICDData::ICDMode::LIT);
 
         // Add first entry to the first fabric
         ICDMonitoringEntry entry3(&(ctx->mKeystore));
@@ -277,7 +277,7 @@ public:
         notifier.BroadcastICDManagementEvent(ICDMEvent::kTableUpdated);
 
         // Check ICDManager is now in the LIT operating mode
-        NL_TEST_ASSERT(aSuite, ctx->mICDManager.GetICDMode() == ICDManager::ICDMode::LIT);
+        NL_TEST_ASSERT(aSuite, ctx->mICDData.GetICDMode() == ICDData::ICDMode::LIT);
 
         // Add second entry to the first fabric
         ICDMonitoringEntry entry4(&(ctx->mKeystore));
@@ -293,7 +293,7 @@ public:
         notifier.BroadcastICDManagementEvent(ICDMEvent::kTableUpdated);
 
         // Check ICDManager is still in the LIT operating mode
-        NL_TEST_ASSERT(aSuite, ctx->mICDManager.GetICDMode() == ICDManager::ICDMode::LIT);
+        NL_TEST_ASSERT(aSuite, ctx->mICDData.GetICDMode() == ICDData::ICDMode::LIT);
 
         // Remove single entry from remaining fabric
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == table1.Remove(1));
@@ -302,7 +302,7 @@ public:
         notifier.BroadcastICDManagementEvent(ICDMEvent::kTableUpdated);
 
         // Check ICDManager is still in the LIT operating mode
-        NL_TEST_ASSERT(aSuite, ctx->mICDManager.GetICDMode() == ICDManager::ICDMode::LIT);
+        NL_TEST_ASSERT(aSuite, ctx->mICDData.GetICDMode() == ICDData::ICDMode::LIT);
 
         // Remove last entry from remaining fabric
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == table1.Remove(0));
@@ -313,7 +313,7 @@ public:
         notifier.BroadcastICDManagementEvent(ICDMEvent::kTableUpdated);
 
         // Check ICDManager is still in the LIT operating mode
-        NL_TEST_ASSERT(aSuite, ctx->mICDManager.GetICDMode() == ICDManager::ICDMode::SIT);
+        NL_TEST_ASSERT(aSuite, ctx->mICDData.GetICDMode() == ICDData::ICDMode::SIT);
     }
 };
 
