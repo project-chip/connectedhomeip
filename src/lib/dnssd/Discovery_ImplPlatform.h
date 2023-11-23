@@ -23,7 +23,6 @@
 #include <lib/core/Global.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/Resolver.h>
-#include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/platform/Dnssd.h>
 #include <platform/CHIPDeviceConfig.h>
 
@@ -52,15 +51,11 @@ public:
 
     // Members that implement Resolver interface.
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
-    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override
-    {
-        mResolverProxy.SetCommissioningDelegate(delegate);
-    }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
-    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
-    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
-    CHIP_ERROR StopDiscovery() override;
+    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context) override;
+    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) override;
+    CHIP_ERROR StopDiscovery(DiscoveryContext & context) override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
 
     static DiscoveryImplPlatform & GetInstance();
@@ -97,7 +92,6 @@ private:
 
     State mState = State::kUninitialized;
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
-    ResolverProxy mResolverProxy;
     OperationalResolveDelegate * mOperationalDelegate = nullptr;
 
     friend class Global<DiscoveryImplPlatform>;
