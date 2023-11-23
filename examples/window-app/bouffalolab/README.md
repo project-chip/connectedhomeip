@@ -1,7 +1,6 @@
 # `Bouffalo Lab`
 
-This example functions as a light bulb device type, with on/off and level
-capabilities and uses a test Vendor ID (VID) and a Product ID (PID)
+This example functions as a window-app and uses a test Vendor ID (VID) and a Product ID (PID)
 of **0x8005**.
 
 The steps were verified on `Bouffalo Lab` BL602 and BL706 development board.
@@ -78,12 +77,12 @@ Mac OS.
     export BOUFFALOLAB_SDK_ROOT=/opt/bouffalolab_sdk
     ```
 
-## Build CHIP Lighting App example
+## Build CHIP Window App example
 
 The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
 `BL706DK` BL706 board, and `BL704LDK` BL704L board .
 
--   Build lighting app with UART baudrate 2000000
+-   Build window app with UART baudrate 2000000
 
     ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-window-covering build
@@ -91,7 +90,7 @@ The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
     ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-window-covering build
     ```
 
--   Build lighting app with UART baudrate 115200
+-   Build window app with UART baudrate 115200
 
     ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-window-covering-115200 build
@@ -159,9 +158,9 @@ The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
             build options
 
             ```shell
-            ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-window-example.flash.py --port /dev/ttyACM0
-            ./out/bouffalolab-bl706dk-light/chip-bl702-window-example.flash.py --port /dev/ttyACM0
-            ./out/bouffalolab-bl704ldk-light/chip-bl702l-window-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl602-iot-matter-v1-window/chip-bl602-window-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl706dk-window/chip-bl702-window-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl704ldk-window/chip-bl702l-window-example.flash.py --port /dev/ttyACM0
             ```
 
         -   `bl706dk` with 115200 baudrate setting
@@ -174,9 +173,9 @@ The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
             above command.
 
             ```shell
-            ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-window-example.flash.py --port /dev/ttyACM0 --erase
+            ./out/bouffalolab-bl602-iot-matter-v1-window-covering/chip-bl602-window-example.flash.py --port /dev/ttyACM0 --erase
             ./out/bouffalolab-bl706dk-window-covering-115200/chip-bl702-window-example.flash.py --port /dev/ttyACM0 --erase
-            ./out/bouffalolab-bl704ldk-light/chip-bl702l-window-example.flash.py --port /dev/ttyACM0 --erase
+            ./out/bouffalolab-bl704ldk-window-coveringg/chip-bl702l-window-example.flash.py --port /dev/ttyACM0 --erase
             ```
 
             > Note, better to append --erase option to download image for BL602
@@ -204,9 +203,6 @@ The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
         ```
 
 -   To reset the board, Click the **RESET** or **EN** button.
-
--   To toggle the light bulb’s on/off state by clicking BOOT button, which also
-    toggles the LED.
 
 -   To do factory reset, press BOOT button over 4 seconds, release BOOT button
     after led blink stopped.
@@ -322,11 +318,11 @@ ota-provider-app build and usage.
 
 ### Start ota software upgrade
 
--   BLE commission BL602/BL702 lighting if not commissioned.
+-   BLE commission BL602/BL702 window-covering if not commissioned.
 -   Start OTA software upgrade process
     ```shell
-    ./chip-tool otasoftwareupdaterequestor announce-otaprovider 1 0 0 0 <node_id_to_lighting_app> 0
+    ./chip-tool otasoftwareupdaterequestor announce-otaprovider 1 0 0 0 <node_id_to_window_app> 0
     ```
-    where `<node_id_to_lighting_app>` is node id of BL602/BL702 lighting app.
+    where `<node_id_to_window_app>` is node id of BL602/BL702 window_app app.
 -   After OTA software upgrade gets done, BL602/BL702 will get reboot
     automatically.
