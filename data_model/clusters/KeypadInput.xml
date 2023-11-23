@@ -72,7 +72,7 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <enum name="CECKeyCodeEnum">
+    <enum name="CecKeyCodeEnum">
       <item value="0" name="Select">
         <mandatoryConform/>
       </item>
@@ -348,7 +348,7 @@ Davis, CA 95616, USA
     <command id="0x00" name="SendKey" response="SendKeyResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="KeyCode" type="CECKeyCodeEnum">
+      <field id="0" name="KeyCode" type="CecKeyCodeEnum">
         <mandatoryConform/>
       </field>
     </command>
