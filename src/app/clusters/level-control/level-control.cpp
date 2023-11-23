@@ -120,7 +120,7 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs);
 static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::Optional<chip::BitMask<OptionsBitmap>> optionsMask,
                                chip::Optional<chip::BitMask<OptionsBitmap>> optionsOverride);
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 class DefaultLevelControlSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
@@ -256,7 +256,7 @@ public:
 };
 static DefaultLevelControlSceneHandler sLevelControlSceneHandler;
 
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
 #if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
 static void reallyUpdateCoupledColorTemp(EndpointId endpoint);
@@ -610,11 +610,11 @@ Status MoveToLevel(EndpointId endpointId, const Commands::MoveToLevel::Decodable
 
 chip::scenes::SceneHandler * GetSceneHandler()
 {
-#ifdef EMBER_AF_PLUGIN_SCENES
+#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     return &sLevelControlSceneHandler;
 #else
     return nullptr;
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 }
 
 } // namespace LevelControlServer
@@ -910,7 +910,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     // The level has changed, the scene is no longer valid.
     if (emberAfContainsServer(endpoint, Scenes::Id))
     {
-        Scenes::ScenesServer::Instance().MakeSceneInvalid(endpoint);
+        Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
     }
 #endif // EMBER_AF_PLUGIN_SCENES
 
@@ -1446,10 +1446,10 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
         }
     }
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     // Registers Scene handlers for the level control cluster on the server
     app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(endpoint, LevelControlServer::GetSceneHandler());
-#endif
+#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
     emberAfPluginLevelControlClusterServerPostInitCallback(endpoint);
 }

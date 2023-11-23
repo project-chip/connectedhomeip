@@ -1656,6 +1656,30 @@ static id _Nullable DecodeEventPayloadForTimerCluster(EventId aEventId, TLV::TLV
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForOvenModeCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::OvenMode;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForLaundryDryerControlsCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::LaundryDryerControls;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForModeSelectCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ModeSelect;
@@ -2470,7 +2494,7 @@ static id _Nullable DecodeEventPayloadForDemandResponseLoadControlCluster(EventI
                     memberValue = nil;
                 } else {
                     memberValue = [MTRDemandResponseLoadControlClusterPowerSavingsControlStruct new];
-                    memberValue.powerSavings = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.powerSavingsControl.Value().Value().powerSavings)];
+                    memberValue.powerSavings = [NSNumber numberWithUnsignedChar:cppValue.powerSavingsControl.Value().Value().powerSavings];
                 }
             } else {
                 memberValue = nil;
@@ -3664,6 +3688,12 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::Timer::Id: {
         return DecodeEventPayloadForTimerCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::OvenMode::Id: {
+        return DecodeEventPayloadForOvenModeCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::LaundryDryerControls::Id: {
+        return DecodeEventPayloadForLaundryDryerControlsCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ModeSelect::Id: {
         return DecodeEventPayloadForModeSelectCluster(aPath.mEventId, aReader, aError);

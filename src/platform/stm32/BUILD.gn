@@ -89,10 +89,6 @@ static_library("stm32") {
     public_deps += [ "${stm32_sdk_build_root}:stm32_sdk" ]
 
     deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
-
-    public_configs = [
-      "${chip_root}/src/lib/address_resolve:default_address_resolve_config",
-    ]
   }
 
   # Set the compiler flags

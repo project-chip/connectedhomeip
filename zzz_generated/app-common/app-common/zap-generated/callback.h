@@ -369,6 +369,22 @@ void emberAfIcdManagementClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfTimerClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Oven Mode Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOvenModeClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Laundry Dryer Controls Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfLaundryDryerControlsClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Mode Select Cluster Init
  *
  * Cluster Init
@@ -4103,6 +4119,160 @@ void emberAfTimerClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfTimerClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Oven Mode Cluster
+//
+
+/** @brief Oven Mode Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOvenModeClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Oven Mode Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterOvenModeClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Oven Mode Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOvenModeClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Oven Mode Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterOvenModeClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Oven Mode Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterOvenModeClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                       EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Oven Mode Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterOvenModeClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                       EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Oven Mode Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfOvenModeClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Oven Mode Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfOvenModeClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Laundry Dryer Controls Cluster
+//
+
+/** @brief Laundry Dryer Controls Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfLaundryDryerControlsClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Laundry Dryer Controls Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterLaundryDryerControlsClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Laundry Dryer Controls Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfLaundryDryerControlsClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Laundry Dryer Controls Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterLaundryDryerControlsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Laundry Dryer Controls Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterLaundryDryerControlsClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Laundry Dryer Controls Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterLaundryDryerControlsClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Laundry Dryer Controls Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfLaundryDryerControlsClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Laundry Dryer Controls Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfLaundryDryerControlsClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Mode Select Cluster
@@ -9358,6 +9528,12 @@ bool emberAfTimerClusterAddTimeCallback(chip::app::CommandHandler * commandObj, 
 bool emberAfTimerClusterReduceTimeCallback(chip::app::CommandHandler * commandObj,
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::Timer::Commands::ReduceTime::DecodableType & commandData);
+/**
+ * @brief Oven Mode Cluster ChangeToMode Command callback (from client)
+ */
+bool emberAfOvenModeClusterChangeToModeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OvenMode::Commands::ChangeToMode::DecodableType & commandData);
 /**
  * @brief Mode Select Cluster ChangeToMode Command callback (from client)
  */

@@ -64,7 +64,8 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         Cleanup();
         mServer->GetSecureSessionManager().ExpireAllPASESessions();
         // That should have cleared out mPASESession.
-#if CONFIG_NETWORK_LAYER_BLE
+#if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        // If in NonConcurrentConnection, this will already have been completed
         mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
     }
@@ -82,6 +83,13 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         app::DnssdServer::Instance().AdvertiseOperational();
         ChipLogProgress(AppServer, "Operational advertising enabled");
     }
+#if CONFIG_NETWORK_LAYER_BLE
+    else if (event->Type == DeviceLayer::DeviceEventType::kCloseAllBleConnections)
+    {
+        ChipLogProgress(AppServer, "Received kCloseAllBleConnections");
+        mServer->GetBleLayerObject()->CloseAllBleConnections();
+    }
+#endif
 }
 
 void CommissioningWindowManager::Shutdown()
@@ -544,7 +552,7 @@ void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnu
     {
         mWindowStatus = aNewStatus;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-        app::ICDListener::KeepActiveFlags request = app::ICDListener::KeepActiveFlags::kCommissioningWindowOpen;
+        app::ICDListener::KeepActiveFlags request = app::ICDListener::KeepActiveFlag::kCommissioningWindowOpen;
         if (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen)
         {
             app::ICDNotifier::GetInstance().BroadcastActiveRequestNotification(request);

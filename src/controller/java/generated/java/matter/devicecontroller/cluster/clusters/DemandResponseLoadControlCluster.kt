@@ -105,14 +105,6 @@ class DemandResponseLoadControlCluster(
     }
   }
 
-  suspend fun readDeviceClassAttribute(): UInt {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeDeviceClassAttribute(minInterval: Int, maxInterval: Int): UInt {
-    // Implementation needs to be added here
-  }
-
   suspend fun readLoadControlProgramsAttribute(): LoadControlProgramsAttribute {
     // Implementation needs to be added here
   }
@@ -165,11 +157,11 @@ class DemandResponseLoadControlCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun readNumberOfTransistionsAttribute(): UByte {
+  suspend fun readNumberOfTransitionsAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNumberOfTransistionsAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeNumberOfTransitionsAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 

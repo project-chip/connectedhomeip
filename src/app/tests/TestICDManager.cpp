@@ -141,13 +141,15 @@ public:
     {
         TestContext * ctx = static_cast<TestContext *>(aContext);
 
-        // After the init we should be in active mode
+        // After the init we should be in Idle mode
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+        AdvanceClockAndRunEventLoop(ctx, secondsToMilliseconds(ICDManagementServer::GetInstance().GetIdleModeDurationSec()) + 1);
+        // Idle mode interval expired, ICDManager transitioned to the ActiveMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
         AdvanceClockAndRunEventLoop(ctx, ICDManagementServer::GetInstance().GetActiveModeDurationMs() + 1);
         // Active mode interval expired, ICDManager transitioned to the IdleMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
         AdvanceClockAndRunEventLoop(ctx, secondsToMilliseconds(ICDManagementServer::GetInstance().GetIdleModeDurationSec()) + 1);
-        // Idle mode interval expired, ICDManager transitioned to the ActiveMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Events updating the Operation to Active mode can extend the current active mode time by 1 Active mode threshold.
@@ -163,7 +165,7 @@ public:
     static void TestKeepActivemodeRequests(nlTestSuite * aSuite, void * aContext)
     {
         TestContext * ctx = static_cast<TestContext *>(aContext);
-        typedef ICDListener::KeepActiveFlags ActiveFlag;
+        typedef ICDListener::KeepActiveFlag ActiveFlag;
         ICDNotifier notifier = ICDNotifier::GetInstance();
 
         // Setting a requirement will transition the ICD to active mode.

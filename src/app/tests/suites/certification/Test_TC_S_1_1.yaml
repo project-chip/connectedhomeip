@@ -41,7 +41,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 3a: Read FeatureMap (global attribute 65532)"
+    - label: "Step 3a: Read FeatureMap NameSupport bit (global attribute 65532)"
       PICS: (!S.S.F00)
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -50,7 +50,7 @@ tests:
               type: bitmap32
               hasMasksClear: [0x1]
 
-    - label: "Step 3a: Read FeatureMap (global attribute 65532)"
+    - label: "Step 3a: Read FeatureMap NameSupport bit (global attribute 65532)"
       PICS: S.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -59,7 +59,17 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Step 3b: Read FeatureMap (global attribute 65532)"
+    - label: "Step 3b: Read FeatureMap Explicit bit (global attribute 65532)"
+      PICS: (!S.S.F01)
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x2]
+
+    - label: "Step 3b: Read FeatureMap Explicit bit (global attribute 65532)"
+      PICS: S.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -67,13 +77,41 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2]
 
-    - label: "Step 3c: Read FeatureMap (global attribute 65532)"
+    - label: "Step 3c: Read FeatureMap TableSize bit (global attribute 65532)"
+      PICS: (!S.S.F02)
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x4]
+
+    - label: "Step 3c: Read FeatureMap TableSize bit (global attribute 65532)"
+      PICS: S.S.F02
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
               hasMasksSet: [0x4]
+
+    - label: "Step 3d: Read FeatureMap FabricScene bit (global attribute 65532)"
+      PICS: (!S.S.F03)
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x8]
+
+    - label: "Step 3d: Read FeatureMap FabricScene bit (global attribute 65532)"
+      PICS: S.S.F03
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x8]
 
     - label:
           "Step 4: Read Mandatory attributes in AttributeList (global attribute

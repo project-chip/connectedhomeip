@@ -74,12 +74,13 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticD
 CHIP_ERROR EthernetDiagosticsAttrAccess::ReadPHYRate(AttributeValueEncoder & aEncoder)
 {
     Attributes::PHYRate::TypeInfo::Type pHYRate;
-    auto value = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE10_M;
+    auto value = app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum::kRate10M;
 
     if (DeviceLayer::GetDiagnosticDataProvider().GetEthPHYRate(value) == CHIP_NO_ERROR)
     {
         pHYRate.SetNonNull(value);
-        ChipLogProgress(Zcl, "The current nominal, usable speed at the top of the physical layer of the Node: %d", value);
+        ChipLogProgress(Zcl, "The current nominal, usable speed at the top of the physical layer of the Node: %d",
+                        chip::to_underlying(value));
     }
     else
     {

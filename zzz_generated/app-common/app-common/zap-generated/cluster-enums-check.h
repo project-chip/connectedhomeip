@@ -982,9 +982,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnost
     using EnumType = EthernetNetworkDiagnostics::PHYRateEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kRate10M:
     case EnumType::kRate100M:
     case EnumType::kRate1G:
@@ -995,18 +992,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnost
     case EnumType::kRate100G:
     case EnumType::kRate200G:
     case EnumType::kRate400G:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE10_M:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE100_M:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE1_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE2_5_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE5_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE10_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE40_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE100_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE200_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE400_G:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(10);
@@ -1210,6 +1195,41 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Timer::TimerStatusEnum 
     case EnumType::kPaused:
     case EnumType::kExpired:
     case EnumType::kReady:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenMode::ModeTag val)
+{
+    using EnumType = OvenMode::ModeTag;
+    switch (val)
+    {
+    case EnumType::kBake:
+    case EnumType::kConvection:
+    case EnumType::kGrill:
+    case EnumType::kRoast:
+    case EnumType::kClean:
+    case EnumType::kConvectionBake:
+    case EnumType::kConvectionRoast:
+    case EnumType::kWarming:
+    case EnumType::kProofing:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryDryerControls::DrynessLevelEnum val)
+{
+    using EnumType = LaundryDryerControls::DrynessLevelEnum;
+    switch (val)
+    {
+    case EnumType::kLow:
+    case EnumType::kNormal:
+    case EnumType::kExtra:
+    case EnumType::kMax:
         return val;
     default:
         return static_cast<EnumType>(4);
@@ -1550,19 +1570,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadContr
         return val;
     default:
         return static_cast<EnumType>(13);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::PowerSavingsEnum val)
-{
-    using EnumType = DemandResponseLoadControl::PowerSavingsEnum;
-    switch (val)
-    {
-    case EnumType::kLow:
-    case EnumType::kMedium:
-    case EnumType::kHigh:
-        return val;
-    default:
-        return static_cast<EnumType>(3);
     }
 }
 
@@ -2181,17 +2188,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorMode
     using EnumType = ColorControl::ColorMode;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kCurrentHueAndCurrentSaturation:
     case EnumType::kCurrentXAndCurrentY:
     case EnumType::kColorTemperature:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION:
-    case EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y:
-    case EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(3);
@@ -2855,9 +2854,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(MediaInput::InputTypeEn
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CecKeyCode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CECKeyCodeEnum val)
 {
-    using EnumType = KeypadInput::CecKeyCode;
+    using EnumType = KeypadInput::CECKeyCodeEnum;
     switch (val)
     {
     case EnumType::kSelect:
