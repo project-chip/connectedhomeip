@@ -509,8 +509,8 @@ void TestCommandInteraction::TestCommandSenderWithWrongState(nlTestSuite * apSui
 
 void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSuite, void * apContext)
 {
-    TestContext & ctx        = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err           = CHIP_NO_ERROR;
+    TestContext & ctx                       = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
     ConcreteCommandPath requestCommandPath  = { kTestEndpointId, kTestClusterId, kTestCommandIdNoData };
     ConcreteCommandPath responseCommandPath = { kTestEndpointId, kTestClusterId, kTestCommandIdNoData };
 
@@ -560,8 +560,8 @@ void TestCommandInteraction::TestCommandSenderWithSendCommand(nlTestSuite * apSu
 
 void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite * apSuite, void * apContext)
 {
-    TestContext & ctx        = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err           = CHIP_NO_ERROR;
+    TestContext & ctx                       = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
     ConcreteCommandPath requestCommandPath  = { kTestEndpointId, kTestClusterId, kTestCommandIdNoData };
     ConcreteCommandPath responseCommandPath = { kTestEndpointId, kTestClusterId, kTestCommandIdNoData };
 

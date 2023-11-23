@@ -503,8 +503,8 @@ private:
     bool mSuppressResponse   = false;
     bool mTimedRequest       = false;
     bool mSentStatusResponse = false;
-    bool mGroupRequest    = false;
-    bool mBufferAllocated = false;
+    bool mGroupRequest       = false;
+    bool mBufferAllocated    = false;
     // If mGoneAsync is true, we have finished out initial processing of the
     // incoming invoke.  After this point, our session could go away at any
     // time.
