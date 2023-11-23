@@ -1039,7 +1039,7 @@ endpoint 0 {
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster AccessControl {
@@ -1151,7 +1151,7 @@ endpoint 0 {
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
@@ -1182,7 +1182,7 @@ endpoint 0 {
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0002;
+    ram      attribute clusterRevision default = 2;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
@@ -1260,7 +1260,7 @@ endpoint 0 {
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
     callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
 
     handle command KeySetWrite;
     handle command KeySetRead;
@@ -1283,7 +1283,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster OperationalState {

@@ -6604,7 +6604,7 @@ endpoint 0 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster AccessControl {
@@ -6658,7 +6658,7 @@ endpoint 0 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster LocalizationConfiguration {
@@ -6769,7 +6769,7 @@ endpoint 0 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
@@ -6798,7 +6798,7 @@ endpoint 0 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0002;
+    ram      attribute clusterRevision default = 2;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
@@ -6945,7 +6945,7 @@ endpoint 0 {
     ram      attribute uniqueID;
     callback attribute productAppearance;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster Switch {
@@ -7013,7 +7013,7 @@ endpoint 0 {
     callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
 
     handle command KeySetWrite;
     handle command KeySetRead;
@@ -7081,7 +7081,7 @@ endpoint 0 {
     ram      attribute sendPINOverTheAir default = 0;
     ram      attribute requirePINforRemoteOperation default = 0;
     ram      attribute expiringUserTimeout;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 7;
 
     handle command LockDoor;
     handle command UnlockDoor;
@@ -7152,7 +7152,7 @@ endpoint 0 {
     ram      attribute operationMode default = 0x00;
     ram      attribute controlMode default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster Thermostat {
@@ -7474,7 +7474,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Off;
     handle command On;
@@ -7524,7 +7524,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster BasicInformation {
@@ -7549,7 +7549,7 @@ endpoint 1 {
     callback attribute uniqueID;
     callback attribute capabilityMinima;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster LocalizationConfiguration {

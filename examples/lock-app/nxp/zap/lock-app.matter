@@ -1452,7 +1452,7 @@ endpoint 0 {
     callback attribute clientList;
     callback attribute partsList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster AccessControl {
@@ -1516,7 +1516,7 @@ endpoint 0 {
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
@@ -1535,7 +1535,7 @@ endpoint 0 {
     callback attribute upTime default = 0x0000000000000000;
     callback attribute testEventTriggersEnabled default = false;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0002;
+    ram      attribute clusterRevision default = 2;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
@@ -1661,7 +1661,7 @@ endpoint 0 {
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
     callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
 
     handle command KeySetWrite;
     handle command KeySetRead;
@@ -1697,7 +1697,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster DoorLock {
@@ -1718,7 +1718,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x1000;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 7;
 
     handle command LockDoor;
     handle command UnlockDoor;
