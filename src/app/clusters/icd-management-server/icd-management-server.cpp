@@ -163,7 +163,7 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadClientsSupportedPerFabric(EndpointI
 class IcdManagementFabricDelegate : public FabricTable::Delegate
 {
 public:
-    void Init(PersistentStorageDelegate & storage, Crypto::SessionKeystore * sessionKeystore, ICDData icdData)
+    void Init(PersistentStorageDelegate & storage, Crypto::SessionKeystore * sessionKeystore, ICDData & icdData)
     {
         mStorage         = &storage;
         mSessionKeystore = sessionKeystore;
