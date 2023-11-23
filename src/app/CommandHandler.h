@@ -30,7 +30,7 @@
 
 #pragma once
 
-#include "CommandRefLookupTable.h"
+#include "CommandPathRegistry.h"
 
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
@@ -174,6 +174,15 @@ public:
                                 System::PacketBufferHandle && payload, bool isTimedInvoke);
 
     /**
+     * Checks that all CommandDataIB within InvokeRequests is correct as per spec.
+     *
+     * This also build a lookup table that is multipurpose. It helps validate that all elements
+     * in the invoke request are unique, but also used when later on when populating
+     * elements of the InvokeResponse.
+     */
+    CHIP_ERROR ValidateInvokeRequestsAndBuildRegistry(TLV::TLVReader & invokeRequestsReader);
+
+    /**
      * Adds the given command status and returns any failures in adding statuses (e.g. out
      * of buffer space) to the caller
      */
@@ -192,12 +201,59 @@ public:
     CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 
     Protocols::InteractionModel::Status ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
-    CHIP_ERROR PrepareCommand(const ConcreteCommandPath & aRequestCommandPath, const ConcreteCommandPath & aCommandPath,
-                              bool aStartDataStruct = true);
-    [[deprecated("PrepareCommand now needs the requested command path. Without it device cannot support batch invoke")]] CHIP_ERROR
+
+    /**
+     * This will add a new CommandDataIB element into InvokeResponses. It will put the
+     * aResponseCommandPath into CommandPath element within CommandDataIB.
+     *
+     * This call will fail if CommandHandler is already in the middle of building/sending
+     * InvokeResponseMessage.
+     *
+     * Upon success, the caller is expected to call `FinishCommand` once they have added
+     * all Data into Fields element of CommandDataIB.
+     *
+     * @param [in] aRequestCommandPath the concrete path of the command we are responding to.
+     * @param [in] aResponseCommandPath the concrete response path that we are sending to Requester.
+     * @param [in] aStartDataStruct starts the TLV container for the CommandFields element within
+     *             CommandDataIB.
+     */
+    CHIP_ERROR PrepareInvokeResponseCommand(const ConcreteCommandPath & aRequestCommandPath,
+                                            const ConcreteCommandPath & aResponseCommandPath, bool aStartDataStruct = true);
+    [[deprecated("PrepareCommand now needs the requested command path. Please use PrepareInvokeResponseCommand")]] CHIP_ERROR
     PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct = true);
+
+    /**
+     * Finishes the CommandDataIB element within the InvokeResponses.
+     *
+     * Caller must have first successfully called `PrepareInvokeResponseCommand`.
+     *
+     * @param [in] aEndDataStruct end the TLV container for the CommandFields element within
+     *             CommandDataIB.
+     */
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
+
+    /**
+     * This will add a new CommandStatusIB element into InvokeResponses. It will put the
+     * aCommandPath into CommandPath element within CommandStatusIB.
+     *
+     * This call will fail if CommandHandler is already in the middle of building/sending
+     * InvokeResponseMessage.
+     *
+     * Upon success, the caller is expected to call `FinishStatus` once they have added
+     * data into Fields element of CommandStatusIB.
+     *
+     * @param [in] aCommandPath the concrete path of the command we are responding to.
+     */
     CHIP_ERROR PrepareStatus(const ConcreteCommandPath & aCommandPath);
+
+    /**
+     * Finishes the CommandStatusIB element within the InvokeResponses.
+     *
+     * Caller must have first successfully called `PrepareStatus`.
+     *
+     * @param [in] aEndDataStruct end the TLV container for the CommandFields element within
+     *             CommandDataIB.
+     */
     CHIP_ERROR FinishStatus();
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
 
@@ -320,7 +376,7 @@ private:
         VerifyOrDie(false);
     }
 
-    enum class State
+    enum class State : uint8_t
     {
         Idle,                ///< Default state that the object starts out in, where no work has commenced
         Preparing,           ///< We are prepaing the command or status header.
@@ -368,10 +424,8 @@ private:
      */
     CHIP_ERROR AllocateBuffer();
 
-    CHIP_ERROR ValidateCommands(TLV::TLVReader & invokeRequestsReader);
-
-    CHIP_ERROR PrepareCommand(const CommandRefLookupTable::CommandRefTableEntry * apCommandRefTableEntry,
-                              const ConcreteCommandPath & aCommandPath, bool aStartDataStruct);
+    CHIP_ERROR PrepareInvokeResponseCommand(const CommandPathRegistryEntry & apCommandPathRegistryEntry,
+                                            const ConcreteCommandPath & aCommandPath, bool aStartDataStruct);
 
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
 
@@ -407,8 +461,11 @@ private:
     template <typename CommandData>
     CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
+        // Return early in case of requests targeted to a group, since they should not add a response.
+        VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
+
         ConcreteCommandPath path = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId, CommandData::GetCommandId() };
-        ReturnErrorOnFailure(PrepareCommand(aRequestCommandPath, path, false));
+        ReturnErrorOnFailure(PrepareInvokeResponseCommand(aRequestCommandPath, path, false));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
@@ -426,24 +483,26 @@ private:
      */
     void SetGroupRequest(bool isGroupRequest) { mGroupRequest = isGroupRequest; }
 
+    CommandPathRegistryInterface & GetCommandPathRegistry() { return mCommandPathRegistry; }
+
+    size_t MaxPathsPerInvoke() { return CHIP_CONFIG_MAX_PATHS_PER_INVOKE; }
+
     Messaging::ExchangeHolder mExchangeCtx;
     Callback * mpCallback = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     size_t mPendingWork                    = 0;
-    bool mSuppressResponse                 = false;
-    bool mTimedRequest                     = false;
-
-    bool mSentStatusResponse = false;
-
-    State mState = State::Idle;
 
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     TLV::TLVWriter mBackupWriter;
-    State mBackupState;
-    CommandRefLookupTable mCommandRefLookupTable;
+    StaticCommandPathRegistry<CHIP_CONFIG_MAX_PATHS_PER_INVOKE> mCommandPathRegistry;
     Optional<uint16_t> mRefForResponse;
 
+    State mState = State::Idle;
+    State mBackupState;
+    bool mSuppressResponse   = false;
+    bool mTimedRequest       = false;
+    bool mSentStatusResponse = false;
     bool mGroupRequest    = false;
     bool mBufferAllocated = false;
     // If mGoneAsync is true, we have finished out initial processing of the

@@ -98,20 +98,28 @@ void CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, con
     mGoneAsync = true;
 }
 
-CHIP_ERROR CommandHandler::ValidateCommands(TLV::TLVReader & invokeRequestsReader)
+CHIP_ERROR CommandHandler::ValidateInvokeRequestsAndBuildRegistry(TLV::TLVReader & invokeRequestsReader)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     size_t commandCount     = 0;
     bool commandRefExpected = false;
 
     TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */);
+
+    // If this is a GroupRequest the only thing to check is that there is only one
+    // CommandDataIB.
     if (IsGroupRequest())
     {
         VerifyOrReturnError(commandCount == 1, CHIP_ERROR_INVALID_ARGUMENT);
         return CHIP_NO_ERROR;
     }
+    // While technically any commandCount == 1 should already be unique and does not need
+    // any further validation, we do need to read and populate the registry to help
+    // in building the InvokeResponse.
 
-    VerifyOrReturnError(commandCount <= CHIP_CONFIG_MAX_PATHS_PER_INVOKE, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(commandCount <= MaxPathsPerInvoke(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // If there is more than one CommandDataIB, spec states that CommandRef must be provided.
     commandRefExpected = commandCount > 1;
 
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
@@ -120,12 +128,13 @@ CHIP_ERROR CommandHandler::ValidateCommands(TLV::TLVReader & invokeRequestsReade
         CommandDataIB::Parser commandData;
         ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
 
+        // First validating that we can get a ConcreteCommandPath
         CommandPathIB::Parser commandPath;
         ConcreteCommandPath concretePath(0, 0, 0);
-
         ReturnErrorOnFailure(commandData.GetPath(&commandPath));
         ReturnErrorOnFailure(commandPath.GetConcreteCommandPath(concretePath));
 
+        // Trying to read CommandRef. If it is not populated, we will assume value of 0.
         Optional<uint16_t> commandRef;
         uint16_t ref;
         err = commandData.GetRef(&ref);
@@ -139,12 +148,10 @@ CHIP_ERROR CommandHandler::ValidateCommands(TLV::TLVReader & invokeRequestsReade
             commandRef = MakeOptional(ref);
         }
 
-        VerifyOrReturnError(mCommandRefLookupTable.IsRequestedPathAndRefUnique(concretePath, commandRef),
-                            CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorOnFailure(mCommandRefLookupTable.Add(concretePath, commandRef));
+        ReturnErrorOnFailure(GetCommandPathRegistry().Add(concretePath, commandRef));
     }
 
-    // if we have exhausted this container
+    // It's OK/expected to have reached the end of the container without failure.
     if (CHIP_END_OF_TLV == err)
     {
         err = CHIP_NO_ERROR;
@@ -175,8 +182,8 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
     VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::UnsupportedAccess);
     invokeRequests.GetReader(&invokeRequestsReader);
 
-    VerifyOrReturnError(ValidateCommands(invokeRequestsReader) == CHIP_NO_ERROR, Status::InvalidAction);
-    // Reset the reader
+    VerifyOrReturnError(ValidateInvokeRequestsAndBuildRegistry(invokeRequestsReader) == CHIP_NO_ERROR, Status::InvalidAction);
+    // Reset the reader after validation, so that we can iterate the commands to actually process them.
     invokeRequests.GetReader(&invokeRequestsReader);
 
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
@@ -552,37 +559,44 @@ CHIP_ERROR CommandHandler::AddClusterSpecificFailure(const ConcreteCommandPath &
     return AddStatusInternal(aCommandPath, StatusIB(Status::Failure, aClusterStatus));
 }
 
-CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aRequestCommandPath, const ConcreteCommandPath & aCommandPath,
-                                          bool aStartDataStruct)
+CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const ConcreteCommandPath & aRequestCommandPath,
+                                                        const ConcreteCommandPath & aResponseCommandPath, bool aStartDataStruct)
 {
-    // Return prematurely in case of requests targeted to a group that should not add command for response purposes.
+    // Return early in case of requests targeted to a group, since they should not add a response.
     VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
-    auto * commandRefTableEntry = mCommandRefLookupTable.Find(aRequestCommandPath);
-    return PrepareCommand(commandRefTableEntry, aCommandPath, aStartDataStruct);
+
+    auto commandPathRegistryEntry = GetCommandPathRegistry().Find(aRequestCommandPath);
+    VerifyOrReturnValue(commandPathRegistryEntry.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
+    return PrepareInvokeResponseCommand(commandPathRegistryEntry.Value(), aResponseCommandPath, aStartDataStruct);
 }
 
-CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct)
+CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aResponseCommandPath, bool aStartDataStruct)
 {
-    // Return prematurely in case of requests targeted to a group that should not add command for response purposes.
+    // Return early in case of requests targeted to a group, since they should not add a response.
     VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
 
     // Legacy code is calling the deprecated version of PrepareCommand. If we are in a case where
     // there was a single command in the request, we can just assume this response is triggered by
     // the single command.
-    auto * commandRefTableEntry = mCommandRefLookupTable.GetCommandRefTableEntryIfSingleRequest();
+    size_t countOfPathRegistryEntries = GetCommandPathRegistry().Count();
 
-    // At this point application supports Batch Invoke Commands since there does not exist a single command in table,
-    // but application is calling the depricated PrepareCommand. We have no way to determine the associated CommandRef
+    // At this point application supports Batch Invoke Commands since CommandPathRegistry has more than 1 entry,
+    // but application is calling the deprecated PrepareCommand. We have no way to determine the associated CommandRef
     // to put into the InvokeResponse.
-    VerifyOrDieWithMsg(commandRefTableEntry, DataManagement,
+    VerifyOrDieWithMsg(countOfPathRegistryEntries > 1, DataManagement,
                        "Seemingly device supports batch commands, but is calling the deprecated PrepareCommand API");
-    return PrepareCommand(commandRefTableEntry, aCommandPath, aStartDataStruct);
+
+    auto commandPathRegistryEntry = GetCommandPathRegistry().GetFirstEntry();
+    VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
+    VerifyOrReturnValue(commandPathRegistryEntry.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
+    return PrepareInvokeResponseCommand(commandPathRegistryEntry.Value(), aResponseCommandPath, aStartDataStruct);
 }
 
-CHIP_ERROR CommandHandler::PrepareCommand(const CommandRefLookupTable::CommandRefTableEntry * apCommandRefTableEntry,
-                                          const ConcreteCommandPath & aCommandPath, bool aStartDataStruct)
+CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const CommandPathRegistryEntry & apCommandPathRegistryEntry,
+                                                        const ConcreteCommandPath & aCommandPath, bool aStartDataStruct)
 {
-    VerifyOrReturnError(apCommandRefTableEntry, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(AllocateBuffer());
 
     mInvokeResponseBuilder.Checkpoint(mBackupWriter);
@@ -592,7 +606,7 @@ CHIP_ERROR CommandHandler::PrepareCommand(const CommandRefLookupTable::CommandRe
     //
     VerifyOrReturnError(mState == State::Idle || mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
 
-    mRefForResponse = apCommandRefTableEntry->ref;
+    mRefForResponse = apCommandPathRegistryEntry.ref;
 
     MoveToState(State::Preparing);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
@@ -641,9 +655,9 @@ CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPat
     //
     VerifyOrReturnError(mState == State::Idle || mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
 
-    auto * commandRefTableEntry = mCommandRefLookupTable.Find(aCommandPath);
-    VerifyOrReturnError(commandRefTableEntry, CHIP_ERROR_INCORRECT_STATE);
-    mRefForResponse = commandRefTableEntry->ref;
+    auto commandPathRegistryEntry = GetCommandPathRegistry().Find(aCommandPath);
+    VerifyOrReturnError(commandPathRegistryEntry.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    mRefForResponse = commandPathRegistryEntry.Value().ref;
 
     MoveToState(State::Preparing);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
