@@ -65,10 +65,10 @@ source_set("manager") {
 
   public_deps = [
     ":data",
+    ":monitoring-table",
     ":notifier",
     ":observer",
     ":sender",
-    ":table",
     "${chip_root}/src/credentials:credentials",
   ]
 }
@@ -80,8 +80,8 @@ source_set("sender") {
   ]
 
   public_deps = [
+    ":monitoring-table",
     ":notifier",
-    ":table",
     "${chip_root}/src/credentials:credentials",
     "${chip_root}/src/lib/address_resolve:address_resolve",
     "${chip_root}/src/protocols/secure_channel",
@@ -90,7 +90,7 @@ source_set("sender") {
 
 # ICDMonitoringTable source-set is broken out of the main source-set to enable unit tests
 # All sources and configurations used by the ICDMonitoringTable need to go in this source-set
-source_set("table") {
+source_set("monitoring-table") {
   sources = [
     "ICDMonitoringTable.cpp",
     "ICDMonitoringTable.h",
