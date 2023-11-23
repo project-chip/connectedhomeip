@@ -524,7 +524,7 @@ CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aComman
 void CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
                                const char * context)
 {
-    // Return prematurely in case of requests targeted to a group that should not add the status for response purposes.
+    // Return early in case of requests targeted to a group, since they should not add a response.
     VerifyOrReturn(!IsGroupRequest());
     VerifyOrDie(FallibleAddStatus(aCommandPath, aStatus, context) == CHIP_NO_ERROR);
 }
@@ -562,9 +562,6 @@ CHIP_ERROR CommandHandler::AddClusterSpecificFailure(const ConcreteCommandPath &
 CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const ConcreteCommandPath & aRequestCommandPath,
                                                         const ConcreteCommandPath & aResponseCommandPath, bool aStartDataStruct)
 {
-    // Return early in case of requests targeted to a group, since they should not add a response.
-    VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
-
     auto commandPathRegistryEntry = GetCommandPathRegistry().Find(aRequestCommandPath);
     VerifyOrReturnValue(commandPathRegistryEntry.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -573,9 +570,6 @@ CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const ConcreteCommandPat
 
 CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aResponseCommandPath, bool aStartDataStruct)
 {
-    // Return early in case of requests targeted to a group, since they should not add a response.
-    VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
-
     // Legacy code is calling the deprecated version of PrepareCommand. If we are in a case where
     // there was a single command in the request, we can just assume this response is triggered by
     // the single command.

@@ -106,7 +106,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
 
         chip::TLV::TLVWriter * writer;
 
-        ReturnOnFailure(apCommandObj->PrepareCommand(aRequestCommandPath, path));
+        ReturnOnFailure(apCommandObj->PrepareInvokeResponseCommand(aRequestCommandPath, path));
 
         writer = apCommandObj->GetCommandDataIBTLVWriter();
         ReturnOnFailure(writer->Put(chip::TLV::ContextTag(kTestFieldId1), kTestFieldValue1));

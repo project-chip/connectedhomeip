@@ -61,7 +61,7 @@ public:
 
     Optional<CommandPathRegistryEntry> Find(const ConcreteCommandPath & requestPath) const override
     {
-        for (int i = 0; i < mCount; i++)
+        for (size_t i = 0; i < mCount; i++)
         {
             if (mTable[i].requestPath == requestPath)
             {
@@ -86,7 +86,7 @@ public:
         {
             return CHIP_ERROR_NO_MEMORY;
         }
-        for (int i = 0; i < mCount; i++)
+        for (size_t i = 0; i < mCount; i++)
         {
             if (mTable[i].requestPath == requestPath)
             {
