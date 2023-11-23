@@ -79,8 +79,8 @@ CHIP_ERROR ESP32SecureCertDACProvider ::GetDeviceAttestationCert(MutableByteSpan
     {
         ESP_FAULT_ASSERT(err == ESP_OK && dac_cert != NULL && dac_len != 0);
         VerifyOrReturnError(dac_len <= kMaxDERCertLength, CHIP_ERROR_UNSUPPORTED_CERT_FORMAT,
-                            esp_secure_cert_free_ca_cert(dac_cert));
-        VerifyOrReturnError(dac_len <= outBuffer.size(), CHIP_ERROR_BUFFER_TOO_SMALL, esp_secure_cert_free_ca_cert(dac_cert));
+                            esp_secure_cert_free_device_cert(dac_cert));
+        VerifyOrReturnError(dac_len <= outBuffer.size(), CHIP_ERROR_BUFFER_TOO_SMALL, esp_secure_cert_free_device_cert(dac_cert));
         memcpy(outBuffer.data(), dac_cert, outBuffer.size());
         outBuffer.reduce_size(dac_len);
         esp_secure_cert_free_device_cert(dac_cert);
