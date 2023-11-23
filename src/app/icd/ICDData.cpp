@@ -30,7 +30,7 @@ System::Clock::Milliseconds32 ICDData::GetSlowPollingInterval()
         return GetSITPollingThreshold();
     }
 #endif
-    return kSlowPollingInterval;
+    return mSlowPollingInterval;
 }
 
-}
+} // namespace chip

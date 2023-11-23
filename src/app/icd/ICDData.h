@@ -32,6 +32,13 @@ namespace app {
 class ICDManager;
 } // namespace app
 
+/**
+ * @brief ICDData manages and stores ICD related configurations for the ICDManager.
+ *        Goal of the class is to expose ICD information to all consummers without creating circular dependencies
+ *        since the ICDManager is appart of the App layer
+ *
+ *        Anyone can read the ICD configurations but only the ICDManager can changes those configurations.
+ */
 class ICDData
 {
 public:
@@ -51,25 +58,39 @@ public:
 
     uint32_t GetICDCounter() { return mICDCounter; }
 
-    void SetICDCounter(uint32_t count) { mICDCounter = count; }
-
     uint16_t GetClientsSupportedPerFabric() { return mFabricClientsSupported; }
 
     System::Clock::Milliseconds32 GetSITPollingThreshold() { return kSITPollingThreshold; }
 
-    System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
+    System::Clock::Milliseconds32 GetFastPollingInterval() { return mFastPollingInterval; }
 
+    /**
+     * If ICD_ENFORCE_SIT_SLOW_POLL_LIMIT is set to 0, function will always return the configured Slow Polling interval
+     * (CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL).
+     *
+     * If ICD_ENFORCE_SIT_SLOW_POLL_LIMIT is set to 1, the returned value will depend on the devices operating mode.
+     * If ICDMode == SIT && the configured slow poll interval is superior to the maximum threshold (15s), the function will return
+     * the threshold (15s). If ICDMode == SIT but the configured slow poll interval is equal or inferior to the threshold, the
+     * function will the return the configured slow poll interval. If ICDMode == LIT, the function will return the configured slow
+     * poll interval.
+     *
+     * @return System::Clock::Milliseconds32
+     */
     System::Clock::Milliseconds32 GetSlowPollingInterval();
 
     ICDMode GetICDMode() { return mICDMode; }
 
 private:
-    // ICD Operating mode is managed by the ICDManager but stored in the ICDData to enable consummers to access it without creating
-    // a circular dependency To avoid allowing consummers changing the state of the ICD mode without going through the ICDManager;
-    // making the ICDManager a friend.
+    // ICD related information is managed by the ICDManager but stored in the ICDData to enable consummers to access it without
+    // creating a circular dependency. To avoid allowing consummers changing the state of the ICD mode without going through the
+    // ICDManager, the ICDManager is a friend that can access the private setters. If a consummer needs to be notified when a value
+    // is changed, they leverages the Observer events the ICDManager generates. See src/app/icd/ICDStateObserver.h
     friend class chip::app::ICDManager;
 
     void SetICDMode(ICDMode mode) { mICDMode = mode; };
+    void SetICDCounter(uint32_t count) { mICDCounter = count; }
+    void SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval) { mSlowPollingInterval = slowPollInterval; };
+    void SetFastPollingInterval(System::Clock::Milliseconds32 fastPollInterval) { mFastPollingInterval = fastPollInterval; };
 
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) <= 64800,
                   "Spec requires the IdleModeDuration to be equal or inferior to 64800s.");
@@ -93,13 +114,8 @@ private:
 
     // SIT ICDs should have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)
     static constexpr System::Clock::Milliseconds32 kSITPollingThreshold = System::Clock::Milliseconds32(15000);
-    System::Clock::Milliseconds32 kSlowPollingInterval                  = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
-    System::Clock::Milliseconds32 kFastPollingInterval                  = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
-
-    // Minimal constraint value of the the ICD attributes.
-    static constexpr uint32_t kMinIdleModeDuration    = 500;
-    static constexpr uint32_t kMinActiveModeDuration  = 300;
-    static constexpr uint16_t kMinActiveModeThreshold = 300;
+    System::Clock::Milliseconds32 mSlowPollingInterval                  = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+    System::Clock::Milliseconds32 mFastPollingInterval                  = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
 
     ICDMode mICDMode = ICDMode::SIT;
 };
