@@ -212,8 +212,7 @@ void SynchronizedReportSchedulerImpl::TimerFired()
             return Loop::Break;
         });
 
-        bool firstNodeFound = (nullptr != firstNode);
-        VerifyOrReturn(firstNodeFound);
+        VerifyOrReturn(firstNode); // Verify we have a valid node
 
         Timeout timeout = Milliseconds32(0);
         ReturnOnFailure(CalculateNextReportTimeout(timeout, firstNode, now));
