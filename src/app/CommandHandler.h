@@ -250,9 +250,6 @@ public:
      * Finishes the CommandStatusIB element within the InvokeResponses.
      *
      * Caller must have first successfully called `PrepareStatus`.
-     *
-     * @param [in] aEndDataStruct end the TLV container for the CommandFields element within
-     *             CommandDataIB.
      */
     CHIP_ERROR FinishStatus();
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
