@@ -191,7 +191,8 @@ void SynchronizedReportSchedulerImpl::TimerFired()
 
         if (node->IsReportableNow(now))
         {
-            // We assume we fired the timer early if no handler is reportable at the moment
+            // We set firedEarly false here because we assume we fired the timer early if no handler is reportable at the moment,
+            // which becomes false if we find a handler that is reportable
             firedEarly = false;
             node->SetEngineRunScheduled(true);
             ChipLogProgress(DataManagement, "Handler: %p with min: 0x" ChipLogFormatX64 " and max: 0x" ChipLogFormatX64 "", (node),

@@ -126,7 +126,7 @@ public:
         return SUCCESS;
     }
 
-    static int InitializeSync(void * context)
+    static int SetUpSyncTestSuite(void * context)
     {
         gRealClock = &chip::System::SystemClock();
         chip::System::Clock::Internal::SetSystemClockForTesting(&gMockClock);
@@ -135,23 +135,6 @@ public:
 
         if (AppContext::Initialize(context) != SUCCESS)
             return FAILURE;
-
-        auto * ctx = static_cast<TestContext *>(context);
-
-        if (ctx->mEventCounter.Init(0) != CHIP_NO_ERROR)
-        {
-            return FAILURE;
-        }
-
-        chip::app::LogStorageResources logStorageResources[] = {
-            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
-            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
-            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
-        };
-
-        chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(), ArraySize(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
-
         return SUCCESS;
     }
 
@@ -2343,6 +2326,7 @@ void TestReadInteraction::TestSubscribeEarlyReport(nlTestSuite * apSuite, void *
         NL_TEST_ASSERT(apSuite, gReportScheduler->IsReportScheduled(delegate.mpReadHandler));
         NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
     }
+    ctx.DrainAndServiceIO();
 
     engine->Shutdown();
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -5173,8 +5157,10 @@ nlTestSuite sSyncSuite =
 {
     "TestSyncReadInteraction",
     &sTests[0],
-    TestContext::InitializeSync,
-    TestContext::Finalize
+    TestContext::SetUpSyncTestSuite,
+    TestContext::TearDownTestSuite,
+    TestContext::SetUp,
+    TestContext::TearDown,
 };
 // clang-format on
 
