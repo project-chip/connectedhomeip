@@ -38,8 +38,7 @@
 {{cluster.api_maturity | idltxt}}{{cluster.side | idltxt}} cluster {{cluster.name}} = {{cluster.code}} {
   revision {{cluster.revision}};
 
-  {##}
-  {%- for enum in cluster.enums %}
+  {% for enum in cluster.enums %}
   enum {{enum.name}} : {{ enum.base_type}} {
     {% for entry in enum.entries %}
     {{entry.name}} = {{entry.code}};
