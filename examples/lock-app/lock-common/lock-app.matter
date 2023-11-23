@@ -3,6 +3,8 @@
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 server cluster Identify = 3 {
+  revision 4;
+
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
     kBreathe = 1;
@@ -49,6 +51,8 @@ server cluster Identify = 3 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
+  revision 2;
+
   bitmap Feature : bitmap32 {
     kTagList = 0x1;
   }
@@ -82,6 +86,8 @@ server cluster Descriptor = 29 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 server cluster AccessControl = 31 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
     kCASE = 2;
@@ -154,6 +160,8 @@ server cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 server cluster BasicInformation = 40 {
+  revision 3;
+
   enum ColorEnum : enum8 {
     kBlack = 0;
     kNavy = 1;
@@ -243,6 +251,8 @@ server cluster BasicInformation = 40 {
 
 /** Provides an interface for providing OTA software updates */
 client cluster OtaSoftwareUpdateProvider = 41 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
     kAwaitNextAction = 1;
@@ -317,6 +327,8 @@ client cluster OtaSoftwareUpdateProvider = 41 {
 
 /** Provides an interface for downloading and applying OTA software updates */
 server cluster OtaSoftwareUpdateRequestor = 42 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
     kUpdateAvailable = 1;
@@ -395,6 +407,8 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
       standards. As such, Nodes that visually or audibly convey information need a mechanism by which
       they can be configured to use a user’s preferred language, units, etc */
 server cluster LocalizationConfiguration = 43 {
+  revision 1; // NOTE: Default/not specifically set
+
   attribute access(write: manage) char_string<35> activeLocale = 0;
   readonly attribute char_string supportedLocales[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -410,6 +424,8 @@ server cluster LocalizationConfiguration = 43 {
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
 server cluster UnitLocalization = 45 {
+  revision 1;
+
   enum TempUnitEnum : enum8 {
     kFahrenheit = 0;
     kCelsius = 1;
@@ -430,6 +446,8 @@ server cluster UnitLocalization = 45 {
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 server cluster PowerSource = 47 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;
     kAlkaline = 1;
@@ -666,6 +684,8 @@ server cluster PowerSource = 47 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CommissioningErrorEnum : enum8 {
     kOK = 0;
     kValueOutsideRange = 1;
@@ -730,6 +750,8 @@ server cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 server cluster NetworkCommissioning = 49 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
     kOutOfRange = 1;
@@ -887,6 +909,8 @@ server cluster NetworkCommissioning = 49 {
 
 /** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
 server cluster DiagnosticLogs = 50 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum IntentEnum : enum8 {
     kEndUserSupport = 0;
     kNetworkDiag = 1;
@@ -924,6 +948,8 @@ server cluster DiagnosticLogs = 50 {
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster GeneralDiagnostics = 51 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum BootReasonEnum : enum8 {
     kUnspecified = 0;
     kPowerOnReboot = 1;
@@ -1035,6 +1061,8 @@ server cluster GeneralDiagnostics = 51 {
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster SoftwareDiagnostics = 52 {
+  revision 1; // NOTE: Default/not specifically set
+
   bitmap Feature : bitmap32 {
     kWatermarks = 0x1;
   }
@@ -1069,6 +1097,8 @@ server cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 server cluster ThreadNetworkDiagnostics = 53 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
     kNotConnected = 1;
@@ -1232,6 +1262,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
 
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster WiFiNetworkDiagnostics = 54 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AssociationFailureCauseEnum : enum8 {
     kUnknown = 0;
     kAssociationFailed = 1;
@@ -1306,6 +1338,8 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 /** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster EthernetNetworkDiagnostics = 55 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum PHYRateEnum : enum8 {
     kRate10M = 0;
     kRate100M = 1;
@@ -1345,6 +1379,8 @@ server cluster EthernetNetworkDiagnostics = 55 {
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 server cluster AdministratorCommissioning = 60 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CommissioningWindowStatusEnum : enum8 {
     kWindowNotOpen = 0;
     kEnhancedWindowOpen = 1;
@@ -1385,6 +1421,8 @@ server cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 server cluster OperationalCredentials = 62 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
     kPAICertificate = 2;
@@ -1501,6 +1539,8 @@ server cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 server cluster GroupKeyManagement = 63 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
@@ -1574,6 +1614,8 @@ server cluster GroupKeyManagement = 63 {
 /** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
 labels. */
 server cluster FixedLabel = 64 {
+  revision 1; // NOTE: Default/not specifically set
+
   struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
@@ -1590,6 +1632,8 @@ server cluster FixedLabel = 64 {
 
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 server cluster UserLabel = 65 {
+  revision 1; // NOTE: Default/not specifically set
+
   struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
@@ -1606,6 +1650,8 @@ server cluster UserLabel = 65 {
 
 /** Allows servers to ensure that listed clients are notified when a server is available for communication. */
 server cluster IcdManagement = 70 {
+  revision 2;
+
   bitmap Feature : bitmap32 {
     kCheckInProtocolSupport = 0x1;
     kUserActiveModeTrigger = 0x2;
@@ -1651,6 +1697,8 @@ server cluster IcdManagement = 70 {
 
 /** An interface to a generic way to secure a door */
 server cluster DoorLock = 257 {
+  revision 7;
+
   enum AlarmCodeEnum : enum8 {
     kLockJammed = 0;
     kLockFactoryReset = 1;
