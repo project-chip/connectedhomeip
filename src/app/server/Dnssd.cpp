@@ -371,12 +371,8 @@ void DnssdServer::StartServer()
 
 void DnssdServer::StopServer()
 {
-    // Make sure we don't hold on to dangling pointers.
+    // Make sure we don't hold on to a dangling fabric table pointer.
     mFabricTable = nullptr;
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    mICDManager = nullptr;
-#endif
 
     DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
 

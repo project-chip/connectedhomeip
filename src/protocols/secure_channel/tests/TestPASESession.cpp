@@ -299,7 +299,6 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
         // If running as an ICD, increase waitTimeout to account for the polling interval
         waitTimeout += ICDData::GetInstance().GetSlowPollingInterval();
-        ;
 #endif
 
         // Wait some time so the dropped message will be retransmitted when we drain the IO.
