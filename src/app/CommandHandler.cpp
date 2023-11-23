@@ -128,13 +128,14 @@ CHIP_ERROR CommandHandler::ValidateInvokeRequestsAndBuildRegistry(TLV::TLVReader
         CommandDataIB::Parser commandData;
         ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
 
-        // First validating that we can get a ConcreteCommandPath
+        // First validating that we can get a ConcreteCommandPath.
         CommandPathIB::Parser commandPath;
         ConcreteCommandPath concretePath(0, 0, 0);
         ReturnErrorOnFailure(commandData.GetPath(&commandPath));
         ReturnErrorOnFailure(commandPath.GetConcreteCommandPath(concretePath));
 
-        // Trying to read CommandRef. If it is not populated, we will assume value of 0.
+        // Following section is to grab the CommandRef if avaiable and perform
+        // any validation on it if we expect there to be a CommandRef
         Optional<uint16_t> commandRef;
         uint16_t ref;
         err = commandData.GetRef(&ref);
@@ -148,6 +149,8 @@ CHIP_ERROR CommandHandler::ValidateInvokeRequestsAndBuildRegistry(TLV::TLVReader
             commandRef = MakeOptional(ref);
         }
 
+        // Adding can fail if concretePath is not unique, or if commandRef is a value
+        // and is not unique, or if we have already added more paths then we support.
         ReturnErrorOnFailure(GetCommandPathRegistry().Add(concretePath, commandRef));
     }
 
