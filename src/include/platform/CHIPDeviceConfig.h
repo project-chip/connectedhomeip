@@ -875,6 +875,16 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
+ *
+ * Enable Thread Border Router service.
+ * Users should ensure OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE is set accordingly within their thread stack
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
+#define CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER 0
+#endif
+/**
  * CHIP_DEVICE_CONFIG_THREAD_TASK_NAME
  *
  * The name of the Thread task.

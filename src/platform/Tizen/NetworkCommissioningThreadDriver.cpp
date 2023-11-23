@@ -164,6 +164,25 @@ bool TizenThreadDriver::ThreadNetworkIterator::Next(Network & item)
     return false;
 }
 
+ThreadCapabilities TizenThreadDriver::GetSupportedThreadFeatures()
+{
+    BitMask<ThreadCapabilities> capabilites = 0;
+    capabilites.SetField(ThreadCapabilities::kIsBorderRouterCapable,
+                         CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER /*OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE*/);
+    capabilites.SetField(ThreadCapabilities::kIsRouterCapable, CHIP_DEVICE_CONFIG_THREAD_FTD);
+    capabilites.SetField(ThreadCapabilities::kIsSleepyEndDeviceCapable, !CHIP_DEVICE_CONFIG_THREAD_FTD);
+    capabilites.SetField(ThreadCapabilities::kIsFullThreadDevice, CHIP_DEVICE_CONFIG_THREAD_FTD);
+    capabilites.SetField(ThreadCapabilities::kIsSynchronizedSleepyEndDeviceCapable,
+                         (!CHIP_DEVICE_CONFIG_THREAD_FTD && CHIP_DEVICE_CONFIG_THREAD_SSED));
+    return capabilites;
+}
+
+uint16_t TizenThreadDriver::GetThreadVersion()
+{
+    // TODO Needs to be implemented with Tizen Thread stack api
+    return 0;
+}
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 } // namespace NetworkCommissioning
