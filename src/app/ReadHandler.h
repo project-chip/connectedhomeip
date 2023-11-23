@@ -258,7 +258,7 @@ public:
     }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    static void SetICDData(ICDData & icdData) { mICDData = &icdData; }
+    static void SetICDData(ICDData * icdData) { mICDData = icdData; }
 #endif
 
 private:

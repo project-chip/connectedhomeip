@@ -313,7 +313,7 @@ public:
     // Check if a given subject (CAT or NodeId) has at least 1 active subscription
     bool SubjectHasActiveSubscription(const FabricIndex aFabricIndex, const NodeId & subject);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    void SetICDData(ICDData & data);
+    void SetICDData(ICDData * data);
 #endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST

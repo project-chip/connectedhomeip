@@ -501,10 +501,16 @@ void Server::Shutdown()
     PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
     mCASEServer.Shutdown();
     mCASESessionManager.Shutdown();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    app::DnssdServer::Instance().SetICDManager(nullptr);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
 
     chip::Dnssd::Resolver::Instance().Shutdown();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::app::InteractionModelEngine::GetInstance()->SetICDData(nullptr);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     mCommissioningWindowManager.Shutdown();
     mMessageCounterManager.Shutdown();

@@ -1973,7 +1973,7 @@ bool InteractionModelEngine::HasSubscriptionsToResume()
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-void InteractionModelEngine::SetICDData(ICDData & data)
+void InteractionModelEngine::SetICDData(ICDData * data)
 {
     ReadHandler::SetICDData(data);
 }
