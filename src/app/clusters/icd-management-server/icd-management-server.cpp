@@ -116,14 +116,17 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeThreshold(EndpointId endp
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
-    uint16_t supported_clients = mICDData->GetClientsSupportedPerFabric();
+    uint16_t supported_clients                = mICDData->GetClientsSupportedPerFabric();
+    PersistentStorageDelegate * storage       = mStorage;
+    Crypto::SessionKeystore * sessionKeystore = mSessionKeystore;
+    FabricTable * fabricTable                 = mFabricTable;
 
-    return encoder.EncodeList([supported_clients, mStorage, mSessionKeystore, mFabricTable](const auto & subEncoder) -> CHIP_ERROR {
-        ICDMonitoringEntry e(mSessionKeystore);
+    return encoder.EncodeList([supported_clients, storage, sessionKeystore, fabricTable](const auto & subEncoder) -> CHIP_ERROR {
+        ICDMonitoringEntry e(sessionKeystore);
 
-        for (const auto & fabricInfo : mFabricTable)
+        for (const auto & fabricInfo : *fabricTable)
         {
-            ICDMonitoringTable table(mStorage, fabricInfo.GetFabricIndex(), supported_clients, mSessionKeystore);
+            ICDMonitoringTable table(*storage, fabricInfo.GetFabricIndex(), supported_clients, sessionKeystore);
             for (uint16_t i = 0; i < table.Limit(); ++i)
             {
                 CHIP_ERROR err = table.Get(i, e);
@@ -194,9 +197,8 @@ PersistentStorageDelegate * ICDManagementServer::mStorage           = nullptr;
 Crypto::SymmetricKeystore * ICDManagementServer::mSymmetricKeystore = nullptr;
 ICDData * ICDManagementServer::mICDData                             = nullptr;
 
-Status ICDManagementServer::RegisterClient(FabricIndex fabric_index, NodeId node_id, uint64_t monitored_subject,
-                                           ByteSpan key, Optional<ByteSpan> verification_key, bool isAdmin,
-                                           uint32_t & icdCounter)
+Status ICDManagementServer::RegisterClient(FabricIndex fabric_index, NodeId node_id, uint64_t monitored_subject, ByteSpan key,
+                                           Optional<ByteSpan> verification_key, bool isAdmin, uint32_t & icdCounter)
 {
     bool isFirstEntryForFabric = false;
     ICDMonitoringTable table(*mStorage, fabric_index, mICDData->GetClientsSupportedPerFabric(), mSymmetricKeystore);
@@ -259,8 +261,8 @@ Status ICDManagementServer::RegisterClient(FabricIndex fabric_index, NodeId node
     return InteractionModel::Status::Success;
 }
 
-Status ICDManagementServer::UnregisterClient(FabricIndex fabric_index, NodeId node_id,
-                                             Optional<ByteSpan> verificationKey, bool isAdmin)
+Status ICDManagementServer::UnregisterClient(FabricIndex fabric_index, NodeId node_id, Optional<ByteSpan> verificationKey,
+                                             bool isAdmin)
 {
     ICDMonitoringTable table(*mStorage, fabric_index, mICDData->GetClientsSupportedPerFabric(), mSymmetricKeystore);
 
@@ -301,8 +303,8 @@ void ICDManagementServer::TriggerICDMTableUpdatedEvent()
     app::ICDNotifier::GetInstance().BroadcastICDManagementEvent(app::ICDListener::ICDManagementEvents::kTableUpdated);
 }
 
-CHIP_ERROR ICDManagementServer::CheckAdmin(app::CommandHandler * commandObj,
-                                           const app::ConcreteCommandPath & commandPath, bool & isAdmin)
+CHIP_ERROR ICDManagementServer::CheckAdmin(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                           bool & isAdmin)
 {
     RequestPath requestPath{ .cluster = commandPath.mClusterId, .endpoint = commandPath.mEndpointId };
     CHIP_ERROR err = GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, Privilege::kAdminister);
