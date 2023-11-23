@@ -5,6 +5,7 @@
 		pwm-led1 = &pwm_led1;
 		pwm-led2 = &pwm_led2;
 		pwm-led3 = &pwm_led3;
+		i2c = &i2c;
 	};
 
 	pwm_leds {
@@ -76,5 +77,17 @@
 
 &pwm0 {
 	pinctrl-0 = <&pwm_ch0_pb4_default &pwm_ch1_pb5_default &pwm_ch2_pe2_default &pwm_ch3_pe0_default>;
+};
+
+&i2c {
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_FAST>;
+	pinctrl-0 = <&i2c_scl_pe1_default &i2c_sda_pe3_default>;
+	pinctrl-names = "default";
+
+	st25dvxxkc: st25dvxxkc@a6 {
+		compatible = "stm,st25dvxxkc";
+		reg = <0xa6>, <0xae>;
+	};
 };
 
