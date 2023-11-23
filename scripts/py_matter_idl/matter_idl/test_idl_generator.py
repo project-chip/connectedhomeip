@@ -49,7 +49,7 @@ class TestCaseStorage(GeneratorStorage):
         self.content = content
 
 
-def ReadMatterIdl(repo_path: str) -> Idl:
+def ReadMatterIdl(repo_path: str) -> str:
     path = os.path.join(os.path.dirname(__file__), "../../..", repo_path)
     with open(path, "rt") as stream:
         return stream.read()
@@ -62,7 +62,7 @@ def ParseMatterIdl(repo_path: str, skip_meta: bool) -> Idl:
 def RenderAsIdlTxt(idl: Idl) -> str:
     storage = TestCaseStorage()
     IdlGenerator(storage=storage, idl=idl).render(dry_run=False)
-    return storage.content
+    return storage.content or ""
 
 
 def SkipLeadingComments(txt: str, also_strip: List[str] = list()) -> str:
@@ -131,7 +131,7 @@ class TestIdlRendering(unittest.TestCase):
             idl2 = CreateParser(skip_meta=True).parse(txt)
 
             # checks that data types and content is the same
-            self.assertTextEqual(idl, idl2)
+            self.assertEqual(idl, idl2)
 
 
 if __name__ == '__main__':
