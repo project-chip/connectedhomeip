@@ -232,7 +232,7 @@ class Cluster:
     side: ClusterSide
     name: str
     code: int
-    revision: int = 1 # TODO: should not have a default ideally
+    revision: int = 1  # TODO: should not have a default ideally
     enums: List[Enum] = field(default_factory=list)
     bitmaps: List[Bitmap] = field(default_factory=list)
     events: List[Event] = field(default_factory=list)

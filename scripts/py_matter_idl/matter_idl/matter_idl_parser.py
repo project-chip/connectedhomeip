@@ -345,7 +345,7 @@ class MatterIdlTransformer(Transformer):
 
     @v_args(inline=True)
     def cluster_revision(self, revision):
-       return revision
+        return revision
 
     def event(self, args):
         return Event(qualities=args[0], priority=args[1], code=args[3], fields=args[4:], **args[2])
