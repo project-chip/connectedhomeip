@@ -144,6 +144,7 @@ public:
 
     void Reset()
     {
+        mPendingMessageQueue              = std::queue<PendingMessageItem>();
         mNumMessagesToDrop                = 0;
         mDroppedMessageCount              = 0;
         mSentMessageCount                 = 0;
