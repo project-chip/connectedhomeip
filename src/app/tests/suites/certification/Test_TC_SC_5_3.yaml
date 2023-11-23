@@ -350,8 +350,8 @@ tests:
           [1686319509.379782][8834:8834] CHIP:EM: Handling via exchange: 28261r, Delegate: 0x558cfb749be8
           [1686319509.379795][8834:8834] CHIP:DMG: InvokeRequestMessage =
           [1686319509.379797][8834:8834] CHIP:DMG: {
-          [1686319509.379800][8834:8834] CHIP:DMG:         suppressResponse = false, 
-          [1686319509.379803][8834:8834] CHIP:DMG:         timedRequest = false, 
+          [1686319509.379800][8834:8834] CHIP:DMG:         suppressResponse = false,
+          [1686319509.379803][8834:8834] CHIP:DMG:         timedRequest = false,
           [1686319509.379805][8834:8834] CHIP:DMG:         InvokeRequests =
           [1686319509.379810][8834:8834] CHIP:DMG:         [
           [1686319509.379813][8834:8834] CHIP:DMG:                 CommandDataIB =
@@ -361,16 +361,16 @@ tests:
           [1686319509.379825][8834:8834] CHIP:DMG:                                 ClusterId = 0x4,
           [1686319509.379828][8834:8834] CHIP:DMG:                                 CommandId = 0x0,
           [1686319509.379831][8834:8834] CHIP:DMG:                         },
-          [1686319509.379834][8834:8834] CHIP:DMG:                         
-          [1686319509.379837][8834:8834] CHIP:DMG:                         CommandFields = 
+          [1686319509.379834][8834:8834] CHIP:DMG:
+          [1686319509.379837][8834:8834] CHIP:DMG:                         CommandFields =
           [1686319509.379840][8834:8834] CHIP:DMG:                         {
-          [1686319509.379844][8834:8834] CHIP:DMG:                                 0x0 = 257, 
-          [1686319509.379847][8834:8834] CHIP:DMG:                                 0x1 = "grp2" (4 chars), 
+          [1686319509.379844][8834:8834] CHIP:DMG:                                 0x0 = 257,
+          [1686319509.379847][8834:8834] CHIP:DMG:                                 0x1 = "grp2" (4 chars),
           [1686319509.379851][8834:8834] CHIP:DMG:                         },
           [1686319509.379854][8834:8834] CHIP:DMG:                 },
-          [1686319509.379858][8834:8834] CHIP:DMG:                 
+          [1686319509.379858][8834:8834] CHIP:DMG:
           [1686319509.379860][8834:8834] CHIP:DMG:         ],
-          [1686319509.379865][8834:8834] CHIP:DMG:         
+          [1686319509.379865][8834:8834] CHIP:DMG:
           [1686319509.379867][8834:8834] CHIP:DMG:         InteractionModelRevision = 1
           [1686319509.379870][8834:8834] CHIP:DMG: },
           [1686319509.379881][8834:8834] CHIP:DMG: Rec
@@ -389,7 +389,7 @@ tests:
           [1684167429.421129][29723:29723] CHIP:IN:   Joined multicast group on interface wlp0s20f3
 
           Verify the DSIZ flag is set to Group On TH(Reference app) log:
-          (Here in below log the value received is 0X06 = 0110 (binary) - Here the S Flag (1 bit, position 2) is enabled as SourceNodeID is present and DISZ has a value 2(10) as the Destination Node ID field is present as a 16-bit Group 
+          (Here in below log the value received is 0X06 = 0110 (binary) - Here the S Flag (1 bit, position 2) is enabled as SourceNodeID is present and DISZ has a value 2(10) as the Destination Node ID field is present as a 16-bit Group
           [1700720496.175477][40754:40754] CHIP:DMG: Header Flags =
           [1700720496.175481][40754:40754] CHIP:DMG: {
           [1700720496.175485][40754:40754] CHIP:DMG:     Security (0x01) =
