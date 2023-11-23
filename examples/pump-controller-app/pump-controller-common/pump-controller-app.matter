@@ -3,6 +3,8 @@
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 server cluster Identify = 3 {
+  revision 4;
+
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
     kBreathe = 1;
@@ -43,6 +45,8 @@ server cluster Identify = 3 {
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 client cluster OnOff = 6 {
+  revision 6;
+
   enum DelayedAllOffEffectVariantEnum : enum8 {
     kDelayedOffFastFade = 0;
     kNoFade = 1;
@@ -113,6 +117,8 @@ client cluster OnOff = 6 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
+  revision 2;
+
   bitmap Feature : bitmap32 {
     kTagList = 0x1;
   }
@@ -143,6 +149,8 @@ server cluster Descriptor = 29 {
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 server cluster Binding = 30 {
+  revision 1; // NOTE: Default/not specifically set
+
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
     optional group_id group = 2;
@@ -165,6 +173,8 @@ server cluster Binding = 30 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 server cluster AccessControl = 31 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
     kCASE = 2;
@@ -237,6 +247,8 @@ server cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 server cluster BasicInformation = 40 {
+  revision 3;
+
   enum ColorEnum : enum8 {
     kBlack = 0;
     kNavy = 1;
@@ -324,6 +336,8 @@ server cluster BasicInformation = 40 {
 
 /** Provides an interface for providing OTA software updates */
 client cluster OtaSoftwareUpdateProvider = 41 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
     kAwaitNextAction = 1;
@@ -398,6 +412,8 @@ client cluster OtaSoftwareUpdateProvider = 41 {
 
 /** Provides an interface for downloading and applying OTA software updates */
 server cluster OtaSoftwareUpdateRequestor = 42 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
     kUpdateAvailable = 1;
@@ -473,6 +489,8 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CommissioningErrorEnum : enum8 {
     kOK = 0;
     kValueOutsideRange = 1;
@@ -537,6 +555,8 @@ server cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 server cluster NetworkCommissioning = 49 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
     kOutOfRange = 1;
@@ -684,6 +704,8 @@ server cluster NetworkCommissioning = 49 {
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster GeneralDiagnostics = 51 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum BootReasonEnum : enum8 {
     kUnspecified = 0;
     kPowerOnReboot = 1;
@@ -790,6 +812,8 @@ server cluster GeneralDiagnostics = 51 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 server cluster ThreadNetworkDiagnostics = 53 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
     kNotConnected = 1;
@@ -907,6 +931,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 server cluster AdministratorCommissioning = 60 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CommissioningWindowStatusEnum : enum8 {
     kWindowNotOpen = 0;
     kEnhancedWindowOpen = 1;
@@ -952,6 +978,8 @@ server cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 server cluster OperationalCredentials = 62 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
     kPAICertificate = 2;
@@ -1068,6 +1096,8 @@ server cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 server cluster GroupKeyManagement = 63 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
@@ -1140,6 +1170,8 @@ server cluster GroupKeyManagement = 63 {
 
 /** An interface for configuring and controlling pumps. */
 client cluster PumpConfigurationAndControl = 512 {
+  revision 3;
+
   enum ControlModeEnum : enum8 {
     kConstantSpeed = 0;
     kConstantPressure = 1;
@@ -1262,6 +1294,8 @@ client cluster PumpConfigurationAndControl = 512 {
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 client cluster TemperatureMeasurement = 1026 {
+  revision 1; // NOTE: Default/not specifically set
+
   readonly attribute nullable temperature measuredValue = 0;
   readonly attribute nullable temperature minMeasuredValue = 1;
   readonly attribute nullable temperature maxMeasuredValue = 2;
@@ -1276,6 +1310,8 @@ client cluster TemperatureMeasurement = 1026 {
 
 /** Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements. */
 client cluster PressureMeasurement = 1027 {
+  revision 3;
+
   bitmap Feature : bitmap32 {
     kExtended = 0x1;
   }
@@ -1299,6 +1335,8 @@ client cluster PressureMeasurement = 1027 {
 
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
 client cluster FlowMeasurement = 1028 {
+  revision 1; // NOTE: Default/not specifically set
+
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
   readonly attribute nullable int16u maxMeasuredValue = 2;

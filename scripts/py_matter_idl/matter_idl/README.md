@@ -39,6 +39,10 @@ struct LabelStruct {
 // Every cluster has an identifier that is defined by the matter spec (31 in this case)
 server cluster AccessControl = 31 {
 
+  // Revision of the cluster being described here
+  // If not specified, it is assumed to be 1
+  revision 3;
+
   // Enums and structs can be defined globally or be cluster specific.
   // IDL generation rules will take into account scoping (i.e. pick local defined
   // name first, things defined in one cluster are not visible in another).

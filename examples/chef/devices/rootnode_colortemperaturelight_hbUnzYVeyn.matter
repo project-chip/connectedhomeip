@@ -3,6 +3,8 @@
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 server cluster Identify = 3 {
+  revision 4;
+
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
     kBreathe = 1;
@@ -49,6 +51,8 @@ server cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 server cluster Groups = 4 {
+  revision 4;
+
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
   }
@@ -118,6 +122,8 @@ server cluster Groups = 4 {
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 server cluster OnOff = 6 {
+  revision 6;
+
   enum DelayedAllOffEffectVariantEnum : enum8 {
     kDelayedOffFastFade = 0;
     kNoFade = 1;
@@ -182,6 +188,8 @@ server cluster OnOff = 6 {
 
 /** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
 server cluster LevelControl = 8 {
+  revision 5;
+
   enum MoveModeEnum : enum8 {
     kUp = 0;
     kDown = 1;
@@ -281,6 +289,8 @@ server cluster LevelControl = 8 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
+  revision 2;
+
   bitmap Feature : bitmap32 {
     kTagList = 0x1;
   }
@@ -314,6 +324,8 @@ server cluster Descriptor = 29 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 server cluster AccessControl = 31 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
     kCASE = 2;
@@ -386,6 +398,8 @@ server cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 server cluster BasicInformation = 40 {
+  revision 3;
+
   enum ColorEnum : enum8 {
     kBlack = 0;
     kNavy = 1;
@@ -475,6 +489,8 @@ server cluster BasicInformation = 40 {
 
 /** Provides an interface for providing OTA software updates */
 client cluster OtaSoftwareUpdateProvider = 41 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
     kAwaitNextAction = 1;
@@ -549,6 +565,8 @@ client cluster OtaSoftwareUpdateProvider = 41 {
 
 /** Provides an interface for downloading and applying OTA software updates */
 server cluster OtaSoftwareUpdateRequestor = 42 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
     kUpdateAvailable = 1;
@@ -624,6 +642,8 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CommissioningErrorEnum : enum8 {
     kOK = 0;
     kValueOutsideRange = 1;
@@ -688,6 +708,8 @@ server cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 server cluster NetworkCommissioning = 49 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
     kOutOfRange = 1;
@@ -845,6 +867,8 @@ server cluster NetworkCommissioning = 49 {
 
 /** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
 server cluster DiagnosticLogs = 50 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum IntentEnum : enum8 {
     kEndUserSupport = 0;
     kNetworkDiag = 1;
@@ -882,6 +906,8 @@ server cluster DiagnosticLogs = 50 {
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster GeneralDiagnostics = 51 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum BootReasonEnum : enum8 {
     kUnspecified = 0;
     kPowerOnReboot = 1;
@@ -993,6 +1019,8 @@ server cluster GeneralDiagnostics = 51 {
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster SoftwareDiagnostics = 52 {
+  revision 1; // NOTE: Default/not specifically set
+
   bitmap Feature : bitmap32 {
     kWatermarks = 0x1;
   }
@@ -1027,6 +1055,8 @@ server cluster SoftwareDiagnostics = 52 {
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 server cluster AdministratorCommissioning = 60 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CommissioningWindowStatusEnum : enum8 {
     kWindowNotOpen = 0;
     kEnhancedWindowOpen = 1;
@@ -1072,6 +1102,8 @@ server cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 server cluster OperationalCredentials = 62 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
     kPAICertificate = 2;
@@ -1188,6 +1220,8 @@ server cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 server cluster GroupKeyManagement = 63 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
@@ -1260,6 +1294,8 @@ server cluster GroupKeyManagement = 63 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 server cluster ColorControl = 768 {
+  revision 6;
+
   enum ColorLoopAction : enum8 {
     kDeactivate = 0;
     kActivateFromColorLoopStartEnhancedHue = 1;
