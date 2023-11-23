@@ -135,7 +135,6 @@ private:
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
     ObjectPool<ICDCheckInSender, (CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS)> mICDSenderPool;
-    ICDData * mICDData = nullptr;
 
 #ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // feature map that can be changed at runtime for testing purposes

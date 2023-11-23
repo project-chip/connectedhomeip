@@ -41,7 +41,7 @@ namespace {
 /**
  * @brief Implementation of attribute access for IcdManagement cluster
  */
-class IcdManagementAttributeAccess : public app::AttributeAccessInterface
+class IcdManagementAttributeAccess : public AttributeAccessInterface
 {
 public:
     IcdManagementAttributeAccess() : AttributeAccessInterface(MakeOptional(kRootEndpointId), IcdManagement::Id) {}
@@ -175,7 +175,7 @@ public:
         uint16_t supported_clients = mICDData->GetClientsSupportedPerFabric();
         ICDMonitoringTable table(*mStorage, fabricIndex, supported_clients, mSessionKeystore);
         table.RemoveAll();
-        app::ICDNotifier::GetInstance().BroadcastICDManagementEvent(app::ICDListener::ICDManagementEvents::kTableUpdated);
+        ICDNotifier::GetInstance().BroadcastICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
     }
 
 private:
@@ -294,17 +294,16 @@ Status ICDManagementServer::StayActiveRequest(FabricIndex fabric_index)
 {
     // TODO: Implementent stay awake logic for end device
     // https://github.com/project-chip/connectedhomeip/issues/24259
-    app::ICDNotifier::GetInstance().BroadcastICDManagementEvent(app::ICDListener::ICDManagementEvents::kStayActiveRequestReceived);
+    ICDNotifier::GetInstance().BroadcastICDManagementEvent(ICDListener::ICDManagementEvents::kStayActiveRequestReceived);
     return InteractionModel::Status::UnsupportedCommand;
 }
 
 void ICDManagementServer::TriggerICDMTableUpdatedEvent()
 {
-    app::ICDNotifier::GetInstance().BroadcastICDManagementEvent(app::ICDListener::ICDManagementEvents::kTableUpdated);
+    ICDNotifier::GetInstance().BroadcastICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
 }
 
-CHIP_ERROR ICDManagementServer::CheckAdmin(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                           bool & isAdmin)
+CHIP_ERROR ICDManagementServer::CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, bool & isAdmin)
 {
     RequestPath requestPath{ .cluster = commandPath.mClusterId, .endpoint = commandPath.mEndpointId };
     CHIP_ERROR err = GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, Privilege::kAdminister);
@@ -336,8 +335,7 @@ void ICDManagementServer::Init(PersistentStorageDelegate & storage, Crypto::Symm
  * @brief ICD Management Cluster RegisterClient Command callback (from client)
  *
  */
-bool emberAfIcdManagementClusterRegisterClientCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
+bool emberAfIcdManagementClusterRegisterClientCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                        const Commands::RegisterClient::DecodableType & commandData)
 {
     InteractionModel::Status status = InteractionModel::Status::Failure;
@@ -369,8 +367,7 @@ bool emberAfIcdManagementClusterRegisterClientCallback(app::CommandHandler * com
  * @brief ICD Management Cluster UregisterClient Command callback (from client)
  *
  */
-bool emberAfIcdManagementClusterUnregisterClientCallback(app::CommandHandler * commandObj,
-                                                         const app::ConcreteCommandPath & commandPath,
+bool emberAfIcdManagementClusterUnregisterClientCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                          const Commands::UnregisterClient::DecodableType & commandData)
 {
     InteractionModel::Status status = InteractionModel::Status::Failure;
@@ -390,8 +387,7 @@ bool emberAfIcdManagementClusterUnregisterClientCallback(app::CommandHandler * c
 /**
  * @brief ICD Management Cluster StayActiveRequest Command callback (from client)
  */
-bool emberAfIcdManagementClusterStayActiveRequestCallback(app::CommandHandler * commandObj,
-                                                          const app::ConcreteCommandPath & commandPath,
+bool emberAfIcdManagementClusterStayActiveRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                           const Commands::StayActiveRequest::DecodableType & commandData)
 {
     ICDManagementServer server;
