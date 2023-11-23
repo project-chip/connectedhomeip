@@ -18,7 +18,7 @@ import os
 import sys
 import unittest
 from difflib import unified_diff
-from typing import Optional, List
+from typing import List, Optional
 
 try:
     from matter_idl.matter_idl_parser import CreateParser
@@ -44,7 +44,8 @@ class TestCaseStorage(GeneratorStorage):
 
     def write_new_data(self, relative_path: str, content: str):
         if self.content:
-            raise Exception("Unexpected extra data: single file generation expected")
+            raise Exception(
+                "Unexpected extra data: single file generation expected")
         self.content = content
 
 
@@ -103,8 +104,10 @@ class TestIdlRendering(unittest.TestCase):
         path = "src/controller/data_model/controller-clusters.matter"
 
         # Files MUST be identical except the header comments which are different
-        original = SkipLeadingComments(ReadMatterIdl(path), also_strip=[" // NOTE: Default/not specifically set"])
-        generated = SkipLeadingComments(RenderAsIdlTxt(ParseMatterIdl(path, skip_meta=False)))
+        original = SkipLeadingComments(ReadMatterIdl(path), also_strip=[
+                                       " // NOTE: Default/not specifically set"])
+        generated = SkipLeadingComments(RenderAsIdlTxt(
+            ParseMatterIdl(path, skip_meta=False)))
 
         self.assertTextEqual(original, generated)
 
