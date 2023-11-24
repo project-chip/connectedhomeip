@@ -81,7 +81,7 @@ private:
     static void FunctionTimerEventHandler(void * aGenericEvent);
     static button_status_t KBD_Callback(void * buttonHandle, button_callback_message_t * message, void * callbackParam);
     static void HandleKeyboard(void);
-    static void OTAHandler(void * aGenericEvent);
+    static void SoftResetHandler(void * aGenericEvent);
     static void BleHandler(void * aGenericEvent);
     static void BleStartAdvertising(intptr_t arg);
     static void ContactActionEventHandler(void * aGenericEvent);
@@ -96,7 +96,6 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     static void InitOTA(intptr_t arg);
-    static void StartOTAQuery(intptr_t arg);
 #endif
 
     static void UpdateClusterStateInternal(intptr_t arg);

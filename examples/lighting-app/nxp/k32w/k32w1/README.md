@@ -114,7 +114,8 @@ point before the 6 second limit.
 
 **Button SW3** can be used to change the state of the simulated light bulb. This
 can be used to mimic a user manually operating a switch. The button behaves as a
-toggle, swapping the state every time it is pressed.
+toggle, swapping the state every time it is short pressed. When long pressed, it
+does a clean soft reset that takes into account Matter shutdown procedure.
 
 ## Building
 
