@@ -24,6 +24,10 @@ config:
     timeout: 400
     endpoint: 1
 
+    PIXIT.OO.MaxCommunicationTurnaround:
+        type: int16u
+        defaultValue: 45
+
 tests:
     - label: "1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -298,8 +302,8 @@ tests:
       PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - PIXIT.OO.MaxCommunicationTurnaround
+              maxValue: 300
 
     - label: "9b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
@@ -393,8 +397,8 @@ tests:
       PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - PIXIT.OO.MaxCommunicationTurnaround
+              maxValue: 300
 
     - label: "10e:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
@@ -441,8 +445,8 @@ tests:
       PICS: OO.S.A4002 && OO.S.C40.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - PIXIT.OO.MaxCommunicationTurnaround
+              maxValue: 300
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -484,8 +488,8 @@ tests:
       PICS: OO.S.A4002 && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 170
-              maxValue: 230
+              minValue: 200 - PIXIT.OO.MaxCommunicationTurnaround
+              maxValue: 200 + PIXIT.OO.MaxCommunicationTurnaround
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -572,8 +576,8 @@ tests:
       PICS: OO.S.A4002 && OO.S.C00.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - PIXIT.OO.MaxCommunicationTurnaround
+              maxValue: 300
 
     - label: "Wait 30000ms"
       cluster: "DelayCommands"
@@ -682,8 +686,8 @@ tests:
       PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - PIXIT.OO.MaxCommunicationTurnaround
+              maxValue: 300
 
     - label: "17c:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
@@ -754,8 +758,8 @@ tests:
       PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - PIXIT.OO.MaxCommunicationTurnaround
+              maxValue: 300
 
     - label: "18b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
@@ -817,8 +821,8 @@ tests:
       PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 170
-              maxValue: 230
+              minValue: 200 - PIXIT.OO.MaxCommunicationTurnaround
+              maxValue: 200 + PIXIT.OO.MaxCommunicationTurnaround
 
     - label: "19c:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
@@ -851,8 +855,8 @@ tests:
       PICS: OO.S.A4002 && OO.S.C00.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - PIXIT.OO.MaxCommunicationTurnaround
+              maxValue: 300
 
     - label: "21a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
@@ -894,8 +898,8 @@ tests:
       PICS: OO.S.A4002 && PICS_SKIP_SAMPLE_APP && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 170
-              maxValue: 230
+              minValue: 200 - PIXIT.OO.MaxCommunicationTurnaround
+              maxValue: 200 + PIXIT.OO.MaxCommunicationTurnaround
 
     - label: "22a:Send On Command"
       PICS: OO.S.C01.Rsp
@@ -966,8 +970,8 @@ tests:
       PICS: OO.S.A4002 && OO.S.C00.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - PIXIT.OO.MaxCommunicationTurnaround
+              maxValue: 300
 
     - label: "Wait 40000ms"
       cluster: "DelayCommands"
@@ -1023,8 +1027,8 @@ tests:
       PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - PIXIT.OO.MaxCommunicationTurnaround
+              maxValue: 300
 
     - label: "24b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
