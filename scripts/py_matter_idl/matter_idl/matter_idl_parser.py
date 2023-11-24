@@ -324,6 +324,10 @@ class MatterIdlTransformer(Transformer):
 
         return init_args
 
+    @v_args(inline=True)
+    def cluster_revision(self, revision):
+        return revision
+
     def event(self, args):
         return Event(qualities=args[0], priority=args[1], code=args[3], fields=args[4:], **args[2])
 
@@ -466,14 +470,16 @@ class MatterIdlTransformer(Transformer):
         return element
 
     @v_args(inline=True, meta=True)
-    def cluster(self, meta, api_maturity, name, code, *content):
+    def cluster(self, meta, api_maturity, name, code, revision, *content):
         meta = None if self.skip_meta else ParseMetaData(meta)
 
         if api_maturity is None:
             api_maturity = ApiMaturity.STABLE
 
-        result = Cluster(parse_meta=meta, name=name,
-                         code=code, api_maturity=api_maturity)
+        if not revision:
+            revision = 1
+
+        result = Cluster(parse_meta=meta, name=name, code=code, revision=revision, api_maturity=api_maturity)
 
         for item in content:
             if isinstance(item, Enum):

@@ -226,6 +226,7 @@ class Command:
 class Cluster:
     name: str
     code: int
+    revision: int = 1
     enums: List[Enum] = field(default_factory=list)
     bitmaps: List[Bitmap] = field(default_factory=list)
     events: List[Event] = field(default_factory=list)

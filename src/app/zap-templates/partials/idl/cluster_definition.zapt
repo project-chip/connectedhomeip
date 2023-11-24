@@ -6,6 +6,14 @@ cluster {{asUpperCamelCase name}} = {{!}}
      {{else}}
         {{~code~}}
      {{/if}} {
+  {{#global_attribute_default code="0xFFFD"}}
+  {{#if defaultValue}}
+  revision {{defaultValue}};
+  {{else}}
+  revision 1; // NOTE: Default/not specifically set
+  {{/if}}
+
+  {{/global_attribute_default}}
   {{#zcl_enums}}
   enum {{asUpperCamelCase name preserveAcronyms=true}} : enum{{multiply size 8}} {
     {{#zcl_enum_items}}

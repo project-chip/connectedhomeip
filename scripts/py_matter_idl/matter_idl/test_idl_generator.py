@@ -18,7 +18,7 @@ import os
 import sys
 import unittest
 from difflib import unified_diff
-from typing import Optional
+from typing import List, Optional
 
 try:
     from matter_idl.matter_idl_parser import CreateParser
@@ -49,7 +49,7 @@ class TestCaseStorage(GeneratorStorage):
         self.content = content
 
 
-def ReadMatterIdl(repo_path: str) -> Idl:
+def ReadMatterIdl(repo_path: str) -> str:
     path = os.path.join(os.path.dirname(__file__), "../../..", repo_path)
     with open(path, "rt") as stream:
         return stream.read()
@@ -62,16 +62,22 @@ def ParseMatterIdl(repo_path: str, skip_meta: bool) -> Idl:
 def RenderAsIdlTxt(idl: Idl) -> str:
     storage = TestCaseStorage()
     IdlGenerator(storage=storage, idl=idl).render(dry_run=False)
-    return storage.content
+    return storage.content or ""
 
 
-def SkipLeadingComments(txt: str) -> str:
+def SkipLeadingComments(txt: str, also_strip: List[str] = list()) -> str:
     """Skips leading lines starting with // in a file. """
     lines = txt.split("\n")
     idx = 0
     while lines[idx].startswith("//") or not lines[idx]:
         idx = idx + 1
-    return "\n".join(lines[idx:])
+
+    result = "\n".join(lines[idx:])
+
+    for s in also_strip:
+        result = result.replace(s, "")
+
+    return result
 
 
 class TestIdlRendering(unittest.TestCase):
@@ -81,7 +87,6 @@ class TestIdlRendering(unittest.TestCase):
             self.assertEqual(a, b)
             return
 
-        # Not the same. Try to make a human readable diff:
         delta = unified_diff(a.splitlines(keepends=True),
                              b.splitlines(keepends=True),
                              fromfile='actual.matter',
@@ -99,7 +104,8 @@ class TestIdlRendering(unittest.TestCase):
         path = "src/controller/data_model/controller-clusters.matter"
 
         # Files MUST be identical except the header comments which are different
-        original = SkipLeadingComments(ReadMatterIdl(path))
+        original = SkipLeadingComments(ReadMatterIdl(path), also_strip=[
+                                       " // NOTE: Default/not specifically set"])
         generated = SkipLeadingComments(RenderAsIdlTxt(
             ParseMatterIdl(path, skip_meta=False)))
 
@@ -125,7 +131,7 @@ class TestIdlRendering(unittest.TestCase):
             idl2 = CreateParser(skip_meta=True).parse(txt)
 
             # checks that data types and content is the same
-            self.assertTextEqual(idl, idl2)
+            self.assertEqual(idl, idl2)
 
 
 if __name__ == '__main__':

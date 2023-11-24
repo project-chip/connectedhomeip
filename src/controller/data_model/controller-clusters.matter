@@ -3,6 +3,8 @@
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
+  revision 4;
+
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
     kBreathe = 1;
@@ -51,6 +53,8 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
+  revision 4;
+
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
   }
@@ -126,6 +130,8 @@ cluster Groups = 4 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 provisional cluster Scenes = 5 {
+  revision 5;
+
   bitmap CopyModeBitmap : bitmap8 {
     kCopyAllScenes = 0x1;
   }
@@ -317,6 +323,8 @@ provisional cluster Scenes = 5 {
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 cluster OnOff = 6 {
+  revision 6;
+
   enum DelayedAllOffEffectVariantEnum : enum8 {
     kDelayedOffFastFade = 0;
     kNoFade = 1;
@@ -387,6 +395,8 @@ cluster OnOff = 6 {
 
 /** Attributes and commands for configuring On/Off switching devices. */
 cluster OnOffSwitchConfiguration = 7 {
+  revision 1; // NOTE: Default/not specifically set
+
   readonly attribute enum8 switchType = 0;
   attribute enum8 switchActions = 16;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -399,6 +409,8 @@ cluster OnOffSwitchConfiguration = 7 {
 
 /** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
 cluster LevelControl = 8 {
+  revision 5;
+
   enum MoveModeEnum : enum8 {
     kUp = 0;
     kDown = 1;
@@ -522,6 +534,8 @@ cluster LevelControl = 8 {
 
 /** An interface for reading the value of a binary measurement and accessing various characteristics of that measurement. */
 cluster BinaryInputBasic = 15 {
+  revision 1; // NOTE: Default/not specifically set
+
   attribute optional char_string<16> activeText = 4;
   attribute optional char_string<16> description = 28;
   attribute optional char_string<16> inactiveText = 46;
@@ -541,6 +555,8 @@ cluster BinaryInputBasic = 15 {
 
 /** Cluster to control pulse width modulation */
 provisional cluster PulseWidthModulation = 28 {
+  revision 1; // NOTE: Default/not specifically set
+
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -551,6 +567,8 @@ provisional cluster PulseWidthModulation = 28 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
+  revision 2;
+
   bitmap Feature : bitmap32 {
     kTagList = 0x1;
   }
@@ -582,6 +600,8 @@ cluster Descriptor = 29 {
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 cluster Binding = 30 {
+  revision 1; // NOTE: Default/not specifically set
+
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
     optional group_id group = 2;
@@ -604,6 +624,8 @@ cluster Binding = 30 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 cluster AccessControl = 31 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
     kCASE = 2;
@@ -674,6 +696,8 @@ cluster AccessControl = 31 {
 
 /** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
 cluster Actions = 37 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ActionErrorEnum : enum8 {
     kUnknown = 0;
     kInterrupted = 1;
@@ -851,6 +875,8 @@ cluster Actions = 37 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
+  revision 3;
+
   enum ColorEnum : enum8 {
     kBlack = 0;
     kNavy = 1;
@@ -944,6 +970,8 @@ cluster BasicInformation = 40 {
 
 /** Provides an interface for providing OTA software updates */
 cluster OtaSoftwareUpdateProvider = 41 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
     kAwaitNextAction = 1;
@@ -1018,6 +1046,8 @@ cluster OtaSoftwareUpdateProvider = 41 {
 
 /** Provides an interface for downloading and applying OTA software updates */
 cluster OtaSoftwareUpdateRequestor = 42 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
     kUpdateAvailable = 1;
@@ -1097,6 +1127,8 @@ cluster OtaSoftwareUpdateRequestor = 42 {
       standards. As such, Nodes that visually or audibly convey information need a mechanism by which
       they can be configured to use a user’s preferred language, units, etc */
 cluster LocalizationConfiguration = 43 {
+  revision 1; // NOTE: Default/not specifically set
+
   attribute access(write: manage) char_string<35> activeLocale = 0;
   readonly attribute char_string supportedLocales[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1112,6 +1144,8 @@ cluster LocalizationConfiguration = 43 {
       or audibly convey time information need a mechanism by which they can be configured to use a
       user’s preferred format. */
 cluster TimeFormatLocalization = 44 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CalendarTypeEnum : enum8 {
     kBuddhist = 0;
     kChinese = 1;
@@ -1152,6 +1186,8 @@ cluster TimeFormatLocalization = 44 {
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
 cluster UnitLocalization = 45 {
+  revision 1;
+
   enum TempUnitEnum : enum8 {
     kFahrenheit = 0;
     kCelsius = 1;
@@ -1173,6 +1209,8 @@ cluster UnitLocalization = 45 {
 
 /** This cluster is used to describe the configuration and capabilities of a Device's power system. */
 cluster PowerSourceConfiguration = 46 {
+  revision 1;
+
   readonly attribute endpoint_no sources[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1184,6 +1222,8 @@ cluster PowerSourceConfiguration = 46 {
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 cluster PowerSource = 47 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;
     kAlkaline = 1;
@@ -1441,6 +1481,8 @@ cluster PowerSource = 47 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CommissioningErrorEnum : enum8 {
     kOK = 0;
     kValueOutsideRange = 1;
@@ -1508,6 +1550,8 @@ cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
     kOutOfRange = 1;
@@ -1686,6 +1730,8 @@ cluster NetworkCommissioning = 49 {
 
 /** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
 cluster DiagnosticLogs = 50 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum IntentEnum : enum8 {
     kEndUserSupport = 0;
     kNetworkDiag = 1;
@@ -1731,6 +1777,8 @@ cluster DiagnosticLogs = 50 {
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster GeneralDiagnostics = 51 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum BootReasonEnum : enum8 {
     kUnspecified = 0;
     kPowerOnReboot = 1;
@@ -1844,6 +1892,8 @@ cluster GeneralDiagnostics = 51 {
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster SoftwareDiagnostics = 52 {
+  revision 1; // NOTE: Default/not specifically set
+
   bitmap Feature : bitmap32 {
     kWatermarks = 0x1;
   }
@@ -1879,6 +1929,8 @@ cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
     kNotConnected = 1;
@@ -2043,6 +2095,8 @@ cluster ThreadNetworkDiagnostics = 53 {
 
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster WiFiNetworkDiagnostics = 54 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AssociationFailureCauseEnum : enum8 {
     kUnknown = 0;
     kAssociationFailed = 1;
@@ -2118,6 +2172,8 @@ cluster WiFiNetworkDiagnostics = 54 {
 
 /** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster EthernetNetworkDiagnostics = 55 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum PHYRateEnum : enum8 {
     kRate10M = 0;
     kRate100M = 1;
@@ -2158,6 +2214,8 @@ cluster EthernetNetworkDiagnostics = 55 {
 
 /** Accurate time is required for a number of reasons, including scheduling, display and validating security materials. */
 cluster TimeSynchronization = 56 {
+  revision 2;
+
   enum GranularityEnum : enum8 {
     kNoTimeGranularity = 0;
     kMinutesGranularity = 1;
@@ -2307,6 +2365,8 @@ cluster TimeSynchronization = 56 {
           collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
           such as the vendor name, the model name, or user-assigned name. */
 cluster BridgedDeviceBasicInformation = 57 {
+  revision 3;
+
   enum ColorEnum : enum8 {
     kBlack = 0;
     kNavy = 1;
@@ -2387,6 +2447,8 @@ cluster BridgedDeviceBasicInformation = 57 {
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
 cluster Switch = 59 {
+  revision 1; // NOTE: Default/not specifically set
+
   bitmap Feature : bitmap32 {
     kLatchingSwitch = 0x1;
     kMomentarySwitch = 0x2;
@@ -2438,6 +2500,8 @@ cluster Switch = 59 {
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CommissioningWindowStatusEnum : enum8 {
     kWindowNotOpen = 0;
     kEnhancedWindowOpen = 1;
@@ -2486,6 +2550,8 @@ cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
     kPAICertificate = 2;
@@ -2610,6 +2676,8 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
@@ -2687,6 +2755,8 @@ cluster GroupKeyManagement = 63 {
 /** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
 labels. */
 cluster FixedLabel = 64 {
+  revision 1; // NOTE: Default/not specifically set
+
   struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
@@ -2703,6 +2773,8 @@ cluster FixedLabel = 64 {
 
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 cluster UserLabel = 65 {
+  revision 1; // NOTE: Default/not specifically set
+
   struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
@@ -2719,6 +2791,8 @@ cluster UserLabel = 65 {
 
 /** Cluster to control Proxy Configuration */
 cluster ProxyConfiguration = 66 {
+  revision 1; // NOTE: Default/not specifically set
+
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2729,6 +2803,8 @@ cluster ProxyConfiguration = 66 {
 
 /** Cluster to control Proxy Discovery */
 cluster ProxyDiscovery = 67 {
+  revision 1; // NOTE: Default/not specifically set
+
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2739,6 +2815,8 @@ cluster ProxyDiscovery = 67 {
 
 /** Cluster to control Proxy Valid */
 cluster ProxyValid = 68 {
+  revision 1; // NOTE: Default/not specifically set
+
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2749,6 +2827,8 @@ cluster ProxyValid = 68 {
 
 /** This cluster provides an interface to a boolean state called StateValue. */
 cluster BooleanState = 69 {
+  revision 1;
+
   info event StateChange = 0 {
     boolean stateValue = 0;
   }
@@ -2764,6 +2844,8 @@ cluster BooleanState = 69 {
 
 /** Allows servers to ensure that listed clients are notified when a server is available for communication. */
 cluster IcdManagement = 70 {
+  revision 2;
+
   bitmap Feature : bitmap32 {
     kCheckInProtocolSupport = 0x1;
     kUserActiveModeTrigger = 0x2;
@@ -2841,6 +2923,8 @@ cluster IcdManagement = 70 {
 
 /** This cluster supports creating a simple timer functionality. */
 provisional cluster Timer = 71 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum TimerStatusEnum : enum8 {
     kRunning = 0;
     kPaused = 1;
@@ -2886,6 +2970,8 @@ provisional cluster Timer = 71 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 provisional cluster OvenMode = 73 {
+  revision 1;
+
   enum ModeTag : enum16 {
     kBake = 16384;
     kConvection = 16385;
@@ -2941,6 +3027,8 @@ provisional cluster OvenMode = 73 {
 /** This cluster supports remotely monitoring and controling the different typs of
             functionality available to a drying device, such as a laundry dryer. */
 cluster LaundryDryerControls = 74 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum DrynessLevelEnum : enum8 {
     kLow = 0;
     kNormal = 1;
@@ -2960,6 +3048,8 @@ cluster LaundryDryerControls = 74 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster ModeSelect = 80 {
+  revision 2;
+
   bitmap Feature : bitmap32 {
     kOnOff = 0x1;
   }
@@ -2998,6 +3088,8 @@ cluster ModeSelect = 80 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster LaundryWasherMode = 81 {
+  revision 2;
+
   enum ModeTag : enum16 {
     kNormal = 16384;
     kDelicate = 16385;
@@ -3047,6 +3139,8 @@ cluster LaundryWasherMode = 81 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
+  revision 2;
+
   enum ModeTag : enum16 {
     kRapidCool = 16384;
     kRapidFreeze = 16385;
@@ -3094,6 +3188,8 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
 
 /** This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine. */
 cluster LaundryWasherControls = 83 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum NumberOfRinsesEnum : enum8 {
     kNone = 0;
     kNormal = 1;
@@ -3120,6 +3216,8 @@ cluster LaundryWasherControls = 83 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcRunMode = 84 {
+  revision 2;
+
   enum ModeTag : enum16 {
     kIdle = 16384;
     kCleaning = 16385;
@@ -3177,6 +3275,8 @@ cluster RvcRunMode = 84 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcCleanMode = 85 {
+  revision 2;
+
   enum ModeTag : enum16 {
     kDeepClean = 16384;
     kVacuum = 16385;
@@ -3228,6 +3328,8 @@ cluster RvcCleanMode = 85 {
 
 /** Attributes and commands for configuring the temperature control, and reporting temperature. */
 cluster TemperatureControl = 86 {
+  revision 1; // NOTE: Default/not specifically set
+
   bitmap Feature : bitmap32 {
     kTemperatureNumber = 0x1;
     kTemperatureLevel = 0x2;
@@ -3258,6 +3360,8 @@ cluster TemperatureControl = 86 {
 
 /** Attributes and commands for configuring the Refrigerator alarm. */
 cluster RefrigeratorAlarm = 87 {
+  revision 1; // NOTE: Default/not specifically set
+
   bitmap AlarmMap : bitmap32 {
     kDoorOpen = 0x1;
   }
@@ -3282,6 +3386,8 @@ cluster RefrigeratorAlarm = 87 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster DishwasherMode = 89 {
+  revision 2;
+
   enum ModeTag : enum16 {
     kNormal = 16384;
     kHeavy = 16385;
@@ -3330,6 +3436,8 @@ cluster DishwasherMode = 89 {
 
 /** Attributes for reporting air quality classification */
 cluster AirQuality = 91 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AirQualityEnum : enum8 {
     kUnknown = 0;
     kGood = 1;
@@ -3358,6 +3466,8 @@ cluster AirQuality = 91 {
 
 /** This cluster provides an interface for observing and managing the state of smoke and CO alarms. */
 cluster SmokeCoAlarm = 92 {
+  revision 1;
+
   enum AlarmStateEnum : enum8 {
     kNormal = 0;
     kWarning = 1;
@@ -3468,6 +3578,8 @@ cluster SmokeCoAlarm = 92 {
 
 /** Attributes and commands for configuring the Dishwasher alarm. */
 cluster DishwasherAlarm = 93 {
+  revision 1; // NOTE: Default/not specifically set
+
   bitmap AlarmMap : bitmap32 {
     kInflowError = 0x1;
     kDrainError = 0x2;
@@ -3515,6 +3627,8 @@ cluster DishwasherAlarm = 93 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 provisional cluster MicrowaveOvenMode = 94 {
+  revision 1;
+
   enum ModeTag : enum16 {
     kNormal = 16384;
     kDefrost = 16385;
@@ -3547,6 +3661,8 @@ provisional cluster MicrowaveOvenMode = 94 {
 
 /** Attributes and commands for configuring the microwave oven control, and reporting cooking stats. */
 provisional cluster MicrowaveOvenControl = 95 {
+  revision 1; // NOTE: Default/not specifically set
+
   readonly attribute elapsed_s cookTime = 1;
   readonly attribute int8u powerSetting = 2;
   readonly attribute optional int8u minPower = 3;
@@ -3577,6 +3693,8 @@ provisional cluster MicrowaveOvenControl = 95 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
 cluster OperationalState = 96 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ErrorStateEnum : enum8 {
     kNoError = 0;
     kUnableToStartOrResume = 1;
@@ -3641,6 +3759,8 @@ cluster OperationalState = 96 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
 cluster RvcOperationalState = 97 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ErrorStateEnum : enum8 {
     kFailedToFindChargingDock = 64;
     kStuck = 65;
@@ -3708,6 +3828,8 @@ cluster RvcOperationalState = 97 {
 
 /** Attributes and commands for monitoring HEPA filters in a device */
 cluster HepaFilterMonitoring = 113 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ChangeIndicationEnum : enum8 {
     kOK = 0;
     kWarning = 1;
@@ -3757,6 +3879,8 @@ cluster HepaFilterMonitoring = 113 {
 
 /** Attributes and commands for monitoring activated carbon filters in a device */
 cluster ActivatedCarbonFilterMonitoring = 114 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ChangeIndicationEnum : enum8 {
     kOK = 0;
     kWarning = 1;
@@ -3806,6 +3930,8 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
 
 /** This cluster is used to configure a boolean sensor. */
 provisional cluster BooleanSensorConfiguration = 128 {
+  revision 1;
+
   enum SensitivityEnum : enum8 {
     kHigh = 0;
     kStandard = 1;
@@ -3853,6 +3979,8 @@ provisional cluster BooleanSensorConfiguration = 128 {
 
 /** This cluster is used to configure a valve. */
 provisional cluster ValveConfigurationAndControl = 129 {
+  revision 1;
+
   enum ValveStateEnum : enum8 {
     kOpen = 0;
     kClosed = 1;
@@ -3913,6 +4041,8 @@ provisional cluster ValveConfigurationAndControl = 129 {
 
 /** This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control. */
 provisional cluster DemandResponseLoadControl = 150 {
+  revision 4;
+
   enum CriticalityLevelEnum : enum8 {
     kUnknown = 0;
     kGreen = 1;
@@ -4107,6 +4237,8 @@ provisional cluster DemandResponseLoadControl = 150 {
 
 /** An interface to a generic way to secure a door */
 cluster DoorLock = 257 {
+  revision 7;
+
   enum AlarmCodeEnum : enum8 {
     kLockJammed = 0;
     kLockFactoryReset = 1;
@@ -4727,6 +4859,8 @@ cluster DoorLock = 257 {
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
 cluster WindowCovering = 258 {
+  revision 5;
+
   enum EndProductType : enum8 {
     kRollerShade = 0;
     kRomanShade = 1;
@@ -4878,6 +5012,8 @@ cluster WindowCovering = 258 {
 
 /** This cluster provides control of a barrier (garage door). */
 cluster BarrierControl = 259 {
+  revision 1; // NOTE: Default/not specifically set
+
   bitmap BarrierControlCapabilities : bitmap8 {
     kPartialBarrier = 0x1;
   }
@@ -4918,6 +5054,8 @@ cluster BarrierControl = 259 {
 
 /** An interface for configuring and controlling pumps. */
 cluster PumpConfigurationAndControl = 512 {
+  revision 3;
+
   enum ControlModeEnum : enum8 {
     kConstantSpeed = 0;
     kConstantPressure = 1;
@@ -5040,6 +5178,8 @@ cluster PumpConfigurationAndControl = 512 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
+  revision 6;
+
   enum SetpointAdjustMode : enum8 {
     kHeat = 0;
     kCool = 1;
@@ -5197,6 +5337,8 @@ cluster Thermostat = 513 {
 
 /** An interface for controlling a fan in a heating/cooling system. */
 provisional cluster FanControl = 514 {
+  revision 4;
+
   enum AirflowDirectionEnum : enum8 {
     kForward = 0;
     kReverse = 1;
@@ -5277,6 +5419,8 @@ provisional cluster FanControl = 514 {
 
 /** An interface for configuring the user interface of a thermostat (which may be remote from the thermostat). */
 cluster ThermostatUserInterfaceConfiguration = 516 {
+  revision 2;
+
   enum KeypadLockoutEnum : enum8 {
     kNoLockout = 0;
     kLockout1 = 1;
@@ -5309,6 +5453,8 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
+  revision 6;
+
   enum ColorLoopAction : enum8 {
     kDeactivate = 0;
     kActivateFromColorLoopStartEnhancedHue = 1;
@@ -5627,6 +5773,8 @@ cluster ColorControl = 768 {
 
 /** Attributes and commands for configuring a lighting ballast. */
 provisional cluster BallastConfiguration = 769 {
+  revision 4;
+
   bitmap BallastStatusBitmap : bitmap8 {
     kBallastNonOperational = 0x1;
     kLampFailure = 0x2;
@@ -5660,6 +5808,8 @@ provisional cluster BallastConfiguration = 769 {
 
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
 cluster IlluminanceMeasurement = 1024 {
+  revision 3;
+
   enum LightSensorTypeEnum : enum8 {
     kPhotodiode = 0;
     kCMOS = 1;
@@ -5680,6 +5830,8 @@ cluster IlluminanceMeasurement = 1024 {
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 cluster TemperatureMeasurement = 1026 {
+  revision 1; // NOTE: Default/not specifically set
+
   readonly attribute nullable temperature measuredValue = 0;
   readonly attribute nullable temperature minMeasuredValue = 1;
   readonly attribute nullable temperature maxMeasuredValue = 2;
@@ -5694,6 +5846,8 @@ cluster TemperatureMeasurement = 1026 {
 
 /** Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements. */
 cluster PressureMeasurement = 1027 {
+  revision 3;
+
   bitmap Feature : bitmap32 {
     kExtended = 0x1;
   }
@@ -5717,6 +5871,8 @@ cluster PressureMeasurement = 1027 {
 
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
 cluster FlowMeasurement = 1028 {
+  revision 1; // NOTE: Default/not specifically set
+
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
   readonly attribute nullable int16u maxMeasuredValue = 2;
@@ -5731,6 +5887,8 @@ cluster FlowMeasurement = 1028 {
 
 /** Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements. */
 cluster RelativeHumidityMeasurement = 1029 {
+  revision 3;
+
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
   readonly attribute nullable int16u maxMeasuredValue = 2;
@@ -5745,6 +5903,8 @@ cluster RelativeHumidityMeasurement = 1029 {
 
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 cluster OccupancySensing = 1030 {
+  revision 3;
+
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0;
     kUltrasonic = 1;
@@ -5784,6 +5944,8 @@ cluster OccupancySensing = 1030 {
 
 /** Attributes for reporting carbon monoxide concentration measurements */
 cluster CarbonMonoxideConcentrationMeasurement = 1036 {
+  revision 3;
+
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -5839,6 +6001,8 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
 
 /** Attributes for reporting carbon dioxide concentration measurements */
 cluster CarbonDioxideConcentrationMeasurement = 1037 {
+  revision 3;
+
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -5894,6 +6058,8 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
 
 /** Attributes for reporting nitrogen dioxide concentration measurements */
 cluster NitrogenDioxideConcentrationMeasurement = 1043 {
+  revision 3;
+
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -5949,6 +6115,8 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
 
 /** Attributes for reporting ozone concentration measurements */
 cluster OzoneConcentrationMeasurement = 1045 {
+  revision 3;
+
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -6004,6 +6172,8 @@ cluster OzoneConcentrationMeasurement = 1045 {
 
 /** Attributes for reporting PM2.5 concentration measurements */
 cluster Pm25ConcentrationMeasurement = 1066 {
+  revision 3;
+
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -6059,6 +6229,8 @@ cluster Pm25ConcentrationMeasurement = 1066 {
 
 /** Attributes for reporting formaldehyde concentration measurements */
 cluster FormaldehydeConcentrationMeasurement = 1067 {
+  revision 3;
+
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -6114,6 +6286,8 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
 
 /** Attributes for reporting PM1 concentration measurements */
 cluster Pm1ConcentrationMeasurement = 1068 {
+  revision 3;
+
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -6169,6 +6343,8 @@ cluster Pm1ConcentrationMeasurement = 1068 {
 
 /** Attributes for reporting PM10 concentration measurements */
 cluster Pm10ConcentrationMeasurement = 1069 {
+  revision 3;
+
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -6224,6 +6400,8 @@ cluster Pm10ConcentrationMeasurement = 1069 {
 
 /** Attributes for reporting total volatile organic compounds concentration measurements */
 cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
+  revision 3;
+
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -6279,6 +6457,8 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
 
 /** Attributes for reporting radon concentration measurements */
 cluster RadonConcentrationMeasurement = 1071 {
+  revision 3;
+
   enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
@@ -6334,6 +6514,8 @@ cluster RadonConcentrationMeasurement = 1071 {
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 cluster WakeOnLan = 1283 {
+  revision 1; // NOTE: Default/not specifically set
+
   readonly attribute optional char_string<12> MACAddress = 0;
   readonly attribute optional octet_string<16> linkLocalAddress = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -6346,6 +6528,8 @@ cluster WakeOnLan = 1283 {
 
 /** This cluster provides an interface for controlling the current Channel on a device. */
 cluster Channel = 1284 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum LineupInfoTypeEnum : enum8 {
     kMSO = 0;
   }
@@ -6414,6 +6598,8 @@ cluster Channel = 1284 {
 
 /** This cluster provides an interface for UX navigation within a set of targets on a device or endpoint. */
 cluster TargetNavigator = 1285 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum StatusEnum : enum8 {
     kSuccess = 0;
     kTargetNotFound = 1;
@@ -6450,6 +6636,8 @@ cluster TargetNavigator = 1285 {
 
 /** This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker. */
 cluster MediaPlayback = 1286 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum PlaybackStateEnum : enum8 {
     kPlaying = 0;
     kPaused = 1;
@@ -6533,6 +6721,8 @@ cluster MediaPlayback = 1286 {
 
 /** This cluster provides an interface for controlling the Input Selector on a media device such as a TV. */
 cluster MediaInput = 1287 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum InputTypeEnum : enum8 {
     kInternal = 0;
     kAux = 1;
@@ -6589,6 +6779,8 @@ cluster MediaInput = 1287 {
 
 /** This cluster provides an interface for managing low power mode on a device. */
 cluster LowPower = 1288 {
+  revision 1; // NOTE: Default/not specifically set
+
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6602,6 +6794,8 @@ cluster LowPower = 1288 {
 
 /** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
 cluster KeypadInput = 1289 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CECKeyCodeEnum : enum8 {
     kSelect = 0;
     kUp = 1;
@@ -6724,6 +6918,8 @@ cluster KeypadInput = 1289 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ContentLauncher = 1290 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum MetricTypeEnum : enum8 {
     kPixels = 0;
     kPercentage = 1;
@@ -6832,6 +7028,8 @@ cluster ContentLauncher = 1290 {
 
 /** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 cluster AudioOutput = 1291 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum OutputTypeEnum : enum8 {
     kHDMI = 0;
     kBT = 1;
@@ -6877,6 +7075,8 @@ cluster AudioOutput = 1291 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ApplicationLauncher = 1292 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum StatusEnum : enum8 {
     kSuccess = 0;
     kAppNotAvailable = 1;
@@ -6934,6 +7134,8 @@ cluster ApplicationLauncher = 1292 {
 
 /** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
 cluster ApplicationBasic = 1293 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ApplicationStatusEnum : enum8 {
     kStopped = 0;
     kActiveVisibleFocus = 1;
@@ -6964,6 +7166,8 @@ cluster ApplicationBasic = 1293 {
 
 /** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
 cluster AccountLogin = 1294 {
+  revision 1; // NOTE: Default/not specifically set
+
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6994,6 +7198,8 @@ cluster AccountLogin = 1294 {
 
 /** Attributes related to the electrical properties of a device. This cluster is used by power outlets and other devices that need to provide instantaneous data as opposed to metrology data which should be retrieved from the metering cluster.. */
 cluster ElectricalMeasurement = 2820 {
+  revision 3;
+
   readonly attribute optional bitmap32 measurementType = 0;
   readonly attribute optional int16s dcVoltage = 256;
   readonly attribute optional int16s dcVoltageMin = 257;
@@ -7159,6 +7365,8 @@ cluster ElectricalMeasurement = 2820 {
 
 /** The Test Cluster is meant to validate the generated code */
 internal cluster UnitTesting = 4294048773 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum SimpleEnum : enum8 {
     kUnspecified = 0;
     kValueA = 1;
@@ -7605,6 +7813,8 @@ internal cluster UnitTesting = 4294048773 {
 
 /** The Fault Injection Cluster provide a means for a test harness to configure faults(for example triggering a fault in the system). */
 internal cluster FaultInjection = 4294048774 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum FaultType : enum8 {
     kUnspecified = 0;
     kSystemFault = 1;
@@ -7642,6 +7852,8 @@ internal cluster FaultInjection = 4294048774 {
 
 /** The Sample MEI cluster showcases a cluster manufacturer extensions */
 cluster SampleMei = 4294048800 {
+  revision 1; // NOTE: Default/not specifically set
+
   attribute boolean flipFlop = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
