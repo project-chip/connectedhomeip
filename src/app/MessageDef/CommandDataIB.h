@@ -71,7 +71,7 @@ public:
     /**
      *  @brief Get the provided command reference associated with the CommandData
      *
-     *  @param [in] apRef    A pointer to apRef
+     *  @param [out] apRef    A pointer to apRef
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types

@@ -87,7 +87,7 @@ public:
         IntegerType updated = static_cast<IntegerType>(BitFlags<FlagsEnum, StorageType>::Raw() & ~bitMask);
 
         // Set the right bits
-        updated |= static_cast<IntegerType>(bitMask & (value << shift));
+        updated = static_cast<IntegerType>(updated | (bitMask & (value << shift)));
 
         BitFlags<FlagsEnum, StorageType>::SetRaw(updated);
 

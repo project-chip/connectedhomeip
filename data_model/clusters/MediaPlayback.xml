@@ -61,10 +61,10 @@ Davis, CA 95616, USA
   </revisionHistory>
   <classification hierarchy="base" role="application" picsCode="MEDIAPLAYBACK" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="AS" name="AdvancedSeek" summary="Enables clients to implement more advanced media seeking behavior in their user interface, such as for example a &quot;seek bar&quot;.">
+    <feature bit="0" code="AS" name="AdvancedSeek" summary="Advanced media seeking">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="VS" name="VariableSpeed" summary="Support for commands to support variable speed playback on media that supports it.">
+    <feature bit="1" code="VS" name="VariableSpeed" summary="Variable speed playback">
       <optionalConform/>
     </feature>
   </features>
@@ -203,12 +203,22 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="VS"/>
       </mandatoryConform>
+      <field id="0" name="AudioAdvanceUnmuted" type="bool" default="false">
+        <mandatoryConform>
+          <feature name="AA"/>
+        </mandatoryConform>
+      </field>
     </command>
     <command id="0x07" name="FastForward" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="VS"/>
       </mandatoryConform>
+      <field id="0" name="AudioAdvanceUnmuted" type="bool" default="false">
+        <mandatoryConform>
+          <feature name="AA"/>
+        </mandatoryConform>
+      </field>
     </command>
     <command id="0x08" name="SkipForward" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
