@@ -68,7 +68,7 @@ void CheckForInvalidAction(nlTestSuite * apSuite, chip::Test::MessageCapturer & 
 namespace chip {
 
 namespace {
-bool isCommandDispatched = false;
+bool isCommandDispatched      = false;
 size_t commandDispatchedCount = 0;
 
 bool sendResponse = true;
