@@ -47,19 +47,22 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Ge
 void OperationalStateDelegate::SetOpStatePauseCallback(
     std::function<void(Clusters::OperationalState::GenericOperationalError & err)> aCallback)
 {
-    mPauseCallback = Platform::MakeUnique<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>>(aCallback);
+    mPauseCallback =
+        Platform::MakeUnique<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>>(aCallback);
 }
 
 void OperationalStateDelegate::SetOpStateResumeCallback(
     std::function<void(Clusters::OperationalState::GenericOperationalError & err)> aCallback)
 {
-    mResumeCallback = Platform::MakeUnique<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>>(aCallback);
+    mResumeCallback =
+        Platform::MakeUnique<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>>(aCallback);
 }
 
 void OperationalStateDelegate::SetOpStateStartCallback(
     std::function<void(Clusters::OperationalState::GenericOperationalError & err)> aCallback)
 {
-    mStartCallback = Platform::MakeUnique<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>>(aCallback);
+    mStartCallback =
+        Platform::MakeUnique<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>>(aCallback);
 }
 
 void OperationalStateDelegate::SetOpStateStopCallback(
