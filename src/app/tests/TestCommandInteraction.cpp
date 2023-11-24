@@ -1294,6 +1294,16 @@ void TestCommandInteraction::TestCommandRequestLimits(nlTestSuite * apSuite, voi
     static_assert(kMinSize < 1100);
     static_assert(kMaxSize > 1180);
 
+    /// As buffer sizes increase, we expect to fail earlier and earlier.
+    /// what we do NOT expect is for larger buffers to behave better than smaller ones
+    /// because that may indicate some logic error somewhere
+    enum class ErrorState {
+        kSucceeding,
+        kFailingToSend,
+        kFailingToPrepare,
+    };
+    ErrorState errorState = ErrorState::kSucceeding;
+
     unsigned requestsSent = 0;
     unsigned invokeCreateFailures = 0;
     unsigned sendFailures = 0;
@@ -1307,15 +1317,19 @@ void TestCommandInteraction::TestCommandRequestLimits(nlTestSuite * apSuite, voi
 
         if (err != CHIP_NO_ERROR) {
             invokeCreateFailures++;
+            errorState = ErrorState::kFailingToPrepare;
             continue;
         }
 
         err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
         if (err != CHIP_NO_ERROR) {
+            NL_TEST_ASSERT(apSuite, (errorState == ErrorState::kSucceeding) || (errorState == ErrorState::kFailingToSend));
+            errorState = ErrorState::kFailingToSend;
             sendFailures++;
             continue;
         }
 
+        NL_TEST_ASSERT(apSuite, errorState == ErrorState::kSucceeding);
         requestsSent++;
 
         ctx.DrainAndServiceIO();
