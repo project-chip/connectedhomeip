@@ -22,8 +22,8 @@ from basic_composition_support import BasicCompositionTests
 from chip.tlv import uint
 from conformance_support import ConformanceDecision, conformance_allowed
 from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
-                                    async_test_body, default_matter_test_main, ProblemSeverity, ProblemNotice)
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, ProblemNotice,
+                                    ProblemSeverity, async_test_body, default_matter_test_main)
 from spec_parsing_support import CommandType, build_xml_clusters
 
 
