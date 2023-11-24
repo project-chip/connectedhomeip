@@ -144,13 +144,5 @@ static_library("nxp_platform") {
     "${chip_root}/src/platform:syscalls_stub",
   ]
 
-  public_configs = [
-    ":nxp_platform_config",
-
-    # TODO: platform should NOT depend on default_address_resolve_config. This should
-    #       be removed. See https://github.com/project-chip/connectedhomeip/issues/30596
-    #
-    #       Currently this exists because OpenThread platform includes src/app/Server.h
-    "${chip_root}/src/lib/address_resolve:default_address_resolve_config",
-  ]
+  public_configs = [ ":nxp_platform_config" ]
 }

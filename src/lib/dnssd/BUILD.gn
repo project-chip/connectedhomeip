@@ -34,6 +34,8 @@ static_library("dnssd") {
     "IPAddressSorter.cpp",
     "IPAddressSorter.h",
     "Resolver.h",
+    "ResolverProxy.cpp",
+    "ResolverProxy.h",
     "ServiceNaming.cpp",
     "ServiceNaming.h",
     "TxtFields.cpp",

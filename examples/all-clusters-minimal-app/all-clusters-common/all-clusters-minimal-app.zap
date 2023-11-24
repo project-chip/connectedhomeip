@@ -4672,7 +4672,7 @@
               "side": "server",
               "type": "NameSupportBitmap",
               "included": 1,
-              "storageOption": "External",
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x80",
@@ -4688,7 +4688,7 @@
               "side": "server",
               "type": "node_id",
               "included": 1,
-              "storageOption": "External",
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -4704,7 +4704,7 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "External",
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "16",
@@ -10908,7 +10908,7 @@
               "side": "server",
               "type": "NameSupportBitmap",
               "included": 1,
-              "storageOption": "External",
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x80",
@@ -10924,7 +10924,7 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "External",
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "16",
@@ -11004,7 +11004,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "External",
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -12254,5 +12254,3 @@
     }
   ]
 }
-
-
