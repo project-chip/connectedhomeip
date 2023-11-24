@@ -479,7 +479,8 @@ class MatterIdlTransformer(Transformer):
         if not revision:
             revision = 1
 
-        result = Cluster(parse_meta=meta, name=name, code=code, revision=revision, api_maturity=api_maturity)
+        result = Cluster(parse_meta=meta, name=name, code=code,
+                         revision=revision, api_maturity=api_maturity)
 
         for item in content:
             if isinstance(item, Enum):
