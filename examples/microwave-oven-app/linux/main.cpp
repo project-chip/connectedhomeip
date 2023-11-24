@@ -32,7 +32,7 @@ void ApplicationInit()
     gMicrowaveOvenDevice.get()->Init(kMicrowwaveOvenEndpointId);
 }
 
-void ApplicationShutdown(){}
+void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {

@@ -38,7 +38,8 @@ private:
     /**
      * define callback binding function
      */
-    std::unique_ptr<std::function<Protocols::InteractionModel::Status(uint8_t, uint32_t, uint8_t)>> mHandleSetCookingParametersCallback;
+    std::unique_ptr<std::function<Protocols::InteractionModel::Status(uint8_t, uint32_t, uint8_t)>>
+        mHandleSetCookingParametersCallback;
     std::unique_ptr<std::function<Protocols::InteractionModel::Status(uint32_t)>> mHandleAddMoreTimeCallback;
 
 public:
@@ -46,7 +47,7 @@ public:
      * Handle Command Callback in application: set-cooking-parameters
      */
     Protocols::InteractionModel::Status HandleSetCookingParametersCommandCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                           uint8_t powerSetting) override;
+                                                                                  uint8_t powerSetting) override;
 
     /**
      * Handle Command Callback in application: add-more-time
@@ -78,8 +79,6 @@ public:
      * Set callback function for add more time
      */
     void SetMicrowaveOvenControlAddMoreTimeCallback(std::function<Protocols::InteractionModel::Status(uint32_t)> aCallback);
-
-
 };
 
 } // namespace MicrowaveOvenControl

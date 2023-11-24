@@ -56,7 +56,7 @@ public:
      * handle command for microwave oven control: set cooking parameters
      */
     Protocols::InteractionModel::Status HandleMicrowaveOvenSetCookingParametersCommandCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                                        uint8_t powerSetting);
+                                                                                               uint8_t powerSetting);
 
     /**
      * handle command for microwave oven control: add more time

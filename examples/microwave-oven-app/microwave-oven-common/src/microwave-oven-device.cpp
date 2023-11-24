@@ -26,7 +26,8 @@ using OperationalStateEnum = chip::app::Clusters::OperationalState::OperationalS
 using Status               = Protocols::InteractionModel::Status;
 
 Protocols::InteractionModel::Status
-MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCommandCallback(uint8_t cookMode, uint32_t cookTime, uint8_t powerSetting)
+MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCommandCallback(uint8_t cookMode, uint32_t cookTime,
+                                                                            uint8_t powerSetting)
 {
     // placeholder implementation
     // TODO(#30609): set Microwave Oven cooking mode by cookMode.Value().
