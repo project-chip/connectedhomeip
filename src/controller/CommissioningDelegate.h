@@ -35,7 +35,7 @@ enum CommissioningStage : uint8_t
     kError,
     kSecurePairing,              ///< Establish a PASE session with the device
     kReadCommissioningInfo,      ///< Query General Commissioning Attributes, Network Features and Time Synchronization Cluster
-    kReadCommissioningInfo2,     ///< Query ICD state, check for matching fabric
+    kReadCommissioningInfo2,     ///< Query SupportsConcurrentConnection, ICD state, check for matching fabric
     kArmFailsafe,                ///< Send ArmFailSafe (0x30:0) command to the device
     kConfigRegulatory,           ///< Send SetRegulatoryConfig (0x30:2) command to the device
     kConfigureUTCTime,           ///< SetUTCTime if the DUT has a time cluster
@@ -145,6 +145,10 @@ public:
     {
         return mDeviceRegulatoryLocation;
     }
+
+    // Value to determine whether the node supports Concurrent Connections as read from the GeneralCommissioning cluster.
+    // In the AutoCommissioner, this is automatically set from from the kReadCommissioningInfo2 stage.
+    Optional<bool> GetSupportsConcurrentConnection() const { return mSupportsConcurrentConnection; }
 
     // The country code to be used for the node, if set.
     Optional<CharSpan> GetCountryCode() const { return mCountryCode; }
@@ -304,6 +308,12 @@ public:
     CommissioningParameters & SetDeviceRegulatoryLocation(app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum location)
     {
         mDeviceRegulatoryLocation.SetValue(location);
+        return *this;
+    }
+
+    CommissioningParameters & SetSupportsConcurrentConnection(bool concurrentConnection)
+    {
+        mSupportsConcurrentConnection.SetValue(concurrentConnection);
         return *this;
     }
 
@@ -550,6 +560,7 @@ public:
         mDAC.ClearValue();
         mTimeZone.ClearValue();
         mDSTOffsets.ClearValue();
+        mDefaultNTP.ClearValue();
         mICDSymmetricKey.ClearValue();
     }
 
@@ -584,6 +595,7 @@ private:
     Optional<uint16_t> mRemoteProductId;
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> mDefaultRegulatoryLocation;
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> mLocationCapability;
+    Optional<bool> mSupportsConcurrentConnection;
     CompletionStatus completionStatus;
     Credentials::DeviceAttestationDelegate * mDeviceAttestationDelegate =
         nullptr; // Delegate to handle device attestation failures during commissioning
@@ -681,9 +693,10 @@ struct ReadCommissioningInfo
 
 struct ReadCommissioningInfo2
 {
-    NodeId nodeId               = kUndefinedNodeId;
-    bool isIcd                  = false;
-    bool checkInProtocolSupport = false;
+    NodeId nodeId                     = kUndefinedNodeId;
+    bool isIcd                        = false;
+    bool checkInProtocolSupport       = false;
+    bool supportsConcurrentConnection = true;
 };
 
 struct TimeZoneResponseInfo
@@ -716,7 +729,7 @@ class CommissioningDelegate
 public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
-     * kReadCommissioningInfo - ReadCommissioningInfo
+     * kReadCommissioningInfo: ReadCommissioningInfo
      * kReadCommissioningInfo2: ReadCommissioningInfo2
      * kArmFailsafe: CommissioningErrorInfo if there is an error
      * kConfigRegulatory: CommissioningErrorInfo if there is an error

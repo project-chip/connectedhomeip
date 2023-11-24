@@ -1,0 +1,27 @@
+# This file contains settings for local github action runner act:
+# https://github.com/nektos/act
+#
+# It is recommended to run specific jobs that you need, all jobs except those
+# running on should darwin work.
+# e.g. act -j build_linux
+#
+# It is recommended to set up a separate bridge network
+# and possibly define it in  ~/.actrc like so:
+# --network=bridge
+# https://docs.docker.com/network/drivers/bridge/
+
+# Remove containers after finishing a job, comment out for debugging
+--rm
+
+# Reuse the checkout from host, otherwise act will do docker cp that makes
+# running jobs a lot longer even on SSD. Clean up your .environment before
+# running it.
+--bind
+
+# Easier to have 1:1 match between triggering jobs and reading logs when they
+# use the same name
+--log-prefix-job-id
+
+# Default runner image does not include enough.
+# https://github.com/nektos/act#default-runners-are-intentionally-incomplete
+-P ubuntu-latest=catthehacker/ubuntu:full-latest

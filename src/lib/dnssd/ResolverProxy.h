@@ -17,112 +17,48 @@
 
 #pragma once
 
-#include <lib/core/ReferenceCounted.h>
 #include <lib/dnssd/Resolver.h>
 
 namespace chip {
 namespace Dnssd {
 
-class ResolverDelegateProxy : public ReferenceCounted<ResolverDelegateProxy>, public CommissioningResolveDelegate
-
+/**
+ * Convenience class for discovering Matter commissioners and commissionable nodes.
+ *
+ * The class simplifies the usage of the global DNS-SD resolver to discover Matter nodes by managing
+ * the lifetime of the discovery context object.
+ *
+ * The proxy provides a method to register an external commissioning delegate whose
+ * `OnNodeDiscovered` method is called whenever a new node is discovered. The delegate is
+ * automatically unregistered when the proxy is shut down or destroyed.
+ *
+ * The proxy can be safely shut down or destroyed even if the last discovery operation has not
+ * finished yet.
+ */
+class ResolverProxy
 {
 public:
-    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) { mCommissioningDelegate = delegate; }
+    explicit ResolverProxy(Resolver * resolver = nullptr) : mResolver(resolver != nullptr ? *resolver : Resolver::Instance()) {}
+    ~ResolverProxy() { Shutdown(); }
 
-    // CommissioningResolveDelegate
-    void OnNodeDiscovered(const DiscoveredNodeData & nodeData) override
+    CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPoint = nullptr);
+    void Shutdown();
+
+    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate)
     {
-        if (mCommissioningDelegate != nullptr)
+        if (mContext != nullptr)
         {
-            mCommissioningDelegate->OnNodeDiscovered(nodeData);
-        }
-        else
-        {
-            ChipLogError(Discovery, "Missing commissioning delegate. Data discarded.");
+            mContext->SetCommissioningDelegate(delegate);
         }
     }
+
+    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter());
+    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter());
+    CHIP_ERROR StopDiscovery();
 
 private:
-    CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
-};
-
-class ResolverProxy : public Resolver
-{
-public:
-    ResolverProxy() {}
-    ~ResolverProxy() override;
-
-    // Resolver interface.
-    CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPoint = nullptr) override
-    {
-        ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(udpEndPoint));
-        VerifyOrReturnError(mDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mDelegate = chip::Platform::New<ResolverDelegateProxy>();
-
-        if (mDelegate != nullptr)
-        {
-            if (mPreInitCommissioningDelegate != nullptr)
-            {
-                ChipLogProgress(Discovery, "Setting commissioning delegate post init");
-                mDelegate->SetCommissioningDelegate(mPreInitCommissioningDelegate);
-                mPreInitCommissioningDelegate = nullptr;
-            }
-        }
-
-        return mDelegate != nullptr ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
-    }
-
-    bool IsInitialized() override { return Resolver::Instance().IsInitialized(); }
-
-    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override
-    {
-        /// Unfortunately cannot remove this method since it is in a Resolver interface.
-        ChipLogError(Discovery, "!!! Operational proxy does NOT support operational discovery");
-        ChipLogError(Discovery, "!!! Please use AddressResolver or DNSSD Resolver directly");
-        chipDie(); // force detection of invalid usages.
-    }
-
-    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override
-    {
-        if (mDelegate != nullptr)
-        {
-            mDelegate->SetCommissioningDelegate(delegate);
-        }
-        else
-        {
-            if (delegate != nullptr)
-            {
-                ChipLogError(Discovery, "Delaying proxy of commissioning discovery: missing delegate");
-            }
-            mPreInitCommissioningDelegate = delegate;
-        }
-    }
-
-    void Shutdown() override
-    {
-        VerifyOrReturn(mDelegate != nullptr);
-        mDelegate->SetCommissioningDelegate(nullptr);
-        mDelegate->Release();
-        mDelegate = nullptr;
-    }
-
-    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
-    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
-    CHIP_ERROR StopDiscovery() override;
-    CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
-
-    // TODO: ResolverProxy should not be used anymore to implement operational node resolution
-    //       This method still here because Resolver interface requires it
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override {}
-
-private:
-    ResolverDelegateProxy * mDelegate                            = nullptr;
-    CommissioningResolveDelegate * mPreInitCommissioningDelegate = nullptr;
-
-    // While discovery (commissionable or commissioner) is ongoing,
-    // mDiscoveryContext may have a value to allow StopDiscovery to work.
-    Optional<intptr_t> mDiscoveryContext;
+    Resolver & mResolver;
+    DiscoveryContext * mContext = nullptr;
 };
 
 } // namespace Dnssd

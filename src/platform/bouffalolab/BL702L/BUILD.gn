@@ -92,7 +92,4 @@ static_library("BL702L") {
 
   deps += [ "${chip_root}/src/credentials:credentials_header" ]
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
-
-  public_configs =
-      [ "${chip_root}/src/lib/address_resolve:default_address_resolve_config" ]
 }

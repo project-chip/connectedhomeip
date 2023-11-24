@@ -38,6 +38,8 @@ struct ConcreteClusterPath
 
     bool IsValidConcreteClusterPath() const { return !(mEndpointId == kInvalidEndpointId || mClusterId == kInvalidClusterId); }
 
+    bool HasValidIds() const { return IsValidEndpointId(mEndpointId) && IsValidClusterId(mClusterId); }
+
     bool operator==(const ConcreteClusterPath & aOther) const
     {
         return mEndpointId == aOther.mEndpointId && mClusterId == aOther.mClusterId;

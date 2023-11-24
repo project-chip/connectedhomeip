@@ -29,6 +29,8 @@ namespace chip {
 namespace Controller {
 
 using namespace chip::app::Clusters;
+using chip::app::DataModel::MakeNullable;
+using chip::app::DataModel::NullNullable;
 
 AutoCommissioner::AutoCommissioner()
 {
@@ -112,7 +114,9 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
          IsUnsafeSpan(params.GetPAI(), mParams.GetPAI()) || IsUnsafeSpan(params.GetDAC(), mParams.GetDAC()) ||
          IsUnsafeSpan(params.GetTimeZone(), mParams.GetTimeZone()) ||
          IsUnsafeSpan(params.GetDSTOffsets(), mParams.GetDSTOffsets()) ||
-         IsUnsafeSpan(params.GetICDSymmetricKey(), mParams.GetICDSymmetricKey()));
+         IsUnsafeSpan(params.GetICDSymmetricKey(), mParams.GetICDSymmetricKey()) ||
+         (params.GetDefaultNTP().HasValue() && !params.GetDefaultNTP().Value().IsNull() &&
+          params.GetDefaultNTP().Value().Value().data() != mDefaultNtp));
 
     mParams = params;
 
@@ -219,15 +223,35 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         for (size_t i = 0; i < size; ++i)
         {
             mTimeZoneBuf[i] = params.GetTimeZone().Value()[i];
-            if (mTimeZoneBuf[i].name.HasValue())
+            if (params.GetTimeZone().Value()[i].name.HasValue() &&
+                params.GetTimeZone().Value()[i].name.Value().size() <= kMaxTimeZoneNameLen)
             {
                 auto span = MutableCharSpan(mTimeZoneNames[i], kMaxTimeZoneNameLen);
-                CopyCharSpanToMutableCharSpan(mTimeZoneBuf[i].name.Value(), span);
+                // The buffer backing "span" is statically allocated and is of size kMaxSupportedTimeZones, so this should never
+                // fail.
+                CopyCharSpanToMutableCharSpan(params.GetTimeZone().Value()[i].name.Value(), span);
                 mTimeZoneBuf[i].name.SetValue(span);
+            }
+            else
+            {
+                mTimeZoneBuf[i].name.ClearValue();
             }
         }
         auto list = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>(mTimeZoneBuf, size);
         mParams.SetTimeZone(list);
+    }
+    if (params.GetDefaultNTP().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting Default NTP from parameters");
+        // This parameter is an optional nullable, so we need to go two levels deep here.
+        if (!params.GetDefaultNTP().Value().IsNull() && params.GetDefaultNTP().Value().Value().size() <= kMaxDefaultNtpSize)
+        {
+            // The buffer backing "span" is statically allocated and is of size kMaxDefaultNtpSize.
+            auto span = MutableCharSpan(mDefaultNtp, kMaxDefaultNtpSize);
+            CopyCharSpanToMutableCharSpan(params.GetDefaultNTP().Value().Value(), span);
+            auto default_ntp = MakeNullable(CharSpan(mDefaultNtp, params.GetDefaultNTP().Value().Value().size()));
+            mParams.SetDefaultNTP(default_ntp);
+        }
     }
 
     if (params.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore && params.GetICDSymmetricKey().HasValue())
@@ -713,21 +737,31 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mNeedsDST = false;
             break;
         case CommissioningStage::kReadCommissioningInfo2: {
-            bool shouldReadCommissioningInfo2 =
-                mParams.GetCheckForMatchingFabric() || (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore);
-            if (shouldReadCommissioningInfo2)
+
+            if (!report.Is<ReadCommissioningInfo2>())
             {
-                if (!report.Is<ReadCommissioningInfo2>())
+                ChipLogError(
+                    Controller,
+                    "[BUG] Should read commissioning info (part 2), but report is not ReadCommissioningInfo2. THIS IS A BUG.");
+            }
+
+            ReadCommissioningInfo2 commissioningInfo = report.Get<ReadCommissioningInfo2>();
+            mParams.SetSupportsConcurrentConnection(commissioningInfo.supportsConcurrentConnection);
+
+            if (mParams.GetCheckForMatchingFabric())
+            {
+                chip::NodeId nodeId = commissioningInfo.nodeId;
+                if (nodeId != kUndefinedNodeId)
                 {
-                    ChipLogError(
-                        Controller,
-                        "[BUG] Should read commissioning info (part 2), but report is not ReadCommissioningInfo2. THIS IS A BUG.");
+                    mParams.SetRemoteNodeId(nodeId);
                 }
+            }
 
-                ReadCommissioningInfo2 commissioningInfo = report.Get<ReadCommissioningInfo2>();
-
-                if (mParams.GetCheckForMatchingFabric())
+            if (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
+            {
+                if (commissioningInfo.isIcd)
                 {
+<<<<<<< HEAD
                     chip::NodeId nodeId = commissioningInfo.nodeId;
                     if (nodeId != kUndefinedNodeId)
                     {
@@ -742,6 +776,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                         mNeedIcdRegistraion = true;
                         ChipLogDetail(Controller, "AutoCommissioner: ICD supports the check-in protocol.");
                     }
+=======
+                    mNeedIcdRegistraion = true;
+                    ChipLogDetail(Controller, "AutoCommissioner: Device is ICD");
+>>>>>>> chip/master
                 }
             }
             break;

@@ -32,7 +32,6 @@ class TelinkApp(Enum):
     OTA_REQUESTOR = auto()
     PUMP = auto()
     PUMP_CONTROLLER = auto()
-    RESOURCE_MONITORING = auto()
     SHELL = auto()
     SMOKE_CO_ALARM = auto()
     TEMPERATURE_MEASUREMENT = auto()
@@ -62,8 +61,6 @@ class TelinkApp(Enum):
             return 'pump-app'
         elif self == TelinkApp.PUMP_CONTROLLER:
             return 'pump-controller-app'
-        elif self == TelinkApp.RESOURCE_MONITORING:
-            return 'resource-monitoring-app'
         elif self == TelinkApp.SHELL:
             return 'shell'
         elif self == TelinkApp.SMOKE_CO_ALARM:

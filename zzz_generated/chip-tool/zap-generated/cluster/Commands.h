@@ -77,6 +77,7 @@
 | IcdManagement                                                       | 0x0046 |
 | Timer                                                               | 0x0047 |
 | OvenMode                                                            | 0x0049 |
+| LaundryDryerControls                                                | 0x004A |
 | ModeSelect                                                          | 0x0050 |
 | LaundryWasherMode                                                   | 0x0051 |
 | RefrigeratorAndTemperatureControlledCabinetMode                     | 0x0052 |
@@ -4942,6 +4943,24 @@ public:
 private:
     chip::app::Clusters::OvenMode::Commands::ChangeToMode::Type mRequest;
 };
+
+/*----------------------------------------------------------------------------*\
+| Cluster LaundryDryerControls                                        | 0x004A |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * SupportedDrynessLevels                                            | 0x0000 |
+| * SelectedDrynessLevel                                              | 0x0001 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
 | Cluster ModeSelect                                                  | 0x0050 |
@@ -16077,6 +16096,69 @@ void registerClusterOvenMode(Commands & commands, CredentialIssuerCommands * cre
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterLaundryDryerControls(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::LaundryDryerControls;
+
+    const char * clusterName = "LaundryDryerControls";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "supported-dryness-levels", Attributes::SupportedDrynessLevels::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "selected-dryness-level", Attributes::SelectedDrynessLevel::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<
+            WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum>>>(
+            Id, "supported-dryness-levels", Attributes::SupportedDrynessLevels::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum>>>(
+            Id, "selected-dryness-level", 0, UINT8_MAX, Attributes::SelectedDrynessLevel::Id, WriteCommandType::kWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                  //
+        make_unique<SubscribeAttribute>(Id, "supported-dryness-levels", Attributes::SupportedDrynessLevels::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "selected-dryness-level", Attributes::SelectedDrynessLevel::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::ModeSelect;
@@ -23042,6 +23124,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterIcdManagement(commands, credsIssuerConfig);
     registerClusterTimer(commands, credsIssuerConfig);
     registerClusterOvenMode(commands, credsIssuerConfig);
+    registerClusterLaundryDryerControls(commands, credsIssuerConfig);
     registerClusterModeSelect(commands, credsIssuerConfig);
     registerClusterLaundryWasherMode(commands, credsIssuerConfig);
     registerClusterRefrigeratorAndTemperatureControlledCabinetMode(commands, credsIssuerConfig);

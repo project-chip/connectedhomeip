@@ -144,10 +144,5 @@ static_library("nxp_platform") {
     "${chip_root}/src/platform:syscalls_stub",
   ]
 
-  public_configs = [
-    ":nxp_platform_config",
-
-    # address_resolve config needed by the include of server.h in ConfigurationManagerImpl.cpp
-    "${chip_root}/src/lib/address_resolve:default_address_resolve_config",
-  ]
+  public_configs = [ ":nxp_platform_config" ]
 }

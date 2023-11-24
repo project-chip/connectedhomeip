@@ -774,6 +774,22 @@ server cluster A = 1 { /* Test comment */ }
 
         self.assertEqual(actual, expected)
 
+    def test_revision(self):
+        actual = parseText("""
+            server cluster A = 1 { } // revision 1 implied
+            client cluster B = 2 { revision 1; }
+            client cluster C = 3 { revision 2; }
+            client cluster D = 4 { revision 123; }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER, name="A", code=1, revision=1),
+            Cluster(side=ClusterSide.CLIENT, name="B", code=2, revision=1),
+            Cluster(side=ClusterSide.CLIENT, name="C", code=3, revision=2),
+            Cluster(side=ClusterSide.CLIENT, name="D", code=4, revision=123),
+        ])
+        self.assertEqual(actual, expected)
+
     def test_handle_commands(self):
         actual = parseText("""
             endpoint 1 {

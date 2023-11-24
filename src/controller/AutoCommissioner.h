@@ -119,6 +119,9 @@ private:
     static constexpr size_t kMaxSupportedDstStructs = 10;
     app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type mDstOffsetsBuf[kMaxSupportedDstStructs];
 
+    static constexpr size_t kMaxDefaultNtpSize = 128;
+    char mDefaultNtp[kMaxDefaultNtpSize];
+
     bool mNeedsNetworkSetup = false;
     ReadCommissioningInfo mDeviceCommissioningInfo;
     bool mNeedsDST = false;

@@ -8719,6 +8719,52 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case LaundryDryerControls::Id: {
+        switch (path.mAttributeId)
+        {
+        case LaundryDryerControls::Attributes::SupportedDrynessLevels::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedDrynessLevels", 1, value);
+        }
+        case LaundryDryerControls::Attributes::SelectedDrynessLevel::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SelectedDrynessLevel", 1, value);
+        }
+        case LaundryDryerControls::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case LaundryDryerControls::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case LaundryDryerControls::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case LaundryDryerControls::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case LaundryDryerControls::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case LaundryDryerControls::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case ModeSelect::Id: {
         switch (path.mAttributeId)
         {

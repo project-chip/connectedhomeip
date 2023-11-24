@@ -3,6 +3,7 @@ package com.matter.virtual.device.app.core.matter.manager
 import com.matter.virtual.device.app.DeviceApp
 import com.matter.virtual.device.app.DoorLockManager
 import com.matter.virtual.device.app.core.common.MatterConstants
+import com.matter.virtual.device.app.core.model.matter.LockState
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,14 +13,14 @@ import timber.log.Timber
 @Singleton
 class DoorLockManagerStub @Inject constructor(private val deviceApp: DeviceApp) : DoorLockManager {
 
-  private val _lockState = MutableStateFlow(false)
-  val lockState: StateFlow<Boolean>
+  private val _lockState = MutableStateFlow(LockState.LOCKED)
+  val lockState: StateFlow<LockState>
     get() = _lockState
 
   override fun initAttributeValue() {
     Timber.d("initAttributeValue()")
     deviceApp.setLockType(MatterConstants.DEFAULT_ENDPOINT, DoorLockManager.DlLockType_kMagnetic)
-    deviceApp.setLockState(MatterConstants.DEFAULT_ENDPOINT, lockState.value.asLockState())
+    deviceApp.setLockState(MatterConstants.DEFAULT_ENDPOINT, DoorLockManager.DlLockState_kLocked)
     deviceApp.setActuatorEnabled(MatterConstants.DEFAULT_ENDPOINT, true)
     deviceApp.setOperatingMode(
       MatterConstants.DEFAULT_ENDPOINT,
@@ -33,12 +34,12 @@ class DoorLockManagerStub @Inject constructor(private val deviceApp: DeviceApp) 
 
   override fun handleLockStateChanged(value: Int) {
     Timber.d("handleLockStateChanged():$value")
-    _lockState.value = value.asBooleanLockState()
+    _lockState.value = value.asLockStateEnum()
   }
 
-  fun setLockState(value: Boolean) {
-    Timber.d("setLockState():$value")
-    deviceApp.setLockState(MatterConstants.DEFAULT_ENDPOINT, value.asLockState())
+  fun setLockState(lockState: LockState) {
+    Timber.d("setLockState():$lockState")
+    deviceApp.setLockState(MatterConstants.DEFAULT_ENDPOINT, lockState.asLockState())
   }
 
   fun sendLockAlarmEvent() {
@@ -46,16 +47,21 @@ class DoorLockManagerStub @Inject constructor(private val deviceApp: DeviceApp) 
     deviceApp.sendLockAlarmEvent(MatterConstants.DEFAULT_ENDPOINT)
   }
 
-  private fun Boolean.asLockState() =
+  private fun LockState.asLockState() =
     when (this) {
-      true -> DoorLockManager.DlLockState_kUnlocked
-      false -> DoorLockManager.DlLockState_kLocked
+      LockState.NOT_FULLY_LOCKED -> DoorLockManager.DlLockState_kNotFullyLocked
+      LockState.LOCKED -> DoorLockManager.DlLockState_kLocked
+      LockState.UNLOCKED -> DoorLockManager.DlLockState_kUnlocked
+      LockState.UNLATCHED -> DoorLockManager.DlLockState_kUnlatched
+      else -> DoorLockManager.DlLockState_kUnknownEnumValue
     }
 
-  private fun Int.asBooleanLockState() =
+  private fun Int.asLockStateEnum() =
     when (this) {
-      DoorLockManager.DlLockState_kUnlocked -> true
-      DoorLockManager.DlLockState_kLocked -> false
-      else -> false
+      DoorLockManager.DlLockState_kNotFullyLocked -> LockState.NOT_FULLY_LOCKED
+      DoorLockManager.DlLockState_kLocked -> LockState.LOCKED
+      DoorLockManager.DlLockState_kUnlocked -> LockState.UNLOCKED
+      DoorLockManager.DlLockState_kUnlatched -> LockState.UNLATCHED
+      else -> LockState.UNKNOWN_ENUM_VALUE
     }
 }
