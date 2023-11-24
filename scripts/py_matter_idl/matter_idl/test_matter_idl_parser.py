@@ -764,10 +764,10 @@ server cluster A = 1 { /* Test comment */ }
         """)
 
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER, name="A", code=1, revision=1),
-            Cluster(side=ClusterSide.CLIENT, name="B", code=2, revision=1),
-            Cluster(side=ClusterSide.CLIENT, name="C", code=3, revision=2),
-            Cluster(side=ClusterSide.CLIENT, name="D", code=4, revision=123),
+            Cluster(name="A", code=1, revision=1),
+            Cluster(name="B", code=2, revision=1),
+            Cluster(name="C", code=3, revision=2),
+            Cluster(name="D", code=4, revision=123),
         ])
         self.assertEqual(actual, expected)
 
