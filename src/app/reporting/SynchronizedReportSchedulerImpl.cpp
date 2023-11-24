@@ -133,7 +133,6 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::FindNextMinInterval(const Timestamp 
 CHIP_ERROR SynchronizedReportSchedulerImpl::CalculateNextReportTimeout(Timeout & timeout, ReadHandlerNode * aNode,
                                                                        const Timestamp & now)
 {
-    VerifyOrReturnError(nullptr != FindReadHandlerNode(aNode->GetReadHandler()), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(FindNextMaxInterval(now));
     ReturnErrorOnFailure(FindNextMinInterval(now));
     bool reportableNow   = false;
@@ -205,18 +204,8 @@ void SynchronizedReportSchedulerImpl::TimerFired()
     // If there are no handlers registers, no need to schedule the next report
     if (mNodesPool.Allocated() && firedEarly)
     {
-        ReadHandlerNode * firstNode = nullptr;
-
-        // If we fired the timer early, we need to restart the timer
-        mNodesPool.ForEachActiveObject([&firstNode](ReadHandlerNode * node) {
-            firstNode = node;
-            return Loop::Break;
-        });
-
-        VerifyOrReturn(firstNode); // Verify we have a valid node
-
         Timeout timeout = Milliseconds32(0);
-        ReturnOnFailure(CalculateNextReportTimeout(timeout, firstNode, now));
+        ReturnOnFailure(CalculateNextReportTimeout(timeout, nullptr, now));
         ScheduleReport(timeout, nullptr, now);
     }
     else

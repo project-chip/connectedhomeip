@@ -154,7 +154,10 @@ public:
     }
 
     /// @brief Check if a ReadHandler is reportable without considering the timing
-    bool IsReadHandlerReportable(ReadHandler * aReadHandler) const { return aReadHandler->ShouldStartReporting(); }
+    bool IsReadHandlerReportable(ReadHandler * aReadHandler) const
+    {
+        return (nullptr != aReadHandler) ? aReadHandler->ShouldStartReporting() : false;
+    }
     /// @brief Sets the ForceDirty flag of a ReadHandler
     void HandlerForceDirtyState(ReadHandler * aReadHandler) { aReadHandler->ForceDirtyState(); }
 
