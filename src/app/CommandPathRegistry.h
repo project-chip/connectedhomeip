@@ -33,18 +33,19 @@ struct CommandPathRegistryEntry
     Optional<uint16_t> ref;
 };
 
-class CommandPathRegistryInterface
+class CommandPathRegistry
 {
 public:
-    virtual ~CommandPathRegistryInterface(){};
+    virtual ~CommandPathRegistry(){};
     virtual Optional<CommandPathRegistryEntry> Find(const ConcreteCommandPath & requestPath) const  = 0;
     virtual Optional<CommandPathRegistryEntry> GetFirstEntry() const                                = 0;
     virtual CHIP_ERROR Add(const ConcreteCommandPath & requestPath, const Optional<uint16_t> & ref) = 0;
     virtual size_t Count() const                                                                    = 0;
+    virtual size_t MaxSize() const                                                                  = 0;
 };
 
 /**
- * @class StaticCommandPathRegistry
+ * @class BasicCommandPathRegistry
  *
  * @brief Allows looking up CommandRef using the requested ConcreteCommandPath.
  *
@@ -54,10 +55,10 @@ public:
  * newer transports).
  */
 template <size_t N>
-class StaticCommandPathRegistry : public CommandPathRegistryInterface
+class BasicCommandPathRegistry : public CommandPathRegistry
 {
 public:
-    ~StaticCommandPathRegistry() override{};
+    ~BasicCommandPathRegistry() override{};
 
     Optional<CommandPathRegistryEntry> Find(const ConcreteCommandPath & requestPath) const override
     {
@@ -104,6 +105,7 @@ public:
     }
 
     virtual size_t Count() const override { return mCount; }
+    virtual size_t MaxSize() const override { return N; }
 
 private:
     size_t mCount = 0;

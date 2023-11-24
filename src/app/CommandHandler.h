@@ -161,6 +161,14 @@ public:
     CommandHandler(Callback * apCallback);
 
     /*
+     * Constructor to override number of supported paths per invoke.
+     *
+     * The callback and command path registry passed in has to outlive this CommandHandler object.
+     * Created for testing purposes.
+     */
+    CommandHandler(Callback * apCallback, CommandPathRegistry * mCommandPathRegistry);
+
+    /*
      * Main entrypoint for this class to handle an invoke request.
      *
      * This function will always call the OnDone function above on the registered callback
@@ -480,9 +488,9 @@ private:
      */
     void SetGroupRequest(bool isGroupRequest) { mGroupRequest = isGroupRequest; }
 
-    CommandPathRegistryInterface & GetCommandPathRegistry() { return mCommandPathRegistry; }
+    CommandPathRegistry & GetCommandPathRegistry() { return *mCommandPathRegistry; }
 
-    size_t MaxPathsPerInvoke() { return CHIP_CONFIG_MAX_PATHS_PER_INVOKE; }
+    size_t MaxPathsPerInvoke() { return mMaxPathsPerInvoke; }
 
     Messaging::ExchangeHolder mExchangeCtx;
     Callback * mpCallback = nullptr;
@@ -492,7 +500,9 @@ private:
 
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     TLV::TLVWriter mBackupWriter;
-    StaticCommandPathRegistry<CHIP_CONFIG_MAX_PATHS_PER_INVOKE> mCommandPathRegistry;
+    size_t mMaxPathsPerInvoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
+    BasicCommandPathRegistry<CHIP_CONFIG_MAX_PATHS_PER_INVOKE> mBasicCommandPathRegistry;
+    CommandPathRegistry * mCommandPathRegistry = &mBasicCommandPathRegistry;
     Optional<uint16_t> mRefForResponse;
 
     State mState = State::Idle;

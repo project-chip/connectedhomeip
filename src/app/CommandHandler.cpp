@@ -45,6 +45,12 @@ using Status = Protocols::InteractionModel::Status;
 
 CommandHandler::CommandHandler(Callback * apCallback) : mExchangeCtx(*this), mpCallback(apCallback), mSuppressResponse(false) {}
 
+CommandHandler::CommandHandler(Callback * apCallback, CommandPathRegistry * apCommandPathRegistry) : CommandHandler(apCallback)
+{
+    mMaxPathsPerInvoke   = apCommandPathRegistry->MaxSize();
+    mCommandPathRegistry = apCommandPathRegistry;
+}
+
 CHIP_ERROR CommandHandler::AllocateBuffer()
 {
     if (!mBufferAllocated)

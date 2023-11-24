@@ -69,6 +69,7 @@ namespace chip {
 
 namespace {
 bool isCommandDispatched = false;
+size_t commandDispatchedCount = 0;
 
 bool sendResponse = true;
 bool asyncCommand = false;
@@ -171,6 +172,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
     }
 
     chip::isCommandDispatched = true;
+    commandDispatchedCount++;
 }
 
 class MockCommandSenderCallback : public CommandSender::Callback
@@ -220,6 +222,8 @@ public:
         return ServerClusterCommandExists(aCommandPath);
     }
 
+    void ResetCounter() { onFinalCalledTimes = 0; }
+
     int onFinalCalledTimes = 0;
 } mockCommandHandlerDelegate;
 
@@ -246,7 +250,10 @@ public:
     static void TestCommandHandlerWithSendEmptyResponse(nlTestSuite * apSuite, void * apContext);
 
     static void TestCommandHandlerWithProcessReceivedEmptyDataMsg(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandHandlerRejectMultipleCommands(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandHandlerRejectMultipleIdenticalCommands(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandHandlerRejectsMultipleCommandsWithIdenticalCommandRef(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandHandlerRejectMultipleCommandsWhenHandlerOnlySupportsOne(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandHandlerAcceptMultipleCommands(nlTestSuite * apSuite, void * apContext);
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     static void TestCommandHandlerReleaseWithExchangeClosed(nlTestSuite * apSuite, void * apContext);
@@ -1100,6 +1107,8 @@ void TestCommandInteraction::TestCommandHandlerInvalidMessageAsync(nlTestSuite *
     // Decrease CommandHandler refcount and send response
     asyncCommandHandle = nullptr;
 
+    // Prevent breaking other tests.
+    asyncCommand = false;
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite,
@@ -1360,7 +1369,7 @@ void TestCommandInteraction::TestCommandSenderAbruptDestruction(nlTestSuite * ap
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
 }
 
-void TestCommandInteraction::TestCommandHandlerRejectMultipleCommands(nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestCommandHandlerRejectMultipleIdenticalCommands(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -1414,6 +1423,236 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleCommands(nlTestSuit
 
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestCommandInteraction::TestCommandHandlerRejectsMultipleCommandsWithIdenticalCommandRef(nlTestSuite * apSuite,
+                                                                                              void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    isCommandDispatched = false;
+    mockCommandSenderDelegate.ResetCounter();
+
+    // Using commandSender to help build afterward we take the buffer to feed into standalone CommandHandler
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
+
+    size_t numberOfCommandsToSend = 2;
+    {
+        CommandPathParams requestCommandPaths[] = {
+            MakeTestCommandPath(kTestCommandIdWithData),
+            MakeTestCommandPath(kTestCommandIdCommandSpecificResponse),
+        };
+
+        commandSender.AllocateBuffer();
+
+        // CommandSender does not support sending multiple commands with public API, so we craft a message manaully.
+        for (size_t i = 0; i < numberOfCommandsToSend; i++)
+        {
+            InvokeRequests::Builder & invokeRequests = commandSender.mInvokeRequestBuilder.GetInvokeRequests();
+            CommandDataIB::Builder & invokeRequest   = invokeRequests.CreateCommandData();
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequests.GetError());
+            CommandPathIB::Builder & path = invokeRequest.CreatePath();
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.GetError());
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == path.Encode(requestCommandPaths[i]));
+            NL_TEST_ASSERT(apSuite,
+                           CHIP_NO_ERROR ==
+                               invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::Tag::kFields),
+                                                                         TLV::kTLVType_Structure,
+                                                                         commandSender.mDataElementContainerType));
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.GetWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+            NL_TEST_ASSERT(apSuite,
+                           CHIP_NO_ERROR == invokeRequest.GetWriter()->EndContainer(commandSender.mDataElementContainerType));
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.Ref(1));
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.EndOfCommandDataIB());
+        }
+
+        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
+        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.EndOfInvokeRequestMessage());
+
+        commandSender.MoveToState(app::CommandSender::State::AddedCommand);
+    }
+
+    CommandHandler commandHandler(&mockCommandHandlerDelegate);
+    TestExchangeDelegate delegate;
+    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+    commandHandler.mExchangeCtx.Grab(exchange);
+
+    // Hackery to steal the InvokeRequest buffer from commandSender.
+    System::PacketBufferHandle commandDatabuf;
+    err = commandSender.Finalize(commandDatabuf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    mockCommandHandlerDelegate.ResetCounter();
+    commandDispatchedCount = 0;
+
+    InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+    NL_TEST_ASSERT(apSuite, status == InteractionModel::Status::InvalidAction);
+
+    NL_TEST_ASSERT(apSuite, commandDispatchedCount == 0);
+
+    //
+    // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
+    // OnMessageReceived callback and not having sent a subsequent message (as is the case when calling ProcessInvokeRequest
+    // above, which doesn't actually send back a response in these cases). Since that isn't the case in this artificial
+    // setup here (where we created a responder exchange that's not responding to anything), we need to explicitly close it
+    // out. This is not expected in normal application logic.
+    //
+    exchange->Close();
+}
+
+void TestCommandInteraction::TestCommandHandlerRejectMultipleCommandsWhenHandlerOnlySupportsOne(nlTestSuite * apSuite,
+                                                                                                void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    isCommandDispatched = false;
+    mockCommandSenderDelegate.ResetCounter();
+
+    // Using commandSender to help build afterward we take the buffer to feed into standalone CommandHandler
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
+
+    size_t numberOfCommandsToSend = 2;
+    {
+        CommandPathParams requestCommandPaths[] = {
+            MakeTestCommandPath(kTestCommandIdWithData),
+            MakeTestCommandPath(kTestCommandIdCommandSpecificResponse),
+        };
+
+        commandSender.AllocateBuffer();
+
+        // CommandSender does not support sending multiple commands with public API, so we craft a message manaully.
+        for (size_t i = 0; i < numberOfCommandsToSend; i++)
+        {
+            InvokeRequests::Builder & invokeRequests = commandSender.mInvokeRequestBuilder.GetInvokeRequests();
+            CommandDataIB::Builder & invokeRequest   = invokeRequests.CreateCommandData();
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequests.GetError());
+            CommandPathIB::Builder & path = invokeRequest.CreatePath();
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.GetError());
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == path.Encode(requestCommandPaths[i]));
+            NL_TEST_ASSERT(apSuite,
+                           CHIP_NO_ERROR ==
+                               invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::Tag::kFields),
+                                                                         TLV::kTLVType_Structure,
+                                                                         commandSender.mDataElementContainerType));
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.GetWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+            NL_TEST_ASSERT(apSuite,
+                           CHIP_NO_ERROR == invokeRequest.GetWriter()->EndContainer(commandSender.mDataElementContainerType));
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.Ref(static_cast<uint16_t>(i)));
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.EndOfCommandDataIB());
+        }
+
+        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
+        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.EndOfInvokeRequestMessage());
+
+        commandSender.MoveToState(app::CommandSender::State::AddedCommand);
+    }
+
+    BasicCommandPathRegistry<4> mBasicCommandPathRegistry;
+    CommandHandler commandHandler(&mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
+    TestExchangeDelegate delegate;
+    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+    commandHandler.mExchangeCtx.Grab(exchange);
+
+    // Hackery to steal the InvokeRequest buffer from commandSender.
+    System::PacketBufferHandle commandDatabuf;
+    err = commandSender.Finalize(commandDatabuf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    mockCommandHandlerDelegate.ResetCounter();
+    sendResponse           = true;
+    commandDispatchedCount = 0;
+
+    InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+    NL_TEST_ASSERT(apSuite, status == InteractionModel::Status::Success);
+
+    NL_TEST_ASSERT(apSuite, commandDispatchedCount == 2);
+
+    //
+    // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
+    // OnMessageReceived callback and not having sent a subsequent message (as is the case when calling ProcessInvokeRequest
+    // above, which doesn't actually send back a response in these cases). Since that isn't the case in this artificial
+    // setup here (where we created a responder exchange that's not responding to anything), we need to explicitly close it
+    // out. This is not expected in normal application logic.
+    //
+    exchange->Close();
+}
+
+void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    isCommandDispatched = false;
+    mockCommandSenderDelegate.ResetCounter();
+
+    // Using commandSender to help build afterward we take the buffer to feed into standalone CommandHandler
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
+
+    size_t numberOfCommandsToSend = 2;
+    {
+        CommandPathParams requestCommandPaths[] = {
+            MakeTestCommandPath(kTestCommandIdWithData),
+            MakeTestCommandPath(kTestCommandIdCommandSpecificResponse),
+        };
+
+        commandSender.AllocateBuffer();
+
+        // CommandSender does not support sending multiple commands with public API, so we craft a message manaully.
+        for (size_t i = 0; i < numberOfCommandsToSend; i++)
+        {
+            InvokeRequests::Builder & invokeRequests = commandSender.mInvokeRequestBuilder.GetInvokeRequests();
+            CommandDataIB::Builder & invokeRequest   = invokeRequests.CreateCommandData();
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequests.GetError());
+            CommandPathIB::Builder & path = invokeRequest.CreatePath();
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.GetError());
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == path.Encode(requestCommandPaths[i]));
+            NL_TEST_ASSERT(apSuite,
+                           CHIP_NO_ERROR ==
+                               invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::Tag::kFields),
+                                                                         TLV::kTLVType_Structure,
+                                                                         commandSender.mDataElementContainerType));
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.GetWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+            NL_TEST_ASSERT(apSuite,
+                           CHIP_NO_ERROR == invokeRequest.GetWriter()->EndContainer(commandSender.mDataElementContainerType));
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.Ref(static_cast<uint16_t>(i)));
+            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.EndOfCommandDataIB());
+        }
+
+        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
+        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.EndOfInvokeRequestMessage());
+
+        commandSender.MoveToState(app::CommandSender::State::AddedCommand);
+    }
+
+    BasicCommandPathRegistry<4> mBasicCommandPathRegistry;
+    CommandHandler commandHandler(&mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
+    TestExchangeDelegate delegate;
+    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+    commandHandler.mExchangeCtx.Grab(exchange);
+
+    // Hackery to steal the InvokeRequest buffer from commandSender.
+    System::PacketBufferHandle commandDatabuf;
+    err = commandSender.Finalize(commandDatabuf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    mockCommandHandlerDelegate.ResetCounter();
+    commandDispatchedCount = 0;
+
+    InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+    NL_TEST_ASSERT(apSuite, status == InteractionModel::Status::Success);
+
+    NL_TEST_ASSERT(apSuite, commandDispatchedCount == 2);
+
+    //
+    // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
+    // OnMessageReceived callback and not having sent a subsequent message (as is the case when calling ProcessInvokeRequest
+    // above, which doesn't actually send back a response in these cases). Since that isn't the case in this artificial
+    // setup here (where we created a responder exchange that's not responding to anything), we need to explicitly close it
+    // out. This is not expected in normal application logic.
+    //
+    exchange->Close();
 }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -1472,7 +1711,11 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestCommandHandlerWithSendSimpleStatusCode", chip::app::TestCommandInteraction::TestCommandHandlerWithSendSimpleStatusCode),
     NL_TEST_DEF("TestCommandHandlerWithProcessReceivedNotExistCommand", chip::app::TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistCommand),
     NL_TEST_DEF("TestCommandHandlerWithProcessReceivedEmptyDataMsg", chip::app::TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg),
-    NL_TEST_DEF("TestCommandHandlerRejectMultipleCommands", chip::app::TestCommandInteraction::TestCommandHandlerRejectMultipleCommands),
+    NL_TEST_DEF("TestCommandHandlerRejectMultipleIdenticalCommands", chip::app::TestCommandInteraction::TestCommandHandlerRejectMultipleIdenticalCommands),
+    NL_TEST_DEF("TestCommandHandlerRejectsMultipleCommandsWithIdenticalCommandRef", chip::app::TestCommandInteraction::TestCommandHandlerRejectsMultipleCommandsWithIdenticalCommandRef),
+    NL_TEST_DEF("TestCommandHandlerRejectMultipleCommandsWhenHandlerOnlySupportsOne", chip::app::TestCommandInteraction::TestCommandHandlerRejectMultipleCommandsWhenHandlerOnlySupportsOne),
+    NL_TEST_DEF("TestCommandHandlerAcceptMultipleCommands", chip::app::TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands),
+
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     NL_TEST_DEF("TestCommandHandlerReleaseWithExchangeClosed", chip::app::TestCommandInteraction::TestCommandHandlerReleaseWithExchangeClosed),
