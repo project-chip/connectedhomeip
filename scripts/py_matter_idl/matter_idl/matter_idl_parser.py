@@ -556,6 +556,9 @@ class ParserWithLines:
         #       ordering.
         #
         # As a result, for now allow multiple definitions IF AND ONLY IF identical
+        #
+        # A zap PR to allow us to not need this is:
+        #    https://github.com/project-chip/zap/pull/1216
         clusters: Dict[int, Cluster] = {}
         for c in idl.clusters:
             if c.code in clusters:
