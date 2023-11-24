@@ -33,8 +33,9 @@ namespace app {
 namespace InvokeResponseMessage {
 enum class Tag : uint8_t
 {
-    kSuppressResponse = 0,
-    kInvokeResponses  = 1,
+    kSuppressResponse    = 0,
+    kInvokeResponses     = 1,
+    kMoreChunkedMessages = 2,
 };
 
 class Parser : public MessageParser
@@ -61,6 +62,16 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetInvokeResponses(InvokeResponseIBs::Parser * const apInvokeResponses) const;
+
+    /**
+     *  @brief Get MoreChunkedMessages boolean
+     *
+     *  @param [out] apMoreChunkedMessages    A pointer to apMoreChunkedMessages
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const;
 };
 
 class Builder : public MessageBuilder
@@ -85,6 +96,13 @@ public:
      *  @return A reference to InvokeResponseIBs::Builder
      */
     InvokeResponseIBs::Builder & GetInvokeResponses() { return mInvokeResponses; }
+
+    /**
+     *  @brief Set True if the set of InvokeResponseIB have to be sent across multiple packets in a single transaction
+     *  @param [in] aMoreChunkedMessages  true if more chunked messaged is needed
+     *  @return A reference to *this
+     */
+    InvokeResponseMessage::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
 
     /**
      *  @brief Mark the end of this InvokeResponseMessage

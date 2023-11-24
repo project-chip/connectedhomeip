@@ -64,6 +64,15 @@ CHIP_ERROR InvokeResponseMessage::Parser::PrettyPrint() const
             PRETTY_PRINT_DECDEPTH();
         }
         break;
+        case to_underlying(Tag::kMoreChunkedMessages):
+#if CHIP_DETAIL_LOGGING
+        {
+            bool moreChunkedMessages;
+            ReturnErrorOnFailure(reader.Get(moreChunkedMessages));
+            PRETTY_PRINT("\tmoreChunkedMessages = %s, ", moreChunkedMessages ? "true" : "false");
+        }
+#endif // CHIP_DETAIL_LOGGING
+        break;
         case kInteractionModelRevisionTag:
             ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
             break;
@@ -98,6 +107,11 @@ CHIP_ERROR InvokeResponseMessage::Parser::GetInvokeResponses(InvokeResponseIBs::
     return apStatus->Init(reader);
 }
 
+CHIP_ERROR InvokeResponseMessage::Parser::GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const
+{
+    return GetSimpleValue(to_underlying(Tag::kMoreChunkedMessages), TLV::kTLVType_Boolean, apMoreChunkedMessages);
+}
+
 InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::SuppressResponse(const bool aSuppressResponse)
 {
     if (mError == CHIP_NO_ERROR)
@@ -114,6 +128,16 @@ InvokeResponseIBs::Builder & InvokeResponseMessage::Builder::CreateInvokeRespons
         mError = mInvokeResponses.Init(mpWriter, to_underlying(Tag::kInvokeResponses));
     }
     return mInvokeResponses;
+}
+
+InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::MoreChunkedMessages(const bool aMoreChunkedMessages)
+{
+    // skip if error has already been set
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kMoreChunkedMessages), aMoreChunkedMessages);
+    }
+    return *this;
 }
 
 CHIP_ERROR InvokeResponseMessage::Builder::EndOfInvokeResponseMessage()
