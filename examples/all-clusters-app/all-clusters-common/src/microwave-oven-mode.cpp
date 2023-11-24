@@ -25,9 +25,8 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
-static ExampleMicrowaveOvenModeDelegate gMicrowaveOvenModeDelegate;
-static ModeBase::Instance gMicrowaveOvenModeInstance(&gMicrowaveOvenModeDelegate, 0x1, MicrowaveOvenMode::Id,
-                                                     chip::to_underlying(Feature::kOnOff));
+static ExampleMicrowaveOvenModeDelegate * gMicrowaveOvenModeDelegate = nullptr;
+static ModeBase::Instance * gMicrowaveOvenModeInstance     = nullptr;
 
 CHIP_ERROR ExampleMicrowaveOvenModeDelegate::Init()
 {
@@ -80,14 +79,27 @@ CHIP_ERROR ExampleMicrowaveOvenModeDelegate::GetModeTagsByIndex(uint8_t modeInde
 
 ModeBase::Instance * MicrowaveOvenMode::Instance()
 {
-    return &gMicrowaveOvenModeInstance;
+    return gMicrowaveOvenModeInstance;
 }
 
 void MicrowaveOvenMode::Shutdown() {
-    gMicrowaveOvenModeInstance.Shutdown();
+    if (gMicrowaveOvenModeInstance != nullptr)
+    {
+        delete gMicrowaveOvenModeInstance;
+        gMicrowaveOvenModeInstance = nullptr;
+    }
+    if (gMicrowaveOvenModeDelegate != nullptr)
+    {
+        delete gMicrowaveOvenModeDelegate;
+        gMicrowaveOvenModeDelegate = nullptr;
+    }
 }
 
 void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
 {
-    gMicrowaveOvenModeInstance.Init();
+    VerifyOrDie(gMicrowaveOvenModeDelegate == nullptr && gMicrowaveOvenModeInstance == nullptr);
+    gMicrowaveOvenModeDelegate = new MicrowaveOvenMode::ExampleMicrowaveOvenModeDelegate;
+    gMicrowaveOvenModeInstance =
+        new ModeBase::Instance(gMicrowaveOvenModeDelegate, endpointId, MicrowaveOvenMode::Id, chip::to_underlying(Feature::kOnOff));
+    gMicrowaveOvenModeInstance->Init();
 }
