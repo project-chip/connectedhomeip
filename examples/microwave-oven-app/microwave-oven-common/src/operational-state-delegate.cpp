@@ -47,53 +47,53 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Ge
 void OperationalStateDelegate::SetOpStatePauseCallback(
     std::function<void(Clusters::OperationalState::GenericOperationalError & err)> aCallback)
 {
-    mPauseCallback = aCallback;
+    mPauseCallback = std::make_unique<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>>(aCallback);
 }
 
 void OperationalStateDelegate::SetOpStateResumeCallback(
     std::function<void(Clusters::OperationalState::GenericOperationalError & err)> aCallback)
 {
-    mResumeCallback = aCallback;
+    mResumeCallback = std::make_unique<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>>(aCallback);
 }
 
 void OperationalStateDelegate::SetOpStateStartCallback(
     std::function<void(Clusters::OperationalState::GenericOperationalError & err)> aCallback)
 {
-    mStartCallback = aCallback;
+    mStartCallback = std::make_unique<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>>(aCallback);
 }
 
 void OperationalStateDelegate::SetOpStateStopCallback(
     std::function<void(Clusters::OperationalState::GenericOperationalError & err)> aCallback)
 {
-    mStopCallback = aCallback;
+    mStopCallback = std::make_unique<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>>(aCallback);
 }
 
 void OperationalStateDelegate::SetOpStateGetCountdownTimeCallback(std::function<app::DataModel::Nullable<uint32_t>(void)> aCallback)
 {
-    mGetCountdownTimeCallback = aCallback;
+    mGetCountdownTimeCallback = std::make_unique<std::function<app::DataModel::Nullable<uint32_t>(void)>>(aCallback);
 }
 
 app::DataModel::Nullable<uint32_t> OperationalStateDelegate::OperationalStateDelegate::GetCountdownTime()
 {
-    return mGetCountdownTimeCallback();
+    return (*mGetCountdownTimeCallback.get())();
 }
 
 void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
-    mPauseCallback(err);
+    (*mPauseCallback.get())(err);
 }
 
 void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
 {
-    mResumeCallback(err);
+    (*mResumeCallback.get())(err);
 }
 
 void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
 {
-    mStartCallback(err);
+    (*mStartCallback.get())(err);
 }
 
 void OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
 {
-    mStopCallback(err);
+    (*mStopCallback.get())(err);
 }

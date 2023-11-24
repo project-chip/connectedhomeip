@@ -300,20 +300,20 @@ bool IsPowerSettingInRange(uint8_t powerSetting, uint8_t minCookPower, uint8_t m
 
 void SetOPInstance(EndpointId aEndpoint, OperationalState::Instance * aInstance)
 {
-    uint16_t aMirowaveOvenEpIndex = emberAfGetClusterServerEndpointIndex(
+    uint16_t aMicrowaveOvenEpIndex = emberAfGetClusterServerEndpointIndex(
         aEndpoint, MicrowaveOvenControl::Id, EMBER_AF_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
-    if (aMirowaveOvenEpIndex < kMicrowaveOvenControlInstanceTableSize)
+    if (aMicrowaveOvenEpIndex < kMicrowaveOvenControlInstanceTableSize)
     {
-        gOPInstanceTable[aMirowaveOvenEpIndex] = aInstance;
+        gOPInstanceTable[aMicrowaveOvenEpIndex] = aInstance;
     }
 }
 
 OperationalState::Instance * GetOPInstance(EndpointId aEndpoint)
 {
-    uint16_t aMirowaveOvenEpIndex = emberAfGetClusterServerEndpointIndex(
+    uint16_t aMicrowaveOvenEpIndex = emberAfGetClusterServerEndpointIndex(
         aEndpoint, MicrowaveOvenControl::Id, EMBER_AF_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (aMirowaveOvenEpIndex >= kMicrowaveOvenControlInstanceTableSize ? nullptr : gOPInstanceTable[aMirowaveOvenEpIndex]);
+    return (aMicrowaveOvenEpIndex >= kMicrowaveOvenControlInstanceTableSize ? nullptr : gOPInstanceTable[aMicrowaveOvenEpIndex]);
 }
 
 } // namespace MicrowaveOvenControl

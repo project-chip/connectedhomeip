@@ -22,21 +22,17 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-#define MICROWAVE_OVEN_ENDPOINT 1
+static constexpr EndpointId kMicrowwaveOvenEndpointId = 1;
 
-MicrowaveOvenDevice * gMicrowaveOvenDevice = nullptr;
+std::unique_ptr<MicrowaveOvenDevice> gMicrowaveOvenDevice;
 
 void ApplicationInit()
 {
-    gMicrowaveOvenDevice = new MicrowaveOvenDevice(MICROWAVE_OVEN_ENDPOINT);
-    gMicrowaveOvenDevice->Init(MICROWAVE_OVEN_ENDPOINT);
+    gMicrowaveOvenDevice = std::make_unique<MicrowaveOvenDevice>(kMicrowwaveOvenEndpointId);
+    gMicrowaveOvenDevice.get()->Init(kMicrowwaveOvenEndpointId);
 }
 
-void ApplicationShutdown()
-{
-    delete gMicrowaveOvenDevice;
-    gMicrowaveOvenDevice = nullptr;
-}
+void ApplicationShutdown(){}
 
 int main(int argc, char * argv[])
 {
