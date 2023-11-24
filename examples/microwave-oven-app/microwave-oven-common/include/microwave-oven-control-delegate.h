@@ -38,9 +38,9 @@ private:
     /**
      * define callback binding function
      */
-    std::unique_ptr<std::function<Protocols::InteractionModel::Status(uint8_t, uint32_t, uint8_t)>>
+    Platform::UniquePtr<std::function<Protocols::InteractionModel::Status(uint8_t, uint32_t, uint8_t)>>
         mHandleSetCookingParametersCallback;
-    std::unique_ptr<std::function<Protocols::InteractionModel::Status(uint32_t)>> mHandleAddMoreTimeCallback;
+    Platform::UniquePtr<std::function<Protocols::InteractionModel::Status(uint32_t)>> mHandleAddMoreTimeCallback;
 
 public:
     /**

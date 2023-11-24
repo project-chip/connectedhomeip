@@ -39,11 +39,11 @@ void ExampleMicrowaveOvenControlDelegate::SetMicrowaveOvenControlSetCookingParam
     std::function<Protocols::InteractionModel::Status(uint8_t, uint32_t, uint8_t)> aCallback)
 {
     mHandleSetCookingParametersCallback =
-        std::make_unique<std::function<Protocols::InteractionModel::Status(uint8_t, uint32_t, uint8_t)>>(aCallback);
+        Platform::MakeUnique<std::function<Protocols::InteractionModel::Status(uint8_t, uint32_t, uint8_t)>>(aCallback);
 }
 
 void ExampleMicrowaveOvenControlDelegate::SetMicrowaveOvenControlAddMoreTimeCallback(
     std::function<Protocols::InteractionModel::Status(uint32_t)> aCallback)
 {
-    mHandleAddMoreTimeCallback = std::make_unique<std::function<Protocols::InteractionModel::Status(uint32_t)>>(aCallback);
+    mHandleAddMoreTimeCallback = Platform::MakeUnique<std::function<Protocols::InteractionModel::Status(uint32_t)>>(aCallback);
 }

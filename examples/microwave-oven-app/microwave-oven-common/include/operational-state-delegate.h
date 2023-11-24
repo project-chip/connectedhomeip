@@ -52,11 +52,11 @@ private:
     /**
      * define callback binding function
      */
-    std::unique_ptr<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>> mPauseCallback;
-    std::unique_ptr<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>> mResumeCallback;
-    std::unique_ptr<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>> mStartCallback;
-    std::unique_ptr<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>> mStopCallback;
-    std::unique_ptr<std::function<app::DataModel::Nullable<uint32_t>(void)>> mGetCountdownTimeCallback;
+    Platform::UniquePtr<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>> mPauseCallback;
+    Platform::UniquePtr<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>> mResumeCallback;
+    Platform::UniquePtr<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>> mStartCallback;
+    Platform::UniquePtr<std::function<void(Clusters::OperationalState::GenericOperationalError & err)>> mStopCallback;
+    Platform::UniquePtr<std::function<app::DataModel::Nullable<uint32_t>(void)>> mGetCountdownTimeCallback;
 
 public:
     /**
