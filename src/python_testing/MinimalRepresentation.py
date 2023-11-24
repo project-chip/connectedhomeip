@@ -15,15 +15,13 @@
 #    limitations under the License.
 #
 
-from typing import Callable
-
 from dataclasses import dataclass, field
-import chip.clusters as Clusters
+
 from chip.tlv import uint
-from TC_DeviceConformance import DeviceConformanceTests
-from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import (MatterBaseTest, async_test_body, default_matter_test_main)
 from conformance_support import ConformanceDecision
+from global_attribute_ids import GlobalAttributeIds
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from TC_DeviceConformance import DeviceConformanceTests
 
 
 @dataclass
@@ -108,15 +106,15 @@ class MinimalRepresentationChecker(DeviceConformanceTests):
             for cluster_id, minimals in cluster_list.items():
                 name = self.xml_clusters[cluster_id].name
                 print(f'  Cluster {cluster_id:04x} - {name}')
-                print(f'    Features:')
+                print('    Features:')
                 for feature in minimals.features:
                     code = self.xml_clusters[cluster_id].features[feature].code
                     print(f'      {feature:02x}: {code}')
-                print(f'    Attributes:')
+                print('    Attributes:')
                 for attribute in minimals.attributes:
                     name = self.xml_clusters[cluster_id].attributes[attribute].name
                     print(f'      {attribute:02x}: {name}')
-                print(f'    Commands:')
+                print('    Commands:')
                 for command in minimals.commands:
                     name = self.xml_clusters[cluster_id].accepted_commands[command].name
                     print(f'      {command:02x}: {name}')
