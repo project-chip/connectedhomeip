@@ -227,7 +227,7 @@ template("k32w1_sdk") {
       "USE_RTOS=1",
       "USE_SDK_OSA=0",
       "FSL_RTOS_FREE_RTOS=1",
-      "MinimalHeapSize_c=0x8C00",
+      "MinimalHeapSize_c=0x7C00",
       "gMemManagerLightExtendHeapAreaUsage=0",
       "DEBUG_SERIAL_INTERFACE_INSTANCE=0",
       "APP_SERIAL_INTERFACE_INSTANCE=1",
