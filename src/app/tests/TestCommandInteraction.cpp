@@ -137,9 +137,11 @@ constexpr CommandId kTestCommandIdWithData                = 4;
 constexpr CommandId kTestCommandIdNoData                  = 5;
 constexpr CommandId kTestCommandIdCommandSpecificResponse = 6;
 constexpr CommandId kTestCommandRequestSizedResponse      = 7;
+constexpr CommandId kTestCommandLargeRequest              = 8;
 constexpr CommandId kTestNonExistCommandId                = 0;
 
 constexpr chip::TLV::Tag kTagResponseSize = chip::TLV::ContextTag(0x12);
+constexpr chip::TLV::Tag kTagLargeRequest = chip::TLV::ContextTag(0x13);
 
 } // namespace
 
@@ -245,13 +247,20 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
             NL_TEST_ASSERT(gSuite, aReader.Get(responseSizeRequest) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
         }
+        else if (aCommandPath.mCommandId == kTestCommandLargeRequest)
+        {
+            ByteSpan span; // expect to contain a span that can be read
+
+            NL_TEST_ASSERT(gSuite, aReader.GetTag() == kTagLargeRequest);
+            NL_TEST_ASSERT(gSuite, aReader.Get(span) == CHIP_NO_ERROR);
+        }
         else
         {
+            bool val;
+
             // Everything else sends a true bool
             NL_TEST_ASSERT(gSuite, aReader.GetTag() == TLV::ContextTag(1));
-            bool val;
-            err = aReader.Get(val);
-            NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(gSuite, aReader.Get(val) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(gSuite, val);
         }
     }
@@ -385,6 +394,7 @@ public:
 
     static void TestCommandSenderAbruptDestruction(nlTestSuite * apSuite, void * apContext);
     static void TestCommandReplyLimits(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandRequestLimits(nlTestSuite * apSuite, void * apContext);
 
     static size_t GetNumActiveHandlerObjects()
     {
@@ -412,6 +422,9 @@ private:
 
     // Create an invoke request asking for the specified buffer size
     static CHIP_ERROR AddInvokeRequestForSize(CommandSender * apCommandSender, uint32_t responseSize);
+
+    // Create a "large" invoke request of the given size
+    static CHIP_ERROR AddInvokeRequestWithSize(CommandSender * apCommandSender, uint32_t requestSize);
 };
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
@@ -568,6 +581,20 @@ CHIP_ERROR TestCommandInteraction::AddInvokeRequestForSize(CommandSender * apCom
 
     chip::TLV::TLVWriter * writer = apCommandSender->GetCommandDataIBTLVWriter();
     ReturnErrorOnFailure(writer->Put(kTagResponseSize, responseSize));
+
+    return apCommandSender->FinishCommand();
+}
+
+CHIP_ERROR TestCommandInteraction::AddInvokeRequestWithSize(CommandSender * apCommandSender, uint32_t requestSize) {
+    auto commandPathParams = MakeTestCommandPath(kTestCommandLargeRequest);
+    ReturnErrorOnFailure(apCommandSender->PrepareCommand(commandPathParams));
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
+    VerifyOrReturnError(buffer.Alloc(requestSize), CHIP_ERROR_NO_MEMORY);
+    memset(buffer.Get(), 0xab, requestSize);
+
+    chip::TLV::TLVWriter * writer = apCommandSender->GetCommandDataIBTLVWriter();
+    ReturnErrorOnFailure(writer->Put(kTagLargeRequest, ByteSpan(buffer.Get(), requestSize)));
 
     return apCommandSender->FinishCommand();
 }
@@ -1250,6 +1277,74 @@ void TestCommandInteraction::TestCommandReplyLimits(nlTestSuite * apSuite, void 
     }
 }
 
+void TestCommandInteraction::TestCommandRequestLimits(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    // This test validates boundary conditions on replies
+    //   - replies will pack a single octet string of the specified size
+    //   - there will be some overhead for command paths and packing, hence
+    //     the min size range
+    //
+    // At the time of writing this, kMaxSecureSduLengthBytes is 1194
+    constexpr uint32_t kMinSize = chip::app::kMaxSecureSduLengthBytes - 100;
+    constexpr uint32_t kMaxSize = chip::app::kMaxSecureSduLengthBytes;
+
+    // these asserts is to understand general code ranges hit below
+    static_assert(kMinSize < 1100);
+    static_assert(kMaxSize > 1180);
+
+    unsigned requestsSent = 0;
+    unsigned invokeCreateFailures = 0;
+    unsigned sendFailures = 0;
+
+    for (uint32_t requestSize = kMinSize; requestSize <= kMaxSize; requestSize++)
+    {
+        mockCommandSenderDelegate.ResetCounter();
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
+
+        CHIP_ERROR err = AddInvokeRequestWithSize(&commandSender, requestSize);
+
+        if (err != CHIP_NO_ERROR) {
+            invokeCreateFailures++;
+            continue;
+        }
+
+        err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
+        if (err != CHIP_NO_ERROR) {
+            sendFailures++;
+            continue;
+        }
+
+        requestsSent++;
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
+        NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+        // A reply MUST be received
+        NL_TEST_ASSERT(apSuite, mockCommandSenderDelegate.onFinalCalledTimes == 1);
+
+        // If we manage to send it, we should have received a reply successfully because the
+        // reply size is trivial
+        NL_TEST_ASSERT(apSuite, mockCommandSenderDelegate.onResponseCalledTimes == 1);
+        NL_TEST_ASSERT(apSuite, mockCommandSenderDelegate.onErrorCalledTimes == 0);
+    }
+
+    ChipLogProgress(Controller, "Test requests sent:       %u", requestsSent);
+    ChipLogProgress(Controller, "Test send failures:       %u", sendFailures);
+    ChipLogProgress(Controller, "Invoke creation failures: %u", invokeCreateFailures);
+
+    // Do not care about exact sizes, however large buffer sending SHOULD be possible
+    NL_TEST_ASSERT(apSuite, requestsSent > 10);
+
+    // We are testing boundary conditions. Some failures are expected to know we are reaching
+    // the boundary
+    NL_TEST_ASSERT(apSuite, sendFailures > 0);
+    NL_TEST_ASSERT(apSuite, invokeCreateFailures > 0);
+}
+
 // Command Sender sends malformed invoke request, this command is aysnc command, handler fails to process it and sends status
 // report with invalid action
 void TestCommandInteraction::TestCommandHandlerInvalidMessageAsync(nlTestSuite * apSuite, void * apContext)
@@ -1655,6 +1750,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestCommandHandlerInvalidMessageSync", chip::app::TestCommandInteraction::TestCommandHandlerInvalidMessageSync),
     NL_TEST_DEF("TestCommandHandlerInvalidMessageAsync", chip::app::TestCommandInteraction::TestCommandHandlerInvalidMessageAsync),
     NL_TEST_DEF("TestCommandReplyLimits", chip::app::TestCommandInteraction::TestCommandReplyLimits),
+    NL_TEST_DEF("TestCommandRequestLimits", chip::app::TestCommandInteraction::TestCommandRequestLimits),
     NL_TEST_SENTINEL()
 };
 // clang-format on
