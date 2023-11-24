@@ -1171,11 +1171,13 @@ void TestCommandInteraction::TestCommandReplyLimits(nlTestSuite * apSuite, void 
 
     for (uint32_t replySize = kMinSize; replySize <= kMaxSize; replySize++)
     {
-        if ((replySize >= 1145) && (replySize <= 1160)) {
+        if ((replySize >= 1145) && (replySize <= 1160))
+        {
             continue; // Unclear why these fail - onFinalCalledTimes is not 1
         }
 
-        if ((replySize >= 1161) && (replySize <= 1165)) {
+        if ((replySize >= 1161) && (replySize <= 1165))
+        {
             // Crash due to MessageBuilder::EncodeInteractionModelRevision() encoding failure
             // these return CHIP_ERROR_INVALID_TLV_TAG because of a context tag not being inside a struct/list
             continue;
@@ -1199,11 +1201,11 @@ void TestCommandInteraction::TestCommandReplyLimits(nlTestSuite * apSuite, void 
         NL_TEST_ASSERT(
             apSuite,
             (mockCommandSenderDelegate.onResponseCalledTimes == 1 && mockCommandSenderDelegate.onErrorCalledTimes == 0) //
-            || (mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onErrorCalledTimes == 1)
-        );
+                || (mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onErrorCalledTimes == 1));
 
-        if (mockCommandSenderDelegate.onErrorCalledTimes == 1) {
-           NL_TEST_ASSERT(apSuite, mockCommandSenderDelegate.mError == CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+        if (mockCommandSenderDelegate.onErrorCalledTimes == 1)
+        {
+            NL_TEST_ASSERT(apSuite, mockCommandSenderDelegate.mError == CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
         }
     }
 }
