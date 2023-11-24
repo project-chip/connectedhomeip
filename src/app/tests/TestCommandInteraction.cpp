@@ -71,6 +71,9 @@ namespace {
 
 /// allows a value to only be changed within a scope,
 /// this is to force determinism in test execution
+///
+/// When a variable of this type is used, it should
+/// only be changed via `ScopedChange`.
 template <typename T>
 class ScopedChangeOnly
 {
@@ -85,6 +88,28 @@ private:
     T mValue;
 };
 
+/// Allows a scoped mutation to occur on a variable.
+///
+/// When an instance of this class goes out of scope, the variable
+/// will be reset to the default.
+///
+/// Example usage
+///
+/// int              a = 123;
+/// ScopedChangeOnly b(234);
+///
+/// /* a == 123, b == 234 */
+/// {
+///    ScopedChange changeA(a, 321);
+///    /* a == 321, b == 234 */
+///    {
+///       ScopedChange changeB(b, 10);
+///       /* a == 321, b == 10 */
+///    }
+///    /* a == 321, b == 234 */
+/// }
+/// /* a == 123, b == 234 */
+///
 template <typename T>
 class ScopedChange
 {
@@ -122,6 +147,21 @@ namespace app {
 
 CommandHandler::Handle asyncCommandHandle;
 
+/// This is a struct that can be passed into `AddResponseData` and can have
+/// a controllable size buffer that will be encoded
+///
+/// Actual encoding is:
+///
+///    TAG: STRUCT BEGIN
+///       <ContextTag: 1> <ByteSpan>
+///    STRUCT_END
+///
+/// Which is a few more bytes than just the given size.
+///
+/// Usage example:
+///
+/// CHIP_ERROR err = commandObj.AddResponseData(path, ForcedSizeBuffer(123));
+///
 struct ForcedSizeBuffer
 {
     chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mBuffer;
