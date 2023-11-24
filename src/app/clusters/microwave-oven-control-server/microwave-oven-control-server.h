@@ -121,14 +121,14 @@ public:
      *   @brief Handle Command Callback in application: SetCookingParameters
      *   @return Returns the Interaction Model status code which was user determined in the business logic
      */
-    virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
+    virtual Protocols::InteractionModel::Status HandleSetCookingParametersCommandCallback(uint8_t cookMode, uint32_t cookTime,
                                                                                    uint8_t powerSetting) = 0;
 
     /**
      *   @brief Handle Command Callback in application: AddMoreTime
      *   @return Returns the Interaction Model status code which was user determined in the business logic
      */
-    virtual Protocols::InteractionModel::Status HandleAddMoreTimeCallback(uint32_t finalCookTime) = 0;
+    virtual Protocols::InteractionModel::Status HandleAddMoreTimeCommandCallback(uint32_t finalCookTime) = 0;
 
     /**
      *   @brief get the MinPower

@@ -230,7 +230,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
             // set Microwave Oven cooking power to max power(default).
             reqPowerSetting = mDelegate->GetMaxPower();
         }
-        status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTime, reqPowerSetting);
+        status = mDelegate->HandleSetCookingParametersCommandCallback(reqCookMode, reqCookTime, reqPowerSetting);
         goto exit;
     }
     else
@@ -268,7 +268,7 @@ void Instance::HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTi
         // if the added cooking time is greater than the max cooking time, the cooking time stay unchanged.
         if (finalCookTime < kMaxCookTime)
         {
-            status = mDelegate->HandleAddMoreTimeCallback(finalCookTime);
+            status = mDelegate->HandleAddMoreTimeCommandCallback(finalCookTime);
             goto exit;
         }
         else

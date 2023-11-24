@@ -31,10 +31,10 @@ public:
     {
         // set callback functions
         mMicrowaveOvenControlDelegate.SetMicrowaveOvenControlSetCookingParametersCallback(
-            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCallback, this, std::placeholders::_1,
+            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCommandCallback, this, std::placeholders::_1,
                       std::placeholders::_2, std::placeholders::_3));
         mMicrowaveOvenControlDelegate.SetMicrowaveOvenControlAddMoreTimeCallback(
-            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenAddMoreTimeCallback, this, std::placeholders::_1));
+            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenAddMoreTimeCommandCallback, this, std::placeholders::_1));
         mOperationalStateDelegate.SetOpStatePauseCallback(
             std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStatePauseCallback, this, std::placeholders::_1));
         mOperationalStateDelegate.SetOpStateResumeCallback(
@@ -55,13 +55,13 @@ public:
     /**
      * handle command for microwave oven control: set cooking parameters
      */
-    Protocols::InteractionModel::Status HandleMicrowaveOvenSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
+    Protocols::InteractionModel::Status HandleMicrowaveOvenSetCookingParametersCommandCallback(uint8_t cookMode, uint32_t cookTime,
                                                                                         uint8_t powerSetting);
 
     /**
      * handle command for microwave oven control: add more time
      */
-    Protocols::InteractionModel::Status HandleMicrowaveOvenAddMoreTimeCallback(uint32_t finalCookTime);
+    Protocols::InteractionModel::Status HandleMicrowaveOvenAddMoreTimeCommandCallback(uint32_t finalCookTime);
 
     /**
      * handle command for operational state: pause

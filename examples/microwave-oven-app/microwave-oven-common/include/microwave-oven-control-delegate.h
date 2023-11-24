@@ -45,13 +45,13 @@ public:
     /**
      * Handle Command Callback in application: set-cooking-parameters
      */
-    Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
+    Protocols::InteractionModel::Status HandleSetCookingParametersCommandCallback(uint8_t cookMode, uint32_t cookTime,
                                                                            uint8_t powerSetting) override;
 
     /**
      * Handle Command Callback in application: add-more-time
      */
-    Protocols::InteractionModel::Status HandleAddMoreTimeCallback(uint32_t finalCookTime) override;
+    Protocols::InteractionModel::Status HandleAddMoreTimeCommandCallback(uint32_t finalCookTime) override;
 
     /**
      * Get the value of MinPower.
