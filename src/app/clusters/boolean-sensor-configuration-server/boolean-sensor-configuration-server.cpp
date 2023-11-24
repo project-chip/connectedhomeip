@@ -67,12 +67,17 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 
 static bool emitAlarmsStateChangedEvent(EndpointId ep)
 {
+    if (!HasFeature(ep, BooleanSensorConfiguration::Feature::kAudible) &&
+        !HasFeature(ep, BooleanSensorConfiguration::Feature::kVisual))
+    {
+        return false;
+    }
+
     BooleanSensorConfiguration::Events::AlarmsStateChanged::Type event;
     chip::BitMask<BooleanSensorConfiguration::AlarmModeBitmap> active;
     VerifyOrReturnValue(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Get(ep, &active), false);
     event.alarmsActive = active;
 
-    // TODO add compile time feature-map check to reduce code size
     if (HasFeature(ep, BooleanSensorConfiguration::Feature::kAlarmSuppress))
     {
         chip::BitMask<BooleanSensorConfiguration::AlarmModeBitmap> suppressed;
@@ -94,7 +99,7 @@ static bool emitAlarmsStateChangedEvent(EndpointId ep)
     return true;
 }
 
-static bool emitSensorFaultEvent(EndpointId ep)
+static CHIP_ERROR emitSensorFaultEvent(EndpointId ep)
 {
     BooleanSensorConfiguration::Events::SensorFault::Type event;
     EventNumber eventNumber;
@@ -104,11 +109,11 @@ static bool emitSensorFaultEvent(EndpointId ep)
     if (CHIP_NO_ERROR != error)
     {
         ChipLogError(Zcl, "Unable to emit SensorFault event [ep=%d]", ep);
-        return false;
+        return error;
     }
 
     ChipLogProgress(Zcl, "Emit SensorFault event [ep=%d]", ep);
-    return true;
+    return CHIP_NO_ERROR;
 }
 
 namespace chip {
@@ -137,7 +142,7 @@ CHIP_ERROR SetAlarmsActive(EndpointId ep, chip::BitMask<BooleanSensorConfigurati
     if (HasFeature(ep, BooleanSensorConfiguration::Feature::kVisual) ||
         HasFeature(ep, BooleanSensorConfiguration::Feature::kAudible))
     {
-        chip::BitMask<BooleanSensorConfiguration::AlarmModeBitmap, uint8_t> alarmsEnabled;
+        chip::BitMask<BooleanSensorConfiguration::AlarmModeBitmap> alarmsEnabled;
         VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsEnabled::Get(ep, &alarmsEnabled),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
         if (!alarmsEnabled.Has(alarms))
@@ -154,7 +159,7 @@ CHIP_ERROR SetAlarmsActive(EndpointId ep, chip::BitMask<BooleanSensorConfigurati
 
 CHIP_ERROR ClearAllAlarms(EndpointId ep)
 {
-    chip::BitMask<BooleanSensorConfiguration::AlarmModeBitmap, uint8_t> alarmsActive, alarmsSuppressed;
+    chip::BitMask<BooleanSensorConfiguration::AlarmModeBitmap> alarmsActive, alarmsSuppressed;
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Get(ep, &alarmsActive),
                         CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsSuppressed::Get(ep, &alarmsSuppressed),
@@ -179,10 +184,10 @@ CHIP_ERROR SuppressAlarms(EndpointId ep, chip::BitMask<BooleanSensorConfiguratio
 
     if (!HasFeature(ep, BooleanSensorConfiguration::Feature::kAlarmSuppress))
     {
-        return attribute_error;
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedCommand);
     }
 
-    chip::BitMask<BooleanSensorConfiguration::AlarmModeBitmap, uint8_t> alarmsActive, alarmsSuppressed;
+    chip::BitMask<BooleanSensorConfiguration::AlarmModeBitmap> alarmsActive, alarmsSuppressed;
 
     if (HasFeature(ep, BooleanSensorConfiguration::Feature::kVisual) ||
         HasFeature(ep, BooleanSensorConfiguration::Feature::kAudible))
@@ -190,16 +195,16 @@ CHIP_ERROR SuppressAlarms(EndpointId ep, chip::BitMask<BooleanSensorConfiguratio
         VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Get(ep, &alarmsActive), attribute_error);
         if (!alarmsActive.Has(alarm))
         {
-            CHIP_IM_GLOBAL_STATUS(InvalidInState);
+            return CHIP_IM_GLOBAL_STATUS(InvalidInState);
         }
     }
     else
     {
-        CHIP_IM_GLOBAL_STATUS(InvalidInState);
+        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
     }
 
     Delegate * delegate = GetDelegate(ep);
-    if (delegate != nullptr)
+    if (isDelegateNull(delegate, ep))
     {
         delegate->HandleSuppressRequest(alarm);
     }
@@ -222,9 +227,10 @@ CHIP_ERROR SetSensitivityLevel(EndpointId ep, BooleanSensorConfiguration::Sensit
     return CHIP_NO_ERROR;
 }
 
-bool EmitSensorFault(EndpointId ep)
+CHIP_ERROR EmitSensorFault(EndpointId ep)
 {
-    return emitSensorFaultEvent(ep);
+    ReturnErrorOnFailure(emitSensorFaultEvent(ep));
+    return CHIP_NO_ERROR;
 }
 
 } // namespace BooleanSensorConfiguration
@@ -232,76 +238,30 @@ bool EmitSensorFault(EndpointId ep)
 } // namespace app
 } // namespace chip
 
-namespace {
-
-class BooleanSensorConfigurationAttrAccess : public AttributeAccessInterface
-{
-public:
-    BooleanSensorConfigurationAttrAccess() :
-        AttributeAccessInterface(Optional<EndpointId>::Missing(), BooleanSensorConfiguration::Id)
-    {}
-
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-private:
-    CHIP_ERROR ReadSensitivityLevel(AttributeValueEncoder & aEncoder, Delegate * delegate);
-};
-
-BooleanSensorConfigurationAttrAccess gBooleanSensorConfigurationAttrAccess;
-
-CHIP_ERROR BooleanSensorConfigurationAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    EndpointId endpoint = aPath.mEndpointId;
-    Delegate * delegate = GetDelegate(endpoint);
-
-    if (isDelegateNull(delegate, endpoint))
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    switch (aPath.mAttributeId)
-    {
-    case SensitivityLevel::Id: {
-        return ReadSensitivityLevel(aEncoder, delegate);
-    }
-    break;
-
-    default:
-        break;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR BooleanSensorConfigurationAttrAccess::ReadSensitivityLevel(AttributeValueEncoder & aEncoder, Delegate * delegate)
-{
-    // TODO this needs to be implemented if the type of this attribute type changes to struct in
-    // https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/7845
-    return CHIP_NO_ERROR;
-}
-} // namespace
-
 bool emberAfBooleanSensorConfigurationClusterSuppressRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const BooleanSensorConfiguration::Commands::SuppressRequest::DecodableType & commandData)
 {
     const auto & alarm = commandData.alarmsToSuppress;
     CHIP_ERROR err     = BooleanSensorConfiguration::SuppressAlarms(commandPath.mEndpointId, alarm);
-    if (err == CHIP_IM_GLOBAL_STATUS(InvalidInState))
+    if (err == CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Status::Success);
+    }
+    else if (err == CHIP_IM_GLOBAL_STATUS(InvalidInState))
     {
         commandObj->AddStatus(commandPath, Status::InvalidInState);
-        return true;
     }
-    else if (err == CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute))
+    else if (err == CHIP_IM_GLOBAL_STATUS(UnsupportedCommand))
     {
         return false;
     }
+    else
+    {
+        commandObj->AddStatus(commandPath, Status::Failure);
+    }
 
-    commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }
 
-void MatterBooleanSensorConfigurationPluginServerInitCallback()
-{
-    registerAttributeAccessOverride(&gBooleanSensorConfigurationAttrAccess);
-}
+void MatterBooleanSensorConfigurationPluginServerInitCallback() {}

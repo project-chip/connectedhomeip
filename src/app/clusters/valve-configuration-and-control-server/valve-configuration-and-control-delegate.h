@@ -19,6 +19,8 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/data-model/Nullable.h>
+#include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
 
 namespace chip {
@@ -32,11 +34,15 @@ namespace ValveConfigurationAndControl {
 class Delegate
 {
 public:
-    Delegate(){};
+    Delegate() : mRemainingDuration(0){};
 
-    virtual CHIP_ERROR HandleOpenValve() = 0;
+    virtual CHIP_ERROR HandleOpenValve(DataModel::Nullable<chip::Percent> level) = 0;
+    virtual CHIP_ERROR HandleCloseValve()                                        = 0;
 
     virtual ~Delegate() = default;
+
+    chip::EndpointId mEndpoint;
+    uint32_t mRemainingDuration;
 };
 
 } // namespace ValveConfigurationAndControl

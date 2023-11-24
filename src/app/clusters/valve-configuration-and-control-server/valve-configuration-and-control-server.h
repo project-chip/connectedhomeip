@@ -25,8 +25,11 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/Nullable.h>
 #include <app/util/basic-types.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/Optional.h>
+#include <lib/support/BitMask.h>
 
 namespace chip {
 namespace app {
@@ -35,6 +38,10 @@ namespace ValveConfigurationAndControl {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 Delegate * GetDefaultDelegate(EndpointId endpoint);
+
+CHIP_ERROR CloseValve(chip::EndpointId ep);
+CHIP_ERROR SetValveLevel(chip::EndpointId ep, DataModel::Nullable<chip::Percent> level, chip::Optional<uint32_t> openDuration);
+CHIP_ERROR EmitValveFault(chip::EndpointId ep, chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
 
 inline bool HasFeature(EndpointId ep, Feature feature)
 {
