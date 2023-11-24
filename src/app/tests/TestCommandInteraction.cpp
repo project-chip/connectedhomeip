@@ -68,10 +68,40 @@ void CheckForInvalidAction(nlTestSuite * apSuite, chip::Test::MessageCapturer & 
 namespace chip {
 
 namespace {
+
+/// allows a value to only be changed within a scope,
+/// this is to force determinism in test execution
+template <typename T>
+class ScopedChangeOnly
+{
+public:
+    explicit ScopedChangeOnly(T initial) : mValue(initial) {}
+    operator T() const { return mValue; }
+
+    // DO NOT use directly
+    T & InternalMutableValue() { return mValue; }
+
+private:
+    T mValue;
+};
+
+template <typename T>
+class ScopedChange
+{
+public:
+    ScopedChange(ScopedChangeOnly<T> & what, T value) : mValue(what.InternalMutableValue()), mOriginal(what) { mValue = value; }
+    ScopedChange(T & what, T value) : mValue(what), mOriginal(what) { mValue = value; }
+    ~ScopedChange() { mValue = mOriginal; }
+
+private:
+    T & mValue;
+    T mOriginal;
+};
+
 bool isCommandDispatched = false;
 
-bool sendResponse = true;
-bool asyncCommand = false;
+ScopedChangeOnly sendResponse(true);
+ScopedChangeOnly asyncCommand(false);
 
 // Allow us to do test asserts from arbitrary places.
 nlTestSuite * gSuite = nullptr;
@@ -81,12 +111,40 @@ constexpr ClusterId kTestClusterId                        = 3;
 constexpr CommandId kTestCommandIdWithData                = 4;
 constexpr CommandId kTestCommandIdNoData                  = 5;
 constexpr CommandId kTestCommandIdCommandSpecificResponse = 6;
+constexpr CommandId kTestCommandRequestSizedResponse      = 7;
 constexpr CommandId kTestNonExistCommandId                = 0;
+
+constexpr chip::TLV::Tag kTagResponseSize = chip::TLV::ContextTag(0x12);
+
 } // namespace
 
 namespace app {
 
 CommandHandler::Handle asyncCommandHandle;
+
+struct ForcedSizeBuffer
+{
+    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mBuffer;
+
+    ForcedSizeBuffer(uint32_t size)
+    {
+        if (mBuffer.Alloc(size))
+        {
+            memset(mBuffer.Get(), 0x12, size);
+        }
+    }
+
+    static constexpr chip::CommandId GetCommandId() { return 0x12; }
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+    {
+        VerifyOrReturnError(mBuffer, CHIP_ERROR_NO_MEMORY);
+
+        TLV::TLVType outerContainerType;
+        ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outerContainerType));
+        ReturnErrorOnFailure(app::DataModel::Encode(aWriter, TLV::ContextTag(1), ByteSpan(mBuffer.Get(), mBuffer.AllocatedSize())));
+        return aWriter.EndContainer(outerContainerType);
+    }
+};
 
 InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
@@ -129,6 +187,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     CHIP_ERROR err = aReader.EnterContainer(outerContainerType);
     NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
 
+    uint32_t responseSizeRequest = 0;
+
     err = aReader.Next();
     if (aCommandPath.mCommandId == kTestCommandIdNoData)
     {
@@ -137,11 +197,23 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     else
     {
         NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(gSuite, aReader.GetTag() == TLV::ContextTag(1));
-        bool val;
-        err = aReader.Get(val);
-        NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(gSuite, val);
+
+        if (aCommandPath.mCommandId == kTestCommandRequestSizedResponse)
+        {
+            // figure out response size
+            NL_TEST_ASSERT(gSuite, aReader.GetTag() == kTagResponseSize);
+            NL_TEST_ASSERT(gSuite, aReader.Get(responseSizeRequest) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+        }
+        else
+        {
+            // Everything else sends a true bool
+            NL_TEST_ASSERT(gSuite, aReader.GetTag() == TLV::ContextTag(1));
+            bool val;
+            err = aReader.Get(val);
+            NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(gSuite, val);
+        }
     }
 
     err = aReader.ExitContainer(outerContainerType);
@@ -150,7 +222,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     if (asyncCommand)
     {
         asyncCommandHandle = apCommandObj;
-        asyncCommand       = false;
     }
 
     if (sendResponse)
@@ -161,10 +232,27 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         }
         else
         {
-            apCommandObj->PrepareCommand(aCommandPath);
-            chip::TLV::TLVWriter * writer = apCommandObj->GetCommandDataIBTLVWriter();
-            writer->PutBoolean(chip::TLV::ContextTag(1), true);
-            apCommandObj->FinishCommand();
+
+            if (aCommandPath.mCommandId == kTestCommandRequestSizedResponse)
+            {
+                err = apCommandObj->AddResponseData(aCommandPath, ForcedSizeBuffer(responseSizeRequest));
+            }
+            else
+            {
+                NL_TEST_ASSERT(gSuite, apCommandObj->PrepareCommand(aCommandPath) == CHIP_NO_ERROR);
+
+                chip::TLV::TLVWriter * writer = apCommandObj->GetCommandDataIBTLVWriter();
+                NL_TEST_ASSERT(gSuite, writer->PutBoolean(chip::TLV::ContextTag(1), true) == CHIP_NO_ERROR);
+                err = apCommandObj->FinishCommand();
+            }
+
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogProgress(Controller, "Failure to construct reply to command %d: %" CHIP_ERROR_FORMAT,
+                                static_cast<int>(aCommandPath.mCommandId), err.Format());
+                // Assume resource exhausted for now
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::ResourceExhausted);
+            }
         }
     }
 
@@ -256,6 +344,7 @@ public:
     static void TestCommandSenderCommandSpecificResponseFlow(nlTestSuite * apSuite, void * apContext);
 
     static void TestCommandSenderAbruptDestruction(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandReplyLimits(nlTestSuite * apSuite, void * apContext);
 
     static size_t GetNumActiveHandlerObjects()
     {
@@ -280,6 +369,9 @@ private:
     static void AddInvokeResponseData(nlTestSuite * apSuite, void * apContext, CommandHandler * apCommandHandler,
                                       bool aNeedStatusCode, CommandId aCommandId = kTestCommandIdWithData);
     static void ValidateCommandHandlerWithSendCommand(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode);
+
+    // Create an invoke request asking for the specified buffer size
+    static CHIP_ERROR AddInvokeRequestForSize(CommandSender * apCommandSender, uint32_t responseSize);
 };
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
@@ -427,6 +519,17 @@ void TestCommandInteraction::AddInvokeRequestData(nlTestSuite * apSuite, void * 
 
     err = apCommandSender->FinishCommand();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+}
+
+CHIP_ERROR TestCommandInteraction::AddInvokeRequestForSize(CommandSender * apCommandSender, uint32_t responseSize)
+{
+    auto commandPathParams = MakeTestCommandPath(kTestCommandRequestSizedResponse);
+    ReturnErrorOnFailure(apCommandSender->PrepareCommand(commandPathParams));
+
+    chip::TLV::TLVWriter * writer = apCommandSender->GetCommandDataIBTLVWriter();
+    ReturnErrorOnFailure(writer->Put(kTagResponseSize, responseSize));
+
+    return apCommandSender->FinishCommand();
 }
 
 void TestCommandInteraction::AddInvalidInvokeRequestData(nlTestSuite * apSuite, void * apContext, CommandSender * apCommandSender,
@@ -755,7 +858,6 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
     app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
 
     AddInvokeRequestData(apSuite, apContext, &commandSender);
-    asyncCommand = false;
 
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 1;
@@ -827,7 +929,6 @@ void TestCommandInteraction::TestCommandInvalidMessage2(nlTestSuite * apSuite, v
     app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
 
     AddInvokeRequestData(apSuite, apContext, &commandSender);
-    asyncCommand = false;
 
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 1;
@@ -898,7 +999,6 @@ void TestCommandInteraction::TestCommandInvalidMessage3(nlTestSuite * apSuite, v
     app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
 
     AddInvokeRequestData(apSuite, apContext, &commandSender);
-    asyncCommand = false;
 
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 1;
@@ -969,7 +1069,6 @@ void TestCommandInteraction::TestCommandInvalidMessage4(nlTestSuite * apSuite, v
     app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
 
     AddInvokeRequestData(apSuite, apContext, &commandSender);
-    asyncCommand = false;
 
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 1;
@@ -1053,6 +1152,30 @@ void TestCommandInteraction::TestCommandHandlerInvalidMessageSync(nlTestSuite * 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+void TestCommandInteraction::TestCommandReplyLimits(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
+
+    uint32_t cnt = 10;
+    NL_TEST_ASSERT(apSuite, AddInvokeRequestForSize(&commandSender, cnt) == CHIP_NO_ERROR);
+
+    err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite,
+                   mockCommandSenderDelegate.onResponseCalledTimes == 1 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
+                       mockCommandSenderDelegate.onErrorCalledTimes == 0);
+    NL_TEST_ASSERT(apSuite, mockCommandSenderDelegate.mError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 // Command Sender sends malformed invoke request, this command is aysnc command, handler fails to process it and sends status
 // report with invalid action
 void TestCommandInteraction::TestCommandHandlerInvalidMessageAsync(nlTestSuite * apSuite, void * apContext)
@@ -1062,7 +1185,8 @@ void TestCommandInteraction::TestCommandHandlerInvalidMessageAsync(nlTestSuite *
 
     mockCommandSenderDelegate.ResetCounter();
     app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
-    asyncCommand = true;
+    ScopedChange changeAsyncCommand(asyncCommand, true);
+
     AddInvalidInvokeRequestData(apSuite, apContext, &commandSender);
     err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1215,7 +1339,7 @@ void TestCommandInteraction::TestCommandSenderCommandAsyncSuccessResponseFlow(nl
     app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
 
     AddInvokeRequestData(apSuite, apContext, &commandSender);
-    asyncCommand = true;
+    ScopedChange changeAsyncCommand(asyncCommand, true);
     err          = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1299,7 +1423,7 @@ void TestCommandInteraction::TestCommandSenderAbruptDestruction(nlTestSuite * ap
     // Don't send back a response, just keep the CommandHandler
     // hanging to give us enough time to do what we want with the CommandSender object.
     //
-    sendResponse = false;
+    ScopedChange changeSendResponse(sendResponse, false);
 
     mockCommandSenderDelegate.ResetCounter();
 
@@ -1401,7 +1525,7 @@ void TestCommandInteraction::TestCommandHandlerReleaseWithExchangeClosed(nlTestS
 
     AddInvokeRequestData(apSuite, apContext, &commandSender);
     asyncCommandHandle = nullptr;
-    asyncCommand       = true;
+    ScopedChange changeAsyncCommand(asyncCommand, true);
     err                = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1456,6 +1580,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestCommandSenderAbruptDestruction", chip::app::TestCommandInteraction::TestCommandSenderAbruptDestruction),
     NL_TEST_DEF("TestCommandHandlerInvalidMessageSync", chip::app::TestCommandInteraction::TestCommandHandlerInvalidMessageSync),
     NL_TEST_DEF("TestCommandHandlerInvalidMessageAsync", chip::app::TestCommandInteraction::TestCommandHandlerInvalidMessageAsync),
+    NL_TEST_DEF("TestCommandReplyLimits", chip::app::TestCommandInteraction::TestCommandReplyLimits),
     NL_TEST_SENTINEL()
 };
 // clang-format on
