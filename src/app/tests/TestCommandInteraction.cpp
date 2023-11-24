@@ -585,7 +585,8 @@ CHIP_ERROR TestCommandInteraction::AddInvokeRequestForSize(CommandSender * apCom
     return apCommandSender->FinishCommand();
 }
 
-CHIP_ERROR TestCommandInteraction::AddInvokeRequestWithSize(CommandSender * apCommandSender, uint32_t requestSize) {
+CHIP_ERROR TestCommandInteraction::AddInvokeRequestWithSize(CommandSender * apCommandSender, uint32_t requestSize)
+{
     auto commandPathParams = MakeTestCommandPath(kTestCommandLargeRequest);
     ReturnErrorOnFailure(apCommandSender->PrepareCommand(commandPathParams));
 
@@ -1297,16 +1298,17 @@ void TestCommandInteraction::TestCommandRequestLimits(nlTestSuite * apSuite, voi
     /// As buffer sizes increase, we expect to fail earlier and earlier.
     /// what we do NOT expect is for larger buffers to behave better than smaller ones
     /// because that may indicate some logic error somewhere
-    enum class ErrorState {
+    enum class ErrorState
+    {
         kSucceeding,
         kFailingToSend,
         kFailingToPrepare,
     };
     ErrorState errorState = ErrorState::kSucceeding;
 
-    unsigned requestsSent = 0;
+    unsigned requestsSent         = 0;
     unsigned invokeCreateFailures = 0;
-    unsigned sendFailures = 0;
+    unsigned sendFailures         = 0;
 
     for (uint32_t requestSize = kMinSize; requestSize <= kMaxSize; requestSize++)
     {
@@ -1315,14 +1317,16 @@ void TestCommandInteraction::TestCommandRequestLimits(nlTestSuite * apSuite, voi
 
         CHIP_ERROR err = AddInvokeRequestWithSize(&commandSender, requestSize);
 
-        if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR)
+        {
             invokeCreateFailures++;
             errorState = ErrorState::kFailingToPrepare;
             continue;
         }
 
         err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
-        if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR)
+        {
             NL_TEST_ASSERT(apSuite, (errorState == ErrorState::kSucceeding) || (errorState == ErrorState::kFailingToSend));
             errorState = ErrorState::kFailingToSend;
             sendFailures++;
