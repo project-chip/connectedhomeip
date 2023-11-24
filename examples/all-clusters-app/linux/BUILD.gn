@@ -40,6 +40,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
     "AllClustersCommandDelegate.cpp",
     "AppOptions.cpp",
+    "ValveControlDelegate.cpp",
     "WindowCoveringManager.cpp",
     "include/tv-callbacks.cpp",
     "include/tv-callbacks.h",
