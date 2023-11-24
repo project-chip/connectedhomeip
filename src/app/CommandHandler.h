@@ -214,8 +214,8 @@ public:
     Protocols::InteractionModel::Status ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
 
     /**
-     * This will add a new CommandDataIB element into InvokeResponses for the associated
-     * aRequestCommandPath. This adds up until the `CommandFields` element within the
+     * This adds a new CommandDataIB element into InvokeResponses for the associated
+     * aRequestCommandPath. This adds up until the `CommandFields` element within
      * `CommandDataIB`.
      *
      * This call will fail if CommandHandler is already in the middle of building/sending
