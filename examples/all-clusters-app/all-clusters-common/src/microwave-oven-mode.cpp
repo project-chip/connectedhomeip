@@ -83,7 +83,9 @@ ModeBase::Instance * MicrowaveOvenMode::Instance()
     return &gMicrowaveOvenModeInstance;
 }
 
-void MicrowaveOvenMode::Shutdown() {}
+void MicrowaveOvenMode::Shutdown() {
+    gMicrowaveOvenModeInstance.Shutdown();
+}
 
 void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
 {

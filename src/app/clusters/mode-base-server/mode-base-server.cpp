@@ -51,6 +51,15 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
 
 Instance::~Instance()
 {
+    Shutdown();
+}
+
+void Instance::Shutdown()
+{
+    if (!IsInList())
+    {
+        return;
+    }
     UnregisterThisInstance();
     chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
     unregisterAttributeAccessOverride(this);
