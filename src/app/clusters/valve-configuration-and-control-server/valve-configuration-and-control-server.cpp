@@ -247,9 +247,12 @@ CHIP_ERROR SetValveLevel(chip::EndpointId ep, DataModel::Nullable<chip::Percent>
             VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == OpenDuration::Get(ep, oDuration), attribute_error);
         }
 
-        uint64_t time = oDuration.Value() * chip::kMicrosecondsPerSecond;
-        autoCloseTime.SetNonNull(utcTime.count() + time);
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AutoCloseTime::Set(ep, autoCloseTime), attribute_error);
+        if (!oDuration.IsNull())
+        {
+            uint64_t time = oDuration.Value() * chip::kMicrosecondsPerSecond;
+            autoCloseTime.SetNonNull(utcTime.count() + time);
+            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AutoCloseTime::Set(ep, autoCloseTime), attribute_error);
+        }
     }
 
     // if remainingduration available set to openduration field or attribute
