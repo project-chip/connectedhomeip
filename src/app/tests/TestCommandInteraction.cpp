@@ -1155,25 +1155,41 @@ void TestCommandInteraction::TestCommandHandlerInvalidMessageSync(nlTestSuite * 
 void TestCommandInteraction::TestCommandReplyLimits(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = CHIP_NO_ERROR;
 
-    mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
+    // This test validates boundary conditions on replies
+    //   - replies will pack a single octet string of the specified size
+    //   - there will be some overhead for command paths and packing, hence
+    //     the min size range
+    constexpr uint32_t kMinSize = chip::app::kMaxSecureSduLengthBytes - 100;
+    constexpr uint32_t kMaxSize = chip::app::kMaxSecureSduLengthBytes;
 
-    uint32_t cnt = 10;
-    NL_TEST_ASSERT(apSuite, AddInvokeRequestForSize(&commandSender, cnt) == CHIP_NO_ERROR);
+    for (uint32_t replySize = kMinSize; replySize <= kMaxSize; replySize++)
+    {
+        mockCommandSenderDelegate.ResetCounter();
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
 
-    err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, AddInvokeRequestForSize(&commandSender, replySize) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, commandSender.SendCommandRequest(ctx.GetSessionBobToAlice()) == CHIP_NO_ERROR);
 
-    ctx.DrainAndServiceIO();
+        ctx.DrainAndServiceIO();
 
-    NL_TEST_ASSERT(apSuite,
-                   mockCommandSenderDelegate.onResponseCalledTimes == 1 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
-                       mockCommandSenderDelegate.onErrorCalledTimes == 0);
-    NL_TEST_ASSERT(apSuite, mockCommandSenderDelegate.mError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
-    NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+        NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
+        NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+        // A reply MUST be received
+        NL_TEST_ASSERT(apSuite, mockCommandSenderDelegate.onFinalCalledTimes == 1);
+
+        // the reply could have been success or error
+        NL_TEST_ASSERT(
+            apSuite,
+            (mockCommandSenderDelegate.onResponseCalledTimes == 1 && mockCommandSenderDelegate.onErrorCalledTimes == 0) //
+            || (mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onErrorCalledTimes == 1)
+        );
+
+        if (mockCommandSenderDelegate.onErrorCalledTimes == 1) {
+           NL_TEST_ASSERT(apSuite, mockCommandSenderDelegate.mError == CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+        }
+    }
 }
 
 // Command Sender sends malformed invoke request, this command is aysnc command, handler fails to process it and sends status
@@ -1340,7 +1356,7 @@ void TestCommandInteraction::TestCommandSenderCommandAsyncSuccessResponseFlow(nl
 
     AddInvokeRequestData(apSuite, apContext, &commandSender);
     ScopedChange changeAsyncCommand(asyncCommand, true);
-    err          = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
+    err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -1526,7 +1542,7 @@ void TestCommandInteraction::TestCommandHandlerReleaseWithExchangeClosed(nlTestS
     AddInvokeRequestData(apSuite, apContext, &commandSender);
     asyncCommandHandle = nullptr;
     ScopedChange changeAsyncCommand(asyncCommand, true);
-    err                = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
+    err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
