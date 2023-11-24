@@ -26,7 +26,7 @@ using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
 static ExampleMicrowaveOvenModeDelegate * gMicrowaveOvenModeDelegate = nullptr;
-static ModeBase::Instance * gMicrowaveOvenModeInstance     = nullptr;
+static ModeBase::Instance * gMicrowaveOvenModeInstance               = nullptr;
 
 CHIP_ERROR ExampleMicrowaveOvenModeDelegate::Init()
 {
@@ -82,7 +82,8 @@ ModeBase::Instance * MicrowaveOvenMode::Instance()
     return gMicrowaveOvenModeInstance;
 }
 
-void MicrowaveOvenMode::Shutdown() {
+void MicrowaveOvenMode::Shutdown()
+{
     if (gMicrowaveOvenModeInstance != nullptr)
     {
         delete gMicrowaveOvenModeInstance;
