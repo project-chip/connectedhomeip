@@ -122,7 +122,7 @@ public:
      */
     void Reset()
     {
-        mPeerAddress              = PeerAddress::Uninitialized();
+        mPeerAddress               = PeerAddress::Uninitialized();
         mLongDiscriminator         = 0;
         mVendorId                  = 0;
         mProductId                 = 0;
@@ -132,8 +132,8 @@ public:
         mCdUponPasscodeDialog      = false;
         mCommissionerPasscode      = false;
         mCommissionerPasscodeReady = false;
-        mExpirationTime           = System::Clock::kZero;
-        mUDCClientProcessingState = UDCClientProcessingState::kNotInitialized;
+        mExpirationTime            = System::Clock::kZero;
+        mUDCClientProcessingState  = UDCClientProcessingState::kNotInitialized;
     }
 
 private:
@@ -145,7 +145,7 @@ private:
     uint16_t mProductId         = 0;
     uint16_t mCdPort            = 0;
     uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen];
-    size_t mRotatingIdLen = 0;
+    size_t mRotatingIdLen           = 0;
     bool mNoPasscode                = false;
     bool mCdUponPasscodeDialog      = false;
     bool mCommissionerPasscode      = false;
