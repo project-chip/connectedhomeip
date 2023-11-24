@@ -153,6 +153,10 @@ public:
         uint32_t mMagic            = 0;
     };
 
+    class TestOnlyMarker
+    {
+    };
+
     /*
      * Constructor.
      *
@@ -164,9 +168,9 @@ public:
      * Constructor to override number of supported paths per invoke.
      *
      * The callback and command path registry passed in has to outlive this CommandHandler object.
-     * Created for testing purposes.
+     * For testing purposes.
      */
-    CommandHandler(Callback * apCallback, CommandPathRegistry * mCommandPathRegistry);
+    CommandHandler(TestOnlyMarker aTestMarker, Callback * apCallback, CommandPathRegistry * apCommandPathRegistry);
 
     /*
      * Main entrypoint for this class to handle an invoke request.
@@ -184,9 +188,8 @@ public:
     /**
      * Checks that all CommandDataIB within InvokeRequests is correct as per spec.
      *
-     * This also build a lookup table that is multipurpose. It helps validate that all elements
-     * in the invoke request are unique, but also used when later on when populating
-     * elements of the InvokeResponse.
+     * This also builds a registry that to ensure that all commands can be responded
+     * to with the data required as per spec.
      */
     CHIP_ERROR ValidateInvokeRequestsAndBuildRegistry(TLV::TLVReader & invokeRequestsReader);
 
@@ -211,8 +214,9 @@ public:
     Protocols::InteractionModel::Status ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
 
     /**
-     * This will add a new CommandDataIB element into InvokeResponses. It will put the
-     * aResponseCommandPath into CommandPath element within CommandDataIB.
+     * This will add a new CommandDataIB element into InvokeResponses for the associated
+     * aRequestCommandPath. This adds up until the `CommandFields` element within the
+     * `CommandDataIB`.
      *
      * This call will fail if CommandHandler is already in the middle of building/sending
      * InvokeResponseMessage.
@@ -237,6 +241,21 @@ public:
      *
      * @param [in] aEndDataStruct end the TLV container for the CommandFields element within
      *             CommandDataIB.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE
+     *                      If device has not previously successfully called
+     *                      `PrepareInvokeResponseCommand`.
+     * @retval CHIP_ERROR_BUFFER_TOO_SMALL
+     *                      If writing the values needed to finish the InvokeReponseIB
+     *                      with the current contents of the InvokeResponseMessage
+     *                      would exceed the limit. When this error occurs, it is possible
+     *                      we have already closed some of the IB Builders that were
+     *                      previously started in `PrepareInvokeResponseCommand`.
+     * @return CHIP_ERROR_NO_MEMORY
+     *                      If TLVWriter attempted to allocate an output buffer failed due to
+     *                      lack of memory.
+     * @return other        Other TLVWriter related errors. Typically occurs if
+     *                      `GetCommandDataIBTLVWriter()` was called and used incorrectly.
      */
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
 
@@ -488,9 +507,9 @@ private:
      */
     void SetGroupRequest(bool isGroupRequest) { mGroupRequest = isGroupRequest; }
 
-    CommandPathRegistry & GetCommandPathRegistry() { return *mCommandPathRegistry; }
+    CommandPathRegistry & GetCommandPathRegistry() const { return *mCommandPathRegistry; }
 
-    size_t MaxPathsPerInvoke() { return mMaxPathsPerInvoke; }
+    size_t MaxPathsPerInvoke() const { return mMaxPathsPerInvoke; }
 
     Messaging::ExchangeHolder mExchangeCtx;
     Callback * mpCallback = nullptr;
@@ -501,6 +520,7 @@ private:
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     TLV::TLVWriter mBackupWriter;
     size_t mMaxPathsPerInvoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
+    // TODO Allow flexibility in registration.
     BasicCommandPathRegistry<CHIP_CONFIG_MAX_PATHS_PER_INVOKE> mBasicCommandPathRegistry;
     CommandPathRegistry * mCommandPathRegistry = &mBasicCommandPathRegistry;
     Optional<uint16_t> mRefForResponse;

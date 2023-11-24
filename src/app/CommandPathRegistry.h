@@ -36,7 +36,8 @@ struct CommandPathRegistryEntry
 class CommandPathRegistry
 {
 public:
-    virtual ~CommandPathRegistry(){};
+    virtual ~CommandPathRegistry() = default;
+
     virtual Optional<CommandPathRegistryEntry> Find(const ConcreteCommandPath & requestPath) const  = 0;
     virtual Optional<CommandPathRegistryEntry> GetFirstEntry() const                                = 0;
     virtual CHIP_ERROR Add(const ConcreteCommandPath & requestPath, const Optional<uint16_t> & ref) = 0;
@@ -58,8 +59,6 @@ template <size_t N>
 class BasicCommandPathRegistry : public CommandPathRegistry
 {
 public:
-    ~BasicCommandPathRegistry() override{};
-
     Optional<CommandPathRegistryEntry> Find(const ConcreteCommandPath & requestPath) const override
     {
         for (size_t i = 0; i < mCount; i++)
@@ -93,7 +92,10 @@ public:
             {
                 return CHIP_ERROR_DUPLICATE_KEY_ID;
             }
-            if (mTable[i].ref.HasValue() && mTable[i].ref == ref)
+            // No need to check if either has value. This is because if there is more than
+            // 1 entry in the table expectation is to have all entirely unique ref values
+            // so duplicate optional would mean we would want to error out.
+            if (mTable[i].ref == ref)
             {
                 return CHIP_ERROR_DUPLICATE_KEY_ID;
             }

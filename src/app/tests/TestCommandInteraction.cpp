@@ -83,6 +83,8 @@ constexpr CommandId kTestCommandIdWithData                = 4;
 constexpr CommandId kTestCommandIdNoData                  = 5;
 constexpr CommandId kTestCommandIdCommandSpecificResponse = 6;
 constexpr CommandId kTestNonExistCommandId                = 0;
+
+const app::CommandHandler::TestOnlyMarker kThisIsForTestOnly;
 } // namespace
 
 namespace app {
@@ -1550,7 +1552,7 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleCommandsWhenHandler
     }
 
     BasicCommandPathRegistry<4> mBasicCommandPathRegistry;
-    CommandHandler commandHandler(&mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
+    CommandHandler commandHandler(kThisIsForTestOnly, &mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
     commandHandler.mExchangeCtx.Grab(exchange);
@@ -1627,7 +1629,7 @@ void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuit
     }
 
     BasicCommandPathRegistry<4> mBasicCommandPathRegistry;
-    CommandHandler commandHandler(&mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
+    CommandHandler commandHandler(kThisIsForTestOnly, &mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
     commandHandler.mExchangeCtx.Grab(exchange);
