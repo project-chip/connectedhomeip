@@ -121,6 +121,9 @@ public:
      */
     bool IsSupportedMode(uint8_t mode);
 
+    // Unregisters this instance if already registered.
+    void Shutdown();
+
 private:
     Delegate * mDelegate;
 
