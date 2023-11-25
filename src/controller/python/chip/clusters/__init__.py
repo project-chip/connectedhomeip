@@ -49,7 +49,7 @@ __all__ = [Attribute, CHIPClusters, Command, AccessControl, AccountLogin, Action
            BinaryInputBasic, Binding, BooleanState, BridgedDeviceBasicInformation, CarbonDioxideConcentrationMeasurement,
            CarbonMonoxideConcentrationMeasurement, Channel,
            ColorControl, ContentLauncher, Descriptor, DiagnosticLogs, DishwasherAlarm, DishwasherMode,
-           DoorLock, ElectricalMeasurement, EnergyEvse, EthernetNetworkDiagnostics, FanControl, FaultInjection, FixedLabel, FlowMeasurement,
+           DoorLock, ElectricalMeasurement,  EnergyEvse, EthernetNetworkDiagnostics, FanControl, FaultInjection, FixedLabel, FlowMeasurement,
            FormaldehydeConcentrationMeasurement, GeneralCommissioning, GeneralDiagnostics, GroupKeyManagement, Groups,
            HepaFilterMonitoring, IcdManagement, Identify, IlluminanceMeasurement, KeypadInput,
            LaundryWasherControls, LaundryWasherMode, LevelControl, LocalizationConfiguration, LowPower, MediaInput, MediaPlayback, ModeSelect,
