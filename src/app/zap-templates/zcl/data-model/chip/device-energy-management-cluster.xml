@@ -31,48 +31,44 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA).</description>
+    
+    <globalAttribute side="server" code="0xFFFD" value="2" />
+
     <!--Attributes-->
-    <attribute code="0x0000" side="server" type="ESATypeEnum" define="DEVICE_ENERGY_MANAGEMENT_ESA_TYPE" writable="false" optional="false">ESAType</attribute>
-    <attribute code="0x0001" side="server" type="boolean" define="DEVICE_ENERGY_MANAGEMENT_ESA_CAN_GENERATE" writable="false" optional="false">ESACanGenerate</attribute>
-    <attribute code="0x0002" side="server" type="ESAStateEnum" define="DEVICE_ENERGY_MANAGEMENT_ESA_STATE" default="0" writable="false" optional="false">ESAState</attribute>
-    <attribute code="0x0003" side="server" type="int64s" define="DEVICE_ENERGY_MANAGEMENT_ABS_MIN_POWER" default="0" writable="false" optional="false">AbsMinPower</attribute>
-    <attribute code="0x0004" side="server" type="int64s" define="DEVICE_ENERGY_MANAGEMENT_ABS_MAX_POWER" default="0" writable="false" optional="false">AbsMaxPower</attribute>
+    <attribute code="0x0000" side="server" type="ESATypeEnum" define="ESA_TYPE" writable="false" optional="false">ESAType</attribute>
+    <attribute code="0x0001" side="server" type="boolean" define="ESA_CAN_GENERATE" writable="false" optional="false">ESACanGenerate</attribute>
+    <attribute code="0x0002" side="server" type="ESAStateEnum" define="ESA_STATE" default="0" writable="false" optional="false">ESAState</attribute>
+    <attribute code="0x0003" side="server" type="int64s" define="ABS_MIN_POWER" default="0" writable="false" optional="false">AbsMinPower</attribute>
+    <attribute code="0x0004" side="server" type="int64s" define="ABS_MAX_POWER" default="0" writable="false" optional="false">AbsMaxPower</attribute>
     <!--Conformance feature PA - for now optional-->
-    <attribute code="0x0005" side="server" type="ARRAY" entryType="PowerAdjustStruct" define="DEVICE_ENERGY_MANAGEMENT_POWER_ADJUSTMENT_CAPABILITY" isNullable="true" writable="false" optional="true">PowerAdjustmentCapability</attribute>
+    <attribute code="0x0005" side="server" type="ARRAY" entryType="PowerAdjustStruct" define="POWER_ADJUSTMENT_CAPABILITY" isNullable="true" writable="false" optional="true">PowerAdjustmentCapability</attribute>
     <!--Conformance feature PFR \| SFR - for now optional-->
-    <attribute code="0x0006" side="server" type="ForecastStruct" define="DEVICE_ENERGY_MANAGEMENT_FORECAST" isNullable="true" writable="false" optional="true">Forecast</attribute>
+    <attribute code="0x0006" side="server" type="ForecastStruct" define="FORECAST" isNullable="true" writable="false" optional="true">Forecast</attribute>
     <command source="client" code="0x0000" name="PowerAdjustRequest" optional="true" apiMaturity="provisional">
-      <access op="invoke" privilege="operate"/>
       <arg name="Power" type="int64s"/>
       <arg name="Duration" type="elapsed_s"/>
       <description>Allows a client to request an adjustment in the power consumption of an ESA for a specified duration.</description>
     </command>
     <command source="client" code="0x0001" name="CancelPowerAdjustRequest" optional="true" apiMaturity="provisional">
-      <access op="invoke" privilege="operate"/>
       <description>Allows a client to cancel an ongoing PowerAdjustmentRequest operation.</description>
     </command>
     <command source="client" code="0x0002" name="StartTimeAdjustRequest" optional="true" apiMaturity="provisional">
-      <access op="invoke" privilege="operate"/>
       <arg name="RequestedStartTime" type="epoch_s"/>
       <description>Allows a client to adjust the start time of a Forecast sequence that has not yet started operation (i.e. where the current Forecast StartTime is in the future).</description>
     </command>
     <command source="client" code="0x0003" name="PauseRequest" optional="true" apiMaturity="provisional">
-      <access op="invoke" privilege="operate"/>
       <arg name="Duration" type="elapsed_s"/>
       <description>Allows a client to temporarily pause an operation and reduce the ESAs energy demand.</description>
     </command>
     <command source="client" code="0x0004" name="ResumeRequest" optional="true" apiMaturity="provisional">
-      <access op="invoke" privilege="operate"/>
       <description>Allows a client to cancel the PauseRequest command and enable earlier resumption of operation.</description>
     </command>
     <command source="client" code="0x0005" name="ModifyForecastRequest" optional="true" apiMaturity="provisional">
-      <access op="invoke" privilege="operate"/>
       <arg name="ForecastId" type="int32u"/>
       <arg name="SlotAdjustments" array="true" type="SlotAdjustmentStruct"/>
       <description>Allows a client to modify a Forecast within the limits allowed by the ESA.</description>
     </command>
     <command source="client" code="0x0006" name="RequestConstraintBasedForecast" optional="true" apiMaturity="provisional">
-      <access op="invoke" privilege="operate"/>
       <arg name="Constraints" array="true" type="ConstraintsStruct"/>
       <description>Allows a client to ask the ESA to recompute its Forecast based on power and time constraints.</description>
     </command>

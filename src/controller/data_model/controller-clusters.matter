@@ -4237,6 +4237,8 @@ provisional client cluster DemandResponseLoadControl = 150 {
 
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
 provisional client cluster DeviceEnergyManagement = 152 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CauseEnum : enum8 {
     kNormalCompletion = 0;
     kOffline = 1;
