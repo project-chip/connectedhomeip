@@ -16,11 +16,11 @@
  */
 
 #include "DefaultICDClientStorage.h"
-#include "DefaultICDStorageKey.h"
 #include <iterator>
 #include <lib/core/Global.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -34,61 +34,62 @@ DefaultICDClientStorage * DefaultICDClientStorage::GetInstance()
     return &sDefaultICDClientStorage.get();
 }
 
-DefaultICDClientStorage::ICDClientInfoIteratorImpl::ICDClientInfoIteratorImpl(DefaultICDClientStorage & aManager) :
-    mManager(aManager)
+DefaultICDClientStorage::ICDClientInfoIteratorImpl::ICDClientInfoIteratorImpl(DefaultICDClientStorage & manager) : mManager(manager)
 {
     mStorageIndex    = 0;
     mClientInfoIndex = 0;
+    mClientInfoVector.clear();
 }
 
 size_t DefaultICDClientStorage::ICDClientInfoIteratorImpl::Count()
 {
     size_t total = 0;
-    for (auto & storageIterator : mManager.mStorages)
+    for (auto & storage : mManager.mStorages)
     {
-        if (!storageIterator.IsValid())
-        {
-            continue;
-        }
-        for (size_t clientInfoIndex = 0; clientInfoIndex < mManager.mpICDStorageKeyDelegate->MaxKeyCounter(); clientInfoIndex++)
-        {
-            if (storageIterator.mpClientInfoStore->SyncDoesKeyExist(
-                    mManager.mpICDStorageKeyDelegate->GetKey(clientInfoIndex).KeyName()))
-            {
-                total++;
-            }
-        }
-    }
-    return total;
-}
-
-bool DefaultICDClientStorage::ICDClientInfoIteratorImpl::Next(ICDClientInfo & aOutput)
-{
-    for (; mStorageIndex < mManager.Size(); mStorageIndex++)
-    {
-        ICDStorage & storage = mManager.mStorages[mStorageIndex];
         if (!storage.IsValid())
         {
             continue;
         }
-        for (; mClientInfoIndex < mManager.mpICDStorageKeyDelegate->MaxKeyCounter(); mClientInfoIndex++)
-        {
-            CHIP_ERROR err = mManager.Load(storage, mClientInfoIndex, aOutput);
-            if (err == CHIP_NO_ERROR)
-            {
-                mClientInfoIndex++;
-                return true;
-            }
 
-            if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        size_t counter      = 0;
+        uint16_t counterLen = static_cast<uint16_t>(sizeof(counter));
+        if (storage.mpCounterStore->SyncGetKeyValue(
+                DefaultStorageKeyAllocator::FabricICDClientInfoCounter(storage.mFabricIndex).KeyName(), &counter, counterLen) !=
+            CHIP_NO_ERROR)
+        {
+            return 0;
+        }
+        total += counter;
+    }
+    return total;
+}
+
+bool DefaultICDClientStorage::ICDClientInfoIteratorImpl::Next(ICDClientInfo & item)
+{
+    for (; mStorageIndex < mManager.Size(); mStorageIndex++)
+    {
+        if (mClientInfoVector.size() == 0)
+        {
+            ICDStorage & storage = mManager.mStorages[mStorageIndex];
+            if (!storage.IsValid())
             {
-                ChipLogError(DataManagement, "Failed to load ICDClient Info at index %u fabric %u error %" CHIP_ERROR_FORMAT,
-                             static_cast<unsigned>(mClientInfoIndex), static_cast<unsigned>(storage.mFabricIndex), err.Format());
-                break;
+                continue;
+            }
+            if (mManager.Load(storage, mClientInfoVector) != CHIP_NO_ERROR)
+            {
+                continue;
             }
         }
+        if (mClientInfoIndex < mClientInfoVector.size())
+        {
+            item = mClientInfoVector[mClientInfoIndex];
+            mClientInfoIndex++;
+            return true;
+        }
         mClientInfoIndex = 0;
+        mClientInfoVector.clear();
     }
+
     return false;
 }
 
@@ -97,15 +98,7 @@ void DefaultICDClientStorage::ICDClientInfoIteratorImpl::Release()
     mManager.mICDClientInfoIterators.ReleaseObject(this);
 }
 
-CHIP_ERROR DefaultICDClientStorage::Init(ICDStorageKeyDelegate * apICDStorageKeyDelegate)
-{
-    VerifyOrReturnError(apICDStorageKeyDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mpICDStorageKeyDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mpICDStorageKeyDelegate = apICDStorageKeyDelegate;
-    return CHIP_NO_ERROR;
-}
-
-ICDStorage * DefaultICDClientStorage::FindStorage(FabricIndex aFabricIndex)
+ICDStorage * DefaultICDClientStorage::FindStorage(FabricIndex fabricIndex)
 {
     for (auto & storage : mStorages)
     {
@@ -114,7 +107,7 @@ ICDStorage * DefaultICDClientStorage::FindStorage(FabricIndex aFabricIndex)
             continue;
         }
 
-        if (storage.mFabricIndex == aFabricIndex)
+        if (storage.mFabricIndex == fabricIndex)
         {
             return &storage;
         }
@@ -127,205 +120,250 @@ DefaultICDClientStorage::ICDClientInfoIterator * DefaultICDClientStorage::Iterat
     return mICDClientInfoIterators.CreateObject(*this);
 }
 
-CHIP_ERROR DefaultICDClientStorage::Load(ICDStorage & aStorage, size_t aIndex, ICDClientInfo & aICDClientInfo)
+CHIP_ERROR DefaultICDClientStorage::Load(ICDStorage & storage, std::vector<ICDClientInfo> & clientInfoVector)
 {
-    VerifyOrReturnError(aStorage.IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(storage.IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
+    size_t counter      = 0;
+    uint16_t counterLen = static_cast<uint16_t>(sizeof(counter));
+    ReturnErrorOnFailure(storage.mpCounterStore->SyncGetKeyValue(
+        DefaultStorageKeyAllocator::FabricICDClientInfoCounter(storage.mFabricIndex).KeyName(), &counter, counterLen));
+
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    ReturnErrorCodeIf(!backingBuffer.Calloc(MaxICDClientInfoSize()), CHIP_ERROR_NO_MEMORY);
-    size_t len = MaxICDClientInfoSize();
+    size_t len = MaxICDClientInfoSize() * counter;
+    ReturnErrorCodeIf(!backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
     uint16_t length = static_cast<uint16_t>(len);
-    ReturnErrorOnFailure(aStorage.mpClientInfoStore->SyncGetKeyValue(mpICDStorageKeyDelegate->GetKey(aIndex).KeyName(),
-                                                                     backingBuffer.Get(), length));
+    ReturnErrorOnFailure(storage.mpClientInfoStore->SyncGetKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey().KeyName(),
+                                                                    backingBuffer.Get(), length));
 
-    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), MaxICDClientInfoSize());
+    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), len);
 
-    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(reader.EnterContainer(arrayType));
 
-    TLV::TLVType ICDClientInfoType;
-    NodeId nodeId;
-    FabricIndex fabricIndex;
-    ReturnErrorOnFailure(reader.EnterContainer(ICDClientInfoType));
-    // Peer Node ID
-    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(Tag::kPeerNodeId)));
-    ReturnErrorOnFailure(reader.Get(nodeId));
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag())) == CHIP_NO_ERROR)
+    {
+        ICDClientInfo clientInfo;
+        TLV::TLVType ICDClientInfoType;
+        NodeId nodeId;
+        FabricIndex fabricIndex;
+        ReturnErrorOnFailure(reader.EnterContainer(ICDClientInfoType));
+        // Peer Node ID
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(Tag::kPeerNodeId)));
+        ReturnErrorOnFailure(reader.Get(nodeId));
 
-    // Fabric Index
-    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(Tag::kFabricIndex)));
-    ReturnErrorOnFailure(reader.Get(fabricIndex));
-    aICDClientInfo.mPeerNode = ScopedNodeId(nodeId, fabricIndex);
-    // Start ICD Counter
-    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(Tag::kStartICDCounter)));
-    ReturnErrorOnFailure(reader.Get(aICDClientInfo.mStartICDCounter));
+        // Fabric Index
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(Tag::kFabricIndex)));
+        ReturnErrorOnFailure(reader.Get(fabricIndex));
+        clientInfo.mPeerNode = ScopedNodeId(nodeId, fabricIndex);
 
-    // Offset
-    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(Tag::kOffset)));
-    ReturnErrorOnFailure(reader.Get(aICDClientInfo.mOffset));
+        // Start ICD Counter
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(Tag::kStartICDCounter)));
+        ReturnErrorOnFailure(reader.Get(clientInfo.mStartICDCounter));
 
-    // MonitoredSubject
-    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(Tag::kMonitoredSubject)));
-    ReturnErrorOnFailure(reader.Get(aICDClientInfo.mMonitoredSubject));
+        // Offset
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(Tag::kOffset)));
+        ReturnErrorOnFailure(reader.Get(clientInfo.mOffset));
 
-    // Shared key
-    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(Tag::kSharedKey)));
-    ByteSpan buf(aICDClientInfo.mSharedKey.AsMutable<Crypto::Aes128KeyByteArray>());
-    ReturnErrorOnFailure(reader.Get(buf));
-    memcpy(aICDClientInfo.mSharedKey.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
-    return reader.ExitContainer(ICDClientInfoType);
+        // MonitoredSubject
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(Tag::kMonitoredSubject)));
+        ReturnErrorOnFailure(reader.Get(clientInfo.mMonitoredSubject));
+
+        // Shared key
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(Tag::kSharedKey)));
+        ByteSpan buf(clientInfo.mSharedKey.AsMutable<Crypto::Aes128KeyByteArray>());
+        ReturnErrorOnFailure(reader.Get(buf));
+        memcpy(clientInfo.mSharedKey.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
+        ReturnErrorOnFailure(reader.ExitContainer(ICDClientInfoType));
+        clientInfoVector.push_back(clientInfo);
+    }
+
+    if (err != CHIP_END_OF_TLV)
+    {
+        return err;
+    }
+    ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+    return reader.VerifyEndOfContainer();
 }
 
-CHIP_ERROR DefaultICDClientStorage::SetKey(ICDClientInfo & aClientInfo, const ByteSpan aKeyData)
+CHIP_ERROR DefaultICDClientStorage::SetKey(ICDClientInfo & clientInfo, const ByteSpan keyData)
 {
-    ICDStorage * storage = FindStorage(aClientInfo.mPeerNode.GetFabricIndex());
+    ICDStorage * storage = FindStorage(clientInfo.mPeerNode.GetFabricIndex());
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    VerifyOrReturnError(aKeyData.size() == sizeof(Crypto::Aes128KeyByteArray), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(keyData.size() == sizeof(Crypto::Aes128KeyByteArray), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(storage->mpKeyStore != nullptr, CHIP_ERROR_INTERNAL);
 
     Crypto::Aes128KeyByteArray keyMaterial;
-    memcpy(keyMaterial, aKeyData.data(), sizeof(Crypto::Aes128KeyByteArray));
+    memcpy(keyMaterial, keyData.data(), sizeof(Crypto::Aes128KeyByteArray));
 
-    return storage->mpKeyStore->CreateKey(keyMaterial, aClientInfo.mSharedKey);
+    return storage->mpKeyStore->CreateKey(keyMaterial, clientInfo.mSharedKey);
 }
 
-CHIP_ERROR DefaultICDClientStorage::Save(TLV::TLVWriter & aWriter, const ICDClientInfo & aICDClientInfo)
+CHIP_ERROR DefaultICDClientStorage::Save(TLV::TLVWriter & writer, const std::vector<ICDClientInfo> & clientInfoVector)
 {
-    TLV::TLVType ICDClientInfoContainerType;
-    ReturnErrorOnFailure(aWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, ICDClientInfoContainerType));
-    ReturnErrorOnFailure(aWriter.Put(TLV::ContextTag(Tag::kPeerNodeId), aICDClientInfo.mPeerNode.GetNodeId()));
-    ReturnErrorOnFailure(aWriter.Put(TLV::ContextTag(Tag::kFabricIndex), aICDClientInfo.mPeerNode.GetFabricIndex()));
-    ReturnErrorOnFailure(aWriter.Put(TLV::ContextTag(Tag::kStartICDCounter), aICDClientInfo.mStartICDCounter));
-    ReturnErrorOnFailure(aWriter.Put(TLV::ContextTag(Tag::kOffset), aICDClientInfo.mOffset));
-    ReturnErrorOnFailure(aWriter.Put(TLV::ContextTag(Tag::kMonitoredSubject), aICDClientInfo.mMonitoredSubject));
-    ByteSpan buf(aICDClientInfo.mSharedKey.As<Crypto::Aes128KeyByteArray>());
-    ReturnErrorOnFailure(aWriter.Put(TLV::ContextTag(Tag::kSharedKey), buf));
-    ReturnErrorOnFailure(aWriter.EndContainer(ICDClientInfoContainerType));
-    return CHIP_NO_ERROR;
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
+    for (auto & clientInfo : clientInfoVector)
+    {
+        TLV::TLVType ICDClientInfoContainerType;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, ICDClientInfoContainerType));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Tag::kPeerNodeId), clientInfo.mPeerNode.GetNodeId()));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Tag::kFabricIndex), clientInfo.mPeerNode.GetFabricIndex()));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Tag::kStartICDCounter), clientInfo.mStartICDCounter));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Tag::kOffset), clientInfo.mOffset));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Tag::kMonitoredSubject), clientInfo.mMonitoredSubject));
+        ByteSpan buf(clientInfo.mSharedKey.As<Crypto::Aes128KeyByteArray>());
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Tag::kSharedKey), buf));
+        ReturnErrorOnFailure(writer.EndContainer(ICDClientInfoContainerType));
+    }
+    return writer.EndContainer(arrayType);
 }
 
-CHIP_ERROR DefaultICDClientStorage::StoreICDInfoEntry(ICDClientInfo & aICDClientInfo)
+CHIP_ERROR DefaultICDClientStorage::StoreEntry(ICDClientInfo & clientInfo)
 {
-    ICDStorage * storage = FindStorage(aICDClientInfo.mPeerNode.GetFabricIndex());
+    ICDStorage * storage = FindStorage(clientInfo.mPeerNode.GetFabricIndex());
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_NOT_FOUND);
+    std::vector<ICDClientInfo> clientInfoVector;
+    ReturnErrorOnFailure(Load(*storage, clientInfoVector));
 
-    // Find empty index or duplicate if exists
-    size_t maxCount        = mpICDStorageKeyDelegate->MaxKeyCounter();
-    size_t firstEmptyIndex = maxCount;
-    for (size_t index = 0; index < maxCount; index++)
+    for (auto it = clientInfoVector.begin(); it != clientInfoVector.end(); it++)
     {
-        ICDClientInfo currentICDClientInfo;
-        CHIP_ERROR err = Load(*storage, index, currentICDClientInfo);
-
-        // if empty and firstEmptyIndex isn't set yet, then mark empty spot
-        if ((firstEmptyIndex == maxCount) && (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
+        if (clientInfo.mPeerNode.GetNodeId() == it->mPeerNode.GetNodeId())
         {
-            firstEmptyIndex = index;
-        }
-
-        // delete duplicate
-        if (err == CHIP_NO_ERROR)
-        {
-            if (aICDClientInfo.mPeerNode.GetNodeId() == currentICDClientInfo.mPeerNode.GetNodeId())
-            {
-                Delete(*storage, index, aICDClientInfo.mSharedKey);
-                // if duplicate is the first empty spot, then also set it
-                if (firstEmptyIndex == maxCount)
-                {
-                    firstEmptyIndex = index;
-                }
-            }
+            clientInfoVector.erase(it);
+            break;
         }
     }
 
-    // Fail if no empty space
-    if (firstEmptyIndex == maxCount)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    clientInfoVector.push_back(clientInfo);
 
-    // Now construct ICD ClientInfo and save
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    backingBuffer.Calloc(MaxICDClientInfoSize());
+    size_t total = MaxICDClientInfoSize() * clientInfoVector.size();
+    backingBuffer.Calloc(total);
     ReturnErrorCodeIf(backingBuffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+    TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), total);
 
-    TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), MaxICDClientInfoSize());
-
-    ReturnErrorOnFailure(Save(writer, aICDClientInfo));
+    ReturnErrorOnFailure(Save(writer, clientInfoVector));
 
     const auto len = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     writer.Finalize(backingBuffer);
-    ReturnErrorOnFailure(storage->mpClientInfoStore->SyncSetKeyValue(mpICDStorageKeyDelegate->GetKey(firstEmptyIndex).KeyName(),
+    ReturnErrorOnFailure(storage->mpClientInfoStore->SyncSetKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey().KeyName(),
                                                                      backingBuffer.Get(), static_cast<uint16_t>(len)));
-    return CHIP_NO_ERROR;
+
+    return UpdateCounter(*storage, true /*increase*/);
 }
 
-CHIP_ERROR DefaultICDClientStorage::Delete(ICDStorage & aStorage, size_t aIndex, Crypto::Aes128KeyHandle & aSharedKey)
+CHIP_ERROR DefaultICDClientStorage::UpdateCounter(ICDStorage & storage, bool increase)
 {
-    VerifyOrReturnError(aStorage.mpClientInfoStore != nullptr, CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(aStorage.mpClientInfoStore->SyncDeleteKeyValue(mpICDStorageKeyDelegate->GetKey(aIndex).KeyName()));
-    return DeleteKey(aStorage.mpKeyStore, aSharedKey);
-}
-
-CHIP_ERROR DefaultICDClientStorage::DeleteKey(Crypto::SymmetricKeystore * apKeyStore, Crypto::Aes128KeyHandle & aSharedKey)
-{
-    VerifyOrReturnError(apKeyStore != nullptr, CHIP_ERROR_INTERNAL);
-    apKeyStore->DestroyKey(aSharedKey);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DefaultICDClientStorage::DeleteEntry(ScopedNodeId aPeerNode)
-{
-    ICDStorage * storage = FindStorage(aPeerNode.GetFabricIndex());
-    VerifyOrReturnError(storage != nullptr, CHIP_ERROR_NOT_FOUND);
-    size_t maxCount = mpICDStorageKeyDelegate->MaxKeyCounter();
-    for (size_t index = 0; index < maxCount; index++)
+    VerifyOrReturnError(storage.mpCounterStore != nullptr, CHIP_ERROR_INTERNAL);
+    size_t counter      = 0;
+    uint16_t counterLen = static_cast<uint16_t>(sizeof(counter));
+    ReturnErrorOnFailure(storage.mpCounterStore->SyncGetKeyValue(
+        DefaultStorageKeyAllocator::FabricICDClientInfoCounter(storage.mFabricIndex).KeyName(), &counter, counterLen));
+    if (increase)
     {
-        ICDClientInfo currentICDClientInfo;
-        CHIP_ERROR err = Load(*storage, index, currentICDClientInfo);
-        if (err == CHIP_NO_ERROR)
+        counter++;
+    }
+    else
+    {
+        counter--;
+    }
+    ReturnErrorOnFailure(storage.mpClientInfoStore->SyncDeleteKeyValue(
+        DefaultStorageKeyAllocator::FabricICDClientInfoCounter(storage.mFabricIndex).KeyName()));
+    return storage.mpCounterStore->SyncSetKeyValue(
+        DefaultStorageKeyAllocator::FabricICDClientInfoCounter(storage.mFabricIndex).KeyName(), &counter, counterLen);
+}
+
+CHIP_ERROR DefaultICDClientStorage::DeleteCounter(ICDStorage & storage)
+{
+    VerifyOrReturnError(storage.mpCounterStore != nullptr, CHIP_ERROR_INTERNAL);
+    return storage.mpCounterStore->SyncDeleteKeyValue(
+        DefaultStorageKeyAllocator::FabricICDClientInfoCounter(storage.mFabricIndex).KeyName());
+}
+
+CHIP_ERROR DefaultICDClientStorage::DeleteClientInfo(ICDStorage & storage)
+{
+    VerifyOrReturnError(storage.mpClientInfoStore != nullptr, CHIP_ERROR_INTERNAL);
+    return storage.mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey().KeyName());
+}
+
+CHIP_ERROR DefaultICDClientStorage::DeleteKey(ICDStorage & storage, Crypto::Aes128KeyHandle & sharedKey)
+{
+    VerifyOrReturnError(storage.mpKeyStore != nullptr, CHIP_ERROR_INTERNAL);
+    storage.mpKeyStore->DestroyKey(sharedKey);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
+{
+    ICDStorage * storage = FindStorage(peerNode.GetFabricIndex());
+    VerifyOrReturnError(storage != nullptr, CHIP_ERROR_NOT_FOUND);
+    std::vector<ICDClientInfo> clientInfoVector;
+    ReturnErrorOnFailure(Load(*storage, clientInfoVector));
+
+    for (auto it = clientInfoVector.begin(); it != clientInfoVector.end(); it++)
+    {
+        if (peerNode.GetNodeId() == it->mPeerNode.GetNodeId())
         {
-            if (aPeerNode.GetNodeId() == currentICDClientInfo.mPeerNode.GetNodeId())
-            {
-                Delete(*storage, index, currentICDClientInfo.mSharedKey);
-                break;
-            }
+            DeleteKey(*storage, it->mSharedKey);
+            it = clientInfoVector.erase(it);
+            break;
         }
     }
-    return CHIP_NO_ERROR;
+
+    ReturnErrorOnFailure(DeleteClientInfo(*storage));
+
+    Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
+    size_t total = MaxICDClientInfoSize() * clientInfoVector.size();
+    backingBuffer.Calloc(total);
+    ReturnErrorCodeIf(backingBuffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+    TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), total);
+
+    ReturnErrorOnFailure(Save(writer, clientInfoVector));
+
+    const auto len = writer.GetLengthWritten();
+    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    writer.Finalize(backingBuffer);
+    ReturnErrorOnFailure(storage->mpClientInfoStore->SyncSetKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey().KeyName(),
+                                                                     backingBuffer.Get(), static_cast<uint16_t>(len)));
+
+    return UpdateCounter(*storage, false /*increase*/);
 }
 
-CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex aFabricIndex)
+CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
 {
-    ICDStorage * storage = FindStorage(aFabricIndex);
+    ICDStorage * storage = FindStorage(fabricIndex);
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_NOT_FOUND);
-    size_t maxCount = mpICDStorageKeyDelegate->MaxKeyCounter();
-    for (size_t index = 0; index < maxCount; index++)
+    std::vector<ICDClientInfo> clientInfoVector;
+    ReturnErrorOnFailure(Load(*storage, clientInfoVector));
+
+    for (auto it = clientInfoVector.begin(); it != clientInfoVector.end(); it++)
     {
-        ICDClientInfo currentICDClientInfo;
-        CHIP_ERROR err = Load(*storage, index, currentICDClientInfo);
-        if (err == CHIP_NO_ERROR)
-        {
-            Delete(*storage, index, currentICDClientInfo.mSharedKey);
-        }
+        DeleteKey(*storage, it->mSharedKey);
     }
+    ReturnErrorOnFailure(DeleteClientInfo(*storage));
+    return DeleteCounter(*storage);
+}
+
+CHIP_ERROR DefaultICDClientStorage::AddStorage(ICDStorage && storage)
+{
+    VerifyOrReturnError(storage.IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
+    mStorages.push_back(std::move(storage));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultICDClientStorage::AddStorage(ICDStorage && aStorage)
+void DefaultICDClientStorage::RemoveStorage(FabricIndex fabricIndex)
 {
-    VerifyOrReturnError(aStorage.IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
-    mStorages.push_back(std::move(aStorage));
-    return CHIP_NO_ERROR;
-}
-
-void DefaultICDClientStorage::RemoveStorage(FabricIndex aFabricIndex)
-{
-    DeleteAllEntries(aFabricIndex);
+    DeleteAllEntries(fabricIndex);
     for (auto storageIterator = mStorages.begin(); storageIterator != mStorages.end(); storageIterator++)
     {
-        if (storageIterator->mFabricIndex == aFabricIndex)
+        if (storageIterator->mFabricIndex == fabricIndex)
         {
             mStorages.erase(storageIterator);
             break;
@@ -333,7 +371,7 @@ void DefaultICDClientStorage::RemoveStorage(FabricIndex aFabricIndex)
     }
 }
 
-bool DefaultICDClientStorage::ValidateCheckInPayload(const ByteSpan & aPayload, ICDClientInfo & aClientInfo)
+bool DefaultICDClientStorage::ValidateCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo)
 {
     // TODO: Need to implement default decription code using CheckinMessage::ParseCheckinMessagePayload
     return false;

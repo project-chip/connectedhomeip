@@ -44,17 +44,13 @@ public:
      */
     static DefaultICDClientStorage * GetInstance(void);
 
-    CHIP_ERROR Init(ICDStorageKeyDelegate * apICDStorageKeyDelegate);
-
     ICDClientInfoIterator * IterateICDClientInfo() override;
 
-    CHIP_ERROR SetKey(ICDClientInfo & aClientInfo, const ByteSpan aKeyData) override;
+    CHIP_ERROR SetKey(ICDClientInfo & clientInfo, const ByteSpan keyData) override;
 
-    CHIP_ERROR StoreICDInfoEntry(ICDClientInfo & aICDClientInfo) override;
+    CHIP_ERROR StoreEntry(ICDClientInfo & clientInfo) override;
 
-    CHIP_ERROR DeleteEntry(ScopedNodeId aPeerNodeId) override;
-
-    CHIP_ERROR DeleteAllEntries(FabricIndex aFabricIndex) override;
+    CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNodeId) override;
 
     /**
      * Add the storage instance in the persistent storage manager
@@ -62,7 +58,7 @@ public:
      *
      * @param[in] aStorage the storage instance to be added
      */
-    CHIP_ERROR AddStorage(ICDStorage && aStorage);
+    CHIP_ERROR AddStorage(ICDStorage && storage);
 
     /**
      * Removes the storage instance associated with the specified fabric index from
@@ -73,7 +69,9 @@ public:
      */
     void RemoveStorage(FabricIndex aFabricIndex);
 
-    bool ValidateCheckInPayload(const ByteSpan & aPayload, ICDClientInfo & aClientInfo) override;
+    CHIP_ERROR DeleteAllEntries(FabricIndex aFabricIndex) override;
+
+    bool ValidateCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) override;
 
     size_t Size();
 
@@ -88,41 +86,41 @@ protected:
         kSharedKey        = 6
     };
 
-    CHIP_ERROR Save(TLV::TLVWriter & aWriter, const ICDClientInfo & aICDClientInfo);
+    CHIP_ERROR Save(TLV::TLVWriter & writer, const std::vector<ICDClientInfo> & clientInfoVector);
 
     class ICDClientInfoIteratorImpl : public ICDClientInfoIterator
     {
     public:
-        ICDClientInfoIteratorImpl(DefaultICDClientStorage & aManager);
+        ICDClientInfoIteratorImpl(DefaultICDClientStorage & manager);
         size_t Count() override;
-        bool Next(ICDClientInfo & aOutput) override;
+        bool Next(ICDClientInfo & info) override;
         void Release() override;
 
     private:
         DefaultICDClientStorage & mManager;
         size_t mStorageIndex    = 0;
         size_t mClientInfoIndex = 0;
+        std::vector<ICDClientInfo> mClientInfoVector;
     };
 
     static constexpr size_t MaxICDClientInfoSize()
     {
         // All the fields added together
-        return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(uint32_t), sizeof(uint32_t), sizeof(uint64_t),
-                                           sizeof(Crypto::Aes128KeyByteArray));
+        return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t), sizeof(uint32_t),
+                                           sizeof(uint64_t), sizeof(Crypto::Aes128KeyByteArray));
     }
 
 private:
     friend class ICDClientInfoIteratorImpl;
-    CHIP_ERROR Delete(ICDStorage & aStorage, size_t aIndex, Crypto::Aes128KeyHandle & aSharedKey);
-    CHIP_ERROR DeleteKey(Crypto::SymmetricKeystore * apKeyStore, Crypto::Aes128KeyHandle & aSharedKey);
-    CHIP_ERROR Load(ICDStorage & aStorage, size_t aIndex, ICDClientInfo & aICDClientInfo);
-    CHIP_ERROR SetClientInfoKeyHandle(Crypto::SymmetricKeystore * apKeyStore, ICDClientInfo & aClientInfo,
-                                      const ByteSpan & aKeyData);
-    ICDStorage * FindStorage(FabricIndex aFabricIndex);
+    CHIP_ERROR UpdateCounter(ICDStorage & storage, bool increase);
+    CHIP_ERROR DeleteCounter(ICDStorage & storage);
+    CHIP_ERROR DeleteClientInfo(ICDStorage & storage);
+    CHIP_ERROR DeleteKey(ICDStorage & storage, Crypto::Aes128KeyHandle & sharedKey);
+    CHIP_ERROR Load(ICDStorage & storage, std::vector<ICDClientInfo> & clientInfoVector);
+    ICDStorage * FindStorage(FabricIndex fabricIndex);
 
     ObjectPool<ICDClientInfoIteratorImpl, kIteratorsMax> mICDClientInfoIterators;
     std::vector<ICDStorage> mStorages;
-    ICDStorageKeyDelegate * mpICDStorageKeyDelegate = nullptr;
 };
 } // namespace app
 } // namespace chip

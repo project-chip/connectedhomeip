@@ -27,13 +27,36 @@
 namespace chip {
 namespace app {
 
-struct ICDClientInfo
+class ICDClientInfo
 {
+public:
     ScopedNodeId mPeerNode;
     uint32_t mStartICDCounter          = 0;
     uint32_t mOffset                   = 0;
     uint64_t mMonitoredSubject         = static_cast<uint64_t>(0);
     Crypto::Aes128KeyHandle mSharedKey = Crypto::Aes128KeyHandle();
+
+    ICDClientInfo() {}
+    ICDClientInfo(const ICDClientInfo & other)
+    {
+        mPeerNode         = other.mPeerNode;
+        mStartICDCounter  = other.mStartICDCounter;
+        mOffset           = other.mOffset;
+        mMonitoredSubject = other.mMonitoredSubject;
+        ByteSpan buf(other.mSharedKey.As<Crypto::Aes128KeyByteArray>());
+        memcpy(mSharedKey.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
+    }
+
+    ICDClientInfo & operator=(const ICDClientInfo & other)
+    {
+        mPeerNode         = other.mPeerNode;
+        mStartICDCounter  = other.mStartICDCounter;
+        mOffset           = other.mOffset;
+        mMonitoredSubject = other.mMonitoredSubject;
+        ByteSpan buf(other.mSharedKey.As<Crypto::Aes128KeyByteArray>());
+        memcpy(mSharedKey.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
+        return *this;
+    }
 };
 
 } // namespace app

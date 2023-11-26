@@ -19,15 +19,14 @@
 #include <nlunit-test.h>
 
 #include <app/icd/client/DefaultICDClientStorage.h>
-#include <app/icd/client/DefaultICDStorageKey.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
 using namespace chip;
-using namespace chip::app;
-using namespace chip::System;
-using TestSessionKeystoreImpl = chip::Crypto::DefaultSessionKeystore;
+using namespace app;
+using namespace System;
+using TestSessionKeystoreImpl = Crypto::DefaultSessionKeystore;
 
 constexpr uint8_t kKeyBuffer1[] = {
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
@@ -43,7 +42,10 @@ constexpr uint8_t kKeyBuffer3[] = {
 class DefaultICDClientStorageTest : public DefaultICDClientStorage
 {
 public:
-    CHIP_ERROR TestSave(chip::TLV::TLVWriter & aWriter, ICDClientInfo & aClientInfo) { return Save(aWriter, aClientInfo); }
+    CHIP_ERROR TestSave(TLV::TLVWriter & aWriter, const std::vector<ICDClientInfo> & clientInfoVector)
+    {
+        return Save(aWriter, clientInfoVector);
+    }
 
     static constexpr size_t TestMaxClientInfoSize() { return MaxICDClientInfoSize(); }
 };
@@ -66,32 +68,33 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
     FabricIndex fabricId = 1;
     NodeId nodeId1       = 6666;
     NodeId nodeId2       = 6667;
-    chip::TestPersistentStorageDelegate clientInfoStorage;
+    TestPersistentStorageDelegate clientInfoStorage;
+    TestPersistentStorageDelegate countStorage;
     TestSessionKeystoreImpl keystore;
-    ICDStorage testStorage(fabricId, &clientInfoStorage, &keystore);
-    DefaultICDStorageKey keyDelegate;
-    keyDelegate.Init(256);
+    ICDStorage testStorage(fabricId, &clientInfoStorage, &keystore, &countStorage);
     DefaultICDClientStorageTest manager;
-    manager.Init(&keyDelegate);
     err = manager.AddStorage(std::move(testStorage));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     // Write some ClientInfos and see the counts are correct
-    ICDClientInfo clientInfo1 = { .mPeerNode = ScopedNodeId(nodeId1, fabricId) };
-    ICDClientInfo clientInfo2 = { .mPeerNode = ScopedNodeId(nodeId2, fabricId) };
-    ICDClientInfo clientInfo3 = { .mPeerNode = ScopedNodeId(nodeId1, fabricId) };
-    err                       = manager.SetKey(clientInfo1, chip::ByteSpan(kKeyBuffer1));
+    ICDClientInfo clientInfo1;
+    clientInfo1.mPeerNode = ScopedNodeId(nodeId1, fabricId);
+    ICDClientInfo clientInfo2;
+    clientInfo2.mPeerNode = ScopedNodeId(nodeId2, fabricId);
+    ICDClientInfo clientInfo3;
+    clientInfo3.mPeerNode = ScopedNodeId(nodeId1, fabricId);
+    err                   = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = manager.StoreICDInfoEntry(clientInfo1);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = manager.SetKey(clientInfo2, chip::ByteSpan(kKeyBuffer2));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = manager.StoreICDInfoEntry(clientInfo2);
+    err = manager.StoreEntry(clientInfo1);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = manager.SetKey(clientInfo3, chip::ByteSpan(kKeyBuffer3));
+    err = manager.SetKey(clientInfo2, ByteSpan(kKeyBuffer2));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = manager.StoreICDInfoEntry(clientInfo3);
+    err = manager.StoreEntry(clientInfo2);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = manager.SetKey(clientInfo3, ByteSpan(kKeyBuffer3));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = manager.StoreEntry(clientInfo3);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     // Make sure iterator counts correctly
@@ -124,7 +127,7 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
 
     manager.RemoveStorage(fabricId);
 
-    err = manager.SetKey(clientInfo1, chip::ByteSpan(kKeyBuffer1));
+    err = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_FOUND);
 }
 
@@ -136,38 +139,40 @@ void TestClientInfoCountMultipleFabric(nlTestSuite * apSuite, void * apContext)
     NodeId nodeId1        = 6666;
     NodeId nodeId2        = 6667;
     NodeId nodeId3        = 6668;
-    chip::TestPersistentStorageDelegate clientInfoStorage1;
+    TestPersistentStorageDelegate clientInfoStorage1;
     TestSessionKeystoreImpl keystore1;
-    ICDStorage testStorage1(fabricId1, &clientInfoStorage1, &keystore1);
-    chip::TestPersistentStorageDelegate clientInfoStorage2;
+    TestPersistentStorageDelegate countStorage;
+    ICDStorage testStorage1(fabricId1, &clientInfoStorage1, &keystore1, &countStorage);
+    TestPersistentStorageDelegate clientInfoStorage2;
     TestSessionKeystoreImpl keystore2;
-    ICDStorage testStorage2(fabricId2, &clientInfoStorage2, &keystore2);
+    ICDStorage testStorage2(fabricId2, &clientInfoStorage2, &keystore2, &countStorage);
 
-    DefaultICDStorageKey keyDelegate;
-    keyDelegate.Init(256);
     DefaultICDClientStorageTest manager;
-    manager.Init(&keyDelegate);
+
     err = manager.AddStorage(std::move(testStorage1));
     err = manager.AddStorage(std::move(testStorage2));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     // Write some ClientInfos and see the counts are correct
-    ICDClientInfo clientInfo1 = { .mPeerNode = ScopedNodeId(nodeId1, fabricId1) };
-    ICDClientInfo clientInfo2 = { .mPeerNode = ScopedNodeId(nodeId2, fabricId1) };
-    ICDClientInfo clientInfo3 = { .mPeerNode = ScopedNodeId(nodeId3, fabricId2) };
+    ICDClientInfo clientInfo1;
+    clientInfo1.mPeerNode = ScopedNodeId(nodeId1, fabricId1);
+    ICDClientInfo clientInfo2;
+    clientInfo2.mPeerNode = ScopedNodeId(nodeId2, fabricId1);
+    ICDClientInfo clientInfo3;
+    clientInfo3.mPeerNode = ScopedNodeId(nodeId3, fabricId2);
 
-    err = manager.SetKey(clientInfo1, chip::ByteSpan(kKeyBuffer1));
+    err = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = manager.StoreICDInfoEntry(clientInfo1);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = manager.SetKey(clientInfo2, chip::ByteSpan(kKeyBuffer2));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = manager.StoreICDInfoEntry(clientInfo2);
+    err = manager.StoreEntry(clientInfo1);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = manager.SetKey(clientInfo3, chip::ByteSpan(kKeyBuffer3));
+    err = manager.SetKey(clientInfo2, ByteSpan(kKeyBuffer2));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = manager.StoreICDInfoEntry(clientInfo3);
+    err = manager.StoreEntry(clientInfo2);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = manager.SetKey(clientInfo3, ByteSpan(kKeyBuffer3));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = manager.StoreEntry(clientInfo3);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     // Make sure iterator counts correctly
     auto * iterator = manager.IterateICDClientInfo();
@@ -201,9 +206,9 @@ void TestClientInfoCountMultipleFabric(nlTestSuite * apSuite, void * apContext)
     manager.RemoveStorage(fabricId1);
     manager.RemoveStorage(fabricId2);
 
-    err = manager.SetKey(clientInfo1, chip::ByteSpan(kKeyBuffer1));
+    err = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_FOUND);
-    err = manager.SetKey(clientInfo3, chip::ByteSpan(kKeyBuffer2));
+    err = manager.SetKey(clientInfo3, ByteSpan(kKeyBuffer2));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_FOUND);
 }
 
@@ -212,7 +217,7 @@ void TestClientInfoCountMultipleFabric(nlTestSuite * apSuite, void * apContext)
  */
 int TestClientInfo_Setup(void * apContext)
 {
-    VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
+    VerifyOrReturnError(CHIP_NO_ERROR == Platform::MemoryInit(), FAILURE);
 
     return SUCCESS;
 }
@@ -222,7 +227,7 @@ int TestClientInfo_Setup(void * apContext)
  */
 int TestClientInfo_Teardown(void * apContext)
 {
-    chip::Platform::MemoryShutdown();
+    Platform::MemoryShutdown();
     return SUCCESS;
 }
 

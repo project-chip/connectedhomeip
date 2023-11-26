@@ -1702,5 +1702,23 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_ICD_CLIENT_INFO_KEY_CONST
+ *
+ * @brief Defines ICD Client Info Key const
+ */
+#ifndef CHIP_CONFIG_ICD_CLIENT_INFO_KEY_CONST
+#define CHIP_CONFIG_ICD_CLIENT_INFO_KEY_CONST "g/icd/key"
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_CLIENT_INFO_COUNT_FORMATER
+ *
+ * @brief Defines ICD Client Info count formater
+ */
+#ifndef CHIP_CONFIG_ICD_CLIENT_INFO_COUNT_FORMATER
+#define CHIP_CONFIG_ICD_CLIENT_INFO_COUNT_FORMATER "f/%x/icdcount"
+#endif
+
+/**
  * @}
  */

@@ -174,6 +174,13 @@ public:
     static StorageKeyName TSDefaultNTP() { return StorageKeyName::FromConst("g/ts/dntp"); }
     static StorageKeyName TSTimeZone() { return StorageKeyName::FromConst("g/ts/tz"); }
     static StorageKeyName TSDSTOffset() { return StorageKeyName::FromConst("g/ts/dsto"); }
+
+    static StorageKeyName FabricICDClientInfoCounter(FabricIndex fabric)
+    {
+        return StorageKeyName::Formatted(CHIP_CONFIG_ICD_CLIENT_INFO_COUNT_FORMATER, fabric);
+    }
+
+    static StorageKeyName ICDClientInfoKey() { return StorageKeyName::FromConst(CHIP_CONFIG_ICD_CLIENT_INFO_KEY_CONST); }
 };
 
 } // namespace chip

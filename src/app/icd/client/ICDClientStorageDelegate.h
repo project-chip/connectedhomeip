@@ -18,7 +18,6 @@
 #pragma once
 
 #include "ICDClientInfo.h"
-#include "ICDStorageKeyDelegate.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -26,7 +25,6 @@
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/CommonIterator.h>
-#include <lib/support/StorageKeyName.h>
 #include <stddef.h>
 
 namespace chip {
@@ -65,13 +63,14 @@ public:
      *
      * @param[in] aICDClientInfo the updated ICD Client Info.
      */
-    virtual CHIP_ERROR StoreICDInfoEntry(ICDClientInfo & aICDClientInfo) = 0;
+    virtual CHIP_ERROR StoreEntry(ICDClientInfo & aICDClientInfo) = 0;
+
     /**
      * Delete ICD Client persistent information associated with the specified scoped node Id.
      * when ICD device is unpaired/removed, the corresponding entry in ICD storage is removed.
      * @param aPeerNodeId scoped node with peer node id and fabric index
      */
-    virtual CHIP_ERROR DeleteEntry(ScopedNodeId aPeerNodeId) = 0;
+    virtual CHIP_ERROR DeleteEntry(const ScopedNodeId & aPeerNodeId) = 0;
 
     /**
      * Remove all ICDClient persistent informations associated with the specified

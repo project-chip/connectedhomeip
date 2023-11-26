@@ -25,7 +25,7 @@
 #include <lib/support/CodeUtils.h>
 #include <stddef.h>
 
-// TODO: SymmetricKeystore is not in sdk code, replace the below when sdk supports SymmetricKeystore
+// TODO: SymmetricKeystore is an alias for SessionKeystore, replace the below when sdk supports SymmetricKeystore
 namespace chip {
 namespace Crypto {
 using SymmetricKeystore = SessionKeystore;
@@ -36,32 +36,40 @@ namespace chip {
 namespace app {
 
 /**
- * Struct per identity representing persistent storage for ICD client information and key store
+ * Per-identity Struct representing persistent storages for ICD client information and key store.
+ * CounterStore holds all per-identify ICDClientInfo counters.
  */
 struct ICDStorage
 {
-public:
     FabricIndex mFabricIndex                      = kUndefinedFabricIndex;
     PersistentStorageDelegate * mpClientInfoStore = nullptr;
     Crypto::SymmetricKeystore * mpKeyStore        = nullptr;
-    ICDStorage(FabricIndex aFabricIndex, PersistentStorageDelegate * apClientInfoStore, Crypto::SymmetricKeystore * apKeyStore)
+    PersistentStorageDelegate * mpCounterStore    = nullptr;
+    ICDStorage(FabricIndex fabricIndex, PersistentStorageDelegate * clientInfoStore, Crypto::SymmetricKeystore * keyStore,
+               PersistentStorageDelegate * counterStore)
     {
-        mFabricIndex      = aFabricIndex;
-        mpClientInfoStore = apClientInfoStore;
-        mpKeyStore        = apKeyStore;
+        mFabricIndex      = fabricIndex;
+        mpClientInfoStore = clientInfoStore;
+        mpKeyStore        = keyStore;
+        mpCounterStore    = counterStore;
     }
     ~ICDStorage() = default;
-    ICDStorage(ICDStorage && aOther)
+    ICDStorage(ICDStorage && other)
     {
-        mFabricIndex             = aOther.mFabricIndex;
-        mpClientInfoStore        = aOther.mpClientInfoStore;
-        mpKeyStore               = aOther.mpKeyStore;
-        aOther.mpClientInfoStore = nullptr;
-        aOther.mpKeyStore        = nullptr;
-        aOther.mFabricIndex      = kUndefinedFabricIndex;
+        mFabricIndex            = other.mFabricIndex;
+        mpClientInfoStore       = other.mpClientInfoStore;
+        mpKeyStore              = other.mpKeyStore;
+        mpCounterStore          = other.mpCounterStore;
+        other.mpClientInfoStore = nullptr;
+        other.mpKeyStore        = nullptr;
+        other.mFabricIndex      = kUndefinedFabricIndex;
     }
-    ICDStorage & operator=(const ICDStorage & aOther) = default;
-    bool IsValid() { return (mFabricIndex != kUndefinedFabricIndex) && (mpClientInfoStore != nullptr) && (mpKeyStore != nullptr); }
+    ICDStorage & operator=(const ICDStorage & other) = default;
+    bool IsValid()
+    {
+        return (mFabricIndex != kUndefinedFabricIndex) && (mpClientInfoStore != nullptr) && (mpKeyStore != nullptr) &&
+            (mpCounterStore != nullptr);
+    }
 };
 
 } // namespace app
