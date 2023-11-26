@@ -494,6 +494,22 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback
+    : public Callback::Callback<CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallbackType>
+{
+public:
+    CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback(jobject javaCallback);
+
+    ~CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback();
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPLaundryWasherModeClusterChangeToModeResponseCallback
     : public Callback::Callback<CHIPLaundryWasherModeClusterChangeToModeResponseCallbackType>
 {

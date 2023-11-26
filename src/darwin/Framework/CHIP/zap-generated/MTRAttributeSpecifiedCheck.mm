@@ -1952,6 +1952,51 @@ static BOOL AttributeIsSpecifiedInTimerCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInOvenCavityOperationalStateCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::OvenCavityOperationalState;
+    switch (aAttributeId) {
+    case Attributes::PhaseList::Id: {
+        return YES;
+    }
+    case Attributes::CurrentPhase::Id: {
+        return YES;
+    }
+    case Attributes::CountdownTime::Id: {
+        return YES;
+    }
+    case Attributes::OperationalStateList::Id: {
+        return YES;
+    }
+    case Attributes::OperationalState::Id: {
+        return YES;
+    }
+    case Attributes::OperationalError::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInModeSelectCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ModeSelect;
@@ -5726,6 +5771,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::Timer::Id: {
         return AttributeIsSpecifiedInTimerCluster(aAttributeId);
+    }
+    case Clusters::OvenCavityOperationalState::Id: {
+        return AttributeIsSpecifiedInOvenCavityOperationalStateCluster(aAttributeId);
     }
     case Clusters::ModeSelect::Id: {
         return AttributeIsSpecifiedInModeSelectCluster(aAttributeId);

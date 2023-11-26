@@ -6689,6 +6689,217 @@ public class ClusterInfoMapping {
     }
   }
 
+
+  public static class DelegatedOvenCavityOperationalStateClusterOperationalCommandResponseCallback implements ChipClusters.OvenCavityOperationalStateCluster.OperationalCommandResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct commandResponseState) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      // commandResponseState: Struct ErrorStateStruct
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedOvenCavityOperationalStateClusterPhaseListAttributeCallback implements ChipClusters.OvenCavityOperationalStateCluster.PhaseListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<String> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<String>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedOvenCavityOperationalStateClusterCurrentPhaseAttributeCallback implements ChipClusters.OvenCavityOperationalStateCluster.CurrentPhaseAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedOvenCavityOperationalStateClusterCountdownTimeAttributeCallback implements ChipClusters.OvenCavityOperationalStateCluster.CountdownTimeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedOvenCavityOperationalStateClusterOperationalStateListAttributeCallback implements ChipClusters.OvenCavityOperationalStateCluster.OperationalStateListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.OvenCavityOperationalStateClusterOperationalStateStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.OvenCavityOperationalStateClusterOperationalStateStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedOvenCavityOperationalStateClusterOperationalErrorAttributeCallback implements ChipClusters.OvenCavityOperationalStateCluster.OperationalErrorAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedOvenCavityOperationalStateClusterGeneratedCommandListAttributeCallback implements ChipClusters.OvenCavityOperationalStateCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedOvenCavityOperationalStateClusterAcceptedCommandListAttributeCallback implements ChipClusters.OvenCavityOperationalStateCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedOvenCavityOperationalStateClusterEventListAttributeCallback implements ChipClusters.OvenCavityOperationalStateCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedOvenCavityOperationalStateClusterAttributeListAttributeCallback implements ChipClusters.OvenCavityOperationalStateCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedModeSelectClusterStandardNamespaceAttributeCallback implements ChipClusters.ModeSelectCluster.StandardNamespaceAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -17322,6 +17533,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.TimerCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("timer", timerClusterInfo);
 
+    ClusterInfo ovenCavityOperationalStateClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.OvenCavityOperationalStateCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("ovenCavityOperationalState", ovenCavityOperationalStateClusterInfo);
+
     ClusterInfo modeSelectClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ModeSelectCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("modeSelect", modeSelectClusterInfo);
@@ -17604,6 +17819,7 @@ public class ClusterInfoMapping {
     destination.get("booleanState").combineCommands(source.get("booleanState"));
     destination.get("icdManagement").combineCommands(source.get("icdManagement"));
     destination.get("timer").combineCommands(source.get("timer"));
+    destination.get("ovenCavityOperationalState").combineCommands(source.get("ovenCavityOperationalState"));
     destination.get("modeSelect").combineCommands(source.get("modeSelect"));
     destination.get("laundryWasherMode").combineCommands(source.get("laundryWasherMode"));
     destination.get("refrigeratorAndTemperatureControlledCabinetMode").combineCommands(source.get("refrigeratorAndTemperatureControlledCabinetMode"));
@@ -19978,6 +20194,58 @@ public class ClusterInfoMapping {
     timerClusterInteractionInfoMap.put("reduceTime", timerreduceTimeInteractionInfo);
 
     commandMap.put("timer", timerClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> ovenCavityOperationalStateClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> ovenCavityOperationalStatepauseCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo ovenCavityOperationalStatepauseInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.OvenCavityOperationalStateCluster) cluster)
+          .pause((ChipClusters.OvenCavityOperationalStateCluster.OperationalCommandResponseCallback) callback
+            );
+        },
+        () -> new DelegatedOvenCavityOperationalStateClusterOperationalCommandResponseCallback(),
+        ovenCavityOperationalStatepauseCommandParams
+      );
+    ovenCavityOperationalStateClusterInteractionInfoMap.put("pause", ovenCavityOperationalStatepauseInteractionInfo);
+
+    Map<String, CommandParameterInfo> ovenCavityOperationalStatestopCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo ovenCavityOperationalStatestopInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.OvenCavityOperationalStateCluster) cluster)
+          .stop((ChipClusters.OvenCavityOperationalStateCluster.OperationalCommandResponseCallback) callback
+            );
+        },
+        () -> new DelegatedOvenCavityOperationalStateClusterOperationalCommandResponseCallback(),
+        ovenCavityOperationalStatestopCommandParams
+      );
+    ovenCavityOperationalStateClusterInteractionInfoMap.put("stop", ovenCavityOperationalStatestopInteractionInfo);
+
+    Map<String, CommandParameterInfo> ovenCavityOperationalStatestartCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo ovenCavityOperationalStatestartInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.OvenCavityOperationalStateCluster) cluster)
+          .start((ChipClusters.OvenCavityOperationalStateCluster.OperationalCommandResponseCallback) callback
+            );
+        },
+        () -> new DelegatedOvenCavityOperationalStateClusterOperationalCommandResponseCallback(),
+        ovenCavityOperationalStatestartCommandParams
+      );
+    ovenCavityOperationalStateClusterInteractionInfoMap.put("start", ovenCavityOperationalStatestartInteractionInfo);
+
+    Map<String, CommandParameterInfo> ovenCavityOperationalStateresumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo ovenCavityOperationalStateresumeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.OvenCavityOperationalStateCluster) cluster)
+          .resume((ChipClusters.OvenCavityOperationalStateCluster.OperationalCommandResponseCallback) callback
+            );
+        },
+        () -> new DelegatedOvenCavityOperationalStateClusterOperationalCommandResponseCallback(),
+        ovenCavityOperationalStateresumeCommandParams
+      );
+    ovenCavityOperationalStateClusterInteractionInfoMap.put("resume", ovenCavityOperationalStateresumeInteractionInfo);
+
+    commandMap.put("ovenCavityOperationalState", ovenCavityOperationalStateClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> modeSelectClusterInteractionInfoMap = new LinkedHashMap<>();
 
