@@ -39,7 +39,6 @@ enum class TagScene : uint8_t
     kSceneID,
     kName,
     kTransitionTimeMs,
-    kExtensionFieldSetsContainer,
 };
 
 using SceneTableEntry = DefaultSceneTableImpl::SceneTableEntry;
@@ -150,8 +149,7 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
         }
 
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kTransitionTimeMs), mStorageData.mSceneTransitionTimeMs));
-        ReturnErrorOnFailure(
-            mStorageData.mExtensionFieldSets.Serialize(writer, TLV::ContextTag(TagScene::kExtensionFieldSetsContainer)));
+        ReturnErrorOnFailure(mStorageData.mExtensionFieldSets.Serialize(writer));
 
         return writer.EndContainer(container);
     }
@@ -186,8 +184,7 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
         mStorageData.SetName(nameSpan);
 
         ReturnErrorOnFailure(reader.Get(mStorageData.mSceneTransitionTimeMs));
-        ReturnErrorOnFailure(
-            mStorageData.mExtensionFieldSets.Deserialize(reader, TLV::ContextTag(TagScene::kExtensionFieldSetsContainer)));
+        ReturnErrorOnFailure(mStorageData.mExtensionFieldSets.Deserialize(reader));
 
         return reader.ExitContainer(container);
     }

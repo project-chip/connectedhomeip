@@ -22,7 +22,7 @@ namespace scenes {
 
 // ExtensionFieldSetsImpl::ExtensionFieldSetsImpl() : ExtensionFieldSets() {}
 
-CHIP_ERROR ExtensionFieldSetsImpl::Serialize(TLV::TLVWriter & writer, TLV::Tag structTag) const
+CHIP_ERROR ExtensionFieldSetsImpl::Serialize(TLV::TLVWriter & writer) const
 {
     TLV::TLVType arrayContainer;
     ReturnErrorOnFailure(
@@ -35,7 +35,7 @@ CHIP_ERROR ExtensionFieldSetsImpl::Serialize(TLV::TLVWriter & writer, TLV::Tag s
     return writer.EndContainer(arrayContainer);
 }
 
-CHIP_ERROR ExtensionFieldSetsImpl::Deserialize(TLV::TLVReader & reader, TLV::Tag structTag)
+CHIP_ERROR ExtensionFieldSetsImpl::Deserialize(TLV::TLVReader & reader)
 {
     TLV::TLVType arrayContainer;
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::ContextTag(TagEFS::kFieldSetArrayContainer)));
