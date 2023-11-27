@@ -103,7 +103,7 @@ struct EndpointSceneCount : public PersistentData<kPersistentBufferSceneCountByt
 // when using the OnOff, Level Control and Color Control as well as the maximal name length of 16 bytes. Putting 256 gives some
 // slack in case different clusters are used. Value obtained by using writer.GetLengthWritten at the end of the SceneTableData
 // Serialize method.
-static constexpr size_t kPersistentSceneBufferMax = 256;
+static constexpr size_t kPersistentSceneBufferMax = CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES;
 
 struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneBufferMax>
 {
