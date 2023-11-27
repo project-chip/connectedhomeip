@@ -48,6 +48,10 @@ public:
 
     // TODO: remove IsReliableTransmissionAllowed, this function should be provided over session.
     virtual bool IsReliableTransmissionAllowed() const { return true; }
+
+private:
+    CHIP_ERROR PrepareAndSendNonMRPMessage(SessionManager * sessionManager, const SessionHandle & session,
+                                           PayloadHeader & payloadHeader, System::PacketBufferHandle && message);
 };
 
 } // namespace Messaging
