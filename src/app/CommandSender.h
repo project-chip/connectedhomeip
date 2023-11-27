@@ -114,6 +114,33 @@ public:
         virtual void OnDone(CommandSender * apCommandSender) = 0;
     };
 
+    // While today there is only one item in this struct, this was added to make providing future elements of
+    // InvokeRequests easier.
+    struct AdditionalInvokeRequestElements
+    {
+        Optional<uint16_t> commandRef;
+    };
+
+    // While today there is only one item in this struct, this was added to make providing future elements of
+    // InvokeResponse easier.
+    struct AdditionalInvokeResponseElements
+    {
+        Optional<uint16_t> commandRef;
+    };
+
+    /**
+     * Called from Callbacks to get additional elements in InvokeResponseMessage.
+     *
+     * For legacy reasons we cannot change arguments passed through `OnResponse`, but we wanted to provide a
+     * way for arguments to be queried going forward from within the `OnResponse` callback.
+     *
+     * @param [out] aInvokeReponseElements additional InvokeResponse elements.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE
+     *                      If CommandSender is not in ResponseReceived state.
+     */
+    CHIP_ERROR GetAdditionalInvokeResponseElements(AdditionalInvokeResponseElements & aInvokeReponseElements);
+
     /*
      * Constructor.
      *
@@ -124,7 +151,23 @@ public:
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
                   bool aSuppressResponse = false);
     ~CommandSender();
-    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
+
+    /**
+     * Enables CommandSender to send batch commands up until the number of supported by remote peer.
+     *
+     * Must be called before PrepareCommand.
+     *
+     * @param [in] aRemoteMaxPathsPerInvoke max number of paths per invoke supported by remote peer.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE
+     *                      If device has previously called `PrepareCommand`.
+     * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
+     *                      Device has not enabled CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED.
+     */
+    CHIP_ERROR SetBatchCommandsConfig(uint16_t aRemoteMaxPathsPerInvoke);
+
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true,
+                              AdditionalInvokeRequestElements aOptionalArgs = AdditionalInvokeRequestElements());
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
     /**
@@ -149,11 +192,12 @@ public:
      */
     template <typename CommandDataT>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                              const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+                              const Optional<uint16_t> & aTimedInvokeTimeoutMs,
+                              AdditionalInvokeRequestElements aOptionalArgs = AdditionalInvokeRequestElements())
     {
         VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
-        return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
+        return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
     }
 
     CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
@@ -166,9 +210,10 @@ public:
      */
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs,
+                                          AdditionalInvokeRequestElements aOptionalArgs = AdditionalInvokeRequestElements())
     {
-        return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
+        return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
     }
 
     /**
@@ -183,9 +228,10 @@ public:
 private:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                      const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+                                      const Optional<uint16_t> & aTimedInvokeTimeoutMs,
+                                      AdditionalInvokeRequestElements aOptionalArgs)
     {
-        ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false));
+        ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false, aOptionalArgs));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
@@ -288,12 +334,18 @@ private:
     // invoke.
     Optional<uint16_t> mTimedInvokeTimeoutMs;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
-    bool mSuppressResponse                 = false;
-    bool mTimedRequest                     = false;
 
     State mState = State::Idle;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
-    bool mBufferAllocated = false;
+    AdditionalInvokeRequestElements mAdditionalRequestElements;
+    AdditionalInvokeResponseElements mAdditionalResponseElements;
+    uint16_t mFinishedCommandCount    = 0;
+    uint16_t mRemoteMaxPathsPerInvoke = 1;
+
+    bool mSuppressResponse     = false;
+    bool mTimedRequest         = false;
+    bool mBufferAllocated      = false;
+    bool mBatchCommandsEnabled = false;
 };
 
 } // namespace app

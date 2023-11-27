@@ -1612,6 +1612,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
+ *
+ * @brief Device supports sending multiple batch commands in a single Invoke Request Message.
+ */
+#ifndef CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
+#define CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED 0
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_PATHS_PER_INVOKE
  *
  * @brief The maximum number of elements in the InvokeRequests list that the Node is able to process.

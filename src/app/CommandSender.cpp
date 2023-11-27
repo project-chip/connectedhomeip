@@ -32,6 +32,34 @@
 
 namespace chip {
 namespace app {
+namespace {
+
+
+// Gets the CommandRef if available. Error returned if we expected CommandRef and it wasn't
+// provided in the response.
+template <typename ParserT>
+CHIP_ERROR GetRef(ParserT aParser, Optional<uint16_t> & aRef, bool commandRefExpected)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint16_t ref;
+    err = aParser.GetRef(&ref);
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, err);
+    if (err == CHIP_END_OF_TLV)
+    {
+        if (commandRefExpected)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        aRef = NullOptional;
+        return CHIP_NO_ERROR;
+    }
+
+    aRef = MakeOptional(ref);
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
 
 CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest,
                              bool aSuppressResponse) :
@@ -296,11 +324,13 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
     StatusIB statusIB;
 
     {
-        bool hasDataResponse = false;
+        bool commandRefExpected = (mFinishedCommandCount > 1);
+        bool hasDataResponse    = false;
         TLV::TLVReader commandDataReader;
 
         CommandStatusIB::Parser commandStatus;
         err = aInvokeResponse.GetStatus(&commandStatus);
+        mAdditionalResponseElements = AdditionalInvokeResponseElements();
         if (CHIP_NO_ERROR == err)
         {
             CommandPathIB::Parser commandPath;
@@ -312,6 +342,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             StatusIB::Parser status;
             commandStatus.GetErrorStatus(&status);
             ReturnErrorOnFailure(status.DecodeStatusIB(statusIB));
+            ReturnErrorOnFailure(GetRef(commandStatus, mAdditionalResponseElements.commandRef, commandRefExpected));
         }
         else if (CHIP_END_OF_TLV == err)
         {
@@ -323,6 +354,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
             ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
             commandData.GetFields(&commandDataReader);
+            ReturnErrorOnFailure(GetRef(commandData, mAdditionalResponseElements.commandRef, commandRefExpected));
             err             = CHIP_NO_ERROR;
             hasDataResponse = true;
         }
@@ -367,14 +399,46 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct)
+CHIP_ERROR CommandSender::GetAdditionalInvokeResponseElements(AdditionalInvokeResponseElements & aInvokeReponseElements)
+{
+    VerifyOrReturnError(mState == State::ResponseReceived, CHIP_ERROR_INCORRECT_STATE);
+    aInvokeReponseElements = mAdditionalResponseElements;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommandSender::SetBatchCommandsConfig(uint16_t aRemoteMaxPathsPerInvoke)
+{
+#if CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
+    VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
+
+    mRemoteMaxPathsPerInvoke = aRemoteMaxPathsPerInvoke;
+    mBatchCommandsEnabled    = true;
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
+}
+
+CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct,
+                                         AdditionalInvokeRequestElements aOptionalArgs)
 {
     ReturnErrorOnFailure(AllocateBuffer());
 
     //
-    // We must not be in the middle of preparing a command, or having prepared or sent one.
+    // We must not be in the middle of preparing a command, or have already sent InvokeReponseMessage.
     //
-    VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
+    bool canAddAnotherCommand = mState == State::AddedCommand && mBatchCommandsEnabled;
+    VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
+    // TODO what is the best error to give here? I thought CHIP_ERROR_SENTINEL might be an indicator for the called to then
+    // batch call send such that we can then try sending another InvokeRequest once we have processed all of Responses.
+    VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_SENTINEL);
+
+    if (mBatchCommandsEnabled)
+    {
+        VerifyOrReturnError(aOptionalArgs.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
     InvokeRequests::Builder & invokeRequests = mInvokeRequestBuilder.GetInvokeRequests();
     CommandDataIB::Builder & invokeRequest   = invokeRequests.CreateCommandData();
     ReturnErrorOnFailure(invokeRequests.GetError());
@@ -387,6 +451,8 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
         ReturnErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::Tag::kFields),
                                                                        TLV::kTLVType_Structure, mDataElementContainerType));
     }
+
+    mAdditionalRequestElements = aOptionalArgs;
 
     MoveToState(State::AddingCommand);
     return CHIP_NO_ERROR;
@@ -405,12 +471,16 @@ CHIP_ERROR CommandSender::FinishCommand(bool aEndDataStruct)
         ReturnErrorOnFailure(commandData.GetWriter()->EndContainer(mDataElementContainerType));
     }
 
+    if (mAdditionalRequestElements.commandRef.HasValue())
+    {
+        ReturnErrorOnFailure(commandData.Ref(mAdditionalRequestElements.commandRef.Value()));
+    }
+
     ReturnErrorOnFailure(commandData.EndOfCommandDataIB());
-    ReturnErrorOnFailure(mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
-    ReturnErrorOnFailure(mInvokeRequestBuilder.EndOfInvokeRequestMessage());
 
     MoveToState(State::AddedCommand);
 
+    mFinishedCommandCount++;
     return CHIP_NO_ERROR;
 }
 
@@ -442,6 +512,8 @@ CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeT
 CHIP_ERROR CommandSender::Finalize(System::PacketBufferHandle & commandPacket)
 {
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
+    ReturnErrorOnFailure(mInvokeRequestBuilder.EndOfInvokeRequestMessage());
     return mCommandMessageWriter.Finalize(&commandPacket);
 }
 
