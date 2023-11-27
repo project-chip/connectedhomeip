@@ -4084,22 +4084,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OvenCavityOperationalState::Events::OperationalError::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("ErrorState", indent + 1, value.errorState);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ErrorState'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const OvenCavityOperationalState::Events::OperationCompletion::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -16022,11 +16006,6 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
     case OvenCavityOperationalState::Id: {
         switch (header.mPath.mEventId)
         {
-        case OvenCavityOperationalState::Events::OperationalError::Id: {
-            chip::app::Clusters::OvenCavityOperationalState::Events::OperationalError::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("OperationalError", 1, value);
-        }
         case OvenCavityOperationalState::Events::OperationCompletion::Id: {
             chip::app::Clusters::OvenCavityOperationalState::Events::OperationCompletion::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
