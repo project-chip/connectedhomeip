@@ -68,11 +68,7 @@ public:
     void OnICDModeChange() {}
 };
 
-TestICDStateObserver mICDStateObserver;
-static Clock::Internal::MockClock gMockClock;
-static Clock::ClockBase * gRealClock;
-
-class TestContext : public Test::AppContext
+class TestContext : public chip::Test::AppContext
 {
 public:
     static int Initialize(void * context)
@@ -83,15 +79,11 @@ public:
         auto * ctx = static_cast<TestContext *>(context);
         DeviceLayer::SetSystemLayerForTesting(&ctx->GetSystemLayer());
 
-        gRealClock = &SystemClock();
-        Clock::Internal::SetSystemClockForTesting(&gMockClock);
+        ctx->mRealClock = &SystemClock();
+        Clock::Internal::SetSystemClockForTesting(&ctx->mMockClock);
 
-        if (ctx->mEventCounter.Init(0) != CHIP_NO_ERROR)
-        {
-            return FAILURE;
-        }
         ctx->mICDManager.Init(&ctx->testStorage, &ctx->GetFabricTable(), &(ctx->mKeystore));
-        ctx->mICDManager.RegisterObserver(&mICDStateObserver);
+        ctx->mICDManager.RegisterObserver(&ctx->mICDStateObserver);
         return SUCCESS;
     }
 
@@ -100,7 +92,7 @@ public:
         auto * ctx = static_cast<TestContext *>(context);
         ctx->mICDManager.Shutdown();
         app::EventManagement::DestroyEventManagement();
-        System::Clock::Internal::SetSystemClockForTesting(gRealClock);
+        System::Clock::Internal::SetSystemClockForTesting(ctx->mRealClock);
         DeviceLayer::SetSystemLayerForTesting(nullptr);
 
         if (AppContext::Finalize(context) != SUCCESS)
@@ -109,12 +101,14 @@ public:
         return SUCCESS;
     }
 
+    System::Clock::Internal::MockClock mMockClock;
     TestSessionKeystoreImpl mKeystore;
     app::ICDManager mICDManager;
     TestPersistentStorageDelegate testStorage;
 
 private:
-    MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
+    System::Clock::ClockBase * mRealClock;
+    TestICDStateObserver mICDStateObserver;
 };
 
 } // namespace
@@ -133,7 +127,7 @@ public:
      */
     static void AdvanceClockAndRunEventLoop(TestContext * ctx, uint32_t time_ms)
     {
-        gMockClock.AdvanceMonotonic(System::Clock::Timeout(time_ms));
+        ctx->mMockClock.AdvanceMonotonic(System::Clock::Timeout(time_ms));
         ctx->GetIOContext().DriveIO();
     }
 
