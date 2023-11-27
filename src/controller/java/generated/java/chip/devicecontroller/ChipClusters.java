@@ -26964,17 +26964,17 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void suppressRequest(DefaultClusterCallback callback, Integer alarmsToSuppress) {
-      suppressRequest(chipClusterPtr, callback, alarmsToSuppress, null);
+      suppressRequest(callback, alarmsToSuppress, 0);
     }
 
     public void suppressRequest(DefaultClusterCallback callback, Integer alarmsToSuppress, int timedInvokeTimeoutMs) {
-      suppressRequest(chipClusterPtr, callback, alarmsToSuppress, timedInvokeTimeoutMs);
-    }
-
-    private native void suppressRequest(long chipClusterPtr, DefaultClusterCallback callback, Integer alarmsToSuppress, @Nullable Integer timedInvokeTimeoutMs);
+      final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long alarmsToSuppressFieldID = 0L;
