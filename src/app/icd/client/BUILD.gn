@@ -20,7 +20,7 @@ source_set("manager") {
     "DefaultICDClientStorage.cpp",
     "DefaultICDClientStorage.h",
     "ICDClientInfo.h",
-    "ICDClientStorageDelegate.h",
+    "ICDClientStorage.h",
     "ICDStorage.h",
   ]
 

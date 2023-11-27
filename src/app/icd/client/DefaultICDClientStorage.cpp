@@ -27,13 +27,6 @@
 namespace chip {
 namespace app {
 
-Global<DefaultICDClientStorage> sDefaultICDClientStorage;
-
-DefaultICDClientStorage * DefaultICDClientStorage::GetInstance()
-{
-    return &sDefaultICDClientStorage.get();
-}
-
 DefaultICDClientStorage::ICDClientInfoIteratorImpl::ICDClientInfoIteratorImpl(DefaultICDClientStorage & manager) : mManager(manager)
 {
     mStorageIndex    = 0;

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "ICDClientStorageDelegate.h"
+#include "ICDClientStorage.h"
 #include "ICDStorage.h"
 #include <lib/core/CHIPCore.h>
 
@@ -29,20 +29,12 @@ namespace chip {
 namespace app {
 
 /**
- * An DefaultICDClientStorage using ICDClientStorageDelegate as its backend.
+ * An DefaultICDClientStorage using ICDClientStorage as its backend.
  */
-class DefaultICDClientStorage : public ICDClientStorageDelegate
+class DefaultICDClientStorage : public ICDClientStorage
 {
 public:
     static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS;
-
-    /**
-     * @brief Retrieve the singleton DefaultICDClientStorage.
-     *
-     *  @return  A pointer to the shared DefaultICDClientStorage
-     *
-     */
-    static DefaultICDClientStorage * GetInstance(void);
 
     ICDClientInfoIterator * IterateICDClientInfo() override;
 

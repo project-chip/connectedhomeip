@@ -31,15 +31,15 @@ namespace chip {
 namespace app {
 
 /**
- * The ICDClientStorageDelegate class is an abstract interface that defines the operations
+ * The ICDClientStorage class is an abstract interface that defines the operations
  * for storing, retrieving and deleting ICD client information in persistent storage.
  */
-class ICDClientStorageDelegate
+class ICDClientStorage
 {
 public:
     using ICDClientInfoIterator = CommonIterator<ICDClientInfo>;
 
-    virtual ~ICDClientStorageDelegate() = default;
+    virtual ~ICDClientStorage() = default;
 
     /**
      * Iterate through persisted ICD Client Info
