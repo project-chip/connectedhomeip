@@ -27,7 +27,7 @@ limitations under the License.
     <description>This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven.</description>
 
     <globalAttribute side="server" code="0xFFFD" value="1" />
-    
+
     <attribute side="server" code="0x0000" define="PHASE_LIST"              type="ARRAY" entryType="char_string"                                     writable="false" isNullable="true"  optional="false">PhaseList</attribute>
     <attribute side="server" code="0x0001" define="CURRENT_PHASE"           type="int8u"                                    min="0x00" max="0x1F"    writable="false" isNullable="true"  optional="false">CurrentPhase</attribute>
     <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="elapsed_s"                                min="0x00" max="259200"  writable="false" isNullable="true"  optional="true">CountdownTime</attribute>
@@ -55,11 +55,6 @@ limitations under the License.
       <description>This command SHALL be generated in response to any of the Start, Stop, Pause, or Resume commands.</description>
       <arg name="CommandResponseState" type="ErrorStateStruct"/>
     </command>
-
-    <event side="server" code="0x00" priority="critical" name="OperationalError" optional="false">
-      <description>OperationalError</description>
-      <field id="0" name="ErrorState" type="ErrorStateStruct" />
-    </event>
 
      <event side="server" code="0x01" priority="info" name="OperationCompletion" optional="true">
       <description>OperationCompletion</description>
