@@ -8,9 +8,9 @@ tools/*
 
 ## Project Information
 
--   [Build Guide](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md)
+-   [Build Guide](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.html)
 -   Sphinx documentation framework
-    -   New directories and individual files must be added to the [tree](https://github.com/project-chip/connectedhomeip/blob/ci-cd-doc-patch/docs/index.md)
+    -   New directories and individual files must be added to the [tree](https://github.com/project-chip/connectedhomeip/blob/ci-cd-doc-patch/docs/index.html)
     -   New files under directories must be added to the tree in the index file; see above. Glob and regular expressions may be used to include all
 -   Pull Requests
     -   Built in style and spelling checks must be satisfied
@@ -27,7 +27,7 @@ Work In Progress
 
 ## Tools
 
--   [Daily Fail Summary](tools/daily_fail_summary.md)
+-   [Daily Fail Summary](tools/daily_fail_summary.html)
 
 ## To Do
 
