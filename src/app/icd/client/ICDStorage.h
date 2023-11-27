@@ -44,14 +44,11 @@ struct ICDStorage
     FabricIndex mFabricIndex                      = kUndefinedFabricIndex;
     PersistentStorageDelegate * mpClientInfoStore = nullptr;
     Crypto::SymmetricKeystore * mpKeyStore        = nullptr;
-    PersistentStorageDelegate * mpCounterStore    = nullptr;
-    ICDStorage(FabricIndex fabricIndex, PersistentStorageDelegate * clientInfoStore, Crypto::SymmetricKeystore * keyStore,
-               PersistentStorageDelegate * counterStore)
+    ICDStorage(FabricIndex fabricIndex, PersistentStorageDelegate * clientInfoStore, Crypto::SymmetricKeystore * keyStore)
     {
         mFabricIndex      = fabricIndex;
         mpClientInfoStore = clientInfoStore;
         mpKeyStore        = keyStore;
-        mpCounterStore    = counterStore;
     }
     ~ICDStorage() = default;
     ICDStorage(ICDStorage && other)
@@ -59,7 +56,6 @@ struct ICDStorage
         mFabricIndex            = other.mFabricIndex;
         mpClientInfoStore       = other.mpClientInfoStore;
         mpKeyStore              = other.mpKeyStore;
-        mpCounterStore          = other.mpCounterStore;
         other.mpClientInfoStore = nullptr;
         other.mpKeyStore        = nullptr;
         other.mFabricIndex      = kUndefinedFabricIndex;
@@ -67,8 +63,7 @@ struct ICDStorage
     ICDStorage & operator=(const ICDStorage & other) = default;
     bool IsValid()
     {
-        return (mFabricIndex != kUndefinedFabricIndex) && (mpClientInfoStore != nullptr) && (mpKeyStore != nullptr) &&
-            (mpCounterStore != nullptr);
+        return (mFabricIndex != kUndefinedFabricIndex) && (mpClientInfoStore != nullptr) && (mpKeyStore != nullptr);
     }
 };
 

@@ -53,7 +53,7 @@ size_t DefaultICDClientStorage::ICDClientInfoIteratorImpl::Count()
 
         size_t counter      = 0;
         uint16_t counterLen = static_cast<uint16_t>(sizeof(counter));
-        if (storage.mpCounterStore->SyncGetKeyValue(
+        if (storage.mpClientInfoStore->SyncGetKeyValue(
                 DefaultStorageKeyAllocator::FabricICDClientInfoCounter(storage.mFabricIndex).KeyName(), &counter, counterLen) !=
             CHIP_NO_ERROR)
         {
@@ -125,7 +125,7 @@ CHIP_ERROR DefaultICDClientStorage::Load(ICDStorage & storage, std::vector<ICDCl
     VerifyOrReturnError(storage.IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
     size_t counter      = 0;
     uint16_t counterLen = static_cast<uint16_t>(sizeof(counter));
-    ReturnErrorOnFailure(storage.mpCounterStore->SyncGetKeyValue(
+    ReturnErrorOnFailure(storage.mpClientInfoStore->SyncGetKeyValue(
         DefaultStorageKeyAllocator::FabricICDClientInfoCounter(storage.mFabricIndex).KeyName(), &counter, counterLen));
 
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
@@ -260,10 +260,10 @@ CHIP_ERROR DefaultICDClientStorage::StoreEntry(ICDClientInfo & clientInfo)
 
 CHIP_ERROR DefaultICDClientStorage::UpdateCounter(ICDStorage & storage, bool increase)
 {
-    VerifyOrReturnError(storage.mpCounterStore != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(storage.mpClientInfoStore != nullptr, CHIP_ERROR_INTERNAL);
     size_t counter      = 0;
     uint16_t counterLen = static_cast<uint16_t>(sizeof(counter));
-    ReturnErrorOnFailure(storage.mpCounterStore->SyncGetKeyValue(
+    ReturnErrorOnFailure(storage.mpClientInfoStore->SyncGetKeyValue(
         DefaultStorageKeyAllocator::FabricICDClientInfoCounter(storage.mFabricIndex).KeyName(), &counter, counterLen));
     if (increase)
     {
@@ -275,14 +275,14 @@ CHIP_ERROR DefaultICDClientStorage::UpdateCounter(ICDStorage & storage, bool inc
     }
     ReturnErrorOnFailure(storage.mpClientInfoStore->SyncDeleteKeyValue(
         DefaultStorageKeyAllocator::FabricICDClientInfoCounter(storage.mFabricIndex).KeyName()));
-    return storage.mpCounterStore->SyncSetKeyValue(
+    return storage.mpClientInfoStore->SyncSetKeyValue(
         DefaultStorageKeyAllocator::FabricICDClientInfoCounter(storage.mFabricIndex).KeyName(), &counter, counterLen);
 }
 
 CHIP_ERROR DefaultICDClientStorage::DeleteCounter(ICDStorage & storage)
 {
-    VerifyOrReturnError(storage.mpCounterStore != nullptr, CHIP_ERROR_INTERNAL);
-    return storage.mpCounterStore->SyncDeleteKeyValue(
+    VerifyOrReturnError(storage.mpClientInfoStore != nullptr, CHIP_ERROR_INTERNAL);
+    return storage.mpClientInfoStore->SyncDeleteKeyValue(
         DefaultStorageKeyAllocator::FabricICDClientInfoCounter(storage.mFabricIndex).KeyName());
 }
 

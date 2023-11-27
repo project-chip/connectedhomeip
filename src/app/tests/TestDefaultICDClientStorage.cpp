@@ -69,9 +69,8 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
     NodeId nodeId1       = 6666;
     NodeId nodeId2       = 6667;
     TestPersistentStorageDelegate clientInfoStorage;
-    TestPersistentStorageDelegate countStorage;
     TestSessionKeystoreImpl keystore;
-    ICDStorage testStorage(fabricId, &clientInfoStorage, &keystore, &countStorage);
+    ICDStorage testStorage(fabricId, &clientInfoStorage, &keystore);
     DefaultICDClientStorageTest manager;
     err = manager.AddStorage(std::move(testStorage));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -141,11 +140,10 @@ void TestClientInfoCountMultipleFabric(nlTestSuite * apSuite, void * apContext)
     NodeId nodeId3        = 6668;
     TestPersistentStorageDelegate clientInfoStorage1;
     TestSessionKeystoreImpl keystore1;
-    TestPersistentStorageDelegate countStorage;
-    ICDStorage testStorage1(fabricId1, &clientInfoStorage1, &keystore1, &countStorage);
+    ICDStorage testStorage1(fabricId1, &clientInfoStorage1, &keystore1);
     TestPersistentStorageDelegate clientInfoStorage2;
     TestSessionKeystoreImpl keystore2;
-    ICDStorage testStorage2(fabricId2, &clientInfoStorage2, &keystore2, &countStorage);
+    ICDStorage testStorage2(fabricId2, &clientInfoStorage2, &keystore2);
 
     DefaultICDClientStorageTest manager;
 
