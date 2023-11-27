@@ -17,6 +17,35 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
+ <enum name="OperationalStateEnum" type="enum8">
+    <cluster code="0x0048"/>
+    <item name="Stopped" value="0x00"/>
+    <item name="Running" value="0x01"/>
+    <item name="Paused"  value="0x02"/>
+    <item name="Error"   value="0x03"/>
+  </enum>
+
+  <enum name="ErrorStateEnum" type="enum8">
+    <cluster code="0x0048"/>
+    <item name="NoError"                    value="0x00"/>
+    <item name="UnableToStartOrResume"      value="0x01"/>
+    <item name="UnableToCompleteOperation"  value="0x02"/>
+    <item name="CommandInvalidInState"      value="0x03"/>
+  </enum>
+
+  <struct name="OperationalStateStruct">
+    <cluster code="0x0048"/>
+    <item name="OperationalStateID"    type="enum8" optional="false"/>
+    <item name="OperationalStateLabel" type="char_string" optional="true" length="64"/>
+  </struct>
+
+  <struct name="ErrorStateStruct">
+    <cluster code="0x0048"/>
+    <item name="ErrorStateID" type="enum8" optional="false" />
+    <item name="ErrorStateLabel" type="char_string" optional="true" length="64" />
+    <item name="ErrorStateDetails" type="char_string" optional="true" length="64" />
+  </struct>
+
   <cluster>
     <domain>Appliances</domain>
     <name>Oven Cavity Operational State</name>
@@ -56,12 +85,16 @@ limitations under the License.
       <arg name="CommandResponseState" type="ErrorStateStruct"/>
     </command>
 
-     <event side="server" code="0x01" priority="info" name="OperationCompletion" optional="true">
-      <description>OperationCompletion</description>
-      <field id="0" name="CompletionErrorCode"  type="enum8"                            optional="false"/>
-      <field id="1" name="TotalOperationalTime" type="elapsed_s"      isNullable="true" optional="true"/>
-      <field id="2" name="PausedTime"           type="elapsed_s"      isNullable="true" optional="true"/>
+    <event side="server" code="0x00" priority="critical" name="OperationalError" optional="false">
+      <description>OperationalError</description>
+      <field id="0" name="ErrorState" type="ErrorStateStruct" />
     </event>
 
+     <event side="server" code="0x01" priority="info" name="OperationCompletion" optional="true">
+      <description>OperationCompletion</description>
+      <field id="0" name="CompletionErrorCode"  type="enum8" />
+      <field id="1" name="TotalOperationalTime" type="elapsed_s" isNullable="true" optional="true"/>
+      <field id="2" name="PausedTime"           type="elapsed_s" isNullable="true" optional="true"/>
+    </event>
   </cluster>
 </configurator>
