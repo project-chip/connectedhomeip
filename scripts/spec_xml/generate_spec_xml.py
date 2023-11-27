@@ -66,7 +66,8 @@ def scrape_clusters(scraper, spec_root, output_dir, dry_run):
     media_clusters_dir = os.path.abspath(os.path.join(app_clusters_dir, 'media'))
     clusters_output_dir = os.path.abspath(os.path.join(output_dir, 'clusters'))
     dm_clusters_list = ['ACL-Cluster.adoc', 'Binding-Cluster.adoc', 'bridge-clusters.adoc',
-                        'Descriptor-Cluster.adoc', 'Group-Key-Management-Cluster.adoc', 'Label-Cluster.adoc']
+                        'Descriptor-Cluster.adoc', 'Group-Key-Management-Cluster.adoc', 'ICDManagement.adoc',
+                        'Label-Cluster.adoc']
     sdm_exclude_list = ['AdminAssistedCommissioningFlows.adoc', 'BulkDataExchange.adoc', 'CommissioningFlows.adoc',
                         'DeviceCommissioningFlows.adoc', 'DistributedComplianceLedger.adoc', 'OTAFileFormat.adoc']
     app_exclude_list = ['appliances.adoc', 'closures.adoc', 'general.adoc',
