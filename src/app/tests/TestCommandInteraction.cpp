@@ -1067,6 +1067,8 @@ void TestCommandInteraction::TestCommandHandlerInvalidMessageAsync(nlTestSuite *
     err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
+
     // Decrease CommandHandler refcount and send response
     asyncCommandHandle = nullptr;
 
@@ -1365,9 +1367,6 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleCommands(nlTestSuit
                            CHIP_NO_ERROR == invokeRequest.GetWriter()->EndContainer(commandSender.mDataElementContainerType));
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.EndOfCommandDataIB());
         }
-
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.EndOfInvokeRequestMessage());
 
         commandSender.MoveToState(app::CommandSender::State::AddedCommand);
     }
