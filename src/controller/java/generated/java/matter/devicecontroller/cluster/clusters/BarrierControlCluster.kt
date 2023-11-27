@@ -20,17 +20,22 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class BarrierControlCluster(
-  private val controller: MatterController,
-  private val endpointId: UShort
-) {
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+class BarrierControlCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
   suspend fun barrierControlGoToPercent(percentOpen: UByte, timedInvokeTimeoutMs: Int? = null) {
     val commandId = 0L
@@ -39,7 +44,7 @@ class BarrierControlCluster(
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
   suspend fun barrierControlStop(timedInvokeTimeoutMs: Int? = null) {
@@ -49,14 +54,17 @@ class BarrierControlCluster(
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
   suspend fun readBarrierMovingStateAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBarrierMovingStateAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeBarrierMovingStateAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -64,7 +72,10 @@ class BarrierControlCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBarrierSafetyStatusAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeBarrierSafetyStatusAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -72,7 +83,10 @@ class BarrierControlCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBarrierCapabilitiesAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeBarrierCapabilitiesAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -80,15 +94,21 @@ class BarrierControlCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeBarrierOpenEventsAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBarrierOpenEventsAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeBarrierOpenEventsAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeBarrierOpenEventsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -96,15 +116,21 @@ class BarrierControlCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeBarrierCloseEventsAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBarrierCloseEventsAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeBarrierCloseEventsAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeBarrierCloseEventsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -114,13 +140,13 @@ class BarrierControlCluster(
 
   suspend fun writeBarrierCommandOpenEventsAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeoutMs: Int? = null    
   ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribeBarrierCommandOpenEventsAttribute(
@@ -136,13 +162,13 @@ class BarrierControlCluster(
 
   suspend fun writeBarrierCommandCloseEventsAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeoutMs: Int? = null    
   ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
   suspend fun subscribeBarrierCommandCloseEventsAttribute(
@@ -156,15 +182,21 @@ class BarrierControlCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeBarrierOpenPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBarrierOpenPeriodAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeBarrierOpenPeriodAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeBarrierOpenPeriodAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -172,15 +204,21 @@ class BarrierControlCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun writeBarrierClosePeriodAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBarrierClosePeriodAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }
+    }    
   }
 
-  suspend fun subscribeBarrierClosePeriodAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeBarrierClosePeriodAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -188,7 +226,10 @@ class BarrierControlCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBarrierPositionAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun subscribeBarrierPositionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
     // Implementation needs to be added here
   }
 
@@ -218,7 +259,10 @@ class BarrierControlCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -237,7 +281,10 @@ class BarrierControlCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -245,7 +292,10 @@ class BarrierControlCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

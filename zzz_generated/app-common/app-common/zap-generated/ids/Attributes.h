@@ -4160,10 +4160,6 @@ namespace PIHeatingDemand {
 static constexpr AttributeId Id = 0x00000008;
 } // namespace PIHeatingDemand
 
-namespace HVACSystemTypeConfiguration {
-static constexpr AttributeId Id = 0x00000009;
-} // namespace HVACSystemTypeConfiguration
-
 namespace LocalTemperatureCalibration {
 static constexpr AttributeId Id = 0x00000010;
 } // namespace LocalTemperatureCalibration
@@ -4215,6 +4211,10 @@ static constexpr AttributeId Id = 0x0000001B;
 namespace SystemMode {
 static constexpr AttributeId Id = 0x0000001C;
 } // namespace SystemMode
+
+namespace AlarmMask {
+static constexpr AttributeId Id = 0x0000001D;
+} // namespace AlarmMask
 
 namespace ThermostatRunningMode {
 static constexpr AttributeId Id = 0x0000001E;
@@ -4316,9 +4316,65 @@ namespace ACCoilTemperature {
 static constexpr AttributeId Id = 0x00000046;
 } // namespace ACCoilTemperature
 
-namespace ACCapacityformat {
+namespace ACCapacityFormat {
 static constexpr AttributeId Id = 0x00000047;
-} // namespace ACCapacityformat
+} // namespace ACCapacityFormat
+
+namespace PresetTypes {
+static constexpr AttributeId Id = 0x00000048;
+} // namespace PresetTypes
+
+namespace ScheduleTypes {
+static constexpr AttributeId Id = 0x00000049;
+} // namespace ScheduleTypes
+
+namespace NumberOfPresets {
+static constexpr AttributeId Id = 0x0000004A;
+} // namespace NumberOfPresets
+
+namespace NumberOfSchedules {
+static constexpr AttributeId Id = 0x0000004B;
+} // namespace NumberOfSchedules
+
+namespace NumberOfScheduleTransitions {
+static constexpr AttributeId Id = 0x0000004C;
+} // namespace NumberOfScheduleTransitions
+
+namespace NumberOfScheduleTransitionPerDay {
+static constexpr AttributeId Id = 0x0000004D;
+} // namespace NumberOfScheduleTransitionPerDay
+
+namespace ActivePresetHandle {
+static constexpr AttributeId Id = 0x0000004E;
+} // namespace ActivePresetHandle
+
+namespace ActiveScheduleHandle {
+static constexpr AttributeId Id = 0x0000004F;
+} // namespace ActiveScheduleHandle
+
+namespace Presets {
+static constexpr AttributeId Id = 0x00000050;
+} // namespace Presets
+
+namespace Schedules {
+static constexpr AttributeId Id = 0x00000051;
+} // namespace Schedules
+
+namespace PresetsSchedulesEditable {
+static constexpr AttributeId Id = 0x00000052;
+} // namespace PresetsSchedulesEditable
+
+namespace TemperatureSetpointHoldPolicy {
+static constexpr AttributeId Id = 0x00000053;
+} // namespace TemperatureSetpointHoldPolicy
+
+namespace SetpointHoldExpiryTimestamp {
+static constexpr AttributeId Id = 0x00000054;
+} // namespace SetpointHoldExpiryTimestamp
+
+namespace QueuedPreset {
+static constexpr AttributeId Id = 0x00000055;
+} // namespace QueuedPreset
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

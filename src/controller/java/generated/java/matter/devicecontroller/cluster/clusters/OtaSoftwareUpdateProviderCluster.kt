@@ -20,77 +20,67 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class OtaSoftwareUpdateProviderCluster(
-  private val controller: MatterController,
-  private val endpointId: UShort
-) {
+class OtaSoftwareUpdateProviderCluster(private val controller: MatterController, private val endpointId: UShort) {
   class QueryImageResponse(
-    val status: UInt,
-    val delayedActionTime: UInt?,
-    val imageURI: String?,
-    val softwareVersion: UInt?,
-    val softwareVersionString: String?,
-    val updateToken: ByteArray?,
-    val userConsentNeeded: Boolean?,
+    val status: UInt, 
+    val delayedActionTime: UInt?, 
+    val imageURI: String?, 
+    val softwareVersion: UInt?, 
+    val softwareVersionString: String?, 
+    val updateToken: ByteArray?, 
+    val userConsentNeeded: Boolean?, 
     val metadataForRequestor: ByteArray?
   )
 
-  class ApplyUpdateResponse(val action: UInt, val delayedActionTime: UInt)
+  class ApplyUpdateResponse(
+    val action: UInt, 
+    val delayedActionTime: UInt
+  )
 
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+  class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(
+    val value: List<UInt>
+  )
 
-  class EventListAttribute(val value: List<UInt>)
+  class EventListAttribute(
+    val value: List<UInt>
+  )
 
-  class AttributeListAttribute(val value: List<UInt>)
+  class AttributeListAttribute(
+    val value: List<UInt>
+  )
 
-  suspend fun queryImage(
-    vendorID: UShort,
-    productID: UShort,
-    softwareVersion: UInt,
-    protocolsSupported: List<UInt>,
-    hardwareVersion: UShort?,
-    location: String?,
-    requestorCanConsent: Boolean?,
-    metadataForProvider: ByteArray?,
-    timedInvokeTimeoutMs: Int? = null
-  ): QueryImageResponse {
+  suspend fun queryImage(vendorID: UShort, productID: UShort, softwareVersion: UInt, protocolsSupported: List<UInt>, hardwareVersion: UShort?, location: String?, requestorCanConsent: Boolean?, metadataForProvider: ByteArray?, timedInvokeTimeoutMs: Int? = null): QueryImageResponse {
     val commandId = 0L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
-  suspend fun applyUpdateRequest(
-    updateToken: ByteArray,
-    newVersion: UInt,
-    timedInvokeTimeoutMs: Int? = null
-  ): ApplyUpdateResponse {
+  suspend fun applyUpdateRequest(updateToken: ByteArray, newVersion: UInt, timedInvokeTimeoutMs: Int? = null): ApplyUpdateResponse {
     val commandId = 2L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
-  suspend fun notifyUpdateApplied(
-    updateToken: ByteArray,
-    softwareVersion: UInt,
-    timedInvokeTimeoutMs: Int? = null
-  ) {
+  suspend fun notifyUpdateApplied(updateToken: ByteArray, softwareVersion: UInt, timedInvokeTimeoutMs: Int? = null) {
     val commandId = 4L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }
+    }    
   }
 
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
@@ -119,7 +109,10 @@ class OtaSoftwareUpdateProviderCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -138,7 +131,10 @@ class OtaSoftwareUpdateProviderCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -146,7 +142,10 @@ class OtaSoftwareUpdateProviderCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
     // Implementation needs to be added here
   }
 

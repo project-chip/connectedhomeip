@@ -1969,28 +1969,6 @@ public class ClusterWriteMapping {
     writePumpConfigurationAndControlInteractionInfo.put("writeControlModeAttribute", writePumpConfigurationAndControlControlModeAttributeInteractionInfo);
     writeAttributeMap.put("pumpConfigurationAndControl", writePumpConfigurationAndControlInteractionInfo);
     Map<String, InteractionInfo> writeThermostatInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeThermostatHVACSystemTypeConfigurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo thermostatHVACSystemTypeConfigurationCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeThermostatHVACSystemTypeConfigurationCommandParams.put(
-        "value",
-        thermostatHVACSystemTypeConfigurationCommandParameterInfo
-    );
-    InteractionInfo writeThermostatHVACSystemTypeConfigurationAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ThermostatCluster) cluster).writeHVACSystemTypeConfigurationAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeThermostatHVACSystemTypeConfigurationCommandParams
-    );
-    writeThermostatInteractionInfo.put("writeHVACSystemTypeConfigurationAttribute", writeThermostatHVACSystemTypeConfigurationAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeThermostatLocalTemperatureCalibrationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatlocalTemperatureCalibrationCommandParameterInfo =
         new CommandParameterInfo(
@@ -2541,28 +2519,28 @@ public class ClusterWriteMapping {
       writeThermostatACLouverPositionCommandParams
     );
     writeThermostatInteractionInfo.put("writeACLouverPositionAttribute", writeThermostatACLouverPositionAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeThermostatACCapacityformatCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo thermostatACCapacityformatCommandParameterInfo =
+    Map<String, CommandParameterInfo> writeThermostatACCapacityFormatCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatACCapacityFormatCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Integer.class, 
             Integer.class 
         );
-    writeThermostatACCapacityformatCommandParams.put(
+    writeThermostatACCapacityFormatCommandParams.put(
         "value",
-        thermostatACCapacityformatCommandParameterInfo
+        thermostatACCapacityFormatCommandParameterInfo
     );
-    InteractionInfo writeThermostatACCapacityformatAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeThermostatACCapacityFormatAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ThermostatCluster) cluster).writeACCapacityformatAttribute(
+        ((ChipClusters.ThermostatCluster) cluster).writeACCapacityFormatAttribute(
           (DefaultClusterCallback) callback,
           (Integer) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeThermostatACCapacityformatCommandParams
+      writeThermostatACCapacityFormatCommandParams
     );
-    writeThermostatInteractionInfo.put("writeACCapacityformatAttribute", writeThermostatACCapacityformatAttributeInteractionInfo);
+    writeThermostatInteractionInfo.put("writeACCapacityFormatAttribute", writeThermostatACCapacityFormatAttributeInteractionInfo);
     writeAttributeMap.put("thermostat", writeThermostatInteractionInfo);
     Map<String, InteractionInfo> writeFanControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeFanControlFanModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();

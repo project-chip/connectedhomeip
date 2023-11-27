@@ -17,13 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DemandResponseLoadControlClusterDutyCycleControlStruct(val dutyCycle: UInt) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class DemandResponseLoadControlClusterDutyCycleControlStruct (
+    val dutyCycle: UInt) {
+  override fun toString(): String  = buildString {
     append("DemandResponseLoadControlClusterDutyCycleControlStruct {\n")
     append("\tdutyCycle : $dutyCycle\n")
     append("}\n")
@@ -40,13 +45,10 @@ class DemandResponseLoadControlClusterDutyCycleControlStruct(val dutyCycle: UInt
   companion object {
     private const val TAG_DUTY_CYCLE = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): DemandResponseLoadControlClusterDutyCycleControlStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DemandResponseLoadControlClusterDutyCycleControlStruct {
       tlvReader.enterStructure(tlvTag)
       val dutyCycle = tlvReader.getUInt(ContextSpecificTag(TAG_DUTY_CYCLE))
-
+      
       tlvReader.exitContainer()
 
       return DemandResponseLoadControlClusterDutyCycleControlStruct(dutyCycle)

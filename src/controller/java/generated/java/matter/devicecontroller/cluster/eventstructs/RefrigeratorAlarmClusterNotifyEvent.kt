@@ -16,7 +16,9 @@
  */
 package matter.devicecontroller.cluster.eventstructs
 
+import java.util.Optional
 import matter.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -54,13 +56,13 @@ class RefrigeratorAlarmClusterNotifyEvent(
     private const val TAG_STATE = 2
     private const val TAG_MASK = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): RefrigeratorAlarmClusterNotifyEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : RefrigeratorAlarmClusterNotifyEvent {
       tlvReader.enterStructure(tlvTag)
       val active = tlvReader.getULong(ContextSpecificTag(TAG_ACTIVE))
       val inactive = tlvReader.getULong(ContextSpecificTag(TAG_INACTIVE))
       val state = tlvReader.getULong(ContextSpecificTag(TAG_STATE))
       val mask = tlvReader.getULong(ContextSpecificTag(TAG_MASK))
-
+      
       tlvReader.exitContainer()
 
       return RefrigeratorAlarmClusterNotifyEvent(active, inactive, state, mask)
