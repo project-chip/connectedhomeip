@@ -66,7 +66,7 @@ public:
     /**
      *  @brief Get MoreChunkedMessages boolean
      *
-     *  @param [out] apMoreChunkedMessages    A pointer to apMoreChunkedMessages
+     *  @param [out] apMoreChunkedMessages    A pointer to bool for storing more chunked messages value.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
@@ -99,7 +99,7 @@ public:
 
     /**
      *  @brief Set True if the set of InvokeResponseIB have to be sent across multiple packets in a single transaction
-     *  @param [in] aMoreChunkedMessages  true if more chunked messaged is needed
+     *  @param [in] aMoreChunkedMessages  true if more chunked messages are needed
      *  @return A reference to *this
      */
     InvokeResponseMessage::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
