@@ -10,7 +10,7 @@ tools/*
 
 -   [Build Guide](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md)
 
-WIP
+Work In Progress
 
 ## Known Issues
 
