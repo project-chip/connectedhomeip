@@ -6,6 +6,12 @@
 tools/*
 ```
 
+## Introduction
+
+-   [Build Guide](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md)
+
+WIP
+
 ## Known Issues
 
 -   Python build running out of space
