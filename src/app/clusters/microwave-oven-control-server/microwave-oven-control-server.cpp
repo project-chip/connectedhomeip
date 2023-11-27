@@ -205,12 +205,10 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         if (CookMode.HasValue())
         {
             // TODO: set Microwave Oven cooking mode by CookMode.Value().
-            reqCookMode = CookMode.Value();
         }
         else
         {
             // TODO: set Microwave Oven cooking mode to normal mode.
-            reqCookMode = 0;
         }
 
         if (CookTime.HasValue())
