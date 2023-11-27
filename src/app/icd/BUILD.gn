@@ -13,9 +13,30 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
 import("icd.gni")
 
 # ICD Server sources and configurations
+
+buildconfig_header("icd_buildconfig") {
+  header = "ICDBuildConfig.h"
+  header_dir = "app/icd"
+
+  defines = [
+    "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
+    "ICD_REPORT_ON_ENTER_ACTIVE_MODE=${chip_report_on_active_mode}",
+    "ICD_MAX_NOTIFICATION_SUBSCRIBERS=${icd_max_notification_subscribers}",
+  ]
+
+  visibility = [ ":icd_config" ]
+}
+
+source_set("icd_config") {
+  sources = [ "ICDConfig.h" ]
+
+  deps = [ ":icd_buildconfig" ]
+}
+
 source_set("observer") {
   sources = [ "ICDStateObserver.h" ]
 }
@@ -26,8 +47,10 @@ source_set("notifier") {
     "ICDNotifier.h",
   ]
 
-  deps = [ "${chip_root}/src/lib/core" ]
-  public_deps = [ "${chip_root}/src/app:app_config" ]
+  deps = [
+    ":icd_config",
+    "${chip_root}/src/lib/core",
+  ]
 }
 
 # ICD Manager source-set is broken out of the main source-set to enable unit tests
@@ -37,6 +60,8 @@ source_set("manager") {
     "ICDManager.cpp",
     "ICDManager.h",
   ]
+
+  deps = [ ":icd_config" ]
 
   public_deps = [
     ":cluster",

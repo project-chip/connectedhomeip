@@ -18,6 +18,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/icd/ICDConfig.h>
 #include <app/icd/ICDManagementServer.h>
 #include <app/icd/ICDManager.h>
 #include <app/icd/ICDMonitoringTable.h>

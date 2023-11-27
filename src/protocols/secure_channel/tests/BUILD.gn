@@ -22,6 +22,7 @@ chip_test_suite_using_nltest("tests") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app/icd:icd_config",
     "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/crypto/tests:tests.lib",
     "${chip_root}/src/lib/core",

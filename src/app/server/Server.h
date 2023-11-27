@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/AppConfig.h>
+#include <app/icd/ICDConfig.h>
 
 #include <access/AccessControl.h>
 #include <access/examples/ExampleAccessControlDelegate.h>

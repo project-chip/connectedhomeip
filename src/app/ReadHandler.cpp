@@ -28,6 +28,7 @@
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/MessageDef/SubscribeRequestMessage.h>
 #include <app/MessageDef/SubscribeResponseMessage.h>
+#include <app/icd/ICDConfig.h>
 #include <lib/core/TLVUtilities.h>
 #include <messaging/ExchangeContext.h>
 

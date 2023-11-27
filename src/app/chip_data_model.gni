@@ -295,7 +295,10 @@ template("chip_data_model") {
         ]
       } else if (cluster == "icd-management-server") {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
-        deps += [ "${chip_root}/src/app/icd:cluster" ]
+        deps += [
+          "${chip_root}/src/app/icd:cluster",
+          "${chip_root}/src/app/icd:icd_config",
+        ]
       } else if (cluster == "resource-monitoring-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
