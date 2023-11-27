@@ -23,7 +23,7 @@
 #include "MinimalMdnsServer.h"
 #include "ServiceNaming.h"
 
-#include <app/AppConfig.h>
+#include <app/icd/ICDConfig.h>
 #include <crypto/RandUtils.h>
 #include <lib/dnssd/Advertiser_ImplMinimalMdnsAllocator.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>

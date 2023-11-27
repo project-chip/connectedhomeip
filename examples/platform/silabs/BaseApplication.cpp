@@ -25,6 +25,8 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
+#include <app/server/Server.h>
+
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
 #include "LEDWidget.h"
 #endif // ENABLE_WSTK_LEDS
@@ -37,9 +39,10 @@
 #endif // DISPLAY_ENABLED
 
 #include "SilabsDeviceDataProvider.h"
-#include <app/icd/ICDNotifier.h>
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+#include <app/icd/ICDNotifier.h> // nogncheck
+#endif
 #include <app/server/OnboardingCodesUtil.h>
-#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
 #include <lib/support/CodeUtils.h>
