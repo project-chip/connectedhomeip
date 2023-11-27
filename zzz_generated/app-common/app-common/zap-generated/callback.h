@@ -553,6 +553,14 @@ void emberAfValveConfigurationAndControlClusterInitCallback(chip::EndpointId end
  */
 void emberAfDemandResponseLoadControlClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Energy EVSE Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfEnergyEvseClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Door Lock Cluster Init
  *
  * Cluster Init
@@ -5898,6 +5906,84 @@ void emberAfDemandResponseLoadControlClusterServerTickCallback(chip::EndpointId 
 void emberAfDemandResponseLoadControlClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
+// Energy EVSE Cluster
+//
+
+/** @brief Energy EVSE Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfEnergyEvseClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Energy EVSE Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterEnergyEvseClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Energy EVSE Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfEnergyEvseClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Energy EVSE Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterEnergyEvseClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Energy EVSE Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterEnergyEvseClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Energy EVSE Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterEnergyEvseClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Energy EVSE Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfEnergyEvseClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Energy EVSE Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfEnergyEvseClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
 // Door Lock Cluster
 //
 
@@ -9631,6 +9717,48 @@ bool emberAfDemandResponseLoadControlClusterRemoveLoadControlEventRequestCallbac
 bool emberAfDemandResponseLoadControlClusterClearLoadControlEventsRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::DecodableType & commandData);
+/**
+ * @brief Energy EVSE Cluster Disable Command callback (from client)
+ */
+bool emberAfEnergyEvseClusterDisableCallback(chip::app::CommandHandler * commandObj,
+                                             const chip::app::ConcreteCommandPath & commandPath,
+                                             const chip::app::Clusters::EnergyEvse::Commands::Disable::DecodableType & commandData);
+/**
+ * @brief Energy EVSE Cluster EnableCharging Command callback (from client)
+ */
+bool emberAfEnergyEvseClusterEnableChargingCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::EnergyEvse::Commands::EnableCharging::DecodableType & commandData);
+/**
+ * @brief Energy EVSE Cluster EnableDischarging Command callback (from client)
+ */
+bool emberAfEnergyEvseClusterEnableDischargingCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::EnergyEvse::Commands::EnableDischarging::DecodableType & commandData);
+/**
+ * @brief Energy EVSE Cluster StartDiagnostics Command callback (from client)
+ */
+bool emberAfEnergyEvseClusterStartDiagnosticsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::EnergyEvse::Commands::StartDiagnostics::DecodableType & commandData);
+/**
+ * @brief Energy EVSE Cluster SetTargets Command callback (from client)
+ */
+bool emberAfEnergyEvseClusterSetTargetsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::EnergyEvse::Commands::SetTargets::DecodableType & commandData);
+/**
+ * @brief Energy EVSE Cluster GetTargets Command callback (from client)
+ */
+bool emberAfEnergyEvseClusterGetTargetsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::EnergyEvse::Commands::GetTargets::DecodableType & commandData);
+/**
+ * @brief Energy EVSE Cluster ClearTargets Command callback (from client)
+ */
+bool emberAfEnergyEvseClusterClearTargetsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::EnergyEvse::Commands::ClearTargets::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */

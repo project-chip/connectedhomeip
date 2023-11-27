@@ -4116,6 +4116,327 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::EnergyEvse::Id: {
+        using namespace app::Clusters::EnergyEvse;
+        switch (aPath.mEventId)
+        {
+        case Events::EVConnected::Id: {
+            Events::EVConnected::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_sessionID;
+            std::string value_sessionIDClassName     = "java/lang/Long";
+            std::string value_sessionIDCtorSignature = "(J)V";
+            jlong jnivalue_sessionID                 = static_cast<jlong>(cppValue.sessionID);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_sessionIDClassName.c_str(), value_sessionIDCtorSignature.c_str(), jnivalue_sessionID, value_sessionID);
+
+            jclass EVConnectedStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$EnergyEvseClusterEVConnectedEvent", EVConnectedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$EnergyEvseClusterEVConnectedEvent");
+                return nullptr;
+            }
+            jmethodID EVConnectedStructCtor = env->GetMethodID(EVConnectedStructClass, "<init>", "(Ljava/lang/Long;)V");
+            if (EVConnectedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$EnergyEvseClusterEVConnectedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(EVConnectedStructClass, EVConnectedStructCtor, value_sessionID);
+
+            return value;
+        }
+        case Events::EVNotDetected::Id: {
+            Events::EVNotDetected::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_sessionID;
+            std::string value_sessionIDClassName     = "java/lang/Long";
+            std::string value_sessionIDCtorSignature = "(J)V";
+            jlong jnivalue_sessionID                 = static_cast<jlong>(cppValue.sessionID);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_sessionIDClassName.c_str(), value_sessionIDCtorSignature.c_str(), jnivalue_sessionID, value_sessionID);
+
+            jobject value_state;
+            std::string value_stateClassName     = "java/lang/Integer";
+            std::string value_stateCtorSignature = "(I)V";
+            jint jnivalue_state                  = static_cast<jint>(cppValue.state);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_stateClassName.c_str(), value_stateCtorSignature.c_str(), jnivalue_state, value_state);
+
+            jobject value_sessionDuration;
+            std::string value_sessionDurationClassName     = "java/lang/Long";
+            std::string value_sessionDurationCtorSignature = "(J)V";
+            jlong jnivalue_sessionDuration                 = static_cast<jlong>(cppValue.sessionDuration);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_sessionDurationClassName.c_str(),
+                                                                        value_sessionDurationCtorSignature.c_str(),
+                                                                        jnivalue_sessionDuration, value_sessionDuration);
+
+            jobject value_sessionEnergyCharged;
+            std::string value_sessionEnergyChargedClassName     = "java/lang/Long";
+            std::string value_sessionEnergyChargedCtorSignature = "(J)V";
+            jlong jnivalue_sessionEnergyCharged                 = static_cast<jlong>(cppValue.sessionEnergyCharged);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_sessionEnergyChargedClassName.c_str(),
+                                                                        value_sessionEnergyChargedCtorSignature.c_str(),
+                                                                        jnivalue_sessionEnergyCharged, value_sessionEnergyCharged);
+
+            jobject value_sessionEnergyDischarged;
+            if (!cppValue.sessionEnergyDischarged.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_sessionEnergyDischarged);
+            }
+            else
+            {
+                jobject value_sessionEnergyDischargedInsideOptional;
+                std::string value_sessionEnergyDischargedInsideOptionalClassName     = "java/lang/Long";
+                std::string value_sessionEnergyDischargedInsideOptionalCtorSignature = "(J)V";
+                jlong jnivalue_sessionEnergyDischargedInsideOptional = static_cast<jlong>(cppValue.sessionEnergyDischarged.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_sessionEnergyDischargedInsideOptionalClassName.c_str(),
+                    value_sessionEnergyDischargedInsideOptionalCtorSignature.c_str(),
+                    jnivalue_sessionEnergyDischargedInsideOptional, value_sessionEnergyDischargedInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_sessionEnergyDischargedInsideOptional,
+                                                                  value_sessionEnergyDischarged);
+            }
+
+            jclass EVNotDetectedStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$EnergyEvseClusterEVNotDetectedEvent", EVNotDetectedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$EnergyEvseClusterEVNotDetectedEvent");
+                return nullptr;
+            }
+            jmethodID EVNotDetectedStructCtor =
+                env->GetMethodID(EVNotDetectedStructClass, "<init>",
+                                 "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/util/Optional;)V");
+            if (EVNotDetectedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$EnergyEvseClusterEVNotDetectedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(EVNotDetectedStructClass, EVNotDetectedStructCtor, value_sessionID, value_state,
+                                           value_sessionDuration, value_sessionEnergyCharged, value_sessionEnergyDischarged);
+
+            return value;
+        }
+        case Events::EnergyTransferStarted::Id: {
+            Events::EnergyTransferStarted::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_sessionID;
+            std::string value_sessionIDClassName     = "java/lang/Long";
+            std::string value_sessionIDCtorSignature = "(J)V";
+            jlong jnivalue_sessionID                 = static_cast<jlong>(cppValue.sessionID);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_sessionIDClassName.c_str(), value_sessionIDCtorSignature.c_str(), jnivalue_sessionID, value_sessionID);
+
+            jobject value_state;
+            std::string value_stateClassName     = "java/lang/Integer";
+            std::string value_stateCtorSignature = "(I)V";
+            jint jnivalue_state                  = static_cast<jint>(cppValue.state);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_stateClassName.c_str(), value_stateCtorSignature.c_str(), jnivalue_state, value_state);
+
+            jobject value_maximumCurrent;
+            std::string value_maximumCurrentClassName     = "java/lang/Long";
+            std::string value_maximumCurrentCtorSignature = "(J)V";
+            jlong jnivalue_maximumCurrent                 = static_cast<jlong>(cppValue.maximumCurrent);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_maximumCurrentClassName.c_str(),
+                                                                        value_maximumCurrentCtorSignature.c_str(),
+                                                                        jnivalue_maximumCurrent, value_maximumCurrent);
+
+            jclass energyTransferStartedStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$EnergyEvseClusterEnergyTransferStartedEvent",
+                energyTransferStartedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$EnergyEvseClusterEnergyTransferStartedEvent");
+                return nullptr;
+            }
+            jmethodID energyTransferStartedStructCtor = env->GetMethodID(energyTransferStartedStructClass, "<init>",
+                                                                         "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;)V");
+            if (energyTransferStartedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$EnergyEvseClusterEnergyTransferStartedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(energyTransferStartedStructClass, energyTransferStartedStructCtor, value_sessionID,
+                                           value_state, value_maximumCurrent);
+
+            return value;
+        }
+        case Events::EnergyTransferStopped::Id: {
+            Events::EnergyTransferStopped::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_sessionID;
+            std::string value_sessionIDClassName     = "java/lang/Long";
+            std::string value_sessionIDCtorSignature = "(J)V";
+            jlong jnivalue_sessionID                 = static_cast<jlong>(cppValue.sessionID);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_sessionIDClassName.c_str(), value_sessionIDCtorSignature.c_str(), jnivalue_sessionID, value_sessionID);
+
+            jobject value_state;
+            std::string value_stateClassName     = "java/lang/Integer";
+            std::string value_stateCtorSignature = "(I)V";
+            jint jnivalue_state                  = static_cast<jint>(cppValue.state);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_stateClassName.c_str(), value_stateCtorSignature.c_str(), jnivalue_state, value_state);
+
+            jobject value_reason;
+            std::string value_reasonClassName     = "java/lang/Integer";
+            std::string value_reasonCtorSignature = "(I)V";
+            jint jnivalue_reason                  = static_cast<jint>(cppValue.reason);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_reasonClassName.c_str(), value_reasonCtorSignature.c_str(), jnivalue_reason, value_reason);
+
+            jobject value_energyTransferred;
+            std::string value_energyTransferredClassName     = "java/lang/Long";
+            std::string value_energyTransferredCtorSignature = "(J)V";
+            jlong jnivalue_energyTransferred                 = static_cast<jlong>(cppValue.energyTransferred);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_energyTransferredClassName.c_str(),
+                                                                        value_energyTransferredCtorSignature.c_str(),
+                                                                        jnivalue_energyTransferred, value_energyTransferred);
+
+            jclass energyTransferStoppedStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$EnergyEvseClusterEnergyTransferStoppedEvent",
+                energyTransferStoppedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$EnergyEvseClusterEnergyTransferStoppedEvent");
+                return nullptr;
+            }
+            jmethodID energyTransferStoppedStructCtor =
+                env->GetMethodID(energyTransferStoppedStructClass, "<init>",
+                                 "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;)V");
+            if (energyTransferStoppedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$EnergyEvseClusterEnergyTransferStoppedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(energyTransferStoppedStructClass, energyTransferStoppedStructCtor, value_sessionID,
+                                           value_state, value_reason, value_energyTransferred);
+
+            return value;
+        }
+        case Events::Fault::Id: {
+            Events::Fault::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_sessionID;
+            std::string value_sessionIDClassName     = "java/lang/Long";
+            std::string value_sessionIDCtorSignature = "(J)V";
+            jlong jnivalue_sessionID                 = static_cast<jlong>(cppValue.sessionID);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_sessionIDClassName.c_str(), value_sessionIDCtorSignature.c_str(), jnivalue_sessionID, value_sessionID);
+
+            jobject value_state;
+            std::string value_stateClassName     = "java/lang/Integer";
+            std::string value_stateCtorSignature = "(I)V";
+            jint jnivalue_state                  = static_cast<jint>(cppValue.state);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_stateClassName.c_str(), value_stateCtorSignature.c_str(), jnivalue_state, value_state);
+
+            jobject value_faultStatePreviousState;
+            std::string value_faultStatePreviousStateClassName     = "java/lang/Integer";
+            std::string value_faultStatePreviousStateCtorSignature = "(I)V";
+            jint jnivalue_faultStatePreviousState                  = static_cast<jint>(cppValue.faultStatePreviousState);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_faultStatePreviousStateClassName.c_str(), value_faultStatePreviousStateCtorSignature.c_str(),
+                jnivalue_faultStatePreviousState, value_faultStatePreviousState);
+
+            jobject value_faultStateCurrentState;
+            std::string value_faultStateCurrentStateClassName     = "java/lang/Integer";
+            std::string value_faultStateCurrentStateCtorSignature = "(I)V";
+            jint jnivalue_faultStateCurrentState                  = static_cast<jint>(cppValue.faultStateCurrentState);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_faultStateCurrentStateClassName.c_str(), value_faultStateCurrentStateCtorSignature.c_str(),
+                jnivalue_faultStateCurrentState, value_faultStateCurrentState);
+
+            jclass faultStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$EnergyEvseClusterFaultEvent", faultStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$EnergyEvseClusterFaultEvent");
+                return nullptr;
+            }
+            jmethodID faultStructCtor = env->GetMethodID(
+                faultStructClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+            if (faultStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$EnergyEvseClusterFaultEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(faultStructClass, faultStructCtor, value_sessionID, value_state,
+                                           value_faultStatePreviousState, value_faultStateCurrentState);
+
+            return value;
+        }
+        case Events::Rfid::Id: {
+            Events::Rfid::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_uid;
+            jbyteArray value_uidByteArray = env->NewByteArray(static_cast<jsize>(cppValue.uid.size()));
+            env->SetByteArrayRegion(value_uidByteArray, 0, static_cast<jsize>(cppValue.uid.size()),
+                                    reinterpret_cast<const jbyte *>(cppValue.uid.data()));
+            value_uid = value_uidByteArray;
+
+            jclass rfidStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$EnergyEvseClusterRfidEvent", rfidStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$EnergyEvseClusterRfidEvent");
+                return nullptr;
+            }
+            jmethodID rfidStructCtor = env->GetMethodID(rfidStructClass, "<init>", "([B)V");
+            if (rfidStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$EnergyEvseClusterRfidEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(rfidStructClass, rfidStructCtor, value_uid);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::DoorLock::Id: {
         using namespace app::Clusters::DoorLock;
         switch (aPath.mEventId)

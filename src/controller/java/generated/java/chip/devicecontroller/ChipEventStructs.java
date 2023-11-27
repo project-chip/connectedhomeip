@@ -3119,6 +3119,462 @@ public static class DemandResponseLoadControlClusterLoadControlEventStatusChange
     return output.toString();
   }
 }
+public static class EnergyEvseClusterEVConnectedEvent {
+  public Long sessionID;
+  private static final long SESSION_I_D_ID = 0L;
+
+  public EnergyEvseClusterEVConnectedEvent(
+    Long sessionID
+  ) {
+    this.sessionID = sessionID;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SESSION_I_D_ID, new UIntType(sessionID)));
+
+    return new StructType(values);
+  }
+
+  public static EnergyEvseClusterEVConnectedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long sessionID = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SESSION_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sessionID = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new EnergyEvseClusterEVConnectedEvent(
+      sessionID
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EnergyEvseClusterEVConnectedEvent {\n");
+    output.append("\tsessionID: ");
+    output.append(sessionID);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class EnergyEvseClusterEVNotDetectedEvent {
+  public Long sessionID;
+  public Integer state;
+  public Long sessionDuration;
+  public Long sessionEnergyCharged;
+  public Optional<Long> sessionEnergyDischarged;
+  private static final long SESSION_I_D_ID = 0L;
+  private static final long STATE_ID = 1L;
+  private static final long SESSION_DURATION_ID = 2L;
+  private static final long SESSION_ENERGY_CHARGED_ID = 3L;
+  private static final long SESSION_ENERGY_DISCHARGED_ID = 4L;
+
+  public EnergyEvseClusterEVNotDetectedEvent(
+    Long sessionID,
+    Integer state,
+    Long sessionDuration,
+    Long sessionEnergyCharged,
+    Optional<Long> sessionEnergyDischarged
+  ) {
+    this.sessionID = sessionID;
+    this.state = state;
+    this.sessionDuration = sessionDuration;
+    this.sessionEnergyCharged = sessionEnergyCharged;
+    this.sessionEnergyDischarged = sessionEnergyDischarged;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SESSION_I_D_ID, new UIntType(sessionID)));
+    values.add(new StructElement(STATE_ID, new UIntType(state)));
+    values.add(new StructElement(SESSION_DURATION_ID, new UIntType(sessionDuration)));
+    values.add(new StructElement(SESSION_ENERGY_CHARGED_ID, new IntType(sessionEnergyCharged)));
+    values.add(new StructElement(SESSION_ENERGY_DISCHARGED_ID, sessionEnergyDischarged.<BaseTLVType>map((nonOptionalsessionEnergyDischarged) -> new IntType(nonOptionalsessionEnergyDischarged)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static EnergyEvseClusterEVNotDetectedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long sessionID = null;
+    Integer state = null;
+    Long sessionDuration = null;
+    Long sessionEnergyCharged = null;
+    Optional<Long> sessionEnergyDischarged = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SESSION_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sessionID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == STATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          state = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SESSION_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sessionDuration = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == SESSION_ENERGY_CHARGED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          sessionEnergyCharged = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == SESSION_ENERGY_DISCHARGED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          sessionEnergyDischarged = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new EnergyEvseClusterEVNotDetectedEvent(
+      sessionID,
+      state,
+      sessionDuration,
+      sessionEnergyCharged,
+      sessionEnergyDischarged
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EnergyEvseClusterEVNotDetectedEvent {\n");
+    output.append("\tsessionID: ");
+    output.append(sessionID);
+    output.append("\n");
+    output.append("\tstate: ");
+    output.append(state);
+    output.append("\n");
+    output.append("\tsessionDuration: ");
+    output.append(sessionDuration);
+    output.append("\n");
+    output.append("\tsessionEnergyCharged: ");
+    output.append(sessionEnergyCharged);
+    output.append("\n");
+    output.append("\tsessionEnergyDischarged: ");
+    output.append(sessionEnergyDischarged);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class EnergyEvseClusterEnergyTransferStartedEvent {
+  public Long sessionID;
+  public Integer state;
+  public Long maximumCurrent;
+  private static final long SESSION_I_D_ID = 0L;
+  private static final long STATE_ID = 1L;
+  private static final long MAXIMUM_CURRENT_ID = 2L;
+
+  public EnergyEvseClusterEnergyTransferStartedEvent(
+    Long sessionID,
+    Integer state,
+    Long maximumCurrent
+  ) {
+    this.sessionID = sessionID;
+    this.state = state;
+    this.maximumCurrent = maximumCurrent;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SESSION_I_D_ID, new UIntType(sessionID)));
+    values.add(new StructElement(STATE_ID, new UIntType(state)));
+    values.add(new StructElement(MAXIMUM_CURRENT_ID, new IntType(maximumCurrent)));
+
+    return new StructType(values);
+  }
+
+  public static EnergyEvseClusterEnergyTransferStartedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long sessionID = null;
+    Integer state = null;
+    Long maximumCurrent = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SESSION_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sessionID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == STATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          state = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MAXIMUM_CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          maximumCurrent = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new EnergyEvseClusterEnergyTransferStartedEvent(
+      sessionID,
+      state,
+      maximumCurrent
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EnergyEvseClusterEnergyTransferStartedEvent {\n");
+    output.append("\tsessionID: ");
+    output.append(sessionID);
+    output.append("\n");
+    output.append("\tstate: ");
+    output.append(state);
+    output.append("\n");
+    output.append("\tmaximumCurrent: ");
+    output.append(maximumCurrent);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class EnergyEvseClusterEnergyTransferStoppedEvent {
+  public Long sessionID;
+  public Integer state;
+  public Integer reason;
+  public Long energyTransferred;
+  private static final long SESSION_I_D_ID = 0L;
+  private static final long STATE_ID = 1L;
+  private static final long REASON_ID = 2L;
+  private static final long ENERGY_TRANSFERRED_ID = 4L;
+
+  public EnergyEvseClusterEnergyTransferStoppedEvent(
+    Long sessionID,
+    Integer state,
+    Integer reason,
+    Long energyTransferred
+  ) {
+    this.sessionID = sessionID;
+    this.state = state;
+    this.reason = reason;
+    this.energyTransferred = energyTransferred;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SESSION_I_D_ID, new UIntType(sessionID)));
+    values.add(new StructElement(STATE_ID, new UIntType(state)));
+    values.add(new StructElement(REASON_ID, new UIntType(reason)));
+    values.add(new StructElement(ENERGY_TRANSFERRED_ID, new IntType(energyTransferred)));
+
+    return new StructType(values);
+  }
+
+  public static EnergyEvseClusterEnergyTransferStoppedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long sessionID = null;
+    Integer state = null;
+    Integer reason = null;
+    Long energyTransferred = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SESSION_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sessionID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == STATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          state = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == REASON_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          reason = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ENERGY_TRANSFERRED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          energyTransferred = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new EnergyEvseClusterEnergyTransferStoppedEvent(
+      sessionID,
+      state,
+      reason,
+      energyTransferred
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EnergyEvseClusterEnergyTransferStoppedEvent {\n");
+    output.append("\tsessionID: ");
+    output.append(sessionID);
+    output.append("\n");
+    output.append("\tstate: ");
+    output.append(state);
+    output.append("\n");
+    output.append("\treason: ");
+    output.append(reason);
+    output.append("\n");
+    output.append("\tenergyTransferred: ");
+    output.append(energyTransferred);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class EnergyEvseClusterFaultEvent {
+  public Long sessionID;
+  public Integer state;
+  public Integer faultStatePreviousState;
+  public Integer faultStateCurrentState;
+  private static final long SESSION_I_D_ID = 0L;
+  private static final long STATE_ID = 1L;
+  private static final long FAULT_STATE_PREVIOUS_STATE_ID = 2L;
+  private static final long FAULT_STATE_CURRENT_STATE_ID = 4L;
+
+  public EnergyEvseClusterFaultEvent(
+    Long sessionID,
+    Integer state,
+    Integer faultStatePreviousState,
+    Integer faultStateCurrentState
+  ) {
+    this.sessionID = sessionID;
+    this.state = state;
+    this.faultStatePreviousState = faultStatePreviousState;
+    this.faultStateCurrentState = faultStateCurrentState;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SESSION_I_D_ID, new UIntType(sessionID)));
+    values.add(new StructElement(STATE_ID, new UIntType(state)));
+    values.add(new StructElement(FAULT_STATE_PREVIOUS_STATE_ID, new UIntType(faultStatePreviousState)));
+    values.add(new StructElement(FAULT_STATE_CURRENT_STATE_ID, new UIntType(faultStateCurrentState)));
+
+    return new StructType(values);
+  }
+
+  public static EnergyEvseClusterFaultEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long sessionID = null;
+    Integer state = null;
+    Integer faultStatePreviousState = null;
+    Integer faultStateCurrentState = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SESSION_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sessionID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == STATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          state = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == FAULT_STATE_PREVIOUS_STATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          faultStatePreviousState = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == FAULT_STATE_CURRENT_STATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          faultStateCurrentState = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new EnergyEvseClusterFaultEvent(
+      sessionID,
+      state,
+      faultStatePreviousState,
+      faultStateCurrentState
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EnergyEvseClusterFaultEvent {\n");
+    output.append("\tsessionID: ");
+    output.append(sessionID);
+    output.append("\n");
+    output.append("\tstate: ");
+    output.append(state);
+    output.append("\n");
+    output.append("\tfaultStatePreviousState: ");
+    output.append(faultStatePreviousState);
+    output.append("\n");
+    output.append("\tfaultStateCurrentState: ");
+    output.append(faultStateCurrentState);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class EnergyEvseClusterRFIDEvent {
+  public byte[] uid;
+  private static final long UID_ID = 0L;
+
+  public EnergyEvseClusterRFIDEvent(
+    byte[] uid
+  ) {
+    this.uid = uid;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(UID_ID, new ByteArrayType(uid)));
+
+    return new StructType(values);
+  }
+
+  public static EnergyEvseClusterRFIDEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] uid = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == UID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          uid = castingValue.value(byte[].class);
+        }
+      }
+    }
+    return new EnergyEvseClusterRFIDEvent(
+      uid
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EnergyEvseClusterRFIDEvent {\n");
+    output.append("\tuid: ");
+    output.append(Arrays.toString(uid));
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DoorLockClusterDoorLockAlarmEvent {
   public Integer alarmCode;
   private static final long ALARM_CODE_ID = 0L;

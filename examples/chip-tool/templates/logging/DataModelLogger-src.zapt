@@ -162,7 +162,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
 {{/first}}
             case {{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::Id:
             {
-                {{zapTypeToDecodableClusterObjectType name ns=parent.name forceNotOptional=true}} value;
+                {{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType value;
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
                 return DataModelLogger::LogValue("{{name}}", 1, value);
             }
