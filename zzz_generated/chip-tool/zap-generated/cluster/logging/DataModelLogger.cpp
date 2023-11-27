@@ -8977,7 +8977,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("OperationalStateList", 1, value);
         }
         case OvenCavityOperationalState::Attributes::OperationalState::Id: {
-            uint8_t value;
+            chip::app::Clusters::OvenCavityOperationalState::OperationalStateEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalState", 1, value);
         }
