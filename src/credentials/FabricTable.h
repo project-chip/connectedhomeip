@@ -386,6 +386,11 @@ public:
         virtual void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex){};
 
         /**
+         * Gets called when a fabric is added to Fabric Table, by AddingNewPendingFabricCommon.
+         **/
+        virtual void OnFabricAdded(const FabricTable & fabricTable, FabricIndex fabricIndex){};
+
+        /**
          * Gets called when operational credentials are changed, which may not be persistent.
          *
          * Can be used to affect what is needed for UpdateNOC prior to commit.
@@ -1154,6 +1159,7 @@ private:
      */
     CHIP_ERROR ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader);
 
+    CHIP_ERROR NotifyFabricAdded(FabricIndex fabricIndex);
     CHIP_ERROR NotifyFabricUpdated(FabricIndex fabricIndex);
     CHIP_ERROR NotifyFabricCommitted(FabricIndex fabricIndex);
 
