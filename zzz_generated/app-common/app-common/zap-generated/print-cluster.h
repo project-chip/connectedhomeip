@@ -292,6 +292,13 @@
 #define CHIP_PRINTCLUSTER_TIMER_CLUSTER
 #endif
 
+#if defined(ZCL_USING_OPERATIONAL_STATE_OVEN_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_STATE_OVEN_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_OVEN_CLUSTER                                                                           \
+    { chip::app::Clusters::OvenCavityOperationalState::Id, "Oven Cavity Operational State" },
+#else
+#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_OVEN_CLUSTER
+#endif
+
 #if defined(ZCL_USING_OVEN_MODE_CLUSTER_SERVER) || defined(ZCL_USING_OVEN_MODE_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_OVEN_MODE_CLUSTER { chip::app::Clusters::OvenMode::Id, "Oven Mode" },
 #else
@@ -762,6 +769,7 @@
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_TIMER_CLUSTER                                                                                                \
+    CHIP_PRINTCLUSTER_OPERATIONAL_STATE_OVEN_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_OVEN_MODE_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_LAUNDRY_DRYER_CONTROLS_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
