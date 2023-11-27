@@ -83,7 +83,7 @@ public:
     virtual CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex) = 0;
 
     /**
-     * Validate received ICD Check-in message payload, consumer has to provide keys and see whether it's the right key, 
+     * Validate received ICD Check-in message payload, consumer has to provide keys and see whether it's the right key,
      * further check its received counter value is valid, then return the matched ICDClientInfo. If anything wrong,
      * return false, ICDClientInfo cannot be updated.
      * @param[in] payload received checkIn Message payload

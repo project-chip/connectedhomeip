@@ -18,12 +18,24 @@
 #pragma once
 
 #include "ICDClientStorage.h"
-#include "ICDStorage.h"
 #include <lib/core/CHIPCore.h>
 
 #include <lib/core/TLV.h>
 #include <lib/support/Pool.h>
 #include <vector>
+#include <crypto/CHIPCryptoPAL.h>
+#include <crypto/SessionKeystore.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/core/ScopedNodeId.h>
+
+// TODO: SymmetricKeystore is an alias for SessionKeystore, replace the below when sdk supports SymmetricKeystore
+namespace chip {
+namespace Crypto {
+using SymmetricKeystore = SessionKeystore;
+} // namespace Crypto
+} // namespace chip
 
 namespace chip {
 namespace app {
@@ -36,7 +48,11 @@ class DefaultICDClientStorage : public ICDClientStorage
 public:
     static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS;
 
+    CHIP_ERROR Init(PersistentStorageDelegate * clientInfoStore, Crypto::SymmetricKeystore * keyStore, size_t clientInfoSize);
+
     ICDClientInfoIterator * IterateICDClientInfo() override;
+
+    CHIP_ERROR UpdateFabricList(FabricIndex fabricIndex);
 
     CHIP_ERROR SetKey(ICDClientInfo & clientInfo, const ByteSpan keyData) override;
 
@@ -44,28 +60,9 @@ public:
 
     CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNodeId) override;
 
-    /**
-     * Add the storage instance in the persistent storage manager
-     * When new fabric is created, the new ICD storage would be put in storage managemment.
-     *
-     * @param[in] aStorage the storage instance to be added
-     */
-    CHIP_ERROR AddStorage(ICDStorage && storage);
-
-    /**
-     * Removes the storage instance associated with the specified fabric index from
-     * the persistent storage manager.
-     * Called When fabricIndex is removed, the corresponding storage is removed.
-     *
-     * @param[in] aFabricIndex the index of the fabric for which to remove storage instance
-     */
-    void RemoveStorage(FabricIndex aFabricIndex);
-
-    CHIP_ERROR DeleteAllEntries(FabricIndex aFabricIndex) override;
+    CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex) override;
 
     bool ValidateCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) override;
-
-    size_t Size();
 
 protected:
     enum class Tag : uint8_t
@@ -77,9 +74,6 @@ protected:
         kMonitoredSubject = 5,
         kSharedKey        = 6
     };
-
-    CHIP_ERROR Save(TLV::TLVWriter & writer, const std::vector<ICDClientInfo> & clientInfoVector);
-
     class ICDClientInfoIteratorImpl : public ICDClientInfoIterator
     {
     public:
@@ -90,29 +84,26 @@ protected:
 
     private:
         DefaultICDClientStorage & mManager;
-        size_t mStorageIndex    = 0;
+        size_t mFabricListIndex    = 0;
         size_t mClientInfoIndex = 0;
         std::vector<ICDClientInfo> mClientInfoVector;
     };
 
-    static constexpr size_t MaxICDClientInfoSize()
-    {
-        // All the fields added together
-        return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t), sizeof(uint32_t),
-                                           sizeof(uint64_t), sizeof(Crypto::Aes128KeyByteArray));
-    }
-
 private:
     friend class ICDClientInfoIteratorImpl;
-    CHIP_ERROR UpdateCounter(ICDStorage & storage, bool increase);
-    CHIP_ERROR DeleteCounter(ICDStorage & storage);
-    CHIP_ERROR DeleteClientInfo(ICDStorage & storage);
-    CHIP_ERROR DeleteKey(ICDStorage & storage, Crypto::Aes128KeyHandle & sharedKey);
-    CHIP_ERROR Load(ICDStorage & storage, std::vector<ICDClientInfo> & clientInfoVector);
-    ICDStorage * FindStorage(FabricIndex fabricIndex);
+    CHIP_ERROR LoadFabricList();
+    CHIP_ERROR MaxICDClientInfoSize(size_t & size);
+
+    CHIP_ERROR UpdateCounter(FabricIndex fabricIndex, bool increase);
+
+    CHIP_ERROR Save(TLV::TLVWriter & writer, const std::vector<ICDClientInfo> & clientInfoVector);
+    CHIP_ERROR Load(FabricIndex fabricIndex, std::vector<ICDClientInfo> & clientInfoVector);
 
     ObjectPool<ICDClientInfoIteratorImpl, kIteratorsMax> mICDClientInfoIterators;
-    std::vector<ICDStorage> mStorages;
+
+    PersistentStorageDelegate * mpClientInfoStore = nullptr;
+    Crypto::SymmetricKeystore * mpKeyStore        = nullptr;
+    std::vector<FabricIndex> mFabricList;
 };
 } // namespace app
 } // namespace chip

@@ -27,7 +27,7 @@ using namespace chip;
 using namespace app;
 using namespace System;
 using TestSessionKeystoreImpl = Crypto::DefaultSessionKeystore;
- 
+
 constexpr uint8_t kKeyBuffer1[] = {
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
 };
@@ -37,17 +37,6 @@ constexpr uint8_t kKeyBuffer2[] = {
 };
 constexpr uint8_t kKeyBuffer3[] = {
     0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f
-};
-
-class DefaultICDClientStorageTest : public DefaultICDClientStorage
-{
-public:
-    CHIP_ERROR TestSave(TLV::TLVWriter & aWriter, const std::vector<ICDClientInfo> & clientInfoVector)
-    {
-        return Save(aWriter, clientInfoVector);
-    }
-
-    static constexpr size_t TestMaxClientInfoSize() { return MaxICDClientInfoSize(); }
 };
 
 struct TestClientInfo : public ICDClientInfo
@@ -68,12 +57,14 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
     FabricIndex fabricId = 1;
     NodeId nodeId1       = 6666;
     NodeId nodeId2       = 6667;
-    DefaultICDClientStorage defaultICDClientStorage;
+    DefaultICDClientStorage manager;
     TestPersistentStorageDelegate clientInfoStorage;
     TestSessionKeystoreImpl keystore;
-    ICDStorage testStorage(fabricId, &clientInfoStorage, &keystore);
-    DefaultICDClientStorageTest manager;
-    err = manager.AddStorage(std::move(testStorage));
+    size_t clientInfoSize = TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t), sizeof(uint32_t),
+                                           sizeof(uint64_t), sizeof(Crypto::Aes128KeyByteArray));
+    err = manager.Init(&clientInfoStorage, &keystore, clientInfoSize);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = manager.UpdateFabricList(fabricId);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     // Write some ClientInfos and see the counts are correct
     ICDClientInfo clientInfo1;
@@ -124,11 +115,6 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
     }
     iterator->Release();
     NL_TEST_ASSERT(apSuite, count == 0);
-
-    manager.RemoveStorage(fabricId);
-
-    err = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_FOUND);
 }
 
 void TestClientInfoCountMultipleFabric(nlTestSuite * apSuite, void * apContext)
@@ -139,19 +125,18 @@ void TestClientInfoCountMultipleFabric(nlTestSuite * apSuite, void * apContext)
     NodeId nodeId1        = 6666;
     NodeId nodeId2        = 6667;
     NodeId nodeId3        = 6668;
-    DefaultICDClientStorage defaultICDClientStorage;
-    TestPersistentStorageDelegate clientInfoStorage1;
-    TestSessionKeystoreImpl keystore1;
-    ICDStorage testStorage1(fabricId1, &clientInfoStorage1, &keystore1);
-    TestPersistentStorageDelegate clientInfoStorage2;
-    TestSessionKeystoreImpl keystore2;
-    ICDStorage testStorage2(fabricId2, &clientInfoStorage2, &keystore2);
-
-    DefaultICDClientStorageTest manager;
-
-    err = manager.AddStorage(std::move(testStorage1));
-    err = manager.AddStorage(std::move(testStorage2));
+    DefaultICDClientStorage manager;
+    TestPersistentStorageDelegate clientInfoStorage;
+    TestSessionKeystoreImpl keystore;
+    size_t clientInfoSize = TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t), sizeof(uint32_t),
+                                           sizeof(uint64_t), sizeof(Crypto::Aes128KeyByteArray));
+    err = manager.Init(&clientInfoStorage, &keystore, clientInfoSize);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = manager.UpdateFabricList(fabricId1);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = manager.UpdateFabricList(fabricId2);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
     // Write some ClientInfos and see the counts are correct
     ICDClientInfo clientInfo1;
     clientInfo1.mPeerNode = ScopedNodeId(nodeId1, fabricId1);
@@ -202,14 +187,6 @@ void TestClientInfoCountMultipleFabric(nlTestSuite * apSuite, void * apContext)
     }
     iterator->Release();
     NL_TEST_ASSERT(apSuite, count == 0);
-
-    manager.RemoveStorage(fabricId1);
-    manager.RemoveStorage(fabricId2);
-
-    err = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_FOUND);
-    err = manager.SetKey(clientInfo3, ByteSpan(kKeyBuffer2));
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_FOUND);
 }
 
 /**

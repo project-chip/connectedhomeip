@@ -22,6 +22,51 @@
 
 #include <stdio.h>
 
+/**
+ * @def CHIP_CONFIG_ICD_CLIENT_INFO_KEY_CONST
+ *
+ * @brief Defines ICD Client Info Key const
+ */
+#ifndef CHIP_CONFIG_ICD_CLIENT_INFO_KEY_CONST
+#define CHIP_CONFIG_ICD_CLIENT_INFO_KEY_CONST "g/%x/icdkey"
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_CLIENT_INFO_COUNT
+ *
+ * @brief Defines ICD Client Info count formater
+ */
+#ifndef CHIP_CONFIG_ICD_CLIENT_INFO_COUNT
+#define CHIP_CONFIG_ICD_CLIENT_INFO_COUNT "g/%x/icdcount"
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_CLIENT_INFO_MAX_SIZE
+ *
+ * @brief Defines ICD Client Info count formater
+ */
+#ifndef CHIP_CONFIG_ICD_CLIENT_INFO_MAX_SIZE_CONST
+#define CHIP_CONFIG_ICD_CLIENT_INFO_MAX_SIZE_CONST "g/icdsize"
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_FABRIC_LIST
+ *
+ * @brief Defines ICD Fabric List
+ */
+#ifndef CHIP_CONFIG_ICD_FABRIC_LIST
+#define CHIP_CONFIG_ICD_FABRIC_LIST "g/icdfl"
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_FABRIC_LIST_COUNTER
+ *
+ * @brief Defines ICD Fabric List Counter
+ */
+#ifndef CHIP_CONFIG_ICD_FABRIC_LIST_COUNTER
+#define CHIP_CONFIG_ICD_FABRIC_LIST_COUNTER "g/icdflc"
+#endif
+
 namespace chip {
 
 /**
@@ -230,12 +275,21 @@ public:
     static StorageKeyName TSTimeZone() { return StorageKeyName::FromConst("g/ts/tz"); }
     static StorageKeyName TSDSTOffset() { return StorageKeyName::FromConst("g/ts/dsto"); }
 
-    static StorageKeyName FabricICDClientInfoCounter(FabricIndex fabric)
+    static StorageKeyName FabricICDClientInfoMaxSize()
     {
-        return StorageKeyName::Formatted(CHIP_CONFIG_ICD_CLIENT_INFO_COUNT_FORMATER, fabric);
+        return StorageKeyName::FromConst(CHIP_CONFIG_ICD_CLIENT_INFO_MAX_SIZE_CONST);
     }
 
-    static StorageKeyName ICDClientInfoKey() { return StorageKeyName::FromConst(CHIP_CONFIG_ICD_CLIENT_INFO_KEY_CONST); }
+    static StorageKeyName FabricICDClientInfoCounter(FabricIndex fabric)
+    {
+        return StorageKeyName::Formatted(CHIP_CONFIG_ICD_CLIENT_INFO_COUNT, fabric);
+    }
+
+    static StorageKeyName ICDClientInfoKey(FabricIndex fabric) { return StorageKeyName::Formatted(CHIP_CONFIG_ICD_CLIENT_INFO_KEY_CONST, fabric); }
+
+    static StorageKeyName ICDFabricList() { return StorageKeyName::FromConst(CHIP_CONFIG_ICD_FABRIC_LIST); }
+
+    static StorageKeyName ICDFabricListCounter() { return StorageKeyName::FromConst(CHIP_CONFIG_ICD_FABRIC_LIST_COUNTER); }
 };
 
 } // namespace chip

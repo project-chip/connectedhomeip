@@ -21,7 +21,6 @@ source_set("manager") {
     "DefaultICDClientStorage.h",
     "ICDClientInfo.h",
     "ICDClientStorage.h",
-    "ICDStorage.h",
   ]
 
   deps = [ "${chip_root}/src/lib/core" ]
