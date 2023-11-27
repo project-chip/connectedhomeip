@@ -67,6 +67,8 @@ CHIP_ERROR AppContext::SetUpTestSuite()
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit((err = chip::Platform::MemoryInit()) == CHIP_NO_ERROR,
                  ChipLogError(AppServer, "Init CHIP memory failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrExit((err = LoopbackTransportManager::Init()) == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Init LoopbackTransportManager failed: %" CHIP_ERROR_FORMAT, err.Format()));
     VerifyOrExit((err = chip::DeviceLayer::PlatformMgr().InitChipStack()) == CHIP_NO_ERROR,
                  ChipLogError(AppServer, "Init CHIP stack failed: %" CHIP_ERROR_FORMAT, err.Format()));
 exit:
@@ -76,14 +78,13 @@ exit:
 void AppContext::TearDownTestSuite()
 {
     chip::DeviceLayer::PlatformMgr().Shutdown();
+    LoopbackTransportManager::Shutdown();
     chip::Platform::MemoryShutdown();
 }
 
 CHIP_ERROR AppContext::SetUp()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit((err = LoopbackTransportManager::Init()) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "Init LoopbackTransportManager failed: %" CHIP_ERROR_FORMAT, err.Format()));
     VerifyOrExit((err = MessagingContext::Init(&GetTransportMgr(), &GetIOContext())) == CHIP_NO_ERROR,
                  ChipLogError(AppServer, "Init MessagingContext failed: %" CHIP_ERROR_FORMAT, err.Format()));
     VerifyOrExit((err = app::InteractionModelEngine::GetInstance()->Init(
@@ -103,7 +104,6 @@ void AppContext::TearDown()
     Access::ResetAccessControlToDefault();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     MessagingContext::Shutdown();
-    LoopbackTransportManager::Shutdown();
 }
 
 } // namespace Test
