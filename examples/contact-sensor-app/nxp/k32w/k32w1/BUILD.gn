@@ -87,7 +87,7 @@ k32w1_executable("contact_sensor_app") {
   deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/contact-sensor-app/contact-sensor-common",
+    "${chip_root}/examples/contact-sensor-app/nxp/zap",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform:syscalls_stub",
