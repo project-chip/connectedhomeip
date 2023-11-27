@@ -15039,39 +15039,6 @@ struct TypeInfo
 };
 } // namespace Attributes
 namespace Events {
-namespace OperationalError {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-
-enum class Fields : uint8_t
-{
-    kErrorState = 0,
-};
-
-struct Type
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::OperationalError::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    Structs::ErrorStateStruct::Type errorState;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::OperationalError::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
-
-    Structs::ErrorStateStruct::DecodableType errorState;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace OperationalError
 namespace OperationCompletion {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 

@@ -1660,44 +1660,6 @@ static id _Nullable DecodeEventPayloadForOvenCavityOperationalStateCluster(Event
 {
     using namespace Clusters::OvenCavityOperationalState;
     switch (aEventId) {
-    case Events::OperationalError::Id: {
-        Events::OperationalError::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-
-        __auto_type * value = [MTROvenCavityOperationalStateClusterOperationalErrorEvent new];
-
-        do {
-            MTROvenCavityOperationalStateClusterErrorStateStruct * _Nonnull memberValue;
-            memberValue = [MTROvenCavityOperationalStateClusterErrorStateStruct new];
-            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorState.errorStateID];
-            if (cppValue.errorState.errorStateLabel.HasValue()) {
-                memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel.Value());
-                if (memberValue.errorStateLabel == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    *aError = err;
-                    return nil;
-                }
-            } else {
-                memberValue.errorStateLabel = nil;
-            }
-            if (cppValue.errorState.errorStateDetails.HasValue()) {
-                memberValue.errorStateDetails = AsString(cppValue.errorState.errorStateDetails.Value());
-                if (memberValue.errorStateDetails == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    *aError = err;
-                    return nil;
-                }
-            } else {
-                memberValue.errorStateDetails = nil;
-            }
-            value.errorState = memberValue;
-        } while (0);
-
-        return value;
-    }
     case Events::OperationCompletion::Id: {
         Events::OperationCompletion::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
