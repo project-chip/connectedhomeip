@@ -8977,7 +8977,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("OperationalStateList", 1, value);
         }
         case OvenCavityOperationalState::Attributes::OperationalState::Id: {
-            chip::app::Clusters::OvenCavityOperationalState::OperationalStateEnum value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalState", 1, value);
         }
@@ -16023,12 +16023,12 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case OvenCavityOperationalState::Events::OperationalError::Id: {
-            OvenCavityOperationalState::Events::OperationalError::DecodableType value;
+            chip::app::Clusters::OvenCavityOperationalState::Events::OperationalError::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalError", 1, value);
         }
         case OvenCavityOperationalState::Events::OperationCompletion::Id: {
-            OvenCavityOperationalState::Events::OperationCompletion::DecodableType value;
+            chip::app::Clusters::OvenCavityOperationalState::Events::OperationCompletion::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationCompletion", 1, value);
         }
