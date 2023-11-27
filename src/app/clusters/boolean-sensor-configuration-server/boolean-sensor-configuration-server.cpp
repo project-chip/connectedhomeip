@@ -204,7 +204,7 @@ CHIP_ERROR SuppressAlarms(EndpointId ep, chip::BitMask<BooleanSensorConfiguratio
     }
 
     Delegate * delegate = GetDelegate(ep);
-    if (isDelegateNull(delegate, ep))
+    if (!isDelegateNull(delegate, ep))
     {
         delegate->HandleSuppressRequest(alarm);
     }

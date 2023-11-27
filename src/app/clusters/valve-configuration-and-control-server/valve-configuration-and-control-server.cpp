@@ -127,11 +127,11 @@ static void onValveConfigurationAndControlTick(chip::System::Layer * systemLayer
 
 void startRemainingDurationTick(EndpointId ep)
 {
-    DataModel::Nullable<uint32_t> rDuration, oDuration;
+    DataModel::Nullable<uint32_t> oDuration;
     Delegate * delegate = GetDelegate(ep);
 
-    VerifyOrReturn(isDelegateNull(delegate, ep));
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == OpenDuration::Get(ep, oDuration));
+    VerifyOrReturn(!isDelegateNull(delegate, ep));
+    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == OpenDuration::Get(ep, oDuration), ChipLogError(Zcl, "Valve OpenDuration is null"));
     if (oDuration.IsNull())
     {
         delegate->mRemainingDuration = 0;
@@ -183,9 +183,11 @@ CHIP_ERROR CloseValve(EndpointId ep)
 
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == TargetState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kClosed),
                         attribute_error);
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kClosed),
+                        attribute_error);
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
     {
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == TargetLevel::Set(ep, chip::Percent(0)), attribute_error);
+        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == TargetLevel::SetNull(ep), attribute_error);
     }
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kTimeSync) &&
         EMBER_ZCL_STATUS_SUCCESS == AutoCloseTime::Get(ep, autoCloseTime))
@@ -200,15 +202,16 @@ CHIP_ERROR CloseValve(EndpointId ep)
     if (!isDelegateNull(delegate, ep))
     {
         delegate->HandleCloseValve();
+        (void) chip::DeviceLayer::SystemLayer().CancelTimer(onValveConfigurationAndControlTick, delegate);
+        delegate->mRemainingDuration = 0;
+    }
+    if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
+    {
+        // TODO not in current spec but proposed in
+        // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/8575
+        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentLevel::Set(ep, chip::Percent(0)), attribute_error);
     }
     emitValveStateChangedEvent(ep, ValveConfigurationAndControl::ValveStateEnum::kClosed);
-
-    // if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
-    // {
-    //     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentLevel::Set(ep, chip::Percent(0)),
-    //                         attribute_error); // TODO not in current spec but proposed in
-    //                                           // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/8575
-    // }
 
     return CHIP_NO_ERROR;
 }
@@ -241,6 +244,8 @@ CHIP_ERROR SetValveLevel(chip::EndpointId ep, DataModel::Nullable<chip::Percent>
         if (openDuration.HasValue())
         {
             oDuration.SetNonNull(openDuration.Value());
+            // TODO OpenDuration attribute shall be set with the value from this field
+            // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/8560
         }
         else
         {
@@ -278,8 +283,11 @@ CHIP_ERROR SetValveLevel(chip::EndpointId ep, DataModel::Nullable<chip::Percent>
     if (!isDelegateNull(delegate, ep))
     {
         delegate->HandleOpenValve(level);
+        delegate->mRemainingDuration = oDuration.IsNull() ? 0 : oDuration.Value();
         startRemainingDurationTick(ep);
     }
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kOpen),
+                        attribute_error);
     emitValveStateChangedEvent(ep, ValveConfigurationAndControl::ValveStateEnum::kOpen);
 
     return CHIP_NO_ERROR;
@@ -397,10 +405,7 @@ exit:
 
 void MatterValveConfigurationAndControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
 {
-    if (attributePath.mAttributeId == OpenDuration::Id)
-    {
-        startRemainingDurationTick(attributePath.mEndpointId);
-    }
+    // TODO
 }
 
 void MatterValveConfigurationAndControlPluginServerInitCallback() {}

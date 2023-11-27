@@ -3452,6 +3452,9 @@ provisional server cluster ValveConfigurationAndControl = 129 {
   readonly attribute nullable elapsed_s remainingDuration = 2;
   readonly attribute nullable ValveStateEnum currentState = 3;
   readonly attribute nullable ValveStateEnum targetState = 4;
+  readonly attribute nullable percent currentLevel = 6;
+  readonly attribute nullable percent targetLevel = 7;
+  attribute access(write: manage) nullable percent openLevel = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6426,16 +6429,19 @@ endpoint 1 {
   server cluster ValveConfigurationAndControl {
     emits event ValveStateChanged;
     emits event ValveFault;
-    ram      attribute openDuration;
+    persist  attribute openDuration;
     ram      attribute autoCloseTime;
     ram      attribute remainingDuration;
     ram      attribute currentState;
     ram      attribute targetState;
+    ram      attribute currentLevel;
+    ram      attribute targetLevel;
+    persist  attribute openLevel default = 100;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
 
     handle command Open;
