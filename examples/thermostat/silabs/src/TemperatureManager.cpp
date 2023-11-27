@@ -36,6 +36,7 @@ using namespace ::chip::DeviceLayer;
 
 constexpr EndpointId kThermostatEndpoint = 1;
 
+using chip::app:Clusters::Thermostat;
 namespace ThermAttr = chip::app::Clusters::Thermostat::Attributes;
 /**********************************************************
  * Variable declarations
@@ -47,7 +48,7 @@ CHIP_ERROR TemperatureManager::Init()
 {
     app::DataModel::Nullable<int16_t> temp;
     int16_t heatingSetpoint, coolingSetpoint;
-    uint8_t systemMode;
+    ThermostatSystemModeEnum systemMode;
 
     PlatformMgr().LockChipStack();
     ThermAttr::LocalTemperature::Get(kThermostatEndpoint, temp);
