@@ -418,14 +418,16 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         {
         case ThermostatControlSequenceEnum::kCoolingOnly:
         case ThermostatControlSequenceEnum::kCoolingWithReheat:
-            if (RequestedSystemMode == ThermostatSystemModeEnum::kHeat || RequestedSystemMode == ThermostatSystemModeEnum::kEmergencyHeat)
+            if (RequestedSystemMode == ThermostatSystemModeEnum::kHeat ||
+                RequestedSystemMode == ThermostatSystemModeEnum::kEmergencyHeat)
                 return imcode::InvalidValue;
             else
                 return imcode::Success;
 
         case ThermostatControlSequenceEnum::kHeatingOnly:
         case ThermostatControlSequenceEnum::kHeatingWithReheat:
-            if (RequestedSystemMode == ThermostatSystemModeEnum::kCool || RequestedSystemMode == ThermostatSystemModeEnum::kPrecooling)
+            if (RequestedSystemMode == ThermostatSystemModeEnum::kCool ||
+                RequestedSystemMode == ThermostatSystemModeEnum::kPrecooling)
                 return imcode::InvalidValue;
             else
                 return imcode::Success;

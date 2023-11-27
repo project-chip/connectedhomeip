@@ -25,7 +25,7 @@ using namespace ::chip::DeviceLayer;
 
 constexpr EndpointId kThermostatEndpoint = 1;
 
-using chip::app:Clusters::Thermostat;
+using chip::app : Clusters::Thermostat;
 namespace ThermAttr = chip::app::Clusters::Thermostat::Attributes;
 
 TemperatureManager TemperatureManager::sTempMgr;
