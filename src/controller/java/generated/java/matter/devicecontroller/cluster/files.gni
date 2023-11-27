@@ -135,6 +135,7 @@ matter_eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/eventstructs/OtaSoftwareUpdateRequestorClusterDownloadErrorEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/eventstructs/OtaSoftwareUpdateRequestorClusterStateTransitionEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/eventstructs/OtaSoftwareUpdateRequestorClusterVersionAppliedEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/eventstructs/OvenCavityOperationalStateClusterOperationalErrorEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/eventstructs/OvenCavityOperationalStateClusterOperationCompletionEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/eventstructs/PowerSourceClusterBatChargeFaultChangeEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/eventstructs/PowerSourceClusterBatFaultChangeEvent.kt",

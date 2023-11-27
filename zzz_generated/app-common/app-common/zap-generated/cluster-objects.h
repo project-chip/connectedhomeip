@@ -14719,8 +14719,54 @@ struct TypeInfo
 } // namespace Timer
 namespace OvenCavityOperationalState {
 namespace Structs {
-namespace ErrorStateStruct       = Clusters::detail::Structs::ErrorStateStruct;
-namespace OperationalStateStruct = Clusters::detail::Structs::OperationalStateStruct;
+namespace ErrorStateStruct {
+enum class Fields : uint8_t
+{
+    kErrorStateID      = 0,
+    kErrorStateLabel   = 1,
+    kErrorStateDetails = 2,
+};
+
+struct Type
+{
+public:
+    uint8_t errorStateID = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> errorStateLabel;
+    Optional<chip::CharSpan> errorStateDetails;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ErrorStateStruct
+namespace OperationalStateStruct {
+enum class Fields : uint8_t
+{
+    kOperationalStateID    = 0,
+    kOperationalStateLabel = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t operationalStateID = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> operationalStateLabel;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace OperationalStateStruct
 } // namespace Structs
 
 namespace Commands {
@@ -15039,6 +15085,39 @@ struct TypeInfo
 };
 } // namespace Attributes
 namespace Events {
+namespace OperationalError {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+
+enum class Fields : uint8_t
+{
+    kErrorState = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OperationalError::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    Structs::ErrorStateStruct::Type errorState;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OperationalError::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OvenCavityOperationalState::Id; }
+
+    Structs::ErrorStateStruct::DecodableType errorState;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace OperationalError
 namespace OperationCompletion {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
