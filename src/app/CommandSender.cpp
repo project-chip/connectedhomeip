@@ -34,7 +34,6 @@ namespace chip {
 namespace app {
 namespace {
 
-
 // Gets the CommandRef if available. Error returned if we expected CommandRef and it wasn't
 // provided in the response.
 template <typename ParserT>
@@ -329,7 +328,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         TLV::TLVReader commandDataReader;
 
         CommandStatusIB::Parser commandStatus;
-        err = aInvokeResponse.GetStatus(&commandStatus);
+        err                         = aInvokeResponse.GetStatus(&commandStatus);
         mAdditionalResponseElements = AdditionalInvokeResponseElements();
         if (CHIP_NO_ERROR == err)
         {
