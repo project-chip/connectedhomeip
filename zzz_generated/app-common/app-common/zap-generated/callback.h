@@ -369,6 +369,14 @@ void emberAfIcdManagementClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfTimerClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Oven Cavity Operational State Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Oven Mode Cluster Init
  *
  * Cluster Init
@@ -4127,6 +4135,82 @@ void emberAfTimerClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfTimerClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Oven Cavity Operational State Cluster
+//
+
+/** @brief Oven Cavity Operational State Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOvenCavityOperationalStateClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Oven Cavity Operational State Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterOvenCavityOperationalStateClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Oven Cavity Operational State Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOvenCavityOperationalStateClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Oven Cavity Operational State Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterOvenCavityOperationalStateClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Oven Cavity Operational State Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterOvenCavityOperationalStateClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Oven Cavity Operational State Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterOvenCavityOperationalStateClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Oven Cavity Operational State Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfOvenCavityOperationalStateClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Oven Cavity Operational State Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfOvenCavityOperationalStateClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Oven Mode Cluster
@@ -9614,6 +9698,30 @@ bool emberAfTimerClusterAddTimeCallback(chip::app::CommandHandler * commandObj, 
 bool emberAfTimerClusterReduceTimeCallback(chip::app::CommandHandler * commandObj,
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::Timer::Commands::ReduceTime::DecodableType & commandData);
+/**
+ * @brief Oven Cavity Operational State Cluster Pause Command callback (from client)
+ */
+bool emberAfOvenCavityOperationalStateClusterPauseCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OvenCavityOperationalState::Commands::Pause::DecodableType & commandData);
+/**
+ * @brief Oven Cavity Operational State Cluster Stop Command callback (from client)
+ */
+bool emberAfOvenCavityOperationalStateClusterStopCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OvenCavityOperationalState::Commands::Stop::DecodableType & commandData);
+/**
+ * @brief Oven Cavity Operational State Cluster Start Command callback (from client)
+ */
+bool emberAfOvenCavityOperationalStateClusterStartCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OvenCavityOperationalState::Commands::Start::DecodableType & commandData);
+/**
+ * @brief Oven Cavity Operational State Cluster Resume Command callback (from client)
+ */
+bool emberAfOvenCavityOperationalStateClusterResumeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OvenCavityOperationalState::Commands::Resume::DecodableType & commandData);
 /**
  * @brief Oven Mode Cluster ChangeToMode Command callback (from client)
  */

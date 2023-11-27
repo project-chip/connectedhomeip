@@ -778,6 +778,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTROvenCavityOperationalStateClusterPauseParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTROvenCavityOperationalStateClusterStopParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTROvenCavityOperationalStateClusterStartParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTROvenCavityOperationalStateClusterResumeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTROvenCavityOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTROvenModeClusterChangeToModeParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

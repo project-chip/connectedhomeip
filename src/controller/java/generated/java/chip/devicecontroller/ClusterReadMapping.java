@@ -6122,6 +6122,131 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readOvenCavityOperationalStateInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readOvenCavityOperationalStatePhaseListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOvenCavityOperationalStatePhaseListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OvenCavityOperationalStateCluster) cluster).readPhaseListAttribute(
+              (ChipClusters.OvenCavityOperationalStateCluster.PhaseListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedOvenCavityOperationalStateClusterPhaseListAttributeCallback(),
+          readOvenCavityOperationalStatePhaseListCommandParams
+        );
+        result.put("readPhaseListAttribute", readOvenCavityOperationalStatePhaseListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readOvenCavityOperationalStateCurrentPhaseCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOvenCavityOperationalStateCurrentPhaseAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OvenCavityOperationalStateCluster) cluster).readCurrentPhaseAttribute(
+              (ChipClusters.OvenCavityOperationalStateCluster.CurrentPhaseAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedOvenCavityOperationalStateClusterCurrentPhaseAttributeCallback(),
+          readOvenCavityOperationalStateCurrentPhaseCommandParams
+        );
+        result.put("readCurrentPhaseAttribute", readOvenCavityOperationalStateCurrentPhaseAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readOvenCavityOperationalStateCountdownTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOvenCavityOperationalStateCountdownTimeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OvenCavityOperationalStateCluster) cluster).readCountdownTimeAttribute(
+              (ChipClusters.OvenCavityOperationalStateCluster.CountdownTimeAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedOvenCavityOperationalStateClusterCountdownTimeAttributeCallback(),
+          readOvenCavityOperationalStateCountdownTimeCommandParams
+        );
+        result.put("readCountdownTimeAttribute", readOvenCavityOperationalStateCountdownTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readOvenCavityOperationalStateOperationalStateListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOvenCavityOperationalStateOperationalStateListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OvenCavityOperationalStateCluster) cluster).readOperationalStateListAttribute(
+              (ChipClusters.OvenCavityOperationalStateCluster.OperationalStateListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedOvenCavityOperationalStateClusterOperationalStateListAttributeCallback(),
+          readOvenCavityOperationalStateOperationalStateListCommandParams
+        );
+        result.put("readOperationalStateListAttribute", readOvenCavityOperationalStateOperationalStateListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readOvenCavityOperationalStateOperationalStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOvenCavityOperationalStateOperationalStateAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OvenCavityOperationalStateCluster) cluster).readOperationalStateAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readOvenCavityOperationalStateOperationalStateCommandParams
+        );
+        result.put("readOperationalStateAttribute", readOvenCavityOperationalStateOperationalStateAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readOvenCavityOperationalStateGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOvenCavityOperationalStateGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OvenCavityOperationalStateCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.OvenCavityOperationalStateCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedOvenCavityOperationalStateClusterGeneratedCommandListAttributeCallback(),
+          readOvenCavityOperationalStateGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readOvenCavityOperationalStateGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readOvenCavityOperationalStateAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOvenCavityOperationalStateAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OvenCavityOperationalStateCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.OvenCavityOperationalStateCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedOvenCavityOperationalStateClusterAcceptedCommandListAttributeCallback(),
+          readOvenCavityOperationalStateAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readOvenCavityOperationalStateAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readOvenCavityOperationalStateEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOvenCavityOperationalStateEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OvenCavityOperationalStateCluster) cluster).readEventListAttribute(
+              (ChipClusters.OvenCavityOperationalStateCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedOvenCavityOperationalStateClusterEventListAttributeCallback(),
+          readOvenCavityOperationalStateEventListCommandParams
+        );
+        result.put("readEventListAttribute", readOvenCavityOperationalStateEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readOvenCavityOperationalStateAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOvenCavityOperationalStateAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OvenCavityOperationalStateCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.OvenCavityOperationalStateCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedOvenCavityOperationalStateClusterAttributeListAttributeCallback(),
+          readOvenCavityOperationalStateAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readOvenCavityOperationalStateAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readOvenCavityOperationalStateFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOvenCavityOperationalStateFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OvenCavityOperationalStateCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readOvenCavityOperationalStateFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readOvenCavityOperationalStateFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readOvenCavityOperationalStateClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOvenCavityOperationalStateClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OvenCavityOperationalStateCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readOvenCavityOperationalStateClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readOvenCavityOperationalStateClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readOvenModeInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readOvenModeSupportedModesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readOvenModeSupportedModesAttributeInteractionInfo = new InteractionInfo(
@@ -18858,6 +18983,7 @@ public class ClusterReadMapping {
             put("booleanState", readBooleanStateInteractionInfo());
             put("icdManagement", readIcdManagementInteractionInfo());
             put("timer", readTimerInteractionInfo());
+            put("ovenCavityOperationalState", readOvenCavityOperationalStateInteractionInfo());
             put("ovenMode", readOvenModeInteractionInfo());
             put("laundryDryerControls", readLaundryDryerControlsInteractionInfo());
             put("modeSelect", readModeSelectInteractionInfo());
