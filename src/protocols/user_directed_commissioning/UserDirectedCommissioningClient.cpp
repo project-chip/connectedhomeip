@@ -121,6 +121,9 @@ uint32_t IdentificationDeclaration::WritePayload(uint8_t * payloadBuffer, size_t
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kVendorIdTag), GetVendorId())), LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kProductIdTag), GetProductId())), LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutString(chip::TLV::ContextTag(kNameTag), mDeviceName)), LogErrorOnFailure(err));
+    VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutString(chip::TLV::ContextTag(kPairingInstTag), mPairingInst)),
+                 LogErrorOnFailure(err));
+    VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kPairingHintTag), mPairingHint)), LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kCdPortTag), GetCdPort())), LogErrorOnFailure(err));
 
     VerifyOrExit(

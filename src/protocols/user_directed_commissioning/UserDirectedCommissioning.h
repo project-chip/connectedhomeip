@@ -126,6 +126,12 @@ public:
         mAppVendorIds[mNumAppVendorIds++] = vid;
     }
 
+    const char * GetPairingInst() const { return mPairingInst; }
+    void SetPairingInst(const char * pairingInst) { Platform::CopyString(mPairingInst, pairingInst); }
+
+    uint16_t GetPairingHint() const { return mPairingHint; }
+    void SetPairingHint(uint16_t pairingHint) { mPairingHint = pairingHint; }
+
     void SetNoPasscode(bool newValue) { mNoPasscode = newValue; };
     bool GetNoPasscode() const { return mNoPasscode; };
 
@@ -182,7 +188,15 @@ public:
         }
         for (size_t i = 0; i < mNumAppVendorIds; i++)
         {
-            ChipLogDetail(AppServer, "\app vendor id [%zu]: %u", i, mAppVendorIds[i]);
+            ChipLogDetail(AppServer, "\tapp vendor id [%zu]: %u", i, mAppVendorIds[i]);
+        }
+        if (strlen(mPairingInst) != 0)
+        {
+            ChipLogDetail(AppServer, "\tpairing instruction: %s", mPairingInst);
+        }
+        if (mPairingHint != 0)
+        {
+            ChipLogDetail(AppServer, "\tpairing hint: %d", mPairingHint);
         }
 
         if (mNoPasscode)
@@ -217,6 +231,8 @@ private:
         kNameTag,
         kRotatingIdTag,
         kCdPortTag,
+        kPairingInstTag,
+        kPairingHintTag,
         kAppVendorIdListTag,
         kAppVendorIdTag,
         kNoPasscodeTag,
@@ -240,6 +256,9 @@ private:
     constexpr static size_t kMaxAppVendorIds = 10;
     size_t mNumAppVendorIds                  = 0; // number of vendor Ids
     uint16_t mAppVendorIds[kMaxAppVendorIds];
+
+    char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1] = {};
+    uint16_t mPairingHint                                         = 0;
 
     bool mNoPasscode                = false;
     bool mCdUponPasscodeDialog      = false;
@@ -270,6 +289,10 @@ public:
         kBindingConfigurationFailed,
         kCommissionerPasscodeNotSupported,
         kInvalidIdentificationDeclarationParams,
+        kAppInstallConsentPending,
+        kAppInstalling,
+        kAppInstallFailed,
+        kAppInstalledRetryNeeded,
 
         kMax = UINT8_MAX
     };

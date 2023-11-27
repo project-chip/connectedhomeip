@@ -370,6 +370,8 @@ void TestUDCIdentificationDeclaration(nlTestSuite * inSuite, void * inContext)
     uint16_t port             = 123;
     const char * deviceName   = "device1";
     uint16_t vendorIdTemp     = 0;
+    uint16_t pairingHint      = 33;
+    const char * pairingInst  = "Read 6 digit code from screen";
 
     // Rotating ID is given as up to 50 hex bytes
     char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1];
@@ -382,6 +384,8 @@ void TestUDCIdentificationDeclaration(nlTestSuite * inSuite, void * inContext)
     id.SetVendorId(vendorId);
     id.SetProductId(productId);
     id.SetDeviceName(deviceName);
+    id.SetPairingInst(pairingInst);
+    id.SetPairingHint(pairingHint);
     id.SetRotatingId(rotatingId, rotatingIdLen);
     id.SetCdPort(port);
 
@@ -401,6 +405,8 @@ void TestUDCIdentificationDeclaration(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, strcmp(id.GetDeviceName(), deviceName) == 0);
     NL_TEST_ASSERT(inSuite, rotatingIdLen == id.GetRotatingIdLength());
     NL_TEST_ASSERT(inSuite, memcmp(id.GetRotatingId(), rotatingId, rotatingIdLen) == 0);
+    NL_TEST_ASSERT(inSuite, pairingHint == id.GetPairingHint());
+    NL_TEST_ASSERT(inSuite, strcmp(id.GetPairingInst(), pairingInst) == 0);
 
     NL_TEST_ASSERT(inSuite, id.GetNumAppVendorIds() == 3);
     NL_TEST_ASSERT(inSuite, id.GetAppVendorId(0, vendorIdTemp) && vendorIdTemp == 1);
@@ -427,6 +433,8 @@ void TestUDCIdentificationDeclaration(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, strcmp(idOut.GetDeviceName(), deviceName) == 0);
     NL_TEST_ASSERT(inSuite, rotatingIdLen == idOut.GetRotatingIdLength());
     NL_TEST_ASSERT(inSuite, memcmp(idOut.GetRotatingId(), rotatingId, rotatingIdLen) == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(idOut.GetPairingInst(), pairingInst) == 0);
+    NL_TEST_ASSERT(inSuite, pairingHint == idOut.GetPairingHint());
 
     NL_TEST_ASSERT(inSuite, id.GetNumAppVendorIds() == idOut.GetNumAppVendorIds());
     NL_TEST_ASSERT(inSuite, idOut.GetAppVendorId(0, vendorIdTemp) && vendorIdTemp == 1);

@@ -26,6 +26,7 @@
 #include "UserDirectedCommissioning.h"
 #include <lib/core/CHIPSafeCasts.h>
 #include <system/TLVPacketBufferBackingStore.h>
+#include <unistd.h>
 
 namespace chip {
 namespace Protocols {
@@ -247,6 +248,14 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
         case kNameTag:
             // deviceName
             err = reader.GetString(mDeviceName, sizeof(mDeviceName));
+            break;
+        case kPairingInstTag:
+            // pairingInst
+            err = reader.GetString(mPairingInst, sizeof(mPairingInst));
+            break;
+        case kPairingHintTag:
+            // pairingHint
+            err = reader.Get(mPairingHint);
             break;
         case kRotatingIdTag:
             // rotatingId
