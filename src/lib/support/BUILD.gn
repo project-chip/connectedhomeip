@@ -201,7 +201,6 @@ static_library("support") {
     "SetupDiscriminator.h",
     "SortUtils.h",
     "StateMachine.h",
-    "StorageKeyName.h",
     "StringBuilder.cpp",
     "StringBuilder.h",
     "StringSplitter.h",
