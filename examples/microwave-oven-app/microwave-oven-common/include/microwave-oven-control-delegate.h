@@ -40,19 +40,19 @@ private:
      */
     Platform::UniquePtr<std::function<Protocols::InteractionModel::Status(uint8_t, uint32_t, uint8_t)>>
         mHandleSetCookingParametersCallback;
-    Platform::UniquePtr<std::function<Protocols::InteractionModel::Status(uint32_t)>> mHandleAddMoreTimeCallback;
+    Platform::UniquePtr<std::function<Protocols::InteractionModel::Status(uint32_t)>> mHandleSetCookTimeCallback;
 
 public:
     /**
      * Handle Command Callback in application: set-cooking-parameters
      */
-    Protocols::InteractionModel::Status HandleSetCookingParametersCommandCallback(uint8_t cookMode, uint32_t cookTime,
+    Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
                                                                                   uint8_t powerSetting) override;
 
     /**
      * Handle Command Callback in application: add-more-time
      */
-    Protocols::InteractionModel::Status HandleAddMoreTimeCommandCallback(uint32_t finalCookTime) override;
+    Protocols::InteractionModel::Status HandleSetCookTimeCallback(uint32_t finalCookTime) override;
 
     /**
      * Get the value of MinPower.
@@ -78,7 +78,7 @@ public:
     /**
      * Set callback function for add more time
      */
-    void SetMicrowaveOvenControlAddMoreTimeCallback(std::function<Protocols::InteractionModel::Status(uint32_t)> aCallback);
+    void SetMicrowaveOvenControlSetCookTimeCallback(std::function<Protocols::InteractionModel::Status(uint32_t)> aCallback);
 };
 
 } // namespace MicrowaveOvenControl

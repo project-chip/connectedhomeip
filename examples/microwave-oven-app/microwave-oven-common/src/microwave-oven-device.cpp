@@ -36,7 +36,7 @@ MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCommandCallback(uint
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status MicrowaveOvenDevice::HandleMicrowaveOvenAddMoreTimeCommandCallback(uint32_t finalCookTime)
+Protocols::InteractionModel::Status MicrowaveOvenDevice::HandleMicrowaveOvenSetCookTimeCommandCallback(uint32_t finalCookTime)
 {
     // placeholder implementation
     mMicrowaveOvenControlInstance.SetCookTime(finalCookTime);

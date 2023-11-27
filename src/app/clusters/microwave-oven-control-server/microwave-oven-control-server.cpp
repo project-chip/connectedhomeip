@@ -205,10 +205,12 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         if (CookMode.HasValue())
         {
             // TODO: set Microwave Oven cooking mode by CookMode.Value().
+            reqCookMode = CookMode.Value();
         }
         else
         {
             // TODO: set Microwave Oven cooking mode to normal mode.
+            reqCookMode = 0;
         }
 
         if (CookTime.HasValue())
@@ -230,7 +232,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
             // set Microwave Oven cooking power to max power(default).
             reqPowerSetting = mDelegate->GetMaxPower();
         }
-        status = mDelegate->HandleSetCookingParametersCommandCallback(reqCookMode, reqCookTime, reqPowerSetting);
+        status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTime, reqPowerSetting);
         goto exit;
     }
     else
@@ -268,7 +270,7 @@ void Instance::HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTi
         // if the added cooking time is greater than the max cooking time, the cooking time stay unchanged.
         if (finalCookTime < kMaxCookTime)
         {
-            status = mDelegate->HandleAddMoreTimeCommandCallback(finalCookTime);
+            status = mDelegate->HandleSetCookTimeCallback(finalCookTime);
             goto exit;
         }
         else

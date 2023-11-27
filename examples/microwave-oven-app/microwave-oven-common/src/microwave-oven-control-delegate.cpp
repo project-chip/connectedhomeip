@@ -24,15 +24,15 @@ using namespace chip::app::Clusters::MicrowaveOvenControl;
 
 // Microwave Oven Control command callbacks
 Protocols::InteractionModel::Status
-ExampleMicrowaveOvenControlDelegate::HandleSetCookingParametersCommandCallback(uint8_t cookMode, uint32_t cookTime,
+ExampleMicrowaveOvenControlDelegate::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
                                                                                uint8_t powerSetting)
 {
     return (*mHandleSetCookingParametersCallback.get())(cookMode, cookTime, powerSetting);
 }
 
-Protocols::InteractionModel::Status ExampleMicrowaveOvenControlDelegate::HandleAddMoreTimeCommandCallback(uint32_t finalCookTime)
+Protocols::InteractionModel::Status ExampleMicrowaveOvenControlDelegate::HandleSetCookTimeCallback(uint32_t finalCookTime)
 {
-    return (*mHandleAddMoreTimeCallback.get())(finalCookTime);
+    return (*mHandleSetCookTimeCallback.get())(finalCookTime);
 }
 
 void ExampleMicrowaveOvenControlDelegate::SetMicrowaveOvenControlSetCookingParametersCallback(
@@ -42,8 +42,8 @@ void ExampleMicrowaveOvenControlDelegate::SetMicrowaveOvenControlSetCookingParam
         Platform::MakeUnique<std::function<Protocols::InteractionModel::Status(uint8_t, uint32_t, uint8_t)>>(aCallback);
 }
 
-void ExampleMicrowaveOvenControlDelegate::SetMicrowaveOvenControlAddMoreTimeCallback(
+void ExampleMicrowaveOvenControlDelegate::SetMicrowaveOvenControlSetCookTimeCallback(
     std::function<Protocols::InteractionModel::Status(uint32_t)> aCallback)
 {
-    mHandleAddMoreTimeCallback = Platform::MakeUnique<std::function<Protocols::InteractionModel::Status(uint32_t)>>(aCallback);
+    mHandleSetCookTimeCallback = Platform::MakeUnique<std::function<Protocols::InteractionModel::Status(uint32_t)>>(aCallback);
 }
