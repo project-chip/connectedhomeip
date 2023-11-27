@@ -38,30 +38,6 @@ chip::Access::AccessControl gPermissiveAccessControl;
 namespace chip {
 namespace Test {
 
-CHIP_ERROR AppContext::Init()
-{
-    ReturnErrorOnFailure(Super::Init());
-    ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().InitChipStack());
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
-                                                                                app::reporting::GetDefaultReportScheduler()));
-
-    Access::SetAccessControl(gPermissiveAccessControl);
-    ReturnErrorOnFailure(
-        Access::GetAccessControl().Init(chip::Access::Examples::GetPermissiveAccessControlDelegate(), gDeviceTypeResolver));
-
-    return CHIP_NO_ERROR;
-}
-
-void AppContext::Shutdown()
-{
-    Access::GetAccessControl().Finish();
-    Access::ResetAccessControlToDefault();
-
-    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
-    chip::DeviceLayer::PlatformMgr().Shutdown();
-    Super::Shutdown();
-}
-
 CHIP_ERROR AppContext::SetUpTestSuite()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
