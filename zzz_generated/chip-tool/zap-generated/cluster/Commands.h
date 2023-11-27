@@ -4912,7 +4912,6 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
-| * OperationalError                                                  | 0x0000 |
 | * OperationCompletion                                               | 0x0001 |
 \*----------------------------------------------------------------------------*/
 
@@ -16598,10 +16597,8 @@ void registerClusterOvenCavityOperationalState(Commands & commands, CredentialIs
         // Events
         //
         make_unique<ReadEvent>(Id, credsIssuerConfig),                                                               //
-        make_unique<ReadEvent>(Id, "operational-error", Events::OperationalError::Id, credsIssuerConfig),            //
         make_unique<ReadEvent>(Id, "operation-completion", Events::OperationCompletion::Id, credsIssuerConfig),      //
         make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                          //
-        make_unique<SubscribeEvent>(Id, "operational-error", Events::OperationalError::Id, credsIssuerConfig),       //
         make_unique<SubscribeEvent>(Id, "operation-completion", Events::OperationCompletion::Id, credsIssuerConfig), //
     };
 
