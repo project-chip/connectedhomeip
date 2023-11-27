@@ -6344,7 +6344,6 @@ public class ClusterIDMapping {
         }
 
         public enum Event {
-            OperationalError(0L),
             OperationCompletion(1L),;
             private final long id;
             Event(long id) {
