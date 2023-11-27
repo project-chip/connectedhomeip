@@ -1977,10 +1977,6 @@ limitations under the License.
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Temperature Controlled Cabinet" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Cooktop" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
