@@ -55,7 +55,7 @@ public:
      * @param[inout] aICDClientInfo the ICD Client information to be updated with keyData and be saved
      * @param[in] aKeyData raw key data provided by application
      */
-    virtual CHIP_ERROR SetKey(ICDClientInfo & aClientInfo, const ByteSpan aKeyData) = 0;
+    virtual CHIP_ERROR SetKey(ICDClientInfo & clientInfo, const ByteSpan keyData) = 0;
 
     /**
      * Store updated ICD ClientInfo to storage when ICD registration completes or check-in message
@@ -63,14 +63,14 @@ public:
      *
      * @param[in] aICDClientInfo the updated ICD Client Info.
      */
-    virtual CHIP_ERROR StoreEntry(ICDClientInfo & aICDClientInfo) = 0;
+    virtual CHIP_ERROR StoreEntry(ICDClientInfo & clientInfo) = 0;
 
     /**
      * Delete ICD Client persistent information associated with the specified scoped node Id.
      * when ICD device is unpaired/removed, the corresponding entry in ICD storage is removed.
      * @param aPeerNodeId scoped node with peer node id and fabric index
      */
-    virtual CHIP_ERROR DeleteEntry(const ScopedNodeId & aPeerNodeId) = 0;
+    virtual CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNodeId) = 0;
 
     /**
      * Remove all ICDClient persistent informations associated with the specified
@@ -80,15 +80,16 @@ public:
      *
      * @param[in] fabricIndex the index of the fabric for which to remove ICDClient persistent information
      */
-    virtual CHIP_ERROR DeleteAllEntries(FabricIndex aFabricIndex) = 0;
+    virtual CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex) = 0;
 
     /**
-     * Validate received ICD Check-in message payload, return true when the key decription is successful
-     * Consumer has to provide keys and see whether it's the right key, further check its received
-     * counter value is valid, then return the correponding ICDClientInfo
-     * @param[in] aPayload received checkIn Message payload
+     * Validate received ICD Check-in message payload, consumer has to provide keys and see whether it's the right key, 
+     * further check its received counter value is valid, then return the matched ICDClientInfo. If anything wrong,
+     * return false, ICDClientInfo cannot be updated.
+     * @param[in] payload received checkIn Message payload
+     * @param[out] clientInfo retrieved matched clientInfo from storage
      */
-    virtual bool ValidateCheckInPayload(const ByteSpan & aPayload, ICDClientInfo & aClientInfo) = 0;
+    virtual bool ValidateCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) = 0;
 };
 } // namespace app
 } // namespace chip
