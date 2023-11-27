@@ -22,14 +22,14 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-static constexpr EndpointId kMicrowwaveOvenEndpointId = 1;
+static constexpr EndpointId kMicrowaveOvenEndpointId = 1;
 
 Platform::UniquePtr<MicrowaveOvenDevice> gMicrowaveOvenDevice;
 
 void ApplicationInit()
 {
-    gMicrowaveOvenDevice = Platform::MakeUnique<MicrowaveOvenDevice>(kMicrowwaveOvenEndpointId);
-    gMicrowaveOvenDevice.get()->Init(kMicrowwaveOvenEndpointId);
+    gMicrowaveOvenDevice = Platform::MakeUnique<MicrowaveOvenDevice>(kMicrowaveOvenEndpointId);
+    gMicrowaveOvenDevice.get()->Init(kMicrowaveOvenEndpointId);
 }
 
 void ApplicationShutdown() {}
