@@ -124,32 +124,19 @@ public:
     static void OnIconTimeout(WindowManager::Timer & timer);
 
 protected:
-    struct StateFlags
-    {
-#if CHIP_ENABLE_OPENTHREAD
-        bool isThreadProvisioned = false;
-        bool isThreadEnabled     = false;
-#else
-        bool isWiFiProvisioned = false;
-        bool isWiFiEnabled     = false;
-#endif
-        bool haveBLEConnections = false;
-        bool isWinking          = false;
-    };
-
     Cover & GetCover();
     Cover * GetCover(chip::EndpointId endpoint);
 
     static void OnLongPressTimeout(Timer & timer);
 
     Timer * mLongPressTimer = nullptr;
-    StateFlags mState;
-    bool mTiltMode       = false;
-    bool mUpPressed      = false;
-    bool mDownPressed    = false;
-    bool mUpSuppressed   = false;
-    bool mDownSuppressed = false;
-    bool mResetWarning   = false;
+    bool isWinking          = false;
+    bool mTiltMode          = false;
+    bool mUpPressed         = false;
+    bool mDownPressed       = false;
+    bool mUpSuppressed      = false;
+    bool mDownSuppressed    = false;
+    bool mResetWarning      = false;
 
 private:
     void HandleLongPress();
@@ -158,7 +145,6 @@ private:
     Cover mCoverList[WINDOW_COVER_COUNT];
     uint8_t mCurrentCover = 0;
 
-    LEDWidget mStatusLED;
     LEDWidget mActionLED;
 #ifdef DISPLAY_ENABLED
     Timer mIconTimer;

@@ -206,6 +206,7 @@ void WindowManager::HandleLongPress()
         mCurrentCover                   = mCurrentCover < WINDOW_COVER_COUNT - 1 ? mCurrentCover + 1 : 0;
         event.Type                      = AppEvent::kEventType_CoverChange;
         AppTask::GetAppTask().PostEvent(&event);
+        ChipLogDetail(AppServer, "App controls set to cover %d", mCurrentCover + 1);
     }
     else if (mUpPressed)
     {
@@ -229,6 +230,7 @@ void WindowManager::HandleLongPress()
         mDownSuppressed = true;
         Type type       = GetCover().CycleType();
         mTiltMode       = mTiltMode && (Type::kTiltBlindLiftAndTilt == type);
+        ChipLogDetail(AppServer, "Cover type changed to %d", to_underlying(type));
     }
 }
 
@@ -624,7 +626,6 @@ CHIP_ERROR WindowManager::Init()
 
     // Initialize LEDs
     LEDWidget::InitGpio();
-    mStatusLED.Init(APP_STATE_LED);
     mActionLED.Init(APP_ACTION_LED);
 
 #ifdef DISPLAY_ENABLED
@@ -649,9 +650,6 @@ void WindowManager::UpdateLEDs()
     Cover & cover = GetCover();
     if (mResetWarning)
     {
-        mStatusLED.Set(false);
-        mStatusLED.Blink(500);
-
         mActionLED.Set(false);
         mActionLED.Blink(500);
     }
@@ -698,11 +696,7 @@ void WindowManager::UpdateLCD()
 {
     // Update LCD
 #ifdef DISPLAY_ENABLED
-#if CHIP_ENABLE_OPENTHREAD
-    if (mState.isThreadProvisioned)
-#else
-    if (BaseApplication::getWifiProvisionStatus())
-#endif // CHIP_ENABLE_OPENTHREAD
+    if (BaseApplication::GetProvisionStatus())
     {
         Cover & cover = GetCover();
         chip::app::DataModel::Nullable<uint16_t> lift;
@@ -765,7 +759,7 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
         break;
 
     case AppEvent::kEventType_Reset:
-        chip::Server::GetInstance().ScheduleFactoryReset();
+        AppTask::GetAppTask().ScheduleFactoryReset();
         break;
 
     case AppEvent::kEventType_UpPressed:
@@ -793,9 +787,9 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
         }
         else if (window->mDownPressed)
         {
-            window->mTiltMode     = !(window->mTiltMode);
-            window->mUpSuppressed = window->mDownSuppressed = true;
-            aEvent->Type                                    = AppEvent::kEventType_TiltModeChange;
+            window->mTiltMode       = !(window->mTiltMode);
+            window->mDownSuppressed = true;
+            aEvent->Type            = AppEvent::kEventType_TiltModeChange;
             AppTask::GetAppTask().PostEvent(aEvent);
         }
         else
@@ -830,8 +824,9 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
         else if (window->mUpPressed)
         {
             window->mTiltMode     = !(window->mTiltMode);
-            window->mUpSuppressed = window->mDownSuppressed = true;
-            aEvent->Type                                    = AppEvent::kEventType_TiltModeChange;
+            window->mUpSuppressed = true;
+            aEvent->Type          = AppEvent::kEventType_TiltModeChange;
+            AppTask::GetAppTask().PostEvent(aEvent);
         }
         else
         {
@@ -849,7 +844,7 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
 
     case AppEvent::kEventType_WinkOn:
     case AppEvent::kEventType_WinkOff:
-        window->mState.isWinking = (AppEvent::kEventType_WinkOn == aEvent->Type);
+        window->isWinking = (AppEvent::kEventType_WinkOn == aEvent->Type);
         window->UpdateLEDs();
         break;
 
@@ -868,6 +863,7 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
         window->UpdateLCD();
         break;
     case AppEvent::kEventType_TiltModeChange:
+        ChipLogDetail(AppServer, "App control mode changed to %s", window->mTiltMode ? "Tilt" : "Lift");
         window->mIconTimer.Start();
         window->mIcon = window->mTiltMode ? LcdIcon::Tilt : LcdIcon::Lift;
         window->UpdateLCD();

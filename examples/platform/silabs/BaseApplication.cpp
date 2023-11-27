@@ -754,7 +754,7 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     }
 }
 
-bool BaseApplication::getWifiProvisionStatus()
+bool BaseApplication::GetProvisionStatus()
 {
     return BaseApplication::sIsProvisioned;
 }

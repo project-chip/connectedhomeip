@@ -104,7 +104,7 @@ public:
      *        Turns off Status LED before stopping timer
      */
     static void StopStatusLEDTimer(void);
-    static bool getWifiProvisionStatus(void);
+    static bool GetProvisionStatus(void);
 
 #ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
     // Idenfiy server command callbacks.
