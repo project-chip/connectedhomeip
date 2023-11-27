@@ -372,6 +372,12 @@
             "CurrentPhase",
             "CountdownTime"
         ],
+        "Oven Cavity Operational State": [
+            "OperationalState",
+            "OperationalError",
+            "CurrentPhase",
+            "CountdownTime"
+        ],
         "Activated Carbon Filter Monitoring": [
             "Condition",
             "DegradationDirection",
