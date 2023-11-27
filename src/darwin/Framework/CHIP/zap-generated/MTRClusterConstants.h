@@ -6977,6 +6977,7 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterBooleanStateEventStateChangeID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000000,
 
     // Cluster OvenCavityOperationalState events
+    MTREventIDTypeClusterOvenCavityOperationalStateEventOperationalErrorID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTREventIDTypeClusterOvenCavityOperationalStateEventOperationCompletionID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
 
     // Cluster RefrigeratorAlarm events

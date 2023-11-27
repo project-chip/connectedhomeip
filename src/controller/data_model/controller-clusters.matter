@@ -2997,6 +2997,10 @@ client cluster OvenCavityOperationalState = 72 {
     optional char_string<64> operationalStateLabel = 1;
   }
 
+  critical event OperationalError = 0 {
+    ErrorStateStruct errorState = 0;
+  }
+
   info event OperationCompletion = 1 {
     enum8 completionErrorCode = 0;
     optional nullable elapsed_s totalOperationalTime = 1;

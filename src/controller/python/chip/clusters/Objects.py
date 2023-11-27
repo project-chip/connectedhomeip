@@ -15813,6 +15813,25 @@ class OvenCavityOperationalState(Cluster):
 
     class Events:
         @dataclass
+        class OperationalError(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000048
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="errorState", Tag=0, Type=OvenCavityOperationalState.Structs.ErrorStateStruct),
+                    ])
+
+            errorState: 'OvenCavityOperationalState.Structs.ErrorStateStruct' = field(default_factory=lambda: OvenCavityOperationalState.Structs.ErrorStateStruct())
+
+        @dataclass
         class OperationCompletion(ClusterEvent):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
