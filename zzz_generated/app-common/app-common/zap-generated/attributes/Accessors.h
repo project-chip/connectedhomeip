@@ -1336,8 +1336,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace CountdownTime
 
 namespace OperationalState {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::OvenCavityOperationalState::OperationalStateEnum * value); // OperationalStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OvenCavityOperationalState::OperationalStateEnum value);
 } // namespace OperationalState
 
 namespace OperationalError {

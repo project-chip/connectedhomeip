@@ -16243,8 +16243,9 @@ void registerClusterOvenCavityOperationalState(Commands & commands, CredentialIs
             const chip::app::Clusters::OvenCavityOperationalState::Structs::OperationalStateStruct::Type>>>(
             Id, "operational-state-list", Attributes::OperationalStateList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "operational-state", 0, UINT8_MAX, Attributes::OperationalState::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::OvenCavityOperationalState::OperationalStateEnum>>(
+            Id, "operational-state", 0, UINT8_MAX, Attributes::OperationalState::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::Clusters::OvenCavityOperationalState::Structs::ErrorStateStruct::Type>>(
             Id, "operational-error", Attributes::OperationalError::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
