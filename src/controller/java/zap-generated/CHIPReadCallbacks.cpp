@@ -35764,9 +35764,9 @@ void CHIPThermostatScheduleTypesAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPThermostatNumberOfScheduleTransitionsPerDayAttributeCallback::CHIPThermostatNumberOfScheduleTransitionsPerDayAttributeCallback(
+CHIPThermostatNumberOfScheduleTransitionPerDayAttributeCallback::CHIPThermostatNumberOfScheduleTransitionPerDayAttributeCallback(
     jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterNumberOfScheduleTransitionsPerDayAttributeCallbackType>(CallbackFn, this),
+    chip::Callback::Callback<CHIPThermostatClusterNumberOfScheduleTransitionPerDayAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -35783,8 +35783,7 @@ CHIPThermostatNumberOfScheduleTransitionsPerDayAttributeCallback::CHIPThermostat
     }
 }
 
-CHIPThermostatNumberOfScheduleTransitionsPerDayAttributeCallback::~
-CHIPThermostatNumberOfScheduleTransitionsPerDayAttributeCallback()
+CHIPThermostatNumberOfScheduleTransitionPerDayAttributeCallback::~CHIPThermostatNumberOfScheduleTransitionPerDayAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -35795,7 +35794,7 @@ CHIPThermostatNumberOfScheduleTransitionsPerDayAttributeCallback()
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPThermostatNumberOfScheduleTransitionsPerDayAttributeCallback::CallbackFn(
+void CHIPThermostatNumberOfScheduleTransitionPerDayAttributeCallback::CallbackFn(
     void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -35804,8 +35803,8 @@ void CHIPThermostatNumberOfScheduleTransitionsPerDayAttributeCallback::CallbackF
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPThermostatNumberOfScheduleTransitionsPerDayAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPThermostatNumberOfScheduleTransitionsPerDayAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPThermostatNumberOfScheduleTransitionPerDayAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPThermostatNumberOfScheduleTransitionPerDayAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -35828,6 +35827,138 @@ void CHIPThermostatNumberOfScheduleTransitionsPerDayAttributeCallback::CallbackF
         jint jnijavaValue                  = static_cast<jint>(value.Value());
         chip::JniReferences::GetInstance().CreateBoxedObject<jint>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
                                                                    jnijavaValue, javaValue);
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
+CHIPThermostatActivePresetHandleAttributeCallback::CHIPThermostatActivePresetHandleAttributeCallback(jobject javaCallback,
+                                                                                                     bool keepAlive) :
+    chip::Callback::Callback<CHIPThermostatClusterActivePresetHandleAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPThermostatActivePresetHandleAttributeCallback::~CHIPThermostatActivePresetHandleAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPThermostatActivePresetHandleAttributeCallback::CallbackFn(void * context,
+                                                                   const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPThermostatActivePresetHandleAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPThermostatActivePresetHandleAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        jbyteArray javaValueByteArray = env->NewByteArray(static_cast<jsize>(value.Value().size()));
+        env->SetByteArrayRegion(javaValueByteArray, 0, static_cast<jsize>(value.Value().size()),
+                                reinterpret_cast<const jbyte *>(value.Value().data()));
+        javaValue = javaValueByteArray;
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
+CHIPThermostatActiveScheduleHandleAttributeCallback::CHIPThermostatActiveScheduleHandleAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
+    chip::Callback::Callback<CHIPThermostatClusterActiveScheduleHandleAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPThermostatActiveScheduleHandleAttributeCallback::~CHIPThermostatActiveScheduleHandleAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPThermostatActiveScheduleHandleAttributeCallback::CallbackFn(void * context,
+                                                                     const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPThermostatActiveScheduleHandleAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPThermostatActiveScheduleHandleAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        jbyteArray javaValueByteArray = env->NewByteArray(static_cast<jsize>(value.Value().size()));
+        env->SetByteArrayRegion(javaValueByteArray, 0, static_cast<jsize>(value.Value().size()),
+                                reinterpret_cast<const jbyte *>(value.Value().data()));
+        javaValue = javaValueByteArray;
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
@@ -36009,72 +36140,6 @@ void CHIPThermostatPresetsAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPThermostatActivePresetHandleAttributeCallback::CHIPThermostatActivePresetHandleAttributeCallback(jobject javaCallback,
-                                                                                                     bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterActivePresetHandleAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPThermostatActivePresetHandleAttributeCallback::~CHIPThermostatActivePresetHandleAttributeCallback()
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-}
-
-void CHIPThermostatActivePresetHandleAttributeCallback::CallbackFn(void * context,
-                                                                   const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPThermostatActivePresetHandleAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPThermostatActivePresetHandleAttributeCallback *>(context), maybeDestroy);
-
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
-    VerifyOrReturn(javaCallbackRef != nullptr,
-                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
-
-    jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
-
-    jobject javaValue;
-    if (value.IsNull())
-    {
-        javaValue = nullptr;
-    }
-    else
-    {
-        jbyteArray javaValueByteArray = env->NewByteArray(static_cast<jsize>(value.Value().size()));
-        env->SetByteArrayRegion(javaValueByteArray, 0, static_cast<jsize>(value.Value().size()),
-                                reinterpret_cast<const jbyte *>(value.Value().data()));
-        javaValue = javaValueByteArray;
-    }
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
-}
-
 CHIPThermostatSchedulesAttributeCallback::CHIPThermostatSchedulesAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPThermostatClusterSchedulesAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
@@ -36135,10 +36200,19 @@ void CHIPThermostatSchedulesAttributeCallback::CallbackFn(
         auto & entry_0 = iter_arrayListObj_0.GetValue();
         jobject newElement_0;
         jobject newElement_0_scheduleHandle;
-        jbyteArray newElement_0_scheduleHandleByteArray = env->NewByteArray(static_cast<jsize>(entry_0.scheduleHandle.size()));
-        env->SetByteArrayRegion(newElement_0_scheduleHandleByteArray, 0, static_cast<jsize>(entry_0.scheduleHandle.size()),
-                                reinterpret_cast<const jbyte *>(entry_0.scheduleHandle.data()));
-        newElement_0_scheduleHandle = newElement_0_scheduleHandleByteArray;
+        if (entry_0.scheduleHandle.IsNull())
+        {
+            newElement_0_scheduleHandle = nullptr;
+        }
+        else
+        {
+            jbyteArray newElement_0_scheduleHandleByteArray =
+                env->NewByteArray(static_cast<jsize>(entry_0.scheduleHandle.Value().size()));
+            env->SetByteArrayRegion(newElement_0_scheduleHandleByteArray, 0,
+                                    static_cast<jsize>(entry_0.scheduleHandle.Value().size()),
+                                    reinterpret_cast<const jbyte *>(entry_0.scheduleHandle.Value().data()));
+            newElement_0_scheduleHandle = newElement_0_scheduleHandleByteArray;
+        }
         jobject newElement_0_systemMode;
         std::string newElement_0_systemModeClassName     = "java/lang/Integer";
         std::string newElement_0_systemModeCtorSignature = "(I)V";
@@ -36299,12 +36373,19 @@ void CHIPThermostatSchedulesAttributeCallback::CallbackFn(
         else
         {
             jobject newElement_0_builtInInsideOptional;
-            std::string newElement_0_builtInInsideOptionalClassName     = "java/lang/Boolean";
-            std::string newElement_0_builtInInsideOptionalCtorSignature = "(Z)V";
-            jboolean jninewElement_0_builtInInsideOptional              = static_cast<jboolean>(entry_0.builtIn.Value());
-            chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
-                newElement_0_builtInInsideOptionalClassName.c_str(), newElement_0_builtInInsideOptionalCtorSignature.c_str(),
-                jninewElement_0_builtInInsideOptional, newElement_0_builtInInsideOptional);
+            if (entry_0.builtIn.Value().IsNull())
+            {
+                newElement_0_builtInInsideOptional = nullptr;
+            }
+            else
+            {
+                std::string newElement_0_builtInInsideOptionalClassName     = "java/lang/Boolean";
+                std::string newElement_0_builtInInsideOptionalCtorSignature = "(Z)V";
+                jboolean jninewElement_0_builtInInsideOptional = static_cast<jboolean>(entry_0.builtIn.Value().Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                    newElement_0_builtInInsideOptionalClassName.c_str(), newElement_0_builtInInsideOptionalCtorSignature.c_str(),
+                    jninewElement_0_builtInInsideOptional, newElement_0_builtInInsideOptional);
+            }
             chip::JniReferences::GetInstance().CreateOptional(newElement_0_builtInInsideOptional, newElement_0_builtIn);
         }
 
@@ -36335,75 +36416,9 @@ void CHIPThermostatSchedulesAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPThermostatActiveScheduleHandleAttributeCallback::CHIPThermostatActiveScheduleHandleAttributeCallback(jobject javaCallback,
-                                                                                                         bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterActiveScheduleHandleAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPThermostatActiveScheduleHandleAttributeCallback::~CHIPThermostatActiveScheduleHandleAttributeCallback()
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-}
-
-void CHIPThermostatActiveScheduleHandleAttributeCallback::CallbackFn(void * context,
-                                                                     const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPThermostatActiveScheduleHandleAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPThermostatActiveScheduleHandleAttributeCallback *>(context), maybeDestroy);
-
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
-    VerifyOrReturn(javaCallbackRef != nullptr,
-                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
-
-    jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
-
-    jobject javaValue;
-    if (value.IsNull())
-    {
-        javaValue = nullptr;
-    }
-    else
-    {
-        jbyteArray javaValueByteArray = env->NewByteArray(static_cast<jsize>(value.Value().size()));
-        env->SetByteArrayRegion(javaValueByteArray, 0, static_cast<jsize>(value.Value().size()),
-                                reinterpret_cast<const jbyte *>(value.Value().data()));
-        javaValue = javaValueByteArray;
-    }
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
-}
-
-CHIPThermostatSetpointHoldPolicyExpiryTimestampAttributeCallback::CHIPThermostatSetpointHoldPolicyExpiryTimestampAttributeCallback(
+CHIPThermostatSetpointHoldExpiryTimestampAttributeCallback::CHIPThermostatSetpointHoldExpiryTimestampAttributeCallback(
     jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterSetpointHoldPolicyExpiryTimestampAttributeCallbackType>(CallbackFn, this),
+    chip::Callback::Callback<CHIPThermostatClusterSetpointHoldExpiryTimestampAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -36420,8 +36435,7 @@ CHIPThermostatSetpointHoldPolicyExpiryTimestampAttributeCallback::CHIPThermostat
     }
 }
 
-CHIPThermostatSetpointHoldPolicyExpiryTimestampAttributeCallback::~
-CHIPThermostatSetpointHoldPolicyExpiryTimestampAttributeCallback()
+CHIPThermostatSetpointHoldExpiryTimestampAttributeCallback::~CHIPThermostatSetpointHoldExpiryTimestampAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -36432,8 +36446,8 @@ CHIPThermostatSetpointHoldPolicyExpiryTimestampAttributeCallback()
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPThermostatSetpointHoldPolicyExpiryTimestampAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
+void CHIPThermostatSetpointHoldExpiryTimestampAttributeCallback::CallbackFn(void * context,
+                                                                            const chip::app::DataModel::Nullable<uint32_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -36441,8 +36455,8 @@ void CHIPThermostatSetpointHoldPolicyExpiryTimestampAttributeCallback::CallbackF
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPThermostatSetpointHoldPolicyExpiryTimestampAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPThermostatSetpointHoldPolicyExpiryTimestampAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPThermostatSetpointHoldExpiryTimestampAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPThermostatSetpointHoldExpiryTimestampAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;

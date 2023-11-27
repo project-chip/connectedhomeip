@@ -5176,7 +5176,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _scheduleHandle = [NSData data];
+        _scheduleHandle = nil;
 
         _systemMode = @(0);
 
@@ -5351,23 +5351,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRThermostatClusterThermostatScheduleTransition
+@implementation MTRThermostatClusterThermostatScheduleTransitionStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _transitionTime = @(0);
 
-        _heatSetpoint = nil;
+        _heatSetpoint = @(0);
 
-        _coolSetpoint = nil;
+        _coolSetpoint = @(0);
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRThermostatClusterThermostatScheduleTransition alloc] init];
+    auto other = [[MTRThermostatClusterThermostatScheduleTransitionStruct alloc] init];
 
     other.transitionTime = self.transitionTime;
     other.heatSetpoint = self.heatSetpoint;

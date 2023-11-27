@@ -359,10 +359,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Thermostat::Str
 
 static void Finalize(chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransition::Type & request,
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransitionStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransition::Type & request);
+static void Finalize(chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransitionStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type & request,
                         Json::Value & value);

@@ -1134,36 +1134,24 @@ namespace SetActivePresetRequest {
 static constexpr CommandId Id = 0x00000006;
 } // namespace SetActivePresetRequest
 
-namespace StartSchedulesEditRequest {
+namespace StartPresetsSchedulesEditRequest {
 static constexpr CommandId Id = 0x00000007;
-} // namespace StartSchedulesEditRequest
+} // namespace StartPresetsSchedulesEditRequest
 
-namespace CancelSchedulesEditRequest {
+namespace CancelPresetsSchedulesEditRequest {
 static constexpr CommandId Id = 0x00000008;
-} // namespace CancelSchedulesEditRequest
+} // namespace CancelPresetsSchedulesEditRequest
 
-namespace CommitSchedulesEditRequest {
+namespace CommitPresetsSchedulesRequest {
 static constexpr CommandId Id = 0x00000009;
-} // namespace CommitSchedulesEditRequest
-
-namespace StartPresetsEditRequest {
-static constexpr CommandId Id = 0x0000000A;
-} // namespace StartPresetsEditRequest
-
-namespace CancelPresetsEditRequest {
-static constexpr CommandId Id = 0x0000000B;
-} // namespace CancelPresetsEditRequest
-
-namespace CommitPresetsEditRequest {
-static constexpr CommandId Id = 0x0000000C;
-} // namespace CommitPresetsEditRequest
+} // namespace CommitPresetsSchedulesRequest
 
 namespace CancelSetActivePresetRequest {
-static constexpr CommandId Id = 0x0000000E;
+static constexpr CommandId Id = 0x0000000A;
 } // namespace CancelSetActivePresetRequest
 
 namespace SetTemperatureSetpointHoldPolicy {
-static constexpr CommandId Id = 0x0000000F;
+static constexpr CommandId Id = 0x0000000B;
 } // namespace SetTemperatureSetpointHoldPolicy
 
 } // namespace Commands

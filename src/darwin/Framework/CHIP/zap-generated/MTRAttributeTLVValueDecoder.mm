@@ -9082,17 +9082,6 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
-    case Attributes::HVACSystemTypeConfiguration::Id: {
-        using TypeInfo = Attributes::HVACSystemTypeConfiguration::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
-        return value;
-    }
     case Attributes::LocalTemperatureCalibration::Id: {
         using TypeInfo = Attributes::LocalTemperatureCalibration::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -9211,7 +9200,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::ControlSequenceOfOperation::Id: {
@@ -9233,7 +9222,18 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::AlarmMask::Id: {
+        using TypeInfo = Attributes::AlarmMask::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::ThermostatRunningMode::Id: {
@@ -9244,7 +9244,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::StartOfWeek::Id: {
@@ -9255,7 +9255,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::NumberOfWeeklyTransitions::Id: {
@@ -9288,7 +9288,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::TemperatureSetpointHoldDuration::Id: {
@@ -9314,7 +9314,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::ThermostatRunningState::Id: {
@@ -9325,7 +9325,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedShort:cppValue];
+        value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
         return value;
     }
     case Attributes::SetpointChangeSource::Id: {
@@ -9336,7 +9336,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::SetpointChangeAmount::Id: {
@@ -9474,7 +9474,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::ACCapacity::Id: {
@@ -9496,7 +9496,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::ACCompressorType::Id: {
@@ -9507,7 +9507,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::ACErrorCode::Id: {
@@ -9518,7 +9518,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedInt:cppValue];
+        value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
         return value;
     }
     case Attributes::ACLouverPosition::Id: {
@@ -9529,7 +9529,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::ACCoilTemperature::Id: {
@@ -9547,15 +9547,15 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         }
         return value;
     }
-    case Attributes::ACCapacityformat::Id: {
-        using TypeInfo = Attributes::ACCapacityformat::TypeInfo;
+    case Attributes::ACCapacityFormat::Id: {
+        using TypeInfo = Attributes::ACCapacityFormat::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::PresetTypes::Id: {
@@ -9649,8 +9649,8 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
-    case Attributes::NumberOfScheduleTransitionsPerDay::Id: {
-        using TypeInfo = Attributes::NumberOfScheduleTransitionsPerDay::TypeInfo;
+    case Attributes::NumberOfScheduleTransitionPerDay::Id: {
+        using TypeInfo = Attributes::NumberOfScheduleTransitionPerDay::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -9661,6 +9661,36 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             value = nil;
         } else {
             value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::ActivePresetHandle::Id: {
+        using TypeInfo = Attributes::ActivePresetHandle::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSData * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = AsData(cppValue.Value());
+        }
+        return value;
+    }
+    case Attributes::ActiveScheduleHandle::Id: {
+        using TypeInfo = Attributes::ActiveScheduleHandle::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSData * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = AsData(cppValue.Value());
         }
         return value;
     }
@@ -9725,32 +9755,6 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         }
         return value;
     }
-    case Attributes::PresetsEditable::Id: {
-        using TypeInfo = Attributes::PresetsEditable::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithBool:cppValue];
-        return value;
-    }
-    case Attributes::ActivePresetHandle::Id: {
-        using TypeInfo = Attributes::ActivePresetHandle::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSData * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = AsData(cppValue.Value());
-        }
-        return value;
-    }
     case Attributes::Schedules::Id: {
         using TypeInfo = Attributes::Schedules::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -9766,7 +9770,11 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
                 auto & entry_0 = iter_0.GetValue();
                 MTRThermostatClusterScheduleStruct * newElement_0;
                 newElement_0 = [MTRThermostatClusterScheduleStruct new];
-                newElement_0.scheduleHandle = AsData(entry_0.scheduleHandle);
+                if (entry_0.scheduleHandle.IsNull()) {
+                    newElement_0.scheduleHandle = nil;
+                } else {
+                    newElement_0.scheduleHandle = AsData(entry_0.scheduleHandle.Value());
+                }
                 newElement_0.systemMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.systemMode)];
                 if (entry_0.name.HasValue()) {
                     newElement_0.name = AsString(entry_0.name.Value());
@@ -9822,7 +9830,11 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
                     newElement_0.transitions = array_2;
                 }
                 if (entry_0.builtIn.HasValue()) {
-                    newElement_0.builtIn = [NSNumber numberWithBool:entry_0.builtIn.Value()];
+                    if (entry_0.builtIn.Value().IsNull()) {
+                        newElement_0.builtIn = nil;
+                    } else {
+                        newElement_0.builtIn = [NSNumber numberWithBool:entry_0.builtIn.Value().Value()];
+                    }
                 } else {
                     newElement_0.builtIn = nil;
                 }
@@ -9837,8 +9849,8 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         }
         return value;
     }
-    case Attributes::SchedulesEditable::Id: {
-        using TypeInfo = Attributes::SchedulesEditable::TypeInfo;
+    case Attributes::PresetsSchedulesEditable::Id: {
+        using TypeInfo = Attributes::PresetsSchedulesEditable::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -9846,21 +9858,6 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithBool:cppValue];
-        return value;
-    }
-    case Attributes::ActiveScheduleHandle::Id: {
-        using TypeInfo = Attributes::ActiveScheduleHandle::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSData * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = AsData(cppValue.Value());
-        }
         return value;
     }
     case Attributes::TemperatureSetpointHoldPolicy::Id: {
@@ -9874,8 +9871,8 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
-    case Attributes::SetpointHoldPolicyExpiryTimestamp::Id: {
-        using TypeInfo = Attributes::SetpointHoldPolicyExpiryTimestamp::TypeInfo;
+    case Attributes::SetpointHoldExpiryTimestamp::Id: {
+        using TypeInfo = Attributes::SetpointHoldExpiryTimestamp::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

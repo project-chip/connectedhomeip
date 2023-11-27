@@ -21,6 +21,8 @@
 #include <app/util/af-enums.h>
 #include <app/util/basic-types.h>
 
+#include <transport/Session.h>
+
 struct ThermostatMatterScheduleManager
 {
     enum editType
@@ -116,6 +118,10 @@ struct ThermostatMatterScheduleManager
     appendScheduleCB mAppendScheduleCb                 = nullptr;
     clearSchedulesCB mClearSchedulesCb                 = nullptr;
 
+    // TODO: Verify this is the right object to be tracking to ensure that the client 
+    // that started editing is the only one that can edit until it sends a cancel or commit
+    chip::SessionHolder mSession;
+
     ThermostatMatterScheduleManager * nextEditor = nullptr;
 
     bool hasNext() { return this->nextEditor != nullptr; }
@@ -127,5 +133,4 @@ struct ThermostatMatterScheduleManager
     EmberAfStatus
     ValidateSchedulesForCommitting(chip::Span<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type> & oldlist,
                                    chip::Span<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type> & newlist);
-    //    static CHIP_ERROR ValidateSchedulesForCommitting(oldlist, newlist);
 };

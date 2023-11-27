@@ -85,7 +85,7 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ThermostatClusterScheduleStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ThermostatClusterScheduleTransitionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ThermostatClusterScheduleTypeStruct.kt",
-  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ThermostatClusterThermostatScheduleTransition.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ThermostatClusterThermostatScheduleTransitionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ThreadNetworkDiagnosticsClusterNeighborTableStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ThreadNetworkDiagnosticsClusterOperationalDatasetComponents.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ThreadNetworkDiagnosticsClusterRouteTableStruct.kt",

@@ -19233,19 +19233,11 @@ NS_ASSUME_NONNULL_BEGIN
             auto iter_0 = decodableStruct.transitions.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRThermostatClusterThermostatScheduleTransition * newElement_0;
-                newElement_0 = [MTRThermostatClusterThermostatScheduleTransition new];
+                MTRThermostatClusterThermostatScheduleTransitionStruct * newElement_0;
+                newElement_0 = [MTRThermostatClusterThermostatScheduleTransitionStruct new];
                 newElement_0.transitionTime = [NSNumber numberWithUnsignedShort:entry_0.transitionTime];
-                if (entry_0.heatSetpoint.IsNull()) {
-                    newElement_0.heatSetpoint = nil;
-                } else {
-                    newElement_0.heatSetpoint = [NSNumber numberWithShort:entry_0.heatSetpoint.Value()];
-                }
-                if (entry_0.coolSetpoint.IsNull()) {
-                    newElement_0.coolSetpoint = nil;
-                } else {
-                    newElement_0.coolSetpoint = [NSNumber numberWithShort:entry_0.coolSetpoint.Value()];
-                }
+                newElement_0.heatSetpoint = [NSNumber numberWithShort:entry_0.heatSetpoint];
+                newElement_0.coolSetpoint = [NSNumber numberWithShort:entry_0.coolSetpoint];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -19267,7 +19259,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _numberOfTransitionsForSequence = @(0);
 
-        _dayOfWeekForSequence = @(0);
+        _dayOfWeekforSequence = @(0);
 
         _modeForSequence = @(0);
 
@@ -19283,7 +19275,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRThermostatClusterSetWeeklyScheduleParams alloc] init];
 
     other.numberOfTransitionsForSequence = self.numberOfTransitionsForSequence;
-    other.dayOfWeekForSequence = self.dayOfWeekForSequence;
+    other.dayOfWeekforSequence = self.dayOfWeekforSequence;
     other.modeForSequence = self.modeForSequence;
     other.transitions = self.transitions;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -19294,7 +19286,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: numberOfTransitionsForSequence:%@; dayOfWeekForSequence:%@; modeForSequence:%@; transitions:%@; >", NSStringFromClass([self class]), _numberOfTransitionsForSequence, _dayOfWeekForSequence, _modeForSequence, _transitions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: numberOfTransitionsForSequence:%@; dayOfWeekforSequence:%@; modeForSequence:%@; transitions:%@; >", NSStringFromClass([self class]), _numberOfTransitionsForSequence, _dayOfWeekforSequence, _modeForSequence, _transitions];
     return descriptionString;
 }
 
@@ -19310,7 +19302,7 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.numberOfTransitionsForSequence = self.numberOfTransitionsForSequence.unsignedCharValue;
     }
     {
-        encodableStruct.dayOfWeekForSequence = static_cast<std::remove_reference_t<decltype(encodableStruct.dayOfWeekForSequence)>>(self.dayOfWeekForSequence.unsignedCharValue);
+        encodableStruct.dayOfWeekforSequence = static_cast<std::remove_reference_t<decltype(encodableStruct.dayOfWeekforSequence)>>(self.dayOfWeekforSequence.unsignedCharValue);
     }
     {
         encodableStruct.modeForSequence = static_cast<std::remove_reference_t<decltype(encodableStruct.modeForSequence)>>(self.modeForSequence.unsignedCharValue);
@@ -19326,24 +19318,14 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.transitions.count; ++i_0) {
-                    if (![self.transitions[i_0] isKindOfClass:[MTRThermostatClusterThermostatScheduleTransition class]]) {
+                    if (![self.transitions[i_0] isKindOfClass:[MTRThermostatClusterThermostatScheduleTransitionStruct class]]) {
                         // Wrong kind of value.
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRThermostatClusterThermostatScheduleTransition *) self.transitions[i_0];
+                    auto element_0 = (MTRThermostatClusterThermostatScheduleTransitionStruct *) self.transitions[i_0];
                     listHolder_0->mList[i_0].transitionTime = element_0.transitionTime.unsignedShortValue;
-                    if (element_0.heatSetpoint == nil) {
-                        listHolder_0->mList[i_0].heatSetpoint.SetNull();
-                    } else {
-                        auto & nonNullValue_2 = listHolder_0->mList[i_0].heatSetpoint.SetNonNull();
-                        nonNullValue_2 = element_0.heatSetpoint.shortValue;
-                    }
-                    if (element_0.coolSetpoint == nil) {
-                        listHolder_0->mList[i_0].coolSetpoint.SetNull();
-                    } else {
-                        auto & nonNullValue_2 = listHolder_0->mList[i_0].coolSetpoint.SetNonNull();
-                        nonNullValue_2 = element_0.coolSetpoint.shortValue;
-                    }
+                    listHolder_0->mList[i_0].heatSetpoint = element_0.heatSetpoint.shortValue;
+                    listHolder_0->mList[i_0].coolSetpoint = element_0.coolSetpoint.shortValue;
                 }
                 encodableStruct.transitions = ListType_0(listHolder_0->mList, self.transitions.count);
             } else {
@@ -19399,11 +19381,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _relayStatus = @(0);
 
-        _localTemperature = @(0);
+        _localTemperature = nil;
 
-        _humidityInPercentage = @(0);
+        _humidityInPercentage = nil;
 
-        _setpoint = @(0);
+        _setPoint = @(0);
 
         _unreadEntries = @(0);
     }
@@ -19418,7 +19400,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.relayStatus = self.relayStatus;
     other.localTemperature = self.localTemperature;
     other.humidityInPercentage = self.humidityInPercentage;
-    other.setpoint = self.setpoint;
+    other.setPoint = self.setPoint;
     other.unreadEntries = self.unreadEntries;
 
     return other;
@@ -19426,7 +19408,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeOfDay:%@; relayStatus:%@; localTemperature:%@; humidityInPercentage:%@; setpoint:%@; unreadEntries:%@; >", NSStringFromClass([self class]), _timeOfDay, _relayStatus, _localTemperature, _humidityInPercentage, _setpoint, _unreadEntries];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeOfDay:%@; relayStatus:%@; localTemperature:%@; humidityInPercentage:%@; setPoint:%@; unreadEntries:%@; >", NSStringFromClass([self class]), _timeOfDay, _relayStatus, _localTemperature, _humidityInPercentage, _setPoint, _unreadEntries];
     return descriptionString;
 }
 
@@ -19483,13 +19465,21 @@ NS_ASSUME_NONNULL_BEGIN
         self.relayStatus = [NSNumber numberWithUnsignedShort:decodableStruct.relayStatus.Raw()];
     }
     {
-        self.localTemperature = [NSNumber numberWithShort:decodableStruct.localTemperature];
+        if (decodableStruct.localTemperature.IsNull()) {
+            self.localTemperature = nil;
+        } else {
+            self.localTemperature = [NSNumber numberWithShort:decodableStruct.localTemperature.Value()];
+        }
     }
     {
-        self.humidityInPercentage = [NSNumber numberWithUnsignedChar:decodableStruct.humidityInPercentage];
+        if (decodableStruct.humidityInPercentage.IsNull()) {
+            self.humidityInPercentage = nil;
+        } else {
+            self.humidityInPercentage = [NSNumber numberWithUnsignedChar:decodableStruct.humidityInPercentage.Value()];
+        }
     }
     {
-        self.setpoint = [NSNumber numberWithShort:decodableStruct.setpoint];
+        self.setPoint = [NSNumber numberWithShort:decodableStruct.setPoint];
     }
     {
         self.unreadEntries = [NSNumber numberWithUnsignedShort:decodableStruct.unreadEntries];
@@ -19816,7 +19806,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _presetHandle = [NSData data];
 
-        _delayMinutes = @(0);
+        _delayMinutes = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -19853,7 +19843,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.presetHandle = AsByteSpan(self.presetHandle);
     }
     {
-        encodableStruct.delayMinutes = self.delayMinutes.unsignedShortValue;
+        if (self.delayMinutes != nil) {
+            auto & definedValue_0 = encodableStruct.delayMinutes.Emplace();
+            definedValue_0 = self.delayMinutes.unsignedShortValue;
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -19894,7 +19887,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRThermostatClusterStartSchedulesEditRequestParams
+@implementation MTRThermostatClusterStartPresetsSchedulesEditRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -19908,7 +19901,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRThermostatClusterStartSchedulesEditRequestParams alloc] init];
+    auto other = [[MTRThermostatClusterStartPresetsSchedulesEditRequestParams alloc] init];
 
     other.timeoutSeconds = self.timeoutSeconds;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -19925,11 +19918,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRThermostatClusterStartSchedulesEditRequestParams (InternalMethods)
+@implementation MTRThermostatClusterStartPresetsSchedulesEditRequestParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::Thermostat::Commands::StartSchedulesEditRequest::Type encodableStruct;
+    chip::app::Clusters::Thermostat::Commands::StartPresetsSchedulesEditRequest::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.timeoutSeconds = self.timeoutSeconds.unsignedShortValue;
@@ -19973,7 +19966,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRThermostatClusterCancelSchedulesEditRequestParams
+@implementation MTRThermostatClusterCancelPresetsSchedulesEditRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -19985,7 +19978,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRThermostatClusterCancelSchedulesEditRequestParams alloc] init];
+    auto other = [[MTRThermostatClusterCancelPresetsSchedulesEditRequestParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -20001,11 +19994,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRThermostatClusterCancelSchedulesEditRequestParams (InternalMethods)
+@implementation MTRThermostatClusterCancelPresetsSchedulesEditRequestParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::Thermostat::Commands::CancelSchedulesEditRequest::Type encodableStruct;
+    chip::app::Clusters::Thermostat::Commands::CancelPresetsSchedulesEditRequest::Type encodableStruct;
     ListFreer listFreer;
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -20046,7 +20039,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRThermostatClusterCommitSchedulesEditRequestParams
+@implementation MTRThermostatClusterCommitPresetsSchedulesRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -20058,7 +20051,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRThermostatClusterCommitSchedulesEditRequestParams alloc] init];
+    auto other = [[MTRThermostatClusterCommitPresetsSchedulesRequestParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -20074,236 +20067,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRThermostatClusterCommitSchedulesEditRequestParams (InternalMethods)
+@implementation MTRThermostatClusterCommitPresetsSchedulesRequestParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::Thermostat::Commands::CommitSchedulesEditRequest::Type encodableStruct;
-    ListFreer listFreer;
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRThermostatClusterStartPresetsEditRequestParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _timeoutSeconds = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRThermostatClusterStartPresetsEditRequestParams alloc] init];
-
-    other.timeoutSeconds = self.timeoutSeconds;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeoutSeconds:%@; >", NSStringFromClass([self class]), _timeoutSeconds];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRThermostatClusterStartPresetsEditRequestParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::Thermostat::Commands::StartPresetsEditRequest::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.timeoutSeconds = self.timeoutSeconds.unsignedShortValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRThermostatClusterCancelPresetsEditRequestParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRThermostatClusterCancelPresetsEditRequestParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRThermostatClusterCancelPresetsEditRequestParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::Thermostat::Commands::CancelPresetsEditRequest::Type encodableStruct;
-    ListFreer listFreer;
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRThermostatClusterCommitPresetsEditRequestParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRThermostatClusterCommitPresetsEditRequestParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRThermostatClusterCommitPresetsEditRequestParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::Thermostat::Commands::CommitPresetsEditRequest::Type encodableStruct;
+    chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::Type encodableStruct;
     ListFreer listFreer;
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);

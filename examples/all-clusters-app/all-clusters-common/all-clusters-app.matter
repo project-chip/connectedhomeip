@@ -3535,8 +3535,42 @@ server cluster PumpConfigurationAndControl = 512 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** An interface for configuring and controlling the functionality of a thermostat. */
+/** This cluster provides an interface to the functionality of a thermostat. */
 server cluster Thermostat = 513 {
+  enum ACCapacityFormatEnum : enum8 {
+    kBTUh = 0;
+  }
+
+  enum ACCompressorTypeEnum : enum8 {
+    kUnknown = 0;
+    kT1 = 1;
+    kT2 = 2;
+    kT3 = 3;
+  }
+
+  enum ACLouverPositionEnum : enum8 {
+    kClosed = 1;
+    kOpen = 2;
+    kQuarter = 3;
+    kHalf = 4;
+    kThreeQuarters = 5;
+  }
+
+  enum ACRefrigerantTypeEnum : enum8 {
+    kUnknown = 0;
+    kR22 = 1;
+    kR410a = 2;
+    kR407c = 3;
+  }
+
+  enum ACTypeEnum : enum8 {
+    kUnknown = 0;
+    kCoolingFixed = 1;
+    kHeatPumpFixed = 2;
+    kCoolingInverter = 3;
+    kHeatPumpInverter = 4;
+  }
+
   enum PresetScenarioEnum : enum8 {
     kUnspecified = 0;
     kOccupied = 1;
@@ -3547,13 +3581,28 @@ server cluster Thermostat = 513 {
     kUserDefined = 6;
   }
 
-  enum SetpointAdjustMode : enum8 {
-    kHeat = 0;
-    kCool = 1;
-    kBoth = 2;
+  enum SetpointChangeSourceEnum : enum8 {
+    kManual = 0;
+    kSchedule = 1;
+    kExternal = 2;
   }
 
-  enum ThermostatControlSequence : enum8 {
+  enum StartOfWeekEnum : enum8 {
+    kSunday = 0;
+    kMonday = 1;
+    kTuesday = 2;
+    kWednesday = 3;
+    kThursday = 4;
+    kFriday = 5;
+    kSaturday = 6;
+  }
+
+  enum TemperatureSetpointHoldEnum : enum8 {
+    kSetpointHoldOff = 0;
+    kSetpointHoldOn = 1;
+  }
+
+  enum ThermostatControlSequenceEnum : enum8 {
     kCoolingOnly = 0;
     kCoolingWithReheat = 1;
     kHeatingOnly = 2;
@@ -3562,13 +3611,7 @@ server cluster Thermostat = 513 {
     kCoolingAndHeatingWithReheat = 5;
   }
 
-  enum ThermostatRunningMode : enum8 {
-    kOff = 0;
-    kCool = 3;
-    kHeat = 4;
-  }
-
-  enum ThermostatSystemMode : enum8 {
+  enum ThermostatSystemModeEnum : enum8 {
     kOff = 0;
     kAuto = 1;
     kCool = 3;
@@ -3580,7 +3623,21 @@ server cluster Thermostat = 513 {
     kSleep = 9;
   }
 
-  bitmap DayOfWeek : bitmap8 {
+  bitmap ACErrorCodeBitmap : bitmap32 {
+    kCompressorFail = 0x1;
+    kRoomSensorFail = 0x2;
+    kOutdoorSensorFail = 0x4;
+    kCoilSensorFail = 0x8;
+    kFanFail = 0x10;
+  }
+
+  bitmap AlarmCodeBitmap : bitmap8 {
+    kInitialization = 0x1;
+    kHardware = 0x2;
+    kSelfCalibration = 0x4;
+  }
+
+  bitmap DayOfWeekBitmap : bitmap8 {
     kSunday = 0x1;
     kMonday = 0x2;
     kTuesday = 0x4;
@@ -3595,7 +3652,7 @@ server cluster Thermostat = 513 {
     kHeating = 0x1;
     kCooling = 0x2;
     kOccupancy = 0x4;
-    kScheduleConfiguration = 0x8;
+    kZigbeeScheduleConfiguration = 0x8;
     kSetback = 0x10;
     kAutoMode = 0x20;
     kLocalTemperatureNotExposed = 0x40;
@@ -3605,7 +3662,12 @@ server cluster Thermostat = 513 {
     kQueuedPresetsSupported = 0x400;
   }
 
-  bitmap ModeForSequence : bitmap8 {
+  bitmap HVACSystemTypeBitmap : bitmap8 {
+    kHeatingType = 0x10;
+    kHeatingFuel = 0x20;
+  }
+
+  bitmap ModeForSequenceBitmap : bitmap8 {
     kHeatSetpointPresent = 0x1;
     kCoolSetpointPresent = 0x2;
   }
@@ -3613,6 +3675,12 @@ server cluster Thermostat = 513 {
   bitmap PresetTypeFeaturesBitmap : bitmap16 {
     kAutomatic = 0x1;
     kSupportsNames = 0x2;
+  }
+
+  bitmap ProgrammingOperationModeBitmap : bitmap8 {
+    kScheduleActive = 0x1;
+    kAutoRecovery = 0x2;
+    kEconomy = 0x4;
   }
 
   bitmap RelayStateBitmap : bitmap16 {
@@ -3625,11 +3693,23 @@ server cluster Thermostat = 513 {
     kFanStage3 = 0x40;
   }
 
+  bitmap RemoteSensingBitmap : bitmap8 {
+    kLocalTemperature = 0x1;
+    kOutdoorTemperature = 0x2;
+    kOccupancy = 0x4;
+  }
+
   bitmap ScheduleTypeFeaturesBitmap : bitmap16 {
     kSupportsPresets = 0x1;
     kSupportsSetpoints = 0x2;
     kSupportsNames = 0x4;
     kSupportsOff = 0x8;
+  }
+
+  bitmap SetpointAdjustModeBitmap : bitmap8 {
+    kHeat = 0x1;
+    kCool = 0x2;
+    kBoth = 0x4;
   }
 
   bitmap TemperatureSetpointHoldPolicyBitmap : bitmap8 {
@@ -3638,29 +3718,29 @@ server cluster Thermostat = 513 {
   }
 
   struct ScheduleTransitionStruct {
-    DayOfWeek dayOfWeek = 0;
+    DayOfWeekBitmap dayOfWeek = 0;
     int16u transitionTime = 1;
     optional octet_string<16> presetHandle = 2;
-    optional ThermostatSystemMode systemMode = 3;
-    optional int16s coolingSetpoint = 4;
-    optional int16s heatingSetpoint = 5;
+    optional ThermostatSystemModeEnum systemMode = 3;
+    optional temperature coolingSetpoint = 4;
+    optional temperature heatingSetpoint = 5;
   }
 
   struct ScheduleStruct {
-    octet_string<16> scheduleHandle = 0;
-    ThermostatSystemMode systemMode = 1;
+    nullable octet_string<16> scheduleHandle = 0;
+    ThermostatSystemModeEnum systemMode = 1;
     optional char_string<64> name = 2;
     optional octet_string<16> presetHandle = 3;
     ScheduleTransitionStruct transitions[] = 4;
-    optional boolean builtIn = 5;
+    optional nullable boolean builtIn = 5;
   }
 
   struct PresetStruct {
     nullable octet_string<16> presetHandle = 0;
     PresetScenarioEnum presetScenario = 1;
     optional nullable char_string<64> name = 2;
-    optional int16s coolingSetpoint = 3;
-    optional int16s heatingSetpoint = 4;
+    optional temperature coolingSetpoint = 3;
+    optional temperature heatingSetpoint = 4;
     nullable boolean builtIn = 5;
   }
 
@@ -3676,31 +3756,45 @@ server cluster Thermostat = 513 {
   }
 
   struct ScheduleTypeStruct {
-    ThermostatSystemMode systemMode = 0;
+    ThermostatSystemModeEnum systemMode = 0;
     int8u numberOfSchedules = 1;
     ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
   }
 
-  struct ThermostatScheduleTransition {
+  struct ThermostatScheduleTransitionStruct {
     int16u transitionTime = 0;
-    nullable int16s heatSetpoint = 1;
-    nullable int16s coolSetpoint = 2;
+    temperature heatSetpoint = 1;
+    temperature coolSetpoint = 2;
   }
 
-  readonly attribute nullable int16s localTemperature = 0;
-  readonly attribute int16s absMinHeatSetpointLimit = 3;
-  readonly attribute int16s absMaxHeatSetpointLimit = 4;
-  readonly attribute int16s absMinCoolSetpointLimit = 5;
-  readonly attribute int16s absMaxCoolSetpointLimit = 6;
-  attribute int16s occupiedCoolingSetpoint = 17;
-  attribute int16s occupiedHeatingSetpoint = 18;
-  attribute access(write: manage) int16s minHeatSetpointLimit = 21;
-  attribute access(write: manage) int16s maxHeatSetpointLimit = 22;
-  attribute access(write: manage) int16s minCoolSetpointLimit = 23;
-  attribute access(write: manage) int16s maxCoolSetpointLimit = 24;
+  readonly attribute nullable temperature localTemperature = 0;
+  readonly attribute temperature absMinHeatSetpointLimit = 3;
+  readonly attribute temperature absMaxHeatSetpointLimit = 4;
+  readonly attribute temperature absMinCoolSetpointLimit = 5;
+  readonly attribute temperature absMaxCoolSetpointLimit = 6;
+  attribute temperature occupiedCoolingSetpoint = 17;
+  attribute temperature occupiedHeatingSetpoint = 18;
+  attribute access(write: manage) temperature minHeatSetpointLimit = 21;
+  attribute access(write: manage) temperature maxHeatSetpointLimit = 22;
+  attribute access(write: manage) temperature minCoolSetpointLimit = 23;
+  attribute access(write: manage) temperature maxCoolSetpointLimit = 24;
   attribute access(write: manage) int8s minSetpointDeadBand = 25;
-  attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
-  attribute access(write: manage) enum8 systemMode = 28;
+  attribute access(write: manage) ThermostatControlSequenceEnum controlSequenceOfOperation = 27;
+  attribute access(write: manage) ThermostatSystemModeEnum systemMode = 28;
+  readonly attribute PresetTypeStruct presetTypes[] = 72;
+  readonly attribute ScheduleTypeStruct scheduleTypes[] = 73;
+  readonly attribute int8u numberOfPresets = 74;
+  readonly attribute int8u numberOfSchedules = 75;
+  readonly attribute int8u numberOfScheduleTransitions = 76;
+  readonly attribute nullable int8u numberOfScheduleTransitionPerDay = 77;
+  readonly attribute nullable octet_string<16> activePresetHandle = 78;
+  readonly attribute nullable octet_string<16> activeScheduleHandle = 79;
+  attribute access(write: manage) PresetStruct presets[] = 80;
+  attribute access(write: manage) ScheduleStruct schedules[] = 81;
+  readonly attribute boolean presetsSchedulesEditable = 82;
+  readonly attribute TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 83;
+  readonly attribute nullable epoch_s setpointHoldExpiryTimestamp = 84;
+  readonly attribute nullable QueuedPresetStruct queuedPreset = 85;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3709,11 +3803,45 @@ server cluster Thermostat = 513 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SetpointRaiseLowerRequest {
-    SetpointAdjustMode mode = 0;
+    SetpointAdjustModeBitmap mode = 0;
     int8s amount = 1;
   }
 
+  request struct SetActiveScheduleRequestRequest {
+    octet_string<16> scheduleHandle = 0;
+  }
+
+  request struct SetActivePresetRequestRequest {
+    octet_string<16> presetHandle = 0;
+    optional int16u delayMinutes = 1;
+  }
+
+  request struct StartPresetsSchedulesEditRequestRequest {
+    int16u timeoutSeconds = 0;
+  }
+
+  request struct SetTemperatureSetpointHoldPolicyRequest {
+    TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 0;
+  }
+
+  response struct GetRelayStatusLogResponse = 1 {
+    int16u timeOfDay = 0;
+    RelayStateBitmap relayStatus = 1;
+    nullable temperature localTemperature = 2;
+    nullable int8u humidityInPercentage = 3;
+    temperature setPoint = 4;
+    int16u unreadEntries = 5;
+  }
+
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
+  command GetRelayStatusLog(): GetRelayStatusLogResponse = 4;
+  command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
+  command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  command access(invoke: manage) StartPresetsSchedulesEditRequest(StartPresetsSchedulesEditRequestRequest): DefaultSuccess = 7;
+  command access(invoke: manage) CancelPresetsSchedulesEditRequest(): DefaultSuccess = 8;
+  command access(invoke: manage) CommitPresetsSchedulesRequest(): DefaultSuccess = 9;
+  command access(invoke: manage) CancelSetActivePresetRequest(): DefaultSuccess = 10;
+  command SetTemperatureSetpointHoldPolicy(SetTemperatureSetpointHoldPolicyRequest): DefaultSuccess = 11;
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */
@@ -6266,26 +6394,49 @@ endpoint 1 {
 
   server cluster Thermostat {
     ram      attribute localTemperature;
-    ram      attribute absMinHeatSetpointLimit default = 0x02BC;
-    ram      attribute absMaxHeatSetpointLimit default = 0x0BB8;
-    ram      attribute absMinCoolSetpointLimit default = 0x0640;
-    ram      attribute absMaxCoolSetpointLimit default = 0x0C80;
-    ram      attribute occupiedCoolingSetpoint default = 0x0A28;
-    ram      attribute occupiedHeatingSetpoint default = 0x07D0;
-    ram      attribute minHeatSetpointLimit default = 0x02BC;
-    ram      attribute maxHeatSetpointLimit default = 0x0BB8;
-    ram      attribute minCoolSetpointLimit default = 0x0640;
-    ram      attribute maxCoolSetpointLimit default = 0x0C80;
+    ram      attribute absMinHeatSetpointLimit default = 700;
+    ram      attribute absMaxHeatSetpointLimit default = 3000;
+    ram      attribute absMinCoolSetpointLimit default = 1600;
+    ram      attribute absMaxCoolSetpointLimit default = 3200;
+    persist  attribute occupiedCoolingSetpoint default = 0x0A28;
+    persist  attribute occupiedHeatingSetpoint default = 0x07D0;
+    ram      attribute minHeatSetpointLimit default = 700;
+    ram      attribute maxHeatSetpointLimit default = 3000;
+    ram      attribute minCoolSetpointLimit default = 1600;
+    ram      attribute maxCoolSetpointLimit default = 3200;
     ram      attribute minSetpointDeadBand default = 0x19;
     ram      attribute controlSequenceOfOperation default = 0x04;
-    ram      attribute systemMode default = 0x01;
+    persist  attribute systemMode default = 0x01;
+    callback attribute presetTypes;
+    callback attribute scheduleTypes;
+    ram      attribute numberOfPresets default = 0x00;
+    ram      attribute numberOfSchedules default = 0x00;
+    ram      attribute numberOfScheduleTransitions default = 0x00;
+    ram      attribute numberOfScheduleTransitionPerDay default = 0x00;
+    callback attribute activePresetHandle;
+    ram      attribute activeScheduleHandle default = "false";
+    callback attribute presets;
+    callback attribute schedules;
+    ram      attribute presetsSchedulesEditable default = false;
+    ram      attribute temperatureSetpointHoldPolicy;
+    ram      attribute setpointHoldExpiryTimestamp default = 0;
+    callback attribute queuedPreset default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0023;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute featureMap default = 0x7A3;
+    ram      attribute clusterRevision default = 7;
 
     handle command SetpointRaiseLower;
+    handle command GetRelayStatusLogResponse;
+    handle command GetRelayStatusLog;
+    handle command SetActiveScheduleRequest;
+    handle command SetActivePresetRequest;
+    handle command StartPresetsSchedulesEditRequest;
+    handle command CancelPresetsSchedulesEditRequest;
+    handle command CommitPresetsSchedulesRequest;
+    handle command CancelSetActivePresetRequest;
+    handle command SetTemperatureSetpointHoldPolicy;
   }
 
   server cluster FanControl {

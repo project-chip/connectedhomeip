@@ -11070,7 +11070,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer numberOfTransitionsForSequence, Integer dayOfWeekForSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition> transitions) {
+    public void onSuccess(Integer numberOfTransitionsForSequence, Integer dayOfWeekForSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransitionStruct> transitions) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo numberOfTransitionsForSequenceResponseValue = new CommandResponseInfo("numberOfTransitionsForSequence", "Integer");
@@ -11079,9 +11079,41 @@ public class ClusterInfoMapping {
       responseValues.put(dayOfWeekForSequenceResponseValue, dayOfWeekForSequence);
       CommandResponseInfo modeForSequenceResponseValue = new CommandResponseInfo("modeForSequence", "Integer");
       responseValues.put(modeForSequenceResponseValue, modeForSequence);
-      // transitions: ThermostatScheduleTransition
+      // transitions: ThermostatScheduleTransitionStruct
       // Conversion from this type to Java is not properly implemented yet
 
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedThermostatClusterGetRelayStatusLogResponseCallback implements ChipClusters.ThermostatCluster.GetRelayStatusLogResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer timeOfDay, Integer relayStatus, @Nullable Integer localTemperature, @Nullable Integer humidityInPercentage, Integer setPoint, Integer unreadEntries) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo timeOfDayResponseValue = new CommandResponseInfo("timeOfDay", "Integer");
+      responseValues.put(timeOfDayResponseValue, timeOfDay);
+      CommandResponseInfo relayStatusResponseValue = new CommandResponseInfo("relayStatus", "Integer");
+      responseValues.put(relayStatusResponseValue, relayStatus);
+      CommandResponseInfo localTemperatureResponseValue = new CommandResponseInfo("localTemperature", "Integer");
+      responseValues.put(localTemperatureResponseValue, localTemperature);
+      CommandResponseInfo humidityInPercentageResponseValue = new CommandResponseInfo("humidityInPercentage", "Integer");
+      responseValues.put(humidityInPercentageResponseValue, humidityInPercentage);
+      CommandResponseInfo setPointResponseValue = new CommandResponseInfo("setPoint", "Integer");
+      responseValues.put(setPointResponseValue, setPoint);
+      CommandResponseInfo unreadEntriesResponseValue = new CommandResponseInfo("unreadEntries", "Integer");
+      responseValues.put(unreadEntriesResponseValue, unreadEntries);
       callback.onSuccess(responseValues);
     }
 
@@ -11363,7 +11395,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedThermostatClusterNumberOfScheduleTransitionsPerDayAttributeCallback implements ChipClusters.ThermostatCluster.NumberOfScheduleTransitionsPerDayAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedThermostatClusterNumberOfScheduleTransitionPerDayAttributeCallback implements ChipClusters.ThermostatCluster.NumberOfScheduleTransitionPerDayAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -11374,6 +11406,48 @@ public class ClusterInfoMapping {
     public void onSuccess(@Nullable Integer value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedThermostatClusterActivePresetHandleAttributeCallback implements ChipClusters.ThermostatCluster.ActivePresetHandleAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable byte[] value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "byte[]");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedThermostatClusterActiveScheduleHandleAttributeCallback implements ChipClusters.ThermostatCluster.ActiveScheduleHandleAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable byte[] value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "byte[]");
       responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
@@ -11405,27 +11479,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedThermostatClusterActivePresetHandleAttributeCallback implements ChipClusters.ThermostatCluster.ActivePresetHandleAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable byte[] value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "byte[]");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedThermostatClusterSchedulesAttributeCallback implements ChipClusters.ThermostatCluster.SchedulesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -11447,28 +11500,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedThermostatClusterActiveScheduleHandleAttributeCallback implements ChipClusters.ThermostatCluster.ActiveScheduleHandleAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable byte[] value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "byte[]");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedThermostatClusterSetpointHoldPolicyExpiryTimestampAttributeCallback implements ChipClusters.ThermostatCluster.SetpointHoldPolicyExpiryTimestampAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedThermostatClusterSetpointHoldExpiryTimestampAttributeCallback implements ChipClusters.ThermostatCluster.SetpointHoldExpiryTimestampAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -22262,8 +22294,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo thermostatsetWeeklySchedulenumberOfTransitionsForSequenceCommandParameterInfo = new CommandParameterInfo("numberOfTransitionsForSequence", Integer.class, Integer.class);
     thermostatsetWeeklyScheduleCommandParams.put("numberOfTransitionsForSequence",thermostatsetWeeklySchedulenumberOfTransitionsForSequenceCommandParameterInfo);
 
-    CommandParameterInfo thermostatsetWeeklyScheduledayOfWeekForSequenceCommandParameterInfo = new CommandParameterInfo("dayOfWeekForSequence", Integer.class, Integer.class);
-    thermostatsetWeeklyScheduleCommandParams.put("dayOfWeekForSequence",thermostatsetWeeklyScheduledayOfWeekForSequenceCommandParameterInfo);
+    CommandParameterInfo thermostatsetWeeklyScheduledayOfWeekforSequenceCommandParameterInfo = new CommandParameterInfo("dayOfWeekforSequence", Integer.class, Integer.class);
+    thermostatsetWeeklyScheduleCommandParams.put("dayOfWeekforSequence",thermostatsetWeeklyScheduledayOfWeekforSequenceCommandParameterInfo);
 
     CommandParameterInfo thermostatsetWeeklySchedulemodeForSequenceCommandParameterInfo = new CommandParameterInfo("modeForSequence", Integer.class, Integer.class);
     thermostatsetWeeklyScheduleCommandParams.put("modeForSequence",thermostatsetWeeklySchedulemodeForSequenceCommandParameterInfo);
@@ -22275,10 +22307,10 @@ public class ClusterInfoMapping {
         , (Integer)
         commandArguments.get("numberOfTransitionsForSequence")
         , (Integer)
-        commandArguments.get("dayOfWeekForSequence")
+        commandArguments.get("dayOfWeekforSequence")
         , (Integer)
         commandArguments.get("modeForSequence")
-        , (ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition>)
+        , (ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransitionStruct>)
         commandArguments.get("transitions")
         );
       },
@@ -22327,12 +22359,12 @@ public class ClusterInfoMapping {
     InteractionInfo thermostatgetRelayStatusLogInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ThermostatCluster) cluster)
-        .getRelayStatusLog((DefaultClusterCallback) callback
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
+          .getRelayStatusLog((ChipClusters.ThermostatCluster.GetRelayStatusLogResponseCallback) callback
+            );
+        },
+        () -> new DelegatedThermostatClusterGetRelayStatusLogResponseCallback(),
         thermostatgetRelayStatusLogCommandParams
-    );
+      );
     thermostatClusterInteractionInfoMap.put("getRelayStatusLog", thermostatgetRelayStatusLogInteractionInfo);
 
     Map<String, CommandParameterInfo> thermostatsetActiveScheduleRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
@@ -22357,7 +22389,7 @@ public class ClusterInfoMapping {
     CommandParameterInfo thermostatsetActivePresetRequestpresetHandleCommandParameterInfo = new CommandParameterInfo("presetHandle", byte[].class, byte[].class);
     thermostatsetActivePresetRequestCommandParams.put("presetHandle",thermostatsetActivePresetRequestpresetHandleCommandParameterInfo);
 
-    CommandParameterInfo thermostatsetActivePresetRequestdelayMinutesCommandParameterInfo = new CommandParameterInfo("delayMinutes", Integer.class, Integer.class);
+    CommandParameterInfo thermostatsetActivePresetRequestdelayMinutesCommandParameterInfo = new CommandParameterInfo("delayMinutes", Optional.class, Integer.class);
     thermostatsetActivePresetRequestCommandParams.put("delayMinutes",thermostatsetActivePresetRequestdelayMinutesCommandParameterInfo);
     InteractionInfo thermostatsetActivePresetRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
@@ -22365,7 +22397,7 @@ public class ClusterInfoMapping {
         .setActivePresetRequest((DefaultClusterCallback) callback
         , (byte[])
         commandArguments.get("presetHandle")
-        , (Integer)
+        , (Optional<Integer>)
         commandArguments.get("delayMinutes")
         );
       },
@@ -22374,87 +22406,46 @@ public class ClusterInfoMapping {
     );
     thermostatClusterInteractionInfoMap.put("setActivePresetRequest", thermostatsetActivePresetRequestInteractionInfo);
 
-    Map<String, CommandParameterInfo> thermostatstartSchedulesEditRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> thermostatstartPresetsSchedulesEditRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo thermostatstartSchedulesEditRequesttimeoutSecondsCommandParameterInfo = new CommandParameterInfo("timeoutSeconds", Integer.class, Integer.class);
-    thermostatstartSchedulesEditRequestCommandParams.put("timeoutSeconds",thermostatstartSchedulesEditRequesttimeoutSecondsCommandParameterInfo);
-    InteractionInfo thermostatstartSchedulesEditRequestInteractionInfo = new InteractionInfo(
+    CommandParameterInfo thermostatstartPresetsSchedulesEditRequesttimeoutSecondsCommandParameterInfo = new CommandParameterInfo("timeoutSeconds", Integer.class, Integer.class);
+    thermostatstartPresetsSchedulesEditRequestCommandParams.put("timeoutSeconds",thermostatstartPresetsSchedulesEditRequesttimeoutSecondsCommandParameterInfo);
+    InteractionInfo thermostatstartPresetsSchedulesEditRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ThermostatCluster) cluster)
-        .startSchedulesEditRequest((DefaultClusterCallback) callback
+        .startPresetsSchedulesEditRequest((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("timeoutSeconds")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        thermostatstartSchedulesEditRequestCommandParams
+        thermostatstartPresetsSchedulesEditRequestCommandParams
     );
-    thermostatClusterInteractionInfoMap.put("startSchedulesEditRequest", thermostatstartSchedulesEditRequestInteractionInfo);
+    thermostatClusterInteractionInfoMap.put("startPresetsSchedulesEditRequest", thermostatstartPresetsSchedulesEditRequestInteractionInfo);
 
-    Map<String, CommandParameterInfo> thermostatcancelSchedulesEditRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo thermostatcancelSchedulesEditRequestInteractionInfo = new InteractionInfo(
+    Map<String, CommandParameterInfo> thermostatcancelPresetsSchedulesEditRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo thermostatcancelPresetsSchedulesEditRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ThermostatCluster) cluster)
-        .cancelSchedulesEditRequest((DefaultClusterCallback) callback
+        .cancelPresetsSchedulesEditRequest((DefaultClusterCallback) callback
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        thermostatcancelSchedulesEditRequestCommandParams
+        thermostatcancelPresetsSchedulesEditRequestCommandParams
     );
-    thermostatClusterInteractionInfoMap.put("cancelSchedulesEditRequest", thermostatcancelSchedulesEditRequestInteractionInfo);
+    thermostatClusterInteractionInfoMap.put("cancelPresetsSchedulesEditRequest", thermostatcancelPresetsSchedulesEditRequestInteractionInfo);
 
-    Map<String, CommandParameterInfo> thermostatcommitSchedulesEditRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo thermostatcommitSchedulesEditRequestInteractionInfo = new InteractionInfo(
+    Map<String, CommandParameterInfo> thermostatcommitPresetsSchedulesRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo thermostatcommitPresetsSchedulesRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ThermostatCluster) cluster)
-        .commitSchedulesEditRequest((DefaultClusterCallback) callback
+        .commitPresetsSchedulesRequest((DefaultClusterCallback) callback
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        thermostatcommitSchedulesEditRequestCommandParams
+        thermostatcommitPresetsSchedulesRequestCommandParams
     );
-    thermostatClusterInteractionInfoMap.put("commitSchedulesEditRequest", thermostatcommitSchedulesEditRequestInteractionInfo);
-
-    Map<String, CommandParameterInfo> thermostatstartPresetsEditRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo thermostatstartPresetsEditRequesttimeoutSecondsCommandParameterInfo = new CommandParameterInfo("timeoutSeconds", Integer.class, Integer.class);
-    thermostatstartPresetsEditRequestCommandParams.put("timeoutSeconds",thermostatstartPresetsEditRequesttimeoutSecondsCommandParameterInfo);
-    InteractionInfo thermostatstartPresetsEditRequestInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ThermostatCluster) cluster)
-        .startPresetsEditRequest((DefaultClusterCallback) callback
-        , (Integer)
-        commandArguments.get("timeoutSeconds")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        thermostatstartPresetsEditRequestCommandParams
-    );
-    thermostatClusterInteractionInfoMap.put("startPresetsEditRequest", thermostatstartPresetsEditRequestInteractionInfo);
-
-    Map<String, CommandParameterInfo> thermostatcancelPresetsEditRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo thermostatcancelPresetsEditRequestInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ThermostatCluster) cluster)
-        .cancelPresetsEditRequest((DefaultClusterCallback) callback
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        thermostatcancelPresetsEditRequestCommandParams
-    );
-    thermostatClusterInteractionInfoMap.put("cancelPresetsEditRequest", thermostatcancelPresetsEditRequestInteractionInfo);
-
-    Map<String, CommandParameterInfo> thermostatcommitPresetsEditRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo thermostatcommitPresetsEditRequestInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ThermostatCluster) cluster)
-        .commitPresetsEditRequest((DefaultClusterCallback) callback
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        thermostatcommitPresetsEditRequestCommandParams
-    );
-    thermostatClusterInteractionInfoMap.put("commitPresetsEditRequest", thermostatcommitPresetsEditRequestInteractionInfo);
+    thermostatClusterInteractionInfoMap.put("commitPresetsSchedulesRequest", thermostatcommitPresetsSchedulesRequestInteractionInfo);
 
     Map<String, CommandParameterInfo> thermostatcancelSetActivePresetRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo thermostatcancelSetActivePresetRequestInteractionInfo = new InteractionInfo(

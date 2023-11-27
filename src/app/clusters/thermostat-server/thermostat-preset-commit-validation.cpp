@@ -62,7 +62,7 @@ struct Type
 {
 public:
     chip::ByteSpan sceduleHandle;
-    ThermostatSystemMode systemMode = static_cast<ThermostatSystemMode>(0);
+    ThermostatSystemModeEnum systemMode = static_cast<ThermostatSystemModeEnum>(0);
     DataModel::Nullable<chip::CharSpan> name;
     chip::ByteSpan presetHandle;
     DataModel::List<const Structs::ScheduleTransitionStruct::Type> transitions;

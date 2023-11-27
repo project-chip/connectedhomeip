@@ -3333,9 +3333,6 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::PIHeatingDemand::Id: {
         return YES;
     }
-    case Attributes::HVACSystemTypeConfiguration::Id: {
-        return YES;
-    }
     case Attributes::LocalTemperatureCalibration::Id: {
         return YES;
     }
@@ -3373,6 +3370,9 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::SystemMode::Id: {
+        return YES;
+    }
+    case Attributes::AlarmMask::Id: {
         return YES;
     }
     case Attributes::ThermostatRunningMode::Id: {
@@ -3450,7 +3450,7 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::ACCoilTemperature::Id: {
         return YES;
     }
-    case Attributes::ACCapacityformat::Id: {
+    case Attributes::ACCapacityFormat::Id: {
         return YES;
     }
     case Attributes::PresetTypes::Id: {
@@ -3468,31 +3468,28 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::NumberOfScheduleTransitions::Id: {
         return YES;
     }
-    case Attributes::NumberOfScheduleTransitionsPerDay::Id: {
-        return YES;
-    }
-    case Attributes::Presets::Id: {
-        return YES;
-    }
-    case Attributes::PresetsEditable::Id: {
+    case Attributes::NumberOfScheduleTransitionPerDay::Id: {
         return YES;
     }
     case Attributes::ActivePresetHandle::Id: {
         return YES;
     }
+    case Attributes::ActiveScheduleHandle::Id: {
+        return YES;
+    }
+    case Attributes::Presets::Id: {
+        return YES;
+    }
     case Attributes::Schedules::Id: {
         return YES;
     }
-    case Attributes::SchedulesEditable::Id: {
-        return YES;
-    }
-    case Attributes::ActiveScheduleHandle::Id: {
+    case Attributes::PresetsSchedulesEditable::Id: {
         return YES;
     }
     case Attributes::TemperatureSetpointHoldPolicy::Id: {
         return YES;
     }
-    case Attributes::SetpointHoldPolicyExpiryTimestamp::Id: {
+    case Attributes::SetpointHoldExpiryTimestamp::Id: {
         return YES;
     }
     case Attributes::QueuedPreset::Id: {

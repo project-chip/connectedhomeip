@@ -26,7 +26,7 @@ static EmberAfStatus FindScheduleByHandle(const chip::ByteSpan & handle, const S
 {
     for (auto & schedule : list)
     {
-        if (handle.data_equal(schedule.scheduleHandle))
+        if ((schedule.scheduleHandle.IsNull() == false) && handle.data_equal(schedule.scheduleHandle.Value()))
         {
             outSchedule = schedule;
             return EMBER_ZCL_STATUS_SUCCESS;
@@ -41,7 +41,7 @@ static EmberAfStatus CheckScheduleHandleUnique(const chip::ByteSpan & handle, Sp
     int count = 0;
     for (auto & schedule : list)
     {
-        if (handle.data_equal(schedule.scheduleHandle))
+        if ((schedule.scheduleHandle.IsNull() == false) && handle.data_equal(schedule.scheduleHandle.Value()))
         {
             if (count == 0)
             {
@@ -87,7 +87,7 @@ struct Type
 {
 public:
     chip::ByteSpan sceduleHandle;
-    ThermostatSystemMode systemMode = static_cast<ThermostatSystemMode>(0);
+    ThermostatSystemModeEnum systemMode = static_cast<ThermostatSystemModeEnum>(0);
     DataModel::Nullable<chip::CharSpan> name;
     chip::ByteSpan presetHandle;
     DataModel::List<const Structs::ScheduleTransitionStruct::Type> transitions;
@@ -102,7 +102,7 @@ struct DecodableType
 {
 public:
     chip::ByteSpan sceduleHandle;
-    ThermostatSystemMode systemMode = static_cast<ThermostatSystemMode>(0);
+    ThermostatSystemModeEnum systemMode = static_cast<ThermostatSystemModeEnum>(0);
     DataModel::Nullable<chip::CharSpan> name;
     chip::ByteSpan presetHandle;
     DataModel::DecodableList<Structs::ScheduleTransitionStruct::DecodableType> transitions;
@@ -126,7 +126,7 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    ThermostatSystemMode systemMode                                = static_cast<ThermostatSystemMode>(0);
+    ThermostatSystemModeEnum systemMode                                = static_cast<ThermostatSystemModeEnum>(0);
     uint8_t numberOfSchedules                                      = static_cast<uint8_t>(0);
     chip::BitMask<ScheduleTypeFeaturesBitmap> scheduleTypeFeatures = static_cast<chip::BitMask<ScheduleTypeFeaturesBitmap>>(0);
 
@@ -188,7 +188,7 @@ static EmberAfStatus CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, S
             }
 
             // Check the off requirements (check 9)
-            if (schedule.systemMode == ThermostatSystemMode::kOff)
+            if (schedule.systemMode == ThermostatSystemModeEnum::kOff)
             {
                 const bool offSupported = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsOff);
                 VerifyOrReturnError(offSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);

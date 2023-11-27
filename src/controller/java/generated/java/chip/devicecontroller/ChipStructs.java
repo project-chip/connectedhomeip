@@ -6142,12 +6142,12 @@ public static class ThermostatClusterScheduleTransitionStruct {
   }
 }
 public static class ThermostatClusterScheduleStruct {
-  public byte[] scheduleHandle;
+  public @Nullable byte[] scheduleHandle;
   public Integer systemMode;
   public Optional<String> name;
   public Optional<byte[]> presetHandle;
   public ArrayList<ChipStructs.ThermostatClusterScheduleTransitionStruct> transitions;
-  public Optional<Boolean> builtIn;
+  public @Nullable Optional<Boolean> builtIn;
   private static final long SCHEDULE_HANDLE_ID = 0L;
   private static final long SYSTEM_MODE_ID = 1L;
   private static final long NAME_ID = 2L;
@@ -6156,12 +6156,12 @@ public static class ThermostatClusterScheduleStruct {
   private static final long BUILT_IN_ID = 5L;
 
   public ThermostatClusterScheduleStruct(
-    byte[] scheduleHandle,
+    @Nullable byte[] scheduleHandle,
     Integer systemMode,
     Optional<String> name,
     Optional<byte[]> presetHandle,
     ArrayList<ChipStructs.ThermostatClusterScheduleTransitionStruct> transitions,
-    Optional<Boolean> builtIn
+    @Nullable Optional<Boolean> builtIn
   ) {
     this.scheduleHandle = scheduleHandle;
     this.systemMode = systemMode;
@@ -6173,12 +6173,12 @@ public static class ThermostatClusterScheduleStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(SCHEDULE_HANDLE_ID, new ByteArrayType(scheduleHandle)));
+    values.add(new StructElement(SCHEDULE_HANDLE_ID, scheduleHandle != null ? new ByteArrayType(scheduleHandle) : new NullType()));
     values.add(new StructElement(SYSTEM_MODE_ID, new UIntType(systemMode)));
     values.add(new StructElement(NAME_ID, name.<BaseTLVType>map((nonOptionalname) -> new StringType(nonOptionalname)).orElse(new EmptyType())));
     values.add(new StructElement(PRESET_HANDLE_ID, presetHandle.<BaseTLVType>map((nonOptionalpresetHandle) -> new ByteArrayType(nonOptionalpresetHandle)).orElse(new EmptyType())));
     values.add(new StructElement(TRANSITIONS_ID, ArrayType.generateArrayType(transitions, (elementtransitions) -> elementtransitions.encodeTlv())));
-    values.add(new StructElement(BUILT_IN_ID, builtIn.<BaseTLVType>map((nonOptionalbuiltIn) -> new BooleanType(nonOptionalbuiltIn)).orElse(new EmptyType())));
+    values.add(new StructElement(BUILT_IN_ID, builtIn != null ? builtIn.<BaseTLVType>map((nonOptionalbuiltIn) -> new BooleanType(nonOptionalbuiltIn)).orElse(new EmptyType()) : new NullType()));
 
     return new StructType(values);
   }
@@ -6187,12 +6187,12 @@ public static class ThermostatClusterScheduleStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    byte[] scheduleHandle = null;
+    @Nullable byte[] scheduleHandle = null;
     Integer systemMode = null;
     Optional<String> name = Optional.empty();
     Optional<byte[]> presetHandle = Optional.empty();
     ArrayList<ChipStructs.ThermostatClusterScheduleTransitionStruct> transitions = null;
-    Optional<Boolean> builtIn = Optional.empty();
+    @Nullable Optional<Boolean> builtIn = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SCHEDULE_HANDLE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -6596,18 +6596,18 @@ public static class ThermostatClusterScheduleTypeStruct {
     return output.toString();
   }
 }
-public static class ThermostatClusterThermostatScheduleTransition {
+public static class ThermostatClusterThermostatScheduleTransitionStruct {
   public Integer transitionTime;
-  public @Nullable Integer heatSetpoint;
-  public @Nullable Integer coolSetpoint;
+  public Integer heatSetpoint;
+  public Integer coolSetpoint;
   private static final long TRANSITION_TIME_ID = 0L;
   private static final long HEAT_SETPOINT_ID = 1L;
   private static final long COOL_SETPOINT_ID = 2L;
 
-  public ThermostatClusterThermostatScheduleTransition(
+  public ThermostatClusterThermostatScheduleTransitionStruct(
     Integer transitionTime,
-    @Nullable Integer heatSetpoint,
-    @Nullable Integer coolSetpoint
+    Integer heatSetpoint,
+    Integer coolSetpoint
   ) {
     this.transitionTime = transitionTime;
     this.heatSetpoint = heatSetpoint;
@@ -6617,19 +6617,19 @@ public static class ThermostatClusterThermostatScheduleTransition {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(TRANSITION_TIME_ID, new UIntType(transitionTime)));
-    values.add(new StructElement(HEAT_SETPOINT_ID, heatSetpoint != null ? new IntType(heatSetpoint) : new NullType()));
-    values.add(new StructElement(COOL_SETPOINT_ID, coolSetpoint != null ? new IntType(coolSetpoint) : new NullType()));
+    values.add(new StructElement(HEAT_SETPOINT_ID, new IntType(heatSetpoint)));
+    values.add(new StructElement(COOL_SETPOINT_ID, new IntType(coolSetpoint)));
 
     return new StructType(values);
   }
 
-  public static ThermostatClusterThermostatScheduleTransition decodeTlv(BaseTLVType tlvValue) {
+  public static ThermostatClusterThermostatScheduleTransitionStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
     Integer transitionTime = null;
-    @Nullable Integer heatSetpoint = null;
-    @Nullable Integer coolSetpoint = null;
+    Integer heatSetpoint = null;
+    Integer coolSetpoint = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == TRANSITION_TIME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -6648,7 +6648,7 @@ public static class ThermostatClusterThermostatScheduleTransition {
         }
       }
     }
-    return new ThermostatClusterThermostatScheduleTransition(
+    return new ThermostatClusterThermostatScheduleTransitionStruct(
       transitionTime,
       heatSetpoint,
       coolSetpoint
@@ -6658,7 +6658,7 @@ public static class ThermostatClusterThermostatScheduleTransition {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ThermostatClusterThermostatScheduleTransition {\n");
+    output.append("ThermostatClusterThermostatScheduleTransitionStruct {\n");
     output.append("\ttransitionTime: ");
     output.append(transitionTime);
     output.append("\n");

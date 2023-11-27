@@ -9842,41 +9842,23 @@ bool emberAfThermostatClusterSetActivePresetRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData);
 /**
- * @brief Thermostat Cluster StartSchedulesEditRequest Command callback (from client)
+ * @brief Thermostat Cluster StartPresetsSchedulesEditRequest Command callback (from client)
  */
-bool emberAfThermostatClusterStartSchedulesEditRequestCallback(
+bool emberAfThermostatClusterStartPresetsSchedulesEditRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::StartSchedulesEditRequest::DecodableType & commandData);
+    const chip::app::Clusters::Thermostat::Commands::StartPresetsSchedulesEditRequest::DecodableType & commandData);
 /**
- * @brief Thermostat Cluster CancelSchedulesEditRequest Command callback (from client)
+ * @brief Thermostat Cluster CancelPresetsSchedulesEditRequest Command callback (from client)
  */
-bool emberAfThermostatClusterCancelSchedulesEditRequestCallback(
+bool emberAfThermostatClusterCancelPresetsSchedulesEditRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::CancelSchedulesEditRequest::DecodableType & commandData);
+    const chip::app::Clusters::Thermostat::Commands::CancelPresetsSchedulesEditRequest::DecodableType & commandData);
 /**
- * @brief Thermostat Cluster CommitSchedulesEditRequest Command callback (from client)
+ * @brief Thermostat Cluster CommitPresetsSchedulesRequest Command callback (from client)
  */
-bool emberAfThermostatClusterCommitSchedulesEditRequestCallback(
+bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::CommitSchedulesEditRequest::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster StartPresetsEditRequest Command callback (from client)
- */
-bool emberAfThermostatClusterStartPresetsEditRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::StartPresetsEditRequest::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster CancelPresetsEditRequest Command callback (from client)
- */
-bool emberAfThermostatClusterCancelPresetsEditRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::CancelPresetsEditRequest::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster CommitPresetsEditRequest Command callback (from client)
- */
-bool emberAfThermostatClusterCommitPresetsEditRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::CommitPresetsEditRequest::DecodableType & commandData);
+    const chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::DecodableType & commandData);
 /**
  * @brief Thermostat Cluster CancelSetActivePresetRequest Command callback (from client)
  */

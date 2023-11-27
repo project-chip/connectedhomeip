@@ -10058,7 +10058,6 @@ public class ClusterIDMapping {
             AbsMaxCoolSetpointLimit(6L),
             PICoolingDemand(7L),
             PIHeatingDemand(8L),
-            HVACSystemTypeConfiguration(9L),
             LocalTemperatureCalibration(16L),
             OccupiedCoolingSetpoint(17L),
             OccupiedHeatingSetpoint(18L),
@@ -10072,6 +10071,7 @@ public class ClusterIDMapping {
             RemoteSensing(26L),
             ControlSequenceOfOperation(27L),
             SystemMode(28L),
+            AlarmMask(29L),
             ThermostatRunningMode(30L),
             StartOfWeek(32L),
             NumberOfWeeklyTransitions(33L),
@@ -10097,22 +10097,21 @@ public class ClusterIDMapping {
             ACErrorCode(68L),
             ACLouverPosition(69L),
             ACCoilTemperature(70L),
-            ACCapacityformat(71L),
+            ACCapacityFormat(71L),
             PresetTypes(72L),
             ScheduleTypes(73L),
             NumberOfPresets(74L),
             NumberOfSchedules(75L),
             NumberOfScheduleTransitions(76L),
-            NumberOfScheduleTransitionsPerDay(77L),
-            Presets(78L),
-            PresetsEditable(79L),
-            ActivePresetHandle(80L),
+            NumberOfScheduleTransitionPerDay(77L),
+            ActivePresetHandle(78L),
+            ActiveScheduleHandle(79L),
+            Presets(80L),
             Schedules(81L),
-            SchedulesEditable(82L),
-            ActiveScheduleHandle(83L),
-            TemperatureSetpointHoldPolicy(84L),
-            SetpointHoldPolicyExpiryTimestamp(85L),
-            QueuedPreset(86L),
+            PresetsSchedulesEditable(82L),
+            TemperatureSetpointHoldPolicy(83L),
+            SetpointHoldExpiryTimestamp(84L),
+            QueuedPreset(85L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -10166,14 +10165,11 @@ public class ClusterIDMapping {
             GetRelayStatusLog(4L),
             SetActiveScheduleRequest(5L),
             SetActivePresetRequest(6L),
-            StartSchedulesEditRequest(7L),
-            CancelSchedulesEditRequest(8L),
-            CommitSchedulesEditRequest(9L),
-            StartPresetsEditRequest(10L),
-            CancelPresetsEditRequest(11L),
-            CommitPresetsEditRequest(12L),
-            CancelSetActivePresetRequest(14L),
-            SetTemperatureSetpointHoldPolicy(15L),;
+            StartPresetsSchedulesEditRequest(7L),
+            CancelPresetsSchedulesEditRequest(8L),
+            CommitPresetsSchedulesRequest(9L),
+            CancelSetActivePresetRequest(10L),
+            SetTemperatureSetpointHoldPolicy(11L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -10208,7 +10204,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum SetWeeklyScheduleCommandField {NumberOfTransitionsForSequence(0),DayOfWeekForSequence(1),ModeForSequence(2),Transitions(3),;
+                }public enum SetWeeklyScheduleCommandField {NumberOfTransitionsForSequence(0),DayOfWeekforSequence(1),ModeForSequence(2),Transitions(3),;
                     private final int id;
                     SetWeeklyScheduleCommandField(int id) {
                         this.id = id;
@@ -10276,34 +10272,17 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum StartSchedulesEditRequestCommandField {TimeoutSeconds(0),;
+                }public enum StartPresetsSchedulesEditRequestCommandField {TimeoutSeconds(0),;
                     private final int id;
-                    StartSchedulesEditRequestCommandField(int id) {
+                    StartPresetsSchedulesEditRequestCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static StartSchedulesEditRequestCommandField value(int id) throws NoSuchFieldError {
-                        for (StartSchedulesEditRequestCommandField field : StartSchedulesEditRequestCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum StartPresetsEditRequestCommandField {TimeoutSeconds(0),;
-                    private final int id;
-                    StartPresetsEditRequestCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static StartPresetsEditRequestCommandField value(int id) throws NoSuchFieldError {
-                        for (StartPresetsEditRequestCommandField field : StartPresetsEditRequestCommandField.values()) {
+                    public static StartPresetsSchedulesEditRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (StartPresetsSchedulesEditRequestCommandField field : StartPresetsSchedulesEditRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

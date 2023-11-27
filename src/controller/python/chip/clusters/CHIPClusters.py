@@ -7353,9 +7353,9 @@ class ChipClusters:
                 "commandName": "SetWeeklySchedule",
                 "args": {
                     "numberOfTransitionsForSequence": "int",
-                    "dayOfWeekForSequence": "int",
+                    "dayOfWeekforSequence": "int",
                     "modeForSequence": "int",
-                    "transitions": "ThermostatScheduleTransition",
+                    "transitions": "ThermostatScheduleTransitionStruct",
                 },
             },
             0x00000002: {
@@ -7395,50 +7395,31 @@ class ChipClusters:
             },
             0x00000007: {
                 "commandId": 0x00000007,
-                "commandName": "StartSchedulesEditRequest",
+                "commandName": "StartPresetsSchedulesEditRequest",
                 "args": {
                     "timeoutSeconds": "int",
                 },
             },
             0x00000008: {
                 "commandId": 0x00000008,
-                "commandName": "CancelSchedulesEditRequest",
+                "commandName": "CancelPresetsSchedulesEditRequest",
                 "args": {
                 },
             },
             0x00000009: {
                 "commandId": 0x00000009,
-                "commandName": "CommitSchedulesEditRequest",
+                "commandName": "CommitPresetsSchedulesRequest",
                 "args": {
                 },
             },
             0x0000000A: {
                 "commandId": 0x0000000A,
-                "commandName": "StartPresetsEditRequest",
-                "args": {
-                    "timeoutSeconds": "int",
-                },
-            },
-            0x0000000B: {
-                "commandId": 0x0000000B,
-                "commandName": "CancelPresetsEditRequest",
-                "args": {
-                },
-            },
-            0x0000000C: {
-                "commandId": 0x0000000C,
-                "commandName": "CommitPresetsEditRequest",
-                "args": {
-                },
-            },
-            0x0000000E: {
-                "commandId": 0x0000000E,
                 "commandName": "CancelSetActivePresetRequest",
                 "args": {
                 },
             },
-            0x0000000F: {
-                "commandId": 0x0000000F,
+            0x0000000B: {
+                "commandId": 0x0000000B,
                 "commandName": "SetTemperatureSetpointHoldPolicy",
                 "args": {
                     "temperatureSetpointHoldPolicy": "int",
@@ -7499,13 +7480,6 @@ class ChipClusters:
                 "attributeId": 0x00000008,
                 "type": "int",
                 "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "HVACSystemTypeConfiguration",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
             },
             0x00000010: {
                 "attributeName": "LocalTemperatureCalibration",
@@ -7597,6 +7571,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
                 "writable": True,
+            },
+            0x0000001D: {
+                "attributeName": "AlarmMask",
+                "attributeId": 0x0000001D,
+                "type": "int",
+                "reportable": True,
             },
             0x0000001E: {
                 "attributeName": "ThermostatRunningMode",
@@ -7761,7 +7741,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000047: {
-                "attributeName": "ACCapacityformat",
+                "attributeName": "ACCapacityFormat",
                 "attributeId": 0x00000047,
                 "type": "int",
                 "reportable": True,
@@ -7798,62 +7778,58 @@ class ChipClusters:
                 "reportable": True,
             },
             0x0000004D: {
-                "attributeName": "NumberOfScheduleTransitionsPerDay",
+                "attributeName": "NumberOfScheduleTransitionPerDay",
                 "attributeId": 0x0000004D,
                 "type": "int",
                 "reportable": True,
             },
             0x0000004E: {
-                "attributeName": "Presets",
+                "attributeName": "ActivePresetHandle",
                 "attributeId": 0x0000004E,
-                "type": "",
+                "type": "bytes",
                 "reportable": True,
             },
             0x0000004F: {
-                "attributeName": "PresetsEditable",
+                "attributeName": "ActiveScheduleHandle",
                 "attributeId": 0x0000004F,
-                "type": "bool",
+                "type": "bytes",
                 "reportable": True,
             },
             0x00000050: {
-                "attributeName": "ActivePresetHandle",
+                "attributeName": "Presets",
                 "attributeId": 0x00000050,
-                "type": "bytes",
+                "type": "",
                 "reportable": True,
+                "writable": True,
             },
             0x00000051: {
                 "attributeName": "Schedules",
                 "attributeId": 0x00000051,
                 "type": "",
                 "reportable": True,
+                "writable": True,
             },
             0x00000052: {
-                "attributeName": "SchedulesEditable",
+                "attributeName": "PresetsSchedulesEditable",
                 "attributeId": 0x00000052,
                 "type": "bool",
                 "reportable": True,
             },
             0x00000053: {
-                "attributeName": "ActiveScheduleHandle",
+                "attributeName": "TemperatureSetpointHoldPolicy",
                 "attributeId": 0x00000053,
-                "type": "bytes",
+                "type": "int",
                 "reportable": True,
             },
             0x00000054: {
-                "attributeName": "TemperatureSetpointHoldPolicy",
+                "attributeName": "SetpointHoldExpiryTimestamp",
                 "attributeId": 0x00000054,
                 "type": "int",
                 "reportable": True,
             },
             0x00000055: {
-                "attributeName": "SetpointHoldPolicyExpiryTimestamp",
-                "attributeId": 0x00000055,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000056: {
                 "attributeName": "QueuedPreset",
-                "attributeId": 0x00000056,
+                "attributeId": 0x00000055,
                 "type": "",
                 "reportable": True,
             },

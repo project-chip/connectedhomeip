@@ -1276,37 +1276,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRThermostatClusterStartSchedulesEditRequestParams (InternalMethods)
+@interface MTRThermostatClusterStartPresetsSchedulesEditRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRThermostatClusterCancelSchedulesEditRequestParams (InternalMethods)
+@interface MTRThermostatClusterCancelPresetsSchedulesEditRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRThermostatClusterCommitSchedulesEditRequestParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRThermostatClusterStartPresetsEditRequestParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRThermostatClusterCancelPresetsEditRequestParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRThermostatClusterCommitPresetsEditRequestParams (InternalMethods)
+@interface MTRThermostatClusterCommitPresetsSchedulesRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

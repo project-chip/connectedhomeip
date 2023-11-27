@@ -25,7 +25,16 @@ class ThermostatCluster(private val controller: MatterController, private val en
     val numberOfTransitionsForSequence: UByte, 
     val dayOfWeekForSequence: UInt, 
     val modeForSequence: UInt, 
-    val transitions: List<ThermostatClusterThermostatScheduleTransition>
+    val transitions: List<ThermostatClusterThermostatScheduleTransitionStruct>
+  )
+
+  class GetRelayStatusLogResponse(
+    val timeOfDay: UShort, 
+    val relayStatus: UInt, 
+    val localTemperature: Short?, 
+    val humidityInPercentage: UByte?, 
+    val setPoint: Short, 
+    val unreadEntries: UShort
   )
 
   class LocalTemperatureAttribute(
@@ -77,30 +86,30 @@ class ThermostatCluster(private val controller: MatterController, private val en
   )
 
   class ScheduleTypesAttribute(
-    val value: List<ThermostatClusterScheduleTypeStruct>?
+    val value: List<ThermostatClusterScheduleTypeStruct>
   )
 
-  class NumberOfScheduleTransitionsPerDayAttribute(
+  class NumberOfScheduleTransitionPerDayAttribute(
     val value: UByte?
-  )
-
-  class PresetsAttribute(
-    val value: List<ThermostatClusterPresetStruct>?
   )
 
   class ActivePresetHandleAttribute(
     val value: ByteArray?
   )
 
-  class SchedulesAttribute(
-    val value: List<ThermostatClusterScheduleStruct>?
-  )
-
   class ActiveScheduleHandleAttribute(
     val value: ByteArray?
   )
 
-  class SetpointHoldPolicyExpiryTimestampAttribute(
+  class PresetsAttribute(
+    val value: List<ThermostatClusterPresetStruct>?
+  )
+
+  class SchedulesAttribute(
+    val value: List<ThermostatClusterScheduleStruct>
+  )
+
+  class SetpointHoldExpiryTimestampAttribute(
     val value: UInt?
   )
 
@@ -134,7 +143,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }    
   }
 
-  suspend fun setWeeklySchedule(numberOfTransitionsForSequence: UByte, dayOfWeekForSequence: UInt, modeForSequence: UInt, transitions: List<ThermostatClusterThermostatScheduleTransition>, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun setWeeklySchedule(numberOfTransitionsForSequence: UByte, dayOfWeekforSequence: UInt, modeForSequence: UInt, transitions: List<ThermostatClusterThermostatScheduleTransitionStruct>, timedInvokeTimeoutMs: Int? = null) {
     val commandId = 1L
 
     if (timedInvokeTimeoutMs != null) {
@@ -164,7 +173,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }    
   }
 
-  suspend fun getRelayStatusLog(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun getRelayStatusLog(timedInvokeTimeoutMs: Int? = null): GetRelayStatusLogResponse {
     val commandId = 4L
 
     if (timedInvokeTimeoutMs != null) {
@@ -184,7 +193,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }    
   }
 
-  suspend fun setActivePresetRequest(presetHandle: ByteArray, delayMinutes: UShort, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun setActivePresetRequest(presetHandle: ByteArray, delayMinutes: UShort?, timedInvokeTimeoutMs: Int? = null) {
     val commandId = 6L
 
     if (timedInvokeTimeoutMs != null) {
@@ -194,7 +203,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }    
   }
 
-  suspend fun startSchedulesEditRequest(timeoutSeconds: UShort, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun startPresetsSchedulesEditRequest(timeoutSeconds: UShort, timedInvokeTimeoutMs: Int? = null) {
     val commandId = 7L
 
     if (timedInvokeTimeoutMs != null) {
@@ -204,7 +213,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }    
   }
 
-  suspend fun cancelSchedulesEditRequest(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun cancelPresetsSchedulesEditRequest(timedInvokeTimeoutMs: Int? = null) {
     val commandId = 8L
 
     if (timedInvokeTimeoutMs != null) {
@@ -214,7 +223,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }    
   }
 
-  suspend fun commitSchedulesEditRequest(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun commitPresetsSchedulesRequest(timedInvokeTimeoutMs: Int? = null) {
     val commandId = 9L
 
     if (timedInvokeTimeoutMs != null) {
@@ -224,7 +233,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }    
   }
 
-  suspend fun startPresetsEditRequest(timeoutSeconds: UShort, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun cancelSetActivePresetRequest(timedInvokeTimeoutMs: Int? = null) {
     val commandId = 10L
 
     if (timedInvokeTimeoutMs != null) {
@@ -234,38 +243,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }    
   }
 
-  suspend fun cancelPresetsEditRequest(timedInvokeTimeoutMs: Int? = null) {
-    val commandId = 11L
-
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }    
-  }
-
-  suspend fun commitPresetsEditRequest(timedInvokeTimeoutMs: Int? = null) {
-    val commandId = 12L
-
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }    
-  }
-
-  suspend fun cancelSetActivePresetRequest(timedInvokeTimeoutMs: Int? = null) {
-    val commandId = 14L
-
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }    
-  }
-
   suspend fun setTemperatureSetpointHoldPolicy(temperatureSetpointHoldPolicy: UInt, timedInvokeTimeoutMs: Int? = null) {
-    val commandId = 15L
+    val commandId = 11L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
@@ -367,28 +346,6 @@ class ThermostatCluster(private val controller: MatterController, private val en
   }
 
   suspend fun subscribePIHeatingDemandAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readHVACSystemTypeConfigurationAttribute(): UByte {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeHVACSystemTypeConfigurationAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int? = null    
-  ) {
-    if (timedWriteTimeoutMs != null) {
-      // Do the action with timedWriteTimeoutMs
-    } else {
-      // Do the action without timedWriteTimeoutMs
-    }    
-  }
-
-  suspend fun subscribeHVACSystemTypeConfigurationAttribute(
     minInterval: Int,
     maxInterval: Int
   ): UByte {
@@ -675,6 +632,17 @@ class ThermostatCluster(private val controller: MatterController, private val en
   }
 
   suspend fun subscribeSystemModeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAlarmMaskAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAlarmMaskAttribute(
     minInterval: Int,
     maxInterval: Int
   ): UByte {
@@ -1088,11 +1056,11 @@ class ThermostatCluster(private val controller: MatterController, private val en
     // Implementation needs to be added here
   }
 
-  suspend fun readACCapacityformatAttribute(): UByte {
+  suspend fun readACCapacityFormatAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun writeACCapacityformatAttribute(
+  suspend fun writeACCapacityFormatAttribute(
     value: UInt,
     timedWriteTimeoutMs: Int? = null    
   ) {
@@ -1103,7 +1071,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }    
   }
 
-  suspend fun subscribeACCapacityformatAttribute(
+  suspend fun subscribeACCapacityFormatAttribute(
     minInterval: Int,
     maxInterval: Int
   ): UByte {
@@ -1165,36 +1133,14 @@ class ThermostatCluster(private val controller: MatterController, private val en
     // Implementation needs to be added here
   }
 
-  suspend fun readNumberOfScheduleTransitionsPerDayAttribute(): NumberOfScheduleTransitionsPerDayAttribute {
+  suspend fun readNumberOfScheduleTransitionPerDayAttribute(): NumberOfScheduleTransitionPerDayAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNumberOfScheduleTransitionsPerDayAttribute(
+  suspend fun subscribeNumberOfScheduleTransitionPerDayAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): NumberOfScheduleTransitionsPerDayAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readPresetsAttribute(): PresetsAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribePresetsAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): PresetsAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readPresetsEditableAttribute(): Boolean {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribePresetsEditableAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Boolean {
+  ): NumberOfScheduleTransitionPerDayAttribute {
     // Implementation needs to be added here
   }
 
@@ -1209,8 +1155,52 @@ class ThermostatCluster(private val controller: MatterController, private val en
     // Implementation needs to be added here
   }
 
+  suspend fun readActiveScheduleHandleAttribute(): ActiveScheduleHandleAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeActiveScheduleHandleAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ActiveScheduleHandleAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPresetsAttribute(): PresetsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writePresetsAttribute(
+    value: List<ThermostatClusterPresetStruct>,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }    
+  }
+
+  suspend fun subscribePresetsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): PresetsAttribute {
+    // Implementation needs to be added here
+  }
+
   suspend fun readSchedulesAttribute(): SchedulesAttribute {
     // Implementation needs to be added here
+  }
+
+  suspend fun writeSchedulesAttribute(
+    value: List<ThermostatClusterScheduleStruct>,
+    timedWriteTimeoutMs: Int? = null    
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }    
   }
 
   suspend fun subscribeSchedulesAttribute(
@@ -1220,25 +1210,14 @@ class ThermostatCluster(private val controller: MatterController, private val en
     // Implementation needs to be added here
   }
 
-  suspend fun readSchedulesEditableAttribute(): Boolean {
+  suspend fun readPresetsSchedulesEditableAttribute(): Boolean {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSchedulesEditableAttribute(
+  suspend fun subscribePresetsSchedulesEditableAttribute(
     minInterval: Int,
     maxInterval: Int
   ): Boolean {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readActiveScheduleHandleAttribute(): ActiveScheduleHandleAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeActiveScheduleHandleAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): ActiveScheduleHandleAttribute {
     // Implementation needs to be added here
   }
 
@@ -1253,14 +1232,14 @@ class ThermostatCluster(private val controller: MatterController, private val en
     // Implementation needs to be added here
   }
 
-  suspend fun readSetpointHoldPolicyExpiryTimestampAttribute(): SetpointHoldPolicyExpiryTimestampAttribute {
+  suspend fun readSetpointHoldExpiryTimestampAttribute(): SetpointHoldExpiryTimestampAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSetpointHoldPolicyExpiryTimestampAttribute(
+  suspend fun subscribeSetpointHoldExpiryTimestampAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): SetpointHoldPolicyExpiryTimestampAttribute {
+  ): SetpointHoldExpiryTimestampAttribute {
     // Implementation needs to be added here
   }
 
