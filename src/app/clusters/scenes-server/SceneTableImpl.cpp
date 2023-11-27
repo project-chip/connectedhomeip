@@ -99,7 +99,7 @@ struct EndpointSceneCount : public PersistentData<kPersistentBufferSceneCountByt
     }
 };
 
-// Worst case tested: Add Scene Command with EFS using the default SerializeAdd Method. This yielded a serialized scene of 212bytes
+// Worst case tested: Add Scene Command with EFS using the default SerializeAdd Method. This yielded a serialized scene of 171 bytes
 // when using the OnOff, Level Control and Color Control as well as the maximal name length of 16 bytes. Putting 256 gives some
 // slack in case different clusters are used. Value obtained by using writer.GetLengthWritten at the end of the SceneTableData
 // Serialize method.
