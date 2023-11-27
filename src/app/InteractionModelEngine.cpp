@@ -278,7 +278,7 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(const ScopedNodeId & aPe
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-bool InteractionModelEngine::IsMatchingSubscriptionActive(const FabricIndex & aFabricIndex, const NodeId & subjectID)
+bool InteractionModelEngine::IsSubjectSubscriptionActive(const FabricIndex & aFabricIndex, const NodeId & subjectID)
 {
     for (uint16_t index = 0; index < GetNumActiveReadHandlers(); index++)
     {

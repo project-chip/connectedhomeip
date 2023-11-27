@@ -136,7 +136,7 @@ void ICDManager::SendCheckInMsgs()
                 }
 
                 bool active =
-                    InteractionModelEngine::GetInstance()->IsMatchingSubscriptionActive(entry.fabricIndex, entry.monitoredSubject);
+                    InteractionModelEngine::GetInstance()->IsSubjectSubscriptionActive(entry.fabricIndex, entry.monitoredSubject);
                 if (active)
                 {
                     continue;
@@ -145,11 +145,7 @@ void ICDManager::SendCheckInMsgs()
                 // SenderPool will be release upon transition from active to idle state
                 // This will happen when all ICD Check-In messages are sent on the network
                 ICDCheckInSender * sender = mICDSenderPool.CreateObject(mExchangeManager);
-                if (sender == nullptr)
-                {
-                    ChipLogError(AppServer, "Failed to allocate ICDCheckinSender");
-                    return;
-                }
+                VerifyOrReturn(sender != nullptr, ChipLogError(AppServer, "Failed to allocate ICDCheckinSender"));
 
                 if (CHIP_NO_ERROR != sender->RequestResolve(entry, mFabricTable))
                 {
@@ -226,7 +222,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
         }
 #endif
 
-        // Going back to Idle, all check-in messages are sent
+        // Going back to Idle, all Check-In messages are sent
         mICDSenderPool.ReleaseAll();
 
         CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(slowPollInterval);

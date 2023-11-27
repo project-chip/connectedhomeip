@@ -90,7 +90,7 @@ public:
         {
             return FAILURE;
         }
-        ctx->mICDManager.Init(&ctx->testStorage, &ctx->GetFabricTable(), &(ctx->mKeystore), &ctx.GetExchangeManager());
+        ctx->mICDManager.Init(&ctx->testStorage, &ctx->GetFabricTable(), &(ctx->mKeystore), &(ctx->GetExchangeManager()));
         ctx->mICDManager.RegisterObserver(&mICDStateObserver);
         return SUCCESS;
     }
