@@ -47,7 +47,7 @@ public:
      * Handle Command Callback in application: set-cooking-parameters
      */
     Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                                  uint8_t powerSetting) override;
+                                                                           uint8_t powerSetting) override;
 
     /**
      * Handle Command Callback in application: add-more-time

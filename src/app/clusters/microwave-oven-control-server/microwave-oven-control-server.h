@@ -122,7 +122,7 @@ public:
      *   @return Returns the Interaction Model status code which was user determined in the business logic
      */
     virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                                          uint8_t powerSetting) = 0;
+                                                                                   uint8_t powerSetting) = 0;
 
     /**
      *   @brief Handle Command Callback in application: AddMoreTime

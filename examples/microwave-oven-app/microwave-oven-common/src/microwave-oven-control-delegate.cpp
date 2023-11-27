@@ -24,8 +24,7 @@ using namespace chip::app::Clusters::MicrowaveOvenControl;
 
 // Microwave Oven Control command callbacks
 Protocols::InteractionModel::Status
-ExampleMicrowaveOvenControlDelegate::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                               uint8_t powerSetting)
+ExampleMicrowaveOvenControlDelegate::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime, uint8_t powerSetting)
 {
     return (*mHandleSetCookingParametersCallback.get())(cookMode, cookTime, powerSetting);
 }
