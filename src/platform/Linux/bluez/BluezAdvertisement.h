@@ -41,7 +41,7 @@ public:
     BluezAdvertisement() = default;
     ~BluezAdvertisement() { Shutdown(); }
 
-    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, ChipAdvType aAdvType, const char * aAdvUUID, uint32_t aAdvDurationMs);
+    CHIP_ERROR Init(const BluezEndpoint * aEndpoint, ChipAdvType aAdvType, const char * aAdvUUID, uint32_t aAdvDurationMs);
     void Shutdown();
 
     /// Start BLE advertising.
@@ -69,9 +69,8 @@ private:
     CHIP_ERROR StopImpl();
 
     // Objects (interfaces) used by LE advertisement
-    GDBusObjectManagerServer * mpRoot = nullptr;
-    BluezAdapter1 * mpAdapter         = nullptr;
-    BluezLEAdvertisement1 * mpAdv     = nullptr;
+    const BluezEndpoint * mEndpoint = nullptr;
+    BluezLEAdvertisement1 * mpAdv   = nullptr;
 
     bool mIsInitialized = false;
     bool mIsAdvertising = false;

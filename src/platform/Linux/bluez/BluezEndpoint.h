@@ -77,6 +77,7 @@ public:
 
     CHIP_ERROR RegisterGattApplication();
     GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mpRoot; }
+    GDBusObjectManager * GetObjectManager() const { return mpObjMgr; }
 
     CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
     void CancelConnect();

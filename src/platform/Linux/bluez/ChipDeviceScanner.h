@@ -30,6 +30,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+class BluezEndpoint;
+
 /// Receives callbacks when chip devices are being scanned
 class ChipDeviceScannerDelegate
 {
@@ -60,7 +62,7 @@ public:
     ~ChipDeviceScanner() { Shutdown(); }
 
     /// Initialize the scanner.
-    CHIP_ERROR Init(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate);
+    CHIP_ERROR Init(const BluezEndpoint * aEndpoint, ChipDeviceScannerDelegate * delegate);
 
     /// Release any resources associated with the scanner.
     void Shutdown();
@@ -90,8 +92,7 @@ private:
     /// so that it can be re-discovered if it's still advertising.
     void RemoveDevice(BluezDevice1 & device);
 
-    GDBusObjectManager * mManager         = nullptr;
-    BluezAdapter1 * mAdapter              = nullptr;
+    const BluezEndpoint * mEndpoint       = nullptr;
     GCancellable * mCancellable           = nullptr;
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     gulong mObjectAddedSignal             = 0;
