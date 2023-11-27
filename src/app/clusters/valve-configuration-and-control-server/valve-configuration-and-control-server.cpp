@@ -165,7 +165,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     if (ep < kValveConfigurationAndControlDelegateTableSize)
     {
         delegate->mEndpoint = endpoint;
-        gDelegateTable[ep] = delegate;
+        gDelegateTable[ep]  = delegate;
     }
 }
 
