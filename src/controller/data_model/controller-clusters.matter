@@ -2970,7 +2970,7 @@ provisional client cluster Timer = 71 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven. */
 provisional client cluster OvenCavityOperationalState = 72 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ErrorStateEnum : enum8 {
     kNoError = 0;
