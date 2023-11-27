@@ -274,27 +274,25 @@ private:
 class DLL_EXPORT CommissionerDeclaration
 {
 public:
-    enum CdError
+    enum class CdError : uint16_t
     {
-        kNoError = 1,
-        kCommissionableDiscoveryFailed,
-        kPaseConnectionFailed,
-        kPaseAuthFailed,
-        kDacValidationFailed,
-        kAlreadyOnFabric,
-        kOperationalDiscoveryFailed,
-        kCaseConnectionFailed,
-        kCaseAuthFailed,
-        kConfigurationFailed,
-        kBindingConfigurationFailed,
-        kCommissionerPasscodeNotSupported,
-        kInvalidIdentificationDeclarationParams,
-        kAppInstallConsentPending,
-        kAppInstalling,
-        kAppInstallFailed,
-        kAppInstalledRetryNeeded,
-
-        kMax = UINT8_MAX
+        kNoError                                = 0,
+        kCommissionableDiscoveryFailed          = 1,
+        kPaseConnectionFailed                   = 2,
+        kPaseAuthFailed                         = 3,
+        kDacValidationFailed                    = 4,
+        kAlreadyOnFabric                        = 5,
+        kOperationalDiscoveryFailed             = 6,
+        kCaseConnectionFailed                   = 7,
+        kCaseAuthFailed                         = 8,
+        kConfigurationFailed                    = 9,
+        kBindingConfigurationFailed             = 10,
+        kCommissionerPasscodeNotSupported       = 11,
+        kInvalidIdentificationDeclarationParams = 12,
+        kAppInstallConsentPending               = 13,
+        kAppInstalling                          = 14,
+        kAppInstallFailed                       = 15,
+        kAppInstalledRetryNeeded                = 16
     };
 
     constexpr static size_t kUdcTLVDataMaxBytes = 500;
@@ -333,9 +331,9 @@ public:
     {
         ChipLogDetail(AppServer, "---- Commissioner Declaration Start ----");
 
-        if (mErrorCode != 0)
+        if (mErrorCode != CdError::kNoError)
         {
-            ChipLogDetail(AppServer, "\terror code: %u", mErrorCode);
+            ChipLogDetail(AppServer, "\terror code: %hu", mErrorCode);
         }
 
         if (mNeedsPasscode)
@@ -375,7 +373,7 @@ private:
         kMaxNum = UINT8_MAX
     };
 
-    CdError mErrorCode            = kNoError;
+    CdError mErrorCode            = CdError::kNoError;
     bool mNeedsPasscode           = false;
     bool mNoAppsFound             = false;
     bool mPasscodeDialogDisplayed = false;
@@ -405,7 +403,8 @@ class DLL_EXPORT UserConfirmationProvider
 public:
     /**
      * @brief
-     *   Called when a UDC message has been received and corresponding nodeData has been found.
+     *   Called when an Identification Declaration UDC message has been received
+     * and corresponding nodeData has been found.
      * It is expected that the implementer will prompt the user to confirm their intention to
      * commission the given node, and obtain the setup code to allow commissioning to proceed,
      * and then invoke commissioning on the given Node (using CHIP Device Controller, for example)
@@ -416,6 +415,24 @@ public:
     virtual void OnUserDirectedCommissioningRequest(UDCClientState state) = 0;
 
     virtual ~UserConfirmationProvider() = default;
+};
+
+class DLL_EXPORT CommissionerDeclarationHandler
+{
+public:
+    /**
+     * @brief
+     *   Called when a Commissioner Declaration UDC message has been received.
+     * It is expected that the implementer will de-dup messages received from the
+     * same source within a short (1 second) time window.
+     *
+     *  @param[in]    source       The source of the Commissioner Declaration Message.
+     *  @param[in]    cd           The Commissioner Declaration Message.
+     *
+     */
+    virtual void OnCommissionerDeclarationMessage(const chip::Transport::PeerAddress & source, CommissionerDeclaration cd) = 0;
+
+    virtual ~CommissionerDeclarationHandler() = default;
 };
 
 /**
@@ -429,7 +446,7 @@ public:
      * Send a User Directed Commissioning message to a CHIP node.
      *
      * @param transportMgr  A transport to use for sending the message.
-     * @param payload       A PacketBufferHandle with the payload.
+     * @param idMessage     The Identification Declaration message.
      * @param peerAddress   Address of destination.
      *
      * @return CHIP_ERROR_NO_MEMORY if allocation fails.
@@ -452,8 +469,21 @@ public:
 
     CHIP_ERROR EncodeUDCMessage(const System::PacketBufferHandle & payload);
 
+    /**
+     * Set the listener to be called when a Commissioner Declaration UDC request is received.
+     *
+     *  @param[in]    commissionerDeclarationHandler    The callback function to handle the message.
+     *
+     */
+    void SetCommissionerDeclarationHandler(CommissionerDeclarationHandler * commissionerDeclarationHandler)
+    {
+        mCommissionerDeclarationHandler = commissionerDeclarationHandler;
+    }
+
 private:
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
+
+    CommissionerDeclarationHandler * mCommissionerDeclarationHandler = nullptr;
 };
 
 /**

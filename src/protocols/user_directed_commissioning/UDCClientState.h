@@ -93,6 +93,33 @@ public:
         memcpy(mRotatingId, rotatingId, mRotatingIdLen);
     }
 
+    const char * GetPairingInst() const { return mPairingInst; }
+    void SetPairingInst(const char * pairingInst) { Platform::CopyString(mPairingInst, pairingInst); }
+
+    uint16_t GetPairingHint() const { return mPairingHint; }
+    void SetPairingHint(uint16_t pairingHint) { mPairingHint = pairingHint; }
+
+    bool GetAppVendorId(size_t index, uint16_t & vid) const
+    {
+        if (index < mNumAppVendorIds)
+        {
+            vid = mAppVendorIds[index];
+            return true;
+        }
+        return false;
+    }
+    size_t GetNumAppVendorIds() const { return mNumAppVendorIds; }
+
+    void AddAppVendorId(uint16_t vid)
+    {
+        if (mNumAppVendorIds >= sizeof(mAppVendorIds))
+        {
+            // already at max
+            return;
+        }
+        mAppVendorIds[mNumAppVendorIds++] = vid;
+    }
+
     UDCClientProcessingState GetUDCClientProcessingState() const { return mUDCClientProcessingState; }
     void SetUDCClientProcessingState(UDCClientProcessingState state) { mUDCClientProcessingState = state; }
 
@@ -117,6 +144,9 @@ public:
     void SetCommissionerPasscodeReady(bool newValue) { mCommissionerPasscodeReady = newValue; };
     bool GetCommissionerPasscodeReady() const { return mCommissionerPasscodeReady; };
 
+    void SetCancelPasscode(bool newValue) { mCancelPasscode = newValue; };
+    bool GetCancelPasscode() const { return mCancelPasscode; };
+
     /**
      *  Reset the connection state to a completely uninitialized status.
      */
@@ -128,10 +158,14 @@ public:
         mProductId                 = 0;
         mRotatingIdLen             = 0;
         mCdPort                    = 0;
+        mDeviceName[0]             = '\0';
+        mPairingInst[0]            = '\0';
+        mPairingHint               = 0;
         mNoPasscode                = false;
         mCdUponPasscodeDialog      = false;
         mCommissionerPasscode      = false;
         mCommissionerPasscodeReady = false;
+        mCancelPasscode            = false;
         mExpirationTime           = System::Clock::kZero;
         mUDCClientProcessingState = UDCClientProcessingState::kNotInitialized;
     }
@@ -146,10 +180,18 @@ private:
     uint16_t mCdPort            = 0;
     uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen];
     size_t mRotatingIdLen = 0;
+    char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1] = {};
+    uint16_t mPairingHint                                         = 0;
+
+    constexpr static size_t kMaxAppVendorIds = 10;
+    size_t mNumAppVendorIds                  = 0; // number of vendor Ids
+    uint16_t mAppVendorIds[kMaxAppVendorIds];
+
     bool mNoPasscode                = false;
     bool mCdUponPasscodeDialog      = false;
     bool mCommissionerPasscode      = false;
     bool mCommissionerPasscodeReady = false;
+    bool mCancelPasscode            = false;
 
     UDCClientProcessingState mUDCClientProcessingState;
     System::Clock::Timestamp mExpirationTime = System::Clock::kZero;

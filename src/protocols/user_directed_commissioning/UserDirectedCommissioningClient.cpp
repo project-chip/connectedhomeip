@@ -244,6 +244,12 @@ void UserDirectedCommissioningClient::OnMessageReceived(const Transport::PeerAdd
     CommissionerDeclaration cd;
     cd.ReadPayload(udcPayload, sizeof(udcPayload));
     cd.DebugLog();
+
+    // Call the registered mCommissionerDeclarationHandler, if any.
+    if (mCommissionerDeclarationHandler != nullptr)
+    {
+        mCommissionerDeclarationHandler->OnCommissionerDeclarationMessage(source, cd);
+    }
 }
 
 } // namespace UserDirectedCommissioning
