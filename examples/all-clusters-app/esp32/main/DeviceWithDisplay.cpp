@@ -645,7 +645,7 @@ void SetupPretendDevices()
     AddAttribute("HeatSetpoint", "25");
     app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1, static_cast<int16_t>(25 * 100));
     AddAttribute("RunningMode", "4");
-    app::Clusters::Thermostat::Attributes::ThermostatRunningModeEnum::Set(
+    app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(
         1, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kHeat);
 
     AddDevice("Humidity Sensor");
