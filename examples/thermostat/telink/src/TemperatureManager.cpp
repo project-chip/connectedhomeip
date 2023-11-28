@@ -51,16 +51,16 @@ CHIP_ERROR TemperatureManager::Init()
     mCoolingCelsiusSetPoint = ConvertToPrintableTemp(heatingSetpoint);
     switch (systemMode)
     {
-        case ThermostatSystemModeEnum::kOff: systemMode = 0; break;
-        case ThermostatSystemModeEnum::kAuto: systemMode = 1; break;
-        case ThermostatSystemModeEnum::kCool: systemMode = 3; break;
-        case ThermostatSystemModeEnum::kHeat: systemMode = 4; break;
-        case ThermostatSystemModeEnum::kEmergencyHeat: systemMode = 5; break;
-        case ThermostatSystemModeEnum::kPrecooling: systemMode = 6; break;
-        case ThermostatSystemModeEnum::kFanOnly: systemMode = 7; break;
-        case ThermostatSystemModeEnum::kDry: systemMode = 8; break;
-        case ThermostatSystemModeEnum::kSleep: systemMode = 9; break;
-        default: systemMode = 2; break; // unknown value;
+        case ThermostatSystemModeEnum::kOff: mThermMode = 0; break;
+        case ThermostatSystemModeEnum::kAuto: mThermMode = 1; break;
+        case ThermostatSystemModeEnum::kCool: mThermMode = 3; break;
+        case ThermostatSystemModeEnum::kHeat: mThermMode = 4; break;
+        case ThermostatSystemModeEnum::kEmergencyHeat: mThermMode = 5; break;
+        case ThermostatSystemModeEnum::kPrecooling: mThermMode = 6; break;
+        case ThermostatSystemModeEnum::kFanOnly: mThermMode = 7; break;
+        case ThermostatSystemModeEnum::kDry: mThermMode = 8; break;
+        case ThermostatSystemModeEnum::kSleep: mThermMode = 9; break;
+        default: mThermMode = 2; break; // unknown value;
     }
 
     GetAppTask().UpdateThermoStatUI();
