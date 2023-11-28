@@ -119,7 +119,7 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoi
     uint16_t supported_clients                    = mICDConfigurationData->GetClientsSupportedPerFabric();
     PersistentStorageDelegate * storage           = mStorage;
     Crypto::SymmetricKeystore * symmetricKeystore = mSymmetricKeystore;
-    FabricTable * fabricTable                     = mFabricTable;
+    const FabricTable * fabricTable               = mFabricTable;
 
     return encoder.EncodeList([supported_clients, storage, symmetricKeystore, fabricTable](const auto & subEncoder) -> CHIP_ERROR {
         ICDMonitoringEntry e(symmetricKeystore);
@@ -402,7 +402,7 @@ void MatterIcdManagementPluginServerInitCallback()
 {
     PersistentStorageDelegate & storage           = Server::GetInstance().GetPersistentStorage();
     FabricTable & fabricTable                     = Server::GetInstance().GetFabricTable();
-    Crypto::SymmetricKeystore * symmetricKeystore = Server::GetInstance().GetsymmetricKeystore();
+    Crypto::SymmetricKeystore * symmetricKeystore = Server::GetInstance().GetSessionKeystore();
     ICDConfigurationData & icdConfigurationData   = ICDConfigurationData::GetInstance().GetInstance();
 
     // Configure and register Fabric delegate
