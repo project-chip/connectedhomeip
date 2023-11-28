@@ -26,8 +26,6 @@ namespace Test {
  */
 class AppContext : public LoopbackMessagingContext
 {
-    typedef LoopbackMessagingContext Super;
-
 public:
     // Performs shared setup for all tests in the test suite
     virtual CHIP_ERROR SetUpTestSuite();
