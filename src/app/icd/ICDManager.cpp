@@ -109,7 +109,7 @@ void ICDManager::SendCheckInMsgs()
     VerifyOrDie(mFabricTable != nullptr);
     for (const auto & fabricInfo : *mFabricTable)
     {
-        uint16_t supported_clients = ICDManagementServer::GetInstance().GetClientsSupportedPerFabric();
+        uint16_t supported_clients = ICDConfigurationData::GetInstance().GetClientsSupportedPerFabric();
 
         ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), supported_clients /*Table entry limit*/,
                                  mSymmetricKeystore);
