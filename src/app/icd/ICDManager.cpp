@@ -118,39 +118,41 @@ void ICDManager::SendCheckInMsgs()
 
         ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), supported_clients /*Table entry limit*/,
                                  mSymmetricKeystore);
-        if (!table.IsEmpty())
+        if (table.IsEmpty())
         {
-            for (uint16_t i = 0; i < table.Limit(); i++)
+            continue;
+        }
+
+        for (uint16_t i = 0; i < table.Limit(); i++)
+        {
+            ICDMonitoringEntry entry(mSymmetricKeystore);
+            CHIP_ERROR err = table.Get(i, entry);
+            if (err == CHIP_ERROR_NOT_FOUND)
             {
-                ICDMonitoringEntry entry(mSymmetricKeystore);
-                CHIP_ERROR err = table.Get(i, entry);
-                if (err == CHIP_ERROR_NOT_FOUND)
-                {
-                    break;
-                }
+                break;
+            }
 
-                if (err != CHIP_NO_ERROR)
-                {
-                    // Try to fetch the next entry.
-                    continue;
-                }
+            if (err != CHIP_NO_ERROR)
+            {
+                // Try to fetch the next entry upon failure (should not happen).
+                ChipLogError(AppServer, "Failed to retrieved ICDMonitoring entry for Check-In msg, will try next entry.") continue;
+            }
 
-                bool active =
-                    InteractionModelEngine::GetInstance()->IsSubjectSubscriptionActive(entry.fabricIndex, entry.monitoredSubject);
-                if (active)
-                {
-                    continue;
-                }
+            bool active =
+                InteractionModelEngine::GetInstance()->IsSubjectSubscriptionActive(entry.fabricIndex, entry.monitoredSubject);
+            if (active)
+            {
+                continue;
+            }
 
-                // SenderPool will be release upon transition from active to idle state
-                // This will happen when all ICD Check-In messages are sent on the network
-                ICDCheckInSender * sender = mICDSenderPool.CreateObject(mExchangeManager);
-                VerifyOrReturn(sender != nullptr, ChipLogError(AppServer, "Failed to allocate ICDCheckinSender"));
+            // SenderPool will be released upon transition from active to idle state
+            // This will happen when all ICD Check-In messages are sent on the network
+            ICDCheckInSender * sender = mICDSenderPool.CreateObject(mExchangeManager);
+            VerifyOrReturn(sender != nullptr, ChipLogError(AppServer, "Failed to allocate ICDCheckinSender"));
 
-                if (CHIP_NO_ERROR != sender->RequestResolve(entry, mFabricTable))
-                {
-                    ChipLogError(AppServer, "Failed to send ICD Check-In");
-                }
+            if (CHIP_NO_ERROR != sender->RequestResolve(entry, mFabricTable))
+            {
+                ChipLogError(AppServer, "Failed to send ICD Check-In");
             }
         }
     }

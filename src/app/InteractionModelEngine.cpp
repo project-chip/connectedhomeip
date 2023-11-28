@@ -278,37 +278,6 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(const ScopedNodeId & aPe
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-bool InteractionModelEngine::IsSubjectSubscriptionActive(const FabricIndex & aFabricIndex, const NodeId & subjectID)
-{
-    for (uint16_t index = 0; index < GetNumActiveReadHandlers(); index++)
-    {
-        ReadHandler * readHandler = ActiveHandlerAt(index);
-        if (readHandler == nullptr)
-        {
-            // Should not happen
-            continue;
-        }
-
-        if (readHandler->IsType(ReadHandler::InteractionType::Subscribe))
-        {
-            Access::SubjectDescriptor subject = readHandler->GetSubjectDescriptor();
-            if (subject.fabricIndex != aFabricIndex)
-            {
-                continue;
-            }
-
-            if (subject.authMode == Access::AuthMode::kCase)
-            {
-                if (subject.cats.CheckSubjectAgainstCATs(subjectID) || subjectID == subject.subject)
-                {
-                    return readHandler->IsActiveSubscription();
-                }
-            }
-        }
-    }
-    return false;
-}
-
 void InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
 {
     assertChipStackLockedByCurrentThread();
@@ -348,6 +317,36 @@ void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<Fabric
     }
 }
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+
+bool InteractionModelEngine::IsSubjectSubscriptionActive(const FabricIndex & aFabricIndex, const NodeId & subjectID)
+{
+    bool isActive = false;
+    mReadHandlers.ForEachActiveObject([aFabricIndex, subjectID, &isActive](ReadHandler * handler) {
+        if (!handler->IsType(ReadHandler::InteractionType::Subscribe))
+        {
+            return Loop::Continue;
+        }
+
+        Access::SubjectDescriptor subject = handler->GetSubjectDescriptor();
+        if (subject.fabricIndex != aFabricIndex)
+        {
+            return Loop::Continue;
+        }
+
+        if (subject.authMode == Access::AuthMode::kCase)
+        {
+            if (subject.cats.CheckSubjectAgainstCATs(subjectID) || subjectID == subject.subject)
+            {
+                isActive = handler->IsActiveSubscription();
+                return Loop::Break;
+            }
+        }
+
+        return Loop::Continue;
+    });
+
+    return isActive;
+}
 
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
 {
