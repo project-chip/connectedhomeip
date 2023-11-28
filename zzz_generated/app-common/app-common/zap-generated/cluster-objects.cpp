@@ -17115,7 +17115,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace ScheduleTypeStruct
 
-namespace ThermostatScheduleTransitionStruct {
+namespace WeeklyScheduleTransitionStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -17159,7 +17159,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace ThermostatScheduleTransitionStruct
+} // namespace WeeklyScheduleTransitionStruct
 } // namespace Structs
 
 namespace Commands {

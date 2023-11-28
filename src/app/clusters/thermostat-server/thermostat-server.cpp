@@ -395,39 +395,39 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
     case ControlSequenceOfOperation::Id: {
         uint8_t requestedCSO;
         requestedCSO = *value;
-        if (requestedCSO > to_underlying(ThermostatControlSequenceEnum::kCoolingAndHeatingWithReheat))
+        if (requestedCSO > to_underlying(ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat))
             return imcode::InvalidValue;
         return imcode::Success;
     }
 
     case SystemMode::Id: {
-        ThermostatControlSequenceEnum ControlSequenceOfOperation;
+        ControlSequenceOfOperationEnum ControlSequenceOfOperation;
         EmberAfStatus status = ControlSequenceOfOperation::Get(endpoint, &ControlSequenceOfOperation);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
             return imcode::InvalidValue;
         }
-        auto RequestedSystemMode = static_cast<ThermostatSystemModeEnum>(*value);
-        if (ControlSequenceOfOperation > ThermostatControlSequenceEnum::kCoolingAndHeatingWithReheat ||
-            RequestedSystemMode > ThermostatSystemModeEnum::kFanOnly)
+        auto RequestedSystemMode = static_cast<SystemModeEnum>(*value);
+        if (ControlSequenceOfOperation > ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat ||
+            RequestedSystemMode > SystemModeEnum::kFanOnly)
         {
             return imcode::InvalidValue;
         }
 
         switch (ControlSequenceOfOperation)
         {
-        case ThermostatControlSequenceEnum::kCoolingOnly:
-        case ThermostatControlSequenceEnum::kCoolingWithReheat:
-            if (RequestedSystemMode == ThermostatSystemModeEnum::kHeat ||
-                RequestedSystemMode == ThermostatSystemModeEnum::kEmergencyHeat)
+        case ControlSequenceOfOperationEnum::kCoolingOnly:
+        case ControlSequenceOfOperationEnum::kCoolingWithReheat:
+            if (RequestedSystemMode == SystemModeEnum::kHeat ||
+                RequestedSystemMode == SystemModeEnum::kEmergencyHeat)
                 return imcode::InvalidValue;
             else
                 return imcode::Success;
 
-        case ThermostatControlSequenceEnum::kHeatingOnly:
-        case ThermostatControlSequenceEnum::kHeatingWithReheat:
-            if (RequestedSystemMode == ThermostatSystemModeEnum::kCool ||
-                RequestedSystemMode == ThermostatSystemModeEnum::kPrecooling)
+        case ControlSequenceOfOperationEnum::kHeatingOnly:
+        case ControlSequenceOfOperationEnum::kHeatingWithReheat:
+            if (RequestedSystemMode == SystemModeEnum::kCool ||
+                RequestedSystemMode == SystemModeEnum::kPrecooling)
                 return imcode::InvalidValue;
             else
                 return imcode::Success;

@@ -2689,14 +2689,13 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
 
 namespace ControlSequenceOfOperation {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Thermostat::ThermostatControlSequenceEnum * value); // ThermostatControlSequenceEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatControlSequenceEnum value);
+                  chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum * value); // ControlSequenceOfOperationEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum value);
 } // namespace ControlSequenceOfOperation
 
 namespace SystemMode {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Thermostat::ThermostatSystemModeEnum * value); // ThermostatSystemModeEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatSystemModeEnum value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum * value); // SystemModeEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum value);
 } // namespace SystemMode
 
 namespace AlarmMask {

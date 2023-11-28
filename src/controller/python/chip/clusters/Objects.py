@@ -26174,8 +26174,8 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="maxCoolSetpointLimit", Tag=0x00000018, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="minSetpointDeadBand", Tag=0x00000019, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="remoteSensing", Tag=0x0000001A, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="controlSequenceOfOperation", Tag=0x0000001B, Type=Thermostat.Enums.ThermostatControlSequenceEnum),
-                ClusterObjectFieldDescriptor(Label="systemMode", Tag=0x0000001C, Type=Thermostat.Enums.ThermostatSystemModeEnum),
+                ClusterObjectFieldDescriptor(Label="controlSequenceOfOperation", Tag=0x0000001B, Type=Thermostat.Enums.ControlSequenceOfOperationEnum),
+                ClusterObjectFieldDescriptor(Label="systemMode", Tag=0x0000001C, Type=Thermostat.Enums.SystemModeEnum),
                 ClusterObjectFieldDescriptor(Label="alarmMask", Tag=0x0000001D, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="thermostatRunningMode", Tag=0x0000001E, Type=typing.Optional[Thermostat.Enums.ThermostatRunningModeEnum]),
                 ClusterObjectFieldDescriptor(Label="startOfWeek", Tag=0x00000020, Type=typing.Optional[Thermostat.Enums.StartOfWeekEnum]),
@@ -26245,8 +26245,8 @@ class Thermostat(Cluster):
     maxCoolSetpointLimit: 'typing.Optional[int]' = None
     minSetpointDeadBand: 'typing.Optional[int]' = None
     remoteSensing: 'typing.Optional[uint]' = None
-    controlSequenceOfOperation: 'Thermostat.Enums.ThermostatControlSequenceEnum' = None
-    systemMode: 'Thermostat.Enums.ThermostatSystemModeEnum' = None
+    controlSequenceOfOperation: 'Thermostat.Enums.ControlSequenceOfOperationEnum' = None
+    systemMode: 'Thermostat.Enums.SystemModeEnum' = None
     alarmMask: 'typing.Optional[uint]' = None
     thermostatRunningMode: 'typing.Optional[Thermostat.Enums.ThermostatRunningModeEnum]' = None
     startOfWeek: 'typing.Optional[Thermostat.Enums.StartOfWeekEnum]' = None
@@ -26350,6 +26350,19 @@ class Thermostat(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 5,
 
+        class ControlSequenceOfOperationEnum(MatterIntEnum):
+            kCoolingOnly = 0x00
+            kCoolingWithReheat = 0x01
+            kHeatingOnly = 0x02
+            kHeatingWithReheat = 0x03
+            kCoolingAndHeating = 0x04
+            kCoolingAndHeatingWithReheat = 0x05
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 6,
+
         class PresetScenarioEnum(MatterIntEnum):
             kUnspecified = 0x00
             kOccupied = 0x01
@@ -26398,39 +26411,7 @@ class Thermostat(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 7,
 
-        class TemperatureSetpointHoldEnum(MatterIntEnum):
-            kSetpointHoldOff = 0x00
-            kSetpointHoldOn = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 2,
-
-        class ThermostatControlSequenceEnum(MatterIntEnum):
-            kCoolingOnly = 0x00
-            kCoolingWithReheat = 0x01
-            kHeatingOnly = 0x02
-            kHeatingWithReheat = 0x03
-            kCoolingAndHeating = 0x04
-            kCoolingAndHeatingWithReheat = 0x05
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 6,
-
-        class ThermostatRunningModeEnum(MatterIntEnum):
-            kOff = 0x00
-            kCool = 0x03
-            kHeat = 0x04
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 1,
-
-        class ThermostatSystemModeEnum(MatterIntEnum):
+        class SystemModeEnum(MatterIntEnum):
             kOff = 0x00
             kAuto = 0x01
             kCool = 0x03
@@ -26446,6 +26427,25 @@ class Thermostat(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
+        class TemperatureSetpointHoldEnum(MatterIntEnum):
+            kSetpointHoldOff = 0x00
+            kSetpointHoldOn = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 2,
+
+        class ThermostatRunningModeEnum(MatterIntEnum):
+            kOff = 0x00
+            kCool = 0x03
+            kHeat = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 1,
+
     class Bitmaps:
         class ACErrorCodeBitmap(IntFlag):
             kCompressorFail = 0x1
@@ -26458,16 +26458,6 @@ class Thermostat(Cluster):
             kInitialization = 0x1
             kHardware = 0x2
             kSelfCalibration = 0x4
-
-        class DayOfWeekBitmap(IntFlag):
-            kSunday = 0x1
-            kMonday = 0x2
-            kTuesday = 0x4
-            kWednesday = 0x8
-            kThursday = 0x10
-            kFriday = 0x20
-            kSaturday = 0x40
-            kAway = 0x80
 
         class Feature(IntFlag):
             kHeating = 0x1
@@ -26483,12 +26473,8 @@ class Thermostat(Cluster):
             kQueuedPresetsSupported = 0x400
 
         class HVACSystemTypeBitmap(IntFlag):
-            kHeatingType = 0x10
-            kHeatingFuel = 0x20
-
-        class ModeForSequenceBitmap(IntFlag):
-            kHeatSetpointPresent = 0x1
-            kCoolSetpointPresent = 0x2
+            kHeatingIsHeatPump = 0x10
+            kHeatingUsesFuel = 0x20
 
         class PresetTypeFeaturesBitmap(IntFlag):
             kAutomatic = 0x1
@@ -26513,6 +26499,20 @@ class Thermostat(Cluster):
             kOutdoorTemperature = 0x2
             kOccupancy = 0x4
 
+        class ScheduleDayOfWeekBitmap(IntFlag):
+            kSunday = 0x1
+            kMonday = 0x2
+            kTuesday = 0x4
+            kWednesday = 0x8
+            kThursday = 0x10
+            kFriday = 0x20
+            kSaturday = 0x40
+            kAway = 0x80
+
+        class ScheduleModeBitmap(IntFlag):
+            kHeatSetpointPresent = 0x1
+            kCoolSetpointPresent = 0x2
+
         class ScheduleTypeFeaturesBitmap(IntFlag):
             kSupportsPresets = 0x1
             kSupportsSetpoints = 0x2
@@ -26533,7 +26533,7 @@ class Thermostat(Cluster):
                         ClusterObjectFieldDescriptor(Label="dayOfWeek", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="transitionTime", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="presetHandle", Tag=2, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="systemMode", Tag=3, Type=typing.Optional[Thermostat.Enums.ThermostatSystemModeEnum]),
+                        ClusterObjectFieldDescriptor(Label="systemMode", Tag=3, Type=typing.Optional[Thermostat.Enums.SystemModeEnum]),
                         ClusterObjectFieldDescriptor(Label="coolingSetpoint", Tag=4, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="heatingSetpoint", Tag=5, Type=typing.Optional[int]),
                     ])
@@ -26541,7 +26541,7 @@ class Thermostat(Cluster):
             dayOfWeek: 'uint' = 0
             transitionTime: 'uint' = 0
             presetHandle: 'typing.Optional[bytes]' = None
-            systemMode: 'typing.Optional[Thermostat.Enums.ThermostatSystemModeEnum]' = None
+            systemMode: 'typing.Optional[Thermostat.Enums.SystemModeEnum]' = None
             coolingSetpoint: 'typing.Optional[int]' = None
             heatingSetpoint: 'typing.Optional[int]' = None
 
@@ -26552,7 +26552,7 @@ class Thermostat(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="scheduleHandle", Tag=0, Type=typing.Union[Nullable, bytes]),
-                        ClusterObjectFieldDescriptor(Label="systemMode", Tag=1, Type=Thermostat.Enums.ThermostatSystemModeEnum),
+                        ClusterObjectFieldDescriptor(Label="systemMode", Tag=1, Type=Thermostat.Enums.SystemModeEnum),
                         ClusterObjectFieldDescriptor(Label="name", Tag=2, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="presetHandle", Tag=3, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="transitions", Tag=4, Type=typing.List[Thermostat.Structs.ScheduleTransitionStruct]),
@@ -26560,7 +26560,7 @@ class Thermostat(Cluster):
                     ])
 
             scheduleHandle: 'typing.Union[Nullable, bytes]' = NullValue
-            systemMode: 'Thermostat.Enums.ThermostatSystemModeEnum' = 0
+            systemMode: 'Thermostat.Enums.SystemModeEnum' = 0
             name: 'typing.Optional[str]' = None
             presetHandle: 'typing.Optional[bytes]' = None
             transitions: 'typing.List[Thermostat.Structs.ScheduleTransitionStruct]' = field(default_factory=lambda: [])
@@ -26621,17 +26621,17 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="systemMode", Tag=0, Type=Thermostat.Enums.ThermostatSystemModeEnum),
+                        ClusterObjectFieldDescriptor(Label="systemMode", Tag=0, Type=Thermostat.Enums.SystemModeEnum),
                         ClusterObjectFieldDescriptor(Label="numberOfSchedules", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="scheduleTypeFeatures", Tag=2, Type=uint),
                     ])
 
-            systemMode: 'Thermostat.Enums.ThermostatSystemModeEnum' = 0
+            systemMode: 'Thermostat.Enums.SystemModeEnum' = 0
             numberOfSchedules: 'uint' = 0
             scheduleTypeFeatures: 'uint' = 0
 
         @dataclass
-        class ThermostatScheduleTransitionStruct(ClusterObject):
+        class WeeklyScheduleTransitionStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -26678,13 +26678,13 @@ class Thermostat(Cluster):
                         ClusterObjectFieldDescriptor(Label="numberOfTransitionsForSequence", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="dayOfWeekforSequence", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="modeForSequence", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="transitions", Tag=3, Type=typing.List[Thermostat.Structs.ThermostatScheduleTransitionStruct]),
+                        ClusterObjectFieldDescriptor(Label="transitions", Tag=3, Type=typing.List[Thermostat.Structs.WeeklyScheduleTransitionStruct]),
                     ])
 
             numberOfTransitionsForSequence: 'uint' = 0
             dayOfWeekforSequence: 'uint' = 0
             modeForSequence: 'uint' = 0
-            transitions: 'typing.List[Thermostat.Structs.ThermostatScheduleTransitionStruct]' = field(default_factory=lambda: [])
+            transitions: 'typing.List[Thermostat.Structs.WeeklyScheduleTransitionStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class SetWeeklySchedule(ClusterCommand):
@@ -26700,13 +26700,13 @@ class Thermostat(Cluster):
                         ClusterObjectFieldDescriptor(Label="numberOfTransitionsForSequence", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="dayOfWeekforSequence", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="modeForSequence", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="transitions", Tag=3, Type=typing.List[Thermostat.Structs.ThermostatScheduleTransitionStruct]),
+                        ClusterObjectFieldDescriptor(Label="transitions", Tag=3, Type=typing.List[Thermostat.Structs.WeeklyScheduleTransitionStruct]),
                     ])
 
             numberOfTransitionsForSequence: 'uint' = 0
             dayOfWeekforSequence: 'uint' = 0
             modeForSequence: 'uint' = 0
-            transitions: 'typing.List[Thermostat.Structs.ThermostatScheduleTransitionStruct]' = field(default_factory=lambda: [])
+            transitions: 'typing.List[Thermostat.Structs.WeeklyScheduleTransitionStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class GetRelayStatusLogResponse(ClusterCommand):
@@ -27216,9 +27216,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=Thermostat.Enums.ThermostatControlSequenceEnum)
+                return ClusterObjectFieldDescriptor(Type=Thermostat.Enums.ControlSequenceOfOperationEnum)
 
-            value: 'Thermostat.Enums.ThermostatControlSequenceEnum' = 0
+            value: 'Thermostat.Enums.ControlSequenceOfOperationEnum' = 0
 
         @dataclass
         class SystemMode(ClusterAttributeDescriptor):
@@ -27232,9 +27232,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=Thermostat.Enums.ThermostatSystemModeEnum)
+                return ClusterObjectFieldDescriptor(Type=Thermostat.Enums.SystemModeEnum)
 
-            value: 'Thermostat.Enums.ThermostatSystemModeEnum' = 0
+            value: 'Thermostat.Enums.SystemModeEnum' = 0
 
         @dataclass
         class AlarmMask(ClusterAttributeDescriptor):

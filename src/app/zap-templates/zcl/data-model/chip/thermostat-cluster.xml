@@ -30,7 +30,7 @@ limitations under the License.
     <field name="Setpoints" mask="0x200"/>
     <field name="Queued Presets Supported" mask="0x400"/>
   </bitmap>
-  <bitmap name="DayOfWeekBitmap" type="bitmap8">
+  <bitmap name="ScheduleDayOfWeekBitmap" type="bitmap8">
     <cluster code="0x0201"/>
     <field name="Sunday" mask="0x01"/>
     <field name="Monday" mask="0x02"/>
@@ -41,12 +41,12 @@ limitations under the License.
     <field name="Saturday" mask="0x40"/>
     <field name="Away" mask="0x80"/>
   </bitmap>
-  <bitmap name="ModeForSequenceBitmap" type="bitmap8">
+  <bitmap name="ScheduleModeBitmap" type="bitmap8">
     <cluster code="0x0201"/>
     <field name="HeatSetpointPresent" mask="0x01"/>
     <field name="CoolSetpointPresent" mask="0x02"/>
   </bitmap>
-  <enum name="ThermostatSystemModeEnum" type="enum8">
+  <enum name="SystemModeEnum" type="enum8">
     <cluster code="0x0201"/>
     <item name="Off" value="0x00"/>
     <item name="Auto" value="0x01"/>
@@ -74,7 +74,7 @@ limitations under the License.
     <item name="Friday" value="0x05"/>
     <item name="Saturday" value="0x06"/>
   </enum>
-  <enum name="ThermostatControlSequenceEnum" type="enum8">
+  <enum name="ControlSequenceOfOperationEnum" type="enum8">
     <cluster code="0x0201"/>
     <item name="CoolingOnly" value="0x00"/>
     <item name="CoolingWithReheat" value="0x01"/>
@@ -94,7 +94,7 @@ limitations under the License.
     <item name="Cool" value="0x01"/>
     <item name="Both" value="0x02"/>
   </enum>
-  <struct name="ThermostatScheduleTransitionStruct">
+  <struct name="WeeklyScheduleTransitionStruct">
     <cluster code="0x0201"/>
     <item fieldId="0" name="TransitionTime" type="int16u" max="1439"/>
     <item fieldId="1" name="HeatSetpoint" type="temperature"/>
@@ -109,8 +109,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="6"/>
-    <attribute side="server" code="0x0000" define="LOCAL_TEMPERATURE" type="temperature" min="0x954D" max="0x7FFF" writable="false" reportable="true" optional="false" isNullable="true">LocalTemperature</attribute>
-    <attribute side="server" code="0x0001" define="OUTDOOR_TEMPERATURE" type="temperature" min="0x954D" max="0x7FFF" writable="false" optional="true" isNullable="true">OutdoorTemperature</attribute>
+    <attribute side="server" code="0x0000" define="LOCAL_TEMPERATURE" type="temperature" min="-27315" max="0x7FFF" writable="false" reportable="true" optional="false" isNullable="true">LocalTemperature</attribute>
+    <attribute side="server" code="0x0001" define="OUTDOOR_TEMPERATURE" type="temperature" min="-27315" max="0x7FFF" writable="false" optional="true" isNullable="true">OutdoorTemperature</attribute>
     <attribute side="server" code="0x0002" define="OCCUPANCY" type="bitmap8" min="0x00" max="0x01" writable="false" default="1" optional="true">Occupancy</attribute>
     <attribute side="server" code="0x0003" define="ABS_MIN_HEAT_SETPOINT_LIMIT" type="temperature" min="0x954D" max="0x7FFF" writable="false" optional="true">AbsMinHeatSetpointLimit</attribute>
     <attribute side="server" code="0x0004" define="ABS_MAX_HEAT_SETPOINT_LIMIT" type="temperature" min="0x954D" max="0x7FFF" writable="false" optional="true">AbsMaxHeatSetpointLimit</attribute>
@@ -150,11 +150,11 @@ limitations under the License.
       <description>RemoteSensing</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x001B" define="CONTROL_SEQUENCE_OF_OPERATION" type="ThermostatControlSequenceEnum" min="0x00" max="0x05" writable="true" default="4" optional="false">
+    <attribute side="server" code="0x001B" define="CONTROL_SEQUENCE_OF_OPERATION" type="ControlSequenceOfOperationEnum" min="0x00" max="0x05" writable="true" default="4" optional="false">
       <description>ControlSequenceOfOperation</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x001C" define="SYSTEM_MODE" type="ThermostatSystemModeEnum" min="0x00" max="0x07" writable="true" default="1" optional="false">
+    <attribute side="server" code="0x001C" define="SYSTEM_MODE" type="SystemModeEnum" min="0x00" max="0x07" writable="true" default="1" optional="false">
       <description>SystemMode</description>
       <access op="write" privilege="manage"/>
     </attribute>
@@ -218,7 +218,7 @@ limitations under the License.
       <description>ACLouverPosition</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0046" define="AC_COIL_TEMPERATURE" type="temperature" min="0x954D" max="0x7FFF" writable="false" optional="true" isNullable="true">ACCoilTemperature</attribute>
+    <attribute side="server" code="0x0046" define="AC_COIL_TEMPERATURE" type="temperature" min="-27315" max="0x7FFF" writable="false" optional="true" isNullable="true">ACCoilTemperature</attribute>
     <attribute side="server" code="0x0047" define="AC_CAPACITY_FORMAT" type="ACCapacityFormatEnum" min="0x00" max="0xFF" writable="true" default="0" optional="true">
       <description>ACCapacityFormat</description>
       <access op="write" privilege="manage"/>
@@ -253,27 +253,25 @@ limitations under the License.
       <description>Upon receipt, the weekly schedule for updating setpoints SHALL be stored in the thermostat and SHOULD begin at the time of receipt. A status code SHALL be sent in response.</description>
       <access op="invoke" privilege="manage"/>
       <arg name="NumberOfTransitionsForSequence" type="int8u"/>
-      <arg name="DayOfWeekforSequence" type="DayOfWeekBitmap"/>
-      <arg name="ModeForSequence" type="ModeForSequenceBitmap"/>
-      <arg name="Transitions" array="true" type="ThermostatScheduleTransitionStruct"/>
+      <arg name="DayOfWeekforSequence" type="ScheduleDayOfWeekBitmap"/>
+      <arg name="ModeForSequence" type="ScheduleModeBitmap"/>
+      <arg name="Transitions" array="true" type="WeeklyScheduleTransitionStruct"/>
     </command>
     <command source="client" code="0x02" name="GetWeeklySchedule" response="GetWeeklyScheduleResponse" optional="true">
       <description>Upon receipt, the unit SHOULD send in return the Get Weekly Schedule Response command. The Days to Return and Mode to Return fields are defined as bitmask for the flexibility to support multiple days and multiple modes within one command. If thermostat cannot handle incoming command with multiple days and/or multiple modes within one command, it SHALL send default response of INVALID_COMMAND in return.</description>
-      <arg name="DaysToReturn" type="DayOfWeekBitmap"/>
-      <arg name="ModeToReturn" type="ModeForSequenceBitmap"/>
+      <arg name="DaysToReturn" type="ScheduleDayOfWeekBitmap"/>
+      <arg name="ModeToReturn" type="ScheduleModeBitmap"/>
     </command>
     <command source="client" code="0x03" name="ClearWeeklySchedule" optional="true" disableDefaultResponse="true">
       <description>This command is used to clear the weekly schedule. The Clear weekly schedule has no payload.</description>
       <access op="invoke" privilege="manage"/>
     </command>
     <command source="server" code="0x00" name="GetWeeklyScheduleResponse" optional="true">
-      <description>
-        The Current Weekly Schedule Command is sent from the server in response to the Get Weekly Schedule Command.
-      </description>
+      <description>This command has the same payload format as the Set Weekly Schedule. Please refer to the payload detail in </description>
       <arg name="NumberOfTransitionsForSequence" type="int8u"/>
-      <arg name="DayOfWeekforSequence" type="DayOfWeekBitmap"/>
-      <arg name="ModeForSequence" type="ModeForSequenceBitmap"/>
-      <arg name="Transitions" array="true" type="ThermostatScheduleTransitionStruct"/>
+      <arg name="DayOfWeekforSequence" type="ScheduleDayOfWeekBitmap"/>
+      <arg name="ModeForSequence" type="ScheduleModeBitmap"/>
+      <arg name="Transitions" array="true" type="WeeklyScheduleTransitionStruct"/>
     </command>
     <command source="client" code="0x06" name="SetActivePresetRequest" optional="true">
       <description>Upon receipt, this SHALL set the thermostat</description>
@@ -288,7 +286,7 @@ limitations under the License.
       <description>This command is sent from the thermostat cluster server in response to the Get Relay Status Log. After the Relay Status Entry is sent over the air to the requesting client, the specific entry will be cleared from the thermostat internal log.</description>
       <arg name="TimeOfDay" type="int16u" min="0" max="1439"/>
       <arg name="RelayStatus" type="RelayStateBitmap"/>
-      <arg name="LocalTemperature" type="temperature" isNullable="true" min="0x954D" max="0x7FFF"/>
+      <arg name="LocalTemperature" type="temperature" isNullable="true" min="-27315" max="0x7FFF"/>
       <arg name="HumidityInPercentage" type="int8u" isNullable="true" min="0" max="100"/>
       <arg name="SetPoint" type="temperature"/>
       <arg name="UnreadEntries" type="int16u"/>
@@ -320,8 +318,8 @@ limitations under the License.
   </cluster>
   <bitmap name="HVACSystemTypeBitmap" type="bitmap8">
     <cluster code="0x0201"/>
-    <field name="HeatingType" mask="0x10"/>
-    <field name="HeatingFuel" mask="0x20"/>
+    <field name="HeatingIsHeatPump" mask="0x10"/>
+    <field name="HeatingUsesFuel" mask="0x20"/>
   </bitmap>
   <bitmap name="RemoteSensingBitmap" type="bitmap8">
     <cluster code="0x0201"/>
@@ -428,7 +426,7 @@ limitations under the License.
   </enum>
   <struct name="ScheduleTypeStruct" apiMaturity="provisional">
     <cluster code="0x0201"/>
-    <item fieldId="0" name="SystemMode" type="ThermostatSystemModeEnum"/>
+    <item fieldId="0" name="SystemMode" type="SystemModeEnum"/>
     <item fieldId="1" name="NumberOfSchedules" type="int8u"/>
     <item fieldId="2" name="ScheduleTypeFeatures" type="ScheduleTypeFeaturesBitmap"/>
   </struct>
@@ -455,7 +453,7 @@ limitations under the License.
   <struct name="ScheduleStruct" apiMaturity="provisional">
     <cluster code="0x0201"/>
     <item fieldId="0" name="ScheduleHandle" type="octet_string" length="16" isNullable="true"/>
-    <item fieldId="1" name="SystemMode" type="ThermostatSystemModeEnum"/>
+    <item fieldId="1" name="SystemMode" type="SystemModeEnum"/>
     <item fieldId="2" name="Name" type="char_string" length="64" optional="true"/>
     <item fieldId="3" name="PresetHandle" type="octet_string" length="16" optional="true"/>
     <item fieldId="4" name="Transitions" array="true" type="ScheduleTransitionStruct"/>
@@ -463,10 +461,10 @@ limitations under the License.
   </struct>
   <struct name="ScheduleTransitionStruct" apiMaturity="provisional">
     <cluster code="0x0201"/>
-    <item fieldId="0" name="DayOfWeek" type="DayOfWeekBitmap"/>
+    <item fieldId="0" name="DayOfWeek" type="ScheduleDayOfWeekBitmap"/>
     <item fieldId="1" name="TransitionTime" type="int16u" min="0" max="1439"/>
     <item fieldId="2" name="PresetHandle" type="octet_string" length="16" optional="true"/>
-    <item fieldId="3" name="SystemMode" type="ThermostatSystemModeEnum" optional="true"/>
+    <item fieldId="3" name="SystemMode" type="SystemModeEnum" optional="true"/>
     <item fieldId="4" name="CoolingSetpoint" type="temperature" optional="true"/>
     <item fieldId="5" name="HeatingSetpoint" type="temperature" optional="true"/>
   </struct>

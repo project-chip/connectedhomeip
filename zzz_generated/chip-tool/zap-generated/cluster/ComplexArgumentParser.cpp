@@ -2923,21 +2923,20 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::S
     ComplexArgumentParser::Finalize(request.scheduleTypeFeatures);
 }
 
-CHIP_ERROR
-ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransitionStruct::Type & request,
-                             Json::Value & value)
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::Type & request,
+                                        Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThermostatScheduleTransitionStruct.transitionTime",
-                                                                  "transitionTime", value.isMember("transitionTime")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThermostatScheduleTransitionStruct.heatSetpoint", "heatSetpoint",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WeeklyScheduleTransitionStruct.transitionTime", "transitionTime",
+                                                                  value.isMember("transitionTime")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WeeklyScheduleTransitionStruct.heatSetpoint", "heatSetpoint",
                                                                   value.isMember("heatSetpoint")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThermostatScheduleTransitionStruct.coolSetpoint", "coolSetpoint",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WeeklyScheduleTransitionStruct.coolSetpoint", "coolSetpoint",
                                                                   value.isMember("coolSetpoint")));
 
     char labelWithMember[kMaxLabelLength];
@@ -2956,7 +2955,7 @@ ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransitionStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.transitionTime);
     ComplexArgumentParser::Finalize(request.heatSetpoint);

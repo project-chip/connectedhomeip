@@ -16773,6 +16773,15 @@ typedef NS_ENUM(uint8_t, MTRThermostatACType) {
     MTRThermostatACTypeHeatPumpInverter MTR_PROVISIONALLY_AVAILABLE = 0x04,
 } MTR_PROVISIONALLY_AVAILABLE;
 
+typedef NS_ENUM(uint8_t, MTRThermostatControlSequenceOfOperation) {
+    MTRThermostatControlSequenceOfOperationCoolingOnly MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRThermostatControlSequenceOfOperationCoolingWithReheat MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRThermostatControlSequenceOfOperationHeatingOnly MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRThermostatControlSequenceOfOperationHeatingWithReheat MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRThermostatControlSequenceOfOperationCoolingAndHeating MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRThermostatControlSequenceOfOperationCoolingAndHeatingWithReheat MTR_PROVISIONALLY_AVAILABLE = 0x05,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRThermostatPresetScenario) {
     MTRThermostatPresetScenarioUnspecified MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRThermostatPresetScenarioOccupied MTR_PROVISIONALLY_AVAILABLE = 0x01,
@@ -16805,26 +16814,6 @@ typedef NS_ENUM(uint8_t, MTRThermostatStartOfWeek) {
     MTRThermostatStartOfWeekSaturday MTR_PROVISIONALLY_AVAILABLE = 0x06,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRThermostatTemperatureSetpointHold) {
-    MTRThermostatTemperatureSetpointHoldSetpointHoldOff MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRThermostatTemperatureSetpointHoldSetpointHoldOn MTR_PROVISIONALLY_AVAILABLE = 0x01,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRThermostatControlSequence) {
-    MTRThermostatControlSequenceCoolingOnly MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRThermostatControlSequenceCoolingWithReheat MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRThermostatControlSequenceHeatingOnly MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRThermostatControlSequenceHeatingWithReheat MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRThermostatControlSequenceCoolingAndHeating MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTRThermostatControlSequenceCoolingAndHeatingWithReheat MTR_PROVISIONALLY_AVAILABLE = 0x05,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRThermostatRunningMode) {
-    MTRThermostatRunningModeOff MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRThermostatRunningModeCool MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRThermostatRunningModeHeat MTR_PROVISIONALLY_AVAILABLE = 0x04,
-} MTR_PROVISIONALLY_AVAILABLE;
-
 typedef NS_ENUM(uint8_t, MTRThermostatSystemMode) {
     MTRThermostatSystemModeOff MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRThermostatSystemModeAuto MTR_PROVISIONALLY_AVAILABLE = 0x01,
@@ -16835,6 +16824,17 @@ typedef NS_ENUM(uint8_t, MTRThermostatSystemMode) {
     MTRThermostatSystemModeFanOnly MTR_PROVISIONALLY_AVAILABLE = 0x07,
     MTRThermostatSystemModeDry MTR_PROVISIONALLY_AVAILABLE = 0x08,
     MTRThermostatSystemModeSleep MTR_PROVISIONALLY_AVAILABLE = 0x09,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRThermostatTemperatureSetpointHold) {
+    MTRThermostatTemperatureSetpointHoldSetpointHoldOff MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRThermostatTemperatureSetpointHoldSetpointHoldOn MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRThermostatRunningMode) {
+    MTRThermostatRunningModeOff MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRThermostatRunningModeCool MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRThermostatRunningModeHeat MTR_PROVISIONALLY_AVAILABLE = 0x04,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRThermostatACErrorCodeBitmap) {
@@ -16849,17 +16849,6 @@ typedef NS_OPTIONS(uint8_t, MTRThermostatAlarmCodeBitmap) {
     MTRThermostatAlarmCodeBitmapInitialization MTR_PROVISIONALLY_AVAILABLE = 0x1,
     MTRThermostatAlarmCodeBitmapHardware MTR_PROVISIONALLY_AVAILABLE = 0x2,
     MTRThermostatAlarmCodeBitmapSelfCalibration MTR_PROVISIONALLY_AVAILABLE = 0x4,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_OPTIONS(uint8_t, MTRThermostatDayOfWeekBitmap) {
-    MTRThermostatDayOfWeekBitmapSunday MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRThermostatDayOfWeekBitmapMonday MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRThermostatDayOfWeekBitmapTuesday MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRThermostatDayOfWeekBitmapWednesday MTR_PROVISIONALLY_AVAILABLE = 0x8,
-    MTRThermostatDayOfWeekBitmapThursday MTR_PROVISIONALLY_AVAILABLE = 0x10,
-    MTRThermostatDayOfWeekBitmapFriday MTR_PROVISIONALLY_AVAILABLE = 0x20,
-    MTRThermostatDayOfWeekBitmapSaturday MTR_PROVISIONALLY_AVAILABLE = 0x40,
-    MTRThermostatDayOfWeekBitmapAway MTR_PROVISIONALLY_AVAILABLE = 0x80,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRThermostatFeature) {
@@ -16878,13 +16867,8 @@ typedef NS_OPTIONS(uint32_t, MTRThermostatFeature) {
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint8_t, MTRThermostatHVACSystemTypeBitmap) {
-    MTRThermostatHVACSystemTypeBitmapHeatingType MTR_PROVISIONALLY_AVAILABLE = 0x10,
-    MTRThermostatHVACSystemTypeBitmapHeatingFuel MTR_PROVISIONALLY_AVAILABLE = 0x20,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_OPTIONS(uint8_t, MTRThermostatModeForSequenceBitmap) {
-    MTRThermostatModeForSequenceBitmapHeatSetpointPresent MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRThermostatModeForSequenceBitmapCoolSetpointPresent MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRThermostatHVACSystemTypeBitmapHeatingIsHeatPump MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRThermostatHVACSystemTypeBitmapHeatingUsesFuel MTR_PROVISIONALLY_AVAILABLE = 0x20,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint16_t, MTRThermostatPresetTypeFeaturesBitmap) {
@@ -16912,6 +16896,22 @@ typedef NS_OPTIONS(uint8_t, MTRThermostatRemoteSensingBitmap) {
     MTRThermostatRemoteSensingBitmapLocalTemperature MTR_PROVISIONALLY_AVAILABLE = 0x1,
     MTRThermostatRemoteSensingBitmapOutdoorTemperature MTR_PROVISIONALLY_AVAILABLE = 0x2,
     MTRThermostatRemoteSensingBitmapOccupancy MTR_PROVISIONALLY_AVAILABLE = 0x4,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint8_t, MTRThermostatScheduleDayOfWeekBitmap) {
+    MTRThermostatScheduleDayOfWeekBitmapSunday MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRThermostatScheduleDayOfWeekBitmapMonday MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRThermostatScheduleDayOfWeekBitmapTuesday MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRThermostatScheduleDayOfWeekBitmapWednesday MTR_PROVISIONALLY_AVAILABLE = 0x8,
+    MTRThermostatScheduleDayOfWeekBitmapThursday MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRThermostatScheduleDayOfWeekBitmapFriday MTR_PROVISIONALLY_AVAILABLE = 0x20,
+    MTRThermostatScheduleDayOfWeekBitmapSaturday MTR_PROVISIONALLY_AVAILABLE = 0x40,
+    MTRThermostatScheduleDayOfWeekBitmapAway MTR_PROVISIONALLY_AVAILABLE = 0x80,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint8_t, MTRThermostatScheduleModeBitmap) {
+    MTRThermostatScheduleModeBitmapHeatSetpointPresent MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRThermostatScheduleModeBitmapCoolSetpointPresent MTR_PROVISIONALLY_AVAILABLE = 0x2,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint16_t, MTRThermostatScheduleTypeFeaturesBitmap) {

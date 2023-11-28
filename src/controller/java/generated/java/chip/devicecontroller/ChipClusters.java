@@ -32885,11 +32885,11 @@ public class ChipClusters {
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
-    public void setWeeklySchedule(DefaultClusterCallback callback, Integer numberOfTransitionsForSequence, Integer dayOfWeekforSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransitionStruct> transitions) {
+    public void setWeeklySchedule(DefaultClusterCallback callback, Integer numberOfTransitionsForSequence, Integer dayOfWeekforSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct> transitions) {
       setWeeklySchedule(callback, numberOfTransitionsForSequence, dayOfWeekforSequence, modeForSequence, transitions, 0);
     }
 
-    public void setWeeklySchedule(DefaultClusterCallback callback, Integer numberOfTransitionsForSequence, Integer dayOfWeekforSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransitionStruct> transitions, int timedInvokeTimeoutMs) {
+    public void setWeeklySchedule(DefaultClusterCallback callback, Integer numberOfTransitionsForSequence, Integer dayOfWeekforSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct> transitions, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -32944,7 +32944,7 @@ public class ChipClusters {
           final long modeForSequenceFieldID = 2L;
           Integer modeForSequence = null;
           final long transitionsFieldID = 3L;
-          ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransitionStruct> transitions = null;
+          ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct> transitions = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == numberOfTransitionsForSequenceFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -32964,7 +32964,7 @@ public class ChipClusters {
             } else if (element.contextTagNum() == transitionsFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.Array) {
                 ArrayType castingValue = element.value(ArrayType.class);
-                transitions = castingValue.map((elementcastingValue) -> ChipStructs.ThermostatClusterThermostatScheduleTransitionStruct.decodeTlv(elementcastingValue));
+                transitions = castingValue.map((elementcastingValue) -> ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct.decodeTlv(elementcastingValue));
               }
             }
           }
@@ -33182,7 +33182,7 @@ public class ChipClusters {
     }
 
     public interface GetWeeklyScheduleResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer numberOfTransitionsForSequence, Integer dayOfWeekforSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransitionStruct> transitions);
+      void onSuccess(Integer numberOfTransitionsForSequence, Integer dayOfWeekforSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct> transitions);
     }
 
     public interface GetRelayStatusLogResponseCallback extends BaseClusterCallback {

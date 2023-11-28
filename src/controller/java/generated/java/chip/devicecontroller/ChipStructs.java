@@ -6596,7 +6596,7 @@ public static class ThermostatClusterScheduleTypeStruct {
     return output.toString();
   }
 }
-public static class ThermostatClusterThermostatScheduleTransitionStruct {
+public static class ThermostatClusterWeeklyScheduleTransitionStruct {
   public Integer transitionTime;
   public Integer heatSetpoint;
   public Integer coolSetpoint;
@@ -6604,7 +6604,7 @@ public static class ThermostatClusterThermostatScheduleTransitionStruct {
   private static final long HEAT_SETPOINT_ID = 1L;
   private static final long COOL_SETPOINT_ID = 2L;
 
-  public ThermostatClusterThermostatScheduleTransitionStruct(
+  public ThermostatClusterWeeklyScheduleTransitionStruct(
     Integer transitionTime,
     Integer heatSetpoint,
     Integer coolSetpoint
@@ -6623,7 +6623,7 @@ public static class ThermostatClusterThermostatScheduleTransitionStruct {
     return new StructType(values);
   }
 
-  public static ThermostatClusterThermostatScheduleTransitionStruct decodeTlv(BaseTLVType tlvValue) {
+  public static ThermostatClusterWeeklyScheduleTransitionStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -6648,7 +6648,7 @@ public static class ThermostatClusterThermostatScheduleTransitionStruct {
         }
       }
     }
-    return new ThermostatClusterThermostatScheduleTransitionStruct(
+    return new ThermostatClusterWeeklyScheduleTransitionStruct(
       transitionTime,
       heatSetpoint,
       coolSetpoint
@@ -6658,7 +6658,7 @@ public static class ThermostatClusterThermostatScheduleTransitionStruct {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ThermostatClusterThermostatScheduleTransitionStruct {\n");
+    output.append("ThermostatClusterWeeklyScheduleTransitionStruct {\n");
     output.append("\ttransitionTime: ");
     output.append(transitionTime);
     output.append("\n");

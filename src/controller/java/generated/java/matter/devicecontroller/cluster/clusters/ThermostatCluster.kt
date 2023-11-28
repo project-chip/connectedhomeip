@@ -25,7 +25,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     val numberOfTransitionsForSequence: UByte,
     val dayOfWeekforSequence: UInt,
     val modeForSequence: UInt,
-    val transitions: List<ThermostatClusterThermostatScheduleTransitionStruct>
+    val transitions: List<ThermostatClusterWeeklyScheduleTransitionStruct>
   )
 
   class GetRelayStatusLogResponse(
@@ -99,7 +99,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     numberOfTransitionsForSequence: UByte,
     dayOfWeekforSequence: UInt,
     modeForSequence: UInt,
-    transitions: List<ThermostatClusterThermostatScheduleTransitionStruct>,
+    transitions: List<ThermostatClusterWeeklyScheduleTransitionStruct>,
     timedInvokeTimeoutMs: Int? = null
   ) {
     val commandId = 1L

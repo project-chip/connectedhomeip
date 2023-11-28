@@ -48,7 +48,7 @@ CHIP_ERROR TemperatureManager::Init()
 {
     app::DataModel::Nullable<int16_t> temp;
     int16_t heatingSetpoint, coolingSetpoint;
-    ThermostatSystemModeEnum systemMode;
+    SystemModeEnum systemMode;
 
     PlatformMgr().LockChipStack();
     ThermAttr::LocalTemperature::Get(kThermostatEndpoint, temp);
@@ -62,31 +62,31 @@ CHIP_ERROR TemperatureManager::Init()
     mCoolingCelsiusSetPoint = ConvertToPrintableTemp(heatingSetpoint);
     switch (systemMode)
     {
-    case ThermostatSystemModeEnum::kOff:
+    case SystemModeEnum::kOff:
         mThermMode = 0;
         break;
-    case ThermostatSystemModeEnum::kAuto:
+    case SystemModeEnum::kAuto:
         mThermMode = 1;
         break;
-    case ThermostatSystemModeEnum::kCool:
+    case SystemModeEnum::kCool:
         mThermMode = 3;
         break;
-    case ThermostatSystemModeEnum::kHeat:
+    case SystemModeEnum::kHeat:
         mThermMode = 4;
         break;
-    case ThermostatSystemModeEnum::kEmergencyHeat:
+    case SystemModeEnum::kEmergencyHeat:
         mThermMode = 5;
         break;
-    case ThermostatSystemModeEnum::kPrecooling:
+    case SystemModeEnum::kPrecooling:
         mThermMode = 6;
         break;
-    case ThermostatSystemModeEnum::kFanOnly:
+    case SystemModeEnum::kFanOnly:
         mThermMode = 7;
         break;
-    case ThermostatSystemModeEnum::kDry:
+    case SystemModeEnum::kDry:
         mThermMode = 8;
         break;
-    case ThermostatSystemModeEnum::kSleep:
+    case SystemModeEnum::kSleep:
         mThermMode = 9;
         break;
     default:

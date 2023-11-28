@@ -4688,27 +4688,25 @@ void CHIPThermostatClusterGetWeeklyScheduleResponseCallback::CallbackFn(
                                                                    newElement_0_coolSetpointCtorSignature.c_str(),
                                                                    jninewElement_0_coolSetpoint, newElement_0_coolSetpoint);
 
-        jclass thermostatScheduleTransitionStructStructClass_1;
+        jclass weeklyScheduleTransitionStructStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$ThermostatClusterThermostatScheduleTransitionStruct",
-            thermostatScheduleTransitionStructStructClass_1);
+            env, "chip/devicecontroller/ChipStructs$ThermostatClusterWeeklyScheduleTransitionStruct",
+            weeklyScheduleTransitionStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterThermostatScheduleTransitionStruct");
+            ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterWeeklyScheduleTransitionStruct");
             return;
         }
-        jmethodID thermostatScheduleTransitionStructStructCtor_1 =
-            env->GetMethodID(thermostatScheduleTransitionStructStructClass_1, "<init>",
-                             "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-        if (thermostatScheduleTransitionStructStructCtor_1 == nullptr)
+        jmethodID weeklyScheduleTransitionStructStructCtor_1 = env->GetMethodID(
+            weeklyScheduleTransitionStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+        if (weeklyScheduleTransitionStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterThermostatScheduleTransitionStruct constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterWeeklyScheduleTransitionStruct constructor");
             return;
         }
 
-        newElement_0 =
-            env->NewObject(thermostatScheduleTransitionStructStructClass_1, thermostatScheduleTransitionStructStructCtor_1,
-                           newElement_0_transitionTime, newElement_0_heatSetpoint, newElement_0_coolSetpoint);
+        newElement_0 = env->NewObject(weeklyScheduleTransitionStructStructClass_1, weeklyScheduleTransitionStructStructCtor_1,
+                                      newElement_0_transitionTime, newElement_0_heatSetpoint, newElement_0_coolSetpoint);
         chip::JniReferences::GetInstance().AddToList(Transitions, newElement_0);
     }
 

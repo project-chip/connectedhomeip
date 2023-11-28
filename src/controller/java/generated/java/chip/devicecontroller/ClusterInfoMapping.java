@@ -11070,7 +11070,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer numberOfTransitionsForSequence, Integer dayOfWeekforSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransitionStruct> transitions) {
+    public void onSuccess(Integer numberOfTransitionsForSequence, Integer dayOfWeekforSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct> transitions) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo numberOfTransitionsForSequenceResponseValue = new CommandResponseInfo("numberOfTransitionsForSequence", "Integer");
@@ -11079,7 +11079,7 @@ public class ClusterInfoMapping {
       responseValues.put(dayOfWeekforSequenceResponseValue, dayOfWeekforSequence);
       CommandResponseInfo modeForSequenceResponseValue = new CommandResponseInfo("modeForSequence", "Integer");
       responseValues.put(modeForSequenceResponseValue, modeForSequence);
-      // transitions: ThermostatScheduleTransitionStruct
+      // transitions: WeeklyScheduleTransitionStruct
       // Conversion from this type to Java is not properly implemented yet
 
       callback.onSuccess(responseValues);
@@ -22310,7 +22310,7 @@ public class ClusterInfoMapping {
         commandArguments.get("dayOfWeekforSequence")
         , (Integer)
         commandArguments.get("modeForSequence")
-        , (ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransitionStruct>)
+        , (ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct>)
         commandArguments.get("transitions")
         );
       },

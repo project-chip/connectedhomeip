@@ -1405,6 +1405,15 @@ client cluster Thermostat = 513 {
     kHeatPumpInverter = 4;
   }
 
+  enum ControlSequenceOfOperationEnum : enum8 {
+    kCoolingOnly = 0;
+    kCoolingWithReheat = 1;
+    kHeatingOnly = 2;
+    kHeatingWithReheat = 3;
+    kCoolingAndHeating = 4;
+    kCoolingAndHeatingWithReheat = 5;
+  }
+
   enum PresetScenarioEnum : enum8 {
     kUnspecified = 0;
     kOccupied = 1;
@@ -1437,27 +1446,7 @@ client cluster Thermostat = 513 {
     kSaturday = 6;
   }
 
-  enum TemperatureSetpointHoldEnum : enum8 {
-    kSetpointHoldOff = 0;
-    kSetpointHoldOn = 1;
-  }
-
-  enum ThermostatControlSequenceEnum : enum8 {
-    kCoolingOnly = 0;
-    kCoolingWithReheat = 1;
-    kHeatingOnly = 2;
-    kHeatingWithReheat = 3;
-    kCoolingAndHeating = 4;
-    kCoolingAndHeatingWithReheat = 5;
-  }
-
-  enum ThermostatRunningModeEnum : enum8 {
-    kOff = 0;
-    kCool = 3;
-    kHeat = 4;
-  }
-
-  enum ThermostatSystemModeEnum : enum8 {
+  enum SystemModeEnum : enum8 {
     kOff = 0;
     kAuto = 1;
     kCool = 3;
@@ -1467,6 +1456,17 @@ client cluster Thermostat = 513 {
     kFanOnly = 7;
     kDry = 8;
     kSleep = 9;
+  }
+
+  enum TemperatureSetpointHoldEnum : enum8 {
+    kSetpointHoldOff = 0;
+    kSetpointHoldOn = 1;
+  }
+
+  enum ThermostatRunningModeEnum : enum8 {
+    kOff = 0;
+    kCool = 3;
+    kHeat = 4;
   }
 
   bitmap ACErrorCodeBitmap : bitmap32 {
@@ -1481,17 +1481,6 @@ client cluster Thermostat = 513 {
     kInitialization = 0x1;
     kHardware = 0x2;
     kSelfCalibration = 0x4;
-  }
-
-  bitmap DayOfWeekBitmap : bitmap8 {
-    kSunday = 0x1;
-    kMonday = 0x2;
-    kTuesday = 0x4;
-    kWednesday = 0x8;
-    kThursday = 0x10;
-    kFriday = 0x20;
-    kSaturday = 0x40;
-    kAway = 0x80;
   }
 
   bitmap Feature : bitmap32 {
@@ -1509,13 +1498,8 @@ client cluster Thermostat = 513 {
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
-    kHeatingType = 0x10;
-    kHeatingFuel = 0x20;
-  }
-
-  bitmap ModeForSequenceBitmap : bitmap8 {
-    kHeatSetpointPresent = 0x1;
-    kCoolSetpointPresent = 0x2;
+    kHeatingIsHeatPump = 0x10;
+    kHeatingUsesFuel = 0x20;
   }
 
   bitmap PresetTypeFeaturesBitmap : bitmap16 {
@@ -1545,6 +1529,22 @@ client cluster Thermostat = 513 {
     kOccupancy = 0x4;
   }
 
+  bitmap ScheduleDayOfWeekBitmap : bitmap8 {
+    kSunday = 0x1;
+    kMonday = 0x2;
+    kTuesday = 0x4;
+    kWednesday = 0x8;
+    kThursday = 0x10;
+    kFriday = 0x20;
+    kSaturday = 0x40;
+    kAway = 0x80;
+  }
+
+  bitmap ScheduleModeBitmap : bitmap8 {
+    kHeatSetpointPresent = 0x1;
+    kCoolSetpointPresent = 0x2;
+  }
+
   bitmap ScheduleTypeFeaturesBitmap : bitmap16 {
     kSupportsPresets = 0x1;
     kSupportsSetpoints = 0x2;
@@ -1558,17 +1558,17 @@ client cluster Thermostat = 513 {
   }
 
   struct ScheduleTransitionStruct {
-    DayOfWeekBitmap dayOfWeek = 0;
+    ScheduleDayOfWeekBitmap dayOfWeek = 0;
     int16u transitionTime = 1;
     optional octet_string<16> presetHandle = 2;
-    optional ThermostatSystemModeEnum systemMode = 3;
+    optional SystemModeEnum systemMode = 3;
     optional temperature coolingSetpoint = 4;
     optional temperature heatingSetpoint = 5;
   }
 
   struct ScheduleStruct {
     nullable octet_string<16> scheduleHandle = 0;
-    ThermostatSystemModeEnum systemMode = 1;
+    SystemModeEnum systemMode = 1;
     optional char_string<64> name = 2;
     optional octet_string<16> presetHandle = 3;
     ScheduleTransitionStruct transitions[] = 4;
@@ -1596,12 +1596,12 @@ client cluster Thermostat = 513 {
   }
 
   struct ScheduleTypeStruct {
-    ThermostatSystemModeEnum systemMode = 0;
+    SystemModeEnum systemMode = 0;
     int8u numberOfSchedules = 1;
     ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
   }
 
-  struct ThermostatScheduleTransitionStruct {
+  struct WeeklyScheduleTransitionStruct {
     int16u transitionTime = 0;
     temperature heatSetpoint = 1;
     temperature coolSetpoint = 2;
@@ -1627,8 +1627,8 @@ client cluster Thermostat = 513 {
   attribute access(write: manage) optional temperature maxCoolSetpointLimit = 24;
   attribute access(write: manage) optional int8s minSetpointDeadBand = 25;
   attribute access(write: manage) optional RemoteSensingBitmap remoteSensing = 26;
-  attribute access(write: manage) ThermostatControlSequenceEnum controlSequenceOfOperation = 27;
-  attribute access(write: manage) ThermostatSystemModeEnum systemMode = 28;
+  attribute access(write: manage) ControlSequenceOfOperationEnum controlSequenceOfOperation = 27;
+  attribute access(write: manage) SystemModeEnum systemMode = 28;
   readonly attribute optional AlarmCodeBitmap alarmMask = 29;
   readonly attribute optional ThermostatRunningModeEnum thermostatRunningMode = 30;
   readonly attribute optional StartOfWeekEnum startOfWeek = 32;
@@ -1684,16 +1684,16 @@ client cluster Thermostat = 513 {
 
   response struct GetWeeklyScheduleResponse = 0 {
     int8u numberOfTransitionsForSequence = 0;
-    DayOfWeekBitmap dayOfWeekforSequence = 1;
-    ModeForSequenceBitmap modeForSequence = 2;
-    ThermostatScheduleTransitionStruct transitions[] = 3;
+    ScheduleDayOfWeekBitmap dayOfWeekforSequence = 1;
+    ScheduleModeBitmap modeForSequence = 2;
+    WeeklyScheduleTransitionStruct transitions[] = 3;
   }
 
   request struct SetWeeklyScheduleRequest {
     int8u numberOfTransitionsForSequence = 0;
-    DayOfWeekBitmap dayOfWeekforSequence = 1;
-    ModeForSequenceBitmap modeForSequence = 2;
-    ThermostatScheduleTransitionStruct transitions[] = 3;
+    ScheduleDayOfWeekBitmap dayOfWeekforSequence = 1;
+    ScheduleModeBitmap modeForSequence = 2;
+    WeeklyScheduleTransitionStruct transitions[] = 3;
   }
 
   response struct GetRelayStatusLogResponse = 1 {
@@ -1706,8 +1706,8 @@ client cluster Thermostat = 513 {
   }
 
   request struct GetWeeklyScheduleRequest {
-    DayOfWeekBitmap daysToReturn = 0;
-    ModeForSequenceBitmap modeToReturn = 1;
+    ScheduleDayOfWeekBitmap daysToReturn = 0;
+    ScheduleModeBitmap modeToReturn = 1;
   }
 
   request struct SetActiveScheduleRequestRequest {

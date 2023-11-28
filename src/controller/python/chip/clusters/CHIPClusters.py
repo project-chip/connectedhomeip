@@ -7355,7 +7355,7 @@ class ChipClusters:
                     "numberOfTransitionsForSequence": "int",
                     "dayOfWeekforSequence": "int",
                     "modeForSequence": "int",
-                    "transitions": "ThermostatScheduleTransitionStruct",
+                    "transitions": "WeeklyScheduleTransitionStruct",
                 },
             },
             0x00000002: {

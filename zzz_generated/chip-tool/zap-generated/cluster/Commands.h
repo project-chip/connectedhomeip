@@ -8088,7 +8088,7 @@ public:
 private:
     chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Type mRequest;
     TypedComplexArgument<
-        chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransitionStruct::Type>>
+        chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::Type>>
         mComplex_Transitions;
 };
 
@@ -19028,10 +19028,10 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
                                             WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap>>>(
             Id, "remote-sensing", 0, UINT8_MAX, Attributes::RemoteSensing::Id, WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::ThermostatControlSequenceEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum>>(
             Id, "control-sequence-of-operation", 0, UINT8_MAX, Attributes::ControlSequenceOfOperation::Id, WriteCommandType::kWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::ThermostatSystemModeEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::SystemModeEnum>>(
             Id, "system-mode", 0, UINT8_MAX, Attributes::SystemMode::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Thermostat::AlarmCodeBitmap>>>(
             Id, "alarm-mask", 0, UINT8_MAX, Attributes::AlarmMask::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //

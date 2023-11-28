@@ -1294,7 +1294,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRThermostatClusterThermostatScheduleTransitionStruct : NSObject <NSCopying>
+@interface MTRThermostatClusterWeeklyScheduleTransitionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull heatSetpoint MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull coolSetpoint MTR_PROVISIONALLY_AVAILABLE;
