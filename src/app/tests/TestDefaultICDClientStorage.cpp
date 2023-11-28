@@ -60,9 +60,7 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
     DefaultICDClientStorage manager;
     TestPersistentStorageDelegate clientInfoStorage;
     TestSessionKeystoreImpl keystore;
-    size_t clientInfoSize = TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t), sizeof(uint32_t),
-                                           sizeof(uint64_t), sizeof(Crypto::Aes128KeyByteArray));
-    err = manager.Init(&clientInfoStorage, &keystore, clientInfoSize);
+    err = manager.Init(&clientInfoStorage, &keystore);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = manager.UpdateFabricList(fabricId);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -128,9 +126,7 @@ void TestClientInfoCountMultipleFabric(nlTestSuite * apSuite, void * apContext)
     DefaultICDClientStorage manager;
     TestPersistentStorageDelegate clientInfoStorage;
     TestSessionKeystoreImpl keystore;
-    size_t clientInfoSize = TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t), sizeof(uint32_t),
-                                           sizeof(uint64_t), sizeof(Crypto::Aes128KeyByteArray));
-    err = manager.Init(&clientInfoStorage, &keystore, clientInfoSize);
+    err = manager.Init(&clientInfoStorage, &keystore);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = manager.UpdateFabricList(fabricId1);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);

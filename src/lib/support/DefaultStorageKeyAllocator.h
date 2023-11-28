@@ -28,25 +28,16 @@
  * @brief Defines ICD Client Info Key const
  */
 #ifndef CHIP_CONFIG_ICD_CLIENT_INFO_KEY_CONST
-#define CHIP_CONFIG_ICD_CLIENT_INFO_KEY_CONST "g/%x/icdkey"
+#define CHIP_CONFIG_ICD_CLIENT_INFO_KEY_CONST "g/%x/icdk"
 #endif
 
 /**
- * @def CHIP_CONFIG_ICD_CLIENT_INFO_COUNT
+ * @def CHIP_CONFIG_ICD_CLIENT_INFO_COUNTER
  *
- * @brief Defines ICD Client Info count formater
+ * @brief Defines ICD Client Info counter formater
  */
-#ifndef CHIP_CONFIG_ICD_CLIENT_INFO_COUNT
-#define CHIP_CONFIG_ICD_CLIENT_INFO_COUNT "g/%x/icdcount"
-#endif
-
-/**
- * @def CHIP_CONFIG_ICD_CLIENT_INFO_MAX_SIZE
- *
- * @brief Defines ICD Client Info count formater
- */
-#ifndef CHIP_CONFIG_ICD_CLIENT_INFO_MAX_SIZE_CONST
-#define CHIP_CONFIG_ICD_CLIENT_INFO_MAX_SIZE_CONST "g/icdsize"
+#ifndef CHIP_CONFIG_ICD_CLIENT_INFO_COUNTER
+#define CHIP_CONFIG_ICD_CLIENT_INFO_COUNTER "g/%x/icdc"
 #endif
 
 /**
@@ -266,14 +257,9 @@ public:
     static StorageKeyName TSTimeZone() { return StorageKeyName::FromConst("g/ts/tz"); }
     static StorageKeyName TSDSTOffset() { return StorageKeyName::FromConst("g/ts/dsto"); }
 
-    static StorageKeyName FabricICDClientInfoMaxSize()
-    {
-        return StorageKeyName::FromConst(CHIP_CONFIG_ICD_CLIENT_INFO_MAX_SIZE_CONST);
-    }
-
     static StorageKeyName FabricICDClientInfoCounter(FabricIndex fabric)
     {
-        return StorageKeyName::Formatted(CHIP_CONFIG_ICD_CLIENT_INFO_COUNT, fabric);
+        return StorageKeyName::Formatted(CHIP_CONFIG_ICD_CLIENT_INFO_COUNTER, fabric);
     }
 
     static StorageKeyName ICDClientInfoKey(FabricIndex fabric) { return StorageKeyName::Formatted(CHIP_CONFIG_ICD_CLIENT_INFO_KEY_CONST, fabric); }

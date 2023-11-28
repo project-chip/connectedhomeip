@@ -48,7 +48,7 @@ class DefaultICDClientStorage : public ICDClientStorage
 public:
     static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS;
 
-    CHIP_ERROR Init(PersistentStorageDelegate * clientInfoStore, Crypto::SymmetricKeystore * keyStore, size_t clientInfoSize);
+    CHIP_ERROR Init(PersistentStorageDelegate * clientInfoStore, Crypto::SymmetricKeystore * keyStore);
 
     ICDClientInfoIterator * IterateICDClientInfo() override;
 
@@ -65,7 +65,7 @@ public:
     bool ValidateCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) override;
 
 protected:
-    enum class Tag : uint8_t
+    enum class ClientInfoTag : uint8_t
     {
         kPeerNodeId       = 1,
         kFabricIndex      = 2,
@@ -74,6 +74,13 @@ protected:
         kMonitoredSubject = 5,
         kSharedKey        = 6
     };
+
+    enum class CounterTag : uint8_t
+    {
+        kCount       = 1,
+        kSize          = 2,
+    };
+
     class ICDClientInfoIteratorImpl : public ICDClientInfoIterator
     {
     public:
@@ -89,15 +96,27 @@ protected:
         std::vector<ICDClientInfo> mClientInfoVector;
     };
 
+    static constexpr size_t MaxICDClientInfoSize()
+    {
+        // All the fields added together
+        return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t), sizeof(uint32_t),
+                                           sizeof(uint64_t), sizeof(Crypto::Aes128KeyByteArray));
+    }
+
+    static constexpr size_t MaxICDCounterSize()
+    {
+        // All the fields added together
+        return TLV::EstimateStructOverhead(sizeof(size_t), sizeof(size_t));
+    }
+
 private:
     friend class ICDClientInfoIteratorImpl;
     CHIP_ERROR LoadFabricList();
-    CHIP_ERROR MaxICDClientInfoSize(size_t & size);
-
+    CHIP_ERROR LoadCounter(FabricIndex fabricIndex, size_t & count, size_t & clientInfoSize);
     CHIP_ERROR UpdateCounter(FabricIndex fabricIndex, bool increase);
 
     CHIP_ERROR Save(TLV::TLVWriter & writer, const std::vector<ICDClientInfo> & clientInfoVector);
-    CHIP_ERROR Load(FabricIndex fabricIndex, std::vector<ICDClientInfo> & clientInfoVector);
+    CHIP_ERROR Load(FabricIndex fabricIndex, std::vector<ICDClientInfo> & clientInfoVector, size_t & clientInfoSize);
 
     ObjectPool<ICDClientInfoIteratorImpl, kIteratorsMax> mICDClientInfoIterators;
 
