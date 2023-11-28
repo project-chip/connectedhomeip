@@ -44,7 +44,6 @@ If any strings are of the wrong length a ValueError is thrown
 
 import copy
 import logging
-import string
 import struct
 
 shifts = [[[0, 0], [1, 3], [2, 2], [3, 1]],
@@ -76,13 +75,12 @@ log = [0] * 256
 for i in range(1, 255):
     log[alog[i]] = i
 
+
 # multiply two elements of GF(2^m)
-
-
 def mul(a, b):
     if a == 0 or b == 0:
         return 0
-    return alog[(log[a & 0xFF] + log[b & 0xFF]) % 255]
+    return alog[(log[a & 0xFF] + log[b & 0xFF]) % 255]  # noqa: F821
 
 
 # substitution box based on F^{-1}(x)
@@ -158,7 +156,7 @@ def mul4(a, bs):
     for b in bs:
         r <<= 8
         if b != 0:
-            r = r | mul(a, b)
+            r = r | mul(a, b)  # noqa: F821
     return r
 
 
@@ -256,10 +254,10 @@ class rijndael:
         while t < ROUND_KEY_COUNT:
             # extrapolate using phi (the round key evolution function)
             tt = tk[KC - 1]
-            tk[0] ^= (S[(tt >> 16) & 0xFF] & 0xFF) << 24 ^  \
-                     (S[(tt >> 8) & 0xFF] & 0xFF) << 16 ^  \
-                     (S[tt & 0xFF] & 0xFF) << 8 ^  \
-                     (S[(tt >> 24) & 0xFF] & 0xFF) ^  \
+            tk[0] ^= (S[(tt >> 16) & 0xFF] & 0xFF) << 24 ^ \
+                     (S[(tt >> 8) & 0xFF] & 0xFF) << 16 ^ \
+                     (S[tt & 0xFF] & 0xFF) << 8 ^ \
+                     (S[(tt >> 24) & 0xFF] & 0xFF) ^ \
                      (rcon[rconpointer] & 0xFF) << 24
             rconpointer += 1
             if KC != 8:
@@ -383,21 +381,21 @@ class rijndael:
 def encryptFlashData(nonce, key, data, imageLen):
     encyptedBlock = ''
     if (imageLen % 16) != 0:
-        for x in range(16-(imageLen % 16)):
+        for x in range(16 - (imageLen % 16)):
             data = data + bytes([255])
         imageLen = len(data)
 
     r = rijndael(key, block_size=16)
 
-    for x in range(int(imageLen/16)):
-        # use nonce value to create encrpyted chunk
+    for x in range(int(imageLen / 16)):
+        # use nonce value to create encrypted chunk
         encryptNonce = ''
         for i in nonce:
             tempString = "%08x" % i
             y = 0
             while y < 8:
-                encryptNonce = encryptNonce+chr(int(tempString[y:y+2], 16))
-                y = y+2
+                encryptNonce = encryptNonce + chr(int(tempString[y:y+2], 16))
+                y = y + 2
         encChunk = r.encrypt(encryptNonce)
 
         # increment the nonce value
@@ -407,19 +405,16 @@ def encryptFlashData(nonce, key, data, imageLen):
             nonce[3] += 1
 
         # xor encypted junk with data chunk
-        chunk = data[x*16:(x+1)*16]        # Read 16 byte chucks. 128 bits
+        chunk = data[x*16:(x+1)*16]  # Read 16 byte chucks. 128 bits
 
-        ## lchunk = list(map(ord, chunk))
         lchunk = chunk
         lencChunk = list(map(ord, encChunk))
 
-        outputString = ''
         loutChunk = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for i in range(16):
             loutChunk[i] = lchunk[i] ^ lencChunk[i]
             encyptedBlock = encyptedBlock + chr(lchunk[i] ^ lencChunk[i])
 
-    ## print([ord(x) for x in encyptedBlock])
     return (encyptedBlock)
 
 
@@ -429,9 +424,9 @@ def aParsePassKeyString(sPassKey):
     try:
         lstStrPassKey = sPassKey.split(",")
 
-    except:
+    except Exception:
         sPassKey = "0x00000000, 0x00000000, 0x00000000, 0x00000000"
-        lstStrPassKey = self.sPassKey.split(",")
+        lstStrPassKey = sPassKey.split(",")
 
     if len(lstStrPassKey) == 4:
         for i in range(4):
@@ -454,9 +449,9 @@ def aParseNonce(sNonceValue):
     try:
         lstStrNonce = sNonceValue.split(",")
 
-    except:
+    except Exception:
         sNonceValue = "0x00000000, 0x00000000, 0x00000000, 0x00000000"
-        lstStrNonce = self.sNonceValue.split(",")
+        lstStrNonce = sNonceValue.split(",")
 
     if len(lstStrNonce) == 4:
         for i in range(4):
@@ -474,11 +469,13 @@ def encryptData(sSrcData, sPassKey, aPassIv):
 
     sKeyString = sPassKey.strip()
     assert len(sKeyString) == 32, 'the length of encryption key should be equal to 32'
-    sPassString = "0x"+sKeyString[:8]+','+"0x"+sKeyString[8:16]+','+"0x"+sKeyString[16:24]+','+"0x"+sKeyString[24:32]
+    sPassString = "0x" + sKeyString[:8] + ',' + "0x" + sKeyString[8:16] + \
+        ',' + "0x" + sKeyString[16:24] + ',' + "0x" + sKeyString[24:32]
     aPassKey = aParsePassKeyString(sPassString)
 
     sIvString = aPassIv.strip()
-    sPassString = "0x"+sIvString[:8]+','+"0x"+sIvString[8:16]+','+"0x"+sIvString[16:24]+','+"0x"+sIvString[24:32]
+    sPassString = "0x" + sIvString[:8] + ',' + "0x" + sIvString[8:16] + \
+        ',' + "0x" + sIvString[16:24] + ',' + "0x" + sIvString[24:32]
     aNonce = aParseNonce(sPassString)
 
     logging.info("Started Encrypting with key[{}] ......".format(sPassKey))

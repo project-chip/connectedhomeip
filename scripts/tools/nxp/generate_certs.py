@@ -16,7 +16,6 @@
 #
 
 import argparse
-import base64
 import logging as log
 import os
 import subprocess

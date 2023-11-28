@@ -31,8 +31,6 @@ import glob
 import json
 import logging
 import os
-import string
-import struct
 import sys
 
 import crypto_utils
@@ -108,6 +106,7 @@ def generate_factory_data(args: object):
             payload += writer.encoding
 
     write_to_temp(OTA_FACTORY_TLV_TEMP, payload)
+
     return [OTA_FACTORY_TLV_TEMP]
 
 
@@ -135,6 +134,7 @@ def generate_app(args: object):
     Generate app payload with descriptor. If a certain option is not specified, use the default values.
     """
     logging.info("App descriptor information:")
+
     descriptor = generate_descriptor(args.app_version, args.app_version_str, args.app_build_date)
     logging.info(f"App encryption enable: {args.enc_enable}")
     if args.enc_enable:
@@ -160,6 +160,7 @@ def generate_bootloader(args: object):
     Generate SSBL payload with descriptor. If a certain option is not specified, use the default values.
     """
     logging.info("SSBL descriptor information:")
+
     descriptor = generate_descriptor(args.bl_version, args.bl_version_str, args.bl_build_date)
     logging.info(f"Bootloader encryption enable: {args.enc_enable}")
     if args.enc_enable:
