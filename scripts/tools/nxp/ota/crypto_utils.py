@@ -80,7 +80,7 @@ for i in range(1, 255):
 def mul(a, b):
     if a == 0 or b == 0:
         return 0
-    return alog[(log[a & 0xFF] + log[b & 0xFF]) % 255] # noqa: F821
+    return alog[(log[a & 0xFF] + log[b & 0xFF]) % 255]  # noqa: F821
 
 
 # substitution box based on F^{-1}(x)
@@ -156,7 +156,7 @@ def mul4(a, bs):
     for b in bs:
         r <<= 8
         if b != 0:
-            r = r | mul(a, b) # noqa: F821
+            r = r | mul(a, b)  # noqa: F821
     return r
 
 
