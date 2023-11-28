@@ -152,7 +152,7 @@ public:
      */
     void Reset()
     {
-        mPeerAddress              = PeerAddress::Uninitialized();
+        mPeerAddress               = PeerAddress::Uninitialized();
         mLongDiscriminator         = 0;
         mVendorId                  = 0;
         mProductId                 = 0;
@@ -166,8 +166,8 @@ public:
         mCommissionerPasscode      = false;
         mCommissionerPasscodeReady = false;
         mCancelPasscode            = false;
-        mExpirationTime           = System::Clock::kZero;
-        mUDCClientProcessingState = UDCClientProcessingState::kNotInitialized;
+        mExpirationTime            = System::Clock::kZero;
+        mUDCClientProcessingState  = UDCClientProcessingState::kNotInitialized;
     }
 
 private:
@@ -179,7 +179,7 @@ private:
     uint16_t mProductId         = 0;
     uint16_t mCdPort            = 0;
     uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen];
-    size_t mRotatingIdLen = 0;
+    size_t mRotatingIdLen                                         = 0;
     char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1] = {};
     uint16_t mPairingHint                                         = 0;
 

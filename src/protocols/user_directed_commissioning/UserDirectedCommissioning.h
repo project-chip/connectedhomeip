@@ -105,7 +105,7 @@ public:
         memcpy(mRotatingId, rotatingId, mRotatingIdLen);
     }
 
-    bool GetAppVendorId(size_t index, uint16_t & vid) const
+    bool GetAppVendorId(uint8_t index, uint16_t & vid) const
     {
         if (index < mNumAppVendorIds)
         {
@@ -170,7 +170,7 @@ public:
         client->SetRotatingId(GetRotatingId(), GetRotatingIdLength());
         client->SetPairingInst(GetPairingInst());
         client->SetPairingHint(GetPairingHint());
-        for (size_t i = 0; i < GetNumAppVendorIds(); i++)
+        for (uint8_t i = 0; i < GetNumAppVendorIds(); i++)
         {
             uint16_t vid;
             if (GetAppVendorId(i, vid))
@@ -214,9 +214,9 @@ public:
             Encoding::BytesToUppercaseHexString(mRotatingId, mRotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
             ChipLogDetail(AppServer, "\trotating id: %s", rotatingIdString);
         }
-        for (size_t i = 0; i < mNumAppVendorIds; i++)
+        for (uint8_t i = 0; i < mNumAppVendorIds; i++)
         {
-            ChipLogDetail(AppServer, "\tapp vendor id [%zu]: %u", i, mAppVendorIds[i]);
+            ChipLogDetail(AppServer, "\tapp vendor id [%d]: %u", i, mAppVendorIds[i]);
         }
         if (strlen(mPairingInst) != 0)
         {
@@ -282,7 +282,7 @@ private:
     size_t mRotatingIdLen = 0;
 
     constexpr static size_t kMaxAppVendorIds = 10;
-    size_t mNumAppVendorIds                  = 0; // number of vendor Ids
+    uint8_t mNumAppVendorIds                 = 0; // number of vendor Ids
     uint16_t mAppVendorIds[kMaxAppVendorIds];
 
     char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1] = {};
