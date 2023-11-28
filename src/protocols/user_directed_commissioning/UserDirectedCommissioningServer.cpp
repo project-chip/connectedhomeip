@@ -26,6 +26,11 @@
 #include "UserDirectedCommissioning.h"
 #include <lib/core/CHIPSafeCasts.h>
 #include <system/TLVPacketBufferBackingStore.h>
+
+#ifdef __ZEPHYR__
+#include <zephyr/kernel.h>
+#endif // __ZEPHYR__
+
 #include <unistd.h>
 
 namespace chip {
