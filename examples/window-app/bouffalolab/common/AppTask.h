@@ -24,8 +24,8 @@
 #include "FreeRTOS.h"
 #include "timers.h"
 
-#include <platform/CHIPDeviceLayer.h>
 #include "WindowCovering.h"
+#include <platform/CHIPDeviceLayer.h>
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
@@ -64,10 +64,10 @@ public:
         APP_EVENT_BTN_LONG      = 0x00000080,
         APP_EVENT_BTN_ISR       = 0x00000100,
 
-        APP_EVENT_WINDOW_OPEN = 0x00010000,
-        APP_EVENT_WINDOW_CLOSE = 0x00020000,
+        APP_EVENT_WINDOW_OPEN           = 0x00010000,
+        APP_EVENT_WINDOW_CLOSE          = 0x00020000,
         APP_EVENT_WINDOW_TOOGLEMOVETYPE = 0x00040000,
-        APP_EVENT_WINDOW_MASK  = APP_EVENT_WINDOW_OPEN | APP_EVENT_WINDOW_CLOSE | APP_EVENT_WINDOW_TOOGLEMOVETYPE,
+        APP_EVENT_WINDOW_MASK           = APP_EVENT_WINDOW_OPEN | APP_EVENT_WINDOW_CLOSE | APP_EVENT_WINDOW_TOOGLEMOVETYPE,
 
         APP_EVENT_IDENTIFY_START    = 0x01000000,
         APP_EVENT_IDENTIFY_IDENTIFY = 0x02000000,
@@ -100,12 +100,12 @@ public:
     static void ToggleMoveType(void);
 
     OperationalState mMoveType{ OperationalState::MovingUpOrOpen };
+
 private:
     friend void StartAppTask(void);
     friend PlatformManagerImpl;
 
     static uint32_t AppRebootCheck(uint32_t time = 0);
-
 
     static bool StartTimer(void);
     static void CancelTimer(void);

@@ -19,6 +19,7 @@
  * @file
  *   This file implements the handler for data model messages.
  */
+#include "WindowCovering.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -29,7 +30,6 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
 #include <app/util/af.h>
-#include "WindowCovering.h"
 using namespace ::chip;
 using namespace ::chip::app::Clusters::WindowCovering;
 
@@ -44,8 +44,8 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
         break;
     case app::Clusters::WindowCovering::Id:
         ChipLogProgress(Zcl, "Window covering cluster ID: " ChipLogFormatMEI " Type: %u Value: %u, length: %u",
-                    ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
-    break;
+                        ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
+        break;
     default:
         break;
     }

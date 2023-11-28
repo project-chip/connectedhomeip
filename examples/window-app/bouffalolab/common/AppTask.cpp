@@ -191,11 +191,9 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 if (Server::GetInstance().GetFabricTable().FabricCount())
                 {
-
                 }
                 else
                 {
-
                 }
             }
             if (APP_EVENT_WINDOW_OPEN & appEvent)
@@ -213,7 +211,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 #ifdef BOOT_PIN_RESET
             if (APP_EVENT_BTN_LONG & appEvent)
             {
-
             }
 #endif
             if (APP_EVENT_IDENTIFY_MASK & appEvent)
@@ -248,12 +245,12 @@ void AppTask::ToggleMoveType(void)
     if (WindowCovering::Instance().GetMoveType() == WindowCovering::MoveType::LIFT)
     {
         WindowCovering::Instance().SetMoveType(WindowCovering::MoveType::LIFT);
-        ChipLogProgress(NotSpecified,"Window covering move: tilt");
+        ChipLogProgress(NotSpecified, "Window covering move: tilt");
     }
     else
     {
         WindowCovering::Instance().SetMoveType(WindowCovering::MoveType::TILT);
-        ChipLogProgress(NotSpecified,"Window covering move: lift");
+        ChipLogProgress(NotSpecified, "Window covering move: lift");
     }
 }
 
@@ -303,7 +300,6 @@ void AppTask::TimerEventHandler(app_event_t event)
             }
             else if (pressedTime >= APP_BUTTON_PRESS_SHORT)
             {
-
             }
         }
         else
@@ -318,7 +314,6 @@ void AppTask::TimerEventHandler(app_event_t event)
             }
             else
             {
-
             }
 
             GetAppTask().mTimerIntvl        = APP_BUTTON_PRESSED_ITVL;
@@ -333,7 +328,6 @@ void AppTask::TimerEventHandler(app_event_t event)
         }
         else
         {
-
         }
 #endif
     }

@@ -20,8 +20,6 @@
 #include <app/util/af.h>
 #include <platform/CHIPDeviceLayer.h>
 
-
-
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters::WindowCovering;
@@ -29,10 +27,7 @@ using namespace chip::app::Clusters::WindowCovering;
 static constexpr uint32_t sMoveTimeoutMs{ 200 };
 constexpr uint8_t kDefaultMinLevel = 0;
 constexpr uint8_t kDefaultMaxLevel = 254;
-WindowCovering::WindowCovering()
-{
-
-}
+WindowCovering::WindowCovering() {}
 
 void WindowCovering::DriveCurrentLiftPosition(intptr_t)
 {
@@ -105,7 +100,7 @@ chip::Percent100ths WindowCovering::CalculateNextPosition(MoveType aMoveType)
     }
     else
     {
-        //LOG_ERR("Cannot read the current lift position. Error: %d", static_cast<uint8_t>(status));
+        // LOG_ERR("Cannot read the current lift position. Error: %d", static_cast<uint8_t>(status));
     }
 
     return percent100ths;
@@ -249,7 +244,7 @@ void WindowCovering::SetTargetPosition(OperationalState aDirection, chip::Percen
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        //LOG_ERR("Cannot set the target position. Error: %d", static_cast<uint8_t>(status));
+        // LOG_ERR("Cannot set the target position. Error: %d", static_cast<uint8_t>(status));
     }
 }
 
@@ -281,11 +276,11 @@ void WindowCovering::SetBrightness(MoveType aMoveType, uint16_t aPosition)
     uint8_t brightness = PositionToBrightness(aPosition, aMoveType);
     if (aMoveType == MoveType::LIFT)
     {
-        ChipLogProgress(NotSpecified, " MoveType::LIFT brightness %d\r\n",brightness);
+        ChipLogProgress(NotSpecified, " MoveType::LIFT brightness %d\r\n", brightness);
     }
     else if (aMoveType == MoveType::TILT)
     {
-        ChipLogProgress(NotSpecified, " MoveType::TILT brightness %d\r\n",brightness);
+        ChipLogProgress(NotSpecified, " MoveType::TILT brightness %d\r\n", brightness);
     }
 }
 
@@ -295,13 +290,13 @@ uint8_t WindowCovering::PositionToBrightness(uint16_t aPosition, MoveType aMoveT
 
     if (aMoveType == MoveType::LIFT)
     {
-        pwmLimits.open=kDefaultMinLevel;
-        pwmLimits.open=kDefaultMaxLevel;
+        pwmLimits.open = kDefaultMinLevel;
+        pwmLimits.open = kDefaultMaxLevel;
     }
     else if (aMoveType == MoveType::TILT)
     {
-        pwmLimits.open=kDefaultMinLevel;
-        pwmLimits.open=kDefaultMaxLevel;
+        pwmLimits.open = kDefaultMinLevel;
+        pwmLimits.open = kDefaultMaxLevel;
     }
 
     return Percent100thsToValue(pwmLimits, aPosition);
