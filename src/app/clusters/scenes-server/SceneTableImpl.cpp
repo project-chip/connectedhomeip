@@ -98,7 +98,7 @@ struct EndpointSceneCount : public PersistentData<kPersistentBufferSceneCountByt
     }
 };
 
-// Worst case tested: Add Scene Command with EFS using the default SerializeAdd Method. This yielded a serialized scene of 171 bytes
+// Worst case tested: Add Scene Command with EFS using the default SerializeAdd Method. This yielded a serialized scene of 175 bytes
 // when using the OnOff, Level Control and Color Control as well as the maximal name length of 16 bytes. Putting 256 gives some
 // slack in case different clusters are used. Value obtained by using writer.GetLengthWritten at the end of the SceneTableData
 // Serialize method.
@@ -149,8 +149,11 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
         }
 
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kTransitionTimeMs), mStorageData.mSceneTransitionTimeMs));
-        ReturnErrorOnFailure(mStorageData.mExtensionFieldSets.Serialize(writer));
 
+        if (!mStorageData.mExtensionFieldSets.IsEmpty())
+        {
+            ReturnErrorOnFailure(mStorageData.mExtensionFieldSets.Serialize(writer));
+        }
         return writer.EndContainer(container);
     }
 
@@ -171,7 +174,7 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
         ReturnErrorOnFailure(reader.Next());
         TLV::Tag currTag = reader.GetTag();
         VerifyOrReturnError(TLV::ContextTag(TagScene::kName) == currTag || TLV::ContextTag(TagScene::kTransitionTimeMs) == currTag,
-                            CHIP_ERROR_WRONG_TLV_TYPE);
+                            CHIP_ERROR_INVALID_TLV_TAG);
 
         CharSpan nameSpan;
         // A name may or may not have been stored.  Check whether it was.
@@ -182,9 +185,14 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
         }
         // Empty name will be initialized if the name wasn't stored
         mStorageData.SetName(nameSpan);
-
         ReturnErrorOnFailure(reader.Get(mStorageData.mSceneTransitionTimeMs));
-        ReturnErrorOnFailure(mStorageData.mExtensionFieldSets.Deserialize(reader));
+
+        CHIP_ERROR err = reader.Next();
+        if (CHIP_END_OF_TLV != err)
+        {
+            VerifyOrReturnError(TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+            ReturnErrorOnFailure(mStorageData.mExtensionFieldSets.Deserialize(reader));
+        }
 
         return reader.ExitContainer(container);
     }

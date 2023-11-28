@@ -20,8 +20,6 @@
 namespace chip {
 namespace scenes {
 
-// ExtensionFieldSetsImpl::ExtensionFieldSetsImpl() : ExtensionFieldSets() {}
-
 CHIP_ERROR ExtensionFieldSetsImpl::Serialize(TLV::TLVWriter & writer) const
 {
     TLV::TLVType arrayContainer;
