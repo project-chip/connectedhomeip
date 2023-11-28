@@ -13080,26 +13080,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_operationalStateID;
-                std::string newElement_0_operationalStateIDClassName     = "java/lang/Integer";
-                std::string newElement_0_operationalStateIDCtorSignature = "(I)V";
-                jint jninewElement_0_operationalStateID                  = static_cast<jint>(entry_0.operationalStateID);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    newElement_0_operationalStateIDClassName.c_str(), newElement_0_operationalStateIDCtorSignature.c_str(),
-                    jninewElement_0_operationalStateID, newElement_0_operationalStateID);
-                jobject newElement_0_operationalStateLabel;
-                if (!entry_0.operationalStateLabel.HasValue())
-                {
-                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_operationalStateLabel);
-                }
-                else
-                {
-                    jobject newElement_0_operationalStateLabelInsideOptional;
-                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-                        entry_0.operationalStateLabel.Value(), newElement_0_operationalStateLabelInsideOptional));
-                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_operationalStateLabelInsideOptional,
-                                                                      newElement_0_operationalStateLabel);
-                }
 
                 jclass operationalStateStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -13111,7 +13091,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID operationalStateStructStructCtor_1 =
-                    env->GetMethodID(operationalStateStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
+                    env->GetMethodID(operationalStateStructStructClass_1, "<init>", "()V");
                 if (operationalStateStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl,
@@ -13119,8 +13099,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(operationalStateStructStructClass_1, operationalStateStructStructCtor_1,
-                                              newElement_0_operationalStateID, newElement_0_operationalStateLabel);
+                newElement_0 = env->NewObject(operationalStateStructStructClass_1, operationalStateStructStructCtor_1);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -13150,37 +13129,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            jobject value_errorStateID;
-            std::string value_errorStateIDClassName     = "java/lang/Integer";
-            std::string value_errorStateIDCtorSignature = "(I)V";
-            jint jnivalue_errorStateID                  = static_cast<jint>(cppValue.errorStateID);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_errorStateIDClassName.c_str(),
-                                                                       value_errorStateIDCtorSignature.c_str(),
-                                                                       jnivalue_errorStateID, value_errorStateID);
-            jobject value_errorStateLabel;
-            if (!cppValue.errorStateLabel.HasValue())
-            {
-                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_errorStateLabel);
-            }
-            else
-            {
-                jobject value_errorStateLabelInsideOptional;
-                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.errorStateLabel.Value(),
-                                                                                     value_errorStateLabelInsideOptional));
-                chip::JniReferences::GetInstance().CreateOptional(value_errorStateLabelInsideOptional, value_errorStateLabel);
-            }
-            jobject value_errorStateDetails;
-            if (!cppValue.errorStateDetails.HasValue())
-            {
-                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_errorStateDetails);
-            }
-            else
-            {
-                jobject value_errorStateDetailsInsideOptional;
-                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.errorStateDetails.Value(),
-                                                                                     value_errorStateDetailsInsideOptional));
-                chip::JniReferences::GetInstance().CreateOptional(value_errorStateDetailsInsideOptional, value_errorStateDetails);
-            }
 
             jclass errorStateStructStructClass_0;
             err = chip::JniReferences::GetInstance().GetClassRef(
@@ -13191,16 +13139,14 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 ChipLogError(Zcl, "Could not find class ChipStructs$OvenCavityOperationalStateClusterErrorStateStruct");
                 return nullptr;
             }
-            jmethodID errorStateStructStructCtor_0 = env->GetMethodID(
-                errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V");
+            jmethodID errorStateStructStructCtor_0 = env->GetMethodID(errorStateStructStructClass_0, "<init>", "()V");
             if (errorStateStructStructCtor_0 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$OvenCavityOperationalStateClusterErrorStateStruct constructor");
                 return nullptr;
             }
 
-            value = env->NewObject(errorStateStructStructClass_0, errorStateStructStructCtor_0, value_errorStateID,
-                                   value_errorStateLabel, value_errorStateDetails);
+            value = env->NewObject(errorStateStructStructClass_0, errorStateStructStructCtor_0);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {

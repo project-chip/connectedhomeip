@@ -12819,25 +12819,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     {
         self.commandResponseState = [MTROvenCavityOperationalStateClusterErrorStateStruct new];
-        self.commandResponseState.errorStateID = [NSNumber numberWithUnsignedChar:decodableStruct.commandResponseState.errorStateID];
-        if (decodableStruct.commandResponseState.errorStateLabel.HasValue()) {
-            self.commandResponseState.errorStateLabel = AsString(decodableStruct.commandResponseState.errorStateLabel.Value());
-            if (self.commandResponseState.errorStateLabel == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                return err;
-            }
-        } else {
-            self.commandResponseState.errorStateLabel = nil;
-        }
-        if (decodableStruct.commandResponseState.errorStateDetails.HasValue()) {
-            self.commandResponseState.errorStateDetails = AsString(decodableStruct.commandResponseState.errorStateDetails.Value());
-            if (self.commandResponseState.errorStateDetails == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                return err;
-            }
-        } else {
-            self.commandResponseState.errorStateDetails = nil;
-        }
     }
     return CHIP_NO_ERROR;
 }

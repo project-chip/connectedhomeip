@@ -1672,27 +1672,6 @@ static id _Nullable DecodeEventPayloadForOvenCavityOperationalStateCluster(Event
         do {
             MTROvenCavityOperationalStateClusterErrorStateStruct * _Nonnull memberValue;
             memberValue = [MTROvenCavityOperationalStateClusterErrorStateStruct new];
-            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorState.errorStateID];
-            if (cppValue.errorState.errorStateLabel.HasValue()) {
-                memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel.Value());
-                if (memberValue.errorStateLabel == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    *aError = err;
-                    return nil;
-                }
-            } else {
-                memberValue.errorStateLabel = nil;
-            }
-            if (cppValue.errorState.errorStateDetails.HasValue()) {
-                memberValue.errorStateDetails = AsString(cppValue.errorState.errorStateDetails.Value());
-                if (memberValue.errorStateDetails == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    *aError = err;
-                    return nil;
-                }
-            } else {
-                memberValue.errorStateDetails = nil;
-            }
             value.errorState = memberValue;
         } while (0);
 
