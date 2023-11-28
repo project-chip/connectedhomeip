@@ -268,7 +268,7 @@ bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
 {
     auto config = GetMockNodeConfig();
     VerifyOrReturnValue(index < config.endpoints.size(), false);
-    return true; // TODO: TestSceneTable relies on returning true here, we should fix (or use a dedicated) mock config instead
+    return true; // TODO: TestSceneTable relies on returning true here: https://github.com/project-chip/connectedhomeip/issues/30696
     // return config.endpoints[index].clusterById(clusterId) != nullptr;
 }
 

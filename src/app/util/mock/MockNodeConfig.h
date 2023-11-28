@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *     Helpers for configuring the mocked attribute-storage.cpp
- */
-
 #pragma once
 
 #include <app/util/af-types.h>
