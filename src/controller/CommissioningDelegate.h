@@ -35,7 +35,7 @@ enum CommissioningStage : uint8_t
     kError,
     kSecurePairing,              ///< Establish a PASE session with the device
     kReadCommissioningInfo,      ///< Query General Commissioning Attributes, Network Features and Time Synchronization Cluster
-    kCheckForMatchingFabric,     ///< Read the current fabrics on the commissionee
+    kReadCommissioningInfo2,     ///< Query SupportsConcurrentConnection, ICD state, check for matching fabric
     kArmFailsafe,                ///< Send ArmFailSafe (0x30:0) command to the device
     kConfigRegulatory,           ///< Send SetRegulatoryConfig (0x30:2) command to the device
     kConfigureUTCTime,           ///< SetUTCTime if the DUT has a time cluster
@@ -69,6 +69,13 @@ enum CommissioningStage : uint8_t
     /// Call CHIPDeviceController::NetworkCredentialsReady() when CommissioningParameters is populated with
     /// network credentials to use in kWiFiNetworkSetup or kThreadNetworkSetup steps.
     kNeedsNetworkCreds,
+};
+
+enum ICDRegistrationStrategy : uint8_t
+{
+    kIgnore,         ///< Do not check whether the device is an ICD during commissioning
+    kBeforeComplete, ///< Do commissioner self-registration or external controller registration,
+                     ///< Controller should provide a ICDKey manager for generating symmetric key
 };
 
 const char * StageToString(CommissioningStage stage);
@@ -136,6 +143,10 @@ public:
     {
         return mDeviceRegulatoryLocation;
     }
+
+    // Value to determine whether the node supports Concurrent Connections as read from the GeneralCommissioning cluster.
+    // In the AutoCommissioner, this is automatically set from from the kReadCommissioningInfo2 stage.
+    Optional<bool> GetSupportsConcurrentConnection() const { return mSupportsConcurrentConnection; }
 
     // The country code to be used for the node, if set.
     Optional<CharSpan> GetCountryCode() const { return mCountryCode; }
@@ -295,6 +306,12 @@ public:
     CommissioningParameters & SetDeviceRegulatoryLocation(app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum location)
     {
         mDeviceRegulatoryLocation.SetValue(location);
+        return *this;
+    }
+
+    CommissioningParameters & SetSupportsConcurrentConnection(bool concurrentConnection)
+    {
+        mSupportsConcurrentConnection.SetValue(concurrentConnection);
         return *this;
     }
 
@@ -493,6 +510,13 @@ public:
         return *this;
     }
 
+    ICDRegistrationStrategy GetICDRegistrationStrategy() const { return mICDRegistrationStrategy; }
+    CommissioningParameters & SetICDRegistrationStrategy(ICDRegistrationStrategy icdRegistrationStrategy)
+    {
+        mICDRegistrationStrategy = icdRegistrationStrategy;
+        return *this;
+    }
+
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
     void ClearExternalBufferDependentValues()
@@ -511,6 +535,9 @@ public:
         mAttestationSignature.ClearValue();
         mPAI.ClearValue();
         mDAC.ClearValue();
+        mTimeZone.ClearValue();
+        mDSTOffsets.ClearValue();
+        mDefaultNTP.ClearValue();
     }
 
 private:
@@ -544,13 +571,15 @@ private:
     Optional<uint16_t> mRemoteProductId;
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> mDefaultRegulatoryLocation;
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> mLocationCapability;
+    Optional<bool> mSupportsConcurrentConnection;
     CompletionStatus completionStatus;
     Credentials::DeviceAttestationDelegate * mDeviceAttestationDelegate =
         nullptr; // Delegate to handle device attestation failures during commissioning
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
-    bool mCheckForMatchingFabric = false;
+    ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
+    bool mCheckForMatchingFabric                     = false;
 };
 
 struct RequestedCertificate
@@ -632,9 +661,13 @@ struct ReadCommissioningInfo
     uint8_t maxTimeZoneSize        = 1;
     uint8_t maxDSTSize             = 1;
 };
-struct MatchingFabricInfo
+
+struct ReadCommissioningInfo2
 {
-    NodeId nodeId = kUndefinedNodeId;
+    NodeId nodeId                     = kUndefinedNodeId;
+    bool isIcd                        = false;
+    bool checkInProtocolSupport       = false;
+    bool supportsConcurrentConnection = true;
 };
 
 struct TimeZoneResponseInfo
@@ -667,8 +700,8 @@ class CommissioningDelegate
 public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
-     * kReadCommissioningInfo - ReadCommissioningInfo
-     * kCheckForMatchingFabric = MatchingFabricInfo
+     * kReadCommissioningInfo: ReadCommissioningInfo
+     * kReadCommissioningInfo2: ReadCommissioningInfo2
      * kArmFailsafe: CommissioningErrorInfo if there is an error
      * kConfigRegulatory: CommissioningErrorInfo if there is an error
      * kConfigureUTCTime: None
@@ -693,8 +726,8 @@ public:
      * kCleanup: none
      */
     struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
-                                         ReadCommissioningInfo, AttestationErrorInfo, CommissioningErrorInfo,
-                                         NetworkCommissioningStatusInfo, MatchingFabricInfo, TimeZoneResponseInfo>
+                                         ReadCommissioningInfo, ReadCommissioningInfo2, AttestationErrorInfo,
+                                         CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

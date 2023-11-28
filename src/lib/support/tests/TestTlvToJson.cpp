@@ -140,7 +140,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                  "}\n";
     EncodeAndValidate(static_cast<double>(1.0), jsonString);
 
-    CharSpan charSpan = CharSpan::fromCharString("hello");
+    CharSpan charSpan = "hello"_span;
     jsonString        = "{\n"
                         "   \"1:STRING\" : \"hello\"\n"
                         "}\n";

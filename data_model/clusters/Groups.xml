@@ -89,7 +89,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="max"/>
+        <constraint type="min" value="1"/>
       </field>
       <field id="1" name="GroupName" type="string">
         <mandatoryConform/>
@@ -105,7 +105,7 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="GroupID" type="group-id">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="max"/>
+        <constraint type="min" value="1"/>
       </field>
     </command>
     <command id="0x01" name="ViewGroup" response="ViewGroupResponse">
@@ -113,7 +113,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="max"/>
+        <constraint type="min" value="1"/>
       </field>
     </command>
     <command id="0x01" name="ViewGroupResponse" direction="responseFromServer">
@@ -125,7 +125,7 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="GroupID" type="group-id">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="max"/>
+        <constraint type="min" value="1"/>
       </field>
       <field id="2" name="GroupName" type="string">
         <mandatoryConform/>
@@ -137,7 +137,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="GroupList" type="list">
         <entry type="group-id">
-          <constraint type="between" from="1" to="max"/>
+          <constraint type="min" value="1"/>
         </entry>
         <mandatoryConform/>
       </field>
@@ -151,7 +151,7 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="GroupList" type="list">
         <entry type="group-id">
-          <constraint type="between" from="1" to="max"/>
+          <constraint type="min" value="1"/>
         </entry>
         <mandatoryConform/>
       </field>
@@ -161,7 +161,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="max"/>
+        <constraint type="min" value="1"/>
       </field>
     </command>
     <command id="0x03" name="RemoveGroupResponse" direction="responseFromServer">
@@ -173,7 +173,7 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="GroupID" type="group-id">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="max"/>
+        <constraint type="min" value="1"/>
       </field>
     </command>
     <command id="0x04" name="RemoveAllGroups" response="Y">
@@ -185,7 +185,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="max"/>
+        <constraint type="min" value="1"/>
       </field>
       <field id="1" name="GroupName" type="string">
         <mandatoryConform/>

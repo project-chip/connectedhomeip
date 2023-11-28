@@ -43,8 +43,8 @@
 #include <lwip/nd6.h>
 #include <lwip/netif.h>
 
+#include "cy_network_mw_core.h"
 #include "lwip/opt.h"
-#include <cy_lwip.h>
 #include <platform/Infineon/PSOC6/NetworkCommissioningDriver.h>
 #include <type_traits>
 
@@ -446,10 +446,13 @@ void ConnectivityManagerImpl::DriveAPState()
                 // Compute the amount of idle time before the AP should be deactivated and
                 // arm a timer to fire at that time.
                 System::Clock::Timeout apTimeout = (mLastAPDemandTime + mWiFiAPIdleTimeout) - now;
-                err                              = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, nullptr);
-                SuccessOrExit(err);
                 ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " ms",
                                 System::Clock::Milliseconds32(apTimeout).count());
+                SystemLayer().ScheduleLambda([apTimeout, this] {
+                    CHIP_ERROR ret = CHIP_NO_ERROR;
+                    ret            = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, this);
+                    VerifyOrReturn(ret == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "StartTimer failed %s: ", chip::ErrorStr(ret)));
+                });
             }
             else
             {
@@ -605,9 +608,11 @@ void ConnectivityManagerImpl::DriveStationState()
                 System::Clock::Timeout timeToNextConnect = (mLastStationConnectFailTime + mWiFiStationReconnectInterval) - now;
                 ChipLogProgress(DeviceLayer, "Next WiFi station reconnect in %" PRIu32 " ms ",
                                 System::Clock::Milliseconds32(timeToNextConnect).count());
-
-                err = DeviceLayer::SystemLayer().StartTimer(timeToNextConnect, DriveStationState, NULL);
-                SuccessOrExit(err);
+                SystemLayer().ScheduleLambda([timeToNextConnect, this] {
+                    CHIP_ERROR ret = CHIP_NO_ERROR;
+                    ret            = DeviceLayer::SystemLayer().StartTimer(timeToNextConnect, DriveStationState, this);
+                    VerifyOrReturn(ret == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "StartTimer failed %s: ", chip::ErrorStr(ret)));
+                });
             }
         }
     }
@@ -634,7 +639,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
     // If the WiFi station is currently in the connected state...
     if ((mWiFiStationState == kWiFiStationState_Connected) || stationConnected)
     {
-        net_interface = cy_lwip_get_interface(CY_LWIP_STA_NW_INTERFACE);
+        net_interface = (netif *) cy_network_get_nw_interface(CY_NETWORK_WIFI_STA_INTERFACE, 0);
         if (net_interface != NULL && netif_is_up(net_interface) && netif_is_link_up(net_interface))
         {
             if (!ip4_addr_isany(netif_ip4_addr(net_interface)) && !ip4_addr_isany(netif_ip4_gw(net_interface)))

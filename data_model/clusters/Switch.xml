@@ -94,13 +94,13 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="between" from="2" to="max"/>
+      <constraint type="min" value="2"/>
     </attribute>
     <attribute id="0x0001" name="CurrentPosition" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="NumberOfPositions-1"/>
+      <constraint type="max" value="NumberOfPositions-1"/>
     </attribute>
     <attribute id="0x0002" name="MultiPressMax" type="uint8" default="2">
       <access read="true" readPrivilege="view"/>
@@ -108,7 +108,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="MSM"/>
       </mandatoryConform>
-      <constraint type="between" from="2" to="max"/>
+      <constraint type="min" value="2"/>
     </attribute>
   </attributes>
   <events>

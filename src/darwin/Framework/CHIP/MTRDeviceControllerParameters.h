@@ -28,14 +28,29 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ * Parameters that can be used to initialize an MTRDeviceController.  Specific
+ * interfaces inheriting from this one should be used to actually do the
+ * initialization.
+ */
 #if !MTR_PER_CONTROLLER_STORAGE_ENABLED
 MTR_HIDDEN
 #endif
 MTR_NEWLY_AVAILABLE
-@interface MTRDeviceControllerParameters : NSObject
-
+@interface MTRDeviceControllerAbstractParameters : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+@end
+
+/**
+ * Parameters that can be used to initialize an MTRDeviceController which
+ * has a node identity.
+ */
+#if !MTR_PER_CONTROLLER_STORAGE_ENABLED
+MTR_HIDDEN
+#endif
+MTR_NEWLY_AVAILABLE
+@interface MTRDeviceControllerParameters : MTRDeviceControllerAbstractParameters
 
 /**
  * The Product Attestation Authority certificates that are trusted to sign

@@ -23,7 +23,6 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/enums.h>
 #include <app/clusters/account-login-server/account-login-delegate.h>
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>

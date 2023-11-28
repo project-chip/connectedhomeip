@@ -168,9 +168,11 @@ CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t 
     return ZephyrConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
-void ConfigurationManagerImpl::RunConfigUnitTest(void)
+void ConfigurationManagerImpl::RunConfigUnitTest()
 {
+#if CHIP_CONFIG_TEST
     ZephyrConfig::RunConfigUnitTest();
+#endif
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)

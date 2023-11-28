@@ -29,7 +29,6 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include <app/server/OnboardingCodesUtil.h>
-#include <lock/BoltLockManager.h>
 
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "esp_spi_flash.h"
@@ -94,12 +93,6 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         // cancel, if required.
         sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
         sAppTask.mFunction = kFunction_FactoryReset;
-        // Turn off all LEDs before starting blink to make sure blink is
-        // co-ordinated.
-        // sStatusLED.Set(false);
-        // sLockLED.Set(false);
-        // sStatusLED.Blink(500);
-        // sLockLED.Blink(500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
@@ -134,47 +127,6 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
         return;
     }
     mFunctionTimerActive = true;
-}
-void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
-{
-    // If the action has been initiated by the lock, update the bolt lock trait
-    // and start flashing the LEDs rapidly to indicate action initiation.
-    if (aAction == BoltLockManager::LOCK_ACTION)
-    {
-        ESP_LOGI(TAG, "Lock Action has been initiated");
-    }
-    else if (aAction == BoltLockManager::UNLOCK_ACTION)
-    {
-        ESP_LOGI(TAG, "Unlock Action has been initiated");
-    }
-    if (aActor == AppEvent::kEventType_Button)
-    {
-        sAppTask.mSyncClusterToButtonAction = true;
-    }
-    // sLockLED.Blink(50, 50);
-}
-void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
-{
-    // if the action has been completed by the lock, update the bolt lock trait.
-    // Turn on the lock LED if in a LOCKED state OR
-    // Turn off the lock LED if in an UNLOCKED state.
-    if (aAction == BoltLockManager::LOCK_ACTION)
-    {
-        ESP_LOGI(TAG, "Lock Action has been completed");
-        // sLockLED.Set(true);
-    }
-    else if (aAction == BoltLockManager::UNLOCK_ACTION)
-    {
-        ESP_LOGI(TAG, "Unlock Action has been completed");
-        // sLockLED.Set(false);
-    }
-}
-
-CHIP_ERROR AppTask::LockInit()
-{
-    ReturnErrorOnFailure(BoltLockMgr().InitLockState());
-    BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AppTask::Init()

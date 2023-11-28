@@ -310,10 +310,10 @@ class MatterIdlTransformer(Transformer):
     # NOTE: awkward inline because the order of 'meta, children' vs 'children, meta' was flipped
     #       between lark versions in https://github.com/lark-parser/lark/pull/993
     @v_args(meta=True, inline=True)
-    def command(self, meta, *args):
+    def command(self, meta, *tuple_args):
         # The command takes 4 arguments if no input argument, 5 if input
         # argument is provided
-        args = list(args)  # convert from tuple
+        args = list(tuple_args)  # convert from tuple
         if len(args) != 5:
             args.insert(2, None)
 
@@ -342,6 +342,10 @@ class MatterIdlTransformer(Transformer):
             init_args["readacl"] = args[0]
 
         return init_args
+
+    @v_args(inline=True)
+    def cluster_revision(self, revision):
+        return revision
 
     def event(self, args):
         return Event(qualities=args[0], priority=args[1], code=args[3], fields=args[4:], **args[2])
@@ -485,7 +489,7 @@ class MatterIdlTransformer(Transformer):
         return element
 
     @v_args(inline=True, meta=True)
-    def cluster(self, meta, api_maturity, side, name, code, *content):
+    def cluster(self, meta, api_maturity, side, name, code, revision, *content):
         meta = None if self.skip_meta else ParseMetaData(meta)
 
         # shift actual starting position where the doc comment would start
@@ -495,8 +499,11 @@ class MatterIdlTransformer(Transformer):
         if api_maturity is None:
             api_maturity = ApiMaturity.STABLE
 
+        if not revision:
+            revision = 1
+
         result = Cluster(parse_meta=meta, side=side, name=name,
-                         code=code, api_maturity=api_maturity)
+                         code=code, revision=revision, api_maturity=api_maturity)
 
         for item in content:
             if isinstance(item, Enum):

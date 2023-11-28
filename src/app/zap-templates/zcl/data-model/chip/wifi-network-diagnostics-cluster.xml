@@ -23,7 +23,7 @@ limitations under the License.
     <item name="WEP" value="0x02"/>
     <item name="WPA" value="0x03"/>
     <item name="WPA2" value="0x04"/>
-    <item name="WPA3" value="0x05"/>    
+    <item name="WPA3" value="0x05"/>
   </enum>
   <enum name="WiFiVersionEnum" type="enum8">
     <cluster code="0x0036"/>
@@ -80,12 +80,12 @@ limitations under the License.
     </event>
     <event side="server" code="0x01" name="AssociationFailure" priority="info" optional="true">
       <description>Indicate that a Node has failed to connect, or reconnect, to a Wi-Fi access point.</description>
-      <field id="0" name="AssociationFailure" type="AssociationFailureCauseEnum"/>
-      <field id="1" name="Status" type="int16u"/>      
+      <field id="0" name="AssociationFailureCause" type="AssociationFailureCauseEnum"/>
+      <field id="1" name="Status" type="int16u"/>
     </event>
     <event side="server" code="0x02" name="ConnectionStatus" priority="info" optional="true">
       <description>Indicate that a Node’s connection status to a Wi-Fi network has changed.</description>
       <field id="0" name="ConnectionStatus" type="ConnectionStatusEnum"/>
-    </event>                  
+    </event>
   </cluster>
 </configurator>

@@ -86,7 +86,7 @@ ESP32_OPTIONS = {
         # Tool configuration options.
         'esptool': {
             'help': 'File name of the esptool executable',
-            'default': None,
+            'default': 'esptool.py',
             'argparse': {
                 'metavar': 'FILE',
             },
@@ -103,9 +103,8 @@ ESP32_OPTIONS = {
                 """\
                 Unable to execute {esptool}.
 
-                Please ensure that this tool is installed and
-                that $IDF_PATH is set. See the ESP32 example
-                README for installation instructions.
+                Please ensure that the esptool Python package is available.
+                See the ESP32 setup guide for instructions.
                 """,
         },
         'parttool': {
@@ -308,7 +307,6 @@ class Flasher(firmware_utils.Flasher):
         return result
 
     IDF_PATH_TOOLS = {
-        'esptool': 'components/esptool_py/esptool/esptool.py',
         'parttool': 'components/partition_table/parttool.py',
     }
 

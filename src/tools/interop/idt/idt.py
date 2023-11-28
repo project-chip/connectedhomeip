@@ -17,25 +17,38 @@
 
 import argparse
 import asyncio
-import logging
 import os
 import shutil
 import sys
 from pathlib import Path
 
-from capture import EcosystemController, EcosystemFactory, PacketCaptureRunner, PlatformFactory
-from capture.file_utils import border_print, create_file_timestamp, safe_mkdir
+import probe.runner as probe_runner
+from capture import PacketCaptureRunner, controller
 from discovery import MatterBleScanner, MatterDnssdListener
+from utils.artifact import create_file_timestamp, safe_mkdir
+from utils.host_platform import get_available_interfaces, verify_host_dependencies
+from utils.log import border_print
 
-logging.basicConfig(
-    format='%(asctime)s.%(msecs)03d %(levelname)s {%(module)s} [%(funcName)s]\n%(message)s \n',
-    level=logging.INFO)
+import config
+
+splash = '''\x1b[0m
+\x1b[32;1m┌────────┐\x1b[33;20m▪\x1b[32;1m \x1b[34;1m┌──────┐ \x1b[33;20m• \x1b[35;1m┌──────────┐ \x1b[33;20m●
+\x1b[32;1m│░░░░░░░░│  \x1b[34;1m│░░░░░░└┐ \x1b[33;20mﾟ\x1b[35;1m│░░░░░░░░░░│
+\x1b[32;1m└──┐░░┌──┘\x1b[33;20m۰\x1b[32;1m \x1b[34;1m│░░┌┐░░░│  \x1b[35;1m└───┐░░┌───┘
+\x1b[32;1m   │░░│     \x1b[34;1m│░░│└┐░░│\x1b[33;20m▫ \x1b[35;1m \x1b[33;20m۰\x1b[35;1m  │░░│  \x1b[33;20m｡
+\x1b[32;1m \x1b[33;20m•\x1b[32;1m │░░│  \x1b[33;20m●  \x1b[34;1m│░░│┌┘░░│  \x1b[35;1m    │░░│
+\x1b[32;1m┌──┘░░└──┐  \x1b[34;1m│░░└┘░░░│  \x1b[35;1m    │░░│ \x1b[33;20m•
+\x1b[32;1m│░░░░░░░░│  \x1b[34;1m│░░░░░░┌┘\x1b[33;20m۰ \x1b[35;1m \x1b[33;20m▪\x1b[35;1m  │░░│
+\x1b[32;1m└────────┘\x1b[33;20m•\x1b[32;1m \x1b[34;1m└──────┘\x1b[33;20m｡  \x1b[35;1m    └──┘ \x1b[33;20m▫
+\x1b[32;1m✰ Interop\x1b[34;1m  ✰ Debugging\x1b[35;1m   ✰ Tool
+\x1b[0m'''
 
 
 class InteropDebuggingTool:
 
     def __init__(self) -> None:
-
+        if config.enable_color:
+            print(splash)
         self.artifact_dir = None
         create_artifact_dir = True
         if len(sys.argv) == 1:
@@ -44,6 +57,8 @@ class InteropDebuggingTool:
             create_artifact_dir = False
         elif len(sys.argv) >= 3 and (sys.argv[2] == "-h" or sys.argv[2] == "--help"):
             create_artifact_dir = False
+
+        verify_host_dependencies(["adb", "tcpdump"])
 
         if not os.environ['IDT_OUTPUT_DIR']:
             print('Missing required env vars! Use /scripts!!!')
@@ -60,25 +75,22 @@ class InteropDebuggingTool:
             safe_mkdir(self.artifact_dir)
             border_print(f"Using artifact dir {self.artifact_dir}")
 
-        self.available_platforms = PlatformFactory.list_available_platforms()
+        self.available_platforms = controller.list_available_platforms()
         self.available_platforms_default = 'Android' if 'Android' in self.available_platforms else None
         self.platform_required = self.available_platforms_default is None
 
-        self.available_ecosystems = EcosystemFactory.list_available_ecosystems()
+        self.available_ecosystems = controller.list_available_ecosystems()
         self.available_ecosystems_default = 'ALL'
         self.available_ecosystems.append(self.available_ecosystems_default)
 
-        net_interface_path = "/sys/class/net/"
-        self.available_net_interfaces = os.listdir(net_interface_path) \
-            if os.path.exists(net_interface_path) \
-            else []
-        self.available_net_interfaces.append("any")
-        self.available_net_interfaces_default = "any"
+        self.available_net_interfaces = get_available_interfaces()
+        self.available_net_interfaces_default = "any" if "any" in self.available_net_interfaces else None
         self.pcap_artifact_dir = os.path.join(self.artifact_dir, "pcap")
         self.net_interface_required = self.available_net_interfaces_default is None
 
         self.ble_artifact_dir = os.path.join(self.artifact_dir, "ble")
         self.dnssd_artifact_dir = os.path.join(self.artifact_dir, "dnssd")
+        self.prober_dir = os.path.join(self.artifact_dir, "probes")
 
         self.process_args()
 
@@ -145,6 +157,10 @@ class InteropDebuggingTool:
 
         capture_parser.set_defaults(func=self.command_capture)
 
+        prober_parser = subparsers.add_parser("probe",
+                                              help="Probe the environment for Matter and general networking info")
+        prober_parser.set_defaults(func=self.command_probe)
+
         args, unknown = parser.parse_known_args()
         if not hasattr(args, 'func'):
             parser.print_help()
@@ -154,10 +170,13 @@ class InteropDebuggingTool:
     def command_discover(self, args: argparse.Namespace) -> None:
         if args.type[0] == "b":
             safe_mkdir(self.ble_artifact_dir)
-            MatterBleScanner(self.ble_artifact_dir).browse_interactive()
+            scanner = MatterBleScanner(self.ble_artifact_dir)
+            asyncio.run(scanner.browse_interactive())
+            self.zip_artifacts()
         else:
             safe_mkdir(self.dnssd_artifact_dir)
             MatterDnssdListener(self.dnssd_artifact_dir).browse_interactive()
+            self.zip_artifacts()
 
     def zip_artifacts(self) -> None:
         zip_basename = os.path.basename(self.artifact_dir)
@@ -165,10 +184,9 @@ class InteropDebuggingTool:
                                            'zip',
                                            root_dir=self.artifact_dir)
         output_zip = shutil.move(archive_file, self.artifact_dir_parent)
-        print(f'Output zip: {output_zip}')
+        border_print(f'Output zip: {output_zip}')
 
     def command_capture(self, args: argparse.Namespace) -> None:
-
         pcap = args.pcap == 't'
         pcap_runner = None if not pcap else PacketCaptureRunner(
             self.pcap_artifact_dir, args.interface)
@@ -176,21 +194,24 @@ class InteropDebuggingTool:
             border_print("Starting pcap")
             safe_mkdir(self.pcap_artifact_dir)
             pcap_runner.start_pcap()
-
-        asyncio.run(EcosystemFactory.init_ecosystems(args.platform,
-                                                     args.ecosystem,
-                                                     self.artifact_dir))
-        asyncio.run(EcosystemController.start())
-
-        border_print("Press enter twice to stop streaming", important=True)
-        input("")
-
+        asyncio.run(controller.init_ecosystems(args.platform,
+                                               args.ecosystem,
+                                               self.artifact_dir))
+        asyncio.run(controller.start())
+        asyncio.run(controller.run_analyzers())
         if pcap:
             border_print("Stopping pcap")
             pcap_runner.stop_pcap()
+        asyncio.run(controller.stop())
+        asyncio.run(controller.probe())
+        border_print("Checking error report")
+        controller.write_error_report(self.artifact_dir)
+        border_print("Compressing artifacts...")
+        self.zip_artifacts()
 
-        asyncio.run(EcosystemController.stop())
-        asyncio.run(EcosystemController.analyze())
-
-        border_print("Compressing artifacts, this may take some time!")
+    def command_probe(self, args: argparse.Namespace) -> None:
+        border_print("Starting generic Matter prober for local environment!")
+        safe_mkdir(self.dnssd_artifact_dir)
+        safe_mkdir(self.prober_dir)
+        probe_runner.run_probes(self.prober_dir, self.dnssd_artifact_dir)
         self.zip_artifacts()

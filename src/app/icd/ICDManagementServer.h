@@ -33,9 +33,9 @@ using chip::Protocols::InteractionModel::Status;
 class ICDManagementServer
 {
 public:
-    uint32_t GetIdleModeIntervalSec() { return mIdleInterval_s; }
+    uint32_t GetIdleModeDurationSec() { return mIdleInterval_s; }
 
-    uint32_t GetActiveModeIntervalMs() { return mActiveInterval_ms; }
+    uint32_t GetActiveModeDurationMs() { return mActiveInterval_ms; }
 
     void SetSymmetricKeystore(Crypto::SymmetricKeystore * keyStore) { mSymmetricKeystore = keyStore; }
 
@@ -53,6 +53,12 @@ public:
     Status UnregisterClient(PersistentStorageDelegate & storage, FabricIndex fabric_index, chip::NodeId node_id,
                             Optional<chip::ByteSpan> verificationKey, bool is_admin);
 
+    /**
+     * @brief Triggers table update events to notify subscribers that an entry was added or removed
+     *        from the ICDMonitoringTable.
+     */
+    void TriggerICDMTableUpdatedEvent();
+
     Status StayActiveRequest(FabricIndex fabric_index);
 
     static ICDManagementServer & GetInstance() { return mInstance; }
@@ -63,18 +69,20 @@ private:
     static ICDManagementServer mInstance;
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
 
-    static_assert((CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC) <= 64800,
-                  "Spec requires the IdleModeInterval to be equal or inferior to 64800s.");
-    static_assert((CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC) >= 1,
-                  "Spec requires the IdleModeInterval to be equal or greater to 1s.");
-    uint32_t mIdleInterval_s = CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC;
+    static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) <= 64800,
+                  "Spec requires the IdleModeDuration to be equal or inferior to 64800s.");
+    static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) >= 1,
+                  "Spec requires the IdleModeDuration to be equal or greater to 1s.");
+    uint32_t mIdleInterval_s = CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC;
 
-    static_assert((CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS) <= (CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC * kMillisecondsPerSecond),
-                  "Spec requires the IdleModeInterval be equal or greater to the ActiveModeInterval.");
-    uint32_t mActiveInterval_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS;
+    static_assert((CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS) <= (CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC * kMillisecondsPerSecond),
+                  "Spec requires the IdleModeDuration be equal or greater to the ActiveModeDuration.");
+    uint32_t mActiveInterval_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS;
 
     uint16_t mActiveThreshold_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS;
 
+    // TODO : Implement ICD counter
+    // https://github.com/project-chip/connectedhomeip/issues/29184
     uint32_t mICDCounter = 0;
 
     static_assert((CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC) >= 1,

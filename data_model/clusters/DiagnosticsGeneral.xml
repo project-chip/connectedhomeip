@@ -55,9 +55,10 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0033" name="General Diagnostics" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0033" name="General Diagnostics" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
+    <revision revision="2" summary="UpTime attribute now mandatory, and added TimeSnapshot command"/>
   </revisionHistory>
   <classification hierarchy="base" role="utility" picsCode="DGGEN" scope="Node"/>
   <dataTypes>
@@ -227,7 +228,7 @@ Davis, CA 95616, USA
     <attribute id="0x0002" name="UpTime" type="uint64">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false"/>
-      <optionalConform/>
+      <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="TotalOperationalHours" type="uint32">
       <access read="true" readPrivilege="view"/>
@@ -267,6 +268,21 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="16"/>
       </field>
       <field id="1" name="EventTrigger" type="uint64">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x01" name="TimeSnapshot" response="TimeSnapshotResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x02" name="TimeSnapshotResponse" direction="responseFromServer">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="SystemTimeUs" type="&lt;&lt;ref_DataTypeSystemTimeUs&gt;&gt;" default="MS">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="UTCTimeUs" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;" default="null">
+        <quality nullable="true"/>
         <mandatoryConform/>
       </field>
     </command>

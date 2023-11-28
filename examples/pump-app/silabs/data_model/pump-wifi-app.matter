@@ -3,6 +3,8 @@
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 server cluster Identify = 3 {
+  revision 4;
+
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
     kBreathe = 1;
@@ -43,6 +45,8 @@ server cluster Identify = 3 {
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 server cluster OnOff = 6 {
+  revision 6;
+
   enum DelayedAllOffEffectVariantEnum : enum8 {
     kDelayedOffFastFade = 0;
     kNoFade = 1;
@@ -67,6 +71,7 @@ server cluster OnOff = 6 {
   bitmap Feature : bitmap32 {
     kLighting = 0x1;
     kDeadFrontBehavior = 0x2;
+    kOffOnly = 0x4;
   }
 
   bitmap OnOffControlBitmap : bitmap8 {
@@ -88,12 +93,14 @@ server cluster OnOff = 6 {
 
 /** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
 server cluster LevelControl = 8 {
-  enum MoveMode : enum8 {
+  revision 5;
+
+  enum MoveModeEnum : enum8 {
     kUp = 0;
     kDown = 1;
   }
 
-  enum StepMode : enum8 {
+  enum StepModeEnum : enum8 {
     kUp = 0;
     kDown = 1;
   }
@@ -104,7 +111,7 @@ server cluster LevelControl = 8 {
     kFrequency = 0x4;
   }
 
-  bitmap LevelControlOptions : bitmap8 {
+  bitmap OptionsBitmap : bitmap8 {
     kExecuteIfOff = 0x1;
     kCoupleColorTempToLevel = 0x2;
   }
@@ -112,7 +119,7 @@ server cluster LevelControl = 8 {
   readonly attribute nullable int8u currentLevel = 0;
   readonly attribute int8u minLevel = 2;
   readonly attribute int8u maxLevel = 3;
-  attribute LevelControlOptions options = 15;
+  attribute OptionsBitmap options = 15;
   attribute nullable int8u onLevel = 17;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -124,55 +131,55 @@ server cluster LevelControl = 8 {
   request struct MoveToLevelRequest {
     int8u level = 0;
     nullable int16u transitionTime = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct MoveRequest {
-    MoveMode moveMode = 0;
+    MoveModeEnum moveMode = 0;
     nullable int8u rate = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct StepRequest {
-    StepMode stepMode = 0;
+    StepModeEnum stepMode = 0;
     int8u stepSize = 1;
     nullable int16u transitionTime = 2;
-    LevelControlOptions optionsMask = 3;
-    LevelControlOptions optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct StopRequest {
-    LevelControlOptions optionsMask = 0;
-    LevelControlOptions optionsOverride = 1;
+    OptionsBitmap optionsMask = 0;
+    OptionsBitmap optionsOverride = 1;
   }
 
   request struct MoveToLevelWithOnOffRequest {
     int8u level = 0;
     nullable int16u transitionTime = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct MoveWithOnOffRequest {
-    MoveMode moveMode = 0;
+    MoveModeEnum moveMode = 0;
     nullable int8u rate = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct StepWithOnOffRequest {
-    StepMode stepMode = 0;
+    StepModeEnum stepMode = 0;
     int8u stepSize = 1;
     nullable int16u transitionTime = 2;
-    LevelControlOptions optionsMask = 3;
-    LevelControlOptions optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct StopWithOnOffRequest {
-    LevelControlOptions optionsMask = 0;
-    LevelControlOptions optionsOverride = 1;
+    OptionsBitmap optionsMask = 0;
+    OptionsBitmap optionsOverride = 1;
   }
 
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
@@ -187,6 +194,8 @@ server cluster LevelControl = 8 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
+  revision 2;
+
   bitmap Feature : bitmap32 {
     kTagList = 0x1;
   }
@@ -217,6 +226,8 @@ server cluster Descriptor = 29 {
 
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 server cluster Binding = 30 {
+  revision 1; // NOTE: Default/not specifically set
+
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
     optional group_id group = 2;
@@ -225,7 +236,7 @@ server cluster Binding = 30 {
     fabric_idx fabricIndex = 254;
   }
 
-  attribute TargetStruct binding[] = 0;
+  attribute access(write: manage) TargetStruct binding[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -239,6 +250,8 @@ server cluster Binding = 30 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 server cluster AccessControl = 31 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
     kCASE = 2;
@@ -311,6 +324,8 @@ server cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 server cluster BasicInformation = 40 {
+  revision 3;
+
   enum ColorEnum : enum8 {
     kBlack = 0;
     kNavy = 1;
@@ -386,6 +401,8 @@ server cluster BasicInformation = 40 {
   readonly attribute char_string<64> productLabel = 14;
   readonly attribute char_string<32> serialNumber = 15;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
+  readonly attribute int32u specificationVersion = 21;
+  readonly attribute int16u maxPathsPerInvoke = 22;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -396,6 +413,8 @@ server cluster BasicInformation = 40 {
 
 /** Provides an interface for providing OTA software updates */
 client cluster OtaSoftwareUpdateProvider = 41 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
     kAwaitNextAction = 1;
@@ -470,6 +489,8 @@ client cluster OtaSoftwareUpdateProvider = 41 {
 
 /** Provides an interface for downloading and applying OTA software updates */
 server cluster OtaSoftwareUpdateRequestor = 42 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
     kUpdateAvailable = 1;
@@ -545,6 +566,8 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CommissioningErrorEnum : enum8 {
     kOK = 0;
     kValueOutsideRange = 1;
@@ -583,13 +606,13 @@ server cluster GeneralCommissioning = 48 {
 
   request struct SetRegulatoryConfigRequest {
     RegulatoryLocationTypeEnum newRegulatoryConfig = 0;
-    char_string countryCode = 1;
+    char_string<2> countryCode = 1;
     int64u breadcrumb = 2;
   }
 
   response struct ArmFailSafeResponse = 1 {
     CommissioningErrorEnum errorCode = 0;
-    char_string debugText = 1;
+    char_string<128> debugText = 1;
   }
 
   response struct SetRegulatoryConfigResponse = 3 {
@@ -609,6 +632,8 @@ server cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 server cluster NetworkCommissioning = 49 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
     kOutOfRange = 1;
@@ -638,6 +663,15 @@ server cluster NetworkCommissioning = 49 {
     kWiFiNetworkInterface = 0x1;
     kThreadNetworkInterface = 0x2;
     kEthernetNetworkInterface = 0x4;
+    kPerDeviceCredentials = 0x8;
+  }
+
+  bitmap ThreadCapabilitiesBitmap : bitmap16 {
+    kIsBorderRouterCapable = 0x1;
+    kIsRouterCapable = 0x2;
+    kIsSleepyEndDeviceCapable = 0x4;
+    kIsFullThreadDevice = 0x8;
+    kIsSynchronizedSleepyEndDeviceCapable = 0x10;
   }
 
   bitmap WiFiSecurityBitmap : bitmap8 {
@@ -646,11 +680,14 @@ server cluster NetworkCommissioning = 49 {
     kWPAPersonal = 0x4;
     kWPA2Personal = 0x8;
     kWPA3Personal = 0x10;
+    kWPA3MatterPDC = 0x20;
   }
 
   struct NetworkInfoStruct {
     octet_string<32> networkID = 0;
     boolean connected = 1;
+    optional nullable octet_string<20> networkIdentifier = 2;
+    optional nullable octet_string<20> clientIdentifier = 3;
   }
 
   struct ThreadInterfaceScanResultStruct {
@@ -725,6 +762,8 @@ server cluster NetworkCommissioning = 49 {
     NetworkCommissioningStatusEnum networkingStatus = 0;
     optional char_string<512> debugText = 1;
     optional int8u networkIndex = 2;
+    optional octet_string<140> clientIdentity = 3;
+    optional octet_string<64> possessionSignature = 4;
   }
 
   response struct ConnectNetworkResponse = 7 {
@@ -742,6 +781,8 @@ server cluster NetworkCommissioning = 49 {
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster GeneralDiagnostics = 51 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum BootReasonEnum : enum8 {
     kUnspecified = 0;
     kPowerOnReboot = 1;
@@ -823,6 +864,7 @@ server cluster GeneralDiagnostics = 51 {
 
   readonly attribute NetworkInterface networkInterfaces[] = 0;
   readonly attribute int16u rebootCount = 1;
+  readonly attribute int64u upTime = 2;
   readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -836,11 +878,19 @@ server cluster GeneralDiagnostics = 51 {
     int64u eventTrigger = 1;
   }
 
+  response struct TimeSnapshotResponse = 2 {
+    systime_us systemTimeUs = 0;
+    nullable epoch_us UTCTimeUs = 1;
+  }
+
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
+  command TimeSnapshot(): TimeSnapshotResponse = 1;
 }
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 server cluster ThreadNetworkDiagnostics = 53 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
     kNotConnected = 1;
@@ -938,9 +988,9 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute NeighborTableStruct neighborTable[] = 7;
   readonly attribute RouteTableStruct routeTable[] = 8;
   readonly attribute nullable int32u partitionId = 9;
-  readonly attribute nullable int8u weighting = 10;
-  readonly attribute nullable int8u dataVersion = 11;
-  readonly attribute nullable int8u stableDataVersion = 12;
+  readonly attribute nullable int16u weighting = 10;
+  readonly attribute nullable int16u dataVersion = 11;
+  readonly attribute nullable int16u stableDataVersion = 12;
   readonly attribute nullable int8u leaderRouterId = 13;
   readonly attribute nullable SecurityPolicy securityPolicy = 59;
   readonly attribute nullable octet_string<4> channelPage0Mask = 60;
@@ -953,11 +1003,13 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  command ResetCounts(): DefaultSuccess = 0;
+  command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 server cluster AdministratorCommissioning = 60 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CommissioningWindowStatusEnum : enum8 {
     kWindowNotOpen = 0;
     kEnhancedWindowOpen = 1;
@@ -970,9 +1022,13 @@ server cluster AdministratorCommissioning = 60 {
     kWindowNotOpen = 4;
   }
 
+  bitmap Feature : bitmap32 {
+    kBasic = 0x1;
+  }
+
   readonly attribute CommissioningWindowStatusEnum windowStatus = 0;
   readonly attribute nullable fabric_idx adminFabricIndex = 1;
-  readonly attribute nullable int16u adminVendorId = 2;
+  readonly attribute nullable vendor_id adminVendorId = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -985,7 +1041,7 @@ server cluster AdministratorCommissioning = 60 {
     octet_string PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
-    octet_string salt = 4;
+    octet_string<32> salt = 4;
   }
 
   request struct OpenBasicCommissioningWindowRequest {
@@ -999,6 +1055,8 @@ server cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 server cluster OperationalCredentials = 62 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
     kPAICertificate = 2;
@@ -1046,7 +1104,7 @@ server cluster OperationalCredentials = 62 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AttestationRequestRequest {
-    octet_string attestationNonce = 0;
+    octet_string<32> attestationNonce = 0;
   }
 
   request struct CertificateChainRequestRequest {
@@ -1054,14 +1112,14 @@ server cluster OperationalCredentials = 62 {
   }
 
   request struct CSRRequestRequest {
-    octet_string CSRNonce = 0;
+    octet_string<32> CSRNonce = 0;
     optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {
-    octet_string NOCValue = 0;
-    optional octet_string ICACValue = 1;
-    octet_string IPKValue = 2;
+    octet_string<400> NOCValue = 0;
+    optional octet_string<400> ICACValue = 1;
+    octet_string<16> IPKValue = 2;
     int64u caseAdminSubject = 3;
     vendor_id adminVendorId = 4;
   }
@@ -1084,12 +1142,12 @@ server cluster OperationalCredentials = 62 {
   }
 
   response struct AttestationResponse = 1 {
-    octet_string attestationElements = 0;
-    octet_string attestationSignature = 1;
+    octet_string<900> attestationElements = 0;
+    octet_string<64> attestationSignature = 1;
   }
 
   response struct CertificateChainResponse = 3 {
-    octet_string certificate = 0;
+    octet_string<600> certificate = 0;
   }
 
   response struct CSRResponse = 5 {
@@ -1100,7 +1158,7 @@ server cluster OperationalCredentials = 62 {
   response struct NOCResponse = 8 {
     NodeOperationalCertStatusEnum statusCode = 0;
     optional fabric_idx fabricIndex = 1;
-    optional char_string debugText = 2;
+    optional char_string<128> debugText = 2;
   }
 
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
@@ -1115,6 +1173,8 @@ server cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 server cluster GroupKeyManagement = 63 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
@@ -1187,6 +1247,8 @@ server cluster GroupKeyManagement = 63 {
 
 /** An interface for configuring and controlling pumps. */
 server cluster PumpConfigurationAndControl = 512 {
+  revision 3;
+
   enum ControlModeEnum : enum8 {
     kConstantSpeed = 0;
     kConstantPressure = 1;
@@ -1215,7 +1277,7 @@ server cluster PumpConfigurationAndControl = 512 {
 
   bitmap PumpStatusBitmap : bitmap16 {
     kDeviceFault = 0x1;
-    kSupplyfault = 0x2;
+    kSupplyFault = 0x2;
     kSpeedLow = 0x4;
     kSpeedHigh = 0x8;
     kLocalOverride = 0x10;
@@ -1309,9 +1371,11 @@ server cluster PumpConfigurationAndControl = 512 {
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 server cluster TemperatureMeasurement = 1026 {
-  readonly attribute nullable int16s measuredValue = 0;
-  readonly attribute nullable int16s minMeasuredValue = 1;
-  readonly attribute nullable int16s maxMeasuredValue = 2;
+  revision 1; // NOTE: Default/not specifically set
+
+  readonly attribute nullable temperature measuredValue = 0;
+  readonly attribute nullable temperature minMeasuredValue = 1;
+  readonly attribute nullable temperature maxMeasuredValue = 2;
   readonly attribute int16u tolerance = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1323,6 +1387,8 @@ server cluster TemperatureMeasurement = 1026 {
 
 /** Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements. */
 server cluster PressureMeasurement = 1027 {
+  revision 3;
+
   bitmap Feature : bitmap32 {
     kExtended = 0x1;
   }
@@ -1346,6 +1412,8 @@ server cluster PressureMeasurement = 1027 {
 
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
 server cluster FlowMeasurement = 1028 {
+  revision 1; // NOTE: Default/not specifically set
+
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
   readonly attribute nullable int16u maxMeasuredValue = 2;
@@ -1360,6 +1428,8 @@ server cluster FlowMeasurement = 1028 {
 
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 client cluster OccupancySensing = 1030 {
+  revision 3;
+
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0;
     kUltrasonic = 1;
@@ -1450,11 +1520,13 @@ endpoint 0 {
     callback attribute productLabel;
     callback attribute serialNumber;
     callback attribute capabilityMinima;
+    callback attribute specificationVersion;
+    callback attribute maxPathsPerInvoke;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -1523,14 +1595,17 @@ endpoint 0 {
     emits event BootReason;
     callback attribute networkInterfaces;
     callback attribute rebootCount default = 0x0000;
+    callback attribute upTime default = 0x0000000000000000;
     callback attribute testEventTriggersEnabled default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0002;
 
     handle command TestEventTrigger;
+    handle command TimeSnapshot;
+    handle command TimeSnapshotResponse;
   }
 
   server cluster ThreadNetworkDiagnostics {

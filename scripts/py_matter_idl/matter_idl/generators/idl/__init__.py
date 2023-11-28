@@ -33,12 +33,16 @@ def human_text_string(value: Union[ClusterSide, StructTag, StructQuality, EventP
         if value == StructTag.RESPONSE:
             return "response"
     elif type(value) is FieldQuality:
+        # mypy seems confused if using `FieldQuality.OPTIONAL in value`
+        # directly, so do a useless cast here
+        quality: FieldQuality = value
+
         result = ""
-        if FieldQuality.OPTIONAL in value:
+        if FieldQuality.OPTIONAL in quality:
             result += "optional "
-        if FieldQuality.NULLABLE in value:
+        if FieldQuality.NULLABLE in quality:
             result += "nullable "
-        if FieldQuality.FABRIC_SENSITIVE in value:
+        if FieldQuality.FABRIC_SENSITIVE in quality:
             result += "fabric_sensitive "
         return result.strip()
     elif type(value) is StructQuality:
@@ -78,10 +82,10 @@ def human_text_string(value: Union[ClusterSide, StructTag, StructQuality, EventP
         return result
     elif type(value) is CommandQuality:
         result = ""
-        if CommandQuality.TIMED_INVOKE in value:
-            result += "timed "
         if CommandQuality.FABRIC_SCOPED in value:
             result += "fabric "
+        if CommandQuality.TIMED_INVOKE in value:
+            result += "timed "
         return result
     elif type(value) is ApiMaturity:
         if value == ApiMaturity.STABLE:

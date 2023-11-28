@@ -294,20 +294,20 @@ tv-casting-app/APIs.md
 window-app/**/README
 ```
 
-## Resource monitoring example
-
-```{toctree}
-:glob:
-:maxdepth: 1
-
-resource-monitoring-app/**/README
-```
-
-## Air Quality Sensor example
+## RVC example
 
 ```{toctree}
 :glob:
 :maxdepth: 1
 
 rvc-app/README
+```
+
+## Air Purifier Example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+air-purifier-app/**/README
 ```

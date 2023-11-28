@@ -41,7 +41,6 @@
         "TestColorControl_9_2"
     ],
     "DeviceManagement": [
-        "TestIcdManagementCluster",
         "Test_TC_OPCREDS_1_2",
         "Test_TC_OPCREDS_3_7",
         "Test_TC_BINFO_1_1",
@@ -71,7 +70,7 @@
     "GeneralCommissioning": ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_1_1"],
     "GroupKeyManagement": ["Test_TC_GRPKEY_1_1", "Test_TC_GRPKEY_2_2"],
-    "IcdManagement": ["Test_TC_ICDM_1_1"],
+    "IcdManagement": ["TestIcdManagementCluster", "Test_TC_ICDM_1_1"],
     "Identify": [
         "Test_TC_I_1_1",
         "Test_TC_I_2_1",
@@ -179,11 +178,12 @@
         "Test_TC_PCC_2_4"
     ],
     "PowerSourceConfiguration": ["Test_TC_PSCFG_1_1", "Test_TC_PSCFG_2_1"],
-    "RefrigeratorAlarm": ["Test_TC_REFALM_1_1"],
+    "RefrigeratorAlarm": ["Test_TC_REFALM_1_1", "Test_TC_REFALM_2_1"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_1_1", "Test_TC_RH_2_1"],
     "RoboticVacuumCleaner": [
         "Test_TC_RVCCLEANM_1_1",
         "Test_TC_RVCRUNM_1_1",
+        "Test_TC_RVCRUNM_3_1",
         "Test_TC_RVCOPSTATE_1_1"
     ],
     "SecureChannel": [],
@@ -199,7 +199,9 @@
     "Switch": ["Test_TC_SWTCH_1_1", "Test_TC_SWTCH_2_1"],
     "TemperatureControlledCabinetMode": [
         "Test_TC_TCCM_1_1",
-        "Test_TC_TCCM_3_1"
+        "Test_TC_TCCM_3_1",
+        "Test_TC_TCCM_3_2",
+        "Test_TC_TCCM_3_3"
     ],
     "TemperatureControl": [
         "Test_TC_TCTL_1_1",
@@ -319,6 +321,9 @@
         "Test_TC_G_2_1"
     ],
     "Scenes": [
+        "TestScenesFabricRemoval",
+        "TestScenesFabricSceneInfo",
+        "TestScenesMultiFabric",
         "Test_TC_S_1_1",
         "Test_TC_S_2_1",
         "Test_TC_S_2_2",

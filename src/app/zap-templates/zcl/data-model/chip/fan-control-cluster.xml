@@ -44,8 +44,8 @@ limitations under the License.
     <item name="Off/Low/High" value="0x01"/>
     <item name="Off/Low/Med/High/Auto" value="0x02"/>
     <item name="Off/Low/High/Auto" value="0x03"/>
-    <item name="Off/On/Auto" value="0x04"/>
-    <item name="Off/On" value="0x05"/>
+    <item name="Off/High/Auto" value="0x04"/>
+    <item name="Off/High" value="0x05"/>
   </enum>
 
   <bitmap name="RockBitmap" type="bitmap8">
@@ -86,7 +86,7 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="4"/>
 
     <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeEnum" min="0" max="6" writable="true" default="0" optional="false">FanMode</attribute>
-    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceEnum" min="0" max="5" writable="true" default="2" optional="false">FanModeSequence</attribute>
+    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceEnum" min="0" max="5" writable="false" default="2" optional="false">FanModeSequence</attribute>
     <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="percent" min="0" max="100" writable="true" default="0" isNullable="true" optional="false">PercentSetting</attribute>
     <attribute side="server" code="0x0003" define="PERCENT_CURRENT" type="percent" min="0" max="100" writable="false" default="0" optional="false">PercentCurrent</attribute>
     <attribute side="server" code="0x0004" define="SPEED_MAX" type="int8u" min="1" max="100" writable="false" default="1" optional="true">SpeedMax</attribute>
@@ -104,6 +104,5 @@ limitations under the License.
       <arg name="Wrap" type="boolean" optional="true"/>
       <arg name="LowestOff" type="boolean" optional="true"/>
     </command>
-
   </cluster>
 </configurator>

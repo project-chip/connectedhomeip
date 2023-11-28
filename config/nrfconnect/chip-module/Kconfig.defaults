@@ -65,6 +65,18 @@ config FPU
 config SHELL
     default y
 
+config SHELL_MINIMAL
+    default y
+
+# Enable getting reboot reasons information
+config HWINFO
+	bool
+	default y
+
+config HWINFO_SHELL
+	bool
+	default n
+
 config PTHREAD_IPC
     bool
     default n
@@ -75,7 +87,7 @@ config POSIX_MAX_FDS
 
 # Application stack size
 config MAIN_STACK_SIZE
-    default 8192
+    default 6144
 
 config INIT_STACKS
     default y
@@ -88,16 +100,16 @@ config NET_IF_MCAST_IPV6_ADDR_COUNT
 
 # Network buffers
 config NET_PKT_RX_COUNT
-    default 16
+    default 8
 
 config NET_PKT_TX_COUNT
-    default 16
+    default 8
 
 config NET_BUF_RX_COUNT
-    default 80
+    default 16
 
 config NET_BUF_TX_COUNT
-    default 80
+    default 16
 
 # Bluetooth Low Energy configs
 
@@ -162,6 +174,14 @@ config BT_DEVICE_NAME_GATT_WRITABLE
     bool
     default n
 
+config BT_GATT_CACHING
+    bool
+    default n
+
+# Disable 2M PHY due to interoperability issues.
+config BT_CTLR_PHY_2M
+    default n
+
 # Enable NFC support
 
 config CHIP_NFC_COMMISSIONING
@@ -196,9 +216,6 @@ endif # BOARD_NRF7002DK_NRF5340_CPUAPP
 config CHIP_EXTENDED_DISCOVERY
     default n
 
-config NVS_LOOKUP_CACHE
-    default y
-
 config NVS_LOOKUP_CACHE_SIZE
     default 512
 
@@ -209,6 +226,10 @@ config NET_L2_OPENTHREAD
 
 if NET_L2_OPENTHREAD
 
+# Disable OpenThread shell
+config OPENTHREAD_SHELL
+    default n
+
 # Disable certain parts of Zephyr IPv6 stack
 config NET_IPV6_NBR_CACHE
     bool
@@ -218,6 +239,9 @@ config NET_IPV6_NBR_CACHE
 config IEEE802154_NRF5_RX_STACK_SIZE
     default 1024
 
+config OPENTHREAD_THREAD_STACK_SIZE
+	default 4096
+
 endif
 
 if CHIP_WIFI
@@ -226,8 +250,39 @@ choice WPA_SUPP_LOG_LEVEL_CHOICE
 	default WPA_SUPP_LOG_LEVEL_ERR
 endchoice
 
+# increase the prefixes limit to match
+# maximum number of IPv6 addresses per interface
+config NET_IF_IPV6_PREFIX_COUNT
+    default 6
+
+# it saves us 20kB of FLASH
+config WPA_SUPP_NO_DEBUG
+    default y
+
+config NRF700X_LOG_VERBOSE
+    default n
+
+choice WIFI_NRF700X_LOG_LEVEL_CHOICE
+    default WIFI_NRF700X_LOG_LEVEL_OFF
+endchoice
+
 config NRF_WIFI_LOW_POWER
     default n
+
+config NRF700X_RX_NUM_BUFS
+    default 16
+
+config NRF700X_TX_MAX_DATA_SIZE
+    default 1280
+
+config NRF700X_RX_MAX_DATA_SIZE
+    default 1280
+
+config NRF700X_MAX_TX_TOKENS
+    default 10
+
+config NRF700X_MAX_TX_AGGREGATION
+    default 1
 
 config MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG
     default n
@@ -243,7 +298,7 @@ config NET_IF_MCAST_IPV6_ADDR_COUNT
     default 8
 
 config NET_SOCKETS_POLL_MAX
-    default 4
+    default 6
 
 config MBEDTLS_SSL_OUT_CONTENT_LEN
     default 900
@@ -260,13 +315,13 @@ config SHELL_STACK_SIZE
     default 2616
 
 config HEAP_MEM_POOL_SIZE
-    default 200000
-
-config CHIP_MALLOC_SYS_HEAP_SIZE
-    default 28672 # 28 kB
+    default 80000
 
 endif
 
+config CHIP_MALLOC_SYS_HEAP_SIZE
+    default 28672 if CHIP_WIFI
+    default 8192 if NET_L2_OPENTHREAD
 
 # Enable mbedTLS from nrf_security library
 
@@ -284,10 +339,7 @@ config MBEDTLS_ENABLE_HEAP
     default y
 
 config MBEDTLS_HEAP_SIZE
-    default 15360
-
-config MBEDTLS_TLS_LIBRARY
-    default y
+    default 8192
 
 config NRF_SECURITY_ADVANCED
     default y
@@ -305,9 +357,6 @@ config MBEDTLS_CTR_DRBG_C
     default y
 
 config MBEDTLS_CIPHER_MODE_CTR
-    default y
-
-config MBEDTLS_ECJPAKE_C
     default y
 
 config MBEDTLS_SHA256_C
@@ -351,37 +400,10 @@ config MBEDTLS_GCM_C
 config MBEDTLS_RSA_C
     default n
 
-config PSA_WANT_KEY_TYPE_CHACHA20
+config MBEDTLS_SSL_SRV_C
     default n
 
-config PSA_WANT_ALG_GCM
-    default n
-
-config PSA_WANT_ALG_CHACHA20_POLY1305
-    default n
-
-config PSA_WANT_ALG_SHA_1
-    default n
-
-config PSA_WANT_ALG_SHA_224
-    default n
-
-config PSA_WANT_ALG_SHA_384
-    default n
-
-config PSA_WANT_ALG_SHA_512
-    default n
-
-config PSA_WANT_ALG_RIPEMD160
-    default n
-
-config PSA_WANT_ALG_MD5
-    default n
-
-config PSA_WANT_ALG_CFB
-    default n
-
-config PSA_WANT_ALG_OFB
+config MBEDTLS_SSL_COOKIE_C
     default n
 
 # Disable not used shell modules

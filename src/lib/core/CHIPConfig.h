@@ -1433,6 +1433,62 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @brief The maximum number bytes taken by a scene. This needs to be increased if the number of clusters per scene is increased.
+ * @note The default number (256) is based on the assumption that the maximum number of clusters per scene is 3 and that those
+ * clusers are onOff, level control and color control cluster.
+ * @warning Changing this value will not only affect the RAM usage of a scene but also the size of the scene table in the flash.
+ *  A scene's size can be calculated based on the following structure:
+ *  Scene TLV (struct)
+ *  {
+ *  	2 bytes GroupID,
+ *  	1 byte SceneID,
+ *  	0 - 16 bytes SceneName,
+ *  	4 bytes Transition time in miliseconds,
+ *
+ *  	Extension field sets TLV (array)
+ *  	[
+ *  		EFS TLV (struct)
+ *  		{
+ *  			4 bytes for the cluster ID,
+ *  			Attribute Value List TLV (array)
+ *  			[
+ *  				AttributeValue Pair TLV (struct)
+ *  				{
+ *  					Attribute ID
+ *  					4 bytes attributeID,
+ *  					AttributeValue
+ *  					1 - 8 bytes AttributeValue,
+ *  				},
+ *  				.
+ *  				.
+ *  				.
+ *
+ *  			],
+ *
+ *  		},
+ *  		.
+ *  		.
+ *  		.
+ *  	],
+ *  }
+ *
+ *  Including all the TLV fields, the following values can help estimate the needed size for a scenes given a number of clusters:
+ *  Empty EFS Scene Max name size: 33bytes
+ *  Scene Max name size + OnOff : 51 bytes
+ *  Scene Max name size + LevelControl : 60 bytes
+ *  Scene Max name size + ColorControl : 126 bytes
+ *  Scene Max name size + OnOff + LevelControl + ColoControl : 171 bytes
+ *
+ *  Cluster Sizes:
+ *  OnOff Cluster Max Size: 18 bytes
+ *  LevelControl Cluster Max Size: 27 bytes
+ *  Color Control Cluster Max Size: 93 bytes
+ * */
+#ifndef CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES
+#define CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES 256
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS
  *
  * @brief Defines the number of simultaneous Scenes iterators that can be allocated
@@ -1442,6 +1498,31 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS
 #define CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS 2
 #endif
+
+/**
+ * @def CHIP_CONFIG_MAX_SCENES_TABLE_SIZE
+ *
+ * @brief This defines how many scenes a single endpoint is allowed to allocate in flash memory. This value MUST at least 16
+ * per spec and MUST be increased to allow for configuring a greater scene table size from Zap.
+ */
+#ifndef CHIP_CONFIG_MAX_SCENES_TABLE_SIZE
+#if CHIP_CONFIG_TEST
+#define CHIP_CONFIG_MAX_SCENES_TABLE_SIZE 24
+#else
+#define CHIP_CONFIG_MAX_SCENES_TABLE_SIZE 16
+#endif // CHIP_CONFIG_TEST
+#endif // CHIP_CONFIG_MAX_SCENES_TABLE_SIZE
+
+/**
+ * @def CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+ *
+ * @brief This define enables the automatic registration of the default scene handlers in the scene table for each sceneable
+ * cluster. If a user wants to use their own scene handlers, they can disable this flag and implement their own handlers. They can
+ * use ScenesServer::Instance().RegisterSceneHandler() to have their handlers called when a scene is recalled or stored.
+ */
+#ifndef CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#define CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS 1
+#endif // CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
 /**
  * @def CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE
@@ -1484,21 +1565,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC
+ * @def CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
  *
- * @brief Default value for the ICD Management cluster IdleModeInterval attribute, in seconds
+ * @brief Default value for the ICD Management cluster IdleModeDuration attribute, in seconds
  */
-#ifndef CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC
-#define CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC 2
+#ifndef CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
+#define CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC 300
 #endif
 
 /**
- * @def CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS
+ * @def CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS
  *
- * @brief Default value for the ICD Management cluster ActiveModeInterval attribute, in milliseconds
+ * @brief Default value for the ICD Management cluster ActiveModeDuration attribute, in milliseconds
  */
-#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS
-#define CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS 300
+#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS 300
 #endif
 
 /**
@@ -1584,6 +1665,29 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
 #define CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED 0
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_PATHS_PER_INVOKE
+ *
+ * @brief The maximum number of elements in the InvokeRequests list that the Node is able to process.
+ */
+#ifndef CHIP_CONFIG_MAX_PATHS_PER_INVOKE
+#define CHIP_CONFIG_MAX_PATHS_PER_INVOKE 1
+#endif
+
+#if CHIP_CONFIG_MAX_PATHS_PER_INVOKE < 1 || CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 65535
+#error "CHIP_CONFIG_MAX_PATHS_PER_INVOKE is not allowed to be a number less than 1 or greater than 65535"
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
+ *
+ * @brief Defines the entry iterator delegate pool size of the ICDObserver object pool in ICDManager.h.
+ *        Two are used in the default implementation. Users can increase it to register more observers.
+ */
+#ifndef CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
+#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 2
 #endif
 
 /**

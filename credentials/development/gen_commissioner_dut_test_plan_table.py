@@ -79,7 +79,7 @@ def main():
 
     success_cases = []
     failure_cases = []
-    for p in os.listdir(cert_path):
+    for p in sorted(os.listdir(cert_path)):
         if p in skip_cases:
             continue
         path = str(os.path.join(cert_path, p, 'test_case_vector.json'))

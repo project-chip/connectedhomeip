@@ -55,6 +55,7 @@ enum TestCert
     kNode02_07 = 15,
     kNode02_08 = 16,
     kRoot03    = 17,
+    kPDCID01   = 18,
 };
 
 // Special flags to alter how certificates are fetched/loaded.
@@ -68,15 +69,17 @@ enum class TestCertLoadFlags : uint8_t
     kSetAppDefinedCertType = 0x20,
 };
 
-extern CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags, ByteSpan & cert);
-extern const char * GetTestCertName(uint8_t certType);
-extern CHIP_ERROR GetTestCertPubkey(uint8_t certType, ByteSpan & pubkey);
-extern CHIP_ERROR GetTestCertSKID(uint8_t certType, ByteSpan & skid);
-extern CHIP_ERROR GetTestCertAKID(uint8_t certType, ByteSpan & akid);
-extern CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags,
+extern CHIP_ERROR GetTestCert(TestCert certType, BitFlags<TestCertLoadFlags> certLoadFlags, ByteSpan & cert);
+extern const char * GetTestCertName(TestCert certType);
+extern CHIP_ERROR GetTestCertPubkey(TestCert certType, ByteSpan & pubkey);
+extern CHIP_ERROR GetTestCertSKID(TestCert certType, ByteSpan & skid);
+extern CHIP_ERROR GetTestCertAKID(TestCert certType, ByteSpan & akid);
+
+extern CHIP_ERROR DecodeTestCert(ChipCertificateData & certData, TestCert certType);
+extern CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, TestCert certType, BitFlags<TestCertLoadFlags> certLoadFlags,
                                BitFlags<CertDecodeFlags> decodeFlags);
 
-extern const uint8_t gTestCerts[];
+extern const TestCert gTestCerts[];
 extern const size_t gNumTestCerts;
 
 // ------------------------------ DECLARATIONS ----------------------------------------
@@ -201,6 +204,15 @@ extern const ByteSpan sTestCert_Node02_08_PublicKey;
 extern const ByteSpan sTestCert_Node02_08_PrivateKey;
 extern const ByteSpan sTestCert_Node02_08_SubjectKeyId;
 extern const ByteSpan sTestCert_Node02_08_AuthorityKeyId;
+
+extern const ByteSpan sTestCert_PDCID01_Chip;
+extern const ByteSpan sTestCert_PDCID01_ChipCompact;
+extern const ByteSpan sTestCert_PDCID01_DER;
+extern const ByteSpan sTestCert_PDCID01_PublicKey;
+extern const ByteSpan sTestCert_PDCID01_PrivateKey;
+extern const ByteSpan sTestCert_PDCID01_SubjectKeyId;   // empty
+extern const ByteSpan sTestCert_PDCID01_AuthorityKeyId; // empty
+extern const ByteSpan sTestCert_PDCID01_KeyId;
 
 } // namespace TestCerts
 } // namespace chip

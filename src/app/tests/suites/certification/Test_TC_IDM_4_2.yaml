@@ -44,20 +44,20 @@ tests:
           When the ICDM feature is not supported or enabled, the SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT is set to 60 minutes.
       disabled: true
 
-    - label: "Step 0b: CR1 reads from the DUT the IdleModeInterval attribute."
+    - label: "Step 0b: CR1 reads from the DUT the IdleModeDuration attribute."
       PICS: ICDM.S
       verification: |
-          CR1 reads from the DUT the IdleModeInterval attribute by sending below mentioned command
+          CR1 reads from the DUT the IdleModeDuration attribute by sending below mentioned command
 
           icdmanagement read idle-mode-interval 1 0
 
-          Please note down the value of IdleModeInterval as SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT for use in the next step validations.
+          Please note down the value of IdleModeDuration as SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT for use in the next step validations.
 
           [1692870543.225457][7160:7162] CHIP:DMG:         SuppressResponse = true,
           [1692870543.225495][7160:7162] CHIP:DMG:         InteractionModelRevision = 10
           [1692870543.225528][7160:7162] CHIP:DMG: }
           [1692870543.225723][7160:7162] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0000 DataVersion: 4022467249
-          [1692870543.225795][7160:7162] CHIP:TOO:   IdleModeInterval: 2000
+          [1692870543.225795][7160:7162] CHIP:TOO:   IdleModeDuration: 2000
           [1692870543.225992][7160:7162] CHIP:EM: <<< [E:52837i S:57653 M:52559591 (Ack:263018291)] (S) Msg TX to 1:0000000000000001 [853D] --- Type 0000:10 (SecureChannel:StandaloneAck)
       disabled: true
 

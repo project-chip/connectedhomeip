@@ -11,15 +11,15 @@ from lark import Lark
 from lark.visitors import Discard, Transformer, v_args
 
 try:
-    from .types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, ClusterValidationRule,
-                        RequiredAttributesRule, RequiredCommandsRule)
+    from matter_idl.lint.type_definitions import AttributeRequirement
 except ImportError:
     import sys
-
     sys.path.append(os.path.join(os.path.abspath(
         os.path.dirname(__file__)), "..", ".."))
-    from matter_idl.lint.types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, ClusterValidationRule,
-                                       RequiredAttributesRule, RequiredCommandsRule)
+    from matter_idl.lint.type_definitions import AttributeRequirement
+
+from matter_idl.lint.type_definitions import (ClusterAttributeDeny, ClusterCommandRequirement, ClusterRequirement,
+                                              ClusterValidationRule, RequiredAttributesRule, RequiredCommandsRule)
 
 
 class ElementNotFoundError(Exception):
@@ -167,6 +167,9 @@ class LintRulesContext:
     def RequireAttribute(self, r: AttributeRequirement):
         self._required_attributes_rule.RequireAttribute(r)
 
+    def Deny(self, what: ClusterAttributeDeny):
+        self._required_attributes_rule.Deny(what)
+
     def FindClusterCode(self, name: str) -> Optional[Tuple[str, int]]:
         if name not in self._cluster_codes:
             # Name may be a number. If this can be parsed as a number, accept it anyway
@@ -281,9 +284,14 @@ class LintRulesTransformer(Transformer):
     def instruction(self, instruction):
         return Discard
 
-    def all_endpoint_rule(self, attributes):
-        for attribute in attributes:
-            self.context.RequireAttribute(attribute)
+    def all_endpoint_rule(self, rules: List[Union[AttributeRequirement, ClusterAttributeDeny]]):
+        for rule in rules:
+            if type(rule) is AttributeRequirement:
+                self.context.RequireAttribute(rule)
+            elif type(rule) is ClusterAttributeDeny:
+                self.context.Deny(rule)
+            else:
+                raise Exception("Unkown endpoint requirement: %r" % rule)
 
         return Discard
 
@@ -320,6 +328,10 @@ class LintRulesTransformer(Transformer):
     def rejected_server_cluster(self, id):
         return ServerClusterRequirement(ClusterActionEnum.REJECT, id)
 
+    @v_args(inline=True)
+    def denylist_cluster_attribute(self, cluster_id, attribute_id):
+        return ClusterAttributeDeny(cluster_id, attribute_id)
+
 
 class Parser:
     def __init__(self, parser, file_name: str):
@@ -337,7 +349,7 @@ def CreateParser(file_name: str):
     Generates a parser that will process a ".matter" file into a IDL
     """
     return Parser(
-        Lark.open('lint_rules_grammar.lark', rel_to=__file__, parser='lalr', propagate_positions=True), file_name=file_name)
+        Lark.open('lint_rules_grammar.lark', rel_to=__file__, parser='lalr', propagate_positions=True, maybe_placeholders=True), file_name=file_name)
 
 
 if __name__ == '__main__':

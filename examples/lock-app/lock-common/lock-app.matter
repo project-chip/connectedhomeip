@@ -3,6 +3,8 @@
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 server cluster Identify = 3 {
+  revision 4;
+
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
     kBreathe = 1;
@@ -47,57 +49,10 @@ server cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
-/** Attributes and commands for switching devices between 'On' and 'Off' states. */
-server cluster OnOff = 6 {
-  enum DelayedAllOffEffectVariantEnum : enum8 {
-    kDelayedOffFastFade = 0;
-    kNoFade = 1;
-    kDelayedOffSlowFade = 2;
-  }
-
-  enum DyingLightEffectVariantEnum : enum8 {
-    kDyingLightFadeOff = 0;
-  }
-
-  enum EffectIdentifierEnum : enum8 {
-    kDelayedAllOff = 0;
-    kDyingLight = 1;
-  }
-
-  enum StartUpOnOffEnum : enum8 {
-    kOff = 0;
-    kOn = 1;
-    kToggle = 2;
-  }
-
-  bitmap Feature : bitmap32 {
-    kLighting = 0x1;
-    kDeadFrontBehavior = 0x2;
-  }
-
-  bitmap OnOffControlBitmap : bitmap8 {
-    kAcceptOnlyWhenOn = 0x1;
-  }
-
-  readonly attribute boolean onOff = 0;
-  readonly attribute boolean globalSceneControl = 16384;
-  attribute int16u onTime = 16385;
-  attribute int16u offWaitTime = 16386;
-  attribute access(write: manage) nullable StartUpOnOffEnum startUpOnOff = 16387;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  command Off(): DefaultSuccess = 0;
-  command On(): DefaultSuccess = 1;
-  command Toggle(): DefaultSuccess = 2;
-}
-
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
+  revision 2;
+
   bitmap Feature : bitmap32 {
     kTagList = 0x1;
   }
@@ -131,6 +86,8 @@ server cluster Descriptor = 29 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 server cluster AccessControl = 31 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
     kCASE = 2;
@@ -203,6 +160,8 @@ server cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 server cluster BasicInformation = 40 {
+  revision 3;
+
   enum ColorEnum : enum8 {
     kBlack = 0;
     kNavy = 1;
@@ -280,6 +239,8 @@ server cluster BasicInformation = 40 {
   attribute access(write: manage) boolean localConfigDisabled = 16;
   readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
+  readonly attribute int32u specificationVersion = 21;
+  readonly attribute int16u maxPathsPerInvoke = 22;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -290,6 +251,8 @@ server cluster BasicInformation = 40 {
 
 /** Provides an interface for providing OTA software updates */
 client cluster OtaSoftwareUpdateProvider = 41 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
     kAwaitNextAction = 1;
@@ -364,6 +327,8 @@ client cluster OtaSoftwareUpdateProvider = 41 {
 
 /** Provides an interface for downloading and applying OTA software updates */
 server cluster OtaSoftwareUpdateRequestor = 42 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
     kUpdateAvailable = 1;
@@ -442,48 +407,10 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
       standards. As such, Nodes that visually or audibly convey information need a mechanism by which
       they can be configured to use a user’s preferred language, units, etc */
 server cluster LocalizationConfiguration = 43 {
-  attribute char_string<35> activeLocale = 0;
+  revision 1; // NOTE: Default/not specifically set
+
+  attribute access(write: manage) char_string<35> activeLocale = 0;
   readonly attribute char_string supportedLocales[] = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
-      or audibly convey time information need a mechanism by which they can be configured to use a
-      user’s preferred format. */
-server cluster TimeFormatLocalization = 44 {
-  enum CalendarTypeEnum : enum8 {
-    kBuddhist = 0;
-    kChinese = 1;
-    kCoptic = 2;
-    kEthiopian = 3;
-    kGregorian = 4;
-    kHebrew = 5;
-    kIndian = 6;
-    kIslamic = 7;
-    kJapanese = 8;
-    kKorean = 9;
-    kPersian = 10;
-    kTaiwanese = 11;
-  }
-
-  enum HourFormatEnum : enum8 {
-    k12hr = 0;
-    k24hr = 1;
-  }
-
-  bitmap Feature : bitmap32 {
-    kCalendarFormat = 0x1;
-  }
-
-  attribute HourFormatEnum hourFormat = 0;
-  attribute CalendarTypeEnum activeCalendarType = 1;
-  readonly attribute CalendarTypeEnum supportedCalendarTypes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -497,6 +424,8 @@ server cluster TimeFormatLocalization = 44 {
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
 server cluster UnitLocalization = 45 {
+  revision 1;
+
   enum TempUnitEnum : enum8 {
     kFahrenheit = 0;
     kCelsius = 1;
@@ -517,6 +446,8 @@ server cluster UnitLocalization = 45 {
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 server cluster PowerSource = 47 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;
     kAlkaline = 1;
@@ -735,11 +666,13 @@ server cluster PowerSource = 47 {
   readonly attribute PowerSourceStatusEnum status = 0;
   readonly attribute int8u order = 1;
   readonly attribute char_string<60> description = 2;
+  readonly attribute WiredCurrentTypeEnum wiredCurrentType = 5;
   readonly attribute nullable int32u wiredAssessedCurrent = 6;
   readonly attribute BatChargeLevelEnum batChargeLevel = 14;
   readonly attribute boolean batReplacementNeeded = 15;
   readonly attribute BatReplaceabilityEnum batReplaceability = 16;
   readonly attribute char_string<60> batReplacementDescription = 19;
+  readonly attribute int8u batQuantity = 25;
   readonly attribute endpoint_no endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -751,6 +684,8 @@ server cluster PowerSource = 47 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CommissioningErrorEnum : enum8 {
     kOK = 0;
     kValueOutsideRange = 1;
@@ -789,13 +724,13 @@ server cluster GeneralCommissioning = 48 {
 
   request struct SetRegulatoryConfigRequest {
     RegulatoryLocationTypeEnum newRegulatoryConfig = 0;
-    char_string countryCode = 1;
+    char_string<2> countryCode = 1;
     int64u breadcrumb = 2;
   }
 
   response struct ArmFailSafeResponse = 1 {
     CommissioningErrorEnum errorCode = 0;
-    char_string debugText = 1;
+    char_string<128> debugText = 1;
   }
 
   response struct SetRegulatoryConfigResponse = 3 {
@@ -815,6 +750,8 @@ server cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 server cluster NetworkCommissioning = 49 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
     kOutOfRange = 1;
@@ -844,6 +781,15 @@ server cluster NetworkCommissioning = 49 {
     kWiFiNetworkInterface = 0x1;
     kThreadNetworkInterface = 0x2;
     kEthernetNetworkInterface = 0x4;
+    kPerDeviceCredentials = 0x8;
+  }
+
+  bitmap ThreadCapabilitiesBitmap : bitmap16 {
+    kIsBorderRouterCapable = 0x1;
+    kIsRouterCapable = 0x2;
+    kIsSleepyEndDeviceCapable = 0x4;
+    kIsFullThreadDevice = 0x8;
+    kIsSynchronizedSleepyEndDeviceCapable = 0x10;
   }
 
   bitmap WiFiSecurityBitmap : bitmap8 {
@@ -852,11 +798,14 @@ server cluster NetworkCommissioning = 49 {
     kWPAPersonal = 0x4;
     kWPA2Personal = 0x8;
     kWPA3Personal = 0x10;
+    kWPA3MatterPDC = 0x20;
   }
 
   struct NetworkInfoStruct {
     octet_string<32> networkID = 0;
     boolean connected = 1;
+    optional nullable octet_string<20> networkIdentifier = 2;
+    optional nullable octet_string<20> clientIdentifier = 3;
   }
 
   struct ThreadInterfaceScanResultStruct {
@@ -903,6 +852,9 @@ server cluster NetworkCommissioning = 49 {
     octet_string<32> ssid = 0;
     octet_string<64> credentials = 1;
     optional int64u breadcrumb = 2;
+    optional octet_string<140> networkIdentity = 3;
+    optional octet_string<20> clientIdentifier = 4;
+    optional octet_string<32> possessionNonce = 5;
   }
 
   request struct AddOrUpdateThreadNetworkRequest {
@@ -937,6 +889,8 @@ server cluster NetworkCommissioning = 49 {
     NetworkCommissioningStatusEnum networkingStatus = 0;
     optional char_string<512> debugText = 1;
     optional int8u networkIndex = 2;
+    optional octet_string<140> clientIdentity = 3;
+    optional octet_string<64> possessionSignature = 4;
   }
 
   response struct ConnectNetworkResponse = 7 {
@@ -955,6 +909,8 @@ server cluster NetworkCommissioning = 49 {
 
 /** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
 server cluster DiagnosticLogs = 50 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum IntentEnum : enum8 {
     kEndUserSupport = 0;
     kNetworkDiag = 1;
@@ -992,6 +948,8 @@ server cluster DiagnosticLogs = 50 {
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster GeneralDiagnostics = 51 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum BootReasonEnum : enum8 {
     kUnspecified = 0;
     kPowerOnReboot = 1;
@@ -1092,13 +1050,21 @@ server cluster GeneralDiagnostics = 51 {
     int64u eventTrigger = 1;
   }
 
+  response struct TimeSnapshotResponse = 2 {
+    systime_us systemTimeUs = 0;
+    nullable epoch_us UTCTimeUs = 1;
+  }
+
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
+  command TimeSnapshot(): TimeSnapshotResponse = 1;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster SoftwareDiagnostics = 52 {
+  revision 1; // NOTE: Default/not specifically set
+
   bitmap Feature : bitmap32 {
-    kWaterMarks = 0x1;
+    kWatermarks = 0x1;
   }
 
   struct ThreadMetricsStruct {
@@ -1126,11 +1092,13 @@ server cluster SoftwareDiagnostics = 52 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  command ResetWatermarks(): DefaultSuccess = 0;
+  command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 }
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 server cluster ThreadNetworkDiagnostics = 53 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
     kNotConnected = 1;
@@ -1229,9 +1197,9 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute NeighborTableStruct neighborTable[] = 7;
   readonly attribute RouteTableStruct routeTable[] = 8;
   readonly attribute nullable int32u partitionId = 9;
-  readonly attribute nullable int8u weighting = 10;
-  readonly attribute nullable int8u dataVersion = 11;
-  readonly attribute nullable int8u stableDataVersion = 12;
+  readonly attribute nullable int16u weighting = 10;
+  readonly attribute nullable int16u dataVersion = 11;
+  readonly attribute nullable int16u stableDataVersion = 12;
   readonly attribute nullable int8u leaderRouterId = 13;
   readonly attribute int16u detachedRoleCount = 14;
   readonly attribute int16u childRoleCount = 15;
@@ -1289,11 +1257,13 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  command ResetCounts(): DefaultSuccess = 0;
+  command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster WiFiNetworkDiagnostics = 54 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AssociationFailureCauseEnum : enum8 {
     kUnknown = 0;
     kAssociationFailed = 1;
@@ -1335,7 +1305,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
   }
 
   info event AssociationFailure = 1 {
-    AssociationFailureCauseEnum associationFailure = 0;
+    AssociationFailureCauseEnum associationFailureCause = 0;
     int16u status = 1;
   }
 
@@ -1368,6 +1338,8 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 /** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster EthernetNetworkDiagnostics = 55 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum PHYRateEnum : enum8 {
     kRate10M = 0;
     kRate100M = 1;
@@ -1402,11 +1374,13 @@ server cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  command ResetCounts(): DefaultSuccess = 0;
+  command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 server cluster AdministratorCommissioning = 60 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CommissioningWindowStatusEnum : enum8 {
     kWindowNotOpen = 0;
     kEnhancedWindowOpen = 1;
@@ -1419,9 +1393,13 @@ server cluster AdministratorCommissioning = 60 {
     kWindowNotOpen = 4;
   }
 
+  bitmap Feature : bitmap32 {
+    kBasic = 0x1;
+  }
+
   readonly attribute CommissioningWindowStatusEnum windowStatus = 0;
   readonly attribute nullable fabric_idx adminFabricIndex = 1;
-  readonly attribute nullable int16u adminVendorId = 2;
+  readonly attribute nullable vendor_id adminVendorId = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1434,20 +1412,17 @@ server cluster AdministratorCommissioning = 60 {
     octet_string PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
-    octet_string salt = 4;
-  }
-
-  request struct OpenBasicCommissioningWindowRequest {
-    int16u commissioningTimeout = 0;
+    octet_string<32> salt = 4;
   }
 
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 server cluster OperationalCredentials = 62 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
     kPAICertificate = 2;
@@ -1495,7 +1470,7 @@ server cluster OperationalCredentials = 62 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AttestationRequestRequest {
-    octet_string attestationNonce = 0;
+    octet_string<32> attestationNonce = 0;
   }
 
   request struct CertificateChainRequestRequest {
@@ -1503,14 +1478,14 @@ server cluster OperationalCredentials = 62 {
   }
 
   request struct CSRRequestRequest {
-    octet_string CSRNonce = 0;
+    octet_string<32> CSRNonce = 0;
     optional boolean isForUpdateNOC = 1;
   }
 
   request struct AddNOCRequest {
-    octet_string NOCValue = 0;
-    optional octet_string ICACValue = 1;
-    octet_string IPKValue = 2;
+    octet_string<400> NOCValue = 0;
+    optional octet_string<400> ICACValue = 1;
+    octet_string<16> IPKValue = 2;
     int64u caseAdminSubject = 3;
     vendor_id adminVendorId = 4;
   }
@@ -1533,12 +1508,12 @@ server cluster OperationalCredentials = 62 {
   }
 
   response struct AttestationResponse = 1 {
-    octet_string attestationElements = 0;
-    octet_string attestationSignature = 1;
+    octet_string<900> attestationElements = 0;
+    octet_string<64> attestationSignature = 1;
   }
 
   response struct CertificateChainResponse = 3 {
-    octet_string certificate = 0;
+    octet_string<600> certificate = 0;
   }
 
   response struct CSRResponse = 5 {
@@ -1549,7 +1524,7 @@ server cluster OperationalCredentials = 62 {
   response struct NOCResponse = 8 {
     NodeOperationalCertStatusEnum statusCode = 0;
     optional fabric_idx fabricIndex = 1;
-    optional char_string debugText = 2;
+    optional char_string<128> debugText = 2;
   }
 
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
@@ -1564,6 +1539,8 @@ server cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 server cluster GroupKeyManagement = 63 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
@@ -1637,6 +1614,8 @@ server cluster GroupKeyManagement = 63 {
 /** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
 labels. */
 server cluster FixedLabel = 64 {
+  revision 1; // NOTE: Default/not specifically set
+
   struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
@@ -1653,6 +1632,8 @@ server cluster FixedLabel = 64 {
 
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 server cluster UserLabel = 65 {
+  revision 1; // NOTE: Default/not specifically set
+
   struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
@@ -1669,10 +1650,32 @@ server cluster UserLabel = 65 {
 
 /** Allows servers to ensure that listed clients are notified when a server is available for communication. */
 server cluster IcdManagement = 70 {
+  revision 2;
+
   bitmap Feature : bitmap32 {
     kCheckInProtocolSupport = 0x1;
     kUserActiveModeTrigger = 0x2;
     kLongIdleTimeSupport = 0x4;
+  }
+
+  bitmap UserActiveModeTriggerBitmap : bitmap32 {
+    kPowerCycle = 0x1;
+    kSettingsMenu = 0x2;
+    kCustomInstruction = 0x4;
+    kDeviceManual = 0x8;
+    kActuateSensor = 0x10;
+    kActuateSensorSeconds = 0x20;
+    kActuateSensorTimes = 0x40;
+    kActuateSensorLightsBlink = 0x80;
+    kResetButton = 0x100;
+    kResetButtonLightsBlink = 0x200;
+    kResetButtonSeconds = 0x400;
+    kResetButtonTimes = 0x800;
+    kSetupButton = 0x1000;
+    kSetupButtonSeconds = 0x2000;
+    kSetupButtonLightsBlink = 0x4000;
+    kSetupButtonTimes = 0x8000;
+    kAppDefinedButton = 0x10000;
   }
 
   fabric_scoped struct MonitoringRegistrationStruct {
@@ -1681,8 +1684,8 @@ server cluster IcdManagement = 70 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute int32u idleModeInterval = 0;
-  readonly attribute int32u activeModeInterval = 1;
+  readonly attribute int32u idleModeDuration = 0;
+  readonly attribute int32u activeModeDuration = 1;
   readonly attribute int16u activeModeThreshold = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1694,6 +1697,8 @@ server cluster IcdManagement = 70 {
 
 /** An interface to a generic way to secure a door */
 server cluster DoorLock = 257 {
+  revision 7;
+
   enum AlarmCodeEnum : enum8 {
     kLockJammed = 0;
     kLockFactoryReset = 1;
@@ -2341,12 +2346,14 @@ endpoint 0 {
     persist  attribute localConfigDisabled default = 0;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
+    callback attribute specificationVersion;
+    callback attribute maxPathsPerInvoke;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -2374,18 +2381,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster TimeFormatLocalization {
-    persist  attribute hourFormat default = 0;
-    persist  attribute activeCalendarType default = 0;
-    callback attribute supportedCalendarTypes;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster UnitLocalization {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -2400,6 +2395,7 @@ endpoint 0 {
     ram      attribute status default = 1;
     ram      attribute order default = 0;
     ram      attribute description default = "USB";
+    ram      attribute wiredCurrentType default = 0;
     ram      attribute wiredAssessedCurrent;
     callback attribute endpointList;
     callback attribute generatedCommandList;
@@ -2484,9 +2480,11 @@ endpoint 0 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0002;
 
     handle command TestEventTrigger;
+    handle command TimeSnapshot;
+    handle command TimeSnapshotResponse;
   }
 
   server cluster SoftwareDiagnostics {
@@ -2621,7 +2619,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
 
     handle command OpenCommissioningWindow;
-    handle command OpenBasicCommissioningWindow;
     handle command RevokeCommissioning;
   }
 
@@ -2686,11 +2683,11 @@ endpoint 0 {
   }
 
   server cluster IcdManagement {
-    callback attribute idleModeInterval default = 500;
-    callback attribute activeModeInterval default = 300;
+    callback attribute idleModeDuration default = 500;
+    callback attribute activeModeDuration default = 300;
     callback attribute activeModeThreshold default = 300;
     ram      attribute featureMap default = 0x0000;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 }
 endpoint 1 {
@@ -2710,20 +2707,6 @@ endpoint 1 {
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster OnOff {
-    ram      attribute onOff default = 0x00;
-    ram      attribute globalSceneControl default = 1;
-    ram      attribute onTime default = 0;
-    ram      attribute offWaitTime default = 0;
-    ram      attribute startUpOnOff;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
-
-    handle command Off;
-    handle command On;
-    handle command Toggle;
   }
 
   server cluster Descriptor {
@@ -2747,6 +2730,7 @@ endpoint 1 {
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
     ram      attribute batReplacementDescription;
+    ram      attribute batQuantity default = 1;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

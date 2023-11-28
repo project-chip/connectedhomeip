@@ -45,97 +45,88 @@ tests:
 
           1. First read action-list by following command
 
-          ./chip-tool actions read action-list 1 1 --trace_decode 1
+          ./chip-tool actions read action-list 1 1
 
-          Via the TH (bridge-app), verify the ActionList attribute that contains ActionListStructs.
+          Via the TH (bridge-app), verify the ActionList attribute response.
 
-          [1686033574.850552][39104:39106] CHIP:DMG: ReportDataMessage =
-          [1686033574.850639][39104:39106] CHIP:DMG: {
-          [1686033574.850689][39104:39106] CHIP:DMG:         AttributeReportIBs =
-          [1686033574.850802][39104:39106] CHIP:DMG:         [
-          [1686033574.850861][39104:39106] CHIP:DMG:                 AttributeReportIB =
-          [1686033574.850976][39104:39106] CHIP:DMG:                 {
-          [1686033574.851039][39104:39106] CHIP:DMG:                         AttributeDataIB =
-          [1686033574.851133][39104:39106] CHIP:DMG:                         {
-          [1686033574.851206][39104:39106] CHIP:DMG:                                 DataVersion = 0x17ed8ce2,
-          [1686033574.851299][39104:39106] CHIP:DMG:                                 AttributePathIB =
-          [1686033574.851375][39104:39106] CHIP:DMG:                                 {
-          [1686033574.851450][39104:39106] CHIP:DMG:                                         Endpoint = 0x1,
-          [1686033574.851557][39104:39106] CHIP:DMG:                                         Cluster = 0x25,
-          [1686033574.851658][39104:39106] CHIP:DMG:                                         Attribute = 0x0000_0000,
-          [1686033574.851736][39104:39106] CHIP:DMG:                                 }
-          [1686033574.851838][39104:39106] CHIP:DMG:
-          [1686033574.851914][39104:39106] CHIP:DMG:                                 Data = [
-          [1686033574.852009][39104:39106] CHIP:DMG:
-          [1686033574.852090][39104:39106] CHIP:DMG:                                         {
-          [1686033574.852194][39104:39106] CHIP:DMG:                                                 0x0 = 4097,
-          [1686033574.852287][39104:39106] CHIP:DMG:                                                 0x1 = "Room 1 On" (9 chars),
-          [1686033574.852393][39104:39106] CHIP:DMG:                                                 0x2 = 3,
-          [1686033574.852482][39104:39106] CHIP:DMG:                                                 0x3 = 57345,
-          [1686033574.852588][39104:39106] CHIP:DMG:                                                 0x4 = 1,
-          [1686033574.852692][39104:39106] CHIP:DMG:                                                 0x5 = 0,
-          [1686033574.852780][39104:39106] CHIP:DMG:                                         },
-          [1686033574.852880][39104:39106] CHIP:DMG:                                         {
-          [1686033574.852963][39104:39106] CHIP:DMG:                                                 0x0 = 4098,
-          [1686033574.853070][39104:39106] CHIP:DMG:                                                 0x1 = "Turn On Room 2" (14 chars),
-          [1686033574.853158][39104:39106] CHIP:DMG:                                                 0x2 = 3,
-          [1686033574.853311][39104:39106] CHIP:DMG:                                                 0x3 = 57346,
-          [1686033574.853428][39104:39106] CHIP:DMG:                                                 0x4 = 1,
-          [1686033574.853516][39104:39106] CHIP:DMG:                                                 0x5 = 0,
-          [1686033574.853621][39104:39106] CHIP:DMG:                                         },
-          [1686033574.853703][39104:39106] CHIP:DMG:                                 ],
-          [1686033574.853792][39104:39106] CHIP:DMG:                         },
-          [1686033574.853887][39104:39106] CHIP:DMG:
-          [1686033574.853969][39104:39106] CHIP:DMG:                 },
-          [1686033574.854059][39104:39106] CHIP:DMG:
-          [1686033574.854137][39104:39106] CHIP:DMG:         ],
-          [1686033574.854225][39104:39106] CHIP:DMG:
-          [1686033574.854283][39104:39106] CHIP:DMG:         SuppressResponse = true,
-          [1686033574.854342][39104:39106] CHIP:DMG:         InteractionModelRevision = 1
-          [1686033574.854395][39104:39106] CHIP:DMG: }
+          [1698725144.232190][1963:1963] CHIP:IM: Received Read request
+          [1698725144.232296][1963:1963] CHIP:DMG: ReadRequestMessage =
+          [1698725144.232352][1963:1963] CHIP:DMG: {
+          [1698725144.232410][1963:1963] CHIP:DMG:         AttributePathIBs =
+          [1698725144.232484][1963:1963] CHIP:DMG:         [
+          [1698725144.232544][1963:1963] CHIP:DMG:                 AttributePathIB =
+          [1698725144.232608][1963:1963] CHIP:DMG:                 {
+          [1698725144.232688][1963:1963] CHIP:DMG:                         Endpoint = 0x1,
+          [1698725144.232758][1963:1963] CHIP:DMG:                         Cluster = 0x25,
+          [1698725144.232828][1963:1963] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1698725144.232893][1963:1963] CHIP:DMG:                 }
+          [1698725144.232959][1963:1963] CHIP:DMG:
+          [1698725144.233018][1963:1963] CHIP:DMG:         ],
+          [1698725144.233083][1963:1963] CHIP:DMG:
+          [1698725144.233142][1963:1963] CHIP:DMG:         isFabricFiltered = true,
+          [1698725144.233199][1963:1963] CHIP:DMG:         InteractionModelRevision = 11
+          [1698725144.233252][1963:1963] CHIP:DMG: },
 
+
+          ./chip-tool actions read endpoint-lists 1 1
+
+          Via the TH (chip-tool), verify the EndpointLists attribute that contains EndpointListStructs.
+
+          [1698729275.160463][1963:1963] CHIP:IM: Received Read request
+          [1698729275.160560][1963:1963] CHIP:DMG: ReadRequestMessage =
+          [1698729275.160618][1963:1963] CHIP:DMG: {
+          [1698729275.160668][1963:1963] CHIP:DMG:         AttributePathIBs =
+          [1698729275.160729][1963:1963] CHIP:DMG:         [
+          [1698729275.160785][1963:1963] CHIP:DMG:                 AttributePathIB =
+          [1698729275.160848][1963:1963] CHIP:DMG:                 {
+          [1698729275.160912][1963:1963] CHIP:DMG:                         Endpoint = 0x1,
+          [1698729275.160992][1963:1963] CHIP:DMG:                         Cluster = 0x25,
+          [1698729275.161070][1963:1963] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1698729275.161143][1963:1963] CHIP:DMG:                 }
+          [1698729275.161211][1963:1963] CHIP:DMG:
+          [1698729275.161270][1963:1963] CHIP:DMG:         ],
+          [1698729275.161335][1963:1963] CHIP:DMG:
+          [1698729275.161395][1963:1963] CHIP:DMG:         isFabricFiltered = true,
+          [1698729275.161452][1963:1963] CHIP:DMG:         InteractionModelRevision = 11
+          [1698729275.161505][1963:1963] CHIP:DMG: },
 
 
           2. Use the above obtained ActionID to verify the following commands
-           ./chip-tool actions instant-action 4097 1 1 --trace_decode 1
+           ./chip-tool actions instant-action 4097 1 1
       disabled: true
 
     - label: "Step 1: DUT issues an InstantAction command to TH"
       PICS: ACT.C.C00.Tx
       verification: |
-          ./chip-tool actions instant-action 4097 1 1 --trace_decode 1
+          ./chip-tool actions instant-action 4097 1 1
 
-          Via the TH (bridge-app), verify the SUCCESS response for InstantAction.
+          Via the TH (bridge-app), verify the InstantAction response that contains ActionID .
 
-          [1686033693.327962][39117:39119] CHIP:DMG: InvokeResponseMessage =
-          [1686033693.328040][39117:39119] CHIP:DMG: {
-          [1686033693.328094][39117:39119] CHIP:DMG:         suppressResponse = false,
-          [1686033693.328151][39117:39119] CHIP:DMG:         InvokeResponseIBs =
-          [1686033693.328248][39117:39119] CHIP:DMG:         [
-          [1686033693.328307][39117:39119] CHIP:DMG:                 InvokeResponseIB =
-          [1686033693.328407][39117:39119] CHIP:DMG:                 {
-          [1686033693.328469][39117:39119] CHIP:DMG:                         CommandStatusIB =
-          [1686033693.328561][39117:39119] CHIP:DMG:                         {
-          [1686033693.328632][39117:39119] CHIP:DMG:                                 CommandPathIB =
-          [1686033693.328708][39117:39119] CHIP:DMG:                                 {
-          [1686033693.328807][39117:39119] CHIP:DMG:                                         EndpointId = 0x1,
-          [1686033693.328887][39117:39119] CHIP:DMG:                                         ClusterId = 0x25,
-          [1686033693.328987][39117:39119] CHIP:DMG:                                         CommandId = 0x0,
-          [1686033693.329062][39117:39119] CHIP:DMG:                                 },
-          [1686033693.329167][39117:39119] CHIP:DMG:
-          [1686033693.329237][39117:39119] CHIP:DMG:                                 StatusIB =
-          [1686033693.329376][39117:39119] CHIP:DMG:                                 {
-          [1686033693.329454][39117:39119] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1686033693.329551][39117:39119] CHIP:DMG:                                 },
-          [1686033693.329629][39117:39119] CHIP:DMG:
-          [1686033693.329716][39117:39119] CHIP:DMG:                         },
-          [1686033693.329794][39117:39119] CHIP:DMG:
-          [1686033693.329876][39117:39119] CHIP:DMG:                 },
-          [1686033693.329950][39117:39119] CHIP:DMG:
-          [1686033693.330005][39117:39119] CHIP:DMG:         ],
-          [1686033693.330101][39117:39119] CHIP:DMG:
-          [1686033693.330158][39117:39119] CHIP:DMG:         InteractionModelRevision = 1
-          [1686033693.330241][39117:39119] CHIP:DMG: },
+          [1698724321.817293][1963:1963] CHIP:DMG: InvokeRequestMessage =
+          [1698724321.817361][1963:1963] CHIP:DMG: {
+          [1698724321.817413][1963:1963] CHIP:DMG:         suppressResponse = false,
+          [1698724321.817475][1963:1963] CHIP:DMG:         timedRequest = false,
+          [1698724321.817532][1963:1963] CHIP:DMG:         InvokeRequests =
+          [1698724321.817603][1963:1963] CHIP:DMG:         [
+          [1698724321.817659][1963:1963] CHIP:DMG:                 CommandDataIB =
+          [1698724321.817723][1963:1963] CHIP:DMG:                 {
+          [1698724321.817782][1963:1963] CHIP:DMG:                         CommandPathIB =
+          [1698724321.817974][1963:1963] CHIP:DMG:                         {
+          [1698724321.818045][1963:1963] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698724321.818141][1963:1963] CHIP:DMG:                                 ClusterId = 0x25,
+          [1698724321.818232][1963:1963] CHIP:DMG:                                 CommandId = 0x0,
+          [1698724321.818319][1963:1963] CHIP:DMG:                         },
+          [1698724321.818399][1963:1963] CHIP:DMG:
+          [1698724321.818462][1963:1963] CHIP:DMG:                         CommandFields =
+          [1698724321.818537][1963:1963] CHIP:DMG:                         {
+          [1698724321.818607][1963:1963] CHIP:DMG:                                 0x0 = 4097,
+          [1698724321.818697][1963:1963] CHIP:DMG:                         },
+          [1698724321.818767][1963:1963] CHIP:DMG:                 },
+          [1698724321.818838][1963:1963] CHIP:DMG:
+          [1698724321.818894][1963:1963] CHIP:DMG:         ],
+          [1698724321.818963][1963:1963] CHIP:DMG:
+          [1698724321.819017][1963:1963] CHIP:DMG:         InteractionModelRevision = 11
+          [1698724321.819088][1963:1963] CHIP:DMG: },
       disabled: true
 
     - label: "Step 2: DUT issues an StartAction command to TH"

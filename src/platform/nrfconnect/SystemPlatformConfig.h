@@ -47,4 +47,8 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_USE_LWIP 0
 #define CHIP_SYSTEM_CONFIG_USE_SOCKETS 1
 
+#ifndef CONFIG_ARCH_POSIX
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 8
+#endif
+
 // ========== Platform-specific Configuration Overrides =========

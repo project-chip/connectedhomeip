@@ -336,15 +336,10 @@ CHIP_ERROR CertificationElementsDecoder::FindAndEnterArray(const ByteSpan & enco
     ReturnErrorOnFailure(mReader.EnterContainer(outerContainerType1));
 
     // position to arrayTag Array
-    CHIP_ERROR error = CHIP_NO_ERROR;
     do
     {
-        error = mReader.Next(kTLVType_Array, arrayTag);
-        // Return error code unless one of three things happened:
-        // 1. We found the right thing (CHIP_NO_ERROR returned).
-        // 2. The next tag is not the one we are looking for (CHIP_ERROR_UNEXPECTED_TLV_ELEMENT).
-        VerifyOrReturnError(error == CHIP_NO_ERROR || error == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT, error);
-    } while (error != CHIP_NO_ERROR);
+        ReturnErrorOnFailure(mReader.Next());
+    } while (mReader.Expect(kTLVType_Array, arrayTag) != CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(mReader.EnterContainer(outerContainerType2));
 

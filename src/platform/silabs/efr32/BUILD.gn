@@ -124,9 +124,7 @@ static_library("efr32") {
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
 
-    public_configs = [
-      "${chip_root}/src/lib/address_resolve:default_address_resolve_config",
-    ]
+    public_configs = []
   }
 
   if (chip_enable_wifi) {

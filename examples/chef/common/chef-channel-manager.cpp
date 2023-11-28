@@ -148,18 +148,18 @@ void ChefChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannel
     // Error: Found multiple matches
     if (totalMatchedChannels > 1)
     {
-        response.status = chip::app::Clusters::Channel::ChannelStatusEnum::kMultipleMatches;
+        response.status = chip::app::Clusters::Channel::StatusEnum::kMultipleMatches;
         helper.Success(response);
     }
     else if (totalMatchedChannels == 0)
     {
         // Error: Found no match
-        response.status = chip::app::Clusters::Channel::ChannelStatusEnum::kNoMatches;
+        response.status = chip::app::Clusters::Channel::StatusEnum::kNoMatches;
         helper.Success(response);
     }
     else
     {
-        response.status      = chip::app::Clusters::Channel::ChannelStatusEnum::kSuccess;
+        response.status      = chip::app::Clusters::Channel::StatusEnum::kSuccess;
         response.data        = chip::MakeOptional(CharSpan::fromCharString("data response"));
         mCurrentChannelIndex = index;
         helper.Success(response);

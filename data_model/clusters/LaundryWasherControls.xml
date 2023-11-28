@@ -70,22 +70,22 @@ Davis, CA 95616, USA
   </features>
   <dataTypes>
     <enum name="NumberOfRinsesEnum">
-      <item value="0" name="None" summary="This laundry washer mode does not perform rinse cycles">
+      <item value="0" name="None" summary="This laundry mode does not perform rinse cycles">
         <mandatoryConform>
           <feature name="RINSE"/>
         </mandatoryConform>
       </item>
-      <item value="1" name="Normal" summary="This laundry washer mode performs normal rinse cycles determined by the manufacturer">
+      <item value="1" name="Normal" summary="This laundry mode performs normal rinse cycles determined by the manufacturer">
         <mandatoryConform>
           <feature name="RINSE"/>
         </mandatoryConform>
       </item>
-      <item value="2" name="Extra" summary="This laundry washer mode performs an extra rinse cycle">
+      <item value="2" name="Extra" summary="This laundry mode performs an extra rinse cycle">
         <mandatoryConform>
           <feature name="RINSE"/>
         </mandatoryConform>
       </item>
-      <item value="3" name="Max" summary="This laundry washer mode performs the maximum number of rinse cycles determined by the manufacturer">
+      <item value="3" name="Max" summary="This laundry mode performs the maximum number of rinse cycles determined by the manufacturer">
         <mandatoryConform>
           <feature name="RINSE"/>
         </mandatoryConform>

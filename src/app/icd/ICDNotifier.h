@@ -18,6 +18,7 @@
 
 #include <app/AppConfig.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/BitFlags.h>
 
 class ICDListener;
 
@@ -27,7 +28,7 @@ namespace app {
 /**
  * The ICDManager implements the ICDListener functions and is always subscribed to the ICDNotifier
  * This allows other Matter modules to inform the ICDManager that it needs to go and may have to stay in Active Mode,
- * outside of its standard ActiveModeInterval and IdleModeInterval, without being tightly coupled the  application data model
+ * outside of its standard ActiveModeDuration and IdleModeDuration, without being tightly coupled the  application data model
  *
  * This implementation also allows other modules to implement an ICDListener and subscribe to ICDNotifier
  * to couple behaviours with the ICD cycles. In such cases, ICD_MAX_NOTIFICATION_SUBSCRIBERS need to be adjusted
@@ -38,12 +39,23 @@ static_assert(ICD_MAX_NOTIFICATION_SUBSCRIBERS > 0, "At least 1 Subscriber is re
 class ICDListener
 {
 public:
-    enum class KeepActiveFlags : uint8_t
+    enum class KeepActiveFlagsValues : uint8_t
     {
         kCommissioningWindowOpen = 0x01,
         kFailSafeArmed           = 0x02,
-        kExchangeContextOpen     = 0x03,
+        kExchangeContextOpen     = 0x04,
+        kCheckInInProgress       = 0x08,
+        kInvalidFlag             = 0x10, // Move up when adding more flags
     };
+
+    enum class ICDManagementEvents : uint8_t
+    {
+        kTableUpdated              = 0x01,
+        kStayActiveRequestReceived = 0x02,
+    };
+
+    using KeepActiveFlags = BitFlags<KeepActiveFlagsValues>;
+    using KeepActiveFlag  = KeepActiveFlagsValues;
 
     virtual ~ICDListener() {}
 
@@ -68,6 +80,14 @@ public:
      * @param request : The request source
      */
     virtual void OnActiveRequestWithdrawal(KeepActiveFlags request) = 0;
+
+    /**
+     * @brief This function is called for all subscribers of the ICDNotifier when it calls BroadcastICDManagementEvent
+     * It informs the subscriber that an ICD Management action has happened and needs to be processed
+     *
+     * @param event : The event type
+     */
+    virtual void OnICDManagementServerEvent(ICDManagementEvents event){};
 };
 
 class ICDNotifier
@@ -85,6 +105,12 @@ public:
     void BroadcastNetworkActivityNotification();
     void BroadcastActiveRequestNotification(ICDListener::KeepActiveFlags request);
     void BroadcastActiveRequestWithdrawal(ICDListener::KeepActiveFlags request);
+    void BroadcastICDManagementEvent(ICDListener::ICDManagementEvents event);
+
+    inline void BroadcastActiveRequest(ICDListener::KeepActiveFlags request, bool notify)
+    {
+        (notify) ? BroadcastActiveRequestNotification(request) : BroadcastActiveRequestWithdrawal(request);
+    }
 
     static ICDNotifier & GetInstance() { return sICDNotifier; }
 

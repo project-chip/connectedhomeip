@@ -44,7 +44,7 @@ source "../scripts/activate.sh"
 export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 
 if [[ -z "$ZEPHYR_SDK_INSTALL_DIR" && -n "$NRF5_TOOLS_ROOT" ]]; then
-    export ZEPHYR_SDK_INSTALL_DIR="$NRF5_TOOLS_ROOT"/zephyr-sdk-0.16.0
+    export ZEPHYR_SDK_INSTALL_DIR="$NRF5_TOOLS_ROOT"/zephyr-sdk-0.16.1
 fi
 
 # Set ccache base directory to improve the cache hit ratio

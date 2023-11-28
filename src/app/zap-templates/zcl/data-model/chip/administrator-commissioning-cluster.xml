@@ -40,7 +40,7 @@ limitations under the License.
 
     <attribute side="server" code="0x0000" define="WINDOW_STATUS" type="CommissioningWindowStatusEnum" writable="false" optional="false">WindowStatus</attribute>
     <attribute side="server" code="0x0001" define="ADMIN_FABRIC_INDEX" type="fabric_idx" writable="false" isNullable="true" optional="false">AdminFabricIndex</attribute>
-    <attribute side="server" code="0x0002" define="ADMIN_VENDOR_ID" type="int16u" writable="false" isNullable="true" optional="false">AdminVendorId</attribute>
+    <attribute side="server" code="0x0002" define="ADMIN_VENDOR_ID" type="vendor_id" writable="false" isNullable="true" optional="false">AdminVendorId</attribute>
 
     <command source="client" code="0x00" name="OpenCommissioningWindow" mustUseTimedInvoke="true" optional="false">
       <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method.</description>
@@ -48,7 +48,7 @@ limitations under the License.
       <arg name="PAKEPasscodeVerifier" type="octet_string"/>
       <arg name="Discriminator" type="int16u"/>
       <arg name="Iterations" type="int32u"/>
-      <arg name="Salt" type="octet_string"/>
+      <arg name="Salt" type="octet_string" length="32"/>
       <access op="invoke" privilege="administer"/>
     </command>
 
@@ -64,4 +64,9 @@ limitations under the License.
     </command>
 
   </cluster>
+
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x003c" />
+    <field name="Basic" mask="0x01" />
+  </bitmap>
 </configurator>

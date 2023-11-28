@@ -343,15 +343,7 @@ public:
 
             ESP_LOGI(TAG, "editing attribute as string: '%s' (%s)", value.c_str(), i == 0 ? "+" : "-");
             ESP_LOGI(TAG, "name and cluster: '%s' (%s)", name.c_str(), cluster.c_str());
-            if (name == "State" && cluster == "Lock")
-            {
-                value = (value == "Closed") ? "Open" : "Closed";
-                using namespace chip::app::Clusters;
-                // update the doorlock attribute here
-                auto attributeValue = value == "Closed" ? DoorLock::DlLockState::kLocked : DoorLock::DlLockState::kUnlocked;
-                DoorLock::Attributes::LockState::Set(DOOR_LOCK_SERVER_ENDPOINT, attributeValue);
-            }
-            else if (name == "Charge level" && cluster == "Power Source")
+            if (name == "Charge level" && cluster == "Power Source")
             {
                 using namespace chip::app::Clusters::PowerSource;
                 auto attributeValue = BatChargeLevelEnum::kOk;
@@ -578,13 +570,6 @@ void SetupPretendDevices()
     // write the temp attribute
     chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
 
-    AddDevice("Door Lock");
-    AddEndpoint("Default");
-    AddCluster("Lock");
-    AddAttribute("State", "Open");
-    // write the door lock state
-    chip::app::Clusters::DoorLock::Attributes::LockState::Set(DOOR_LOCK_SERVER_ENDPOINT,
-                                                              chip::app::Clusters::DoorLock::DlLockState::kUnlocked);
     AddDevice("Garage 1");
     AddEndpoint("Door 1");
     AddCluster("Door");

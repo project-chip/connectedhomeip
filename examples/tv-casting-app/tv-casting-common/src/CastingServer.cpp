@@ -789,7 +789,7 @@ CastingServer::ContentLauncher_SubscribeToSupportedStreamingProtocols(
 /**
  * @brief Level Control cluster
  */
-CHIP_ERROR CastingServer::LevelControl_Step(TargetEndpointInfo * endpoint, chip::app::Clusters::LevelControl::StepMode stepMode,
+CHIP_ERROR CastingServer::LevelControl_Step(TargetEndpointInfo * endpoint, chip::app::Clusters::LevelControl::StepModeEnum stepMode,
                                             uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
                                             std::function<void(CHIP_ERROR)> responseCallback)
 {
@@ -1100,7 +1100,7 @@ CHIP_ERROR CastingServer::TargetNavigator_SubscribeToCurrentTarget(
  * @brief Keypad Input cluster
  */
 CHIP_ERROR CastingServer::KeypadInput_SendKey(TargetEndpointInfo * endpoint,
-                                              const chip::app::Clusters::KeypadInput::CecKeyCode keyCode,
+                                              const chip::app::Clusters::KeypadInput::CECKeyCodeEnum keyCode,
                                               std::function<void(CHIP_ERROR)> responseCallback)
 {
     ReturnErrorOnFailure(mSendKeyCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));

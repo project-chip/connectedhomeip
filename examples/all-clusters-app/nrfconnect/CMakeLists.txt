@@ -56,7 +56,6 @@ target_include_directories(app PRIVATE
 target_sources(app PRIVATE
                main/AppTask.cpp
                main/main.cpp
-               main/ZclDoorLockCallbacks.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp

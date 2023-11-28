@@ -967,6 +967,13 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, size_t out_length);
 typedef int (*entropy_source)(void * data, uint8_t * output, size_t len, size_t * olen);
 
 /** @brief A function to add entropy sources to crypto library
+ *
+ * This function can be called multiple times to add multiple entropy sources. However,
+ * once the entropy source is added, it cannot be removed. Please make sure that the
+ * entropy source is valid for the lifetime of the application. Also, make sure that the
+ * same entropy source is not added multiple times, e.g.: by calling this function
+ * in class constructor or initialization function.
+ *
  * @param fn_source Function pointer to the entropy source
  * @param p_source  Data that should be provided when fn_source is called
  * @param threshold Minimum required from source before entropy is released

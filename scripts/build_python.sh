@@ -147,6 +147,20 @@ echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"
 
+# This is to prevent python compiled for previous versions reporting 10.16 as a version
+# which breaks the ability to install python wheels.
+#
+# See https://eclecticlight.co/2020/08/13/macos-version-numbering-isnt-so-simple/ for
+# some explanation
+#
+# TLDR:
+#
+#   > import platform
+#   > print(platform.mac_ver()[0])
+#     11.7.3   // (example) if SYSTEM_VERSION_COMPAT is 0
+#     10.16    // SYSTEM_VERSION_COMPAT is unset or 1
+export SYSTEM_VERSION_COMPAT=0
+
 # Generates ninja files
 [[ -n "$chip_mdns" ]] && chip_mdns_arg="chip_mdns=\"$chip_mdns\"" || chip_mdns_arg=""
 [[ -n "$chip_case_retry_delta" ]] && chip_case_retry_arg="chip_case_retry_delta=$chip_case_retry_delta" || chip_case_retry_arg=""
