@@ -131,8 +131,8 @@ bouffalolab_executable("window-app") {
   sources += [
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
     "${example_dir}/common/AppTask.cpp",
-    "${example_dir}/common/ZclCallbacks.cpp",
     "${example_dir}/common/WindowCovering.cpp",
+    "${example_dir}/common/ZclCallbacks.cpp",
     "${examples_plat_dir}/common/iot_sdk/aos_task.c",
     "${examples_plat_dir}/common/iot_sdk/platform_port.cpp",
     "${examples_plat_dir}/common/iot_sdk/uart.cpp",
