@@ -23,8 +23,6 @@
 
 #include "WindowManager.h"
 
-#include "LEDWidget.h"
-
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -39,19 +37,9 @@
 
 #include <lib/support/CodeUtils.h>
 
-#if !defined(BRD2704A)
-#define LIGHT_LED 1
-#else
-#define LIGHT_LED 0
-#endif
-
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
-
-namespace {
-LEDWidget sLightLED;
-}
 
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
@@ -81,23 +69,6 @@ CHIP_ERROR AppTask::Init()
         SILABS_LOG("WindowMgr::Init() failed");
         appError(err);
     }
-
-    sLightLED.Init(LIGHT_LED);
-
-// Update the LCD with the Stored value. Show QR Code if not provisioned
-#ifdef DISPLAY_ENABLED
-
-#ifdef QR_CODE_ENABLED
-#ifdef SL_WIFI
-    if (!ConnectivityMgr().IsWiFiStationProvisioned())
-#else
-    if (!ConnectivityMgr().IsThreadProvisioned())
-#endif /* !SL_WIFI */
-    {
-        GetLCD().ShowQRCode(true);
-    }
-#endif // QR_CODE_ENABLED
-#endif
 
     return err;
 }

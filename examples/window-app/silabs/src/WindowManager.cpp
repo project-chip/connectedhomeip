@@ -42,7 +42,6 @@
 
 #ifdef DISPLAY_ENABLED
 #include <LcdPainter.h>
-SilabsLCD slLCD;
 #endif
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
@@ -602,8 +601,6 @@ CHIP_ERROR WindowManager::Init()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    ConfigurationMgr().LogDeviceConfig();
-
     // Timers
     mLongPressTimer = new Timer(LONG_PRESS_TIMEOUT, OnLongPressTimeout, this);
 
@@ -614,10 +611,7 @@ CHIP_ERROR WindowManager::Init()
     // Initialize LEDs
     LEDWidget::InitGpio();
     mActionLED.Init(APP_ACTION_LED);
-
-#ifdef DISPLAY_ENABLED
-    slLCD.Init();
-#endif
+    AppTask::GetAppTask().LinkAppLed(&mActionLED);
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
@@ -637,13 +631,11 @@ void WindowManager::UpdateLED()
     Cover & cover = GetCover();
     if (mResetWarning)
     {
-        SILABS_LOG("---- UPDATE ACTION LED mResetWarning")
         mActionLED.Set(false);
         mActionLED.Blink(500);
     }
     else
     {
-        SILABS_LOG("******* UPDATE ACTION LED NORMAL")
         // Action LED
         NPercent100ths current;
         LimitStatus liftLimit = LimitStatus::Intermediate;
@@ -664,12 +656,10 @@ void WindowManager::UpdateLED()
         }
         else if (LimitStatus::IsUpOrOpen == liftLimit)
         {
-            SILABS_LOG("---- UPDATE ACTION LED IsUpOrOpen")
             mActionLED.Set(true);
         }
         else if (LimitStatus::IsDownOrClose == liftLimit)
         {
-            SILABS_LOG("---- UPDATE ACTION LED IsDownOrClose")
             mActionLED.Set(false);
         }
         else
@@ -698,7 +688,7 @@ void WindowManager::UpdateLCD()
 
         if (!tilt.IsNull() && !lift.IsNull())
         {
-            LcdPainter::Paint(slLCD, type, lift.Value(), tilt.Value(), mIcon);
+            LcdPainter::Paint(AppTask::GetAppTask().GetLCD(), type, lift.Value(), tilt.Value(), mIcon);
         }
     }
 #endif // DISPLAY_ENABLED

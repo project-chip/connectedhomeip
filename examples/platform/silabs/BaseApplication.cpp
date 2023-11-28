@@ -27,10 +27,6 @@
 
 #include <app/server/Server.h>
 
-#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
-#include "LEDWidget.h"
-#endif // ENABLE_WSTK_LEDS
-
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
@@ -146,8 +142,10 @@ Identify gIdentify = {
 
 #endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
 } // namespace
+
 bool BaseApplication::sIsProvisioned           = false;
-bool BaseApplication::mIsFactoryResetTriggered = false;
+bool BaseApplication::sIsFactoryResetTriggered = false;
+LEDWidget * BaseApplication::sAppActionLed     = nullptr;
 
 #ifdef DIC_ENABLE
 namespace {
@@ -280,7 +278,7 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
 {
     VerifyOrReturn(aEvent->Type == AppEvent::kEventType_Timer);
     // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
-    if (!mIsFactoryResetTriggered)
+    if (!sIsFactoryResetTriggered)
     {
         StartFactoryResetSequence();
     }
@@ -411,7 +409,8 @@ void BaseApplication::LightEventHandler()
 
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
+#if defined(ENABLE_WSTK_LEDS)
+#if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917))
     // Update the status LED if factory reset has not been initiated.
     //
     // If system has "full connectivity", keep the LED On constantly.
@@ -424,13 +423,18 @@ void BaseApplication::LightEventHandler()
     // the LEDs at an even rate of 100ms.
     //
     // Otherwise, blink the LED ON for a very short time.
-    if (!mIsFactoryResetTriggered)
+    if (!sIsFactoryResetTriggered)
     {
         ActivateStatusLedPatterns();
     }
 
     sStatusLED.Animate();
-#endif // ENABLE_WSTK_LEDS && SL_CATALOG_SIMPLE_LED_LED1_PRESENT
+#endif // SL_CATALOG_SIMPLE_LED_LED1_PRESENT
+    if (sAppActionLed)
+    {
+        sAppActionLed->Animate();
+    }
+#endif // ENABLE_WSTK_LEDS
 }
 
 void BaseApplication::ButtonHandler(AppEvent * aEvent)
@@ -448,7 +452,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
     }
     else
     {
-        if (mIsFactoryResetTriggered)
+        if (sIsFactoryResetTriggered)
         {
             CancelFactoryResetSequence();
         }
@@ -531,7 +535,7 @@ void BaseApplication::StartFactoryResetSequence()
     // cancel, if required.
     StartFunctionTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
 
-    mIsFactoryResetTriggered = true;
+    sIsFactoryResetTriggered = true;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
     StartStatusLEDTimer();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -551,9 +555,9 @@ void BaseApplication::CancelFactoryResetSequence()
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
     StopStatusLEDTimer();
 #endif
-    if (mIsFactoryResetTriggered)
+    if (sIsFactoryResetTriggered)
     {
-        mIsFactoryResetTriggered = false;
+        sIsFactoryResetTriggered = false;
         SILABS_LOG("Factory Reset has been Canceled");
     }
 }

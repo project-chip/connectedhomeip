@@ -36,6 +36,10 @@
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if defined(ENABLE_WSTK_LEDS)
+#include "LEDWidget.h"
+#endif // ENABLE_WSTK_LEDS
+
 #ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
 #include <app/clusters/identify-server/identify-server.h>
 #endif
@@ -71,7 +75,8 @@ public:
     BaseApplication() = default;
     virtual ~BaseApplication(){};
     static bool sIsProvisioned;
-    static bool mIsFactoryResetTriggered;
+    static bool sIsFactoryResetTriggered;
+    static LEDWidget * sAppActionLed;
 
     /**
      * @brief Create AppTask task and Event Queue
@@ -80,6 +85,20 @@ public:
      * @return CHIP_ERROR CHIP_NO_ERROR if no errors
      */
     CHIP_ERROR StartAppTask(TaskFunction_t taskFunction);
+
+    /**
+     * @brief Links the application specific led to the baseApplication context
+     * in order to synchronize both LED animations.
+     * Some apps may not have an application led or no animation patterns.
+     *
+     * @param appLed Pointer to the configure LEDWidget for the application defined LED
+     */
+    void LinkAppLed(LEDWidget * appLed) { sAppActionLed = appLed; }
+
+    /**
+     * @brief Remove the app Led linkage form the baseApplication context
+     */
+    void UnlinkAppLed() { sAppActionLed = nullptr; }
 
     /**
      * @brief PostEvent function that add event to AppTask queue for processing
