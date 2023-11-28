@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/server/Server.h>
+#include <app/icd/ICDConfig.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/ICDManager.h> // nogncheck
 #endif
