@@ -101,10 +101,10 @@ limitations under the License.
     <attribute side="server" code="0x07" define="NEIGHBOR_TABLE" type="ARRAY" entryType="NeighborTableStruct" length="254" writable="false" optional="false">NeighborTable</attribute>
     <attribute side="server" code="0x08" define="ROUTE_TABLE" type="ARRAY" entryType="RouteTableStruct" length="254" writable="false" optional="false">RouteTable</attribute>
     <attribute side="server" code="0x09" define="PARTITION_ID" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" isNullable="true" optional="false">PartitionId</attribute>
-    <attribute side="server" code="0x0A" define="WEIGHTING" type="int8u" min="0x00" max="0xFF" writable="false"  isNullable="true" optional="false">Weighting</attribute>
-    <attribute side="server" code="0x0B" define="DATA_VERSION" type="int8u" min="0x00" max="0xFF" writable="false"  isNullable="true" optional="false">DataVersion</attribute>
-    <attribute side="server" code="0x0C" define="STABLE_DATA_VERSION" type="int8u" min="0x00" max="0xFF" writable="false"  isNullable="true" optional="false">StableDataVersion</attribute>
-    <attribute side="server" code="0x0D" define="LEADER_ROUTER_ID" type="int8u" min="0x00" max="0xFF" writable="false"  isNullable="true" optional="false">LeaderRouterId</attribute>
+    <attribute side="server" code="0x0A" define="WEIGHTING" type="int16u" max="0xFF" writable="false"  isNullable="true" optional="false">Weighting</attribute>
+    <attribute side="server" code="0x0B" define="DATA_VERSION" type="int16u" max="0xFF" writable="false"  isNullable="true" optional="false">DataVersion</attribute>
+    <attribute side="server" code="0x0C" define="STABLE_DATA_VERSION" type="int16u" max="0xFF" writable="false"  isNullable="true" optional="false">StableDataVersion</attribute>
+    <attribute side="server" code="0x0D" define="LEADER_ROUTER_ID" type="int8u" min="0x00" max="62" writable="false"  isNullable="true" optional="false">LeaderRouterId</attribute>
     <attribute side="server" code="0x0E" define="DETACHED_ROLE_COUNT" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">DetachedRoleCount</attribute>
     <attribute side="server" code="0x0F" define="CHILD_ROLE_COUNT" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">ChildRoleCount</attribute>
     <attribute side="server" code="0x10" define="ROUTER_ROLE_COUNT" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">RouterRoleCount</attribute>
@@ -156,6 +156,7 @@ limitations under the License.
     <attribute side="server" code="0x3E" define="ACTIVE_THREAD_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFaultEnum" length="4" writable="false" optional="false">ActiveNetworkFaultsList</attribute>
     <command source="client" code="0x00" name="ResetCounts" optional="true" cli="chip thread_network_diagnostics resetcounts">
       <description>Reception of this command SHALL reset the OverrunCount attributes to 0</description>
+      <access op="invoke" privilege="manage"/>
     </command>
     <event side="server" code="0x00" name="ConnectionStatus" priority="info" optional="true">
       <description>Indicate that a Node’s connection status to a Thread network has changed</description>

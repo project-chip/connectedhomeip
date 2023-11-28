@@ -183,7 +183,6 @@ tests:
     - label:
           "Step 4a: TH reads the Uptime attribute value of DUT. Store the value
           in uptime1"
-      PICS: DGGEN.S.A0002
       command: "readAttribute"
       attribute: "UpTime"
       response:
@@ -192,7 +191,6 @@ tests:
               type: int64u
 
     - label: "Wait 10 seconds"
-      PICS: DGGEN.S.A0002
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -203,7 +201,6 @@ tests:
     - label:
           "Step 4b: TH reads a Uptime attribute value of DUT. Store the value in
           uptime2. Verify that uptime2 is greater than uptime1."
-      PICS: DGGEN.S.A0002
       command: "readAttribute"
       attribute: "UpTime"
       response:
@@ -241,7 +238,6 @@ tests:
     - label:
           "Step 4c: TH reads a Uptime attribute value of DUT. Store the value in
           uptime3. Verify that uptime3 is lesser than uptime2."
-      PICS: DGGEN.S.A0003
       command: "readAttribute"
       attribute: "UpTime"
       response:

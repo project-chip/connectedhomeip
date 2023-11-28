@@ -49,12 +49,12 @@ static constexpr uint32_t kChip32bitAttrUTF8Length             = 8;
 static constexpr uint32_t kChip64bitAttrUTF8Length             = 16;
 static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;
 
-// As per specifications (6.3.5. Node Operational Credentials Certificates)
+// As per specifications (6.4.5. Node Operational Credentials Certificates)
 static constexpr uint32_t kMaxCHIPCertLength = 400;
 static constexpr uint32_t kMaxDERCertLength  = 600;
 
-// The decode buffer is used to reconstruct TBS section of X.509 certificate, which doesn't include signature.
-static constexpr uint32_t kMaxCHIPCertDecodeBufLength = kMaxDERCertLength - Crypto::kMax_ECDSA_Signature_Length_Der;
+// As per spec section 11.24 (Wi-Fi Authentication with Per-Device Credentials)
+inline constexpr uint32_t kMaxCHIPCompactNetworkIdentityLength = 137;
 
 /** Data Element Tags for the CHIP Certificate
  */
@@ -112,6 +112,7 @@ enum class CertType : uint8_t
                                   firmware image signing is manufacturer-specific. The CHIP
                                   certificate format supports encoding of firmware signing
                                   certificates if chosen by the manufacturer to use them. */
+    kNetworkIdentity = 0x05, /**< A CHIP Network (Client) Identity. */
 };
 
 /** X.509 Certificate Key Purpose Flags
@@ -395,6 +396,16 @@ public:
 using CertificateKeyId = FixedByteSpan<kKeyIdentifierLength>;
 
 /**
+ *  @brief  A mutable `CertificateKeyId`.
+ */
+using MutableCertificateKeyId = FixedSpan<uint8_t, kKeyIdentifierLength>;
+
+/**
+ *  @brief  A storage type for `CertificateKeyId` and `MutableCertificateKeyId`.
+ */
+using CertificateKeyIdStorage = std::array<uint8_t, kKeyIdentifierLength>;
+
+/**
  *  @brief  A data structure for holding a P256 ECDSA signature, without the ownership of it.
  */
 using P256ECDSASignatureSpan = FixedByteSpan<Crypto::kP256_ECDSA_Signature_Length_Raw>;
@@ -428,7 +439,7 @@ struct ChipCertificateData
     void Clear();
     bool IsEqual(const ChipCertificateData & other) const;
 
-    ByteSpan mCertificate;                      /**< Original raw buffer data. */
+    ByteSpan mSerialNumber;                     /**< Certificate Serial Number. */
     ChipDN mSubjectDN;                          /**< Certificate Subject DN. */
     ChipDN mIssuerDN;                           /**< Certificate Issuer DN. */
     CertificateKeyId mSubjectKeyId;             /**< Certificate Subject public key identifier. */
@@ -529,6 +540,31 @@ CHIP_ERROR VerifyCertSignature(const ChipCertificateData & cert, const ChipCerti
  */
 CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac);
 
+/**
+ * Validates a Network (Client) Identity in TLV-encoded form.
+ * Accepts either a full certificate or the compact-pdc-identity format.
+ *
+ * This function parses the certificate, ensures the rigid fields have the values mandated by the
+ * specification, and validates the certificate signature.
+ *
+ * @param cert The network identity certificate to validate.
+ *
+ * @return CHIP_NO_ERROR on success, CHIP_ERROR_WRONG_CERT_TYPE if the certificate does
+ *         not conform to the requirements for a Network Identity, CHIP_ERROR_INVALID_SIGNATURE
+ *         if the certificate has an invalid signature, or another CHIP_ERROR.
+ *
+ * @see section 11.24 (Wi-Fi Authentication with Per-Device Credentials) of the Matter spec
+ */
+CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert);
+
+/**
+ * Convenience variant of `ValidateChipNetworkIdentity` that, upon successful validation, also
+ * calculates the key identifier for the Network (Client) Identity.
+ * @see ValidateChipNetworkIdentity
+ * @see ExtractIdentifierFromChipNetworkIdentity
+ */
+CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId outKeyId);
+
 struct FutureExtension
 {
     ByteSpan OID;
@@ -554,7 +590,7 @@ struct X509CertRequestParams
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, Crypto::P256Keypair & issuerKeypair,
+CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256Keypair & issuerKeypair,
                            MutableByteSpan & x509Cert);
 
 /**
@@ -568,7 +604,7 @@ CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, Crypto::
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
-                          Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
+                          const Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
 
 /**
  * @brief Generate a new X.509 DER encoded Node operational certificate
@@ -581,7 +617,18 @@ CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, const Cry
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
-                                      Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
+                                      const Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert);
+
+/**
+ * @brief Generates a Network (Client) Identity certificate in TLV-encoded form.
+ *
+ * @param keypair The key pair underlying the identity.
+ * @param outCompactCert Buffer to store the signed certificate in compact-pdc-identity TLV format.
+ *                       Must be at least `kMaxCHIPCompactNetworkIdentityLength` bytes long.
+ *
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert);
 
 /**
  * @brief
@@ -811,6 +858,15 @@ CHIP_ERROR ExtractSubjectDNFromChipCert(const ByteSpan & chipCert, ChipDN & dn);
  * Can return any error that can be returned from converting and parsing the cert.
  */
 CHIP_ERROR ExtractSubjectDNFromX509Cert(const ByteSpan & x509Cert, ChipDN & dn);
+
+/**
+ * Extracts the key identifier from a Network (Client) Identity in TLV-encoded form.
+ * Does NOT perform full validation of the identity certificate.
+ *
+ * @return CHIP_NO_ERROR on success, CHIP_ERROR_WRONG_CERT_TYPE if the certificate is
+ *         not a Network (Client) Identity, or another CHIP_ERROR if parsing fails.
+ */
+CHIP_ERROR ExtractIdentifierFromChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId outKeyId);
 
 } // namespace Credentials
 } // namespace chip

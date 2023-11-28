@@ -178,7 +178,6 @@
 		51B22C222740CB1D008D5055 /* MTRCommandPayloadsObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 51B22C212740CB1D008D5055 /* MTRCommandPayloadsObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51B22C262740CB32008D5055 /* MTRStructsObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51B22C252740CB32008D5055 /* MTRStructsObjc.mm */; };
 		51B22C2A2740CB47008D5055 /* MTRCommandPayloadsObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51B22C292740CB47008D5055 /* MTRCommandPayloadsObjc.mm */; };
-		51B6C5C62AD85B3D003F4D3A /* MTRClusters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B6C5C52AD85B3D003F4D3A /* MTRClusters.swift */; };
 		51C8E3F82825CDB600D47D00 /* MTRTestKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = 51C8E3F72825CDB600D47D00 /* MTRTestKeys.m */; };
 		51C984622A61CE2A00B0AD9A /* MTRFabricInfoChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = 51C984602A61CE2A00B0AD9A /* MTRFabricInfoChecker.m */; };
 		51CFDDB12AC5F78F00DA7CA5 /* EmptyDataModelHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 51CFDDB02AC5F78F00DA7CA5 /* EmptyDataModelHandler.cpp */; };
@@ -543,9 +542,7 @@
 		51B22C212740CB1D008D5055 /* MTRCommandPayloadsObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCommandPayloadsObjc.h; sourceTree = "<group>"; };
 		51B22C252740CB32008D5055 /* MTRStructsObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRStructsObjc.mm; sourceTree = "<group>"; };
 		51B22C292740CB47008D5055 /* MTRCommandPayloadsObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRCommandPayloadsObjc.mm; sourceTree = "<group>"; };
-		51B6C5C52AD85B3D003F4D3A /* MTRClusters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTRClusters.swift; sourceTree = "<group>"; };
 		51B6C5C72AD85B47003F4D3A /* MTRCommandPayloads_Internal.zapt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MTRCommandPayloads_Internal.zapt; sourceTree = "<group>"; };
-		51B6C5C92AD85B50003F4D3A /* MTRClusters-swift.zapt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "MTRClusters-swift.zapt"; sourceTree = "<group>"; };
 		51C8E3F72825CDB600D47D00 /* MTRTestKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRTestKeys.m; sourceTree = "<group>"; };
 		51C984602A61CE2A00B0AD9A /* MTRFabricInfoChecker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRFabricInfoChecker.m; sourceTree = "<group>"; };
 		51C984612A61CE2A00B0AD9A /* MTRFabricInfoChecker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRFabricInfoChecker.h; sourceTree = "<group>"; };
@@ -1000,7 +997,6 @@
 				51B22C1D2740CB0A008D5055 /* MTRStructsObjc.h */,
 				51B22C252740CB32008D5055 /* MTRStructsObjc.mm */,
 				5178E67D2AE098210069DF72 /* MTRCommandTimedCheck.mm */,
-				51B6C5C52AD85B3D003F4D3A /* MTRClusters.swift */,
 				51F522672AE70734000C4050 /* MTRDeviceTypeMetadata.mm */,
 			);
 			path = "zap-generated";
@@ -1035,7 +1031,6 @@
 				3D843728294984AF0070D20A /* MTRClusters.zapt */,
 				3D843720294984AF0070D20A /* MTRClusters_Internal.zapt */,
 				3D843726294984AF0070D20A /* MTRClusters-src.zapt */,
-				51B6C5C92AD85B50003F4D3A /* MTRClusters-swift.zapt */,
 				3D84371A294984AF0070D20A /* MTRCommandPayloadsObjc.zapt */,
 				3D843727294984AF0070D20A /* MTRCommandPayloadsObjc-src.zapt */,
 				51B6C5C72AD85B47003F4D3A /* MTRCommandPayloads_Internal.zapt */,
@@ -1571,7 +1566,6 @@
 					};
 					B202528C2459E34F00F97062 = {
 						CreatedOnToolsVersion = 11.4.1;
-						LastSwiftMigration = 1420;
 					};
 					B20252952459E34F00F97062 = {
 						CreatedOnToolsVersion = 11.4.1;
@@ -1747,7 +1741,6 @@
 				2C222AD1255C620600E446B9 /* MTRBaseDevice.mm in Sources */,
 				1EC3238D271999E2002A8BF0 /* cluster-objects.cpp in Sources */,
 				3CF134A9289D8D800017A19E /* MTRCSRInfo.mm in Sources */,
-				51B6C5C62AD85B3D003F4D3A /* MTRClusters.swift in Sources */,
 				991DC0892475F47D00C13860 /* MTRDeviceController.mm in Sources */,
 				B2E0D7B7245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.mm in Sources */,
 				514304202914CED9004DC7FE /* generic-callback-stubs.cpp in Sources */,
@@ -1908,6 +1901,13 @@
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 				USER_HEADER_SEARCH_PATHS = "";
+				WARNING_CFLAGS = (
+					"-Wformat",
+					"-Wformat-nonliteral",
+					"-Wformat-security",
+					"-Wconversion",
+					"-Wno-documentation",
+				);
 			};
 			name = Debug;
 		};
@@ -1977,6 +1977,13 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "";
+				WARNING_CFLAGS = (
+					"-Wformat",
+					"-Wformat-nonliteral",
+					"-Wformat-security",
+					"-Wconversion",
+					"-Wno-documentation",
+				);
 			};
 			name = Release;
 		};
@@ -2056,7 +2063,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
-				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
@@ -2068,6 +2074,7 @@
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					"$(inherited)",
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
+					"MTR_ENABLE_PROVISIONAL=1",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(CHIP_ROOT)/src",
@@ -2086,11 +2093,6 @@
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
 				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
 				OTHER_CFLAGS = "-fmacro-prefix-map=$(SRCROOT)/CHIP/=";
 				OTHER_LDFLAGS = "";
@@ -2129,8 +2131,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
 				TAPI_VERIFY_MODE = Pedantic;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 				VERSION_INFO_EXPORT_DECL = "__attribute__((visibility(\"hidden\")))";
@@ -2140,7 +2140,6 @@
 		BA09EB752474881D00605257 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../../src";
@@ -2230,7 +2229,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
-				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
@@ -2242,6 +2240,7 @@
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					"$(inherited)",
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
+					"MTR_ENABLE_PROVISIONAL=1",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(CHIP_ROOT)/src",
@@ -2260,11 +2259,6 @@
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
 				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
 				OTHER_CFLAGS = "-fmacro-prefix-map=$(SRCROOT)/CHIP/=";
 				OTHER_LDFLAGS = "";
@@ -2304,7 +2298,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				STRIP_STYLE = "non-global";
-				SWIFT_VERSION = 5.0;
 				TAPI_VERIFY_MODE = Pedantic;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 				VERSION_INFO_EXPORT_DECL = "__attribute__((visibility(\"hidden\")))";
@@ -2314,7 +2307,6 @@
 		BA09EB792474882200605257 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";

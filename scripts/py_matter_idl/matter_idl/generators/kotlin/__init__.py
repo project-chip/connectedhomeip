@@ -20,8 +20,8 @@ import os
 from typing import List, Optional, Set
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.generators.types import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
-                                         ParseDataType, TypeLookupContext)
+from matter_idl.generators.type_definitions import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
+                                                    ParseDataType, TypeLookupContext)
 from matter_idl.matter_idl_types import (Attribute, Cluster, ClusterSide, Command, DataType, Field, FieldQuality, Idl, Struct,
                                          StructQuality, StructTag)
 from stringcase import capitalcase
@@ -132,13 +132,25 @@ _KNOWN_DECODABLE_TYPES = {
 
 
 def GlobalNameToJavaName(name: str) -> str:
-    if name in {'Int8u', 'Int8s', 'Int16u', 'Int16s'}:
-        return 'Integer'
+    if name == 'Int8s':
+        return 'Byte'
+    if name == 'Int8u':
+        return 'UByte'
+    if name == 'Int16s':
+        return 'Short'
+    if name == 'Int16u':
+        return 'UShort'
 
-    if name.startswith('Int'):
+    if name == 'Int32s':
+        return 'Int'
+    if name == 'Int32u':
+        return 'UInt'
+    if name == 'Int64s':
         return 'Long'
+    if name == 'Int64u':
+        return 'ULong'
 
-    # Double/Float/Booleans/CharString/OctetString
+    # Double/Float/Boolean/CharString/OctetString
     return name
 
 
@@ -212,9 +224,9 @@ def JavaAttributeCallbackName(attr: Attribute, context: TypeLookupContext) -> st
     global_name = FieldToGlobalName(attr.definition, context)
 
     if global_name:
-        return '{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
+        return '{}'.format(GlobalNameToJavaName(global_name))
 
-    return '{}AttributeCallback'.format(capitalcase(attr.definition.name))
+    return '{}Attribute'.format(capitalcase(attr.definition.name))
 
 
 def IsFieldGlobalName(field: Field, context: TypeLookupContext) -> bool:
@@ -405,43 +417,6 @@ class EncodableValue:
         return e
 
     @property
-    def boxed_java_type(self):
-        t = ParseDataType(self.data_type, self.context)
-
-        if isinstance(t, FundamentalType):
-            if t == FundamentalType.BOOL:
-                return "Boolean"
-            elif t == FundamentalType.FLOAT:
-                return "Float"
-            elif t == FundamentalType.DOUBLE:
-                return "Double"
-            else:
-                raise Exception("Unknown fundamental type")
-        elif isinstance(t, BasicInteger):
-            # the >= 3 will include int24_t to be considered "long"
-            if t.byte_count >= 3:
-                return "Long"
-            else:
-                return "Integer"
-        elif isinstance(t, BasicString):
-            if t.is_binary:
-                return "ByteArray"
-            else:
-                return "String"
-        elif isinstance(t, IdlEnumType):
-            if t.base_type.byte_count >= 3:
-                return "Long"
-            else:
-                return "Integer"
-        elif isinstance(t, IdlBitmapType):
-            if t.base_type.byte_count >= 3:
-                return "Long"
-            else:
-                return "Integer"
-        else:
-            return "Object"
-
-    @property
     def kotlin_type(self):
         t = ParseDataType(self.data_type, self.context)
 
@@ -455,17 +430,22 @@ class EncodableValue:
             else:
                 raise Exception("Unknown fundamental type")
         elif isinstance(t, BasicInteger):
-            # the >= 3 will include int24_t to be considered "long"
             if t.is_signed:
-                if t.byte_count >= 3:
-                    return "Long"
-                else:
+                if t.byte_count <= 1:
+                    return "Byte"
+                if t.byte_count <= 2:
+                    return "Short"
+                if t.byte_count <= 4:
                     return "Int"
-            else:
-                if t.byte_count >= 3:
-                    return "ULong"
-                else:
+                return "Long"
+            else:  # unsigned
+                if t.byte_count <= 1:
+                    return "UByte"
+                if t.byte_count <= 2:
+                    return "UShort"
+                if t.byte_count <= 4:
                     return "UInt"
+                return "ULong"
         elif isinstance(t, BasicString):
             if t.is_binary:
                 return "ByteArray"
@@ -615,6 +595,11 @@ def IsFabricScopedList(attr: Attribute, lookup: TypeLookupContext) -> bool:
     return struct and struct.qualities == StructQuality.FABRIC_SCOPED
 
 
+def CommandHasResponse(command: Command) -> bool:
+    """Returns true if a command has a specific response."""
+    return command.output_param != "DefaultSuccess"
+
+
 def IsResponseStruct(s: Struct) -> bool:
     return s.tag == StructTag.RESPONSE
 
@@ -649,6 +634,7 @@ class __KotlinCodeGenerator(CodeGenerator):
         self.jinja_env.filters['createLookupContext'] = CreateLookupContext
         self.jinja_env.filters['canGenerateSubscribe'] = CanGenerateSubscribe
         self.jinja_env.filters['isFabricScopedList'] = IsFabricScopedList
+        self.jinja_env.filters['hasResponse'] = CommandHasResponse
 
         self.jinja_env.tests['is_response_struct'] = IsResponseStruct
         self.jinja_env.tests['is_using_global_callback'] = _IsUsingGlobalCallback
@@ -689,3 +675,43 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
                     'cluster': cluster,
                 }
             )
+
+        # Every cluster has its own impl, to avoid
+        # very large compilations (running out of RAM)
+        for cluster in self.idl.clusters:
+            if cluster.side != ClusterSide.CLIENT:
+                continue
+
+            for struct in cluster.structs:
+                if struct.tag:
+                    continue
+
+                output_name = "java/matter/devicecontroller/cluster/structs/{cluster_name}Cluster{struct_name}.kt"
+                self.internal_render_one_output(
+                    template_path="MatterStructs.jinja",
+                    output_file_name=output_name.format(
+                        cluster_name=cluster.name,
+                        struct_name=struct.name),
+                    vars={
+                        'cluster': cluster,
+                        'struct': struct,
+                        'typeLookup': TypeLookupContext(self.idl, cluster),
+                    }
+                )
+
+            for event in cluster.events:
+                if not event.fields:
+                    continue
+
+                output_name = "java/matter/devicecontroller/cluster/eventstructs/{cluster_name}Cluster{event_name}Event.kt"
+                self.internal_render_one_output(
+                    template_path="MatterEventStructs.jinja",
+                    output_file_name=output_name.format(
+                        cluster_name=cluster.name,
+                        event_name=event.name),
+                    vars={
+                        'cluster': cluster,
+                        'event': event,
+                        'typeLookup': TypeLookupContext(self.idl, cluster),
+                    }
+                )

@@ -89,7 +89,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
 
     async def create_commissioner(self):
         if self.commissioner:
-            self.destroy_current_commissioner()
+            await self.destroy_current_commissioner()
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
         self.commissioner = new_fabric_admin.NewController(nodeId=112233, useTestCommissioner=True)
@@ -229,6 +229,57 @@ class TestCommissioningTimeSync(MatterBaseTest):
         asserts.assert_false(self.commissioner.CheckStageSuccessful(
             kCheckForMatchingFabric), "Incorrectly ran check for matching fabric stage")
         asserts.assert_equal(self.commissioner.GetFabricCheckResult(), -1, "Fabric check result incorrectly set")
+
+    @async_test_body
+    async def test_TimeZoneName(self):
+        await self.create_commissioner()
+        self.commissioner.SetTimeZone(offset=3600, validAt=0, name="test")
+        await self.commission_and_base_checks()
+        asserts.assert_true(self.commissioner.CheckStageSuccessful(kConfigureTimeZone), 'Time zone was not successfully set')
+
+        received = await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.TimeZone)
+        expected = [Clusters.TimeSynchronization.Structs.TimeZoneStruct(offset=3600, validAt=0, name="test")]
+        asserts.assert_equal(received, expected, "Time zone was not correctly set by commissioner")
+
+        await self.create_commissioner()
+        # name is max 64 per the spec
+        sixty_five_byte_string = "x" * 65
+        self.commissioner.SetTimeZone(offset=3600, validAt=0, name=sixty_five_byte_string)
+        await self.commission_and_base_checks()
+        asserts.assert_true(self.commissioner.CheckStageSuccessful(kConfigureTimeZone), 'Time zone was not successfully set')
+
+        received = await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.TimeZone)
+        expected = [Clusters.TimeSynchronization.Structs.TimeZoneStruct(offset=3600, validAt=0, name=None)]
+        asserts.assert_equal(received, expected, "Commissioner did not ignore too-long name")
+
+        await self.create_commissioner()
+        # name is max 64 per the spec
+        sixty_four_byte_string = "x" * 64
+        self.commissioner.SetTimeZone(offset=3600, validAt=0, name=sixty_four_byte_string)
+        await self.commission_and_base_checks()
+        asserts.assert_true(self.commissioner.CheckStageSuccessful(kConfigureTimeZone), 'Time zone was not successfully set')
+
+        received = await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.TimeZone)
+        expected = [Clusters.TimeSynchronization.Structs.TimeZoneStruct(offset=3600, validAt=0, name=sixty_four_byte_string)]
+        asserts.assert_equal(received, expected, "Time zone 64 byte name was not correctly set")
+
+    @async_test_body
+    async def test_DefaultNtpSize(self):
+        await self.create_commissioner()
+        too_long_name = "x." + "x" * 127
+        self.commissioner.SetDefaultNTP(too_long_name)
+        await self.commission_and_base_checks()
+        asserts.assert_false(self.commissioner.CheckStageSuccessful(kConfigureDefaultNTP),
+                             'Commissioner attempted to set default NTP to a too long value')
+
+        await self.create_commissioner()
+        just_fits_name = "x." + "x" * 126
+        self.commissioner.SetDefaultNTP(just_fits_name)
+        await self.commission_and_base_checks()
+        asserts.assert_true(self.commissioner.CheckStageSuccessful(kConfigureDefaultNTP),
+                            'Commissioner did not correctly set default NTP')
+        received = await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.DefaultNTP)
+        asserts.assert_equal(received, just_fits_name, 'Commissioner incorrectly set default NTP name')
 
 
 # TODO(cecille): Test - Add hooks to change the time zone response to indicate no DST is needed

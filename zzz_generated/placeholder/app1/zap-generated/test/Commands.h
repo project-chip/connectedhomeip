@@ -320,7 +320,7 @@ private:
         {
         case 0: {
             LogStep(0, "DUT sends ResetCounts command to TH");
-            VerifyOrDo(!ShouldSkip("DGWIFI.S.C00.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGWIFI.C.C00.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitCommand(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Commands::ResetCounts::Id);
         }
         }

@@ -17,538 +17,395 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.controller.MatterController
+import matter.devicecontroller.cluster.structs.*
 
-class WindowCoveringCluster(private val endpointId: UShort) {
+class WindowCoveringCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
+  class CurrentPositionLiftAttribute(val value: UShort?)
+
+  class CurrentPositionTiltAttribute(val value: UShort?)
+
+  class CurrentPositionLiftPercentageAttribute(val value: UByte?)
+
+  class CurrentPositionTiltPercentageAttribute(val value: UByte?)
+
+  class TargetPositionLiftPercent100thsAttribute(val value: UShort?)
+
+  class TargetPositionTiltPercent100thsAttribute(val value: UShort?)
+
+  class CurrentPositionLiftPercent100thsAttribute(val value: UShort?)
+
+  class CurrentPositionTiltPercent100thsAttribute(val value: UShort?)
+
+  class GeneratedCommandListAttribute(val value: List<UInt>)
+
+  class AcceptedCommandListAttribute(val value: List<UInt>)
+
+  class EventListAttribute(val value: List<UInt>)
+
+  class AttributeListAttribute(val value: List<UInt>)
+
+  suspend fun upOrOpen(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun downOrClose(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 1L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun stopMotion(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 2L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun goToLiftValue(liftValue: UShort, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 4L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun goToLiftPercentage(
+    liftPercent100thsValue: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 5L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun goToTiltValue(tiltValue: UShort, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 7L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun goToTiltPercentage(
+    tiltPercent100thsValue: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 8L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readTypeAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPhysicalClosedLimitLiftAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePhysicalClosedLimitLiftAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPhysicalClosedLimitTiltAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePhysicalClosedLimitTiltAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentPositionLiftAttribute(): CurrentPositionLiftAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentPositionLiftAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CurrentPositionLiftAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentPositionTiltAttribute(): CurrentPositionTiltAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentPositionTiltAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CurrentPositionTiltAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNumberOfActuationsLiftAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNumberOfActuationsLiftAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNumberOfActuationsTiltAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNumberOfActuationsTiltAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readConfigStatusAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeConfigStatusAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentPositionLiftPercentageAttribute(): CurrentPositionLiftPercentageAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentPositionLiftPercentageAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CurrentPositionLiftPercentageAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentPositionTiltPercentageAttribute(): CurrentPositionTiltPercentageAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentPositionTiltPercentageAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CurrentPositionTiltPercentageAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOperationalStatusAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOperationalStatusAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTargetPositionLiftPercent100thsAttribute():
+    TargetPositionLiftPercent100thsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTargetPositionLiftPercent100thsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): TargetPositionLiftPercent100thsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTargetPositionTiltPercent100thsAttribute():
+    TargetPositionTiltPercent100thsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTargetPositionTiltPercent100thsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): TargetPositionTiltPercent100thsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEndProductTypeAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEndProductTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentPositionLiftPercent100thsAttribute():
+    CurrentPositionLiftPercent100thsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentPositionLiftPercent100thsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CurrentPositionLiftPercent100thsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentPositionTiltPercent100thsAttribute():
+    CurrentPositionTiltPercent100thsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentPositionTiltPercent100thsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CurrentPositionTiltPercent100thsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readInstalledOpenLimitLiftAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeInstalledOpenLimitLiftAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readInstalledClosedLimitLiftAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeInstalledClosedLimitLiftAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readInstalledOpenLimitTiltAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeInstalledOpenLimitTiltAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readInstalledClosedLimitTiltAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeInstalledClosedLimitTiltAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readModeAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeModeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeModeAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSafetyStatusAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSafetyStatusAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 258u
-  }
-
-  fun upOrOpen(callback: DefaultClusterCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun upOrOpen(callback: DefaultClusterCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun downOrClose(callback: DefaultClusterCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun downOrClose(callback: DefaultClusterCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun stopMotion(callback: DefaultClusterCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun stopMotion(callback: DefaultClusterCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun goToLiftValue(callback: DefaultClusterCallback, liftValue: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun goToLiftValue(
-    callback: DefaultClusterCallback,
-    liftValue: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun goToLiftPercentage(callback: DefaultClusterCallback, liftPercent100thsValue: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun goToLiftPercentage(
-    callback: DefaultClusterCallback,
-    liftPercent100thsValue: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun goToTiltValue(callback: DefaultClusterCallback, tiltValue: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun goToTiltValue(
-    callback: DefaultClusterCallback,
-    tiltValue: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun goToTiltPercentage(callback: DefaultClusterCallback, tiltPercent100thsValue: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun goToTiltPercentage(
-    callback: DefaultClusterCallback,
-    tiltPercent100thsValue: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  interface CurrentPositionLiftAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface CurrentPositionTiltAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface CurrentPositionLiftPercentageAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface CurrentPositionTiltPercentageAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface TargetPositionLiftPercent100thsAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface TargetPositionTiltPercent100thsAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface CurrentPositionLiftPercent100thsAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface CurrentPositionTiltPercent100thsAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readTypeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTypeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPhysicalClosedLimitLiftAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePhysicalClosedLimitLiftAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPhysicalClosedLimitTiltAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePhysicalClosedLimitTiltAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCurrentPositionLiftAttribute(callback: CurrentPositionLiftAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentPositionLiftAttribute(
-    callback: CurrentPositionLiftAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCurrentPositionTiltAttribute(callback: CurrentPositionTiltAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentPositionTiltAttribute(
-    callback: CurrentPositionTiltAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNumberOfActuationsLiftAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNumberOfActuationsLiftAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNumberOfActuationsTiltAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNumberOfActuationsTiltAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readConfigStatusAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeConfigStatusAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCurrentPositionLiftPercentageAttribute(
-    callback: CurrentPositionLiftPercentageAttributeCallback
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentPositionLiftPercentageAttribute(
-    callback: CurrentPositionLiftPercentageAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCurrentPositionTiltPercentageAttribute(
-    callback: CurrentPositionTiltPercentageAttributeCallback
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentPositionTiltPercentageAttribute(
-    callback: CurrentPositionTiltPercentageAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOperationalStatusAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOperationalStatusAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTargetPositionLiftPercent100thsAttribute(
-    callback: TargetPositionLiftPercent100thsAttributeCallback
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTargetPositionLiftPercent100thsAttribute(
-    callback: TargetPositionLiftPercent100thsAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTargetPositionTiltPercent100thsAttribute(
-    callback: TargetPositionTiltPercent100thsAttributeCallback
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTargetPositionTiltPercent100thsAttribute(
-    callback: TargetPositionTiltPercent100thsAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEndProductTypeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEndProductTypeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCurrentPositionLiftPercent100thsAttribute(
-    callback: CurrentPositionLiftPercent100thsAttributeCallback
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentPositionLiftPercent100thsAttribute(
-    callback: CurrentPositionLiftPercent100thsAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCurrentPositionTiltPercent100thsAttribute(
-    callback: CurrentPositionTiltPercent100thsAttributeCallback
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentPositionTiltPercent100thsAttribute(
-    callback: CurrentPositionTiltPercent100thsAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readInstalledOpenLimitLiftAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeInstalledOpenLimitLiftAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readInstalledClosedLimitLiftAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeInstalledClosedLimitLiftAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readInstalledOpenLimitTiltAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeInstalledOpenLimitTiltAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readInstalledClosedLimitTiltAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeInstalledClosedLimitTiltAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readModeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeModeAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeModeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeModeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSafetyStatusAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSafetyStatusAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

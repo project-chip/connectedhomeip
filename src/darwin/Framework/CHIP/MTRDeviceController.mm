@@ -51,7 +51,7 @@
 #import "MTRDeviceAttestationDelegateBridge.h"
 #import "MTRDeviceConnectionBridge.h"
 
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/List.h>
@@ -127,8 +127,17 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 @implementation MTRDeviceController
 
-- (nullable instancetype)initWithParameters:(MTRDeviceControllerParameters *)parameters error:(NSError * __autoreleasing *)error
+- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
 {
+    if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
+        MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
+
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
+        }
+        return nil;
+    }
+
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     if (!factory.isRunning) {
         auto * params = [[MTRDeviceControllerFactoryParams alloc] initWithoutStorage];
@@ -138,7 +147,9 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         }
     }
 
-    return [factory initializeController:self withParameters:parameters error:error];
+    auto * parametersForFactory = static_cast<MTRDeviceControllerParameters *>(parameters);
+
+    return [factory initializeController:self withParameters:parametersForFactory error:error];
 }
 
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory

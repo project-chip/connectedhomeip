@@ -23,12 +23,12 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
-  val associationFailure: UInt,
+  val associationFailureCause: UInt,
   val status: UInt
 ) {
   override fun toString(): String = buildString {
     append("WiFiNetworkDiagnosticsClusterAssociationFailureEvent {\n")
-    append("\tassociationFailure : $associationFailure\n")
+    append("\tassociationFailureCause : $associationFailureCause\n")
     append("\tstatus : $status\n")
     append("}\n")
   }
@@ -36,14 +36,14 @@ class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_ASSOCIATION_FAILURE), associationFailure)
+      put(ContextSpecificTag(TAG_ASSOCIATION_FAILURE_CAUSE), associationFailureCause)
       put(ContextSpecificTag(TAG_STATUS), status)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_ASSOCIATION_FAILURE = 0
+    private const val TAG_ASSOCIATION_FAILURE_CAUSE = 0
     private const val TAG_STATUS = 1
 
     fun fromTlv(
@@ -51,12 +51,13 @@ class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
       tlvReader: TlvReader
     ): WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
       tlvReader.enterStructure(tlvTag)
-      val associationFailure = tlvReader.getUInt(ContextSpecificTag(TAG_ASSOCIATION_FAILURE))
+      val associationFailureCause =
+        tlvReader.getUInt(ContextSpecificTag(TAG_ASSOCIATION_FAILURE_CAUSE))
       val status = tlvReader.getUInt(ContextSpecificTag(TAG_STATUS))
 
       tlvReader.exitContainer()
 
-      return WiFiNetworkDiagnosticsClusterAssociationFailureEvent(associationFailure, status)
+      return WiFiNetworkDiagnosticsClusterAssociationFailureEvent(associationFailureCause, status)
     }
   }
 }

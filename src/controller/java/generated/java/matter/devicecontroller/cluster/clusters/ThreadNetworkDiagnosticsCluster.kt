@@ -17,1040 +17,695 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.controller.MatterController
+import matter.devicecontroller.cluster.structs.*
 
-class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
+class ThreadNetworkDiagnosticsCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
+  class ChannelAttribute(val value: UShort?)
+
+  class RoutingRoleAttribute(val value: UInt?)
+
+  class NetworkNameAttribute(val value: String?)
+
+  class PanIdAttribute(val value: UShort?)
+
+  class ExtendedPanIdAttribute(val value: ULong?)
+
+  class MeshLocalPrefixAttribute(val value: ByteArray?)
+
+  class NeighborTableAttribute(val value: List<ThreadNetworkDiagnosticsClusterNeighborTableStruct>)
+
+  class RouteTableAttribute(val value: List<ThreadNetworkDiagnosticsClusterRouteTableStruct>)
+
+  class PartitionIdAttribute(val value: UInt?)
+
+  class WeightingAttribute(val value: UShort?)
+
+  class DataVersionAttribute(val value: UShort?)
+
+  class StableDataVersionAttribute(val value: UShort?)
+
+  class LeaderRouterIdAttribute(val value: UByte?)
+
+  class ActiveTimestampAttribute(val value: ULong?)
+
+  class PendingTimestampAttribute(val value: ULong?)
+
+  class DelayAttribute(val value: UInt?)
+
+  class SecurityPolicyAttribute(val value: ThreadNetworkDiagnosticsClusterSecurityPolicy?)
+
+  class ChannelPage0MaskAttribute(val value: ByteArray?)
+
+  class OperationalDatasetComponentsAttribute(
+    val value: ThreadNetworkDiagnosticsClusterOperationalDatasetComponents?
+  )
+
+  class ActiveNetworkFaultsListAttribute(val value: List<UInt>)
+
+  class GeneratedCommandListAttribute(val value: List<UInt>)
+
+  class AcceptedCommandListAttribute(val value: List<UInt>)
+
+  class EventListAttribute(val value: List<UInt>)
+
+  class AttributeListAttribute(val value: List<UInt>)
+
+  suspend fun resetCounts(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readChannelAttribute(): ChannelAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeChannelAttribute(minInterval: Int, maxInterval: Int): ChannelAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRoutingRoleAttribute(): RoutingRoleAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRoutingRoleAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): RoutingRoleAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNetworkNameAttribute(): NetworkNameAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNetworkNameAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): NetworkNameAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPanIdAttribute(): PanIdAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePanIdAttribute(minInterval: Int, maxInterval: Int): PanIdAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readExtendedPanIdAttribute(): ExtendedPanIdAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeExtendedPanIdAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ExtendedPanIdAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMeshLocalPrefixAttribute(): MeshLocalPrefixAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMeshLocalPrefixAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): MeshLocalPrefixAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOverrunCountAttribute(): ULong {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOverrunCountAttribute(minInterval: Int, maxInterval: Int): ULong {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNeighborTableAttribute(): NeighborTableAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNeighborTableAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): NeighborTableAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRouteTableAttribute(): RouteTableAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRouteTableAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): RouteTableAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPartitionIdAttribute(): PartitionIdAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePartitionIdAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): PartitionIdAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readWeightingAttribute(): WeightingAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeWeightingAttribute(minInterval: Int, maxInterval: Int): WeightingAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDataVersionAttribute(): DataVersionAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDataVersionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): DataVersionAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readStableDataVersionAttribute(): StableDataVersionAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeStableDataVersionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): StableDataVersionAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLeaderRouterIdAttribute(): LeaderRouterIdAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLeaderRouterIdAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): LeaderRouterIdAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDetachedRoleCountAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDetachedRoleCountAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readChildRoleCountAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeChildRoleCountAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRouterRoleCountAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRouterRoleCountAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLeaderRoleCountAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLeaderRoleCountAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttachAttemptCountAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttachAttemptCountAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPartitionIdChangeCountAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePartitionIdChangeCountAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBetterPartitionAttachAttemptCountAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBetterPartitionAttachAttemptCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readParentChangeCountAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeParentChangeCountAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxTotalCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxTotalCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxUnicastCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxUnicastCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxBroadcastCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxBroadcastCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxAckRequestedCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxAckRequestedCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxAckedCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxAckedCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxNoAckRequestedCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxNoAckRequestedCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxDataCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxDataCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxDataPollCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxDataPollCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxBeaconCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxBeaconCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxBeaconRequestCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxBeaconRequestCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxOtherCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxOtherCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxRetryCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxRetryCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxDirectMaxRetryExpiryCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxDirectMaxRetryExpiryCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxIndirectMaxRetryExpiryCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxIndirectMaxRetryExpiryCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxErrCcaCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxErrCcaCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxErrAbortCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxErrAbortCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTxErrBusyChannelCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTxErrBusyChannelCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxTotalCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxTotalCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxUnicastCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxUnicastCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxBroadcastCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxBroadcastCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxDataCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxDataCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxDataPollCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxDataPollCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxBeaconCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxBeaconCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxBeaconRequestCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxBeaconRequestCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxOtherCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxOtherCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxAddressFilteredCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxAddressFilteredCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxDestAddrFilteredCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxDestAddrFilteredCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxDuplicatedCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxDuplicatedCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxErrNoFrameCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxErrNoFrameCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxErrUnknownNeighborCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxErrUnknownNeighborCountAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxErrInvalidSrcAddrCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxErrInvalidSrcAddrCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxErrSecCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxErrSecCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxErrFcsCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxErrFcsCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRxErrOtherCountAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRxErrOtherCountAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readActiveTimestampAttribute(): ActiveTimestampAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeActiveTimestampAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ActiveTimestampAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPendingTimestampAttribute(): PendingTimestampAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePendingTimestampAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): PendingTimestampAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDelayAttribute(): DelayAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDelayAttribute(minInterval: Int, maxInterval: Int): DelayAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSecurityPolicyAttribute(): SecurityPolicyAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSecurityPolicyAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): SecurityPolicyAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readChannelPage0MaskAttribute(): ChannelPage0MaskAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeChannelPage0MaskAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ChannelPage0MaskAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOperationalDatasetComponentsAttribute(): OperationalDatasetComponentsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOperationalDatasetComponentsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): OperationalDatasetComponentsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readActiveNetworkFaultsListAttribute(): ActiveNetworkFaultsListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeActiveNetworkFaultsListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ActiveNetworkFaultsListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 53u
-  }
-
-  fun resetCounts(callback: DefaultClusterCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun resetCounts(callback: DefaultClusterCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  interface ChannelAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface RoutingRoleAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface NetworkNameAttributeCallback {
-    fun onSuccess(value: String?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface PanIdAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface ExtendedPanIdAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface MeshLocalPrefixAttributeCallback {
-    fun onSuccess(value: ByteArray?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface NeighborTableAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.ThreadNetworkDiagnosticsClusterNeighborTableStruct>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface RouteTableAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.ThreadNetworkDiagnosticsClusterRouteTableStruct>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface PartitionIdAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface WeightingAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface DataVersionAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface StableDataVersionAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface LeaderRouterIdAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface ActiveTimestampAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface PendingTimestampAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface DelayAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface SecurityPolicyAttributeCallback {
-    fun onSuccess(value: ChipStructs.ThreadNetworkDiagnosticsClusterSecurityPolicy?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface ChannelPage0MaskAttributeCallback {
-    fun onSuccess(value: ByteArray?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface OperationalDatasetComponentsAttributeCallback {
-    fun onSuccess(value: ChipStructs.ThreadNetworkDiagnosticsClusterOperationalDatasetComponents?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface ActiveNetworkFaultsListAttributeCallback {
-    fun onSuccess(value: ArrayList<Integer>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readChannelAttribute(callback: ChannelAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeChannelAttribute(
-    callback: ChannelAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRoutingRoleAttribute(callback: RoutingRoleAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRoutingRoleAttribute(
-    callback: RoutingRoleAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNetworkNameAttribute(callback: NetworkNameAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNetworkNameAttribute(
-    callback: NetworkNameAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPanIdAttribute(callback: PanIdAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePanIdAttribute(
-    callback: PanIdAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readExtendedPanIdAttribute(callback: ExtendedPanIdAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeExtendedPanIdAttribute(
-    callback: ExtendedPanIdAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMeshLocalPrefixAttribute(callback: MeshLocalPrefixAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMeshLocalPrefixAttribute(
-    callback: MeshLocalPrefixAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOverrunCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOverrunCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNeighborTableAttribute(callback: NeighborTableAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNeighborTableAttribute(
-    callback: NeighborTableAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRouteTableAttribute(callback: RouteTableAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRouteTableAttribute(
-    callback: RouteTableAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPartitionIdAttribute(callback: PartitionIdAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePartitionIdAttribute(
-    callback: PartitionIdAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readWeightingAttribute(callback: WeightingAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeWeightingAttribute(
-    callback: WeightingAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readDataVersionAttribute(callback: DataVersionAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeDataVersionAttribute(
-    callback: DataVersionAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readStableDataVersionAttribute(callback: StableDataVersionAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeStableDataVersionAttribute(
-    callback: StableDataVersionAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLeaderRouterIdAttribute(callback: LeaderRouterIdAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLeaderRouterIdAttribute(
-    callback: LeaderRouterIdAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readDetachedRoleCountAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeDetachedRoleCountAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readChildRoleCountAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeChildRoleCountAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRouterRoleCountAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRouterRoleCountAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLeaderRoleCountAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLeaderRoleCountAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttachAttemptCountAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttachAttemptCountAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPartitionIdChangeCountAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePartitionIdChangeCountAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBetterPartitionAttachAttemptCountAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBetterPartitionAttachAttemptCountAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readParentChangeCountAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeParentChangeCountAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxTotalCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxTotalCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxUnicastCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxUnicastCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxBroadcastCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxBroadcastCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxAckRequestedCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxAckRequestedCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxAckedCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxAckedCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxNoAckRequestedCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxNoAckRequestedCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxDataCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxDataCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxDataPollCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxDataPollCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxBeaconCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxBeaconCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxBeaconRequestCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxBeaconRequestCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxOtherCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxOtherCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxRetryCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxRetryCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxDirectMaxRetryExpiryCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxDirectMaxRetryExpiryCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxIndirectMaxRetryExpiryCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxIndirectMaxRetryExpiryCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxErrCcaCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxErrCcaCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxErrAbortCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxErrAbortCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTxErrBusyChannelCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTxErrBusyChannelCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxTotalCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxTotalCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxUnicastCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxUnicastCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxBroadcastCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxBroadcastCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxDataCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxDataCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxDataPollCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxDataPollCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxBeaconCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxBeaconCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxBeaconRequestCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxBeaconRequestCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxOtherCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxOtherCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxAddressFilteredCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxAddressFilteredCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxDestAddrFilteredCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxDestAddrFilteredCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxDuplicatedCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxDuplicatedCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxErrNoFrameCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxErrNoFrameCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxErrUnknownNeighborCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxErrUnknownNeighborCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxErrInvalidSrcAddrCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxErrInvalidSrcAddrCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxErrSecCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxErrSecCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxErrFcsCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxErrFcsCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRxErrOtherCountAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRxErrOtherCountAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readActiveTimestampAttribute(callback: ActiveTimestampAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeActiveTimestampAttribute(
-    callback: ActiveTimestampAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPendingTimestampAttribute(callback: PendingTimestampAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePendingTimestampAttribute(
-    callback: PendingTimestampAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readDelayAttribute(callback: DelayAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeDelayAttribute(
-    callback: DelayAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSecurityPolicyAttribute(callback: SecurityPolicyAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSecurityPolicyAttribute(
-    callback: SecurityPolicyAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readChannelPage0MaskAttribute(callback: ChannelPage0MaskAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeChannelPage0MaskAttribute(
-    callback: ChannelPage0MaskAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOperationalDatasetComponentsAttribute(
-    callback: OperationalDatasetComponentsAttributeCallback
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOperationalDatasetComponentsAttribute(
-    callback: OperationalDatasetComponentsAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readActiveNetworkFaultsListAttribute(callback: ActiveNetworkFaultsListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeActiveNetworkFaultsListAttribute(
-    callback: ActiveNetworkFaultsListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

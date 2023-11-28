@@ -23,6 +23,7 @@
 #include "MinimalMdnsServer.h"
 #include "ServiceNaming.h"
 
+#include <app/AppConfig.h>
 #include <crypto/RandUtils.h>
 #include <lib/dnssd/Advertiser_ImplMinimalMdnsAllocator.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
@@ -219,6 +220,7 @@ private:
         char sessionActiveThresholdBuf[KeySize(TxtFieldKey::kSessionActiveThreshold) +
                                        ValSize(TxtFieldKey::kSessionActiveThreshold) + 2];
         char tcpSupportedBuf[KeySize(TxtFieldKey::kTcpSupported) + ValSize(TxtFieldKey::kTcpSupported) + 2];
+        char operatingICDAsLITBuf[KeySize(TxtFieldKey::kLongIdleTimeICD) + ValSize(TxtFieldKey::kLongIdleTimeICD) + 2];
     };
     template <class Derived>
     CHIP_ERROR AddCommonTxtEntries(const BaseAdvertisingParams<Derived> & params, CommonTxtEntryStorage & storage,
@@ -229,6 +231,14 @@ private:
         if (optionalMrp.HasValue())
         {
             auto mrp = optionalMrp.Value();
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+            // An ICD operating as a LIT should not advertise its slow polling interval.
+            // When the ICD doesn't support the LIT feature, it doesn't set nor advertise the GetICDOperatingAsLIT entry.
+            // Therefore when GetICDOperatingAsLIT has no value or a value of 0, we advertise the slow polling interval
+            // otherwise we don't include the SII key in the advertisement.
+            if (!params.GetICDOperatingAsLIT().ValueOr(false))
+#endif
             {
                 if (mrp.mIdleRetransTimeout > kMaxRetryInterval)
                 {
@@ -279,6 +289,15 @@ private:
             VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < sizeof(storage.tcpSupportedBuf)),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtFields[numTxtFields++] = storage.tcpSupportedBuf;
+        }
+        if (params.GetICDOperatingAsLIT().HasValue())
+        {
+            size_t writtenCharactersNumber =
+                static_cast<size_t>(snprintf(storage.operatingICDAsLITBuf, sizeof(storage.operatingICDAsLITBuf), "ICD=%d",
+                                             params.GetICDOperatingAsLIT().Value()));
+            VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < sizeof(storage.operatingICDAsLITBuf)),
+                                CHIP_ERROR_INVALID_STRING_LENGTH);
+            txtFields[numTxtFields++] = storage.operatingICDAsLITBuf;
         }
         return CHIP_NO_ERROR;
     }

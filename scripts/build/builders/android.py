@@ -237,8 +237,8 @@ class AndroidBuilder(Builder):
             "CHIPController.jar": "src/controller/java/CHIPController.jar",
             "OnboardingPayload.jar": "src/controller/java/OnboardingPayload.jar",
             "AndroidPlatform.jar": "src/platform/android/AndroidPlatform.jar",
-            "libCHIPJson.jar": "src/controller/java/libCHIPJson.jar",
-            "libCHIPTlv.jar": "src/controller/java/libCHIPTlv.jar",
+            "libMatterJson.jar": "src/controller/java/libMatterJson.jar",
+            "libMatterTlv.jar": "src/controller/java/libMatterTlv.jar",
             "CHIPClusters.jar": "src/controller/java/CHIPClusters.jar",
             "CHIPClusterID.jar": "src/controller/java/CHIPClusterID.jar",
         }
@@ -568,8 +568,8 @@ class AndroidBuilder(Builder):
                 "CHIPController.jar": os.path.join(
                     self.output_dir, "lib", "src/controller/java/CHIPController.jar"
                 ),
-                "libCHIPTlv.jar": os.path.join(
-                    self.output_dir, "lib", "src/controller/java/libCHIPTlv.jar"
+                "libMatterTlv.jar": os.path.join(
+                    self.output_dir, "lib", "src/controller/java/libMatterTlv.jar"
                 ),
                 "AndroidPlatform.jar": os.path.join(
                     self.output_dir, "lib", "src/platform/android/AndroidPlatform.jar"

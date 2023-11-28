@@ -54,6 +54,7 @@ static const Label sStatsStrings[chip::System::Stats::kNumEntries] = {
 #endif
     "Exchange contexts",
     "Unsolicited message handlers",
+    "Platform events",
 };
 
 count_t sResourcesInUse[kNumEntries];

@@ -35,7 +35,6 @@
 // module header, comes first
 #include <controller/CHIPDeviceController.h>
 
-#include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 
@@ -73,8 +72,6 @@
 #include <ble/BleLayer.h>
 #include <transport/raw/BLE.h>
 #endif
-
-#include <app/util/af-enums.h>
 
 #include <errno.h>
 #include <inttypes.h>
@@ -1018,8 +1015,6 @@ CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(DeviceProxy * 
     OperationalCredentials::Commands::CertificateChainRequest::Type request;
     request.certificateType = static_cast<OperationalCredentials::CertificateChainTypeEnum>(certificateType);
     return SendCommand(device, request, OnCertificateChainResponse, OnCertificateChainFailureResponse, timeout);
-
-    return CHIP_NO_ERROR;
 }
 
 void DeviceCommissioner::OnCertificateChainFailureResponse(void * context, CHIP_ERROR error)
@@ -1616,6 +1611,27 @@ void OnBasicFailure(void * context, CHIP_ERROR error)
     commissioner->CommissioningStageComplete(error);
 }
 
+static void NonConcurrentTimeout(void * context, CHIP_ERROR error)
+{
+    if (error == CHIP_ERROR_TIMEOUT)
+    {
+        ChipLogProgress(Controller, "Non-concurrent mode: Expected NetworkResponse Timeout, do nothing");
+    }
+    else
+    {
+        ChipLogProgress(Controller, "Non-concurrent mode: Received failure response %" CHIP_ERROR_FORMAT, error.Format());
+    }
+}
+
+static void NonConcurrentNetworkResponse(void * context,
+                                         const NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
+{
+    // In Non Concurrent mode the commissioning network should have been shut down and not sent the
+    // ConnectNetworkResponse. In case it does send it this handles the message
+    ChipLogError(Controller, "Non-concurrent Mode : Received Unexpected ConnectNetwork response, ignoring. Status=%u",
+                 to_underlying(data.networkingStatus));
+}
+
 void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
 {
     commissioningCompletionStatus = completionStatus;
@@ -1651,8 +1667,16 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
         ChipLogProgress(Controller, "Expiring failsafe on proxy %p", proxy);
         mDeviceBeingCommissioned = proxy;
         // We actually want to do the same thing on success or failure because we're already in a failure state
-        SendCommand(proxy, request, OnDisarmFailsafe, OnDisarmFailsafeFailure,
-                    /* timeout = */ NullOptional);
+        CHIP_ERROR err = SendCommand(proxy, request, OnDisarmFailsafe, OnDisarmFailsafeFailure,
+                                     /* timeout = */ NullOptional);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just pretend like the
+            // command errored out async.
+            ChipLogError(Controller, "Failed to send command to disarm fail-safe: %" CHIP_ERROR_FORMAT, err.Format());
+            DisarmDone();
+            return;
+        }
     }
 }
 
@@ -2108,6 +2132,16 @@ void DeviceCommissioner::ParseCommissioningInfo2()
     ReadCommissioningInfo2 info;
     CHIP_ERROR return_err = CHIP_NO_ERROR;
 
+    using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
+    CHIP_ERROR err =
+        mAttributeCache->Get<SupportsConcurrentConnection::TypeInfo>(kRootEndpointId, info.supportsConcurrentConnection);
+    if (err != CHIP_NO_ERROR)
+    {
+        // May not be present so don't return the error code, non fatal, default concurrent
+        ChipLogError(Controller, "Failed to read SupportsConcurrentConnection: %" CHIP_ERROR_FORMAT, err.Format());
+        info.supportsConcurrentConnection = true;
+    }
+
     return_err = ParseFabrics(info);
 
     if (return_err == CHIP_NO_ERROR)
@@ -2203,7 +2237,10 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo2 & info)
     }
     else if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
+        // This key is optional so not an error
+        err        = CHIP_NO_ERROR;
         info.isIcd = false;
+        err        = CHIP_NO_ERROR;
     }
     else if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
     {
@@ -2391,7 +2428,7 @@ void DeviceCommissioner::SendCommissioningReadRequest(DeviceProxy * proxy, Optio
     CHIP_ERROR err = readClient->SendRequest(readParams);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to send read request for networking clusters");
+        ChipLogError(Controller, "Failed to send read request: %" CHIP_ERROR_FORMAT, err.Format());
         CommissioningStageComplete(err);
         return;
     }
@@ -2435,8 +2472,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kReadCommissioningInfo: {
-        ChipLogProgress(Controller, "Sending request for commissioning information");
+        ChipLogProgress(Controller, "Sending read request for commissioning information");
         // NOTE: this array cannot have more than 9 entries, since the spec mandates that server only needs to support 9
+        // See R1.1, 2.11.2 Interaction Model Limits
         app::AttributePathParams readPaths[9];
         // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
         readPaths[0] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
@@ -2466,11 +2504,16 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kReadCommissioningInfo2: {
-        ChipLogProgress(Controller, "Sending request for commissioning information -- Part 2");
-
         size_t numberOfAttributes = 0;
         // This is done in a separate step since we've already used up all the available read paths in the previous read step
-        app::AttributePathParams readPaths[9];
+        // NOTE: this array cannot have more than 9 entries, since the spec mandates that server only needs to support 9
+        // See R1.1, 2.11.2 Interaction Model Limits
+        app::AttributePathParams readPaths[3];
+
+        // Mandatory attribute
+        readPaths[numberOfAttributes++] =
+            app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
+                                     app::Clusters::GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id);
 
         // Read the current fabrics
         if (params.GetCheckForMatchingFabric())
@@ -2485,36 +2528,30 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                 app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::FeatureMap::Id);
         }
 
-        // Current implementation makes sense when we only have a few attributes to read with conditions. Should revisit this if we
-        // are adding more attributes here.
-
-        if (numberOfAttributes == 0)
-        {
-            // We don't actually want to do this step, so just bypass it
-            ChipLogProgress(Controller, "kReadCommissioningInfo2 step called without parameter set, skipping");
-            CommissioningStageComplete(CHIP_NO_ERROR);
-        }
-        else
-        {
-            SendCommissioningReadRequest(proxy, timeout, readPaths, numberOfAttributes);
-        }
+        SendCommissioningReadRequest(proxy, timeout, readPaths, numberOfAttributes);
     }
     break;
     case CommissioningStage::kConfigureUTCTime: {
         TimeSynchronization::Commands::SetUTCTime::Type request;
         uint64_t kChipEpochUsSinceUnixEpoch = static_cast<uint64_t>(kChipEpochSecondsSinceUnixEpoch) * chip::kMicrosecondsPerSecond;
         System::Clock::Microseconds64 utcTime;
-        if (System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR && utcTime.count() > kChipEpochUsSinceUnixEpoch)
-        {
-            request.UTCTime = utcTime.count() - kChipEpochUsSinceUnixEpoch;
-            // For now, we assume a seconds granularity
-            request.granularity = TimeSynchronization::GranularityEnum::kSecondsGranularity;
-            SendCommand(proxy, request, OnBasicSuccess, OnSetUTCError, endpoint, timeout);
-        }
-        else
+        if (System::SystemClock().GetClock_RealTime(utcTime) != CHIP_NO_ERROR || utcTime.count() <= kChipEpochUsSinceUnixEpoch)
         {
             // We have no time to give, but that's OK, just complete this stage
             CommissioningStageComplete(CHIP_NO_ERROR);
+            return;
+        }
+
+        request.UTCTime = utcTime.count() - kChipEpochUsSinceUnixEpoch;
+        // For now, we assume a seconds granularity
+        request.granularity = TimeSynchronization::GranularityEnum::kSecondsGranularity;
+        CHIP_ERROR err      = SendCommand(proxy, request, OnBasicSuccess, OnSetUTCError, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send SetUTCTime command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
         }
         break;
     }
@@ -2527,7 +2564,14 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         TimeSynchronization::Commands::SetTimeZone::Type request;
         request.timeZone = params.GetTimeZone().Value();
-        SendCommand(proxy, request, OnSetTimeZoneResponse, OnBasicFailure, endpoint, timeout);
+        CHIP_ERROR err   = SendCommand(proxy, request, OnSetTimeZoneResponse, OnBasicFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send SetTimeZone command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
         break;
     }
     case CommissioningStage::kConfigureDSTOffset: {
@@ -2539,7 +2583,14 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         TimeSynchronization::Commands::SetDSTOffset::Type request;
         request.DSTOffset = params.GetDSTOffsets().Value();
-        SendCommand(proxy, request, OnBasicSuccess, OnBasicFailure, endpoint, timeout);
+        CHIP_ERROR err    = SendCommand(proxy, request, OnBasicSuccess, OnBasicFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send SetDSTOffset command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
         break;
     }
     case CommissioningStage::kConfigureDefaultNTP: {
@@ -2551,7 +2602,14 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         TimeSynchronization::Commands::SetDefaultNTP::Type request;
         request.defaultNTP = params.GetDefaultNTP().Value();
-        SendCommand(proxy, request, OnBasicSuccess, OnBasicFailure, endpoint, timeout);
+        CHIP_ERROR err     = SendCommand(proxy, request, OnBasicSuccess, OnBasicFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send SetDefaultNTP command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
         break;
     }
     case CommissioningStage::kScanNetworks: {
@@ -2561,7 +2619,14 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             request.ssid.Emplace(params.GetWiFiCredentials().Value().ssid);
         }
         request.breadcrumb.Emplace(breadcrumb);
-        SendCommand(proxy, request, OnScanNetworksResponse, OnScanNetworksFailure, endpoint, timeout);
+        CHIP_ERROR err = SendCommand(proxy, request, OnScanNetworksResponse, OnScanNetworksFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send ScanNetworks command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
         break;
     }
     case CommissioningStage::kNeedsNetworkCreds: {
@@ -2621,18 +2686,43 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         request.newRegulatoryConfig = regulatoryConfig;
         request.countryCode         = countryCode;
         request.breadcrumb          = breadcrumb;
-        SendCommand(proxy, request, OnSetRegulatoryConfigResponse, OnBasicFailure, endpoint, timeout);
+        CHIP_ERROR err              = SendCommand(proxy, request, OnSetRegulatoryConfigResponse, OnBasicFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send SetRegulatoryConfig command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
     }
     break;
-    case CommissioningStage::kSendPAICertificateRequest:
+    case CommissioningStage::kSendPAICertificateRequest: {
         ChipLogProgress(Controller, "Sending request for PAI certificate");
-        SendCertificateChainRequestCommand(proxy, CertificateType::kPAI, timeout);
+        CHIP_ERROR err = SendCertificateChainRequestCommand(proxy, CertificateType::kPAI, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send CertificateChainRequest command to get PAI: %" CHIP_ERROR_FORMAT,
+                         err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
         break;
-    case CommissioningStage::kSendDACCertificateRequest:
+    }
+    case CommissioningStage::kSendDACCertificateRequest: {
         ChipLogProgress(Controller, "Sending request for DAC certificate");
-        SendCertificateChainRequestCommand(proxy, CertificateType::kDAC, timeout);
+        CHIP_ERROR err = SendCertificateChainRequestCommand(proxy, CertificateType::kDAC, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send CertificateChainRequest command to get DAC: %" CHIP_ERROR_FORMAT,
+                         err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
         break;
-    case CommissioningStage::kSendAttestationRequest:
+    }
+    case CommissioningStage::kSendAttestationRequest: {
         ChipLogProgress(Controller, "Sending Attestation Request to the device.");
         if (!params.GetAttestationNonce().HasValue())
         {
@@ -2640,8 +2730,16 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        SendAttestationRequestCommand(proxy, params.GetAttestationNonce().Value(), timeout);
+        CHIP_ERROR err = SendAttestationRequestCommand(proxy, params.GetAttestationNonce().Value(), timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send AttestationRequest command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
         break;
+    }
     case CommissioningStage::kAttestationVerification: {
         ChipLogProgress(Controller, "Verifying attestation");
         if (!params.GetAttestationElements().HasValue() || !params.GetAttestationSignature().HasValue() ||
@@ -2667,15 +2765,23 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
-    case CommissioningStage::kSendOpCertSigningRequest:
+    case CommissioningStage::kSendOpCertSigningRequest: {
         if (!params.GetCSRNonce().HasValue())
         {
             ChipLogError(Controller, "No CSR nonce found");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        SendOperationalCertificateSigningRequestCommand(proxy, params.GetCSRNonce().Value(), timeout);
+        CHIP_ERROR err = SendOperationalCertificateSigningRequestCommand(proxy, params.GetCSRNonce().Value(), timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send CSR request: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
         break;
+    }
     case CommissioningStage::kValidateCSR: {
         if (!params.GetNOCChainGenerationParameters().HasValue() || !params.GetDAC().HasValue() || !params.GetCSRNonce().HasValue())
         {
@@ -2691,6 +2797,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             ChipLogError(Controller, "Unable to validate CSR");
         }
         CommissioningStageComplete(err);
+        return;
     }
     break;
     case CommissioningStage::kGenerateNOCChain: {
@@ -2724,7 +2831,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         CHIP_ERROR err = SendTrustedRootCertificate(proxy, params.GetRootCert().Value(), timeout);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Error sending trusted root certificate: %s", err.AsString());
+            ChipLogError(Controller, "Error sending trusted root certificate: %" CHIP_ERROR_FORMAT, err.Format());
             CommissioningStageComplete(err);
             return;
         }
@@ -2744,16 +2851,24 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
-    case CommissioningStage::kSendNOC:
+    case CommissioningStage::kSendNOC: {
         if (!params.GetNoc().HasValue() || !params.GetIpk().HasValue() || !params.GetAdminSubject().HasValue())
         {
             ChipLogError(Controller, "AddNOC contents not specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac(), params.GetIpk().Value(),
-                                   params.GetAdminSubject().Value(), timeout);
+        CHIP_ERROR err = SendOperationalCertificate(proxy, params.GetNoc().Value(), params.GetIcac(), params.GetIpk().Value(),
+                                                    params.GetAdminSubject().Value(), timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Error sending operational certificate: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
         break;
+    }
     case CommissioningStage::kConfigureTrustedTimeSource: {
         if (!params.GetTrustedTimeSource().HasValue())
         {
@@ -2763,7 +2878,14 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         TimeSynchronization::Commands::SetTrustedTimeSource::Type request;
         request.trustedTimeSource = params.GetTrustedTimeSource().Value();
-        SendCommand(proxy, request, OnBasicSuccess, OnBasicFailure, endpoint, timeout);
+        CHIP_ERROR err            = SendCommand(proxy, request, OnBasicSuccess, OnBasicFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send SendTrustedTimeSource command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
         break;
     }
     case CommissioningStage::kWiFiNetworkSetup: {
@@ -2778,7 +2900,14 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         request.ssid        = params.GetWiFiCredentials().Value().ssid;
         request.credentials = params.GetWiFiCredentials().Value().credentials;
         request.breadcrumb.Emplace(breadcrumb);
-        SendCommand(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
+        CHIP_ERROR err = SendCommand(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send AddOrUpdateWiFiNetwork command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
     }
     break;
     case CommissioningStage::kThreadNetworkSetup: {
@@ -2791,7 +2920,14 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
         request.operationalDataset = params.GetThreadOperationalDataset().Value();
         request.breadcrumb.Emplace(breadcrumb);
-        SendCommand(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
+        CHIP_ERROR err = SendCommand(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send AddOrUpdateThreadNetwork command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
     }
     break;
     case CommissioningStage::kFailsafeBeforeWiFiEnable:
@@ -2812,7 +2948,38 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
         request.networkID = params.GetWiFiCredentials().Value().ssid;
         request.breadcrumb.Emplace(breadcrumb);
-        SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        GeneralCommissioning::Attributes::SupportsConcurrentConnection::TypeInfo::Type supportsConcurrentConnection;
+        supportsConcurrentConnection = params.GetSupportsConcurrentConnection().Value();
+        ChipLogProgress(Controller, "SendCommand kWiFiNetworkEnable, supportsConcurrentConnection=%d",
+                        supportsConcurrentConnection);
+        if (supportsConcurrentConnection)
+        {
+            err = SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
+        }
+        else
+        {
+            // Concurrent Connections not allowed. Send the ConnectNetwork command but do not wait for the
+            // ConnectNetworkResponse on the Commissioning network as it will not be present. Log the expected timeout
+            // and run what would have been in the onConnectNetworkResponse callback.
+            err = SendCommand(proxy, request, NonConcurrentNetworkResponse, NonConcurrentTimeout, endpoint, NullOptional);
+            if (err == CHIP_NO_ERROR)
+            {
+                // As there will be no ConnectNetworkResponse, it is an implicit kSuccess so a default report is fine
+                CommissioningDelegate::CommissioningReport report;
+                CommissioningStageComplete(CHIP_NO_ERROR, report);
+                return;
+            }
+        }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send WiFi ConnectNetwork command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
     }
     break;
     case CommissioningStage::kThreadNetworkEnable: {
@@ -2829,7 +2996,14 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
         request.networkID = extendedPanId;
         request.breadcrumb.Emplace(breadcrumb);
-        SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
+        CHIP_ERROR err = SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send Thread ConnectNetwork command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
     }
     break;
     case CommissioningStage::kFindOperational: {
@@ -2855,7 +3029,14 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     break;
     case CommissioningStage::kSendComplete: {
         GeneralCommissioning::Commands::CommissioningComplete::Type request;
-        SendCommand(proxy, request, OnCommissioningCompleteResponse, OnBasicFailure, endpoint, timeout);
+        CHIP_ERROR err = SendCommand(proxy, request, OnCommissioningCompleteResponse, OnBasicFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send CommissioningComplete command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
     }
     break;
     case CommissioningStage::kCleanup:

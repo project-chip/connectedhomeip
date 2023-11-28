@@ -84,6 +84,7 @@ limitations under the License.
             <include cluster="Ethernet Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="WiFi Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Thread Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="ICD Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -1999,6 +2000,24 @@ limitations under the License.
             <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
+        <deviceType>
+        <name>MA-laundry-dryer</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Laundry Dryer</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x007C</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Laundry Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Laundry Dryer Controls" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Temperature Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
     <deviceType>
         <name>MA-robotic-vacuum-cleaner</name>
         <domain>CHIP</domain>
@@ -2029,6 +2048,54 @@ limitations under the License.
             <include cluster="Temperature Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Refrigerator And Temperature Controlled Cabinet Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-boolean-sensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Boolean Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0041</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>TAG_LIST</requireAttribute>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-valve</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Valve</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0042</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Valve Configuration and Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-water-leak-detector</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Water Leak Detector</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0043</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <superset>Matter Boolean Sensor</superset>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean Sensor Configuration" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>TAG_LIST</requireAttribute>
+            </include>
         </clusters>
     </deviceType>
     <deviceType>

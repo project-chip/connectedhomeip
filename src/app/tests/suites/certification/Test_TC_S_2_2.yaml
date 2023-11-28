@@ -309,7 +309,7 @@ tests:
               type: boolean
 
     - label: "Step 3g: TH reads attribute SceneTableSize from DUT."
-      PICS: S.S.F03 && S.S.F02
+      PICS: PICS_SDK_CI_ONLY && S.S.F03 && S.S.F02
       command: "readAttribute"
       attribute: "SceneTableSize"
       response:
@@ -317,7 +317,6 @@ tests:
           constraints:
               type: int16u
 
-    #FabricSceneInfo attribute not supported
     - label: "Step 3h: TH reads attribute FabricSceneInfo from DUT"
       verification: |
           DUT provides FabricSceneInfo containing (for the current fabric) following fields:
@@ -330,7 +329,7 @@ tests:
 
           SceneValid has the value TRUE.
 
-          if S.S.F02(TS), RemainingCapacity has the value SceneTableSize/2
+          if S.S.F02(TS), RemainingCapacity has the value fabricCapacity - 1
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP && S.S.F03 && S.S.F02
@@ -341,18 +340,21 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    #- label: "Step 3h: TH reads attribute FabricSceneInfo from DUT"
-    #  PICS: S.S.F03 && S.S.F02
-    #  command: "readAttribute"
-    #  attribute: "FabricSceneInfo"
-    #  response:
-    #      value: {
-    #              SceneCount: SceneCountValue,
-    #              CurrentScene: 0x01,
-    #              CurrentGroup: G1,
-    #              SceneValid: true,
-    #              RemainingCapacity: ( SceneTableSizeValue/2 ),
-    #          }
+    - label: "Step 3h: TH reads attribute FabricSceneInfo from DUT"
+      PICS: PICS_SDK_CI_ONLY && S.S.F03 && S.S.F02
+      command: "readAttribute"
+      attribute: "FabricSceneInfo"
+      response:
+          value:
+              [
+                  {
+                      SceneCount: 1,
+                      CurrentScene: 0x01,
+                      CurrentGroup: G1,
+                      SceneValid: true,
+                      RemainingCapacity: fabricCapacity - 1,
+                  },
+              ]
 
     - label: "Step 4a: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
@@ -449,76 +451,31 @@ tests:
               - name: "TransitionTime"
                 value: 0x0000
               - name: "ExtensionFieldSets"
-                value:
-                    [
-                        {
-                            ClusterID: 0x0006,
-                            AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
-                        },
-                        {
-                            ClusterID: 0x0008,
-                            AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
-                        },
-                        {
-                            ClusterID: 0x0300,
-                            AttributeValueList:
-                                [
-                                    {
-                                        AttributeID: 0x0003,
-                                        AttributeValue: 0x616b,
-                                    },
-                                    {
-                                        AttributeID: 0x0004,
-                                        AttributeValue: 0x607d,
-                                    },
-                                    {
-                                        AttributeID: 0x4000,
-                                        AttributeValue: 0x0000,
-                                    },
-                                    {
-                                        AttributeID: 0x0001,
-                                        AttributeValue: 0x00,
-                                    },
-                                    {
-                                        AttributeID: 0x4002,
-                                        AttributeValue: 0x00,
-                                    },
-                                    {
-                                        AttributeID: 0x4003,
-                                        AttributeValue: 0x00,
-                                    },
-                                    {
-                                        AttributeID: 0x4004,
-                                        AttributeValue: 0x0019,
-                                    },
-                                    {
-                                        AttributeID: 0x0007,
-                                        AttributeValue: 0x00,
-                                    },
-                                    {
-                                        AttributeID: 0x4001,
-                                        AttributeValue: 0x02,
-                                    },
-                                ],
-                        },
-                    ]
-                #TODO : Need to change the check for a check like below if possible
-                # constraints:
-                #     type: list
-                #     contains: [
-                #         {
-                #             ClusterID: 0x0006,
-                #             AttributeValueList:
-                #                 [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
-                #         },
-                #         {
-                #             ClusterID: 0x0008,
-                #             AttributeValueList:
-                #                 [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
-                #         },
-                #     ]
+                constraints:
+                    type: list
+                    contains:
+                        [
+                            {
+                                ClusterID: 0x0006,
+                                AttributeValueList:
+                                    [
+                                        {
+                                            AttributeID: 0x0000,
+                                            AttributeValue: 0x01,
+                                        },
+                                    ],
+                            },
+                            {
+                                ClusterID: 0x0008,
+                                AttributeValueList:
+                                    [
+                                        {
+                                            AttributeID: 0x0000,
+                                            AttributeValue: 0x64,
+                                        },
+                                    ],
+                            },
+                        ]
 
     - label:
           "Step 5: TH sends a ViewScene command to DUT with the GroupID field

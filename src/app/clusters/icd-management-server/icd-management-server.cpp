@@ -169,6 +169,7 @@ class IcdManagementFabricDelegate : public chip::FabricTable::Delegate
         ICDMonitoringTable table(Server::GetInstance().GetPersistentStorage(), fabricIndex, supported_clients,
                                  Server::GetInstance().GetSessionKeystore());
         table.RemoveAll();
+        ICDManagementServer::GetInstance().TriggerICDMTableUpdatedEvent();
     }
 };
 

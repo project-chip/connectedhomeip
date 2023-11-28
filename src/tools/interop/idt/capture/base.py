@@ -31,18 +31,32 @@ class PlatformLogStreamer(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def connect(self) -> None:
+        """
+        Establish connections to log targets for this platform
+        """
+        raise NotImplementedError
+
+    @abstractmethod
     async def start_streaming(self) -> None:
         """
         Begin streaming logs
-        Start should be able to be called repeatedly without restarting streaming
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def run_observers(self) -> None:
+        """
+        Observe log procs and restart as needed
+        Must be async aware and not interact with stdin
         """
         raise NotImplementedError
 
     @abstractmethod
     async def stop_streaming(self) -> None:
         """
-        Stop streaming logs
-        Stop should not cause an error even if the stream is not running
+        Stop the capture and pull any artifacts from remote devices
+        Write artifacts to artifact_dir passed on instantiation
         """
         raise NotImplementedError
 
@@ -71,13 +85,16 @@ class EcosystemCapture(ABC):
     async def start_capture(self) -> None:
         """
         Start the capture
+        Platform is already started
         """
         raise NotImplementedError
 
     @abstractmethod
     async def stop_capture(self) -> None:
         """
-        Stop the capture
+        Stop the capture and pull any artifacts from remote devices
+        Write artifacts to artifact_dir passed on instantiation
+        Platform is already stopped
         """
         raise NotImplementedError
 
@@ -85,6 +102,13 @@ class EcosystemCapture(ABC):
     async def analyze_capture(self) -> None:
         """
         Parse the capture and create + display helpful analysis artifacts that are unique to the ecosystem
-        Write analysis artifacts to artifact_dir
+        Must be async aware and not interact with stdin
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def probe_capture(self) -> None:
+        """
+        Probe the local environment, e.g. ping relevant remote services and write respective artifacts
         """
         raise NotImplementedError

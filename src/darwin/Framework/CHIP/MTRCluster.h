@@ -29,6 +29,7 @@ typedef void (^MTRStatusCompletion)(NSError * _Nullable error);
 typedef void (^MTRSubscriptionEstablishedHandler)(void);
 
 @class MTRBaseDevice;
+@class MTRDevice;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -44,6 +45,24 @@ NS_ASSUME_NONNULL_BEGIN
  * The endpoint this cluster lives on.
  */
 @property (nonatomic, readonly) NSNumber * endpointID NS_REFINED_FOR_SWIFT MTR_NEWLY_AVAILABLE;
+@end
+
+/**
+ * Base for all MTRBaseCluster* types.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRGenericBaseCluster : MTRCluster
+@end
+
+/**
+ * Base for all MTRCluster* types.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRGenericCluster : MTRCluster
+/**
+ * The device this cluster object is associated with.
+ */
+@property (nonatomic, strong, readonly) MTRDevice * device;
 @end
 
 /**

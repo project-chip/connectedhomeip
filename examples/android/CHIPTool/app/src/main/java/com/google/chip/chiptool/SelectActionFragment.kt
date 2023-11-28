@@ -73,6 +73,7 @@ class SelectActionFragment : Fragment() {
     binding.wildcardBtn.setOnClickListener { handleWildcardClicked() }
     binding.unpairDeviceBtn.setOnClickListener { handleUnpairDeviceClicked() }
     binding.groupSettingBtn.setOnClickListener { handleGroupSettingClicked() }
+    binding.otaProviderBtn.setOnClickListener { handleOTAProviderClicked() }
 
     return binding.root
   }
@@ -216,6 +217,10 @@ class SelectActionFragment : Fragment() {
   /** Notifies listener of unpair button click. */
   private fun handleUnpairDeviceClicked() {
     showFragment(UnpairDeviceFragment.newInstance())
+  }
+
+  private fun handleOTAProviderClicked() {
+    showFragment(OtaProviderClientFragment.newInstance(), false)
   }
 
   /** Notifies listener of provision-WiFi-credentials button click. */

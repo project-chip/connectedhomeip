@@ -49,7 +49,7 @@ protected:
         mEphemeralInitiatorNodeId(ephemeralInitiatorNodeID), mSessionRole(sessionRole),
         mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
         mLastPeerActivityTime(System::Clock::kZero), // Start at zero to default to IDLE state
-        mRemoteMRPConfig(config)
+        mRemoteSessionParams(config)
     {}
     ~UnauthenticatedSession() override { VerifyOrDie(GetReferenceCount() == 0); }
 
@@ -83,15 +83,19 @@ public:
         return Access::SubjectDescriptor(); // return an empty ISD for unauthenticated session.
     }
 
-    bool RequireMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
+    bool AllowsMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
+
+    bool AllowsLargePayload() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kTcp; }
 
     System::Clock::Milliseconds32 GetAckTimeout() const override
     {
         switch (mPeerAddress.GetTransportType())
         {
-        case Transport::Type::kUdp:
-            return GetRetransmissionTimeout(mRemoteMRPConfig.mActiveRetransTimeout, mRemoteMRPConfig.mIdleRetransTimeout,
-                                            GetLastPeerActivityTime(), mRemoteMRPConfig.mActiveThresholdTime);
+        case Transport::Type::kUdp: {
+            const ReliableMessageProtocolConfig & remoteMRPConfig = mRemoteSessionParams.GetMRPConfig();
+            return GetRetransmissionTimeout(remoteMRPConfig.mActiveRetransTimeout, remoteMRPConfig.mIdleRetransTimeout,
+                                            GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime);
+        }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
         case Transport::Type::kBle:
@@ -128,9 +132,9 @@ public:
         return IsPeerActive() ? GetRemoteMRPConfig().mActiveRetransTimeout : GetRemoteMRPConfig().mIdleRetransTimeout;
     }
 
-    void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteMRPConfig = config; }
+    void SetRemoteSessionParameters(const SessionParameters & sessionParams) { mRemoteSessionParams = sessionParams; }
 
-    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const override { return mRemoteMRPConfig; }
+    const SessionParameters & GetRemoteSessionParameters() const override { return mRemoteSessionParams; }
 
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
@@ -157,7 +161,7 @@ private:
     PeerAddress mPeerAddress;
     System::Clock::Timestamp mLastActivityTime;     ///< Timestamp of last tx or rx
     System::Clock::Timestamp mLastPeerActivityTime; ///< Timestamp of last rx
-    ReliableMessageProtocolConfig mRemoteMRPConfig;
+    SessionParameters mRemoteSessionParams;
     PeerMessageCounter mPeerMessageCounter;
 };
 

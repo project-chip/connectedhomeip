@@ -36,6 +36,7 @@ static constexpr size_t kKeySessionActiveIntervalMaxLength       = 7; // [SAI] 0
 static constexpr size_t kKeySessionActiveThresholdMaxLength      = 5; // [SAT] 0-65535
 static constexpr System::Clock::Milliseconds32 kMaxRetryInterval = 3600000_ms32;
 static constexpr size_t kKeyTcpSupportedMaxLength                = 1;
+static constexpr size_t kKeyLongIdleTimeICDMaxLength             = 1;
 
 // Commissionable/commissioner node TXT entries
 static constexpr size_t kKeyLongDiscriminatorMaxLength  = 5;
@@ -69,6 +70,7 @@ enum class TxtFieldKey : uint8_t
     kSessionActiveInterval,
     kSessionActiveThreshold,
     kTcpSupported,
+    kLongIdleTimeICD,
     kCount,
 };
 
@@ -95,6 +97,7 @@ constexpr const TxtFieldInfo txtFieldInfo[static_cast<size_t>(TxtFieldKey::kCoun
     { TxtFieldKey::kSessionActiveInterval, kKeySessionActiveIntervalMaxLength, "SAI", TxtKeyUse::kCommon },
     { TxtFieldKey::kSessionActiveThreshold, kKeySessionActiveThresholdMaxLength, "SAT", TxtKeyUse::kCommon },
     { TxtFieldKey::kTcpSupported, kKeyTcpSupportedMaxLength, "T", TxtKeyUse::kCommon },
+    { TxtFieldKey::kLongIdleTimeICD, kKeyLongIdleTimeICDMaxLength, "ICD", TxtKeyUse::kCommon },
 };
 #ifdef CHIP_CONFIG_TEST
 

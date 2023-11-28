@@ -38,7 +38,6 @@
 #include <platform/ConnectivityManager.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDManager.h>  // nogncheck
 #include <app/icd/ICDNotifier.h> // nogncheck
 #endif
 
@@ -89,9 +88,10 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
 
     mRetransTable.ForEachActiveObject([&](auto * entry) {
         ChipLogDetail(ExchangeManager,
-                      "EC:" ChipLogFormatExchange " MessageCounter:" ChipLogFormatMessageCounter " NextRetransTimeCtr:%" PRIu64,
+                      "EC:" ChipLogFormatExchange " MessageCounter:" ChipLogFormatMessageCounter
+                      " NextRetransTimeCtr: 0x" ChipLogFormatX64,
                       ChipLogValueExchange(&entry->ec.Get()), entry->retainedBuf.GetMessageCounter(),
-                      entry->nextRetransTime.count());
+                      ChipLogValueX64(entry->nextRetransTime.count()));
         return Loop::Continue;
     });
 #endif
@@ -102,7 +102,7 @@ void ReliableMessageMgr::ExecuteActions()
     System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
 
 #if defined(RMP_TICKLESS_DEBUG)
-    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExecuteActions at %" PRIu64 "ms", now.count());
+    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExecuteActions at 0x" ChipLogFormatX64 "ms", ChipLogValueX64(now.count()));
 #endif
 
     ExecuteForAllContext([&](ReliableMessageContext * rc) {
@@ -259,7 +259,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     // Implement:
     //   "An ICD sender SHOULD increase t to also account for its own sleepy interval
     //   required to receive the acknowledgment"
-    mrpBackoffTime += app::ICDManager::GetFastPollingInterval();
+    mrpBackoffTime += CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
 #endif
 
     mrpBackoffTime += CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
@@ -397,8 +397,10 @@ void ReliableMessageMgr::StartTimer()
         const auto nextWakeDelay           = (nextWakeTime > now) ? nextWakeTime - now : 0_ms;
 
 #if defined(RMP_TICKLESS_DEBUG)
-        ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer at %" PRIu64 "ms wake at %" PRIu64 "ms (in %" PRIu64 "ms)",
-                      now.count(), nextWakeTime.count(), nextWakeDelay.count());
+        ChipLogDetail(ExchangeManager,
+                      "ReliableMessageMgr::StartTimer at 0x" ChipLogFormatX64 "ms wake at 0x" ChipLogFormatX64
+                      "ms (in 0x" ChipLogFormatX64 "ms)",
+                      ChipLogValueX64(now.count()), ChipLogValueX64(nextWakeTime.count()), ChipLogValueX64(nextWakeDelay.count()));
 #endif
         VerifyOrDie(mSystemLayer->StartTimer(nextWakeDelay, Timeout, this) == CHIP_NO_ERROR);
     }

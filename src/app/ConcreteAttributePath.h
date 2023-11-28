@@ -48,6 +48,8 @@ struct ConcreteAttributePath : public ConcreteClusterPath
         mExpanded = false;
     }
 
+    bool IsValid() const { return ConcreteClusterPath::HasValidIds() && IsValidAttributeId(mAttributeId); }
+
     bool operator==(const ConcreteAttributePath & aOther) const
     {
         return ConcreteClusterPath::operator==(aOther) && (mAttributeId == aOther.mAttributeId);

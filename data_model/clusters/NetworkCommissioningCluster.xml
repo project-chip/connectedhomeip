@@ -126,7 +126,7 @@ Davis, CA 95616, USA
       <item value="2" name="5G" summary="5GHz - 5.150GHz to 5.895GHz (802.11a/n/ac/ax)">
         <optionalConform choice="a" more="true"/>
       </item>
-      <item value="3" name="6G" summary="6GHz - 5.925GHz to 7.125GHz (802.11ax / WiFi 6E)">
+      <item value="3" name="6G" summary="6GHz - 5.925GHz to 7.125GHz (802.11ax / Wi-Fi 6E)">
         <optionalConform choice="a" more="true"/>
       </item>
       <item value="4" name="60G" summary="60GHz - 57.24GHz to 70.20GHz (802.11ad/ay)">

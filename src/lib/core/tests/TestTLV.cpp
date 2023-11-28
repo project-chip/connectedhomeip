@@ -3628,6 +3628,59 @@ void TestTLVReaderErrorHandling(nlTestSuite * inSuite)
     chip::Platform::MemoryFree(const_cast<uint8_t *>(data));
 }
 
+void TestTLVReaderExpect(nlTestSuite * inSuite)
+{
+    // Prepare some test data
+    uint8_t buffer[20];
+    TLVWriter writer;
+    writer.Init(buffer, sizeof(buffer));
+    TLVType outerContainer;
+    NL_TEST_ASSERT_SUCCESS(inSuite, writer.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainer));
+    NL_TEST_ASSERT_SUCCESS(inSuite, writer.PutBoolean(ContextTag(23), false));
+    NL_TEST_ASSERT_SUCCESS(inSuite, writer.EndContainer(outerContainer));
+
+    TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+
+    // Positioned before the first element
+    NL_TEST_ASSERT(inSuite, reader.GetType() == kTLVType_NotSpecified);
+
+    NL_TEST_ASSERT(inSuite, reader.Expect(AnonymousTag()) == CHIP_ERROR_WRONG_TLV_TYPE);
+    NL_TEST_ASSERT(inSuite, reader.Expect(ContextTag(23)) == CHIP_ERROR_WRONG_TLV_TYPE);
+    NL_TEST_ASSERT(inSuite, reader.Expect(kTLVType_Boolean, AnonymousTag()) == CHIP_ERROR_WRONG_TLV_TYPE);
+
+    // Positioned on kTLVType_Structure / AnonymousTag(),
+    NL_TEST_ASSERT_SUCCESS(inSuite, reader.Next());
+    NL_TEST_ASSERT(inSuite, reader.GetType() == kTLVType_Structure);
+    NL_TEST_ASSERT(inSuite, reader.GetTag() == AnonymousTag());
+
+    NL_TEST_ASSERT(inSuite, reader.Expect(ContextTag(23)) == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    NL_TEST_ASSERT_SUCCESS(inSuite, reader.Expect(AnonymousTag()));
+
+    NL_TEST_ASSERT(inSuite, reader.Expect(kTLVType_SignedInteger, AnonymousTag()) == CHIP_ERROR_WRONG_TLV_TYPE);
+    NL_TEST_ASSERT_SUCCESS(inSuite, reader.Expect(kTLVType_Structure, AnonymousTag()));
+
+    // Positioned before first struct element
+    NL_TEST_ASSERT_SUCCESS(inSuite, reader.EnterContainer(outerContainer));
+    NL_TEST_ASSERT(inSuite, reader.GetType() == kTLVType_NotSpecified);
+
+    NL_TEST_ASSERT(inSuite, reader.Expect(AnonymousTag()) == CHIP_ERROR_WRONG_TLV_TYPE);
+    NL_TEST_ASSERT(inSuite, reader.Expect(ContextTag(23)) == CHIP_ERROR_WRONG_TLV_TYPE);
+    NL_TEST_ASSERT(inSuite, reader.Expect(kTLVType_Boolean, AnonymousTag()) == CHIP_ERROR_WRONG_TLV_TYPE);
+
+    // Positioned on kTLVType_Boolean / ContextTag(23)
+    NL_TEST_ASSERT_SUCCESS(inSuite, reader.Next());
+    NL_TEST_ASSERT(inSuite, reader.GetType() == kTLVType_Boolean);
+    NL_TEST_ASSERT(inSuite, reader.GetTag() == ContextTag(23));
+
+    NL_TEST_ASSERT(inSuite, reader.Expect(AnonymousTag()) == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    NL_TEST_ASSERT(inSuite, reader.Expect(ContextTag(42)) == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    NL_TEST_ASSERT_SUCCESS(inSuite, reader.Expect(ContextTag(23)));
+
+    NL_TEST_ASSERT(inSuite, reader.Expect(kTLVType_SignedInteger, ContextTag(23)) == CHIP_ERROR_WRONG_TLV_TYPE);
+    NL_TEST_ASSERT_SUCCESS(inSuite, reader.Expect(kTLVType_Boolean, ContextTag(23)));
+}
+
 /**
  *  Test that CHIP TLV reader returns an error when a read is requested that
  *  would truncate the output.
@@ -3788,6 +3841,8 @@ void CheckTLVReader(nlTestSuite * inSuite, void * inContext)
     TestTLVReaderDup(inSuite);
 
     TestTLVReaderErrorHandling(inSuite);
+
+    TestTLVReaderExpect(inSuite);
 
     TestTLVReaderTruncatedReads(inSuite);
 

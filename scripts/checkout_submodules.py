@@ -33,7 +33,7 @@ ALL_PLATFORMS = set([
     'cc13xx_26xx',
     'cc32xx',
     'darwin',
-    'efr32',
+    'silabs',
     'esp32',
     'infineon',
     'k32w',

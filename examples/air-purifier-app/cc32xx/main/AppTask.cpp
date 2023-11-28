@@ -62,8 +62,8 @@ extern void DisplayBanner();
 
 #define AIR_PURIFIER_ENDPOINT 1
 #define AIR_QUALITY_SENSOR_ENDPOINT 2
-#define RELATIVE_HUMIDITY_SENSOR_ENDPOINT 3
-#define TEMPERATURE_SENSOR_ENDPOINT 4
+#define TEMPERATURE_SENSOR_ENDPOINT 3
+#define RELATIVE_HUMIDITY_SENSOR_ENDPOINT 4
 
 // Added the below three for DNS Server Initialization
 using namespace ::chip;

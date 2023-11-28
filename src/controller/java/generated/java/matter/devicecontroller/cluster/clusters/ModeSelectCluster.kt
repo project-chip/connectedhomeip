@@ -17,250 +17,167 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.controller.MatterController
+import matter.devicecontroller.cluster.structs.*
 
-class ModeSelectCluster(private val endpointId: UShort) {
+class ModeSelectCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class StandardNamespaceAttribute(val value: UInt?)
+
+  class SupportedModesAttribute(val value: List<ModeSelectClusterModeOptionStruct>)
+
+  class StartUpModeAttribute(val value: UByte?)
+
+  class OnModeAttribute(val value: UByte?)
+
+  class GeneratedCommandListAttribute(val value: List<UInt>)
+
+  class AcceptedCommandListAttribute(val value: List<UInt>)
+
+  class EventListAttribute(val value: List<UInt>)
+
+  class AttributeListAttribute(val value: List<UInt>)
+
+  suspend fun changeToMode(newMode: UByte, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readDescriptionAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDescriptionAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readStandardNamespaceAttribute(): StandardNamespaceAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeStandardNamespaceAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): StandardNamespaceAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSupportedModesAttribute(): SupportedModesAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSupportedModesAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): SupportedModesAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentModeAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentModeAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readStartUpModeAttribute(): StartUpModeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeStartUpModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeStartUpModeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): StartUpModeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOnModeAttribute(): OnModeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOnModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeOnModeAttribute(minInterval: Int, maxInterval: Int): OnModeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 80u
-  }
-
-  fun changeToMode(callback: DefaultClusterCallback, newMode: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun changeToMode(callback: DefaultClusterCallback, newMode: Integer, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  interface StandardNamespaceAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface SupportedModesAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.ModeSelectClusterModeOptionStruct>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface StartUpModeAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface OnModeAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readDescriptionAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeDescriptionAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readStandardNamespaceAttribute(callback: StandardNamespaceAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeStandardNamespaceAttribute(
-    callback: StandardNamespaceAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSupportedModesAttribute(callback: SupportedModesAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSupportedModesAttribute(
-    callback: SupportedModesAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCurrentModeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentModeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readStartUpModeAttribute(callback: StartUpModeAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeStartUpModeAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeStartUpModeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeStartUpModeAttribute(
-    callback: StartUpModeAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOnModeAttribute(callback: OnModeAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOnModeAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOnModeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOnModeAttribute(
-    callback: OnModeAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

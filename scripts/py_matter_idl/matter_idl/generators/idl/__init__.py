@@ -82,10 +82,10 @@ def human_text_string(value: Union[ClusterSide, StructTag, StructQuality, EventP
         return result
     elif type(value) is CommandQuality:
         result = ""
-        if CommandQuality.TIMED_INVOKE in value:
-            result += "timed "
         if CommandQuality.FABRIC_SCOPED in value:
             result += "fabric "
+        if CommandQuality.TIMED_INVOKE in value:
+            result += "timed "
         return result
     elif type(value) is ApiMaturity:
         if value == ApiMaturity.STABLE:

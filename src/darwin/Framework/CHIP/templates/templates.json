@@ -11,7 +11,8 @@
         "darwin/Framework/CHIP/templates/helper.js"
     ],
     "resources": {
-        "availability-data": "availability.yaml"
+        "availability-data": "availability.yaml",
+        "config-data": "../../../../app/common/templates/config-data.yaml"
     },
     "override": "../../../../../src/app/zap-templates/common/override.js",
     "partials": [
@@ -78,11 +79,6 @@
             "path": "MTRClusters-src.zapt",
             "name": "Objc ZCL synchronous API",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters.mm"
-        },
-        {
-            "path": "MTRClusters-swift.zapt",
-            "name": "Swift ZCL synchronous API Header extensions",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters.swift"
         },
         {
             "path": "MTRStructsObjc.zapt",

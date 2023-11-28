@@ -89,5 +89,16 @@ void ICDNotifier::BroadcastActiveRequestWithdrawal(ICDListener::KeepActiveFlags 
     }
 }
 
+void ICDNotifier::BroadcastICDManagementEvent(ICDListener::ICDManagementEvents event)
+{
+    for (auto subscriber : mSubscribers)
+    {
+        if (subscriber != nullptr)
+        {
+            subscriber->OnICDManagementServerEvent(event);
+        }
+    }
+}
+
 } // namespace app
 } // namespace chip

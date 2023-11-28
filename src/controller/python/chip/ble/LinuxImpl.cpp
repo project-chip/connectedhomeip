@@ -1,3 +1,20 @@
+/*
+ *
+ *    Copyright (c) 2020-2023 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -76,7 +93,8 @@ public:
         mScanCallback(scanCallback), mCompleteCallback(completeCallback), mErrorCallback(errorCallback)
     {}
 
-    void SetScanner(std::unique_ptr<ChipDeviceScanner> scanner) { mScanner = std::move(scanner); }
+    CHIP_ERROR ScannerInit(BluezAdapter1 * adapter) { return mScanner.Init(adapter, this); }
+    CHIP_ERROR ScannerStartScan(chip::System::Clock::Timeout timeout) { return mScanner.StartScan(timeout); }
 
     void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
     {
@@ -106,7 +124,7 @@ public:
     }
 
 private:
-    std::unique_ptr<ChipDeviceScanner> mScanner;
+    ChipDeviceScanner mScanner;
     PyObject * const mContext;
     const DeviceScannedCallback mScanCallback;
     const ScanCompleteCallback mCompleteCallback;
@@ -123,23 +141,13 @@ extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, 
     std::unique_ptr<ScannerDelegateImpl> delegate =
         std::make_unique<ScannerDelegateImpl>(context, scanCallback, completeCallback, errorCallback);
 
-    std::unique_ptr<ChipDeviceScanner> scanner = ChipDeviceScanner::Create(static_cast<BluezAdapter1 *>(adapter), delegate.get());
+    CHIP_ERROR err = delegate->ScannerInit(static_cast<BluezAdapter1 *>(adapter));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, nullptr);
 
-    if (!scanner)
-    {
-        return nullptr;
-    }
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    err = scanner->StartScan(chip::System::Clock::Milliseconds32(timeoutMs));
+    err = delegate->ScannerStartScan(chip::System::Clock::Milliseconds32(timeoutMs));
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        return nullptr;
-    }
-
-    delegate->SetScanner(std::move(scanner));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, nullptr);
 
     return delegate.release();
 }

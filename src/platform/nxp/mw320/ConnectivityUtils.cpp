@@ -22,7 +22,6 @@
  */
 
 #include "ConnectivityUtils.h"
-#include <app-common/zap-generated/enums.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <netdb.h>

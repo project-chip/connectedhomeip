@@ -403,6 +403,10 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/stage/blfdt/inc",
       "${bl_iot_sdk_root}/components/stage/cli/cli/include",
     ]
+
+    if (defined(invoker.enable_cdc_module) && invoker.enable_cdc_module) {
+      cflags_cc = [ "-Wno-shadow" ]
+    }
   }
 
   source_set("${sdk_target_name}_stage") {

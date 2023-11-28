@@ -55,6 +55,9 @@ class CustomOTARequestorDriver : public DeviceLayer::ExtendedOTARequestorDriver
 public:
     bool CanConsent() override;
     void UpdateDownloaded() override;
+    void UpdateConfirmed(System::Clock::Seconds32 delay) override;
+    static void AppliedNotifyUpdateTimer(System::Layer * systemLayer, void * appState);
+    void SendNotifyUpdateApplied();
 };
 
 DefaultOTARequestor gRequestorCore;
@@ -74,6 +77,7 @@ constexpr uint16_t kOptionOtaDownloadPath      = 'f';
 constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
 constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionWatchdogTimeout      = 'w';
+constexpr uint16_t kSkipExecImageFile          = 's';
 constexpr size_t kMaxFilePathSize              = 256;
 
 uint32_t gPeriodicQueryTimeoutSec = 0;
@@ -82,6 +86,7 @@ chip::Optional<bool> gRequestorCanConsent;
 static char gOtaDownloadPath[kMaxFilePathSize] = "/tmp/test.bin";
 bool gAutoApplyImage                           = false;
 bool gSendNotifyUpdateApplied                  = true;
+bool gSkipExecImageFile                        = false;
 
 OptionDef cmdLineOptionsDef[] = {
     { "autoApplyImage", chip::ArgParser::kNoArgument, kOptionAutoApplyImage },
@@ -91,6 +96,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "periodicQueryTimeout", chip::ArgParser::kArgumentRequired, kOptionPeriodicQueryTimeout },
     { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "watchdogTimeout", chip::ArgParser::kArgumentRequired, kOptionWatchdogTimeout },
+    { "skipExecImageFile", chip::ArgParser::kNoArgument, kSkipExecImageFile },
     {},
 };
 
@@ -123,6 +129,8 @@ OptionSet cmdLineOptions = {
     "  -w, --watchdogTimeout <time in seconds>\n"
     "       Maximum amount of time allowed for an OTA download before the process is cancelled and state reset to idle.\n"
     "       If none or zero is supplied, the timeout is determined by the driver.\n"
+    "  -s, --skipExecImageFile\n"
+    "       To only check Notify Update Applied Command, skip the Image File execution.\n"
 };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
@@ -139,7 +147,7 @@ bool CustomOTARequestorDriver::CanConsent()
 
 void CustomOTARequestorDriver::UpdateDownloaded()
 {
-    if (gAutoApplyImage)
+    if (gAutoApplyImage || gSkipExecImageFile)
     {
         // Let the default driver take further action to apply the image.
         // All member variables will be implicitly reset upon loading into the new image.
@@ -153,6 +161,39 @@ void CustomOTARequestorDriver::UpdateDownloaded()
         // Reset to put the state back to idle to allow the next OTA update to occur
         gRequestorCore.Reset();
     }
+}
+
+void CustomOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
+{
+    if (gSkipExecImageFile)
+    {
+        // Just waiting delay time
+        VerifyOrDie(SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), AppliedNotifyUpdateTimer,
+                                             this) == CHIP_NO_ERROR);
+    }
+    else
+    {
+        // Let the default driver take further action to apply the image.
+        // All member variables will be implicitly reset upon loading into the new image.
+        DefaultOTARequestorDriver::UpdateConfirmed(delay);
+    }
+}
+
+void CustomOTARequestorDriver::AppliedNotifyUpdateTimer(System::Layer * systemLayer, void * appState)
+{
+    CustomOTARequestorDriver * driver = reinterpret_cast<CustomOTARequestorDriver *>(appState);
+    driver->SendNotifyUpdateApplied();
+}
+
+void CustomOTARequestorDriver::SendNotifyUpdateApplied()
+{
+    VerifyOrDie(mRequestor != nullptr);
+    mRequestor->NotifyUpdateApplied();
+    // After sending Noficy Update Applied command, so reset provider retry counter.
+    mProviderRetryCount = 0;
+
+    // Reset to put the state back to idle to allow the next OTA update to occur
+    gRequestorCore.Reset();
 }
 
 static void InitOTARequestor(void)
@@ -239,6 +280,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionDisableNotify:
         // By default, NotifyUpdateApplied should always be sent. In the presence of this option, disable sending of the command.
         gSendNotifyUpdateApplied = false;
+        break;
+    case kSkipExecImageFile:
+        gSkipExecImageFile = true;
         break;
     default:
         ChipLogError(SoftwareUpdate, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);

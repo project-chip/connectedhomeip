@@ -211,7 +211,7 @@ void DoorLockServer::HandleLocalLockOperationError(chip::EndpointId endpointId, 
 
     HandleWrongCodeEntry(endpointId);
 
-    ChipLogProgress(Zcl, "Handling a local Lock Operation Error: [endpoint=%d, user=%d]", endpointId, userId.Value());
+    ChipLogProgress(Zcl, "Handling a local Lock Operation Error: [endpoint=%d]", endpointId);
 }
 
 bool DoorLockServer::HandleWrongCodeEntry(chip::EndpointId endpointId)
@@ -1985,7 +1985,7 @@ Status DoorLockServer::clearUser(chip::EndpointId endpointId, chip::FabricIndex 
     }
 
     // Remove the user entry
-    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, chip::CharSpan(""), 0,
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, ""_span, 0,
                                       UserStatusEnum::kAvailable, UserTypeEnum::kUnrestrictedUser, CredentialRuleEnum::kSingle,
                                       nullptr, 0))
     {
@@ -3144,8 +3144,10 @@ bool DoorLockServer::sendRemoteLockUserChange(chip::EndpointId endpointId, LockD
     }
     ChipLogProgress(Zcl,
                     "[RemoteLockUserChange] Sent lock user change event "
-                    "[endpointId=%d,eventNumber=%" PRIu64 ",dataType=%u,operation=%u,nodeId=%" PRIu64 ",fabricIndex=%d]",
-                    endpointId, eventNumber, to_underlying(dataType), to_underlying(operation), nodeId, fabricIndex);
+                    "[endpointId=%d,eventNumber=0x" ChipLogFormatX64 ",dataType=%u,operation=%u,nodeId=0x" ChipLogFormatX64
+                    ",fabricIndex=%d]",
+                    endpointId, ChipLogValueX64(eventNumber), to_underlying(dataType), to_underlying(operation),
+                    ChipLogValueX64(nodeId), fabricIndex);
     return true;
 }
 

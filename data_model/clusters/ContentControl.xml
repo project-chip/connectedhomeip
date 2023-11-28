@@ -79,12 +79,12 @@ Davis, CA 95616, USA
   </features>
   <dataTypes>
     <struct name="RatingNameStruct">
-      <field id="1" name="RatingName" type="string">
+      <field id="0" name="RatingName" type="string">
         <access read="true"/>
         <mandatoryConform/>
         <constraint type="maxLength" value="8"/>
       </field>
-      <field id="2" name="RatingNameDesc" type="string">
+      <field id="1" name="RatingNameDesc" type="string">
         <access read="true"/>
         <optionalConform/>
         <constraint type="maxLength" value="64"/>
@@ -92,60 +92,66 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0001" name="Enabled" type="bool">
+    <attribute id="0x0000" name="Enabled" type="bool">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
+      <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0002" name="OnDemandRatings" type="list[RatingNameStruct Type]">
+    <attribute id="0x0001" name="OnDemandRatings" type="list[RatingNameStruct Type]">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="OCR"/>
       </mandatoryConform>
+      <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0003" name="OnDemandRatingThreshold" type="string">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+    <attribute id="0x0002" name="OnDemandRatingThreshold" type="string">
+      <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="OCR"/>
       </mandatoryConform>
       <constraint type="maxLength" value="8"/>
     </attribute>
-    <attribute id="0x0004" name="ScheduledContentRatings" type="list[RatingNameStruct Type]">
+    <attribute id="0x0003" name="ScheduledContentRatings" type="list[RatingNameStruct Type]">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="SCR"/>
       </mandatoryConform>
+      <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0005" name="ScheduledContentRatingThreshold" type="string">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+    <attribute id="0x0004" name="ScheduledContentRatingThreshold" type="string">
+      <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="SCR"/>
       </mandatoryConform>
       <constraint type="maxLength" value="8"/>
     </attribute>
-    <attribute id="0x0006" name="ScreenDailyTime" type="elapsed-s">
+    <attribute id="0x0005" name="ScreenDailyTime" type="elapsed-s">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="ST"/>
       </mandatoryConform>
+      <constraint type="max" value="86400"/>
     </attribute>
-    <attribute id="0x0007" name="RemainingScreenTime" type="elapsed-s">
+    <attribute id="0x0006" name="RemainingScreenTime" type="elapsed-s">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="ST"/>
       </mandatoryConform>
+      <constraint type="max" value="86400"/>
     </attribute>
-    <attribute id="0x0008" name="BlockUnrated" type="bool">
+    <attribute id="0x0007" name="BlockUnrated" type="bool">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="BU"/>
       </mandatoryConform>
+      <constraint type="desc"/>
     </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="UpdatePIN" response="Y">
-      <access invokePrivilege="operate" timed="true"/>
+      <access invokePrivilege="manage" timed="true"/>
       <mandatoryConform>
-        <feature name="PIN"/>
+        <feature name="PM"/>
       </mandatoryConform>
       <field id="0" name="OldPIN" type="string">
         <mandatoryConform/>
@@ -159,13 +165,13 @@ Davis, CA 95616, USA
     <command id="0x01" name="ResetPIN" response="ResetPINResponse">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
-        <feature name="PIN"/>
+        <feature name="PM"/>
       </mandatoryConform>
     </command>
     <command id="0x02" name="ResetPINResponse" direction="responseFromServer">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
-        <feature name="PIN"/>
+        <feature name="PM"/>
       </mandatoryConform>
       <field id="0" name="PINCode" type="string">
         <mandatoryConform/>
@@ -173,20 +179,12 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x03" name="Enable" response="Y">
-      <access invokePrivilege="operate" timed="true"/>
+      <access invokePrivilege="manage" timed="true"/>
       <mandatoryConform/>
-      <field id="0" name="PINCode" type="string">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="6"/>
-      </field>
     </command>
     <command id="0x04" name="Disable" response="Y">
-      <access invokePrivilege="operate" timed="true"/>
+      <access invokePrivilege="manage" timed="true"/>
       <mandatoryConform/>
-      <field id="0" name="PINCode" type="string">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="6"/>
-      </field>
     </command>
     <command id="0x05" name="AddBonusTime" response="Y">
       <access invokePrivilege="operate"/>
@@ -194,7 +192,7 @@ Davis, CA 95616, USA
         <feature name="ST"/>
       </mandatoryConform>
       <field id="0" name="PINCode" type="string">
-        <mandatoryConform/>
+        <optionalConform/>
         <constraint type="maxLength" value="6"/>
       </field>
       <field id="1" name="BonusTime" type="elapsed-s" default="300s">
@@ -202,36 +200,44 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x06" name="SetScreenDailyTime" response="Y">
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="ST"/>
       </mandatoryConform>
-      <field id="0" name="PINCode" type="string">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="6"/>
-      </field>
-      <field id="1" name="ScreenTime" type="elapsed-s">
+      <field id="0" name="ScreenTime" type="elapsed-s">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x07" name="BlockUnratedContent" response="Y">
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="BU"/>
       </mandatoryConform>
-      <field id="0" name="PINCode" type="string">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="6"/>
-      </field>
     </command>
     <command id="0x08" name="UnblockUnratedContent" response="Y">
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="BU"/>
       </mandatoryConform>
-      <field id="0" name="PINCode" type="string">
+    </command>
+    <command id="0x09" name="SetOnDemandRatingThreshold" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="OCR"/>
+      </mandatoryConform>
+      <field id="0" name="Rating" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="6"/>
+        <constraint type="maxLength" value="8"/>
+      </field>
+    </command>
+    <command id="0x0a" name="SetScheduledContentRatingThreshold" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="SCR"/>
+      </mandatoryConform>
+      <field id="0" name="Rating" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="8"/>
       </field>
     </command>
   </commands>

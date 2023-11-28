@@ -135,7 +135,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
     LaunchResponseType response;
     // TODO: Insert code here
     response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
-    response.status = ContentLauncher::ContentLaunchStatusEnum::kSuccess;
+    response.status = ContentLauncher::StatusEnum::kSuccess;
     helper.Success(response);
 }
 
@@ -155,16 +155,16 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
     // TODO: Insert code here
     LaunchResponseType response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
-    response.status = ContentLauncher::ContentLaunchStatusEnum::kSuccess;
+    response.status = ContentLauncher::StatusEnum::kSuccess;
 
     // Handle test cases
     if (contentUrlString == "https://badurl")
     {
-        response.status = ContentLauncher::ContentLaunchStatusEnum::kUrlNotAvailable;
+        response.status = ContentLauncher::StatusEnum::kURLNotAvailable;
     }
     else if (contentUrlString == "https://csa-iot.org/badauth")
     {
-        response.status = ContentLauncher::ContentLaunchStatusEnum::kAuthFailed;
+        response.status = ContentLauncher::StatusEnum::kAuthFailed;
     }
 
     helper.Success(response);

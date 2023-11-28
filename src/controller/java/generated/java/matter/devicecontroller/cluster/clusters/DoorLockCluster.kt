@@ -17,1096 +17,850 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.controller.MatterController
+import matter.devicecontroller.cluster.structs.*
 
-class DoorLockCluster(private val endpointId: UShort) {
+class DoorLockCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class GetWeekDayScheduleResponse(
+    val weekDayIndex: UByte,
+    val userIndex: UShort,
+    val status: UInt,
+    val daysMask: UInt?,
+    val startHour: UByte?,
+    val startMinute: UByte?,
+    val endHour: UByte?,
+    val endMinute: UByte?
+  )
+
+  class GetYearDayScheduleResponse(
+    val yearDayIndex: UByte,
+    val userIndex: UShort,
+    val status: UInt,
+    val localStartTime: UInt?,
+    val localEndTime: UInt?
+  )
+
+  class GetHolidayScheduleResponse(
+    val holidayIndex: UByte,
+    val status: UInt,
+    val localStartTime: UInt?,
+    val localEndTime: UInt?,
+    val operatingMode: UInt?
+  )
+
+  class GetUserResponse(
+    val userIndex: UShort,
+    val userName: String?,
+    val userUniqueID: UInt?,
+    val userStatus: UInt?,
+    val userType: UInt?,
+    val credentialRule: UInt?,
+    val credentials: List<DoorLockClusterCredentialStruct>?,
+    val creatorFabricIndex: UByte?,
+    val lastModifiedFabricIndex: UByte?,
+    val nextUserIndex: UShort?
+  )
+
+  class SetCredentialResponse(
+    val status: UInt,
+    val userIndex: UShort?,
+    val nextCredentialIndex: UShort?
+  )
+
+  class GetCredentialStatusResponse(
+    val credentialExists: Boolean,
+    val userIndex: UShort?,
+    val creatorFabricIndex: UByte?,
+    val lastModifiedFabricIndex: UByte?,
+    val nextCredentialIndex: UShort?
+  )
+
+  class LockStateAttribute(val value: UInt?)
+
+  class DoorStateAttribute(val value: UInt?)
+
+  class GeneratedCommandListAttribute(val value: List<UInt>)
+
+  class AcceptedCommandListAttribute(val value: List<UInt>)
+
+  class EventListAttribute(val value: List<UInt>)
+
+  class AttributeListAttribute(val value: List<UInt>)
+
+  suspend fun lockDoor(PINCode: ByteArray?, timedInvokeTimeoutMs: Int) {
+    val commandId = 0L
+
+    // Implementation needs to be added here
+  }
+
+  suspend fun unlockDoor(PINCode: ByteArray?, timedInvokeTimeoutMs: Int) {
+    val commandId = 1L
+
+    // Implementation needs to be added here
+  }
+
+  suspend fun unlockWithTimeout(timeout: UShort, PINCode: ByteArray?, timedInvokeTimeoutMs: Int) {
+    val commandId = 3L
+
+    // Implementation needs to be added here
+  }
+
+  suspend fun setWeekDaySchedule(
+    weekDayIndex: UByte,
+    userIndex: UShort,
+    daysMask: UInt,
+    startHour: UByte,
+    startMinute: UByte,
+    endHour: UByte,
+    endMinute: UByte,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 11L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun getWeekDaySchedule(
+    weekDayIndex: UByte,
+    userIndex: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ): GetWeekDayScheduleResponse {
+    val commandId = 12L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun clearWeekDaySchedule(
+    weekDayIndex: UByte,
+    userIndex: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 13L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun setYearDaySchedule(
+    yearDayIndex: UByte,
+    userIndex: UShort,
+    localStartTime: UInt,
+    localEndTime: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 14L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun getYearDaySchedule(
+    yearDayIndex: UByte,
+    userIndex: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ): GetYearDayScheduleResponse {
+    val commandId = 15L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun clearYearDaySchedule(
+    yearDayIndex: UByte,
+    userIndex: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 16L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun setHolidaySchedule(
+    holidayIndex: UByte,
+    localStartTime: UInt,
+    localEndTime: UInt,
+    operatingMode: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 17L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun getHolidaySchedule(
+    holidayIndex: UByte,
+    timedInvokeTimeoutMs: Int? = null
+  ): GetHolidayScheduleResponse {
+    val commandId = 18L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun clearHolidaySchedule(holidayIndex: UByte, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 19L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun setUser(
+    operationType: UInt,
+    userIndex: UShort,
+    userName: String?,
+    userUniqueID: UInt?,
+    userStatus: UInt?,
+    userType: UInt?,
+    credentialRule: UInt?,
+    timedInvokeTimeoutMs: Int
+  ) {
+    val commandId = 26L
+
+    // Implementation needs to be added here
+  }
+
+  suspend fun getUser(userIndex: UShort, timedInvokeTimeoutMs: Int? = null): GetUserResponse {
+    val commandId = 27L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun clearUser(userIndex: UShort, timedInvokeTimeoutMs: Int) {
+    val commandId = 29L
+
+    // Implementation needs to be added here
+  }
+
+  suspend fun setCredential(
+    operationType: UInt,
+    credential: DoorLockClusterCredentialStruct,
+    credentialData: ByteArray,
+    userIndex: UShort?,
+    userStatus: UInt?,
+    userType: UInt?,
+    timedInvokeTimeoutMs: Int
+  ): SetCredentialResponse {
+    val commandId = 34L
+
+    // Implementation needs to be added here
+  }
+
+  suspend fun getCredentialStatus(
+    credential: DoorLockClusterCredentialStruct,
+    timedInvokeTimeoutMs: Int? = null
+  ): GetCredentialStatusResponse {
+    val commandId = 36L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun clearCredential(
+    credential: DoorLockClusterCredentialStruct?,
+    timedInvokeTimeoutMs: Int
+  ) {
+    val commandId = 38L
+
+    // Implementation needs to be added here
+  }
+
+  suspend fun unboltDoor(PINCode: ByteArray?, timedInvokeTimeoutMs: Int) {
+    val commandId = 39L
+
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLockStateAttribute(): LockStateAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLockStateAttribute(minInterval: Int, maxInterval: Int): LockStateAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLockTypeAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLockTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readActuatorEnabledAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeActuatorEnabledAttribute(minInterval: Int, maxInterval: Int): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDoorStateAttribute(): DoorStateAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDoorStateAttribute(minInterval: Int, maxInterval: Int): DoorStateAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDoorOpenEventsAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeDoorOpenEventsAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeDoorOpenEventsAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDoorClosedEventsAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeDoorClosedEventsAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeDoorClosedEventsAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOpenPeriodAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOpenPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeOpenPeriodAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNumberOfTotalUsersSupportedAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNumberOfTotalUsersSupportedAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNumberOfPINUsersSupportedAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNumberOfPINUsersSupportedAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNumberOfRFIDUsersSupportedAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNumberOfRFIDUsersSupportedAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNumberOfWeekDaySchedulesSupportedPerUserAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNumberOfWeekDaySchedulesSupportedPerUserAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNumberOfYearDaySchedulesSupportedPerUserAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNumberOfYearDaySchedulesSupportedPerUserAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNumberOfHolidaySchedulesSupportedAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNumberOfHolidaySchedulesSupportedAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMaxPINCodeLengthAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMaxPINCodeLengthAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMinPINCodeLengthAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMinPINCodeLengthAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMaxRFIDCodeLengthAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMaxRFIDCodeLengthAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMinRFIDCodeLengthAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMinRFIDCodeLengthAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCredentialRulesSupportAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCredentialRulesSupportAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNumberOfCredentialsSupportedPerUserAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNumberOfCredentialsSupportedPerUserAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLanguageAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLanguageAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeLanguageAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLEDSettingsAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLEDSettingsAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeLEDSettingsAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAutoRelockTimeAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeAutoRelockTimeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeAutoRelockTimeAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSoundVolumeAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeSoundVolumeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeSoundVolumeAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOperatingModeAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOperatingModeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeOperatingModeAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSupportedOperatingModesAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSupportedOperatingModesAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDefaultConfigurationRegisterAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDefaultConfigurationRegisterAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEnableLocalProgrammingAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeEnableLocalProgrammingAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeEnableLocalProgrammingAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEnableOneTouchLockingAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeEnableOneTouchLockingAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeEnableOneTouchLockingAttribute(minInterval: Int, maxInterval: Int): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEnableInsideStatusLEDAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeEnableInsideStatusLEDAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeEnableInsideStatusLEDAttribute(minInterval: Int, maxInterval: Int): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEnablePrivacyModeButtonAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeEnablePrivacyModeButtonAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeEnablePrivacyModeButtonAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLocalProgrammingFeaturesAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLocalProgrammingFeaturesAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeLocalProgrammingFeaturesAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readWrongCodeEntryLimitAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeWrongCodeEntryLimitAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeWrongCodeEntryLimitAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readUserCodeTemporaryDisableTimeAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeUserCodeTemporaryDisableTimeAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeUserCodeTemporaryDisableTimeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSendPINOverTheAirAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeSendPINOverTheAirAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeSendPINOverTheAirAttribute(minInterval: Int, maxInterval: Int): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRequirePINforRemoteOperationAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeRequirePINforRemoteOperationAttribute(
+    value: Boolean,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeRequirePINforRemoteOperationAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readExpiringUserTimeoutAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeExpiringUserTimeoutAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeExpiringUserTimeoutAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 257u
-  }
-
-  fun lockDoor(callback: DefaultClusterCallback, PINCode: ByteArray?, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun unlockDoor(callback: DefaultClusterCallback, PINCode: ByteArray?, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun unlockWithTimeout(
-    callback: DefaultClusterCallback,
-    timeout: Integer,
-    PINCode: ByteArray?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun setWeekDaySchedule(
-    callback: DefaultClusterCallback,
-    weekDayIndex: Integer,
-    userIndex: Integer,
-    daysMask: Integer,
-    startHour: Integer,
-    startMinute: Integer,
-    endHour: Integer,
-    endMinute: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun setWeekDaySchedule(
-    callback: DefaultClusterCallback,
-    weekDayIndex: Integer,
-    userIndex: Integer,
-    daysMask: Integer,
-    startHour: Integer,
-    startMinute: Integer,
-    endHour: Integer,
-    endMinute: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun getWeekDaySchedule(
-    callback: GetWeekDayScheduleResponseCallback,
-    weekDayIndex: Integer,
-    userIndex: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun getWeekDaySchedule(
-    callback: GetWeekDayScheduleResponseCallback,
-    weekDayIndex: Integer,
-    userIndex: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun clearWeekDaySchedule(
-    callback: DefaultClusterCallback,
-    weekDayIndex: Integer,
-    userIndex: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun clearWeekDaySchedule(
-    callback: DefaultClusterCallback,
-    weekDayIndex: Integer,
-    userIndex: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun setYearDaySchedule(
-    callback: DefaultClusterCallback,
-    yearDayIndex: Integer,
-    userIndex: Integer,
-    localStartTime: Long,
-    localEndTime: Long
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun setYearDaySchedule(
-    callback: DefaultClusterCallback,
-    yearDayIndex: Integer,
-    userIndex: Integer,
-    localStartTime: Long,
-    localEndTime: Long,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun getYearDaySchedule(
-    callback: GetYearDayScheduleResponseCallback,
-    yearDayIndex: Integer,
-    userIndex: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun getYearDaySchedule(
-    callback: GetYearDayScheduleResponseCallback,
-    yearDayIndex: Integer,
-    userIndex: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun clearYearDaySchedule(
-    callback: DefaultClusterCallback,
-    yearDayIndex: Integer,
-    userIndex: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun clearYearDaySchedule(
-    callback: DefaultClusterCallback,
-    yearDayIndex: Integer,
-    userIndex: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun setHolidaySchedule(
-    callback: DefaultClusterCallback,
-    holidayIndex: Integer,
-    localStartTime: Long,
-    localEndTime: Long,
-    operatingMode: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun setHolidaySchedule(
-    callback: DefaultClusterCallback,
-    holidayIndex: Integer,
-    localStartTime: Long,
-    localEndTime: Long,
-    operatingMode: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun getHolidaySchedule(callback: GetHolidayScheduleResponseCallback, holidayIndex: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun getHolidaySchedule(
-    callback: GetHolidayScheduleResponseCallback,
-    holidayIndex: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun clearHolidaySchedule(callback: DefaultClusterCallback, holidayIndex: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun clearHolidaySchedule(
-    callback: DefaultClusterCallback,
-    holidayIndex: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun setUser(
-    callback: DefaultClusterCallback,
-    operationType: Integer,
-    userIndex: Integer,
-    userName: String?,
-    userUniqueID: Long?,
-    userStatus: Integer?,
-    userType: Integer?,
-    credentialRule: Integer?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun getUser(callback: GetUserResponseCallback, userIndex: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun getUser(callback: GetUserResponseCallback, userIndex: Integer, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun clearUser(callback: DefaultClusterCallback, userIndex: Integer, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun setCredential(
-    callback: SetCredentialResponseCallback,
-    operationType: Integer,
-    credential: ChipStructs.DoorLockClusterCredentialStruct,
-    credentialData: ByteArray,
-    userIndex: Integer?,
-    userStatus: Integer?,
-    userType: Integer?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun getCredentialStatus(
-    callback: GetCredentialStatusResponseCallback,
-    credential: ChipStructs.DoorLockClusterCredentialStruct
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun getCredentialStatus(
-    callback: GetCredentialStatusResponseCallback,
-    credential: ChipStructs.DoorLockClusterCredentialStruct,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun clearCredential(
-    callback: DefaultClusterCallback,
-    credential: ChipStructs.DoorLockClusterCredentialStruct?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun unboltDoor(callback: DefaultClusterCallback, PINCode: ByteArray?, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  interface GetWeekDayScheduleResponseCallback {
-    fun onSuccess(
-      weekDayIndex: Integer,
-      userIndex: Integer,
-      status: Integer,
-      daysMask: Integer?,
-      startHour: Integer?,
-      startMinute: Integer?,
-      endHour: Integer?,
-      endMinute: Integer?
-    )
-
-    fun onError(error: Exception)
-  }
-
-  interface GetYearDayScheduleResponseCallback {
-    fun onSuccess(
-      yearDayIndex: Integer,
-      userIndex: Integer,
-      status: Integer,
-      localStartTime: Long?,
-      localEndTime: Long?
-    )
-
-    fun onError(error: Exception)
-  }
-
-  interface GetHolidayScheduleResponseCallback {
-    fun onSuccess(
-      holidayIndex: Integer,
-      status: Integer,
-      localStartTime: Long?,
-      localEndTime: Long?,
-      operatingMode: Integer?
-    )
-
-    fun onError(error: Exception)
-  }
-
-  interface GetUserResponseCallback {
-    fun onSuccess(
-      userIndex: Integer,
-      userName: String?,
-      userUniqueID: Long?,
-      userStatus: Integer?,
-      userType: Integer?,
-      credentialRule: Integer?,
-      credentials: ArrayList<ChipStructs.DoorLockClusterCredentialStruct>?,
-      creatorFabricIndex: Integer?,
-      lastModifiedFabricIndex: Integer?,
-      nextUserIndex: Integer?
-    )
-
-    fun onError(error: Exception)
-  }
-
-  interface SetCredentialResponseCallback {
-    fun onSuccess(status: Integer, userIndex: Integer?, nextCredentialIndex: Integer?)
-
-    fun onError(error: Exception)
-  }
-
-  interface GetCredentialStatusResponseCallback {
-    fun onSuccess(
-      credentialExists: Boolean,
-      userIndex: Integer?,
-      creatorFabricIndex: Integer?,
-      lastModifiedFabricIndex: Integer?,
-      nextCredentialIndex: Integer?
-    )
-
-    fun onError(error: Exception)
-  }
-
-  interface LockStateAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface DoorStateAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readLockStateAttribute(callback: LockStateAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLockStateAttribute(
-    callback: LockStateAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLockTypeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLockTypeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readActuatorEnabledAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeActuatorEnabledAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readDoorStateAttribute(callback: DoorStateAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeDoorStateAttribute(
-    callback: DoorStateAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readDoorOpenEventsAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeDoorOpenEventsAttribute(callback: DefaultClusterCallback, value: Long) {
-    // Implementation needs to be added here
-  }
-
-  fun writeDoorOpenEventsAttribute(
-    callback: DefaultClusterCallback,
-    value: Long,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeDoorOpenEventsAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readDoorClosedEventsAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeDoorClosedEventsAttribute(callback: DefaultClusterCallback, value: Long) {
-    // Implementation needs to be added here
-  }
-
-  fun writeDoorClosedEventsAttribute(
-    callback: DefaultClusterCallback,
-    value: Long,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeDoorClosedEventsAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOpenPeriodAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOpenPeriodAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOpenPeriodAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOpenPeriodAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNumberOfTotalUsersSupportedAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNumberOfTotalUsersSupportedAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNumberOfPINUsersSupportedAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNumberOfPINUsersSupportedAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNumberOfRFIDUsersSupportedAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNumberOfRFIDUsersSupportedAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNumberOfWeekDaySchedulesSupportedPerUserAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNumberOfWeekDaySchedulesSupportedPerUserAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNumberOfYearDaySchedulesSupportedPerUserAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNumberOfYearDaySchedulesSupportedPerUserAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNumberOfHolidaySchedulesSupportedAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNumberOfHolidaySchedulesSupportedAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMaxPINCodeLengthAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMaxPINCodeLengthAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMinPINCodeLengthAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMinPINCodeLengthAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMaxRFIDCodeLengthAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMaxRFIDCodeLengthAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMinRFIDCodeLengthAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMinRFIDCodeLengthAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCredentialRulesSupportAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCredentialRulesSupportAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNumberOfCredentialsSupportedPerUserAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNumberOfCredentialsSupportedPerUserAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLanguageAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLanguageAttribute(callback: DefaultClusterCallback, value: String) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLanguageAttribute(
-    callback: DefaultClusterCallback,
-    value: String,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLanguageAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLEDSettingsAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLEDSettingsAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLEDSettingsAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLEDSettingsAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAutoRelockTimeAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeAutoRelockTimeAttribute(callback: DefaultClusterCallback, value: Long) {
-    // Implementation needs to be added here
-  }
-
-  fun writeAutoRelockTimeAttribute(
-    callback: DefaultClusterCallback,
-    value: Long,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAutoRelockTimeAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSoundVolumeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeSoundVolumeAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeSoundVolumeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSoundVolumeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOperatingModeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOperatingModeAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOperatingModeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOperatingModeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSupportedOperatingModesAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSupportedOperatingModesAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readDefaultConfigurationRegisterAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeDefaultConfigurationRegisterAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEnableLocalProgrammingAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeEnableLocalProgrammingAttribute(callback: DefaultClusterCallback, value: Boolean) {
-    // Implementation needs to be added here
-  }
-
-  fun writeEnableLocalProgrammingAttribute(
-    callback: DefaultClusterCallback,
-    value: Boolean,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEnableLocalProgrammingAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEnableOneTouchLockingAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeEnableOneTouchLockingAttribute(callback: DefaultClusterCallback, value: Boolean) {
-    // Implementation needs to be added here
-  }
-
-  fun writeEnableOneTouchLockingAttribute(
-    callback: DefaultClusterCallback,
-    value: Boolean,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEnableOneTouchLockingAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEnableInsideStatusLEDAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeEnableInsideStatusLEDAttribute(callback: DefaultClusterCallback, value: Boolean) {
-    // Implementation needs to be added here
-  }
-
-  fun writeEnableInsideStatusLEDAttribute(
-    callback: DefaultClusterCallback,
-    value: Boolean,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEnableInsideStatusLEDAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEnablePrivacyModeButtonAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeEnablePrivacyModeButtonAttribute(callback: DefaultClusterCallback, value: Boolean) {
-    // Implementation needs to be added here
-  }
-
-  fun writeEnablePrivacyModeButtonAttribute(
-    callback: DefaultClusterCallback,
-    value: Boolean,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEnablePrivacyModeButtonAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLocalProgrammingFeaturesAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLocalProgrammingFeaturesAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeLocalProgrammingFeaturesAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLocalProgrammingFeaturesAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readWrongCodeEntryLimitAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeWrongCodeEntryLimitAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeWrongCodeEntryLimitAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeWrongCodeEntryLimitAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readUserCodeTemporaryDisableTimeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeUserCodeTemporaryDisableTimeAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeUserCodeTemporaryDisableTimeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeUserCodeTemporaryDisableTimeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSendPINOverTheAirAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeSendPINOverTheAirAttribute(callback: DefaultClusterCallback, value: Boolean) {
-    // Implementation needs to be added here
-  }
-
-  fun writeSendPINOverTheAirAttribute(
-    callback: DefaultClusterCallback,
-    value: Boolean,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSendPINOverTheAirAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRequirePINforRemoteOperationAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeRequirePINforRemoteOperationAttribute(callback: DefaultClusterCallback, value: Boolean) {
-    // Implementation needs to be added here
-  }
-
-  fun writeRequirePINforRemoteOperationAttribute(
-    callback: DefaultClusterCallback,
-    value: Boolean,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRequirePINforRemoteOperationAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readExpiringUserTimeoutAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeExpiringUserTimeoutAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeExpiringUserTimeoutAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeExpiringUserTimeoutAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

@@ -17,389 +17,304 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.util.ArrayList
+import matter.controller.MatterController
+import matter.devicecontroller.cluster.structs.*
 
-class OccupancySensingCluster(private val endpointId: UShort) {
+class OccupancySensingCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
+  class GeneratedCommandListAttribute(val value: List<UInt>)
+
+  class AcceptedCommandListAttribute(val value: List<UInt>)
+
+  class EventListAttribute(val value: List<UInt>)
+
+  class AttributeListAttribute(val value: List<UInt>)
+
+  suspend fun readOccupancyAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOccupancyAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOccupancySensorTypeAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOccupancySensorTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOccupancySensorTypeBitmapAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOccupancySensorTypeBitmapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPIROccupiedToUnoccupiedDelayAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writePIROccupiedToUnoccupiedDelayAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribePIROccupiedToUnoccupiedDelayAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPIRUnoccupiedToOccupiedDelayAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writePIRUnoccupiedToOccupiedDelayAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribePIRUnoccupiedToOccupiedDelayAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPIRUnoccupiedToOccupiedThresholdAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writePIRUnoccupiedToOccupiedThresholdAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribePIRUnoccupiedToOccupiedThresholdAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readUltrasonicOccupiedToUnoccupiedDelayAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeUltrasonicOccupiedToUnoccupiedDelayAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeUltrasonicOccupiedToUnoccupiedDelayAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readUltrasonicUnoccupiedToOccupiedDelayAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeUltrasonicUnoccupiedToOccupiedDelayAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeUltrasonicUnoccupiedToOccupiedDelayAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readUltrasonicUnoccupiedToOccupiedThresholdAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeUltrasonicUnoccupiedToOccupiedThresholdAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribeUltrasonicUnoccupiedToOccupiedThresholdAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPhysicalContactOccupiedToUnoccupiedDelayAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writePhysicalContactOccupiedToUnoccupiedDelayAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribePhysicalContactOccupiedToUnoccupiedDelayAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPhysicalContactUnoccupiedToOccupiedDelayAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writePhysicalContactUnoccupiedToOccupiedDelayAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribePhysicalContactUnoccupiedToOccupiedDelayAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPhysicalContactUnoccupiedToOccupiedThresholdAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writePhysicalContactUnoccupiedToOccupiedThresholdAttribute(
+    value: UByte,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
+  }
+
+  suspend fun subscribePhysicalContactUnoccupiedToOccupiedThresholdAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 1030u
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readOccupancyAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOccupancyAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOccupancySensorTypeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOccupancySensorTypeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOccupancySensorTypeBitmapAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOccupancySensorTypeBitmapAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPIROccupiedToUnoccupiedDelayAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writePIROccupiedToUnoccupiedDelayAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writePIROccupiedToUnoccupiedDelayAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePIROccupiedToUnoccupiedDelayAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPIRUnoccupiedToOccupiedDelayAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writePIRUnoccupiedToOccupiedDelayAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writePIRUnoccupiedToOccupiedDelayAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePIRUnoccupiedToOccupiedDelayAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPIRUnoccupiedToOccupiedThresholdAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writePIRUnoccupiedToOccupiedThresholdAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun writePIRUnoccupiedToOccupiedThresholdAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePIRUnoccupiedToOccupiedThresholdAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readUltrasonicOccupiedToUnoccupiedDelayAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeUltrasonicOccupiedToUnoccupiedDelayAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun writeUltrasonicOccupiedToUnoccupiedDelayAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeUltrasonicOccupiedToUnoccupiedDelayAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readUltrasonicUnoccupiedToOccupiedDelayAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeUltrasonicUnoccupiedToOccupiedDelayAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun writeUltrasonicUnoccupiedToOccupiedDelayAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeUltrasonicUnoccupiedToOccupiedDelayAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readUltrasonicUnoccupiedToOccupiedThresholdAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeUltrasonicUnoccupiedToOccupiedThresholdAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun writeUltrasonicUnoccupiedToOccupiedThresholdAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeUltrasonicUnoccupiedToOccupiedThresholdAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPhysicalContactOccupiedToUnoccupiedDelayAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writePhysicalContactOccupiedToUnoccupiedDelayAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun writePhysicalContactOccupiedToUnoccupiedDelayAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePhysicalContactOccupiedToUnoccupiedDelayAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPhysicalContactUnoccupiedToOccupiedDelayAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writePhysicalContactUnoccupiedToOccupiedDelayAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun writePhysicalContactUnoccupiedToOccupiedDelayAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePhysicalContactUnoccupiedToOccupiedDelayAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPhysicalContactUnoccupiedToOccupiedThresholdAttribute(
-    callback: IntegerAttributeCallback
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun writePhysicalContactUnoccupiedToOccupiedThresholdAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun writePhysicalContactUnoccupiedToOccupiedThresholdAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePhysicalContactUnoccupiedToOccupiedThresholdAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

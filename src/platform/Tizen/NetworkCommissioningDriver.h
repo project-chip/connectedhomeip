@@ -147,6 +147,8 @@ public:
     // ThreadDriver
     Status AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
     void ScanNetworks(ThreadDriver::ScanCallback * callback) override;
+    ThreadCapabilities GetSupportedThreadFeatures() override;
+    uint16_t GetThreadVersion() override;
 
 private:
     ThreadNetworkIterator mThreadIterator = ThreadNetworkIterator(this);
