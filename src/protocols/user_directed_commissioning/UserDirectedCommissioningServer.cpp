@@ -27,10 +27,6 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
-#ifdef __ZEPHYR__
-#include <zephyr/kernel.h>
-#endif // __ZEPHYR__
-
 #include <unistd.h>
 
 namespace chip {
@@ -152,24 +148,11 @@ CHIP_ERROR UserDirectedCommissioningServer::SendCDCMessage(CommissionerDeclarati
     cd.DebugLog();
     ChipLogProgress(Inet, "Sending CDC msg");
 
-    // send UDC message 5 times per spec (no ACK on this message)
-    for (unsigned int i = 0; i < 5; i++)
+    auto err = mTransportMgr->SendMessage(peerAddress, std::move(payload));
+    if (err != CHIP_NO_ERROR)
     {
-        auto msgCopy = payload.CloneData();
-        VerifyOrReturnError(!msgCopy.IsNull(), CHIP_ERROR_NO_MEMORY);
-
-        auto err = mTransportMgr->SendMessage(peerAddress, std::move(msgCopy));
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "CDC SendMessage failed: %" CHIP_ERROR_FORMAT, err.Format());
-            return err;
-        }
-        // Zephyr doesn't provide usleep implementation.
-#ifdef __ZEPHYR__
-        k_usleep(100 * 1000); // 100ms
-#else
-        usleep(100 * 1000); // 100ms
-#endif // __ZEPHYR__
+        ChipLogError(AppServer, "CDC SendMessage failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
     }
 
     ChipLogProgress(Inet, "CDC msg sent");

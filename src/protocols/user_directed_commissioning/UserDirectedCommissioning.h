@@ -593,6 +593,9 @@ public:
 
     /**
      * Send a Commissioner Declaration message to the given peer address
+     *
+     * Only one message will be sent.
+     * Clients should follow spec and send up to 5 times with 100ms sleep between each call.
      */
     CHIP_ERROR SendCDCMessage(CommissionerDeclaration cdMessage, chip::Transport::PeerAddress peerAddress);
 
