@@ -233,17 +233,32 @@ public:
             else if (name == "SystemMode")
             {
                 // System modes - Off, Auto, Cool and Heat are currently supported.
-                chip::app::Clusters::Thermostat::ThermostatSystemModeEnum mode = reinterpret_cast<chip::app::Clusters::Thermostat::ThermostatSystemModeEnum>(n);
+                chip::app::Clusters::Thermostat::ThermostatSystemModeEnum modeEnum = ThermostatSystemModeEnum::kUnknownEnumValue;
+                uint8_t mode = n;
+
+                switch (n)
+                {
+                    case 0: modeEnum = ThermostatSystemModeEnum::kOff; break;
+                    case 1: modeEnum = ThermostatSystemModeEnum::kAuto; break;
+                    case 3: modeEnum = ThermostatSystemModeEnum::kCool; break;
+                    case 4: modeEnum = ThermostatSystemModeEnum::kHeat; break;
+                    case 5: modeEnum = ThermostatSystemModeEnum::kEmergencyHeat; break;
+                    case 6: modeEnum = ThermostatSystemModeEnum::kPrecooling; break;
+                    case 7: modeEnum = ThermostatSystemModeEnum::kFanOnly; break;
+                    case 8: modeEnum = ThermostatSystemModeEnum::kDry; break;
+                    case 9: modeEnum = ThermostatSystemModeEnum::kSleep; break;
+                    default: modeEnum = ThermostatSystemModeEnum::kUnknownEnumValue; break;
+                }
+
                 // Update the system mode here for hardcoded endpoint 1
                 if (isValidThermostatSystemMode(mode))
                 {
                     ESP_LOGI(TAG, "System Mode changed to : %d", mode);
-                    app::Clusters::Thermostat::Attributes::SystemMode::Set(1, mode);
+                    app::Clusters::Thermostat::Attributes::SystemMode::Set(1, modeEnum);
                     // If system mode is auto set running mode to off otherwise set it to what the system mode is set to
-                    if (mode == static_cast<uint8_t>(chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kAuto))
+                    if (modeEnum == chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kAuto)
                     {
-                        app::Clusters::Thermostat::Attributes::ThermostatRunningModeEnum::Set(
-                            1, static_cast<uint8_t>(chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff));
+                        app::Clusters::Thermostat::Attributes::ThermostatRunningModeEnum::Set(1, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff);
                     }
                     else
                     {
@@ -266,20 +281,28 @@ public:
             else if (name == "RunningMode")
             {
                 // Get the system mode
-                uint8_t systemMode = static_cast<uint8_t>(chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff);
-                app::Clusters::Thermostat::Attributes::SystemMode::Get(1, static_cast<uint8_t *>(&systemMode));
-                if (systemMode != static_cast<uint8_t>(chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kAuto))
+                chip::app::Clusters::Thermostat::ThermostatSystemModeEnum systemMode = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kOff;
+                app::Clusters::Thermostat::Attributes::SystemMode::Get(1, &systemMode);
+                if (systemMode != chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kAuto)
                 {
                     ESP_LOGI(TAG, "Running mode can be changed only for system mode auto. Current system mode %d", systemMode);
                 }
                 else
                 {
                     uint8_t mode = n;
+                    chip::app::Clusters::Thermostat::ThermostatRunningModeEnum modeEnum = ThermostatRunningModeEnum::kUnknownEnumValue;
                     // update the running mode here for hardcoded endpoint 1
                     if (isValidThermostatRunningMode(mode))
                     {
                         ESP_LOGI(TAG, "Running Mode changed to : %d", mode);
-                        app::Clusters::Thermostat::Attributes::ThermostatRunningModeEnum::Set(1, static_cast<uint8_t>(mode));
+                        switch (n)
+                        {
+                            case 0: modeEnum = ThermostatRunningModeEnum::kOff; break;
+                            case 3: modeEnum = ThermostatRunningModeEnum::kCool; break;
+                            case 4: modeEnum = ThermostatRunningModeEnum::kHeat; break;
+                            default: modeEnum = ThermostatRunningModeEnum::kUnknownEnumValue; break;
+                        }
+                        app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, modeEnum);
                     }
                     else
                     {
@@ -608,14 +631,14 @@ void SetupPretendDevices()
     app::Clusters::Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(21 * 100));
     AddAttribute("SystemMode", "4");
     app::Clusters::Thermostat::Attributes::SystemMode::Set(
-        1, static_cast<uint8_t>(chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kHeat));
+        1, chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kHeat);
     AddAttribute("CoolSetpoint", "19");
     app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Set(1, static_cast<int16_t>(19 * 100));
     AddAttribute("HeatSetpoint", "25");
     app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1, static_cast<int16_t>(25 * 100));
     AddAttribute("RunningMode", "4");
     app::Clusters::Thermostat::Attributes::ThermostatRunningModeEnum::Set(
-        1, static_cast<uint8_t>(chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kHeat));
+        1, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kHeat);
 
     AddDevice("Humidity Sensor");
     AddEndpoint("External");
