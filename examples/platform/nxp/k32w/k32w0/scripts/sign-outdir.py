@@ -2,6 +2,7 @@ import argparse
 import os
 import subprocess
 
+
 def main(args):
     if os.environ["NXP_K32W0_SDK_ROOT"] != "":
         sign_images_path = os.environ["NXP_K32W0_SDK_ROOT"] + "/tools/imagetool/sign_images.sh"
@@ -21,6 +22,7 @@ def main(args):
         cmd = cmd + " -SimpleHashVerification"
 
     subprocess.call(cmd, shell=True)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
