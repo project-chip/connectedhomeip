@@ -238,16 +238,16 @@ public:
 
                 switch (n)
                 {
-                    case 0: modeEnum = ThermostatSystemModeEnum::kOff; break;
-                    case 1: modeEnum = ThermostatSystemModeEnum::kAuto; break;
-                    case 3: modeEnum = ThermostatSystemModeEnum::kCool; break;
-                    case 4: modeEnum = ThermostatSystemModeEnum::kHeat; break;
-                    case 5: modeEnum = ThermostatSystemModeEnum::kEmergencyHeat; break;
-                    case 6: modeEnum = ThermostatSystemModeEnum::kPrecooling; break;
-                    case 7: modeEnum = ThermostatSystemModeEnum::kFanOnly; break;
-                    case 8: modeEnum = ThermostatSystemModeEnum::kDry; break;
-                    case 9: modeEnum = ThermostatSystemModeEnum::kSleep; break;
-                    default: modeEnum = ThermostatSystemModeEnum::kUnknownEnumValue; break;
+                    case 0: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kOff; break;
+                    case 1: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kAuto; break;
+                    case 3: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kCool; break;
+                    case 4: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kHeat; break;
+                    case 5: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kEmergencyHeat; break;
+                    case 6: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kPrecooling; break;
+                    case 7: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kFanOnly; break;
+                    case 8: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kDry; break;
+                    case 9: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kSleep; break;
+                    default: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kUnknownEnumValue; break;
                 }
 
                 // Update the system mode here for hardcoded endpoint 1
@@ -258,14 +258,14 @@ public:
                     // If system mode is auto set running mode to off otherwise set it to what the system mode is set to
                     if (modeEnum == chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kAuto)
                     {
-                        app::Clusters::Thermostat::Attributes::ThermostatRunningModeEnum::Set(1, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff);
+                        app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff);
                     }
                     else
                     {
                         if (isValidThermostatRunningMode(mode))
                         {
                             ESP_LOGI(TAG, "Running Mode changed to : %d", mode);
-                            app::Clusters::Thermostat::Attributes::ThermostatRunningModeEnum::Set(1, static_cast<uint8_t>(mode));
+                            app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, static_cast<uint8_t>(mode));
                         }
                         else
                         {
@@ -297,10 +297,10 @@ public:
                         ESP_LOGI(TAG, "Running Mode changed to : %d", mode);
                         switch (n)
                         {
-                            case 0: modeEnum = ThermostatRunningModeEnum::kOff; break;
-                            case 3: modeEnum = ThermostatRunningModeEnum::kCool; break;
-                            case 4: modeEnum = ThermostatRunningModeEnum::kHeat; break;
-                            default: modeEnum = ThermostatRunningModeEnum::kUnknownEnumValue; break;
+                            case 0: modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff; break;
+                            case 3: modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kCool; break;
+                            case 4: modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kHeat; break;
+                            default: modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kUnknownEnumValue; break;
                         }
                         app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, modeEnum);
                     }
