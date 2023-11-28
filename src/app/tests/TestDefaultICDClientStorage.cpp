@@ -93,9 +93,9 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
 
     ICDClientInfo clientInfo;
     NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
-    NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId1);
-    NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
     NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId2);
+    NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
+    NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId1);
 
     iterator->Release();
 
