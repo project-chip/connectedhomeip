@@ -158,9 +158,7 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
         break;
     case DeviceEventType::kCommissioningComplete:
         ChipLogProgress(NotSpecified, "Commissioning complete");
-        #ifdef APP_WINDOW_ENABLE
-            GetAppTask().PostEvent(AppTask::APP_EVENT_WINDOW_MASK);
-        #else
+        #ifdef MAX_PWM_CHANNEL
             GetAppTask().PostEvent(AppTask::APP_EVENT_LIGHTING_MASK);
         #endif
         break;

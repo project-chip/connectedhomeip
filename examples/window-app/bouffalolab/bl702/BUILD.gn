@@ -129,7 +129,6 @@ bouffalolab_executable("window-app") {
     "APP_TASK_STACK_SIZE=2048",
     "CHIP_UART_BAUDRATE=${baudrate}",
     "START_ENTRY=bl702_main",
-    "APP_WINDOW_ENABLE",
   ]
 
   defines += [ "CONF_ENABLE_FRAME_PTR=${enable_debug_frame_ptr}" ]

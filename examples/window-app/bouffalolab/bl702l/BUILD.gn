@@ -78,7 +78,6 @@ bl_iot_sdk("sdk") {
     "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_seconds}",
     "OTA_AUTO_REBOOT_DELAY=${ota_auto_reboot_delay_seconds}",
     "PRINT_DEBUG=0",
-    "APP_WINDOW_ENABLE",
   ]
 
   defines += [ "PW_RPC_ENABLED=${chip_enable_pw_rpc}" ]

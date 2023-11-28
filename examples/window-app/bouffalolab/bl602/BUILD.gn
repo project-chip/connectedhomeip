@@ -103,7 +103,6 @@ bouffalolab_executable("window-app") {
     "CHIP_UART_BAUDRATE=${baudrate}",
     "START_ENTRY=bfl_main",
     "SYS_AOS_LOOP_ENABLE",
-    "APP_WINDOW_ENABLE",
   ]
 
   if (false == enable_reset_counter) {
