@@ -18,7 +18,7 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/ICDCheckInSender.h>
-#include <app/icd/ICDData.h>
+#include <app/icd/ICDConfigurationData.h>
 #include <app/icd/ICDMonitoringTable.h>
 #include <app/icd/ICDNotifier.h>
 #include <app/icd/ICDStateObserver.h>
@@ -73,7 +73,7 @@ public:
     void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
     bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
     bool SupportsFeature(Clusters::IcdManagement::Feature feature);
-    ICDData::ICDMode GetICDMode() { return mICDData->GetICDMode(); };
+    ICDConfigurationData::ICDMode GetICDMode() { return mICDConfigurationData->GetICDMode(); };
     /**
      * @brief Adds the referenced observer in parameters to the mStateObserverPool
      * A maximum of CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE observers can be concurrently registered
@@ -131,6 +131,7 @@ private:
     PersistentStorageDelegate * mStorage           = nullptr;
     FabricTable * mFabricTable                     = nullptr;
     Messaging::ExchangeManager * mExchangeManager  = nullptr;
+    ICDConfigurationData * mICDConfigurationData   = nullptr;
     bool mTransitionToIdleCalled                   = false;
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;

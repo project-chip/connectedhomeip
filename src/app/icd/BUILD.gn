@@ -104,8 +104,8 @@ source_set("monitoring-table") {
 
 source_set("data") {
   sources = [
-    "ICDData.cpp",
-    "ICDData.h",
+    "ICDConfigurationData.cpp",
+    "ICDConfigurationData.h",
   ]
 
   deps = [ "${chip_root}/src/lib/core" ]

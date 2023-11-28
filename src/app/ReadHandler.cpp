@@ -36,7 +36,7 @@
 #include <app/reporting/Engine.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDData.h> //nogncheck
+#include <app/icd/ICDConfigurationData.h> //nogncheck
 #endif
 
 namespace chip {
@@ -46,7 +46,7 @@ using Status = Protocols::InteractionModel::Status;
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    return static_cast<uint16_t>(ICDData::GetInstance().GetIdleModeDurationSec());
+    return static_cast<uint16_t>(ICDConfigurationData::GetInstance().GetIdleModeDurationSec());
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
 #endif

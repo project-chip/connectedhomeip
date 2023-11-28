@@ -46,7 +46,7 @@
 #include <messaging/tests/MessagingContext.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDData.h> // nogncheck
+#include <app/icd/ICDConfigurationData.h> // nogncheck
 #endif
 
 namespace {
@@ -1836,7 +1836,7 @@ void TestReliableMessageProtocol::CheckGetBackoff(nlTestSuite * inSuite, void * 
             auto maxBackoff = test.backoffMax + retryBoosterTimeout;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
             // If running as an ICD, increase maxBackoff to account for the polling interval
-            maxBackoff += ICDData::GetInstance().GetSlowPollingInterval();
+            maxBackoff += ICDConfigurationData::GetInstance().GetSlowPollingInterval();
 #endif
             NL_TEST_ASSERT(inSuite, backoff <= maxBackoff);
         }

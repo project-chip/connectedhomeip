@@ -19,7 +19,7 @@
 
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/icd/ICDData.h>
+#include <app/icd/ICDConfigurationData.h>
 #include <app/icd/ICDMonitoringTable.h>
 #include <app/util/basic-types.h>
 #include <crypto/SessionKeystore.h>
@@ -36,7 +36,7 @@ public:
     ICDManagementServer() = default;
 
     static void Init(chip::PersistentStorageDelegate & storage, chip::Crypto::SymmetricKeystore * symmetricKeystore,
-                     chip::ICDData & icdData);
+                     chip::ICDConfigurationData & ICDConfigurationData);
     Status RegisterClient(chip::FabricIndex fabric_index, chip::NodeId node_id, uint64_t monitored_subject, chip::ByteSpan key,
                           chip::Optional<chip::ByteSpan> verification_key, bool is_admin, uint32_t & icdCounter);
 
@@ -57,5 +57,5 @@ private:
 
     static chip::PersistentStorageDelegate * mStorage;
     static chip::Crypto::SymmetricKeystore * mSymmetricKeystore;
-    static chip::ICDData * mICDData;
+    static chip::ICDConfigurationData * mICDConfigurationData;
 };

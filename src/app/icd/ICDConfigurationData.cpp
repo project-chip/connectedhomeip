@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
-#include "ICDData.h"
+#include "ICDConfigurationData.h"
 
 namespace chip {
 
-ICDData ICDData::instance;
+ICDConfigurationData ICDConfigurationData::instance;
 
-System::Clock::Milliseconds32 ICDData::GetSlowPollingInterval()
+System::Clock::Milliseconds32 ICDConfigurationData::GetSlowPollingInterval()
 {
 #if ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
     // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.

@@ -28,18 +28,18 @@
 namespace chip {
 
 namespace app {
-// Forward declaration of ICDManager to allow it to be friend with ICDData
+// Forward declaration of ICDManager to allow it to be friend with ICDConfigurationData
 class ICDManager;
 } // namespace app
 
 /**
- * @brief ICDData manages and stores ICD related configurations for the ICDManager.
+ * @brief ICDConfigurationData manages and stores ICD related configurations for the ICDManager.
  *        Goal of the class is to expose ICD information to all consummers without creating circular dependencies
  *        since the ICDManager is appart of the App layer
  *
  *        Anyone can read the ICD configurations but only the ICDManager can changes those configurations.
  */
-class ICDData
+class ICDConfigurationData
 {
 public:
     enum class ICDMode : uint8_t
@@ -48,7 +48,7 @@ public:
         LIT, // Long Interval Time ICD
     };
 
-    static ICDData & GetInstance() { return instance; };
+    static ICDConfigurationData & GetInstance() { return instance; };
 
     uint32_t GetIdleModeDurationSec() { return mIdleInterval_s; }
 
@@ -82,13 +82,13 @@ public:
 
 private:
     // Singleton Object
-    ICDData() = default;
-    static ICDData instance;
+    ICDConfigurationData() = default;
+    static ICDConfigurationData instance;
 
-    // ICD related information is managed by the ICDManager but stored in the ICDData to enable consummers to access it without
-    // creating a circular dependency. To avoid allowing consummers changing the state of the ICD mode without going through the
-    // ICDManager, the ICDManager is a friend that can access the private setters. If a consummer needs to be notified when a value
-    // is changed, they can leverage the Observer events the ICDManager generates. See src/app/icd/ICDStateObserver.h
+    // ICD related information is managed by the ICDManager but stored in the ICDConfigurationData to enable consummers to access it
+    // without creating a circular dependency. To avoid allowing consummers changing the state of the ICD mode without going through
+    // the ICDManager, the ICDManager is a friend that can access the private setters. If a consummer needs to be notified when a
+    // value is changed, they can leverage the Observer events the ICDManager generates. See src/app/icd/ICDStateObserver.h
     friend class chip::app::ICDManager;
 
     void SetICDMode(ICDMode mode) { mICDMode = mode; };

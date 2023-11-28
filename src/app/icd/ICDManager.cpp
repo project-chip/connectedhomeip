@@ -20,7 +20,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
 #include <app/icd/ICDConfig.h>
-#include <app/icd/ICDData.h>
+#include <app/icd/ICDConfigurationData.h>
 #include <app/icd/ICDManager.h>
 #include <app/icd/ICDMonitoringTable.h>
 #include <lib/support/CodeUtils.h>
@@ -63,11 +63,11 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
     mSymmetricKeystore = symmetricKeystore;
     mExchangeManager   = exchangeManager;
-    mICDData           = &ICDData::GetInstance();
+    mICDConfigurationData = &ICDConfigurationData::GetInstance();
 
     // Removing the check for now since it is possible for the Fast polling
     // to be larger than the ActiveModeDuration for now
-    // uint32_t activeModeDuration = mICDData->GetActiveModeDurationMs();
+    // uint32_t activeModeDuration = mICDConfigurationData->GetActiveModeDurationMs();
     // VerifyOrDie(kFastPollingInterval.count() < activeModeDuration);
 
     UpdateICDMode();
@@ -81,11 +81,11 @@ void ICDManager::Shutdown()
     DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
     DeviceLayer::SystemLayer().CancelTimer(OnActiveModeDone, this);
     DeviceLayer::SystemLayer().CancelTimer(OnTransitionToIdle, this);
-    mICDData->SetICDMode(ICDData::ICDMode::SIT);
-    mOperationalState = OperationalState::ActiveMode;
-    mStorage          = nullptr;
-    mFabricTable      = nullptr;
-    mICDData          = nullptr;
+    mICDConfigurationData->SetICDMode(ICDConfigurationData::ICDMode::SIT);
+    mOperationalState     = OperationalState::ActiveMode;
+    mStorage              = nullptr;
+    mFabricTable          = nullptr;
+    mICDConfigurationData = nullptr;
     mStateObserverPool.ReleaseAll();
     mICDSenderPool.ReleaseAll();
 }
@@ -159,7 +159,7 @@ void ICDManager::UpdateICDMode()
 {
     assertChipStackLockedByCurrentThread();
 
-    ICDData::ICDMode tempMode = ICDData::ICDMode::SIT;
+    ICDConfigurationData::ICDMode tempMode = ICDConfigurationData::ICDMode::SIT;
 
     // Device can only switch to the LIT operating mode if LIT support is present
     if (SupportsFeature(Feature::kLongIdleTimeSupport))
@@ -173,23 +173,24 @@ void ICDManager::UpdateICDMode()
             ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), 1 /*Table entry limit*/, mSymmetricKeystore);
             if (!table.IsEmpty())
             {
-                tempMode = ICDData::ICDMode::LIT;
+                tempMode = ICDConfigurationData::ICDMode::LIT;
                 break;
             }
         }
     }
 
-    if (mICDData->GetICDMode() != tempMode)
+    if (mICDConfigurationData->GetICDMode() != tempMode)
     {
-        mICDData->SetICDMode(tempMode);
+        mICDConfigurationData->SetICDMode(tempMode);
         postObserverEvent(ObserverEventType::ICDModeChange);
     }
 
     // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
-    if (mICDData->GetICDMode() == ICDData::ICDMode::SIT && mICDData->GetSlowPollingInterval() > mICDData->GetSITPollingThreshold())
+    if (mICDConfigurationData->GetICDMode() == ICDConfigurationData::ICDMode::SIT &&
+        mICDConfigurationData->GetSlowPollingInterval() > mICDConfigurationData->GetSITPollingThreshold())
     {
         ChipLogDetail(AppServer, "The Slow Polling Interval of an ICD in SIT mode should be <= %" PRIu32 " seconds",
-                      (mICDData->GetSITPollingThreshold().count() / 1000));
+                      (mICDConfigurationData->GetSITPollingThreshold().count() / 1000));
     }
 }
 
@@ -204,17 +205,18 @@ void ICDManager::UpdateOperationState(OperationalState state)
         mOperationalState = OperationalState::IdleMode;
 
         // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
-        if (mICDData->GetActiveModeDurationMs() > 0)
+        if (mICDConfigurationData->GetActiveModeDurationMs() > 0)
         {
-            uint32_t idleModeDuration = mICDData->GetIdleModeDurationSec();
+            uint32_t idleModeDuration = mICDConfigurationData->GetIdleModeDurationSec();
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(idleModeDuration), OnIdleModeDone, this);
         }
 
-        System::Clock::Milliseconds32 slowPollInterval = mICDData->GetSlowPollingInterval();
+        System::Clock::Milliseconds32 slowPollInterval = mICDConfigurationData->GetSlowPollingInterval();
 
 #if ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
         // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
-        if (mICDData->GetICDMode() == ICDData::ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
+        if (mICDConfigurationData->GetICDMode() == ICDConfigurationData::ICDMode::SIT &&
+            GetSlowPollingInterval() > GetSITPollingThreshold())
         {
             slowPollInterval = GetSITPollingThreshold();
         }
@@ -238,13 +240,13 @@ void ICDManager::UpdateOperationState(OperationalState state)
             DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
 
             mOperationalState           = OperationalState::ActiveMode;
-            uint32_t activeModeDuration = mICDData->GetActiveModeDurationMs();
+            uint32_t activeModeDuration = mICDConfigurationData->GetActiveModeDurationMs();
 
             if (activeModeDuration == 0 && !mKeepActiveFlags.HasAny())
             {
                 // A Network Activity triggered the active mode and activeModeDuration is 0.
                 // Stay active for at least Active Mode Threshold.
-                activeModeDuration = mICDData->GetActiveModeThresholdMs();
+                activeModeDuration = mICDConfigurationData->GetActiveModeThresholdMs();
             }
 
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeDuration), OnActiveModeDone, this);
@@ -253,7 +255,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
                 (activeModeDuration >= ICD_ACTIVE_TIME_JITTER_MS) ? activeModeDuration - ICD_ACTIVE_TIME_JITTER_MS : 0;
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeJitterInterval), OnTransitionToIdle, this);
 
-            CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(mICDData->GetFastPollingInterval());
+            CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(mICDConfigurationData->GetFastPollingInterval());
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Failed to set Fast Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
@@ -268,7 +270,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
         }
         else
         {
-            uint16_t activeModeThreshold = mICDData->GetActiveModeThresholdMs();
+            uint16_t activeModeThreshold = mICDConfigurationData->GetActiveModeThresholdMs();
             DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeThreshold), OnActiveModeDone, this);
             uint16_t activeModeJitterThreshold =
                 (activeModeThreshold >= ICD_ACTIVE_TIME_JITTER_MS) ? activeModeThreshold - ICD_ACTIVE_TIME_JITTER_MS : 0;

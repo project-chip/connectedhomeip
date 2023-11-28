@@ -37,8 +37,8 @@
 #include <platform/ConnectivityManager.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDData.h>     // nogncheck
-#include <app/icd/ICDNotifier.h> // nogncheck
+#include <app/icd/ICDConfigurationData.h> // nogncheck
+#include <app/icd/ICDNotifier.h>          // nogncheck
 #endif
 
 using namespace chip::System::Clock::Literals;
@@ -259,7 +259,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     // Implement:
     //   "An ICD sender SHOULD increase t to also account for its own sleepy interval
     //   required to receive the acknowledgment"
-    mrpBackoffTime += ICDData::GetInstance().GetFastPollingInterval();
+    mrpBackoffTime += ICDConfigurationData::GetInstance().GetFastPollingInterval();
 #endif
 
     mrpBackoffTime += CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
