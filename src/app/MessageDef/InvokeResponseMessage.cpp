@@ -109,7 +109,8 @@ CHIP_ERROR InvokeResponseMessage::Parser::GetInvokeResponses(InvokeResponseIBs::
 
 CHIP_ERROR InvokeResponseMessage::Parser::GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const
 {
-    return CHIP_END_OF_TLV;
+    CHIP_ERROR err = GetSimpleValue(to_underlying(Tag::kMoreChunkedMessages), TLV::kTLVType_Boolean, apMoreChunkedMessages);
+    return err;
 }
 
 InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::SuppressResponse(const bool aSuppressResponse)
