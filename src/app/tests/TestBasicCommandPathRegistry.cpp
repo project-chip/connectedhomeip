@@ -128,7 +128,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestAddingSameCommandRef", chip::app::TestBasicCommandPathRegistry::TestAddingSameCommandRef),
     NL_TEST_DEF("TestAddingMaxNumberOfEntries", chip::app::TestBasicCommandPathRegistry::TestAddingMaxNumberOfEntries),
     NL_TEST_DEF("TestAddingTooManyEntries", chip::app::TestBasicCommandPathRegistry::TestAddingTooManyEntries),
-    
+
     NL_TEST_SENTINEL()
 };
 // clang-format on
