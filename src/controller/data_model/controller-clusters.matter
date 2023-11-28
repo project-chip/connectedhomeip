@@ -2969,7 +2969,7 @@ provisional cluster Timer = 71 {
 }
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven. */
-provisional client cluster OvenCavityOperationalState = 72 {
+provisional cluster OvenCavityOperationalState = 72 {
   revision 1;
 
   enum ErrorStateEnum : enum8 {
@@ -4302,7 +4302,7 @@ provisional cluster DemandResponseLoadControl = 150 {
 }
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
-provisional client cluster EnergyEvse = 153 {
+provisional cluster EnergyEvse = 153 {
   revision 1; // NOTE: Default/not specifically set
 
   enum EnergyTransferStoppedReasonEnum : enum8 {
