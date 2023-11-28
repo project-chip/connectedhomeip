@@ -46,7 +46,7 @@ CHIP_ERROR TemperatureManager::Init()
     mCurrentTempCelsius     = ConvertToPrintableTemp(temp.Value());
     mHeatingCelsiusSetPoint = ConvertToPrintableTemp(coolingSetpoint);
     mCoolingCelsiusSetPoint = ConvertToPrintableTemp(heatingSetpoint);
-    mThermMode              = systemMode;
+    mThermMode              = reinterpret_cast<uint8_t>(systemMode);
 
     GetAppTask().UpdateThermoStatUI();
 
