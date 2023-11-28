@@ -113,9 +113,12 @@ private:
     friend class ICDClientInfoIteratorImpl;
     CHIP_ERROR LoadFabricList();
     CHIP_ERROR LoadCounter(FabricIndex fabricIndex, size_t & count, size_t & clientInfoSize);
-    CHIP_ERROR UpdateCounter(FabricIndex fabricIndex, bool increase);
 
-    CHIP_ERROR Save(TLV::TLVWriter & writer, const std::vector<ICDClientInfo> & clientInfoVector);
+    CHIP_ERROR IncreaseEntryCountForFabric(FabricIndex fabricIndex);
+    CHIP_ERROR DecreaseEntryCountForFabric(FabricIndex fabricIndex);
+    CHIP_ERROR UpdateEntryCountForFabric(FabricIndex fabricIndex, bool increase);
+
+    CHIP_ERROR SerializeToTlv(TLV::TLVWriter & writer, const std::vector<ICDClientInfo> & clientInfoVector);
     CHIP_ERROR Load(FabricIndex fabricIndex, std::vector<ICDClientInfo> & clientInfoVector, size_t & clientInfoSize);
 
     ObjectPool<ICDClientInfoIteratorImpl, kIteratorsMax> mICDClientInfoIterators;
