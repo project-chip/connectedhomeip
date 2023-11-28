@@ -16,9 +16,7 @@
  */
 package matter.devicecontroller.cluster.structs
 
-import java.util.Optional
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -57,7 +55,7 @@ class ThermostatClusterPresetTypeStruct(
       val presetScenario = tlvReader.getUInt(ContextSpecificTag(TAG_PRESET_SCENARIO))
       val numberOfPresets = tlvReader.getUByte(ContextSpecificTag(TAG_NUMBER_OF_PRESETS))
       val presetTypeFeatures = tlvReader.getUInt(ContextSpecificTag(TAG_PRESET_TYPE_FEATURES))
-      
+
       tlvReader.exitContainer()
 
       return ThermostatClusterPresetTypeStruct(presetScenario, numberOfPresets, presetTypeFeatures)

@@ -20,22 +20,17 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class DishwasherAlarmCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+class DishwasherAlarmCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun reset(alarms: ULong, timedInvokeTimeoutMs: Int? = null) {
     val commandId = 0L
@@ -44,7 +39,7 @@ class DishwasherAlarmCluster(private val controller: MatterController, private v
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun modifyEnabledAlarms(mask: ULong, timedInvokeTimeoutMs: Int? = null) {
@@ -54,17 +49,14 @@ class DishwasherAlarmCluster(private val controller: MatterController, private v
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun readMaskAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaskAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeMaskAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -72,10 +64,7 @@ class DishwasherAlarmCluster(private val controller: MatterController, private v
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLatchAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeLatchAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -83,10 +72,7 @@ class DishwasherAlarmCluster(private val controller: MatterController, private v
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeStateAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeStateAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -94,10 +80,7 @@ class DishwasherAlarmCluster(private val controller: MatterController, private v
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSupportedAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeSupportedAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -127,10 +110,7 @@ class DishwasherAlarmCluster(private val controller: MatterController, private v
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -149,10 +129,7 @@ class DishwasherAlarmCluster(private val controller: MatterController, private v
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -160,10 +137,7 @@ class DishwasherAlarmCluster(private val controller: MatterController, private v
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

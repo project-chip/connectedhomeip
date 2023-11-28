@@ -16,7 +16,6 @@
  */
 package matter.devicecontroller.cluster.eventstructs
 
-import java.util.Optional
 import matter.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -56,23 +55,28 @@ class GeneralDiagnosticsClusterHardwareFaultChangeEvent(
     private const val TAG_CURRENT = 0
     private const val TAG_PREVIOUS = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : GeneralDiagnosticsClusterHardwareFaultChangeEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): GeneralDiagnosticsClusterHardwareFaultChangeEvent {
       tlvReader.enterStructure(tlvTag)
-      val current = buildList <UInt> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
-        while(!tlvReader.isEndOfContainer()) {
-          this.add(tlvReader.getUInt(AnonymousTag))
+      val current =
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
+          while (!tlvReader.isEndOfContainer()) {
+            this.add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
         }
-        tlvReader.exitContainer()
-      }
-      val previous = buildList <UInt> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
-        while(!tlvReader.isEndOfContainer()) {
-          this.add(tlvReader.getUInt(AnonymousTag))
+      val previous =
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
+          while (!tlvReader.isEndOfContainer()) {
+            this.add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
         }
-        tlvReader.exitContainer()
-      }
-      
+
       tlvReader.exitContainer()
 
       return GeneralDiagnosticsClusterHardwareFaultChangeEvent(current, previous)

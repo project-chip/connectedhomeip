@@ -21,30 +21,19 @@ import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
 class WakeOnLanCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readMACAddressAttribute(): CharString {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMACAddressAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): CharString {
+  suspend fun subscribeMACAddressAttribute(minInterval: Int, maxInterval: Int): CharString {
     // Implementation needs to be added here
   }
 
@@ -52,10 +41,7 @@ class WakeOnLanCluster(private val controller: MatterController, private val end
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLinkLocalAddressAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): OctetString {
+  suspend fun subscribeLinkLocalAddressAttribute(minInterval: Int, maxInterval: Int): OctetString {
     // Implementation needs to be added here
   }
 
@@ -85,10 +71,7 @@ class WakeOnLanCluster(private val controller: MatterController, private val end
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -107,10 +90,7 @@ class WakeOnLanCluster(private val controller: MatterController, private val end
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -118,10 +98,7 @@ class WakeOnLanCluster(private val controller: MatterController, private val end
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

@@ -20,54 +20,33 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ValveConfigurationAndControlCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class OpenDurationAttribute(
-    val value: UInt?
-  )
+class ValveConfigurationAndControlCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
+  class OpenDurationAttribute(val value: UInt?)
 
-  class AutoCloseTimeAttribute(
-    val value: ULong?
-  )
+  class AutoCloseTimeAttribute(val value: ULong?)
 
-  class RemainingDurationAttribute(
-    val value: UInt?
-  )
+  class RemainingDurationAttribute(val value: UInt?)
 
-  class CurrentStateAttribute(
-    val value: UInt?
-  )
+  class CurrentStateAttribute(val value: UInt?)
 
-  class TargetStateAttribute(
-    val value: UInt?
-  )
+  class TargetStateAttribute(val value: UInt?)
 
-  class CurrentLevelAttribute(
-    val value: UByte?
-  )
+  class CurrentLevelAttribute(val value: UByte?)
 
-  class TargetLevelAttribute(
-    val value: UByte?
-  )
+  class TargetLevelAttribute(val value: UByte?)
 
-  class OpenLevelAttribute(
-    val value: UByte?
-  )
+  class OpenLevelAttribute(val value: UByte?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun open(openDuration: UInt?, timedInvokeTimeoutMs: Int? = null) {
     val commandId = 0L
@@ -76,7 +55,7 @@ class ValveConfigurationAndControlCluster(private val controller: MatterControll
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun close(timedInvokeTimeoutMs: Int? = null) {
@@ -86,7 +65,7 @@ class ValveConfigurationAndControlCluster(private val controller: MatterControll
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun setLevel(level: UByte, openDuration: UInt?, timedInvokeTimeoutMs: Int? = null) {
@@ -96,22 +75,19 @@ class ValveConfigurationAndControlCluster(private val controller: MatterControll
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun readOpenDurationAttribute(): OpenDurationAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOpenDurationAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int? = null    
-  ) {
+  suspend fun writeOpenDurationAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
   suspend fun subscribeOpenDurationAttribute(
@@ -169,21 +145,15 @@ class ValveConfigurationAndControlCluster(private val controller: MatterControll
     // Implementation needs to be added here
   }
 
-  suspend fun writeStartUpStateAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int? = null    
-  ) {
+  suspend fun writeStartUpStateAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
-  suspend fun subscribeStartUpStateAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeStartUpStateAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -213,21 +183,15 @@ class ValveConfigurationAndControlCluster(private val controller: MatterControll
     // Implementation needs to be added here
   }
 
-  suspend fun writeOpenLevelAttribute(
-    value: UByte,
-    timedWriteTimeoutMs: Int? = null    
-  ) {
+  suspend fun writeOpenLevelAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
-  suspend fun subscribeOpenLevelAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): OpenLevelAttribute {
+  suspend fun subscribeOpenLevelAttribute(minInterval: Int, maxInterval: Int): OpenLevelAttribute {
     // Implementation needs to be added here
   }
 
@@ -235,10 +199,7 @@ class ValveConfigurationAndControlCluster(private val controller: MatterControll
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeValveFaultAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeValveFaultAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -268,10 +229,7 @@ class ValveConfigurationAndControlCluster(private val controller: MatterControll
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -290,10 +248,7 @@ class ValveConfigurationAndControlCluster(private val controller: MatterControll
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -301,10 +256,7 @@ class ValveConfigurationAndControlCluster(private val controller: MatterControll
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

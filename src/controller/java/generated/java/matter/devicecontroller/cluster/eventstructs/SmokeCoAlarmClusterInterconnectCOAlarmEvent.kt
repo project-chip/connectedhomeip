@@ -16,17 +16,13 @@
  */
 package matter.devicecontroller.cluster.eventstructs
 
-import java.util.Optional
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class SmokeCoAlarmClusterInterconnectCOAlarmEvent(
-  val alarmSeverityLevel: UInt
-) {
+class SmokeCoAlarmClusterInterconnectCOAlarmEvent(val alarmSeverityLevel: UInt) {
   override fun toString(): String = buildString {
     append("SmokeCoAlarmClusterInterconnectCOAlarmEvent {\n")
     append("\talarmSeverityLevel : $alarmSeverityLevel\n")
@@ -44,10 +40,10 @@ class SmokeCoAlarmClusterInterconnectCOAlarmEvent(
   companion object {
     private const val TAG_ALARM_SEVERITY_LEVEL = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : SmokeCoAlarmClusterInterconnectCOAlarmEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SmokeCoAlarmClusterInterconnectCOAlarmEvent {
       tlvReader.enterStructure(tlvTag)
       val alarmSeverityLevel = tlvReader.getUInt(ContextSpecificTag(TAG_ALARM_SEVERITY_LEVEL))
-      
+
       tlvReader.exitContainer()
 
       return SmokeCoAlarmClusterInterconnectCOAlarmEvent(alarmSeverityLevel)

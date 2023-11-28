@@ -20,54 +20,33 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class WindowCoveringCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class CurrentPositionLiftAttribute(
-    val value: UShort?
-  )
+class WindowCoveringCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
+  class CurrentPositionLiftAttribute(val value: UShort?)
 
-  class CurrentPositionTiltAttribute(
-    val value: UShort?
-  )
+  class CurrentPositionTiltAttribute(val value: UShort?)
 
-  class CurrentPositionLiftPercentageAttribute(
-    val value: UByte?
-  )
+  class CurrentPositionLiftPercentageAttribute(val value: UByte?)
 
-  class CurrentPositionTiltPercentageAttribute(
-    val value: UByte?
-  )
+  class CurrentPositionTiltPercentageAttribute(val value: UByte?)
 
-  class TargetPositionLiftPercent100thsAttribute(
-    val value: UShort?
-  )
+  class TargetPositionLiftPercent100thsAttribute(val value: UShort?)
 
-  class TargetPositionTiltPercent100thsAttribute(
-    val value: UShort?
-  )
+  class TargetPositionTiltPercent100thsAttribute(val value: UShort?)
 
-  class CurrentPositionLiftPercent100thsAttribute(
-    val value: UShort?
-  )
+  class CurrentPositionLiftPercent100thsAttribute(val value: UShort?)
 
-  class CurrentPositionTiltPercent100thsAttribute(
-    val value: UShort?
-  )
+  class CurrentPositionTiltPercent100thsAttribute(val value: UShort?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun upOrOpen(timedInvokeTimeoutMs: Int? = null) {
     val commandId = 0L
@@ -76,7 +55,7 @@ class WindowCoveringCluster(private val controller: MatterController, private va
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun downOrClose(timedInvokeTimeoutMs: Int? = null) {
@@ -86,7 +65,7 @@ class WindowCoveringCluster(private val controller: MatterController, private va
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun stopMotion(timedInvokeTimeoutMs: Int? = null) {
@@ -96,7 +75,7 @@ class WindowCoveringCluster(private val controller: MatterController, private va
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun goToLiftValue(liftValue: UShort, timedInvokeTimeoutMs: Int? = null) {
@@ -106,17 +85,20 @@ class WindowCoveringCluster(private val controller: MatterController, private va
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun goToLiftPercentage(liftPercent100thsValue: UShort, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun goToLiftPercentage(
+    liftPercent100thsValue: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 5L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun goToTiltValue(tiltValue: UShort, timedInvokeTimeoutMs: Int? = null) {
@@ -126,27 +108,27 @@ class WindowCoveringCluster(private val controller: MatterController, private va
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun goToTiltPercentage(tiltPercent100thsValue: UShort, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun goToTiltPercentage(
+    tiltPercent100thsValue: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 8L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun readTypeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTypeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -198,10 +180,7 @@ class WindowCoveringCluster(private val controller: MatterController, private va
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNumberOfActuationsLiftAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeNumberOfActuationsLiftAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -209,10 +188,7 @@ class WindowCoveringCluster(private val controller: MatterController, private va
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNumberOfActuationsTiltAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeNumberOfActuationsTiltAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -220,10 +196,7 @@ class WindowCoveringCluster(private val controller: MatterController, private va
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeConfigStatusAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeConfigStatusAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -253,14 +226,12 @@ class WindowCoveringCluster(private val controller: MatterController, private va
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOperationalStatusAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeOperationalStatusAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readTargetPositionLiftPercent100thsAttribute(): TargetPositionLiftPercent100thsAttribute {
+  suspend fun readTargetPositionLiftPercent100thsAttribute():
+    TargetPositionLiftPercent100thsAttribute {
     // Implementation needs to be added here
   }
 
@@ -271,7 +242,8 @@ class WindowCoveringCluster(private val controller: MatterController, private va
     // Implementation needs to be added here
   }
 
-  suspend fun readTargetPositionTiltPercent100thsAttribute(): TargetPositionTiltPercent100thsAttribute {
+  suspend fun readTargetPositionTiltPercent100thsAttribute():
+    TargetPositionTiltPercent100thsAttribute {
     // Implementation needs to be added here
   }
 
@@ -286,14 +258,12 @@ class WindowCoveringCluster(private val controller: MatterController, private va
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEndProductTypeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeEndProductTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readCurrentPositionLiftPercent100thsAttribute(): CurrentPositionLiftPercent100thsAttribute {
+  suspend fun readCurrentPositionLiftPercent100thsAttribute():
+    CurrentPositionLiftPercent100thsAttribute {
     // Implementation needs to be added here
   }
 
@@ -304,7 +274,8 @@ class WindowCoveringCluster(private val controller: MatterController, private va
     // Implementation needs to be added here
   }
 
-  suspend fun readCurrentPositionTiltPercent100thsAttribute(): CurrentPositionTiltPercent100thsAttribute {
+  suspend fun readCurrentPositionTiltPercent100thsAttribute():
+    CurrentPositionTiltPercent100thsAttribute {
     // Implementation needs to be added here
   }
 
@@ -319,10 +290,7 @@ class WindowCoveringCluster(private val controller: MatterController, private va
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInstalledOpenLimitLiftAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeInstalledOpenLimitLiftAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -341,10 +309,7 @@ class WindowCoveringCluster(private val controller: MatterController, private va
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInstalledOpenLimitTiltAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeInstalledOpenLimitTiltAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -363,21 +328,15 @@ class WindowCoveringCluster(private val controller: MatterController, private va
     // Implementation needs to be added here
   }
 
-  suspend fun writeModeAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int? = null    
-  ) {
+  suspend fun writeModeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
-  suspend fun subscribeModeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -385,10 +344,7 @@ class WindowCoveringCluster(private val controller: MatterController, private va
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSafetyStatusAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeSafetyStatusAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -418,10 +374,7 @@ class WindowCoveringCluster(private val controller: MatterController, private va
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -440,10 +393,7 @@ class WindowCoveringCluster(private val controller: MatterController, private va
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -451,10 +401,7 @@ class WindowCoveringCluster(private val controller: MatterController, private va
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

@@ -20,73 +20,79 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class DemandResponseLoadControlCluster(private val controller: MatterController, private val endpointId: UShort) {
+class DemandResponseLoadControlCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class LoadControlProgramsAttribute(
     val value: List<DemandResponseLoadControlClusterLoadControlProgramStruct>
   )
 
-  class EventsAttribute(
-    val value: List<DemandResponseLoadControlClusterLoadControlEventStruct>
-  )
+  class EventsAttribute(val value: List<DemandResponseLoadControlClusterLoadControlEventStruct>)
 
   class ActiveEventsAttribute(
     val value: List<DemandResponseLoadControlClusterLoadControlEventStruct>
   )
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun registerLoadControlProgramRequest(loadControlProgram: DemandResponseLoadControlClusterLoadControlProgramStruct, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun registerLoadControlProgramRequest(
+    loadControlProgram: DemandResponseLoadControlClusterLoadControlProgramStruct,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 0L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun unregisterLoadControlProgramRequest(loadControlProgramID: ByteArray, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun unregisterLoadControlProgramRequest(
+    loadControlProgramID: ByteArray,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 1L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun addLoadControlEventRequest(event: DemandResponseLoadControlClusterLoadControlEventStruct, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun addLoadControlEventRequest(
+    event: DemandResponseLoadControlClusterLoadControlEventStruct,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 2L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun removeLoadControlEventRequest(eventID: ByteArray, cancelControl: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun removeLoadControlEventRequest(
+    eventID: ByteArray,
+    cancelControl: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 3L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun clearLoadControlEventsRequest(timedInvokeTimeoutMs: Int? = null) {
@@ -96,7 +102,7 @@ class DemandResponseLoadControlCluster(private val controller: MatterController,
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun readLoadControlProgramsAttribute(): LoadControlProgramsAttribute {
@@ -125,10 +131,7 @@ class DemandResponseLoadControlCluster(private val controller: MatterController,
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventsAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventsAttribute {
+  suspend fun subscribeEventsAttribute(minInterval: Int, maxInterval: Int): EventsAttribute {
     // Implementation needs to be added here
   }
 
@@ -158,10 +161,7 @@ class DemandResponseLoadControlCluster(private val controller: MatterController,
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNumberOfTransitionsAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeNumberOfTransitionsAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -169,21 +169,15 @@ class DemandResponseLoadControlCluster(private val controller: MatterController,
     // Implementation needs to be added here
   }
 
-  suspend fun writeDefaultRandomStartAttribute(
-    value: UByte,
-    timedWriteTimeoutMs: Int? = null    
-  ) {
+  suspend fun writeDefaultRandomStartAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
-  suspend fun subscribeDefaultRandomStartAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeDefaultRandomStartAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -191,21 +185,15 @@ class DemandResponseLoadControlCluster(private val controller: MatterController,
     // Implementation needs to be added here
   }
 
-  suspend fun writeDefaultRandomDurationAttribute(
-    value: UByte,
-    timedWriteTimeoutMs: Int? = null    
-  ) {
+  suspend fun writeDefaultRandomDurationAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
-  suspend fun subscribeDefaultRandomDurationAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeDefaultRandomDurationAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -235,10 +223,7 @@ class DemandResponseLoadControlCluster(private val controller: MatterController,
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -257,10 +242,7 @@ class DemandResponseLoadControlCluster(private val controller: MatterController,
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -268,10 +250,7 @@ class DemandResponseLoadControlCluster(private val controller: MatterController,
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

@@ -16,7 +16,6 @@
  */
 package matter.devicecontroller.cluster.structs
 
-import java.util.Optional
 import matter.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -55,14 +54,15 @@ class ScenesClusterExtensionFieldSet(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesClusterExtensionFieldSet {
       tlvReader.enterStructure(tlvTag)
       val clusterID = tlvReader.getUInt(ContextSpecificTag(TAG_CLUSTER_I_D))
-      val attributeValueList = buildList<ScenesClusterAttributeValuePair> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
-      while(!tlvReader.isEndOfContainer()) {
-        add(ScenesClusterAttributeValuePair.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val attributeValueList =
+        buildList<ScenesClusterAttributeValuePair> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
+          while (!tlvReader.isEndOfContainer()) {
+            add(ScenesClusterAttributeValuePair.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return ScenesClusterExtensionFieldSet(clusterID, attributeValueList)

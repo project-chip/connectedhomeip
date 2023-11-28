@@ -16,9 +16,7 @@
  */
 package matter.devicecontroller.cluster.structs
 
-import java.util.Optional
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -52,15 +50,22 @@ class ThermostatClusterThermostatScheduleTransitionStruct(
     private const val TAG_HEAT_SETPOINT = 1
     private const val TAG_COOL_SETPOINT = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterThermostatScheduleTransitionStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): ThermostatClusterThermostatScheduleTransitionStruct {
       tlvReader.enterStructure(tlvTag)
       val transitionTime = tlvReader.getUShort(ContextSpecificTag(TAG_TRANSITION_TIME))
       val heatSetpoint = tlvReader.getShort(ContextSpecificTag(TAG_HEAT_SETPOINT))
       val coolSetpoint = tlvReader.getShort(ContextSpecificTag(TAG_COOL_SETPOINT))
-      
+
       tlvReader.exitContainer()
 
-      return ThermostatClusterThermostatScheduleTransitionStruct(transitionTime, heatSetpoint, coolSetpoint)
+      return ThermostatClusterThermostatScheduleTransitionStruct(
+        transitionTime,
+        heatSetpoint,
+        coolSetpoint
+      )
     }
   }
 }
