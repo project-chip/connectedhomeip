@@ -3116,6 +3116,40 @@ server cluster DishwasherAlarm = 93 {
   command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
 }
 
+/** Attributes and commands for selecting a mode from a list of supported options. */
+provisional server cluster MicrowaveOvenMode = 94 {
+  revision 1;
+
+  enum ModeTag : enum16 {
+    kNormal = 16384;
+    kDefrost = 16385;
+  }
+
+  bitmap Feature : bitmap32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
 server cluster OperationalState = 96 {
   revision 1; // NOTE: Default/not specifically set
@@ -6187,6 +6221,17 @@ endpoint 1 {
 
     handle command Reset;
     handle command ModifyEnabledAlarms;
+  }
+
+  server cluster MicrowaveOvenMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    callback attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster OperationalState {
