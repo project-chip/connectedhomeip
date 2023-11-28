@@ -208,7 +208,7 @@ Status ICDManagementServer::RegisterClient(FabricIndex fabric_index, NodeId node
     CHIP_ERROR err = table.Find(node_id, entry);
     if (CHIP_NO_ERROR == err)
     {
-        // Existing entry: Validate Key if, and only if, the ISD has NOT administrator permissions
+        // Existing entry: Validate Key if, and only if, the ISD does NOT have administrator permissions
         if (!isAdmin)
         {
             VerifyOrReturnError(verification_key.HasValue(), InteractionModel::Status::Failure);
