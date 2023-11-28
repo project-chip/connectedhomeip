@@ -28,6 +28,7 @@ IGNORE: Set[str] = {
     '/examples/',
     '/java/',
     '/Jni',
+    '/mock/',
     '/pybindings/',
     '/python/',
     '/Test',
