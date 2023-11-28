@@ -166,7 +166,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
         else
         {
             const CommandHandler::PrepareParameters prepareParams = { aRequestCommandPath };
-            const ConcreteCommandPath responseCommandPath = aRequestCommandPath;
+            const ConcreteCommandPath responseCommandPath         = aRequestCommandPath;
             apCommandObj->PrepareInvokeResponseCommand(prepareParams, responseCommandPath);
             chip::TLV::TLVWriter * writer = apCommandObj->GetCommandDataIBTLVWriter();
             writer->PutBoolean(chip::TLV::ContextTag(1), true);
@@ -492,7 +492,7 @@ void TestCommandInteraction::AddInvokeResponseData(nlTestSuite * apSuite, void *
     else
     {
         const CommandHandler::PrepareParameters prepareParams = { requestCommandPath };
-        ConcreteCommandPath responseCommandPath = { kTestEndpointId, kTestClusterId, aCommandId };
+        ConcreteCommandPath responseCommandPath               = { kTestEndpointId, kTestClusterId, aCommandId };
         err = apCommandHandler->PrepareInvokeResponseCommand(prepareParams, responseCommandPath);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
