@@ -759,27 +759,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
             if (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
             {
-                if (commissioningInfo.isIcd)
+                if (commissioningInfo.isIcd && commissioningInfo.checkInProtocolSupport)
                 {
-<<<<<<< HEAD
-                    chip::NodeId nodeId = commissioningInfo.nodeId;
-                    if (nodeId != kUndefinedNodeId)
-                    {
-                        mParams.SetRemoteNodeId(nodeId);
-                    }
-                }
-
-                if (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
-                {
-                    if (commissioningInfo.isIcd && commissioningInfo.checkInProtocolSupport)
-                    {
-                        mNeedIcdRegistraion = true;
-                        ChipLogDetail(Controller, "AutoCommissioner: ICD supports the check-in protocol.");
-                    }
-=======
                     mNeedIcdRegistraion = true;
-                    ChipLogDetail(Controller, "AutoCommissioner: Device is ICD");
->>>>>>> chip/master
+                    ChipLogDetail(Controller, "AutoCommissioner: ICD supports the check-in protocol.");
                 }
             }
             break;
