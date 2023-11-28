@@ -115,8 +115,8 @@ public:
     };
 
     // While today there is only one item in this struct, this was added to make providing future elements of
-    // InvokeRequests easier.
-    struct AdditionalInvokeRequestElements
+    // CommandData easier.
+    struct AdditionalCommandDataElements
     {
         Optional<uint16_t> commandRef;
     };
@@ -155,20 +155,26 @@ public:
     /**
      * Enables CommandSender to send batch commands up until the number of supported by remote peer.
      *
-     * Must be called before PrepareCommand.
+     * It ensures that commands contain all required elements while building such that sending the
+     * InvokeRequestMessage has a high likeihood to succeed. Must be called before PrepareCommand.
+     * If aRemoteMaxPathsPerInvoke is 1, this will allow the call to contain only one command and
+     * doesn't enforce other batch commands requirements (similar to have never calling this method.
      *
      * @param [in] aRemoteMaxPathsPerInvoke max number of paths per invoke supported by remote peer.
      *
      * @return CHIP_ERROR_INCORRECT_STATE
      *                      If device has previously called `PrepareCommand`.
+     * @return CHIP_ERROR_INVALID_ARGUMENT
+     *                      Invalid argument value.
      * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
      *                      Device has not enabled CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED.
      */
     CHIP_ERROR SetBatchCommandsConfig(uint16_t aRemoteMaxPathsPerInvoke);
 
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true,
-                              AdditionalInvokeRequestElements aOptionalArgs = AdditionalInvokeRequestElements());
-    CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
+                              AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements());
+    CHIP_ERROR FinishCommand(bool aEndDataStruct                         = true,
+                             AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements());
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
     /**
      * API for adding a data request.  The template parameter T is generally
@@ -193,14 +199,15 @@ public:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                               const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                              AdditionalInvokeRequestElements aOptionalArgs = AdditionalInvokeRequestElements())
+                              AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements())
     {
         VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
     }
 
-    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
+    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs,
+                             AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements());
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     /**
@@ -211,7 +218,7 @@ public:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                                           const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                                          AdditionalInvokeRequestElements aOptionalArgs = AdditionalInvokeRequestElements())
+                                          AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements())
     {
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
     }
@@ -228,14 +235,13 @@ public:
 private:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                      const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                                      AdditionalInvokeRequestElements aOptionalArgs)
+                                      const Optional<uint16_t> & aTimedInvokeTimeoutMs, AdditionalCommandDataElements aOptionalArgs)
     {
         ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false, aOptionalArgs));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
-        return FinishCommand(aTimedInvokeTimeoutMs);
+        return FinishCommand(aTimedInvokeTimeoutMs, aOptionalArgs);
     }
 
 public:
@@ -337,7 +343,6 @@ private:
 
     State mState = State::Idle;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
-    AdditionalInvokeRequestElements mAdditionalRequestElements;
     AdditionalInvokeResponseElements mAdditionalResponseElements;
     uint16_t mFinishedCommandCount    = 0;
     uint16_t mRemoteMaxPathsPerInvoke = 1;

@@ -410,9 +410,10 @@ CHIP_ERROR CommandSender::SetBatchCommandsConfig(uint16_t aRemoteMaxPathsPerInvo
 {
 #if CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
     VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(aRemoteMaxPathsPerInvoke, CHIP_ERROR_INVALID_ARGUMENT);
 
     mRemoteMaxPathsPerInvoke = aRemoteMaxPathsPerInvoke;
-    mBatchCommandsEnabled    = true;
+    mBatchCommandsEnabled    = (aRemoteMaxPathsPerInvoke > 1);
     return CHIP_NO_ERROR;
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -420,7 +421,7 @@ CHIP_ERROR CommandSender::SetBatchCommandsConfig(uint16_t aRemoteMaxPathsPerInvo
 }
 
 CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct,
-                                         AdditionalInvokeRequestElements aOptionalArgs)
+                                         AdditionalCommandDataElements aOptionalArgs)
 {
     ReturnErrorOnFailure(AllocateBuffer());
 
@@ -451,13 +452,11 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
                                                                        TLV::kTLVType_Structure, mDataElementContainerType));
     }
 
-    mAdditionalRequestElements = aOptionalArgs;
-
     MoveToState(State::AddingCommand);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::FinishCommand(bool aEndDataStruct)
+CHIP_ERROR CommandSender::FinishCommand(bool aEndDataStruct, AdditionalCommandDataElements aOptionalArgs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -470,9 +469,16 @@ CHIP_ERROR CommandSender::FinishCommand(bool aEndDataStruct)
         ReturnErrorOnFailure(commandData.GetWriter()->EndContainer(mDataElementContainerType));
     }
 
-    if (mAdditionalRequestElements.commandRef.HasValue())
+    if (mBatchCommandsEnabled)
     {
-        ReturnErrorOnFailure(commandData.Ref(mAdditionalRequestElements.commandRef.Value()));
+        // If error below triggers, whatever provided aOptionalArgs to PerpareCommand has changed it's
+        // values since calling PrepareCommand.
+        VerifyOrReturnError(aOptionalArgs.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    if (aOptionalArgs.commandRef.HasValue())
+    {
+        ReturnErrorOnFailure(commandData.Ref(aOptionalArgs.commandRef.Value()));
     }
 
     ReturnErrorOnFailure(commandData.EndOfCommandDataIB());
@@ -493,9 +499,10 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
     return mInvokeRequestBuilder.GetInvokeRequests().GetCommandData().GetWriter();
 }
 
-CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs,
+                                        AdditionalCommandDataElements aOptionalArgs)
 {
-    ReturnErrorOnFailure(FinishCommand(/* aEndDataStruct = */ false));
+    ReturnErrorOnFailure(FinishCommand(/* aEndDataStruct = */ false, aOptionalArgs));
     if (!mTimedInvokeTimeoutMs.HasValue())
     {
         mTimedInvokeTimeoutMs = aTimedInvokeTimeoutMs;
