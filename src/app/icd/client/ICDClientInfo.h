@@ -27,32 +27,31 @@
 namespace chip {
 namespace app {
 
-class ICDClientInfo
+struct ICDClientInfo
 {
-public:
-    ScopedNodeId mPeerNode;
-    uint32_t mStartICDCounter          = 0;
-    uint32_t mOffset                   = 0;
-    uint64_t mMonitoredSubject         = static_cast<uint64_t>(0);
+    ScopedNodeId peer_node;
+    uint32_t start_icd_counter         = 0;
+    uint32_t offset                    = 0;
+    uint64_t monitored_subject         = static_cast<uint64_t>(0);
     Crypto::Aes128KeyHandle mSharedKey = Crypto::Aes128KeyHandle();
 
     ICDClientInfo() {}
     ICDClientInfo(const ICDClientInfo & other)
     {
-        mPeerNode         = other.mPeerNode;
-        mStartICDCounter  = other.mStartICDCounter;
-        mOffset           = other.mOffset;
-        mMonitoredSubject = other.mMonitoredSubject;
+        peer_node         = other.peer_node;
+        start_icd_counter = other.start_icd_counter;
+        offset            = other.offset;
+        monitored_subject = other.monitored_subject;
         ByteSpan buf(other.mSharedKey.As<Crypto::Aes128KeyByteArray>());
         memcpy(mSharedKey.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
     }
 
     ICDClientInfo & operator=(const ICDClientInfo & other)
     {
-        mPeerNode         = other.mPeerNode;
-        mStartICDCounter  = other.mStartICDCounter;
-        mOffset           = other.mOffset;
-        mMonitoredSubject = other.mMonitoredSubject;
+        peer_node         = other.peer_node;
+        start_icd_counter = other.start_icd_counter;
+        offset            = other.offset;
+        monitored_subject = other.monitored_subject;
         ByteSpan buf(other.mSharedKey.As<Crypto::Aes128KeyByteArray>());
         memcpy(mSharedKey.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
         return *this;

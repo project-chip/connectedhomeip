@@ -43,7 +43,7 @@ struct TestClientInfo : public ICDClientInfo
 {
     bool operator==(const ICDClientInfo & that) const
     {
-        if ((mPeerNode != that.mPeerNode))
+        if ((peer_node != that.peer_node))
         {
             return false;
         }
@@ -66,11 +66,11 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     // Write some ClientInfos and see the counts are correct
     ICDClientInfo clientInfo1;
-    clientInfo1.mPeerNode = ScopedNodeId(nodeId1, fabricId);
+    clientInfo1.peer_node = ScopedNodeId(nodeId1, fabricId);
     ICDClientInfo clientInfo2;
-    clientInfo2.mPeerNode = ScopedNodeId(nodeId2, fabricId);
+    clientInfo2.peer_node = ScopedNodeId(nodeId2, fabricId);
     ICDClientInfo clientInfo3;
-    clientInfo3.mPeerNode = ScopedNodeId(nodeId1, fabricId);
+    clientInfo3.peer_node = ScopedNodeId(nodeId1, fabricId);
     err                   = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = manager.StoreEntry(clientInfo1);
@@ -93,9 +93,9 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
 
     ICDClientInfo clientInfo;
     NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
-    NL_TEST_ASSERT(apSuite, clientInfo.mPeerNode.GetNodeId() == nodeId1);
+    NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId1);
     NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
-    NL_TEST_ASSERT(apSuite, clientInfo.mPeerNode.GetNodeId() == nodeId2);
+    NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId2);
 
     iterator->Release();
 
@@ -135,11 +135,11 @@ void TestClientInfoCountMultipleFabric(nlTestSuite * apSuite, void * apContext)
 
     // Write some ClientInfos and see the counts are correct
     ICDClientInfo clientInfo1;
-    clientInfo1.mPeerNode = ScopedNodeId(nodeId1, fabricId1);
+    clientInfo1.peer_node = ScopedNodeId(nodeId1, fabricId1);
     ICDClientInfo clientInfo2;
-    clientInfo2.mPeerNode = ScopedNodeId(nodeId2, fabricId1);
+    clientInfo2.peer_node = ScopedNodeId(nodeId2, fabricId1);
     ICDClientInfo clientInfo3;
-    clientInfo3.mPeerNode = ScopedNodeId(nodeId3, fabricId2);
+    clientInfo3.peer_node = ScopedNodeId(nodeId3, fabricId2);
 
     err = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
