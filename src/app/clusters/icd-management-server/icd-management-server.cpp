@@ -46,11 +46,11 @@ class IcdManagementAttributeAccess : public AttributeAccessInterface
 public:
     IcdManagementAttributeAccess() : AttributeAccessInterface(MakeOptional(kRootEndpointId), IcdManagement::Id) {}
 
-    void Init(PersistentStorageDelegate & storage, Crypto::SessionKeystore * sessionKeystore, FabricTable & fabricTable,
+    void Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore, FabricTable & fabricTable,
               ICDData & icdData)
     {
         mStorage         = &storage;
-        mSessionKeystore = sessionKeystore;
+        mSymmetricKeystore = symmetricKeystore;
         mFabricTable     = &fabricTable;
         mICDData         = &icdData;
     }
@@ -66,7 +66,7 @@ private:
     CHIP_ERROR ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder);
 
     PersistentStorageDelegate * mStorage       = nullptr;
-    Crypto::SessionKeystore * mSessionKeystore = nullptr;
+    Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
     FabricTable * mFabricTable                 = nullptr;
     ICDData * mICDData                         = nullptr;
 };
@@ -118,15 +118,15 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoi
 {
     uint16_t supported_clients                = mICDData->GetClientsSupportedPerFabric();
     PersistentStorageDelegate * storage       = mStorage;
-    Crypto::SessionKeystore * sessionKeystore = mSessionKeystore;
+    Crypto::SymmetricKeystore * symmetricKeystore = mSymmetricKeystore;
     FabricTable * fabricTable                 = mFabricTable;
 
-    return encoder.EncodeList([supported_clients, storage, sessionKeystore, fabricTable](const auto & subEncoder) -> CHIP_ERROR {
-        ICDMonitoringEntry e(sessionKeystore);
+    return encoder.EncodeList([supported_clients, storage, symmetricKeystore, fabricTable](const auto & subEncoder) -> CHIP_ERROR {
+        ICDMonitoringEntry e(symmetricKeystore);
 
         for (const auto & fabricInfo : *fabricTable)
         {
-            ICDMonitoringTable table(*storage, fabricInfo.GetFabricIndex(), supported_clients, sessionKeystore);
+            ICDMonitoringTable table(*storage, fabricInfo.GetFabricIndex(), supported_clients, symmetricKeystore);
             for (uint16_t i = 0; i < table.Limit(); ++i)
             {
                 CHIP_ERROR err = table.Get(i, e);
@@ -163,24 +163,24 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadClientsSupportedPerFabric(EndpointI
 class IcdManagementFabricDelegate : public FabricTable::Delegate
 {
 public:
-    void Init(PersistentStorageDelegate & storage, Crypto::SessionKeystore * sessionKeystore, ICDData & icdData)
+    void Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore, ICDData & icdData)
     {
         mStorage         = &storage;
-        mSessionKeystore = sessionKeystore;
+        mSymmetricKeystore = symmetricKeystore;
         mICDData         = &icdData;
     }
 
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         uint16_t supported_clients = mICDData->GetClientsSupportedPerFabric();
-        ICDMonitoringTable table(*mStorage, fabricIndex, supported_clients, mSessionKeystore);
+        ICDMonitoringTable table(*mStorage, fabricIndex, supported_clients, mSymmetricKeystore);
         table.RemoveAll();
         ICDNotifier::GetInstance().BroadcastICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
     }
 
 private:
     PersistentStorageDelegate * mStorage       = nullptr;
-    Crypto::SessionKeystore * mSessionKeystore = nullptr;
+    Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
     ICDData * mICDData                         = nullptr;
 };
 
@@ -401,17 +401,17 @@ void MatterIcdManagementPluginServerInitCallback()
 {
     PersistentStorageDelegate & storage       = Server::GetInstance().GetPersistentStorage();
     FabricTable & fabricTable                 = Server::GetInstance().GetFabricTable();
-    Crypto::SessionKeystore * sessionKeystore = Server::GetInstance().GetSessionKeystore();
+    Crypto::SymmetricKeystore * symmetricKeystore = Server::GetInstance().GetsymmetricKeystore();
     ICDData & icdData                         = ICDData::GetInstance().GetInstance();
 
     // Configure and register Fabric delegate
-    gFabricDelegate.Init(storage, sessionKeystore, icdData);
+    gFabricDelegate.Init(storage, symmetricKeystore, icdData);
     fabricTable.AddFabricDelegate(&gFabricDelegate);
 
     // Configure and register Attribute Access Override
-    gAttribute.Init(storage, sessionKeystore, fabricTable, icdData);
+    gAttribute.Init(storage, symmetricKeystore, fabricTable, icdData);
     registerAttributeAccessOverride(&gAttribute);
 
     // Configure ICD Management
-    ICDManagementServer::Init(storage, sessionKeystore, icdData);
+    ICDManagementServer::Init(storage, symmetricKeystore, icdData);
 }
