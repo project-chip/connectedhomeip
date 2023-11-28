@@ -56,6 +56,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/occupancy-sensing-cluster.xml
 load "../src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/operational-credentials-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/operational-state-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/operational-state-oven-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/operational-state-rvc-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/oven-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/power-source-cluster.xml";

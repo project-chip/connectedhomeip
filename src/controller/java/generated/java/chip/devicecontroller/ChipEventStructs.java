@@ -2129,6 +2129,128 @@ public static class BooleanStateClusterStateChangeEvent {
     return output.toString();
   }
 }
+public static class OvenCavityOperationalStateClusterOperationalErrorEvent {
+  public ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct errorState;
+  private static final long ERROR_STATE_ID = 0L;
+
+  public OvenCavityOperationalStateClusterOperationalErrorEvent(
+    ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct errorState
+  ) {
+    this.errorState = errorState;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ERROR_STATE_ID, errorState.encodeTlv()));
+
+    return new StructType(values);
+  }
+
+  public static OvenCavityOperationalStateClusterOperationalErrorEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct errorState = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ERROR_STATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          errorState = ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new OvenCavityOperationalStateClusterOperationalErrorEvent(
+      errorState
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OvenCavityOperationalStateClusterOperationalErrorEvent {\n");
+    output.append("\terrorState: ");
+    output.append(errorState);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class OvenCavityOperationalStateClusterOperationCompletionEvent {
+  public Integer completionErrorCode;
+  public @Nullable Optional<Long> totalOperationalTime;
+  public @Nullable Optional<Long> pausedTime;
+  private static final long COMPLETION_ERROR_CODE_ID = 0L;
+  private static final long TOTAL_OPERATIONAL_TIME_ID = 1L;
+  private static final long PAUSED_TIME_ID = 2L;
+
+  public OvenCavityOperationalStateClusterOperationCompletionEvent(
+    Integer completionErrorCode,
+    @Nullable Optional<Long> totalOperationalTime,
+    @Nullable Optional<Long> pausedTime
+  ) {
+    this.completionErrorCode = completionErrorCode;
+    this.totalOperationalTime = totalOperationalTime;
+    this.pausedTime = pausedTime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(COMPLETION_ERROR_CODE_ID, new UIntType(completionErrorCode)));
+    values.add(new StructElement(TOTAL_OPERATIONAL_TIME_ID, totalOperationalTime != null ? totalOperationalTime.<BaseTLVType>map((nonOptionaltotalOperationalTime) -> new UIntType(nonOptionaltotalOperationalTime)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(PAUSED_TIME_ID, pausedTime != null ? pausedTime.<BaseTLVType>map((nonOptionalpausedTime) -> new UIntType(nonOptionalpausedTime)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static OvenCavityOperationalStateClusterOperationCompletionEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer completionErrorCode = null;
+    @Nullable Optional<Long> totalOperationalTime = null;
+    @Nullable Optional<Long> pausedTime = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == COMPLETION_ERROR_CODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          completionErrorCode = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TOTAL_OPERATIONAL_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          totalOperationalTime = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == PAUSED_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          pausedTime = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new OvenCavityOperationalStateClusterOperationCompletionEvent(
+      completionErrorCode,
+      totalOperationalTime,
+      pausedTime
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OvenCavityOperationalStateClusterOperationCompletionEvent {\n");
+    output.append("\tcompletionErrorCode: ");
+    output.append(completionErrorCode);
+    output.append("\n");
+    output.append("\ttotalOperationalTime: ");
+    output.append(totalOperationalTime);
+    output.append("\n");
+    output.append("\tpausedTime: ");
+    output.append(pausedTime);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class RefrigeratorAlarmClusterNotifyEvent {
   public Long active;
   public Long inactive;

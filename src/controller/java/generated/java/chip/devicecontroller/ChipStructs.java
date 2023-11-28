@@ -3799,6 +3799,143 @@ public static class IcdManagementClusterMonitoringRegistrationStruct {
     return output.toString();
   }
 }
+public static class OvenCavityOperationalStateClusterErrorStateStruct {
+  public Integer errorStateID;
+  public Optional<String> errorStateLabel;
+  public Optional<String> errorStateDetails;
+  private static final long ERROR_STATE_I_D_ID = 0L;
+  private static final long ERROR_STATE_LABEL_ID = 1L;
+  private static final long ERROR_STATE_DETAILS_ID = 2L;
+
+  public OvenCavityOperationalStateClusterErrorStateStruct(
+    Integer errorStateID,
+    Optional<String> errorStateLabel,
+    Optional<String> errorStateDetails
+  ) {
+    this.errorStateID = errorStateID;
+    this.errorStateLabel = errorStateLabel;
+    this.errorStateDetails = errorStateDetails;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ERROR_STATE_I_D_ID, new UIntType(errorStateID)));
+    values.add(new StructElement(ERROR_STATE_LABEL_ID, errorStateLabel.<BaseTLVType>map((nonOptionalerrorStateLabel) -> new StringType(nonOptionalerrorStateLabel)).orElse(new EmptyType())));
+    values.add(new StructElement(ERROR_STATE_DETAILS_ID, errorStateDetails.<BaseTLVType>map((nonOptionalerrorStateDetails) -> new StringType(nonOptionalerrorStateDetails)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static OvenCavityOperationalStateClusterErrorStateStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer errorStateID = null;
+    Optional<String> errorStateLabel = Optional.empty();
+    Optional<String> errorStateDetails = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ERROR_STATE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          errorStateID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ERROR_STATE_LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          errorStateLabel = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == ERROR_STATE_DETAILS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          errorStateDetails = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new OvenCavityOperationalStateClusterErrorStateStruct(
+      errorStateID,
+      errorStateLabel,
+      errorStateDetails
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OvenCavityOperationalStateClusterErrorStateStruct {\n");
+    output.append("\terrorStateID: ");
+    output.append(errorStateID);
+    output.append("\n");
+    output.append("\terrorStateLabel: ");
+    output.append(errorStateLabel);
+    output.append("\n");
+    output.append("\terrorStateDetails: ");
+    output.append(errorStateDetails);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class OvenCavityOperationalStateClusterOperationalStateStruct {
+  public Integer operationalStateID;
+  public Optional<String> operationalStateLabel;
+  private static final long OPERATIONAL_STATE_I_D_ID = 0L;
+  private static final long OPERATIONAL_STATE_LABEL_ID = 1L;
+
+  public OvenCavityOperationalStateClusterOperationalStateStruct(
+    Integer operationalStateID,
+    Optional<String> operationalStateLabel
+  ) {
+    this.operationalStateID = operationalStateID;
+    this.operationalStateLabel = operationalStateLabel;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(OPERATIONAL_STATE_I_D_ID, new UIntType(operationalStateID)));
+    values.add(new StructElement(OPERATIONAL_STATE_LABEL_ID, operationalStateLabel.<BaseTLVType>map((nonOptionaloperationalStateLabel) -> new StringType(nonOptionaloperationalStateLabel)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static OvenCavityOperationalStateClusterOperationalStateStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer operationalStateID = null;
+    Optional<String> operationalStateLabel = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == OPERATIONAL_STATE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          operationalStateID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == OPERATIONAL_STATE_LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          operationalStateLabel = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new OvenCavityOperationalStateClusterOperationalStateStruct(
+      operationalStateID,
+      operationalStateLabel
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OvenCavityOperationalStateClusterOperationalStateStruct {\n");
+    output.append("\toperationalStateID: ");
+    output.append(operationalStateID);
+    output.append("\n");
+    output.append("\toperationalStateLabel: ");
+    output.append(operationalStateLabel);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class OvenModeClusterModeTagStruct {
   public Optional<Integer> mfgCode;
   public Integer value;
