@@ -108,7 +108,7 @@ size_t DefaultICDClientStorage::ICDClientInfoIteratorImpl::Count()
     size_t total = 0;
     for (auto & fabric_idx : mManager.mFabricList)
     {
-        size_t count = 0;
+        size_t count          = 0;
         size_t clientInfoSize = 0;
         if (mManager.LoadCounter(fabric_idx, count, clientInfoSize) != CHIP_NO_ERROR)
         {
@@ -158,7 +158,7 @@ CHIP_ERROR DefaultICDClientStorage::Init(PersistentStorageDelegate * clientInfoS
     VerifyOrReturnError(mpClientInfoStore == nullptr && mpKeyStore == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mpClientInfoStore = clientInfoStore;
     mpKeyStore        = keyStore;
-    CHIP_ERROR err = LoadFabricList();
+    CHIP_ERROR err    = LoadFabricList();
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         err = CHIP_NO_ERROR;
@@ -215,8 +215,8 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
     ReturnErrorCodeIf(!backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
     uint16_t length = static_cast<uint16_t>(len);
-    CHIP_ERROR err = mpClientInfoStore->SyncGetKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricIndex).KeyName(),
-                                                            backingBuffer.Get(), length);
+    CHIP_ERROR err  = mpClientInfoStore->SyncGetKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricIndex).KeyName(),
+                                                         backingBuffer.Get(), length);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         return CHIP_NO_ERROR;
