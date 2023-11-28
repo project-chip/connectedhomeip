@@ -33,6 +33,7 @@
         "MICROWAVE_OVEN_MODE_CLUSTER": [],
         "DOOR_LOCK_CLUSTER": [],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
+        "ENERGY_EVSE_CLUSTER": [],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "FAN_CONTROL_CLUSTER": [],
         "FAULT_INJECTION_CLUSTER": [],
@@ -65,6 +66,7 @@
         "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],
         "OPERATIONAL_CREDENTIALS_CLUSTER": [],
         "OPERATIONAL_STATE_CLUSTER": [],
+        "OPERATIONAL_STATE_OVEN_CLUSTER": [],
         "OPERATIONAL_STATE_RVC_CLUSTER": [],
         "OTA_BOOTLOAD_CLUSTER": [],
         "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER": [],
@@ -165,6 +167,7 @@
         "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
+        "ENERGY_EVSE_CLUSTER": ["energy-evse-server"],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [
             "ethernet-network-diagnostics-server"
         ],
@@ -205,6 +208,7 @@
         "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],
         "OPERATIONAL_CREDENTIALS_CLUSTER": ["operational-credentials-server"],
         "OPERATIONAL_STATE_CLUSTER": ["operational-state-server"],
+        "OPERATIONAL_STATE_OVEN_CLUSTER": ["operational-state-server"],
         "OPERATIONAL_STATE_RVC_CLUSTER": ["operational-state-server"],
         "OTA_BOOTLOAD_CLUSTER": [],
         "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER": ["ota-provider"],
