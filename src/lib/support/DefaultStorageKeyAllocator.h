@@ -58,15 +58,6 @@
 #define CHIP_CONFIG_ICD_FABRIC_LIST "g/icdfl"
 #endif
 
-/**
- * @def CHIP_CONFIG_ICD_FABRIC_LIST_COUNTER
- *
- * @brief Defines ICD Fabric List Counter
- */
-#ifndef CHIP_CONFIG_ICD_FABRIC_LIST_COUNTER
-#define CHIP_CONFIG_ICD_FABRIC_LIST_COUNTER "g/icdflc"
-#endif
-
 namespace chip {
 
 /**
@@ -288,8 +279,6 @@ public:
     static StorageKeyName ICDClientInfoKey(FabricIndex fabric) { return StorageKeyName::Formatted(CHIP_CONFIG_ICD_CLIENT_INFO_KEY_CONST, fabric); }
 
     static StorageKeyName ICDFabricList() { return StorageKeyName::FromConst(CHIP_CONFIG_ICD_FABRIC_LIST); }
-
-    static StorageKeyName ICDFabricListCounter() { return StorageKeyName::FromConst(CHIP_CONFIG_ICD_FABRIC_LIST_COUNTER); }
 };
 
 } // namespace chip

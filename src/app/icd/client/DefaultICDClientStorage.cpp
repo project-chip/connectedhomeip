@@ -25,7 +25,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #define FABRIC_INDEX_TLV_SIZE 2
-
+#define FABRIC_INDEX_MAX 255
 namespace chip {
 namespace app {
 CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
@@ -59,24 +59,14 @@ CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     writer.Finalize(backingBuffer);
-    ReturnErrorOnFailure(mpClientInfoStore->SyncSetKeyValue(DefaultStorageKeyAllocator::ICDFabricList().KeyName(),
-                                                                     backingBuffer.Get(), static_cast<uint16_t>(len)));
-    uint16_t counterLen = static_cast<uint16_t>(sizeof(counter));
-    ReturnErrorOnFailure(mpClientInfoStore->SyncDeleteKeyValue(
-        DefaultStorageKeyAllocator::ICDFabricListCounter().KeyName()));
-    return mpClientInfoStore->SyncSetKeyValue(
-        DefaultStorageKeyAllocator::ICDFabricListCounter().KeyName(), &counter, counterLen);
+    return mpClientInfoStore->SyncSetKeyValue(DefaultStorageKeyAllocator::ICDFabricList().KeyName(),
+                                                                     backingBuffer.Get(), static_cast<uint16_t>(len));
 }
 
 CHIP_ERROR DefaultICDClientStorage::LoadFabricList()
 {
-    size_t counter      = 0;
-    uint16_t counterLen = static_cast<uint16_t>(sizeof(counter));
-    ReturnErrorOnFailure(mpClientInfoStore->SyncGetKeyValue(
-        DefaultStorageKeyAllocator::ICDFabricListCounter().KeyName(), &counter, counterLen));
-
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    size_t len = FABRIC_INDEX_TLV_SIZE * counter;
+    size_t len = FABRIC_INDEX_TLV_SIZE * FABRIC_INDEX_MAX;
     ReturnErrorCodeIf(!backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
     uint16_t length = static_cast<uint16_t>(len);
