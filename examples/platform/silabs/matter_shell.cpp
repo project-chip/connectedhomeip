@@ -47,13 +47,6 @@ extern "C" unsigned int sleep(unsigned int seconds)
     return 0;
 }
 
-extern "C" unsigned int usleep(unsigned int milliseconds)
-{
-    const TickType_t xDelay = pdMS_TO_TICKS(milliseconds);
-    vTaskDelay(xDelay);
-    return 0;
-}
-
 namespace chip {
 
 void NotifyShellProcess()

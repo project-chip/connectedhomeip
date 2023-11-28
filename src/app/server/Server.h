@@ -45,7 +45,6 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/SafeInt.h>
 #include <messaging/ExchangeMgr.h>
-#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/KvsPersistentStorageDelegate.h>
 #include <protocols/secure_channel/CASEServer.h>

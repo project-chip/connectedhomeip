@@ -55,9 +55,6 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
 
-// #include <lib/core/CHIPCore.h>
-// #include <lib/core/TLV.h>
-
 #if defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT) || defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
 #include <lib/support/PersistentStorageAudit.h>
 #endif // defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT) || defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
@@ -562,7 +559,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
 
     CHIP_ERROR err;
     char nameBuffer[chip::Dnssd::Commission::kInstanceNameMaxLength + 1];
-    err = app::DnssdServer::Instance().GetCommissionableInstanceName((char *) nameBuffer, sizeof(nameBuffer));
+    err = app::DnssdServer::Instance().GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to get mdns instance name error: %" CHIP_ERROR_FORMAT, err.Format());
