@@ -2,7 +2,7 @@
 
 import functools
 import logging
-from typing import Optional
+from typing import Dict, Optional
 
 from lark import Lark
 from lark.lexer import Token
@@ -19,10 +19,10 @@ except ModuleNotFoundError:
     from matter_idl.matter_idl_types import AccessPrivilege
 
 from matter_idl.matter_idl_types import (ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
-                                         AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandInstantiation,
-                                         CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority,
-                                         EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
-                                         StructQuality, StructTag)
+                                         AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
+                                         ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
+                                         Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructQuality,
+                                         StructTag)
 
 
 def UnionOfAllFlags(flags_list):
@@ -43,14 +43,6 @@ class PrefixCppDocComment:
             return
 
         actual_pos = self.start_pos + self.value_len
-        while content[actual_pos] in ' \t\n\r':
-            actual_pos += 1
-
-        # Allow to skip api maturity flags
-        for maturity in ["provisional", "internal", "stable", "deprecated"]:
-            if content[actual_pos:].startswith(maturity):
-                actual_pos += len(maturity)
-
         while content[actual_pos] in ' \t\n\r':
             actual_pos += 1
 
@@ -138,7 +130,6 @@ class MatterIdlTransformer(Transformer):
     def __init__(self, skip_meta):
         self.skip_meta = skip_meta
         self.doc_comments = []
-        self._cluster_start_pos = None
 
     def positive_integer(self, tokens):
         """Numbers in the grammar are integers or hex numbers.
@@ -281,16 +272,6 @@ class MatterIdlTransformer(Transformer):
         if args[0] is not None:
             field.api_maturity = args[0]
         return field
-
-    @v_args(meta=True)
-    def server_cluster(self, meta, unused_args):
-        self._cluster_start_pos = meta and meta.start_pos
-        return ClusterSide.SERVER
-
-    @v_args(meta=True, inline=True)
-    def client_cluster(self, meta, *unused_args):
-        self._cluster_start_pos = meta and meta.start_pos
-        return ClusterSide.CLIENT
 
     def command_access(self, privilege):
         return privilege[0]
@@ -489,12 +470,8 @@ class MatterIdlTransformer(Transformer):
         return element
 
     @v_args(inline=True, meta=True)
-    def cluster(self, meta, api_maturity, side, name, code, revision, *content):
+    def cluster(self, meta, api_maturity, name, code, revision, *content):
         meta = None if self.skip_meta else ParseMetaData(meta)
-
-        # shift actual starting position where the doc comment would start
-        if meta and self._cluster_start_pos:
-            meta.start_pos = self._cluster_start_pos
 
         if api_maturity is None:
             api_maturity = ApiMaturity.STABLE
@@ -502,8 +479,8 @@ class MatterIdlTransformer(Transformer):
         if not revision:
             revision = 1
 
-        result = Cluster(parse_meta=meta, side=side, name=name,
-                         code=code, revision=revision, api_maturity=api_maturity)
+        result = Cluster(parse_meta=meta, name=name, code=code,
+                         revision=revision, api_maturity=api_maturity)
 
         for item in content:
             if isinstance(item, Enum):
@@ -569,6 +546,28 @@ class ParserWithLines:
     def parse(self, file: str, file_name: Optional[str] = None):
         idl = self.transformer.transform(self.parser.parse(file))
         idl.parse_file_name = file_name
+
+        # ZAP may generate the same definition of clusters several times.
+        # Validate that if a cluster is defined, its definition is IDENTICAL
+        #
+        # TODO: this is not ideal and zap provides some iteration that seems
+        #       to not care about side: `all_user_clusters_irrespective_of_side`
+        #       however that one loses at least `description` and switches
+        #       ordering.
+        #
+        # As a result, for now allow multiple definitions IF AND ONLY IF identical
+        #
+        # A zap PR to allow us to not need this is:
+        #    https://github.com/project-chip/zap/pull/1216
+        clusters: Dict[int, Cluster] = {}
+        for c in idl.clusters:
+            if c.code in clusters:
+                if c != clusters[c.code]:
+                    raise Exception(
+                        f"Different cluster definition for {c.name}/{c.code}")
+            else:
+                clusters[c.code] = c
+        idl.clusters = [c for c in clusters.values()]
 
         for comment in self.transformer.doc_comments:
             comment.appply_to_idl(idl, file)

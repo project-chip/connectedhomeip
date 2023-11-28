@@ -16,28 +16,8 @@ however it may be easier to understand with an example:
 // so are C-style ones
 
 
-// Types such as enums and structs can be defined globally
-// An enum has a name and must have an underlying type (a sized integer defining
-// storage size and how it gets transmitted over the wire)
-enum StatusCode : ENUM8 {
-  kBusy = 1;                  // every enum MUST have an integer value
-  kPAKEParameterError = 0x02; // throughout, either HEX or integer can be used
-  kWindowNotOpen = 3;
-}
-
-// Structures just have a name
-struct LabelStruct {
-    CHAR_STRING<16> label = 0;  // structure fields have a type. Some types can be sized (strings, octet strings)
-    CHAR_STRING<16> value = 1;  // every structure field has an index. this is the tag when encoding over the wire
-}
-
-// Server clusters are clusters that are expected to be exposed as servers
-//
-// Clusters may have optional things (e.g. optional attributes). A server
-// cluster only defines attributes actually exposed by the server.
-//
 // Every cluster has an identifier that is defined by the matter spec (31 in this case)
-server cluster AccessControl = 31 {
+cluster AccessControl = 31 {
 
   // Revision of the cluster being described here
   // If not specified, it is assumed to be 1
@@ -153,33 +133,15 @@ server cluster AccessControl = 31 {
   internal command FactoryReset(): DefaultSuccess = 10;
 }
 
-// A client cluster represents something that is used by an app
-// but no server is exposed.
-//
-// A code generation may generate either combination of client and server
-// clusters for a given cluster name.
-//
-// Even if both client and server cluster are declared within an IDL, their
-// content may differ. For example
-//    - server cluster contains only attributes that the server exposes. As such
-//      some optional attributes may be missing.
-//
-//    - client cluster contains attributes that the app wants to access as a
-//      client. So an optional attribute may be presented because the
-//      underlying application can make use of that attribute.
-client cluster OtaSoftwareUpdateProvider = 41 {
-    ///.... content removed: it is very similar to a server cluster
-}
-
 // Clusters may be provisional or internal as well
-provisional client cluster SomeClusterInDevelopment = 1234 {
+provisional cluster SomeClusterInDevelopment = 1234 {
   /// ... content removed
 }
 
 // On every endpoint number (non-dynamic)
 // a series of clusters can be exposed
 endpoint 0 {
-  // A binding cluster is a CLIENT cluster that can be bound to for the
+  // A binding cluster is a cluster that can be bound to for the
   // application to make use.
   //
   // As an example, a light switch can be bound to a light bulb or
