@@ -22,7 +22,6 @@
 
 #include <stdio.h>
 
-
 namespace chip {
 
 /**
@@ -231,10 +230,7 @@ public:
     static StorageKeyName TSTimeZone() { return StorageKeyName::FromConst("g/ts/tz"); }
     static StorageKeyName TSDSTOffset() { return StorageKeyName::FromConst("g/ts/dsto"); }
 
-    static StorageKeyName FabricICDClientInfoCounter(FabricIndex fabric)
-    {
-        return StorageKeyName::Formatted("f/%x/icdc", fabric);
-    }
+    static StorageKeyName FabricICDClientInfoCounter(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/icdc", fabric); }
 
     static StorageKeyName ICDClientInfoKey(FabricIndex fabric) { return StorageKeyName::Formatted("g/%x/icdk", fabric); }
 

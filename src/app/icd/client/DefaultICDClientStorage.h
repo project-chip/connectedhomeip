@@ -20,15 +20,15 @@
 #include "ICDClientStorage.h"
 #include <lib/core/CHIPCore.h>
 
-#include <lib/core/TLV.h>
-#include <lib/support/Pool.h>
-#include <vector>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
+#include <lib/core/TLV.h>
+#include <lib/support/Pool.h>
+#include <vector>
 
 // TODO: SymmetricKeystore is an alias for SessionKeystore, replace the below when sdk supports SymmetricKeystore
 namespace chip {
@@ -77,8 +77,8 @@ protected:
 
     enum class CounterTag : uint8_t
     {
-        kCount       = 1,
-        kSize          = 2,
+        kCount = 1,
+        kSize  = 2,
     };
 
     class ICDClientInfoIteratorImpl : public ICDClientInfoIterator
@@ -91,7 +91,7 @@ protected:
 
     private:
         DefaultICDClientStorage & mManager;
-        size_t mFabricListIndex    = 0;
+        size_t mFabricListIndex = 0;
         size_t mClientInfoIndex = 0;
         std::vector<ICDClientInfo> mClientInfoVector;
     };
