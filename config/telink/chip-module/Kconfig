@@ -34,6 +34,9 @@ config CHIP_APP_LOG_LEVEL
 config CHIP_NFC_COMMISSIONING
 	bool "Share onboarding payload in NFC tag"
 	default n
+	imply I2C
+	imply ST25DVXXKC
+	imply NFC		
 	imply NFC_NDEF
 	imply NFC_NDEF_MSG
 	imply NFC_NDEF_RECORD

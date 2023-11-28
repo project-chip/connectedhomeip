@@ -677,7 +677,6 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
             }
             else
             {
-                LOG_INF("Start NFC Tag emulation");
                 ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
             }
         }
