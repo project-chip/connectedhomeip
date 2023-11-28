@@ -233,21 +233,42 @@ public:
             else if (name == "SystemMode")
             {
                 // System modes - Off, Auto, Cool and Heat are currently supported.
-                chip::app::Clusters::Thermostat::ThermostatSystemModeEnum modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kUnknownEnumValue;
+                chip::app::Clusters::Thermostat::ThermostatSystemModeEnum modeEnum =
+                    chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kUnknownEnumValue;
                 uint8_t mode = n;
 
                 switch (n)
                 {
-                    case 0: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kOff; break;
-                    case 1: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kAuto; break;
-                    case 3: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kCool; break;
-                    case 4: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kHeat; break;
-                    case 5: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kEmergencyHeat; break;
-                    case 6: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kPrecooling; break;
-                    case 7: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kFanOnly; break;
-                    case 8: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kDry; break;
-                    case 9: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kSleep; break;
-                    default: modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kUnknownEnumValue; break;
+                case 0:
+                    modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kOff;
+                    break;
+                case 1:
+                    modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kAuto;
+                    break;
+                case 3:
+                    modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kCool;
+                    break;
+                case 4:
+                    modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kHeat;
+                    break;
+                case 5:
+                    modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kEmergencyHeat;
+                    break;
+                case 6:
+                    modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kPrecooling;
+                    break;
+                case 7:
+                    modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kFanOnly;
+                    break;
+                case 8:
+                    modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kDry;
+                    break;
+                case 9:
+                    modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kSleep;
+                    break;
+                default:
+                    modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kUnknownEnumValue;
+                    break;
                 }
 
                 // Update the system mode here for hardcoded endpoint 1
@@ -258,7 +279,8 @@ public:
                     // If system mode is auto set running mode to off otherwise set it to what the system mode is set to
                     if (modeEnum == chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kAuto)
                     {
-                        app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff);
+                        app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(
+                            1, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff);
                     }
                     else
                     {
@@ -268,10 +290,18 @@ public:
                             chip::app::Clusters::Thermostat::ThermostatRunningModeEnum runningModeEnum;
                             switch (mode)
                             {
-                                case 0: runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff; break;
-                                case 3: runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kCool; break;
-                                case 4: runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kHeat; break;
-                                default: runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kUnknownEnumValue; break;
+                            case 0:
+                                runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff;
+                                break;
+                            case 3:
+                                runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kCool;
+                                break;
+                            case 4:
+                                runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kHeat;
+                                break;
+                            default:
+                                runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kUnknownEnumValue;
+                                break;
                             }
                             app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, runningModeEnum);
                         }
@@ -289,26 +319,37 @@ public:
             else if (name == "RunningMode")
             {
                 // Get the system mode
-                chip::app::Clusters::Thermostat::ThermostatSystemModeEnum systemMode = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kOff;
+                chip::app::Clusters::Thermostat::ThermostatSystemModeEnum systemMode =
+                    chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kOff;
                 app::Clusters::Thermostat::Attributes::SystemMode::Get(1, &systemMode);
                 if (systemMode != chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kAuto)
                 {
-                    ESP_LOGI(TAG, "Running mode can be changed only for system mode auto. Current system mode %d", static_cast<int>(systemMode));
+                    ESP_LOGI(TAG, "Running mode can be changed only for system mode auto. Current system mode %d",
+                             static_cast<int>(systemMode));
                 }
                 else
                 {
                     uint8_t mode = n;
-                    chip::app::Clusters::Thermostat::ThermostatRunningModeEnum modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kUnknownEnumValue;
+                    chip::app::Clusters::Thermostat::ThermostatRunningModeEnum modeEnum =
+                        chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kUnknownEnumValue;
                     // update the running mode here for hardcoded endpoint 1
                     if (isValidThermostatRunningMode(mode))
                     {
                         ESP_LOGI(TAG, "Running Mode changed to : %d", mode);
                         switch (n)
                         {
-                            case 0: modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff; break;
-                            case 3: modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kCool; break;
-                            case 4: modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kHeat; break;
-                            default: modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kUnknownEnumValue; break;
+                        case 0:
+                            modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff;
+                            break;
+                        case 3:
+                            modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kCool;
+                            break;
+                        case 4:
+                            modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kHeat;
+                            break;
+                        default:
+                            modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kUnknownEnumValue;
+                            break;
                         }
                         app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, modeEnum);
                     }
@@ -638,8 +679,7 @@ void SetupPretendDevices()
     app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
     app::Clusters::Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(21 * 100));
     AddAttribute("SystemMode", "4");
-    app::Clusters::Thermostat::Attributes::SystemMode::Set(
-        1, chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kHeat);
+    app::Clusters::Thermostat::Attributes::SystemMode::Set(1, chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kHeat);
     AddAttribute("CoolSetpoint", "19");
     app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Set(1, static_cast<int16_t>(19 * 100));
     AddAttribute("HeatSetpoint", "25");
