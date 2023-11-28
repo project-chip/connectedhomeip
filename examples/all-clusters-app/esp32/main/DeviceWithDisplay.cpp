@@ -233,7 +233,7 @@ public:
             else if (name == "SystemMode")
             {
                 // System modes - Off, Auto, Cool and Heat are currently supported.
-                chip::app::Clusters::Thermostat::ThermostatSystemModeEnum modeEnum = ThermostatSystemModeEnum::kUnknownEnumValue;
+                chip::app::Clusters::Thermostat::ThermostatSystemModeEnum modeEnum = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kUnknownEnumValue;
                 uint8_t mode = n;
 
                 switch (n)
@@ -265,7 +265,15 @@ public:
                         if (isValidThermostatRunningMode(mode))
                         {
                             ESP_LOGI(TAG, "Running Mode changed to : %d", mode);
-                            app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, static_cast<uint8_t>(mode));
+                            chip::app::Clusters::Thermostat::ThermostatRunningModeEnum runningModeEnum;
+                            switch (mode)
+                            {
+                                case 0: runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff; break;
+                                case 3: runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kCool; break;
+                                case 4: runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kHeat; break;
+                                default: runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kUnknownEnumValue; break;
+                            }
+                            app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, static_cast<uint8_t>(runningModeEnum));
                         }
                         else
                         {
