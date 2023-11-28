@@ -194,17 +194,17 @@ def main():
     log.basicConfig(format='[%(levelname)s] %(message)s', level=log.INFO)
 
     gen_test_certs(args.chip_cert_path,
-                    args.output,
-                    args.vendor_id,
-                    args.product_id,
-                    args.vendor_name + " " + args.product_name,
-                    args.gen_cd,
-                    args.cd_type,
-                    args.device_type,
-                    args.paa_cert,
-                    args.paa_key,
-                    args.valid_from,
-                    args.lifetime)
+                   args.output,
+                   args.vendor_id,
+                   args.product_id,
+                   args.vendor_name + " " + args.product_name,
+                   args.gen_cd,
+                   args.cd_type,
+                   args.device_type,
+                   args.paa_cert,
+                   args.paa_key,
+                   args.valid_from,
+                   args.lifetime)
 
 
 if __name__ == "__main__":

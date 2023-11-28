@@ -17,8 +17,8 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
+#include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
 #include <platform/nxp/k32w/k32w0/OTAFirmwareProcessor.h>
 
 #include "OtaSupport.h"
@@ -74,11 +74,11 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
     memcpy(&mBlock[0], &mBlock[requestedOtaMaxBlockSize], mUnalignmentNum);
     memcpy(&mBlock[mUnalignmentNum], block.data(), block.size());
 
-    if(mUnalignmentNum + block.size() < requestedOtaMaxBlockSize)
+    if (mUnalignmentNum + block.size() < requestedOtaMaxBlockSize)
     {
         uint32_t mAlignmentNum = (mUnalignmentNum + block.size()) / 16;
-        mAlignmentNum = mAlignmentNum * 16;
-        mUnalignmentNum = (mUnalignmentNum + block.size()) % 16;
+        mAlignmentNum          = mAlignmentNum * 16;
+        mUnalignmentNum        = (mUnalignmentNum + block.size()) % 16;
         memcpy(&mBlock[requestedOtaMaxBlockSize], &mBlock[mAlignmentNum], mUnalignmentNum);
         mBlock.reduce_size(mAlignmentNum);
     }
@@ -98,9 +98,9 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
         return CHIP_OTA_PROCESSOR_MAKE_ROOM;
     }
 #if OTA_ENCRYPTION_ENABLE
-    status = OTA_PushImageChunk((uint8_t*) mBlock.data(), (uint16_t) mBlock.size(), NULL, NULL);
+    status = OTA_PushImageChunk((uint8_t *) mBlock.data(), (uint16_t) mBlock.size(), NULL, NULL);
 #else
-    status = OTA_PushImageChunk((uint8_t*) block.data(), (uint16_t) block.size(), NULL, NULL);
+    status = OTA_PushImageChunk((uint8_t *) block.data(), (uint16_t) block.size(), NULL, NULL);
 #endif
     if (gOtaSuccess_c != status)
     {

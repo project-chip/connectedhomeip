@@ -35,8 +35,8 @@ import json
 import logging
 import os
 import sys
-import crypto_utils
 
+import crypto_utils
 import jsonschema
 
 sys.path.insert(0, os.path.join(
@@ -164,7 +164,7 @@ def generate_bootloader(args: object):
     descriptor = generate_descriptor(args.bl_version, args.bl_version_str, args.bl_build_date)
     logging.info(f"Bootloader encryption enable: {args.enc_enable}")
     if args.enc_enable:
-        inputFile = open(args.bl_input_file,"rb")
+        inputFile = open(args.bl_input_file, "rb")
         enc_file = crypto_utils.encryptData(inputFile.read(), args.input_ota_key, INITIALIZATION_VECTOR)
         enc_file1 = bytes([ord(x) for x in enc_file])
         file_size = len(enc_file1)
@@ -267,6 +267,7 @@ def create_image(args: object):
         for filename in glob.glob(os.path.dirname(__file__) + "/enc_ota_temp_*"):
             os.remove(filename)
 
+
 def main():
     """
     This function is a modified version of ota_image_tool.py main function.
@@ -337,7 +338,8 @@ def main():
     create_parser.add_argument('--json', help="[path] Path to the JSON describing custom TLVs")
 
     create_parser.add_argument('--enc_enable', action="store_true", help='enable ota encryption')
-    create_parser.add_argument('--input_ota_key', type=str, default="1234567890ABCDEFA1B2C3D4E5F6F1B4", help='Input OTA Encryption KEY (string:16Bytes)')
+    create_parser.add_argument('--input_ota_key', type=str, default="1234567890ABCDEFA1B2C3D4E5F6F1B4",
+                               help='Input OTA Encryption KEY (string:16Bytes)')
 
     create_parser.add_argument('-i', '--input_files', default=list(),
                                help='Path to input image payload file')

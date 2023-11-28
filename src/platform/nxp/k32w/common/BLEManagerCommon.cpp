@@ -917,7 +917,7 @@ void BLEManagerCommon::DoBleProcessing(void)
 void BLEManagerCommon::RegisterAppCallbacks(BLECallbackDelegate::GapGenericCallback gapCallback,
                                             BLECallbackDelegate::GattServerCallback gattCallback)
 {
-    callbackDelegate.gapCallback = gapCallback;
+    callbackDelegate.gapCallback  = gapCallback;
     callbackDelegate.gattCallback = gattCallback;
 }
 

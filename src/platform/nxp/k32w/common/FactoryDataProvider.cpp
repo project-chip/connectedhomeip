@@ -40,9 +40,8 @@ static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
     BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
 static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
 
-
-uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t)__MATTER_FACTORY_DATA_START;
-uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t)__MATTER_FACTORY_DATA_SIZE;
+uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t) __MATTER_FACTORY_DATA_START;
+uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t) __MATTER_FACTORY_DATA_SIZE;
 uint32_t FactoryDataProvider::kFactoryDataPayloadStart = kFactoryDataStart + sizeof(FactoryDataProvider::Header);
 
 FactoryDataProvider::FactoryDataProvider()

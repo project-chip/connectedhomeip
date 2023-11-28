@@ -30,6 +30,7 @@ from default import InputArgument
 # Global variable for hash ID
 hash_id = "CE47BA5E"
 
+
 def set_logger():
     stdout_handler = logging.StreamHandler(stream=sys.stdout)
     logging.basicConfig(

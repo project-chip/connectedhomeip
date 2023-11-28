@@ -253,7 +253,8 @@ CHIP_ERROR AppTask::Init()
     /* SSBL will always be seen as booting from address 0, thanks to the remapping mechanism.
      * This means the SSBL version will always offset from address 0. */
     extern uint32_t __MATTER_SSBL_VERSION_START[];
-    K32W_LOG("Current SSBL Version: %ld. Found at address 0x%lx", *((uint32_t*) __MATTER_SSBL_VERSION_START), (uint32_t)__MATTER_SSBL_VERSION_START);
+    K32W_LOG("Current SSBL Version: %ld. Found at address 0x%lx", *((uint32_t *) __MATTER_SSBL_VERSION_START),
+             (uint32_t) __MATTER_SSBL_VERSION_START);
 #endif
 
     return err;

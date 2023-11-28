@@ -256,9 +256,9 @@ class rijndael:
             tt = tk[KC - 1]
             tk[0] ^= (S[(tt >> 16) & 0xFF] & 0xFF) << 24 ^ \
                      (S[(tt >> 8) & 0xFF] & 0xFF) << 16 ^ \
-                     (S[tt & 0xFF] & 0xFF) <<  8 ^ \
+                     (S[tt & 0xFF] & 0xFF) << 8 ^ \
                      (S[(tt >> 24) & 0xFF] & 0xFF) ^ \
-                     (rcon[rconpointer]    & 0xFF) << 24
+                     (rcon[rconpointer] & 0xFF) << 24
             rconpointer += 1
             if KC != 8:
                 for i in range(1, KC):
@@ -285,9 +285,9 @@ class rijndael:
             for j in range(BC):
                 tt = Kd[r][j]
                 Kd[r][j] = U1[(tt >> 24) & 0xFF] ^ \
-                           U2[(tt >> 16) & 0xFF] ^ \
-                           U3[(tt >> 8) & 0xFF] ^ \
-                           U4[tt & 0xFF]
+                    U2[(tt >> 16) & 0xFF] ^ \
+                    U3[(tt >> 8) & 0xFF] ^ \
+                    U4[tt & 0xFF]
         self.Ke = Ke
         self.Kd = Kd
 
@@ -330,8 +330,8 @@ class rijndael:
             tt = Ke[ROUNDS][i]
             result.append((S[(t[i] >> 24) & 0xFF] ^ (tt >> 24)) & 0xFF)
             result.append((S[(t[(i + s1) % BC] >> 16) & 0xFF] ^ (tt >> 16)) & 0xFF)
-            result.append((S[(t[(i + s2) % BC] >>  8) & 0xFF] ^ (tt >> 8)) & 0xFF)
-            result.append((S[ t[(i + s3) % BC] & 0xFF] ^ tt) & 0xFF)
+            result.append((S[(t[(i + s2) % BC] >> 8) & 0xFF] ^ (tt >> 8)) & 0xFF)
+            result.append((S[t[(i + s3) % BC] & 0xFF] ^ tt) & 0xFF)
         return ''.join(list(map(chr, result)))
 
     def decrypt(self, ciphertext):
@@ -339,7 +339,7 @@ class rijndael:
             raise ValueError('wrong block length, expected ' + str(self.block_size) + ' got ' + str(len(ciphertext)))
         Kd = self.Kd
 
-        BC = int (self.block_size / 4)
+        BC = int(self.block_size / 4)
         ROUNDS = len(Kd) - 1
         if BC == 4:
             SC = 0
@@ -373,8 +373,8 @@ class rijndael:
             tt = Kd[ROUNDS][i]
             result.append((Si[(t[i] >> 24) & 0xFF] ^ (tt >> 24)) & 0xFF)
             result.append((Si[(t[(i + s1) % BC] >> 16) & 0xFF] ^ (tt >> 16)) & 0xFF)
-            result.append((Si[(t[(i + s2) % BC] >>  8) & 0xFF] ^ (tt >> 8)) & 0xFF)
-            result.append((Si[ t[(i + s3) % BC] & 0xFF] ^ tt) & 0xFF)
+            result.append((Si[(t[(i + s2) % BC] >> 8) & 0xFF] ^ (tt >> 8)) & 0xFF)
+            result.append((Si[t[(i + s3) % BC] & 0xFF] ^ tt) & 0xFF)
         return ''.join(map(chr, result))
 
 
@@ -384,32 +384,32 @@ def encryptFlashData(nonce, key, data, imageLen):
         for x in range(16 - (imageLen % 16)):
             data = data + bytes([255])
         imageLen = len(data)
-        
+
     r = rijndael(key, block_size=16)
-  
+
     for x in range(int(imageLen / 16)):
         # use nonce value to create encrypted chunk
-        encryptNonce = ''   
+        encryptNonce = ''
         for i in nonce:
             tempString = "%08x" % i
             y = 0
             while y < 8:
                 encryptNonce = encryptNonce + chr(int(tempString[y:y+2], 16))
-                y= y + 2 
+                y = y + 2
         encChunk = r.encrypt(encryptNonce)
 
         # increment the nonce value
-        if(nonce[3] == 0xffffffff):
+        if (nonce[3] == 0xffffffff):
             nonce[3] = 0
         else:
             nonce[3] += 1
-  
+
         # xor encypted junk with data chunk
-        chunk = data[x*16:(x+1)*16] # Read 16 byte chucks. 128 bits
+        chunk = data[x*16:(x+1)*16]  # Read 16 byte chucks. 128 bits
 
         lchunk = chunk
         lencChunk = list(map(ord, encChunk))
-   
+
         outputString = ''
         loutChunk = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for i in range(16):
@@ -421,15 +421,14 @@ def encryptFlashData(nonce, key, data, imageLen):
 
 def aParsePassKeyString(sPassKey):
     lstu32Passkey = [0, 0, 0, 0]
-    
+
     try:
         lstStrPassKey = sPassKey.split(",")
-        
+
     except:
         sPassKey = "0x00000000, 0x00000000, 0x00000000, 0x00000000"
         lstStrPassKey = sPassKey.split(",")
-        
-            
+
     if len(lstStrPassKey) == 4:
         for i in range(4):
             if "0x" in lstStrPassKey[i]:
@@ -438,7 +437,7 @@ def aParsePassKeyString(sPassKey):
                 lstu32Passkey[i] = int(lstStrPassKey[i], 10)
 
     logging.info(f"\t-key: {lstu32Passkey[0]}, {lstu32Passkey[1]}, {lstu32Passkey[2]}, {lstu32Passkey[3]}")
-    abEncryptKey = struct.pack(">LLLL",lstu32Passkey[0],
+    abEncryptKey = struct.pack(">LLLL", lstu32Passkey[0],
                                lstu32Passkey[1],
                                lstu32Passkey[2],
                                lstu32Passkey[3])
@@ -447,37 +446,39 @@ def aParsePassKeyString(sPassKey):
 
 def aParseNonce(sNonceValue):
     lstu32Nonce = [0, 0, 0, 0]
-    
+
     try:
         lstStrNonce = sNonceValue.split(",")
-        
+
     except:
         sNonceValue = "0x00000000, 0x00000000, 0x00000000, 0x00000000"
         lstStrNonce = self.sNonceValue.split(",")
-        
-            
+
     if len(lstStrNonce) == 4:
         for i in range(4):
             if "0x" in lstStrNonce[i]:
                 lstu32Nonce[i] = int(lstStrNonce[i], 16)
             else:
                 lstu32Nonce[i] = int(lstStrNonce[i], 10)
-                
+
     logging.info(f"Nonce : {lstu32Nonce[0]}, {lstu32Nonce[1]}, {lstu32Nonce[2]}, {lstu32Nonce[3]}")
-  
+
     return lstu32Nonce
+
 
 def encryptData(sSrcData, sPassKey, aPassIv):
 
     sKeyString = sPassKey.strip()
     assert len(sKeyString) == 32, 'the length of encryption key should be equal to 32'
-    sPassString = "0x" + sKeyString[:8]+ ',' + "0x" + sKeyString[8:16] + ',' + "0x" + sKeyString[16:24] + ',' + "0x" + sKeyString[24:32]
+    sPassString = "0x" + sKeyString[:8] + ',' + "0x" + sKeyString[8:16] + \
+        ',' + "0x" + sKeyString[16:24] + ',' + "0x" + sKeyString[24:32]
     aPassKey = aParsePassKeyString(sPassString)
-    
+
     sIvString = aPassIv.strip()
-    sPassString = "0x" + sIvString[:8] + ',' + "0x" + sIvString[8:16] + ',' + "0x" + sIvString[16:24] + ',' + "0x" + sIvString[24:32]
+    sPassString = "0x" + sIvString[:8] + ',' + "0x" + sIvString[8:16] + \
+        ',' + "0x" + sIvString[16:24] + ',' + "0x" + sIvString[24:32]
     aNonce = aParseNonce(sPassString)
-    
+
     logging.info("Started Encrypting with key[{}] ......".format(sPassKey))
 
     encryptedData = encryptFlashData(aNonce, aPassKey, sSrcData, len(sSrcData))
