@@ -61,7 +61,7 @@ MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAt
     VerifyOrDie(aAttributes.size() < UINT16_MAX);
 
     // Note: This only populates the parts of the ember structs that are currently needed for our tests.
-    for (auto && event : events)
+    for (const auto & event : events)
     {
         mEmberEventList.push_back(event.id);
     }
@@ -83,7 +83,7 @@ MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<Moc
     VerifyOrDie(aClusters.size() < UINT8_MAX);
 
     // Note: We're copying all the EmberAfClusters because they need to be contiguous in memory
-    for (auto && cluster : clusters)
+    for (const auto & cluster : clusters)
     {
         mEmberClusters.push_back(*cluster.emberCluster());
     }

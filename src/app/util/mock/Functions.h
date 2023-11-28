@@ -39,7 +39,7 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const ap
 void BumpVersion();
 DataVersion GetVersion();
 
-/// Configures the mock attribute storage to use the specified configuration.
+/// Configures the singular global mock attribute storage to use the specified configuration.
 void SetMockNodeConfig(const MockNodeConfig & config);
 
 /// Resets the mock attribute storage to the default configuration.
