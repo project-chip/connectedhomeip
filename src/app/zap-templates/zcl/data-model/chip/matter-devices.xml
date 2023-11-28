@@ -2284,10 +2284,6 @@ limitations under the License.
         <deviceId editable="false">0x0078</deviceId>
         <clusters lockOthers="true">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
-                <requireAttribute>SERVER_LIST</requireAttribute>
-                <requireAttribute>CLIENT_LIST</requireAttribute>
-                <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
