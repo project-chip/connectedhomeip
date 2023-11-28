@@ -333,7 +333,7 @@ public:
 
         if (mErrorCode != CdError::kNoError)
         {
-            ChipLogDetail(AppServer, "\terror code: %hu", mErrorCode);
+            ChipLogDetail(AppServer, "\terror code: %d", static_cast<uint16_t>(mErrorCode));
         }
 
         if (mNeedsPasscode)
