@@ -24,8 +24,15 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#define FABRIC_INDEX_TLV_SIZE 2
-#define FABRIC_INDEX_MAX 255
+namespace {
+// FabricIndex is uint8_t, the tlv size with anonumous tag is 1(control bytes) + 1(value) = 2
+constexpr size_t kFabricIndexTlvSize = 2;
+
+ // The array itself has a control byte and an end-of-array marker.
+constexpr size_t kArrayOverHead = 2;
+constexpr size_t kFabricIndexMax = 255;
+}
+
 namespace chip {
 namespace app {
 CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
@@ -41,8 +48,8 @@ CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
     mFabricList.push_back(fabricIndex);
 
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    size_t counter      = mFabricList.size() + 1;
-    size_t total = FABRIC_INDEX_TLV_SIZE * counter;
+    size_t counter      = mFabricList.size();
+    size_t total = kFabricIndexTlvSize * counter + kArrayOverHead;
     backingBuffer.Calloc(total);
     ReturnErrorCodeIf(backingBuffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
     TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), total);
@@ -66,7 +73,7 @@ CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
 CHIP_ERROR DefaultICDClientStorage::LoadFabricList()
 {
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    size_t len = FABRIC_INDEX_TLV_SIZE * FABRIC_INDEX_MAX;
+    size_t len = kFabricIndexTlvSize * kFabricIndexMax + kArrayOverHead;
     ReturnErrorCodeIf(!backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
     uint16_t length = static_cast<uint16_t>(len);
@@ -193,7 +200,7 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
 {
     size_t count      = 0;
     ReturnErrorOnFailure(LoadCounter(fabricIndex, count, clientInfoSize));
-    size_t len = clientInfoSize * count;
+    size_t len = clientInfoSize * count + kArrayOverHead;
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     ReturnErrorCodeIf(!backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -300,7 +307,7 @@ CHIP_ERROR DefaultICDClientStorage::StoreEntry(ICDClientInfo & clientInfo)
 
     clientInfoVector.push_back(clientInfo);
 
-    size_t total = clientInfoSize * clientInfoVector.size();
+    size_t total = clientInfoSize * clientInfoVector.size() + kArrayOverHead;
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     backingBuffer.Calloc(total);
     ReturnErrorCodeIf(backingBuffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
