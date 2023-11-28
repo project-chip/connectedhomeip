@@ -28,8 +28,8 @@ namespace {
 // Spec-defined constraints
 constexpr uint8_t kMaxRandomStartMinutes    = 60;
 constexpr uint8_t kMaxRandomDurationMinutes = 60;
-constexpr uint8_t kMaxDefaulRandomStart     = 60;
-constexpr uint8_t kMaxDefaulRandomDuration  = 60;
+constexpr uint8_t kMaxDefaultRandomStart    = 60;
+constexpr uint8_t kMaxDefaultRandomDuration = 60;
 constexpr uint16_t kMaxTransitionDuration   = 1440;
 constexpr int16_t kMinTemperature           = -27315;
 constexpr int8_t kMinLoadAdjustment         = -100;
@@ -142,14 +142,14 @@ template <bool ClearLoadControlEventsRequestSupported>
 CHIP_ERROR Instance<ClearLoadControlEventsRequestSupported>::Write(const ConcreteDataAttributePath & aPath,
                                                                    AttributeValueDecoder & aDecoder)
 {
-    VerifyOrDie(aPath.mClusterId == Thermostat::Id);
+    VerifyOrDie(aPath.mClusterId == DemandResponseLoadControl::Id);
 
     switch (aPath.mAttributeId)
     {
     case DefaultRandomStart::Id: {
         uint8_t newValue;
         ReturnErrorOnFailure(aDecoder.Decode(newValue));
-        if (newValue > kMaxDefaulRandomStart)
+        if (newValue > kMaxDefaultRandomStart)
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
@@ -166,7 +166,7 @@ CHIP_ERROR Instance<ClearLoadControlEventsRequestSupported>::Write(const Concret
     case DefaultRandomDuration::Id: {
         uint8_t newValue;
         ReturnErrorOnFailure(aDecoder.Decode(newValue));
-        if (newValue > kMaxDefaulRandomDuration)
+        if (newValue > kMaxDefaultRandomDuration)
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
@@ -538,7 +538,7 @@ LoadControlProgram::Init(const FixedByteSpan<kProgramIDSize> & aProgramID, const
 
     programID             = ByteSpan(mProgramIDBuffer);
     name                  = CharSpan(mNameBuffer, aName.size());
-    randomStartMinutes    = aRandomDurationMinutes;
+    randomStartMinutes    = aRandomStartMinutes;
     randomDurationMinutes = aRandomDurationMinutes;
     return CHIP_NO_ERROR;
 }
