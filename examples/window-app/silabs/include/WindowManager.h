@@ -116,7 +116,7 @@ public:
     void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId);
 
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
-    void UpdateLEDs();
+    void UpdateLED();
     void UpdateLCD();
 
     static void GeneralEventHandler(AppEvent * aEvent);
@@ -130,7 +130,6 @@ protected:
     static void OnLongPressTimeout(Timer & timer);
 
     Timer * mLongPressTimer = nullptr;
-    bool isWinking          = false;
     bool mTiltMode          = false;
     bool mUpPressed         = false;
     bool mDownPressed       = false;

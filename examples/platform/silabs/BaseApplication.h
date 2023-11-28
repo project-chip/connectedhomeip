@@ -71,6 +71,7 @@ public:
     BaseApplication() = default;
     virtual ~BaseApplication(){};
     static bool sIsProvisioned;
+    static bool mIsFactoryResetTriggered;
 
     /**
      * @brief Create AppTask task and Event Queue
@@ -106,6 +107,9 @@ public:
     static void StopStatusLEDTimer(void);
     static bool GetProvisionStatus(void);
 
+    static void StartFactoryResetSequence(void);
+    static void CancelFactoryResetSequence(void);
+
 #ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
     // Idenfiy server command callbacks.
     static void OnIdentifyStart(Identify * identify);
@@ -113,16 +117,6 @@ public:
     static void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState);
     static void OnTriggerIdentifyEffect(Identify * identify);
 #endif
-
-    enum Function_t
-    {
-        kFunction_NoneSelected   = 0,
-        kFunction_SoftwareUpdate = 0,
-        kFunction_StartBleAdv    = 1,
-        kFunction_FactoryReset   = 2,
-
-        kFunction_Invalid
-    } Function;
 
 protected:
     CHIP_ERROR Init();

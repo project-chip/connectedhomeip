@@ -126,7 +126,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     SILABS_LOG("App Task started");
 
-    WindowManager::sWindow.UpdateLEDs();
+    WindowManager::sWindow.UpdateLED();
     WindowManager::sWindow.UpdateLCD();
 
     while (true)
