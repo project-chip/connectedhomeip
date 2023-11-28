@@ -218,8 +218,9 @@ public:
      * aRequestCommandPath. This adds up until the `CommandFields` element within
      * `CommandDataIB`.
      *
-     * This call will fail if CommandHandler is already in the middle of building/sending
-     * InvokeResponseMessage.
+     * This call will fail if CommandHandler is already in the middle of building a
+     * CommandStatusIB or CommandDataID (ei something has called Perpare*, without
+     * calling Finish*), or is already sending InvokeResponseMessage.
      *
      * Upon success, the caller is expected to call `FinishCommand` once they have added
      * all Data into Fields element of CommandDataIB.
@@ -261,10 +262,11 @@ public:
 
     /**
      * This will add a new CommandStatusIB element into InvokeResponses. It will put the
-     * aCommandPath into CommandPath element within CommandStatusIB.
+     * aCommandPath into the CommandPath element within CommandStatusIB.
      *
-     * This call will fail if CommandHandler is already in the middle of building/sending
-     * InvokeResponseMessage.
+     * This call will fail if CommandHandler is already in the middle of building a
+     * CommandStatusIB or CommandDataID (ei something has called Perpare*, without
+     * calling Finish*), or is already sending InvokeResponseMessage.
      *
      * Upon success, the caller is expected to call `FinishStatus` once they have added
      * data into Fields element of CommandStatusIB.
@@ -520,6 +522,7 @@ private:
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     TLV::TLVWriter mBackupWriter;
     size_t mMaxPathsPerInvoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
+    // TODO(#30453): See if we can reduce this size for the default cases
     // TODO Allow flexibility in registration.
     BasicCommandPathRegistry<CHIP_CONFIG_MAX_PATHS_PER_INVOKE> mBasicCommandPathRegistry;
     CommandPathRegistry * mCommandPathRegistry = &mBasicCommandPathRegistry;

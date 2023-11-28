@@ -82,7 +82,7 @@ public:
 
     CHIP_ERROR Add(const ConcreteCommandPath & requestPath, const Optional<uint16_t> & ref) override
     {
-        if (mCount > N)
+        if (mCount >= N)
         {
             return CHIP_ERROR_NO_MEMORY;
         }

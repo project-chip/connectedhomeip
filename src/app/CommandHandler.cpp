@@ -111,7 +111,7 @@ CHIP_ERROR CommandHandler::ValidateInvokeRequestsAndBuildRegistry(TLV::TLVReader
     size_t commandCount     = 0;
     bool commandRefExpected = false;
 
-    TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */);
+    ReturnErrorOnFailure(TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */));
 
     // If this is a GroupRequest the only thing to check is that there is only one
     // CommandDataIB.
@@ -135,14 +135,14 @@ CHIP_ERROR CommandHandler::ValidateInvokeRequestsAndBuildRegistry(TLV::TLVReader
         CommandDataIB::Parser commandData;
         ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
 
-        // First validating that we can get a ConcreteCommandPath.
+        // First validate that we can get a ConcreteCommandPath.
         CommandPathIB::Parser commandPath;
         ConcreteCommandPath concretePath(0, 0, 0);
         ReturnErrorOnFailure(commandData.GetPath(&commandPath));
         ReturnErrorOnFailure(commandPath.GetConcreteCommandPath(concretePath));
 
-        // Following section is to grab the CommandRef if avaiable and perform
-        // any validation on it if we expect there to be a CommandRef
+        // Grab the CommandRef if there is one, and validate that it's there when it
+        // has to be.
         Optional<uint16_t> commandRef;
         uint16_t ref;
         err = commandData.GetRef(&ref);
@@ -153,11 +153,11 @@ CHIP_ERROR CommandHandler::ValidateInvokeRequestsAndBuildRegistry(TLV::TLVReader
         }
         if (err == CHIP_NO_ERROR)
         {
-            commandRef = MakeOptional(ref);
+            commandRef.SetValue(ref);
         }
 
         // Adding can fail if concretePath is not unique, or if commandRef is a value
-        // and is not unique, or if we have already added more paths then we support.
+        // and is not unique, or if we have already added more paths than we support.
         ReturnErrorOnFailure(GetCommandPathRegistry().Add(concretePath, commandRef));
     }
 
@@ -173,7 +173,6 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
-    TLV::TLVReader invokeRequestsReader;
     InvokeRequestMessage::Parser invokeRequestMessage;
     InvokeRequests::Parser invokeRequests;
     reader.Init(std::move(payload));
@@ -190,10 +189,15 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::UnsupportedAccess);
-    invokeRequests.GetReader(&invokeRequestsReader);
 
-    VerifyOrReturnError(ValidateInvokeRequestsAndBuildRegistry(invokeRequestsReader) == CHIP_NO_ERROR, Status::InvalidAction);
-    // Reset the reader after validation, so that we can iterate the commands to actually process them.
+    {
+        TLV::TLVReader validationInvokeRequestsReader;
+        invokeRequests.GetReader(&validationInvokeRequestsReader);
+        VerifyOrReturnError(ValidateInvokeRequestsAndBuildRegistry(validationInvokeRequestsReader) == CHIP_NO_ERROR,
+                            Status::InvalidAction);
+    }
+
+    TLV::TLVReader invokeRequestsReader;
     invokeRequests.GetReader(&invokeRequestsReader);
 
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
@@ -592,7 +596,6 @@ CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aResponseC
                        "Seemingly device supports batch commands, but is calling the deprecated PrepareCommand API");
 
     auto commandPathRegistryEntry = GetCommandPathRegistry().GetFirstEntry();
-    VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
     VerifyOrReturnValue(commandPathRegistryEntry.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
     return PrepareInvokeResponseCommand(commandPathRegistryEntry.Value(), aResponseCommandPath, aStartDataStruct);

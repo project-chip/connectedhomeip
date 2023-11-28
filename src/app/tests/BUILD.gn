@@ -133,6 +133,7 @@ chip_test_suite_using_nltest("tests") {
     "TestClusterInfo.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
+    "TestBasicCommandPathRegistry.cpp",
     "TestDataModelSerialization.cpp",
     "TestDefaultOTARequestorStorage.cpp",
     "TestEventLoggingNoUTCTime.cpp",
