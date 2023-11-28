@@ -232,7 +232,7 @@ public:
 
     static StorageKeyName FabricICDClientInfoCounter(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/icdc", fabric); }
 
-    static StorageKeyName ICDClientInfoKey(FabricIndex fabric) { return StorageKeyName::Formatted("g/%x/icdk", fabric); }
+    static StorageKeyName ICDClientInfoKey(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/icdk", fabric); }
 
     static StorageKeyName ICDFabricList() { return StorageKeyName::FromConst("g/icdfl"); }
 };

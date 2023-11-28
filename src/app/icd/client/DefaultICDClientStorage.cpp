@@ -259,7 +259,7 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
 
         // Shared key
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kSharedKey)));
-        ByteSpan buf(clientInfo.mSharedKey.AsMutable<Crypto::Aes128KeyByteArray>());
+        ByteSpan buf;
         ReturnErrorOnFailure(reader.Get(buf));
         VerifyOrReturnError(buf.size() == sizeof(Crypto::Aes128KeyByteArray), CHIP_ERROR_INTERNAL);
         memcpy(clientInfo.mSharedKey.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
