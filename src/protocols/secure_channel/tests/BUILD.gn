@@ -39,6 +39,6 @@ chip_test_suite_using_nltest("tests") {
   cflags = [ "-Wconversion" ]
 
   if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd:data" ]
+    public_deps += [ "${chip_root}/src/app/icd:configuration-data" ]
   }
 }

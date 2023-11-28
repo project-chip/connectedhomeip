@@ -64,7 +64,7 @@ source_set("manager") {
   deps = [ ":icd_config" ]
 
   public_deps = [
-    ":data",
+    ":configuration-data",
     ":monitoring-table",
     ":notifier",
     ":observer",
@@ -102,7 +102,7 @@ source_set("monitoring-table") {
   ]
 }
 
-source_set("data") {
+source_set("configuration-data") {
   sources = [
     "ICDConfigurationData.cpp",
     "ICDConfigurationData.h",

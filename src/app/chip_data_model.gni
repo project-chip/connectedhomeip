@@ -298,7 +298,7 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.h",
         ]
         deps += [
-          "${chip_root}/src/app/icd:data",
+          "${chip_root}/src/app/icd:configuration-data",
           "${chip_root}/src/app/icd:icd_config",
           "${chip_root}/src/app/icd:monitoring-table",
           "${chip_root}/src/app/icd:notifier",
