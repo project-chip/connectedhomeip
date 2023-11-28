@@ -122,23 +122,23 @@ limitations under the License.
       <description>LocalTemperatureCalibration</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0011" define="OCCUPIED_COOLING_SETPOINT" type="temperature" min="0x954D" max="0x7FFF" writable="true" optional="true">OccupiedCoolingSetpoint</attribute>
-    <attribute side="server" code="0x0012" define="OCCUPIED_HEATING_SETPOINT" type="temperature" min="0x954D" max="0x7FFF" writable="true" optional="true">OccupiedHeatingSetpoint</attribute>
-    <attribute side="server" code="0x0013" define="UNOCCUPIED_COOLING_SETPOINT" type="temperature" min="0x954D" max="0x7FFF" writable="true" optional="true">UnoccupiedCoolingSetpoint</attribute>
-    <attribute side="server" code="0x0014" define="UNOCCUPIED_HEATING_SETPOINT" type="temperature" min="0x954D" max="0x7FFF" writable="true" optional="true">UnoccupiedHeatingSetpoint</attribute>
-    <attribute side="server" code="0x0015" define="MIN_HEAT_SETPOINT_LIMIT" type="temperature" min="0x954D" max="0x7FFF" writable="true" optional="true">
+    <attribute side="server" code="0x0011" define="OCCUPIED_COOLING_SETPOINT" type="temperature" min="-27315" max="0x7FFF" writable="true" optional="true">OccupiedCoolingSetpoint</attribute>
+    <attribute side="server" code="0x0012" define="OCCUPIED_HEATING_SETPOINT" type="temperature" min="-27315" max="0x7FFF" writable="true" optional="true">OccupiedHeatingSetpoint</attribute>
+    <attribute side="server" code="0x0013" define="UNOCCUPIED_COOLING_SETPOINT" type="temperature" min="-27315" max="0x7FFF" writable="true" optional="true">UnoccupiedCoolingSetpoint</attribute>
+    <attribute side="server" code="0x0014" define="UNOCCUPIED_HEATING_SETPOINT" type="temperature" min="-27315" max="0x7FFF" writable="true" optional="true">UnoccupiedHeatingSetpoint</attribute>
+    <attribute side="server" code="0x0015" define="MIN_HEAT_SETPOINT_LIMIT" type="temperature" min="-27315" max="0x7FFF" writable="true" optional="true">
       <description>MinHeatSetpointLimit</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0016" define="MAX_HEAT_SETPOINT_LIMIT" type="temperature" min="0x954D" max="0x7FFF" writable="true" optional="true">
+    <attribute side="server" code="0x0016" define="MAX_HEAT_SETPOINT_LIMIT" type="temperature" min="-27315" max="0x7FFF" writable="true" optional="true">
       <description>MaxHeatSetpointLimit</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0017" define="MIN_COOL_SETPOINT_LIMIT" type="temperature" min="0x954D" max="0x7FFF" writable="true" optional="true">
+    <attribute side="server" code="0x0017" define="MIN_COOL_SETPOINT_LIMIT" type="temperature" min="-27315" max="0x7FFF" writable="true" optional="true">
       <description>MinCoolSetpointLimit</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0018" define="MAX_COOL_SETPOINT_LIMIT" type="temperature" min="0x954D" max="0x7FFF" writable="true" optional="true">
+    <attribute side="server" code="0x0018" define="MAX_COOL_SETPOINT_LIMIT" type="temperature" min="-27315" max="0x7FFF" writable="true" optional="true">
       <description>MaxCoolSetpointLimit</description>
       <access op="write" privilege="manage"/>
     </attribute>
