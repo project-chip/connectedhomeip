@@ -969,12 +969,12 @@ void ParseInvokeResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aR
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     bool suppressResponse = false;
-    err = invokeResponseMessageParser.GetSuppressResponse(&suppressResponse);
+    err                   = invokeResponseMessageParser.GetSuppressResponse(&suppressResponse);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, suppressResponse == true);
 
     bool moreChunkedMessages = true;
-    err = invokeResponseMessageParser.GetMoreChunkedMessages(&suppressResponse);
+    err                      = invokeResponseMessageParser.GetMoreChunkedMessages(&suppressResponse);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, moreChunkedMessages == true);
 
