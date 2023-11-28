@@ -73,7 +73,7 @@ public:
     void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
     bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
     bool SupportsFeature(Clusters::IcdManagement::Feature feature);
-    ICDConfigurationData::ICDMode GetICDMode() { return mICDConfigurationData->GetICDMode(); };
+    ICDConfigurationData::ICDMode GetICDMode() { return ICDConfigurationData::GetInstance().GetICDMode(); };
     /**
      * @brief Adds the referenced observer in parameters to the mStateObserverPool
      * A maximum of CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE observers can be concurrently registered
@@ -131,7 +131,6 @@ private:
     PersistentStorageDelegate * mStorage           = nullptr;
     FabricTable * mFabricTable                     = nullptr;
     Messaging::ExchangeManager * mExchangeManager  = nullptr;
-    ICDConfigurationData * mICDConfigurationData   = nullptr;
     bool mTransitionToIdleCalled                   = false;
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;

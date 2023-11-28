@@ -271,6 +271,13 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     app::DnssdServer::Instance().SetUnsecuredPort(mUserDirectedCommissioningPort);
     app::DnssdServer::Instance().SetInterfaceId(mInterfaceId);
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // We set the ICDManager reference betfore calling the ICDManager init due to the init ordering limitations.
+    // DnssdServer will use the default value initially and will update advertisement once ICDManager
+    // init is called.
+    app::DnssdServer::Instance().SetICDManager(&mICDManager);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     if (GetFabricTable().FabricCount() != 0)
     {
         // The device is already commissioned, proactively disable BLE advertisement.
@@ -321,14 +328,14 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     // ICD Init needs to be after data model init and InteractionModel Init
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr);
 
-    // Register the ICDStateObservers. All observers are released at mICDManager.Shutdown()
-    // They can be released individually with ReleaseObserver
+    // Register the ICDStateObservers.
+    // Call register before init so that observers are notified of any state change during the init.
+    // All observers are released at mICDManager.Shutdown(). They can be released individually with ReleaseObserver
     mICDManager.RegisterObserver(mReportScheduler);
     mICDManager.RegisterObserver(&app::DnssdServer::Instance());
 
-    app::DnssdServer::Instance().SetICDManager(&mICDManager);
+    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // This code is necessary to restart listening to existing groups after a reboot
