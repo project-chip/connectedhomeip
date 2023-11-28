@@ -273,7 +273,7 @@ public:
                                 case 4: runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kHeat; break;
                                 default: runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kUnknownEnumValue; break;
                             }
-                            app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, static_cast<uint8_t>(runningModeEnum));
+                            app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, runningModeEnum);
                         }
                         else
                         {
@@ -293,12 +293,12 @@ public:
                 app::Clusters::Thermostat::Attributes::SystemMode::Get(1, &systemMode);
                 if (systemMode != chip::app::Clusters::Thermostat::ThermostatSystemModeEnum::kAuto)
                 {
-                    ESP_LOGI(TAG, "Running mode can be changed only for system mode auto. Current system mode %d", systemMode);
+                    ESP_LOGI(TAG, "Running mode can be changed only for system mode auto. Current system mode %d", static_cast<int>(systemMode));
                 }
                 else
                 {
                     uint8_t mode = n;
-                    chip::app::Clusters::Thermostat::ThermostatRunningModeEnum modeEnum = ThermostatRunningModeEnum::kUnknownEnumValue;
+                    chip::app::Clusters::Thermostat::ThermostatRunningModeEnum modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kUnknownEnumValue;
                     // update the running mode here for hardcoded endpoint 1
                     if (isValidThermostatRunningMode(mode))
                     {
