@@ -74,8 +74,8 @@ CHIP_ERROR DefaultICDClientStorage::LoadFabricList()
 {
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     size_t len = kFabricIndexTlvSize * kFabricIndexMax + kArrayOverHead;
-    ReturnErrorCodeIf(!backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(!backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
     uint16_t length = static_cast<uint16_t>(len);
     ReturnErrorOnFailure(
         mpClientInfoStore->SyncGetKeyValue(DefaultStorageKeyAllocator::ICDFabricList().KeyName(), backingBuffer.Get(), length));
@@ -175,8 +175,8 @@ CHIP_ERROR DefaultICDClientStorage::LoadCounter(FabricIndex fabricIndex, size_t 
 {
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     size_t len = MaxICDCounterSize();
-    ReturnErrorCodeIf(!backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(!backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
     uint16_t length = static_cast<uint16_t>(len);
 
     CHIP_ERROR err = mpClientInfoStore->SyncGetKeyValue(
@@ -212,8 +212,8 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
     ReturnErrorOnFailure(LoadCounter(fabricIndex, count, clientInfoSize));
     size_t len = clientInfoSize * count + kArrayOverHead;
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    ReturnErrorCodeIf(!backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(!backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
     uint16_t length = static_cast<uint16_t>(len);
     CHIP_ERROR err  = mpClientInfoStore->SyncGetKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricIndex).KeyName(),
                                                          backingBuffer.Get(), length);
