@@ -455,7 +455,7 @@ void TestUDCCommissionerDeclaration(nlTestSuite * inSuite, void * inContext)
     CommissionerDeclaration id;
     CommissionerDeclaration idOut;
 
-    CommissionerDeclaration::CdError errorCode = CommissionerDeclaration::kCaseConnectionFailed;
+    CommissionerDeclaration::CdError errorCode = CommissionerDeclaration::CdError::kCaseConnectionFailed;
 
     id.SetErrorCode(errorCode);
     id.SetNeedsPasscode(true);

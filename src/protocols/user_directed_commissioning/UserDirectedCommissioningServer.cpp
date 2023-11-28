@@ -88,27 +88,7 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
             client->SetUDCClientProcessingState(UDCClientProcessingState::kPromptingUser);
             client->SetPeerAddress(source);
 
-            client->SetDeviceName(id.GetDeviceName());
-            client->SetVendorId(id.GetVendorId());
-            client->SetProductId(id.GetProductId());
-            client->SetRotatingId(id.GetRotatingId(), id.GetRotatingIdLength());
-            client->SetPairingInst(id.GetPairingInst());
-            client->SetPairingHint(id.GetPairingHint());
-            for (size_t i = 0; i < id.GetNumAppVendorIds(); i++)
-            {
-                uint16_t vid;
-                if (id.GetAppVendorId(i, vid))
-                {
-                    client->AddAppVendorId(vid);
-                }
-            }
-
-            client->SetCdPort(id.GetCdPort());
-            client->SetNoPasscode(id.GetNoPasscode());
-            client->SetCdUponPasscodeDialog(id.GetCdUponPasscodeDialog());
-            client->SetCommissionerPasscode(id.GetCommissionerPasscode());
-            client->SetCommissionerPasscodeReady(id.GetCommissionerPasscodeReady());
-            client->SetCancelPasscode(id.GetCancelPasscode());
+            id.UpdateClientState(client);
 
             // TEST: send reply
             if (id.GetCdPort() != 0)

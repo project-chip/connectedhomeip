@@ -159,6 +159,34 @@ public:
      */
     CHIP_ERROR ReadPayload(uint8_t * payloadBuffer, size_t payloadBufferSize);
 
+    /**
+     *  Assigns fields from this Identification Declaration to the given UDC client state.
+     */
+    void UpdateClientState(UDCClientState * client)
+    {
+        client->SetDeviceName(GetDeviceName());
+        client->SetVendorId(GetVendorId());
+        client->SetProductId(GetProductId());
+        client->SetRotatingId(GetRotatingId(), GetRotatingIdLength());
+        client->SetPairingInst(GetPairingInst());
+        client->SetPairingHint(GetPairingHint());
+        for (size_t i = 0; i < GetNumAppVendorIds(); i++)
+        {
+            uint16_t vid;
+            if (GetAppVendorId(i, vid))
+            {
+                client->AddAppVendorId(vid);
+            }
+        }
+
+        client->SetCdPort(GetCdPort());
+        client->SetNoPasscode(GetNoPasscode());
+        client->SetCdUponPasscodeDialog(GetCdUponPasscodeDialog());
+        client->SetCommissionerPasscode(GetCommissionerPasscode());
+        client->SetCommissionerPasscodeReady(GetCommissionerPasscodeReady());
+        client->SetCancelPasscode(GetCancelPasscode());
+    }
+
     void DebugLog()
     {
         ChipLogDetail(AppServer, "---- Identification Declaration Start ----");
