@@ -3799,6 +3799,143 @@ public static class IcdManagementClusterMonitoringRegistrationStruct {
     return output.toString();
   }
 }
+public static class OvenCavityOperationalStateClusterErrorStateStruct {
+  public Integer errorStateID;
+  public Optional<String> errorStateLabel;
+  public Optional<String> errorStateDetails;
+  private static final long ERROR_STATE_I_D_ID = 0L;
+  private static final long ERROR_STATE_LABEL_ID = 1L;
+  private static final long ERROR_STATE_DETAILS_ID = 2L;
+
+  public OvenCavityOperationalStateClusterErrorStateStruct(
+    Integer errorStateID,
+    Optional<String> errorStateLabel,
+    Optional<String> errorStateDetails
+  ) {
+    this.errorStateID = errorStateID;
+    this.errorStateLabel = errorStateLabel;
+    this.errorStateDetails = errorStateDetails;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ERROR_STATE_I_D_ID, new UIntType(errorStateID)));
+    values.add(new StructElement(ERROR_STATE_LABEL_ID, errorStateLabel.<BaseTLVType>map((nonOptionalerrorStateLabel) -> new StringType(nonOptionalerrorStateLabel)).orElse(new EmptyType())));
+    values.add(new StructElement(ERROR_STATE_DETAILS_ID, errorStateDetails.<BaseTLVType>map((nonOptionalerrorStateDetails) -> new StringType(nonOptionalerrorStateDetails)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static OvenCavityOperationalStateClusterErrorStateStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer errorStateID = null;
+    Optional<String> errorStateLabel = Optional.empty();
+    Optional<String> errorStateDetails = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ERROR_STATE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          errorStateID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ERROR_STATE_LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          errorStateLabel = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == ERROR_STATE_DETAILS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          errorStateDetails = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new OvenCavityOperationalStateClusterErrorStateStruct(
+      errorStateID,
+      errorStateLabel,
+      errorStateDetails
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OvenCavityOperationalStateClusterErrorStateStruct {\n");
+    output.append("\terrorStateID: ");
+    output.append(errorStateID);
+    output.append("\n");
+    output.append("\terrorStateLabel: ");
+    output.append(errorStateLabel);
+    output.append("\n");
+    output.append("\terrorStateDetails: ");
+    output.append(errorStateDetails);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class OvenCavityOperationalStateClusterOperationalStateStruct {
+  public Integer operationalStateID;
+  public Optional<String> operationalStateLabel;
+  private static final long OPERATIONAL_STATE_I_D_ID = 0L;
+  private static final long OPERATIONAL_STATE_LABEL_ID = 1L;
+
+  public OvenCavityOperationalStateClusterOperationalStateStruct(
+    Integer operationalStateID,
+    Optional<String> operationalStateLabel
+  ) {
+    this.operationalStateID = operationalStateID;
+    this.operationalStateLabel = operationalStateLabel;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(OPERATIONAL_STATE_I_D_ID, new UIntType(operationalStateID)));
+    values.add(new StructElement(OPERATIONAL_STATE_LABEL_ID, operationalStateLabel.<BaseTLVType>map((nonOptionaloperationalStateLabel) -> new StringType(nonOptionaloperationalStateLabel)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static OvenCavityOperationalStateClusterOperationalStateStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer operationalStateID = null;
+    Optional<String> operationalStateLabel = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == OPERATIONAL_STATE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          operationalStateID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == OPERATIONAL_STATE_LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          operationalStateLabel = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new OvenCavityOperationalStateClusterOperationalStateStruct(
+      operationalStateID,
+      operationalStateLabel
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OvenCavityOperationalStateClusterOperationalStateStruct {\n");
+    output.append("\toperationalStateID: ");
+    output.append(operationalStateID);
+    output.append("\n");
+    output.append("\toperationalStateLabel: ");
+    output.append(operationalStateLabel);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class OvenModeClusterModeTagStruct {
   public Optional<Integer> mfgCode;
   public Integer value;
@@ -6770,6 +6907,82 @@ public static class DeviceEnergyManagementClusterSlotAdjustmentStruct {
     output.append("\n");
     output.append("\tduration: ");
     output.append(duration);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class EnergyEvseClusterChargingTargetStruct {
+  public Integer targetTime;
+  public Optional<Integer> targetSoC;
+  public Optional<Long> addedEnergy;
+  private static final long TARGET_TIME_ID = 0L;
+  private static final long TARGET_SO_C_ID = 1L;
+  private static final long ADDED_ENERGY_ID = 2L;
+
+  public EnergyEvseClusterChargingTargetStruct(
+    Integer targetTime,
+    Optional<Integer> targetSoC,
+    Optional<Long> addedEnergy
+  ) {
+    this.targetTime = targetTime;
+    this.targetSoC = targetSoC;
+    this.addedEnergy = addedEnergy;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(TARGET_TIME_ID, new UIntType(targetTime)));
+    values.add(new StructElement(TARGET_SO_C_ID, targetSoC.<BaseTLVType>map((nonOptionaltargetSoC) -> new UIntType(nonOptionaltargetSoC)).orElse(new EmptyType())));
+    values.add(new StructElement(ADDED_ENERGY_ID, addedEnergy.<BaseTLVType>map((nonOptionaladdedEnergy) -> new IntType(nonOptionaladdedEnergy)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static EnergyEvseClusterChargingTargetStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer targetTime = null;
+    Optional<Integer> targetSoC = Optional.empty();
+    Optional<Long> addedEnergy = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == TARGET_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          targetTime = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TARGET_SO_C_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          targetSoC = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == ADDED_ENERGY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          addedEnergy = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new EnergyEvseClusterChargingTargetStruct(
+      targetTime,
+      targetSoC,
+      addedEnergy
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EnergyEvseClusterChargingTargetStruct {\n");
+    output.append("\ttargetTime: ");
+    output.append(targetTime);
+    output.append("\n");
+    output.append("\ttargetSoC: ");
+    output.append(targetSoC);
+    output.append("\n");
+    output.append("\taddedEnergy: ");
+    output.append(addedEnergy);
     output.append("\n");
     output.append("}\n");
     return output.toString();

@@ -1201,6 +1201,35 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Timer::TimerStatusEnum 
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenCavityOperationalState::ErrorStateEnum val)
+{
+    using EnumType = OvenCavityOperationalState::ErrorStateEnum;
+    switch (val)
+    {
+    case EnumType::kNoError:
+    case EnumType::kUnableToStartOrResume:
+    case EnumType::kUnableToCompleteOperation:
+    case EnumType::kCommandInvalidInState:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenCavityOperationalState::OperationalStateEnum val)
+{
+    using EnumType = OvenCavityOperationalState::OperationalStateEnum;
+    switch (val)
+    {
+    case EnumType::kStopped:
+    case EnumType::kRunning:
+    case EnumType::kPaused:
+    case EnumType::kError:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(OvenMode::ModeTag val)
 {
     using EnumType = OvenMode::ModeTag;
@@ -1640,6 +1669,79 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement:
         return val;
     default:
         return static_cast<EnumType>(14);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::EnergyTransferStoppedReasonEnum val)
+{
+    using EnumType = EnergyEvse::EnergyTransferStoppedReasonEnum;
+    switch (val)
+    {
+    case EnumType::kEVStopped:
+    case EnumType::kEVSEStopped:
+    case EnumType::kOther:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::FaultStateEnum val)
+{
+    using EnumType = EnergyEvse::FaultStateEnum;
+    switch (val)
+    {
+    case EnumType::kNoError:
+    case EnumType::kMeterFailure:
+    case EnumType::kOverVoltage:
+    case EnumType::kUnderVoltage:
+    case EnumType::kOverCurrent:
+    case EnumType::kContactWetFailure:
+    case EnumType::kContactDryFailure:
+    case EnumType::kGroundFault:
+    case EnumType::kPowerLoss:
+    case EnumType::kPowerQuality:
+    case EnumType::kPilotShortCircuit:
+    case EnumType::kEmergencyStop:
+    case EnumType::kEVDisconnected:
+    case EnumType::kWrongPowerSupply:
+    case EnumType::kLiveNeutralSwap:
+    case EnumType::kOverTemperature:
+    case EnumType::kOther:
+        return val;
+    default:
+        return static_cast<EnumType>(16);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::StateEnum val)
+{
+    using EnumType = EnergyEvse::StateEnum;
+    switch (val)
+    {
+    case EnumType::kNotPluggedIn:
+    case EnumType::kPluggedInNoDemand:
+    case EnumType::kPluggedInDemand:
+    case EnumType::kPluggedInCharging:
+    case EnumType::kPluggedInDischarging:
+    case EnumType::kSessionEnding:
+    case EnumType::kFault:
+        return val;
+    default:
+        return static_cast<EnumType>(7);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::SupplyStateEnum val)
+{
+    using EnumType = EnergyEvse::SupplyStateEnum;
+    switch (val)
+    {
+    case EnumType::kDisabled:
+    case EnumType::kChargingEnabled:
+    case EnumType::kDischargingEnabled:
+    case EnumType::kDisabledError:
+    case EnumType::kDisabledDiagnostics:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
     }
 }
 

@@ -29,6 +29,7 @@
    <xi:include href="chip/microwave-oven-mode-cluster.xml" />
    <xi:include href="chip/microwave-oven-control-cluster.xml" />
    <xi:include href="chip/door-lock-cluster.xml" />
+   <xi:include href="chip/energy-evse-cluster.xml" />
    <xi:include href="chip/ethernet-network-diagnostics-cluster.xml" />
    <xi:include href="chip/fan-control-cluster.xml" />
    <xi:include href="chip/fault-injection-cluster.xml" />
@@ -57,6 +58,7 @@
    <xi:include href="chip/onoff-cluster.xml" />
    <xi:include href="chip/operational-credentials-cluster.xml" />
    <xi:include href="chip/operational-state-cluster.xml" />
+   <xi:include href="chip/operational-state-oven-cluster.xml" />
    <xi:include href="chip/operational-state-rvc-cluster.xml" />
    <xi:include href="chip/oven-mode-cluster.xml" />
    <xi:include href="chip/pressure-measurement-cluster.xml" />

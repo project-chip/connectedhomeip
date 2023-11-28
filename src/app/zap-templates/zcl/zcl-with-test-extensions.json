@@ -44,6 +44,7 @@
         "microwave-oven-control-cluster.xml",
         "door-lock-cluster.xml",
         "electrical-measurement-cluster.xml",
+        "energy-evse-cluster.xml",
         "ethernet-network-diagnostics-cluster.xml",
         "fan-control-cluster.xml",
         "fault-injection-cluster.xml",
@@ -75,6 +76,7 @@
         "onoff-switch-configuration-cluster.xml",
         "operational-credentials-cluster.xml",
         "operational-state-cluster.xml",
+        "operational-state-oven-cluster.xml",
         "operational-state-rvc-cluster.xml",
         "oven-mode-cluster.xml",
         "pressure-measurement-cluster.xml",
@@ -368,6 +370,12 @@
             "CountdownTime"
         ],
         "RVC Operational State": [
+            "OperationalState",
+            "OperationalError",
+            "CurrentPhase",
+            "CountdownTime"
+        ],
+        "Oven Cavity Operational State": [
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
