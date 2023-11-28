@@ -37,6 +37,15 @@ enum class TestEnum : uint16_t
     kBits_High8 = 0xFF00,
 };
 
+enum class TestEnum_short : uint8_t
+{
+    kZero = 0x0000, // not a valid mask or bit flag, here anyway
+
+    kBit_0 = 0x01,
+    kBit_1 = 0x02,
+    kBit_2 = 0x04,
+};
+
 void TestBitMaskOperations(nlTestSuite * inSuite, void * inContext)
 {
     BitMask<TestEnum> mask;
@@ -98,10 +107,26 @@ void TestBitMaskInvalid(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mask.Raw() == 0x1234);
 }
 
+void TestClear(nlTestSuite * inSuite, void * inContext)
+{
+    BitMask<TestEnum_short> mask1;
+    BitMask<TestEnum_short> mask2;
+
+    mask1.Set(TestEnum_short::kBit_0);
+    mask1.Set(TestEnum_short::kBit_1);
+    mask1.Set(TestEnum_short::kBit_2);
+
+    mask2.Set(TestEnum_short::kBit_2);
+    mask1.Clear(mask2);
+
+    NL_TEST_ASSERT(inSuite, mask1.Raw() == 0x03);
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("BitMask operations", TestBitMaskOperations), //
     NL_TEST_DEF("BitFields logic", TestBitFieldLogic),        //
     NL_TEST_DEF("Invalid operations", TestBitMaskInvalid),    //
+    NL_TEST_DEF("Tests Clear operation", TestClear),          //
     NL_TEST_SENTINEL()                                        //
 };
 
