@@ -24,6 +24,9 @@
 #ifndef CHIPPROJECTCONFIG_H
 #define CHIPPROJECTCONFIG_H
 
+// TODO Cleanup this file, as most of it is irrelevant
+// Issue #30616
+
 #define CHIP_CONFIG_EVENT_LOGGING_NUM_EXTERNAL_CALLBACKS 2
 
 // Uncomment this for a large Tunnel MTU.

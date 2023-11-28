@@ -318,7 +318,7 @@ void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<Fabric
 }
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
-bool InteractionModelEngine::IsSubjectSubscriptionActive(const FabricIndex & aFabricIndex, const NodeId & subjectID)
+bool InteractionModelEngine::SubjectHasActiveSubscription(const FabricIndex aFabricIndex, const NodeId & subjectID)
 {
     bool isActive = false;
     mReadHandlers.ForEachActiveObject([aFabricIndex, subjectID, &isActive](ReadHandler * handler) {
@@ -338,7 +338,14 @@ bool InteractionModelEngine::IsSubjectSubscriptionActive(const FabricIndex & aFa
             if (subject.cats.CheckSubjectAgainstCATs(subjectID) || subjectID == subject.subject)
             {
                 isActive = handler->IsActiveSubscription();
-                return Loop::Break;
+
+                // Exit loop only if isActive is set to true
+                // Otherwise keep looking for another subscription that could
+                // match the subject
+                if (isActive)
+                {
+                    return Loop::Break;
+                }
             }
         }
 

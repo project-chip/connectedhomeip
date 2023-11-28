@@ -135,11 +135,12 @@ void ICDManager::SendCheckInMsgs()
             if (err != CHIP_NO_ERROR)
             {
                 // Try to fetch the next entry upon failure (should not happen).
-                ChipLogError(AppServer, "Failed to retrieved ICDMonitoring entry for Check-In msg, will try next entry.") continue;
+                ChipLogError(AppServer, "Failed to retrieved ICDMonitoring entry for Check-In msg, will try next entry.");
+                continue;
             }
 
             bool active =
-                InteractionModelEngine::GetInstance()->IsSubjectSubscriptionActive(entry.fabricIndex, entry.monitoredSubject);
+                InteractionModelEngine::GetInstance()->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject);
             if (active)
             {
                 continue;

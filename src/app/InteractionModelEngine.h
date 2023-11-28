@@ -306,8 +306,8 @@ public:
 
     CHIP_ERROR ResumeSubscriptions();
 
-    // Return the state of a subscription for a given subject (CAT or NodeId)
-    bool IsSubjectSubscriptionActive(const FabricIndex & aFabricIndex, const NodeId & subject);
+    // Check if a given subject (CAT or NodeId) has at least 1 active subscription
+    bool SubjectHasActiveSubscription(const FabricIndex aFabricIndex, const NodeId & subject);
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //

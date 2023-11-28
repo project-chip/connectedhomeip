@@ -24,6 +24,9 @@
 #ifndef SYSTEMPROJECTCONFIG_H
 #define SYSTEMPROJECTCONFIG_H
 
+// TODO Cleanup this file, as most of it is irrelevant
+// Issue #30616
+
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 // Uncomment this for larger buffers (e.g. to support a bigger CHIP_CONFIG_TUNNEL_INTERFACE_MTU).
 // #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX 9050
