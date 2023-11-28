@@ -29,6 +29,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <stdlib.h>
 
+#include <app/InteractionModelEngine.h>
+
 #ifndef ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
 // Set to 1 to enforce SIT Slow Polling Max value to 15seconds (spec 9.16.1.5)
 #define ICD_ENFORCE_SIT_SLOW_POLL_LIMIT 0
@@ -44,11 +46,13 @@ using namespace chip::app::Clusters::IcdManagement;
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
-void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore)
+void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore,
+                      Messaging::ExchangeManager * exchangeManager)
 {
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
     VerifyOrDie(symmetricKeystore != nullptr);
+    VerifyOrDie(exchangeManager != nullptr);
 
     bool supportLIT = SupportsFeature(Feature::kLongIdleTimeSupport);
     VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kCheckInProtocolSupport), AppServer,
@@ -64,6 +68,7 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     mFabricTable = fabricTable;
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
     mSymmetricKeystore = symmetricKeystore;
+    mExchangeManager   = exchangeManager;
 
     ICDManagementServer::GetInstance().SetSymmetricKeystore(mSymmetricKeystore);
 
@@ -88,6 +93,7 @@ void ICDManager::Shutdown()
     mStorage          = nullptr;
     mFabricTable      = nullptr;
     mStateObserverPool.ReleaseAll();
+    mICDSenderPool.ReleaseAll();
 }
 
 bool ICDManager::SupportsFeature(Feature feature)
@@ -100,6 +106,59 @@ bool ICDManager::SupportsFeature(Feature feature)
 #else
     return ((mFeatureMap & to_underlying(feature)) != 0);
 #endif // !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+}
+
+void ICDManager::SendCheckInMsgs()
+{
+#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    VerifyOrDie(mStorage != nullptr);
+    VerifyOrDie(mFabricTable != nullptr);
+    for (const auto & fabricInfo : *mFabricTable)
+    {
+        uint16_t supported_clients = ICDManagementServer::GetInstance().GetClientsSupportedPerFabric();
+
+        ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), supported_clients /*Table entry limit*/,
+                                 mSymmetricKeystore);
+        if (table.IsEmpty())
+        {
+            continue;
+        }
+
+        for (uint16_t i = 0; i < table.Limit(); i++)
+        {
+            ICDMonitoringEntry entry(mSymmetricKeystore);
+            CHIP_ERROR err = table.Get(i, entry);
+            if (err == CHIP_ERROR_NOT_FOUND)
+            {
+                break;
+            }
+
+            if (err != CHIP_NO_ERROR)
+            {
+                // Try to fetch the next entry upon failure (should not happen).
+                ChipLogError(AppServer, "Failed to retrieved ICDMonitoring entry for Check-In msg, will try next entry.");
+                continue;
+            }
+
+            bool active =
+                InteractionModelEngine::GetInstance()->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject);
+            if (active)
+            {
+                continue;
+            }
+
+            // SenderPool will be released upon transition from active to idle state
+            // This will happen when all ICD Check-In messages are sent on the network
+            ICDCheckInSender * sender = mICDSenderPool.CreateObject(mExchangeManager);
+            VerifyOrReturn(sender != nullptr, ChipLogError(AppServer, "Failed to allocate ICDCheckinSender"));
+
+            if (CHIP_NO_ERROR != sender->RequestResolve(entry, mFabricTable))
+            {
+                ChipLogError(AppServer, "Failed to send ICD Check-In");
+            }
+        }
+    }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
 void ICDManager::UpdateICDMode()
@@ -167,6 +226,9 @@ void ICDManager::UpdateOperationState(OperationalState state)
         }
 #endif
 
+        // Going back to Idle, all Check-In messages are sent
+        mICDSenderPool.ReleaseAll();
+
         CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(slowPollInterval);
         if (err != CHIP_NO_ERROR)
         {
@@ -201,6 +263,11 @@ void ICDManager::UpdateOperationState(OperationalState state)
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Failed to set Fast Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
+            }
+
+            if (SupportsFeature(Feature::kCheckInProtocolSupport))
+            {
+                SendCheckInMsgs();
             }
 
             postObserverEvent(ObserverEventType::EnterActiveMode);
