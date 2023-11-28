@@ -1,7 +1,7 @@
 # `Bouffalo Lab`
 
-This example functions as a window-app and uses a test Vendor ID (VID) and a Product ID (PID)
-of **0x8005**.
+This example functions as a window-app and uses a test Vendor ID (VID) and a
+Product ID (PID) of **0x8005**.
 
 The steps were verified on `Bouffalo Lab` BL602 and BL706 development board.
 
@@ -97,6 +97,7 @@ The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
     ./scripts/build/build_examples.py --target bouffalolab-bl706dk-window-covering-115200 build
     ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-window-covering-115200 build
     ```
+
 ### Build options with build_examples.py
 
 -   `-shell`, enable UART command line
@@ -263,7 +264,6 @@ After successful commissioning, cluster commands available to control the board.
     $ ./chip-tool windowcovering up-or-open <node_id> 1
     $ ./chip-tool windowcovering down-or-close <node_id> 1
     ```
-
 
 ## Test OTA software upgrade with ota-provider-app
 
