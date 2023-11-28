@@ -60,7 +60,19 @@ CHIP_ERROR TemperatureManager::Init()
     mCurrentTempCelsius     = ConvertToPrintableTemp((temp.IsNull()) ? static_cast<int16_t>(0.0) : temp.Value());
     mHeatingCelsiusSetPoint = ConvertToPrintableTemp(coolingSetpoint);
     mCoolingCelsiusSetPoint = ConvertToPrintableTemp(heatingSetpoint);
-    mThermMode              = reinterpret_cast<uint8_t>(systemMode);
+    switch (systemMode)
+    {
+        case ThermostatSystemModeEnum::kOff: systemMode = 0; break;
+        case ThermostatSystemModeEnum::kAuto: systemMode = 1; break;
+        case ThermostatSystemModeEnum::kCool: systemMode = 3; break;
+        case ThermostatSystemModeEnum::kHeat: systemMode = 4; break;
+        case ThermostatSystemModeEnum::kEmergencyHeat: systemMode = 5; break;
+        case ThermostatSystemModeEnum::kPrecooling: systemMode = 6; break;
+        case ThermostatSystemModeEnum::kFanOnly: systemMode = 7; break;
+        case ThermostatSystemModeEnum::kDry: systemMode = 8; break;
+        case ThermostatSystemModeEnum::kSleep: systemMode = 9; break;
+        default: systemMode = 2; break; // unknown value;
+    }
 
     AppTask::GetAppTask().UpdateThermoStatUI();
 
