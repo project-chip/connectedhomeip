@@ -424,7 +424,7 @@ def aParsePassKeyString(sPassKey):
     try:
         lstStrPassKey = sPassKey.split(",")
 
-    except Exception as e:
+    except Exception:
         sPassKey = "0x00000000, 0x00000000, 0x00000000, 0x00000000"
         lstStrPassKey = sPassKey.split(",")
 
@@ -449,7 +449,7 @@ def aParseNonce(sNonceValue):
     try:
         lstStrNonce = sNonceValue.split(",")
 
-    except Exception as e:
+    except Exception:
         sNonceValue = "0x00000000, 0x00000000, 0x00000000, 0x00000000"
         lstStrNonce = sNonceValue.split(",")
 
