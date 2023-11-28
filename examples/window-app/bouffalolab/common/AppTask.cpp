@@ -191,7 +191,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 if (Server::GetInstance().GetFabricTable().FabricCount())
                 {
-                    
+
                 }
                 else
                 {
@@ -318,7 +318,7 @@ void AppTask::TimerEventHandler(app_event_t event)
             }
             else
             {
-                
+
             }
 
             GetAppTask().mTimerIntvl        = APP_BUTTON_PRESSED_ITVL;
