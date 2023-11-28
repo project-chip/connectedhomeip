@@ -5363,17 +5363,6 @@ static id _Nullable DecodeAttributeValueForOvenCavityOperationalStateCluster(Att
                 auto & entry_0 = iter_0.GetValue();
                 MTROvenCavityOperationalStateClusterOperationalStateStruct * newElement_0;
                 newElement_0 = [MTROvenCavityOperationalStateClusterOperationalStateStruct new];
-                newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:entry_0.operationalStateID];
-                if (entry_0.operationalStateLabel.HasValue()) {
-                    newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel.Value());
-                    if (newElement_0.operationalStateLabel == nil) {
-                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                        *aError = err;
-                        return nil;
-                    }
-                } else {
-                    newElement_0.operationalStateLabel = nil;
-                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -5405,27 +5394,6 @@ static id _Nullable DecodeAttributeValueForOvenCavityOperationalStateCluster(Att
         }
         MTROvenCavityOperationalStateClusterErrorStateStruct * _Nonnull value;
         value = [MTROvenCavityOperationalStateClusterErrorStateStruct new];
-        value.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorStateID];
-        if (cppValue.errorStateLabel.HasValue()) {
-            value.errorStateLabel = AsString(cppValue.errorStateLabel.Value());
-            if (value.errorStateLabel == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                *aError = err;
-                return nil;
-            }
-        } else {
-            value.errorStateLabel = nil;
-        }
-        if (cppValue.errorStateDetails.HasValue()) {
-            value.errorStateDetails = AsString(cppValue.errorStateDetails.Value());
-            if (value.errorStateDetails == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                *aError = err;
-                return nil;
-            }
-        } else {
-            value.errorStateDetails = nil;
-        }
         return value;
     }
     default: {
