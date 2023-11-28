@@ -54,7 +54,6 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
         this->symmetricKeystore = keyStore;
     }
 
-    bool IsValid() { return this->checkInNodeID != kUndefinedNodeId && this->fabricIndex != kUndefinedFabricIndex; }
     CHIP_ERROR UpdateKey(StorageKeyName & key) override;
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override;
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override;
@@ -77,6 +76,13 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
      */
     CHIP_ERROR SetKey(ByteSpan keyData);
     CHIP_ERROR DeleteKey(void);
+    inline bool IsValid()
+    {
+        return (symmetricKeystore != nullptr && keyHandleValid && fabricIndex != kUndefinedFabricIndex &&
+                checkInNodeID != kUndefinedNodeId);
+    }
+
+    ICDMonitoringEntry & operator=(const ICDMonitoringEntry & icdMonitoringEntry);
 
     /**
      * @brief Implement the key verification needed by the ICDManagement Server.

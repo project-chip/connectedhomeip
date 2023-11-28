@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 
@@ -73,9 +73,9 @@ void ReportSchedulerImpl::OnSubscriptionEstablished(ReadHandler * aReadHandler)
     newNode = mNodesPool.CreateObject(aReadHandler, this, now);
 
     ChipLogProgress(DataManagement,
-                    "Registered a ReadHandler that will schedule a report between system Timestamp: %" PRIu64
-                    " and system Timestamp %" PRIu64 ".",
-                    newNode->GetMinTimestamp().count(), newNode->GetMaxTimestamp().count());
+                    "Registered a ReadHandler that will schedule a report between system Timestamp: 0x" ChipLogFormatX64
+                    " and system Timestamp 0x" ChipLogFormatX64 ".",
+                    ChipLogValueX64(newNode->GetMinTimestamp().count()), ChipLogValueX64(newNode->GetMaxTimestamp().count()));
 }
 
 /// @brief When a ReadHandler becomes reportable, schedule, recalculate and reschedule the report.

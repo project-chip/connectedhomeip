@@ -573,7 +573,7 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR PutString(Tag tag, Span<const char> str);
+    CHIP_ERROR PutString(Tag tag, CharSpan str);
 
     /**
      * @brief

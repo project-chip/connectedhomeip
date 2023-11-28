@@ -40,16 +40,13 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 
-uint8_t ICDManager::OpenExchangeContextCount = 0;
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
-              "ICDManager::OpenExchangeContextCount cannot hold count for the max exchange count");
+              "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
-void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver,
-                      Crypto::SymmetricKeystore * symmetricKeystore)
+void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore)
 {
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
-    VerifyOrDie(stateObserver != nullptr);
     VerifyOrDie(symmetricKeystore != nullptr);
 
     bool supportLIT = SupportsFeature(Feature::kLongIdleTimeSupport);
@@ -62,9 +59,8 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     // VerifyOrDieWithMsg((supportLIT == false) && (GetSlowPollingInterval() <= GetSITPollingThreshold()) , AppServer,
     //                    "LIT support is required for slow polling intervals superior to 15 seconds");
 
-    mStorage       = storage;
-    mFabricTable   = fabricTable;
-    mStateObserver = stateObserver;
+    mStorage     = storage;
+    mFabricTable = fabricTable;
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
     mSymmetricKeystore = symmetricKeystore;
 
@@ -76,7 +72,7 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     // VerifyOrDie(kFastPollingInterval.count() < activeModeDuration);
 
     UpdateICDMode();
-    UpdateOperationState(OperationalState::ActiveMode);
+    UpdateOperationState(OperationalState::IdleMode);
 }
 
 void ICDManager::Shutdown()
@@ -87,23 +83,22 @@ void ICDManager::Shutdown()
     DeviceLayer::SystemLayer().CancelTimer(OnActiveModeDone, this);
     DeviceLayer::SystemLayer().CancelTimer(OnTransitionToIdle, this);
     mICDMode          = ICDMode::SIT;
-    mOperationalState = OperationalState::IdleMode;
+    mOperationalState = OperationalState::ActiveMode;
     mStorage          = nullptr;
     mFabricTable      = nullptr;
+    mStateObserverPool.ReleaseAll();
 }
 
 bool ICDManager::SupportsFeature(Feature feature)
 {
     // Can't use attribute accessors/Attributes::FeatureMap::Get in unit tests
-#ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    bool success        = false;
+#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
     uint32_t featureMap = 0;
-    success             = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
-
+    bool success        = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 #else
     return ((mFeatureMap & to_underlying(feature)) != 0);
-#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#endif // !CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
 void ICDManager::UpdateICDMode()
@@ -129,7 +124,12 @@ void ICDManager::UpdateICDMode()
             }
         }
     }
-    mICDMode = tempMode;
+
+    if (mICDMode != tempMode)
+    {
+        mICDMode = tempMode;
+        postObserverEvent(ObserverEventType::ICDModeChange);
+    }
 
     // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
     if (mICDMode == ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
@@ -169,7 +169,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
         CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(slowPollInterval);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(AppServer, "Failed to set Slow Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
     else if (state == OperationalState::ActiveMode)
@@ -199,10 +199,10 @@ void ICDManager::UpdateOperationState(OperationalState state)
             CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetFastPollingInterval());
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogError(AppServer, "Failed to set Fast Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
             }
 
-            mStateObserver->OnEnterActiveMode();
+            postObserverEvent(ObserverEventType::EnterActiveMode);
         }
         else
         {
@@ -264,7 +264,7 @@ void ICDManager::OnTransitionToIdle(System::Layer * aLayer, void * appState)
     // OnTransitionToIdle will trigger a report message if reporting is needed, which should extend the active mode until the
     // ack for the report is received.
     pICDManager->mTransitionToIdleCalled = true;
-    pICDManager->mStateObserver->OnTransitionToIdle();
+    pICDManager->postObserverEvent(ObserverEventType::TransitionToIdle);
 }
 
 /* ICDListener functions. */
@@ -272,44 +272,70 @@ void ICDManager::OnKeepActiveRequest(KeepActiveFlags request)
 {
     assertChipStackLockedByCurrentThread();
 
-    if (request == KeepActiveFlags::kExchangeContextOpen)
+    VerifyOrReturn(request < KeepActiveFlagsValues::kInvalidFlag);
+
+    if (request.Has(KeepActiveFlag::kExchangeContextOpen))
     {
         // There can be multiple open exchange contexts at the same time.
         // Keep track of the requests count.
-        this->OpenExchangeContextCount++;
-        this->SetKeepActiveModeRequirements(request, true /* state */);
+        this->mOpenExchangeContextCount++;
     }
-    else /* !kExchangeContextOpen */
+
+    if (request.Has(KeepActiveFlag::kCheckInInProgress))
     {
-        // Only 1 request per type (kCommissioningWindowOpen, kFailSafeArmed)
-        // set requirement directly
-        this->SetKeepActiveModeRequirements(request, true /* state */);
+        // There can be multiple check-in at the same time.
+        // Keep track of the requests count.
+        this->mCheckInRequestCount++;
     }
+
+    this->SetKeepActiveModeRequirements(request, true /* state */);
 }
 
 void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
 {
     assertChipStackLockedByCurrentThread();
 
-    if (request == KeepActiveFlags::kExchangeContextOpen)
+    VerifyOrReturn(request < KeepActiveFlagsValues::kInvalidFlag);
+
+    if (request.Has(KeepActiveFlag::kExchangeContextOpen))
     {
         // There can be multiple open exchange contexts at the same time.
         // Keep track of the requests count.
-        if (this->OpenExchangeContextCount > 0)
+        if (this->mOpenExchangeContextCount > 0)
         {
-            this->OpenExchangeContextCount--;
+            this->mOpenExchangeContextCount--;
         }
         else
         {
             ChipLogError(DeviceLayer, "The ICD Manager did not account for ExchangeContext closure");
         }
 
-        if (this->OpenExchangeContextCount == 0)
+        if (this->mOpenExchangeContextCount == 0)
         {
-            this->SetKeepActiveModeRequirements(request, false /* state */);
+            this->SetKeepActiveModeRequirements(KeepActiveFlag::kExchangeContextOpen, false /* state */);
         }
     }
-    else /* !kExchangeContextOpen */
+
+    if (request.Has(KeepActiveFlag::kCheckInInProgress))
+    {
+        // There can be multiple open exchange contexts at the same time.
+        // Keep track of the requests count.
+        if (this->mCheckInRequestCount > 0)
+        {
+            this->mCheckInRequestCount--;
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "The ICD Manager did not account for Check-In Sender start");
+        }
+
+        if (this->mCheckInRequestCount == 0)
+        {
+            this->SetKeepActiveModeRequirements(KeepActiveFlag::kCheckInInProgress, false /* state */);
+        }
+    }
+
+    if (request.Has(KeepActiveFlag::kCommissioningWindowOpen) || request.Has(KeepActiveFlag::kFailSafeArmed))
     {
         // Only 1 request per type (kCommissioningWindowOpen, kFailSafeArmed)
         // remove requirement directly
@@ -339,5 +365,60 @@ void ICDManager::OnICDManagementServerEvent(ICDManagementEvents event)
     }
 }
 
+System::Clock::Milliseconds32 ICDManager::GetSlowPollingInterval()
+{
+#if ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
+    // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
+    // This is important for ICD device configured for LIT operation but currently operating as a SIT
+    // due to a lack of client registration
+    if (mICDMode == ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
+    {
+        return GetSITPollingThreshold();
+    }
+#endif
+    return kSlowPollingInterval;
+}
+
+ICDManager::ObserverPointer * ICDManager::RegisterObserver(ICDStateObserver * observer)
+{
+    return mStateObserverPool.CreateObject(observer);
+}
+
+void ICDManager::ReleaseObserver(ICDStateObserver * observer)
+{
+    mStateObserverPool.ForEachActiveObject([this, observer](ObserverPointer * obs) {
+        if (obs->mObserver == observer)
+        {
+            mStateObserverPool.ReleaseObject(obs);
+            return Loop::Break;
+        }
+        return Loop::Continue;
+    });
+}
+
+void ICDManager::postObserverEvent(ObserverEventType event)
+{
+    mStateObserverPool.ForEachActiveObject([event](ObserverPointer * obs) {
+        switch (event)
+        {
+        case ObserverEventType::EnterActiveMode: {
+            obs->mObserver->OnEnterActiveMode();
+            return Loop::Continue;
+        }
+        case ObserverEventType::TransitionToIdle: {
+            obs->mObserver->OnTransitionToIdle();
+            return Loop::Continue;
+        }
+        case ObserverEventType::ICDModeChange: {
+            obs->mObserver->OnICDModeChange();
+            return Loop::Continue;
+        }
+        default: {
+            ChipLogError(DeviceLayer, "Invalid ICD Observer event type");
+            return Loop::Break;
+        }
+        }
+    });
+}
 } // namespace app
 } // namespace chip

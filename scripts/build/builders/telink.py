@@ -32,7 +32,6 @@ class TelinkApp(Enum):
     OTA_REQUESTOR = auto()
     PUMP = auto()
     PUMP_CONTROLLER = auto()
-    RESOURCE_MONITORING = auto()
     SHELL = auto()
     SMOKE_CO_ALARM = auto()
     TEMPERATURE_MEASUREMENT = auto()
@@ -62,8 +61,6 @@ class TelinkApp(Enum):
             return 'pump-app'
         elif self == TelinkApp.PUMP_CONTROLLER:
             return 'pump-controller-app'
-        elif self == TelinkApp.RESOURCE_MONITORING:
-            return 'resource-monitoring-app'
         elif self == TelinkApp.SHELL:
             return 'shell'
         elif self == TelinkApp.SMOKE_CO_ALARM:
@@ -144,7 +141,8 @@ class TelinkBuilder(Builder):
                  enable_shell: bool = False,
                  enable_rpcs: bool = False,
                  enable_factory_data: bool = False,
-                 enable_4mb_flash: bool = False):
+                 enable_4mb_flash: bool = False,
+                 mars_board_config: bool = False):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
@@ -154,6 +152,7 @@ class TelinkBuilder(Builder):
         self.enable_rpcs = enable_rpcs
         self.enable_factory_data = enable_factory_data
         self.enable_4mb_flash = enable_4mb_flash
+        self.mars_board_config = mars_board_config
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -191,6 +190,9 @@ class TelinkBuilder(Builder):
 
         if self.enable_4mb_flash:
             flags.append("-DFLASH_SIZE=4m")
+
+        if self.mars_board_config:
+            flags.append("-DTLNK_MARS_BOARD=y")
 
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")

@@ -1,0 +1,9 @@
+name: Git safe directory
+description: For running act with checkout owned by non-root user
+runs:
+  using: "composite"
+  steps:
+    - name: Set git safe.directory to "*"
+      if: ${{ env.ACT }}
+      shell: bash
+      run: git config --system --add safe.directory '*'

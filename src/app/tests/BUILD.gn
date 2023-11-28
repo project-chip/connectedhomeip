@@ -95,6 +95,8 @@ source_set("scenes-table-test-srcs") {
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSets.h",
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.h",
+    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.cpp",
+    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.h",
     "${chip_root}/src/app/clusters/scenes-server/SceneTable.h",
     "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.cpp",
     "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.h",

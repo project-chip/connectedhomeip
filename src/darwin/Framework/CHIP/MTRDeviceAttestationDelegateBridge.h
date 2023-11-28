@@ -16,7 +16,7 @@
  */
 
 #include <lib/core/NodeId.h>
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #include <Matter/MTRDeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>

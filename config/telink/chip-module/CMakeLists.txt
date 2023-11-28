@@ -155,6 +155,16 @@ else()
   unset(USB_BOOT_DTC_OVERLAY_FILE)
 endif()
 
+if(${TLNK_MARS_BOARD} MATCHES y)
+  if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_mars_boot.overlay")
+    set(MARS_BOOT_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_mars_boot.overlay")
+  else()
+    unset(MARS_BOOT_DTC_OVERLAY_FILE)
+  endif()
+else()
+  unset(MARS_CONF_OVERLAY_FILE)
+endif()
+
 if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}.overlay")
     set(GLOBAL_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}.overlay")
 else()
@@ -186,7 +196,7 @@ if (CONFIG_BOOTLOADER_MCUBOOT)
     add_custom_target(build_mcuboot ALL
         COMMAND
         west build -b ${BASE_BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
-            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE="${GLOBAL_DTC_OVERLAY_FILE};${FLASH_DTC_OVERLAY_FILE};${USB_BOOT_DTC_OVERLAY_FILE}"
+            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE="${GLOBAL_DTC_OVERLAY_FILE};${FLASH_DTC_OVERLAY_FILE};${USB_BOOT_DTC_OVERLAY_FILE};${MARS_BOOT_DTC_OVERLAY_FILE}"
         COMMAND
         cp ${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin ${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin
     )

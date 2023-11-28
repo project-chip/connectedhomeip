@@ -74,6 +74,27 @@ Follow guide in [NEW_CHEF_DEVICES.md](NEW_CHEF_DEVICES.md).
 -   `chef.py`: main script for generating samples. More info on its help
     `chef.py -h`.
 
+## General Linux Options
+
+When building chef for the Linux platform there are several options available at
+runtime. These options are also available for many Linux samples. Do not
+conflate these with chef options available at build time.
+
+Ex.:
+
+-   --discriminator <discriminator>: A 12-bit unsigned integer match the value
+    which a device advertises during commissioning.
+-   --passcode <passcode>: A 27-bit unsigned integer, which serves as proof of
+    possession during commissioning. If not provided to compute a verifier, the
+    --spake2p-verifier-base64 must be provided.
+-   --secured-device-port <port>: A 16-bit unsigned integer specifying the
+    listen port to use for secure device messages (default is 5540).
+-   --KVS <filepath>: A file to store Key Value Store items.
+
+For a full list, call the generated linux binary with
+
+-   -h, --help: Print this output and then exit.
+
 ## CI
 
 All CI jobs for chef can be found in `.github/workflows/chef.yaml`.

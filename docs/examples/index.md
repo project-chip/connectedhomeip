@@ -294,15 +294,6 @@ tv-casting-app/APIs.md
 window-app/**/README
 ```
 
-## Resource monitoring example
-
-```{toctree}
-:glob:
-:maxdepth: 1
-
-resource-monitoring-app/**/README
-```
-
 ## RVC example
 
 ```{toctree}

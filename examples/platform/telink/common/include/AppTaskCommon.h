@@ -29,6 +29,10 @@
 #include "PWMDevice.h"
 #endif
 
+#ifdef CONFIG_WS2812_STRIP
+#include "WS2812Device.h"
+#endif
+
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>

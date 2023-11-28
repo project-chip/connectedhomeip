@@ -30,7 +30,7 @@
 #include <type_traits>
 
 #include <lib/core/CHIPError.h>
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
 namespace DeviceLayer {

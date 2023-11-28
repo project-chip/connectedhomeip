@@ -193,8 +193,8 @@ void SynchronizedReportSchedulerImpl::TimerFired()
         if (node->IsReportableNow(now))
         {
             node->SetEngineRunScheduled(true);
-            ChipLogProgress(DataManagement, "Handler: %p with min: %" PRIu64 " and max: %" PRIu64 "", (node),
-                            node->GetMinTimestamp().count(), node->GetMaxTimestamp().count());
+            ChipLogProgress(DataManagement, "Handler: %p with min: 0x" ChipLogFormatX64 " and max: 0x" ChipLogFormatX64 "", (node),
+                            ChipLogValueX64(node->GetMinTimestamp().count()), ChipLogValueX64(node->GetMaxTimestamp().count()));
         }
 
         return Loop::Continue;

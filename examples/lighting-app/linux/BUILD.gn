@@ -82,6 +82,7 @@ executable("chip-lighting-app") {
       "$dir_pw_log",
       "$dir_pw_rpc:server",
       "$dir_pw_rpc/system_server:facade",
+      "$dir_pw_rpc/system_server:socket",
       "$dir_pw_stream:socket_stream",
       "$dir_pw_stream:sys_io_stream",
       "$dir_pw_sync:mutex",

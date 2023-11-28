@@ -6,6 +6,23 @@
 tools/*
 ```
 
+## Project Information
+
+-   [Build Guide](../guides/BUILDING.html)
+-   Sphinx documentation framework
+    -   New directories and individual files must be added to the
+        [tree](https://github.com/project-chip/connectedhomeip/blob/master/docs/index.md)
+    -   New files under directories must be added to the tree in the index file;
+        see above. Glob and regular expressions may be used to include all
+-   Pull Requests
+    -   Built in style and spelling checks must be satisfied
+    -   Larger changes should go through an approval process; reviewers are
+        automatically added
+    -   Smaller specific changes like ones to this file may be expedited with
+        the "fast track" label
+
+Work In Progress
+
 ## Known Issues
 
 -   Python build running out of space
@@ -14,7 +31,7 @@ tools/*
 
 ## Tools
 
--   [Daily Fail Summary](tools/daily_fail_summary.md)
+-   [Daily Fail Summary](tools/daily_fail_summary.html)
 
 ## To Do
 

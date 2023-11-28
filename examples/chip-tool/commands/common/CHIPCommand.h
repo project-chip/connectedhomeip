@@ -142,7 +142,7 @@ protected:
     // If true, the controller will be created with server capabilities enabled,
     // such as advertising operational nodes over DNS-SD and accepting incoming
     // CASE sessions.
-    virtual bool NeedsOperationalAdvertising() { return false; }
+    virtual bool NeedsOperationalAdvertising() { return mAdvertiseOperational; }
 
     // Execute any deferred cleanups.  Used when exiting interactive mode.
     static void ExecuteDeferredCleanups(intptr_t ignored);
