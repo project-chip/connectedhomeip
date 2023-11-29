@@ -36,10 +36,7 @@ struct ICDClientInfo
     Crypto::Aes128KeyHandle sharedKey = Crypto::Aes128KeyHandle();
 
     ICDClientInfo() {}
-    ICDClientInfo(const ICDClientInfo & other)
-    {
-        *this = other;
-    }
+    ICDClientInfo(const ICDClientInfo & other) { *this = other; }
 
     ICDClientInfo & operator=(const ICDClientInfo & other)
     {
