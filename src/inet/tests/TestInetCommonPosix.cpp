@@ -174,7 +174,7 @@ void InitSystemLayer()
 void ShutdownSystemLayer()
 {
 
-  DeviceLayer::SystemLayer().Shutdown();
+    DeviceLayer::SystemLayer().Shutdown();
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // LwIP implementation uses the event loop for servicing events.
