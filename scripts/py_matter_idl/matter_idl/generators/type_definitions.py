@@ -190,6 +190,7 @@ __CHIP_SIZED_TYPES__ = {
     # Derived types
     # Specification describes them in section '7.18.2. Derived Data Types'
     "action_id": BasicInteger(idl_name="action_id", byte_count=1, is_signed=False),
+    "amperage_mA": BasicInteger(idl_name="amperage_mA", byte_count=8, is_signed=True),
     "attrib_id": BasicInteger(idl_name="attrib_id", byte_count=4, is_signed=False),
     "cluster_id": BasicInteger(idl_name="cluster_id", byte_count=4, is_signed=False),
     "command_id": BasicInteger(idl_name="command_id", byte_count=4, is_signed=False),
@@ -198,6 +199,7 @@ __CHIP_SIZED_TYPES__ = {
     "devtype_id": BasicInteger(idl_name="devtype_id", byte_count=4, is_signed=False),
     "elapsed_s": BasicInteger(idl_name="elapsed_s", byte_count=4, is_signed=False),
     "endpoint_no": BasicInteger(idl_name="endpoint_no", byte_count=2, is_signed=False),
+    "energy_mWh":  BasicInteger(idl_name="energy_mWh", byte_count=8, is_signed=True), 
     "entry_idx": BasicInteger(idl_name="entry_idx", byte_count=2, is_signed=False),
     "epoch_s": BasicInteger(idl_name="epoch_s", byte_count=4, is_signed=False),
     "epoch_us": BasicInteger(idl_name="epoch_us", byte_count=8, is_signed=False),
@@ -212,6 +214,7 @@ __CHIP_SIZED_TYPES__ = {
     "percent": BasicInteger(idl_name="percent", byte_count=1, is_signed=False),
     "percent100ths": BasicInteger(idl_name="percent100ths", byte_count=2, is_signed=False),
     "posix_ms": BasicInteger(idl_name="posix_ms", byte_count=8, is_signed=False),
+    "power_mW": BasicInteger(idl_name="power_mW", byte_count=8, is_signed=True),
     "priority": BasicInteger(idl_name="priority", byte_count=1, is_signed=False),
     "status": BasicInteger(idl_name="status", byte_count=2, is_signed=False),
     "systime_ms": BasicInteger(idl_name="systime_ms", byte_count=8, is_signed=False),
@@ -221,6 +224,7 @@ __CHIP_SIZED_TYPES__ = {
     "tod": BasicInteger(idl_name="tod", byte_count=4, is_signed=False),
     "trans_id": BasicInteger(idl_name="trans_id", byte_count=4, is_signed=False),
     "vendor_id": BasicInteger(idl_name="vendor_id", byte_count=2, is_signed=False),
+    "voltage_mV": BasicInteger(idl_name="voltage_mV", byte_count=8, is_signed=True),
 }
 
 
