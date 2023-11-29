@@ -492,7 +492,7 @@ void TestCommandInteraction::AddInvokeResponseData(nlTestSuite * apSuite, void *
     else
     {
         const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
-        ConcreteCommandPath responseCommandPath               = { kTestEndpointId, kTestClusterId, aCommandId };
+        ConcreteCommandPath responseCommandPath = { kTestEndpointId, kTestClusterId, aCommandId };
         err = apCommandHandler->PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
