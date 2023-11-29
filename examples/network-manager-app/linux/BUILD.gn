@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,26 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-config("mock_include") {
+executable("network-manager-app") {
+  sources = [
+    "include/CHIPProjectAppConfig.h",
+    "main.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/examples/network-manager-app/network-manager-common",
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/lib",
+  ]
+
   include_dirs = [ "include" ]
+  output_dir = root_out_dir
 }
 
-source_set("mock_ember") {
-  sources = [
-    "MockNodeConfig.cpp",
-    "attribute-storage.cpp",
-  ]
+group("linux") {
+  deps = [ ":network-manager-app" ]
+}
 
-  public_deps = [
-    "${chip_root}/src/app",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/lib/support:testing",
-  ]
-
-  public_configs = [ ":mock_include" ]
-
-  cflags = [ "-Wconversion" ]
+group("default") {
+  deps = [ ":linux" ]
 }
