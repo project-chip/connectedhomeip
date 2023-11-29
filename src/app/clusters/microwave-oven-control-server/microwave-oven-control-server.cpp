@@ -33,16 +33,17 @@ using namespace chip::app::Clusters::ModeBase;
 using namespace chip::app::Clusters::MicrowaveOvenControl::Attributes;
 using Status = Protocols::InteractionModel::Status;
 
-
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
 
-Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, Clusters::OperationalState::Instance * aOpStateInstance, Clusters::ModeBase::Instance * aMicrowaveOvenModeInstance) :
-    CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId), AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId),
-    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId),
-    mOpStateInstance(aOpStateInstance), mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
+Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
+                   Clusters::OperationalState::Instance * aOpStateInstance,
+                   Clusters::ModeBase::Instance * aMicrowaveOvenModeInstance) :
+    CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
+    AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
+    mClusterId(aClusterId), mOpStateInstance(aOpStateInstance), mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {
     mDelegate->SetInstance(this);
 }
@@ -61,12 +62,12 @@ CHIP_ERROR Instance::Init()
         ChipLogError(Zcl, "Microwave Oven Control: The cluster with ID %lu was not enabled in zap.", long(mClusterId));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if(!mOpStateInstance)
+    if (!mOpStateInstance)
     {
         ChipLogError(Zcl, "Microwave Oven Control: Operational State instance is NULL");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if(!mMicrowaveOvenModeInstance)
+    if (!mMicrowaveOvenModeInstance)
     {
         ChipLogError(Zcl, "Microwave Oven Control: Microwave Oven Mode instance is NULL");
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -90,7 +91,7 @@ uint8_t Instance::GetPowerSetting() const
 void Instance::SetCookTime(uint32_t cookTime)
 {
     uint32_t oldCookTime = mCookTime;
-    mCookTime = cookTime;
+    mCookTime            = cookTime;
     if (mCookTime != oldCookTime)
     {
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::CookTime::Id);
@@ -100,7 +101,7 @@ void Instance::SetCookTime(uint32_t cookTime)
 void Instance::SetPowerSetting(uint8_t powerSetting)
 {
     uint8_t oldPowerSetting = mPowerSetting;
-    mPowerSetting = powerSetting;
+    mPowerSetting           = powerSetting;
     if (mPowerSetting != oldPowerSetting)
     {
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::PowerSetting::Id);
@@ -171,7 +172,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
     auto & powerSetting = req.powerSetting;
 
     // check if the input cooking value is invalid
-    if(cookMode.HasValue() && (!mMicrowaveOvenModeInstance->IsSupportedMode(cookMode.Value())))
+    if (cookMode.HasValue() && (!mMicrowaveOvenModeInstance->IsSupportedMode(cookMode.Value())))
     {
         status = Status::InvalidCommand;
         ChipLogError(Zcl, "Failed to set cookMode, cookMode is not support");
@@ -193,9 +194,9 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         goto exit;
     }
 
-    //get current operational state
+    // get current operational state
     opState = mOpStateInstance->GetCurrentOperationalState();
-    if(opState != to_underlying(OperationalStateEnum::kStopped))
+    if (opState != to_underlying(OperationalStateEnum::kStopped))
     {
         status = Status::InvalidInState;
         goto exit;
@@ -237,7 +238,7 @@ void Instance::HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTi
     Status status;
     uint8_t opState;
 
-    //get current operational state
+    // get current operational state
     opState = mOpStateInstance->GetCurrentOperationalState();
     if (opState == to_underlying(OperationalStateEnum::kStopped) || opState == to_underlying(OperationalStateEnum::kRunning) ||
         opState == to_underlying(OperationalStateEnum::kPaused))
@@ -277,7 +278,6 @@ bool IsPowerSettingInRange(uint8_t powerSetting, uint8_t minCookPower, uint8_t m
 {
     return (powerSetting < minCookPower || powerSetting > maxCookPower) ? false : true;
 }
-
 
 } // namespace MicrowaveOvenControl
 } // namespace Clusters

@@ -29,7 +29,6 @@ using ModeTagStructType    = chip::app::Clusters::detail::Structs::ModeTagStruct
 using OperationalStateEnum = chip::app::Clusters::OperationalState::OperationalStateEnum;
 using Status               = Protocols::InteractionModel::Status;
 
-
 void ExampleMicrowaveOvenDevice::MicrowaveOvenInit(EndpointId aEndpoint)
 {
     mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
@@ -40,16 +39,16 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit(EndpointId aEndpoint)
 
 /**
  * MicrowaveOvenControl cluster
-*/
+ */
 Protocols::InteractionModel::Status
 ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(Optional<uint8_t> cookMode, uint32_t cookTime, uint8_t powerSetting)
 {
     // placeholder implementation
     Status status;
     uint8_t reqCookMode;
-    if(cookMode.HasValue()){
+    if (cookMode.HasValue())
+    {
         reqCookMode = cookMode.Value();
-
     }
     else
     {
@@ -57,7 +56,7 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(Optional<uint8_t>
         reqCookMode = ModeNormal;
     }
 
-    if((status = mMicrowaveOvenModeInstance.UpdateCurrentMode(reqCookMode)) != Status::Success)
+    if ((status = mMicrowaveOvenModeInstance.UpdateCurrentMode(reqCookMode)) != Status::Success)
     {
         return status;
     }
@@ -73,17 +72,16 @@ Protocols::InteractionModel::Status ExampleMicrowaveOvenDevice::HandleModifyCook
     return Status::Success;
 }
 
-
-
 /**
  * OperationalState cluster
-*/
+ */
 app::DataModel::Nullable<uint32_t> ExampleMicrowaveOvenDevice::GetCountdownTime()
 {
     return static_cast<app::DataModel::Nullable<uint32_t>>(mMicrowaveOvenControlInstance.GetCookTime());
 }
 
-CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalStateAtIndex(size_t index, OperationalState::GenericOperationalState & operationalState)
+CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalStateAtIndex(size_t index,
+                                                                  OperationalState::GenericOperationalState & operationalState)
 {
     if (index > mOperationalStateList.size() - 1)
     {
@@ -93,7 +91,8 @@ CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalStateAtIndex(size_t index, 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalPhaseAtIndex(size_t index, OperationalState::GenericOperationalPhase & operationalPhase)
+CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalPhaseAtIndex(size_t index,
+                                                                  OperationalState::GenericOperationalPhase & operationalPhase)
 {
     if (index > mOperationalPhaseList.size() - 1)
     {
@@ -159,18 +158,16 @@ void ExampleMicrowaveOvenDevice::HandleStopStateCallback(OperationalState::Gener
     }
 }
 
-
 /**
  * MicrowaveOvenMode Cluster
-*/
+ */
 CHIP_ERROR ExampleMicrowaveOvenDevice::Init()
 {
     return CHIP_NO_ERROR;
 }
 
 // todo refactor code by making a parent class for all ModeInstance classes to reduce flash usage.
-void ExampleMicrowaveOvenDevice::HandleChangeToMode(uint8_t NewMode,
-                                                          ModeBase::Commands::ChangeToModeResponse::Type & response)
+void ExampleMicrowaveOvenDevice::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }

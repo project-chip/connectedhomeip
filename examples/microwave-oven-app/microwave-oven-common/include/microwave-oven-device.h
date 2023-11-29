@@ -18,14 +18,14 @@
 
 #pragma once
 
-#include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
-#include <app/clusters/operational-state-server/operational-state-server.h>
-#include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
+#include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app/util/af-enums.h>
-#include <protocols/interaction_model/StatusCode.h>
 #include <app/util/config.h>
 #include <cstring>
+#include <protocols/interaction_model/StatusCode.h>
 #include <utility>
 
 namespace chip {
@@ -34,7 +34,7 @@ namespace Clusters {
 
 /**
  * set default value for the optional attributes
-*/
+ */
 constexpr uint8_t kDefaultMinPower  = 10u;
 constexpr uint8_t kDefaultMaxPower  = 100u;
 constexpr uint8_t kDefaultPowerStep = 10u;
@@ -42,15 +42,17 @@ constexpr uint8_t kDefaultPowerStep = 10u;
 constexpr uint8_t ModeNormal  = 0;
 constexpr uint8_t ModeDefrost = 1;
 
-class ExampleMicrowaveOvenDevice : public MicrowaveOvenControl::Delegate, public ModeBase::Delegate, public OperationalState::Delegate
+class ExampleMicrowaveOvenDevice : public MicrowaveOvenControl::Delegate,
+                                   public ModeBase::Delegate,
+                                   public OperationalState::Delegate
 {
 private:
-    //define delegates and instances for Microwave Oven device
+    // define delegates and instances for Microwave Oven device
     MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
     OperationalState::Instance mOperationalStateInstance;
     ModeBase::Instance mMicrowaveOvenModeInstance;
 
-    //MicrowaveOvenMode types
+    // MicrowaveOvenMode types
     using ModeTagStructType              = detail::Structs::ModeTagStruct::Type;
     ModeTagStructType modeTagsNormal[1]  = { { .value = to_underlying(MicrowaveOvenMode::ModeTag::kNormal) } };
     ModeTagStructType modeTagsDefrost[1] = { { .value = to_underlying(MicrowaveOvenMode::ModeTag::kDefrost) } };
@@ -64,8 +66,7 @@ private:
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsDefrost) }
     };
 
-
-    //Operational States
+    // Operational States
     const OperationalState::GenericOperationalState opStateList[4] = {
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
@@ -73,14 +74,16 @@ private:
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)),
     };
 
-    app::DataModel::List<const OperationalState::GenericOperationalState> mOperationalStateList = Span<const OperationalState::GenericOperationalState>(opStateList);
+    app::DataModel::List<const OperationalState::GenericOperationalState> mOperationalStateList =
+        Span<const OperationalState::GenericOperationalState>(opStateList);
 
     const OperationalState::GenericOperationalPhase opPhaseList[1] = {
         // Phase List is null
         OperationalState::GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
     };
 
-    Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList = Span<const OperationalState::GenericOperationalPhase>(opPhaseList);
+    Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList =
+        Span<const OperationalState::GenericOperationalPhase>(opPhaseList);
 
 public:
     /**
@@ -89,16 +92,19 @@ public:
      * @param aClustersEndpoint The endpoint ID where all the microwave oven clusters exist.
      */
     explicit ExampleMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
-        mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, &mOperationalStateInstance, &mMicrowaveOvenModeInstance),
+        mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, &mOperationalStateInstance,
+                                      &mMicrowaveOvenModeInstance),
         mOperationalStateInstance(this, aClustersEndpoint, OperationalState::Id),
-        mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id, chip::to_underlying(MicrowaveOvenMode::Feature::kOnOff)){}
+        mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id,
+                                   chip::to_underlying(MicrowaveOvenMode::Feature::kOnOff))
+    {}
 
     /**
      * Init all the clusters used by this device.
      */
     void MicrowaveOvenInit(EndpointId aEndpoint);
 
-    //delegates from MicrowaveOvenControl cluster
+    // delegates from MicrowaveOvenControl cluster
     /**
      * handle command for microwave oven control: set cooking parameters
      */
@@ -125,9 +131,7 @@ public:
      */
     uint8_t GetPowerStep() const override { return kDefaultPowerStep; }
 
-
-
-    //delegates from OperationalState cluster
+    // delegates from OperationalState cluster
     /**
      * Get the countdown time.
      * return actual cook time.
@@ -186,9 +190,7 @@ public:
      */
     void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override;
 
-
-
-    //delegates from mode-base cluster
+    // delegates from mode-base cluster
     CHIP_ERROR Init() override;
 
     /**

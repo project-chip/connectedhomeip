@@ -21,8 +21,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
-#include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app/util/af-enums.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -53,7 +53,8 @@ public:
      * Note: a MicrowaveOvenControl instance must live relying on an Operational State instance and a Microwave Oven Mode instance,
      * caller should be initialized that 2 instances before initializing MicorwaveOvenControl instance.
      */
-    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, Clusters::OperationalState::Instance * aOpStateInstance, Clusters::ModeBase::Instance * aMicrowaveOvenModeInstance);
+    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
+             Clusters::OperationalState::Instance * aOpStateInstance, Clusters::ModeBase::Instance * aMicrowaveOvenModeInstance);
 
     ~Instance() override;
 
@@ -90,7 +91,7 @@ private:
     /**
      * set default values
      */
-    uint32_t mCookTime   = kDefaultCookTime;
+    uint32_t mCookTime    = kDefaultCookTime;
     uint8_t mPowerSetting = kDefaultPowerSetting;
 
     /**
@@ -134,7 +135,7 @@ public:
      *   @param  cookTime: the input cook time value
      *   @param  powerSetting: the input power setting value
      */
-    virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(Optional<uint8_t>  cookMode, uint32_t cookTime,
+    virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(Optional<uint8_t> cookMode, uint32_t cookTime,
                                                                                    uint8_t powerSetting) = 0;
 
     /**
@@ -172,7 +173,6 @@ private:
 
 protected:
     Instance * GetInstance() const { return mInstance; }
-
 };
 
 /**
@@ -188,8 +188,6 @@ bool IsCookTimeInRange(uint32_t cookTime);
  *  @param maxCookPower    the max power setting that defined in application level
  */
 bool IsPowerSettingInRange(uint8_t powerSetting, uint8_t minCookPower, uint8_t maxCookPower);
-
-
 
 } // namespace MicrowaveOvenControl
 } // namespace Clusters
