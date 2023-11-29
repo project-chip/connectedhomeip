@@ -51,7 +51,7 @@ public:
      * @param aOpStateInstance The pointer of Operational State Instance. 
      * @param aMicrowaveOvenModeInstance The pointer of Microwave Oven Mode Instance. 
      * Note: a MicrowaveOvenControl instance must live relying on an Operational State instance and a Microwave Oven Mode instance, 
-     * caller should be initialized the 2 instances before initializing MicorwaveOvenControl instance. 
+     * caller should be initialized that 2 instances before initializing MicorwaveOvenControl instance. 
      */
     Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, Clusters::OperationalState::Instance * aOpStateInstance, Clusters::ModeBase::Instance * aMicrowaveOvenModeInstance);
 
@@ -184,8 +184,8 @@ bool IsCookTimeInRange(uint32_t cookTime);
 /**
  *  @brief Check if the given cooking power is in range
  *  @param powerSetting    power setting that given by user
- *  @param minCookPower    the min power setting that defined via zap configuration
- *  @param maxCookPower    the max power setting that defined via zap configuration
+ *  @param minCookPower    the min power setting that defined in application level
+ *  @param maxCookPower    the max power setting that defined in application level
  */
 bool IsPowerSettingInRange(uint8_t powerSetting, uint8_t minCookPower, uint8_t maxCookPower);
 
