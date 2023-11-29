@@ -169,7 +169,7 @@ public:
 
         ConcreteCommandPath mRequestCommandPath;
         /**
-         * Should the method this is being provided to start/end the TLV container for the CommandFields element
+         * Whether the method this is being provided to should start/end the TLV container for the CommandFields element
          * within CommandDataIB.
          */
         bool mStartOrEndDataStruct = true;
@@ -250,7 +250,7 @@ public:
      *
      * @param [in] aResponseCommandPath the concrete response path that we are sending to Requester.
      * @param [in] aPrepareParameters struct containing paramters needs for preparing a command. Data
-     *             such as request path, and if method should start the CommandField element within
+     *             such as request path, and whether this method should start the CommandFields element within
      *             CommandDataIB.
      */
     CHIP_ERROR PrepareInvokeResponseCommand(const ConcreteCommandPath & aResponseCommandPath,
