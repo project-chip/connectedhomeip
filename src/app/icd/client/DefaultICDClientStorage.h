@@ -41,7 +41,7 @@ namespace chip {
 namespace app {
 
 /**
- * An DefaultICDClientStorage using ICDClientStorage as its backend.
+ * A DefaultICDClientStorage implementation of ICDClientStorage.
  */
 class DefaultICDClientStorage : public ICDClientStorage
 {
