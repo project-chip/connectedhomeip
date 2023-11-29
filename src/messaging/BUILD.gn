@@ -79,6 +79,9 @@ static_library("messaging") {
   ]
 
   if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd:notifier" ]
+    public_deps += [
+      "${chip_root}/src/app/icd:configuration-data",
+      "${chip_root}/src/app/icd:notifier",
+    ]
   }
 }
