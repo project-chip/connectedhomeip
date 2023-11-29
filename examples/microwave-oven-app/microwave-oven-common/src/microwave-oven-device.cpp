@@ -23,6 +23,9 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::ModeBase;
 using namespace chip::app::Clusters::MicrowaveOvenControl;
+template <typename T>
+using List                 = chip::app::DataModel::List<T>;
+using ModeTagStructType    = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 using OperationalStateEnum = chip::app::Clusters::OperationalState::OperationalStateEnum;
 using Status               = Protocols::InteractionModel::Status;
 
@@ -43,7 +46,7 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode,
 {
     // placeholder implementation
     Status status;
-    if((status = mMicrowaveOvenModeInstance.UpdateCurrentMode(cookMode) != Status::Success))
+    if((status = mMicrowaveOvenModeInstance.UpdateCurrentMode(cookMode)) != Status::Success)
     {
         return status;
     }
@@ -52,7 +55,7 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode,
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ExampleMicrowaveOvenDevice::HandleSetCookTimeCommandCallback(uint32_t finalCookTime)
+Protocols::InteractionModel::Status ExampleMicrowaveOvenDevice::HandleSetCookTimeCallback(uint32_t finalCookTime)
 {
     // placeholder implementation
     mMicrowaveOvenControlInstance.SetCookTime(finalCookTime);

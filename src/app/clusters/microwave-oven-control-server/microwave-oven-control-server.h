@@ -91,7 +91,7 @@ private:
      * set default values
      */
     uint32_t mCookTime   = kDefaultCookTime;
-    uint8_t mPowerSettng = kDefaultPowerSetting;
+    uint8_t mPowerSetting = kDefaultPowerSetting;
 
     /**
      * IM-level implementation of read

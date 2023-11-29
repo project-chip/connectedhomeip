@@ -39,7 +39,7 @@ namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
 
-Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, Clusters::OperationalState::Instance * aOpStateInstance) :
+Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, Clusters::OperationalState::Instance * aOpStateInstance, Clusters::ModeBase::Instance * aMicrowaveOvenModeInstance) :
     CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId), AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId),
     mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), 
     mOpStateInstance(aOpStateInstance), mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
@@ -75,7 +75,7 @@ uint32_t Instance::GetCookTime() const
 
 uint8_t Instance::GetPowerSetting() const
 {
-    return mPowerSettng;
+    return mPowerSetting;
 }
 
 void Instance::SetCookTime(uint32_t cookTime)
@@ -84,7 +84,7 @@ void Instance::SetCookTime(uint32_t cookTime)
     mCookTime = cookTime;
     if (mCookTime != oldCookTime)
     {
-        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::CookTime::Id));
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::CookTime::Id);
     }
 }
 
@@ -92,9 +92,9 @@ void Instance::SetPowerSetting(uint8_t powerSetting)
 {
     uint8_t oldPowerSetting = mPowerSetting;
     mPowerSetting = powerSetting;
-    if (mPowerSettng != oldPowerSetting)
+    if (mPowerSetting != oldPowerSetting)
     {
-        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::PowerSetting::Id));
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::PowerSetting::Id);
     }
 }
 
