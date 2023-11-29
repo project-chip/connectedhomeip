@@ -3210,12 +3210,12 @@ enum class PresetScenarioEnum : uint8_t
     kUnknownEnumValue = 7,
 };
 
-// Enum for SetpointAdjustModeEnum
-enum class SetpointAdjustModeEnum : uint8_t
+// Enum for SetpointChangeSourceEnum
+enum class SetpointChangeSourceEnum : uint8_t
 {
-    kHeat = 0x00,
-    kCool = 0x01,
-    kBoth = 0x02,
+    kManual   = 0x00,
+    kSchedule = 0x01,
+    kExternal = 0x02,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -3223,12 +3223,12 @@ enum class SetpointAdjustModeEnum : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for SetpointChangeSourceEnum
-enum class SetpointChangeSourceEnum : uint8_t
+// Enum for SetpointRaiseLowerModeEnum
+enum class SetpointRaiseLowerModeEnum : uint8_t
 {
-    kManual   = 0x00,
-    kSchedule = 0x01,
-    kExternal = 0x02,
+    kHeat = 0x00,
+    kCool = 0x01,
+    kBoth = 0x02,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -3334,6 +3334,8 @@ enum class Feature : uint32_t
 // Bitmap for HVACSystemTypeBitmap
 enum class HVACSystemTypeBitmap : uint8_t
 {
+    kCoolingStage      = 0x3,
+    kHeatingStage      = 0xC,
     kHeatingIsHeatPump = 0x10,
     kHeatingUsesFuel   = 0x20,
 };

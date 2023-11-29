@@ -231,16 +231,6 @@ tests:
               minValue: 0
               maxValue: 100
 
-    - label: "Step 11: Read HVACSystemTypeConfiguration attribute from the DUT"
-      PICS: TSTAT.S.A0009
-      command: "readAttribute"
-      attribute: "HVACSystemTypeConfiguration"
-      response:
-          constraints:
-              type: bitmap8
-              minValue: 0
-              maxValue: 63
-
     - label: "Step 12: Read LocalTemperatureCalibration attribute from the DUT"
       PICS: TSTAT.S.A0010
       command: "readAttribute"
@@ -717,7 +707,7 @@ tests:
     - label: "Step 51: Read ACCapacityFormat attribute from the DUT"
       PICS: TSTAT.S.A0047
       command: "readAttribute"
-      attribute: "ACCapacityformat"
+      attribute: "ACCapacityFormat"
       response:
           value: 0
           constraints:

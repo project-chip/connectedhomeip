@@ -2200,19 +2200,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::PresetScena
         return static_cast<EnumType>(7);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::SetpointAdjustModeEnum val)
-{
-    using EnumType = Thermostat::SetpointAdjustModeEnum;
-    switch (val)
-    {
-    case EnumType::kHeat:
-    case EnumType::kCool:
-    case EnumType::kBoth:
-        return val;
-    default:
-        return static_cast<EnumType>(3);
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::SetpointChangeSourceEnum val)
 {
     using EnumType = Thermostat::SetpointChangeSourceEnum;
@@ -2221,6 +2208,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::SetpointCha
     case EnumType::kManual:
     case EnumType::kSchedule:
     case EnumType::kExternal:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::SetpointRaiseLowerModeEnum val)
+{
+    using EnumType = Thermostat::SetpointRaiseLowerModeEnum;
+    switch (val)
+    {
+    case EnumType::kHeat:
+    case EnumType::kCool:
+    case EnumType::kBoth:
         return val;
     default:
         return static_cast<EnumType>(3);

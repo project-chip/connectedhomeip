@@ -17264,16 +17264,16 @@ typedef NS_ENUM(uint8_t, MTRThermostatPresetScenario) {
     MTRThermostatPresetScenarioUserDefined MTR_PROVISIONALLY_AVAILABLE = 0x06,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRThermostatSetpointAdjustMode) {
-    MTRThermostatSetpointAdjustModeHeat MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRThermostatSetpointAdjustModeCool MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRThermostatSetpointAdjustModeBoth MTR_PROVISIONALLY_AVAILABLE = 0x02,
-} MTR_PROVISIONALLY_AVAILABLE;
-
 typedef NS_ENUM(uint8_t, MTRThermostatSetpointChangeSource) {
     MTRThermostatSetpointChangeSourceManual MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRThermostatSetpointChangeSourceSchedule MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRThermostatSetpointChangeSourceExternal MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRThermostatSetpointRaiseLowerMode) {
+    MTRThermostatSetpointRaiseLowerModeHeat MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRThermostatSetpointRaiseLowerModeCool MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRThermostatSetpointRaiseLowerModeBoth MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRThermostatStartOfWeek) {
@@ -17339,6 +17339,8 @@ typedef NS_OPTIONS(uint32_t, MTRThermostatFeature) {
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint8_t, MTRThermostatHVACSystemTypeBitmap) {
+    MTRThermostatHVACSystemTypeBitmapCoolingStage MTR_PROVISIONALLY_AVAILABLE = 0x3,
+    MTRThermostatHVACSystemTypeBitmapHeatingStage MTR_PROVISIONALLY_AVAILABLE = 0xC,
     MTRThermostatHVACSystemTypeBitmapHeatingIsHeatPump MTR_PROVISIONALLY_AVAILABLE = 0x10,
     MTRThermostatHVACSystemTypeBitmapHeatingUsesFuel MTR_PROVISIONALLY_AVAILABLE = 0x20,
 } MTR_PROVISIONALLY_AVAILABLE;

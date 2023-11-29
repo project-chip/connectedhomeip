@@ -1542,16 +1542,16 @@ cluster Thermostat = 513 {
     kUserDefined = 6;
   }
 
-  enum SetpointAdjustModeEnum : enum8 {
-    kHeat = 0;
-    kCool = 1;
-    kBoth = 2;
-  }
-
   enum SetpointChangeSourceEnum : enum8 {
     kManual = 0;
     kSchedule = 1;
     kExternal = 2;
+  }
+
+  enum SetpointRaiseLowerModeEnum : enum8 {
+    kHeat = 0;
+    kCool = 1;
+    kBoth = 2;
   }
 
   enum StartOfWeekEnum : enum8 {
@@ -1616,6 +1616,8 @@ cluster Thermostat = 513 {
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
+    kCoolingStage = 0x3;
+    kHeatingStage = 0xC;
     kHeatingIsHeatPump = 0x10;
     kHeatingUsesFuel = 0x20;
   }
@@ -1796,7 +1798,7 @@ cluster Thermostat = 513 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SetpointRaiseLowerRequest {
-    SetpointAdjustModeEnum mode = 0;
+    SetpointRaiseLowerModeEnum mode = 0;
     int8s amount = 1;
   }
 

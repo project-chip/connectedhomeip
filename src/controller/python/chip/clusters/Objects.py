@@ -27732,20 +27732,20 @@ class Thermostat(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 7,
 
-        class SetpointAdjustModeEnum(MatterIntEnum):
-            kHeat = 0x00
-            kCool = 0x01
-            kBoth = 0x02
+        class SetpointChangeSourceEnum(MatterIntEnum):
+            kManual = 0x00
+            kSchedule = 0x01
+            kExternal = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 3,
 
-        class SetpointChangeSourceEnum(MatterIntEnum):
-            kManual = 0x00
-            kSchedule = 0x01
-            kExternal = 0x02
+        class SetpointRaiseLowerModeEnum(MatterIntEnum):
+            kHeat = 0x00
+            kCool = 0x01
+            kBoth = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
@@ -27828,6 +27828,8 @@ class Thermostat(Cluster):
             kQueuedPresetsSupported = 0x400
 
         class HVACSystemTypeBitmap(IntFlag):
+            kCoolingStage = 0x3
+            kHeatingStage = 0xC
             kHeatingIsHeatPump = 0x10
             kHeatingUsesFuel = 0x20
 
@@ -28012,11 +28014,11 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="mode", Tag=0, Type=Thermostat.Enums.SetpointAdjustModeEnum),
+                        ClusterObjectFieldDescriptor(Label="mode", Tag=0, Type=Thermostat.Enums.SetpointRaiseLowerModeEnum),
                         ClusterObjectFieldDescriptor(Label="amount", Tag=1, Type=int),
                     ])
 
-            mode: 'Thermostat.Enums.SetpointAdjustModeEnum' = 0
+            mode: 'Thermostat.Enums.SetpointRaiseLowerModeEnum' = 0
             amount: 'int' = 0
 
         @dataclass

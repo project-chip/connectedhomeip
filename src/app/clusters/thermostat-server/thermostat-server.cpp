@@ -742,7 +742,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
 
     switch (mode)
     {
-    case SetpointAdjustModeEnum::kBoth:
+    case SetpointRaiseLowerModeEnum::kBoth:
         if (HeatSupported && CoolSupported)
         {
             int16_t DesiredCoolingSetpoint, CoolLimit, DesiredHeatingSetpoint, HeatLimit;
@@ -822,7 +822,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
             status = EMBER_ZCL_STATUS_SUCCESS;
         break;
 
-    case SetpointAdjustModeEnum::kCool:
+    case SetpointRaiseLowerModeEnum::kCool:
         if (CoolSupported)
         {
             if (OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
@@ -875,7 +875,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
             status = EMBER_ZCL_STATUS_INVALID_COMMAND;
         break;
 
-    case SetpointAdjustModeEnum::kHeat:
+    case SetpointRaiseLowerModeEnum::kHeat:
         if (HeatSupported)
         {
             if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)

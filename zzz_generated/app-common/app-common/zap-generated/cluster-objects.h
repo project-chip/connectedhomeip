@@ -25613,8 +25613,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetpointRaiseLower::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    SetpointAdjustModeEnum mode = static_cast<SetpointAdjustModeEnum>(0);
-    int8_t amount               = static_cast<int8_t>(0);
+    SetpointRaiseLowerModeEnum mode = static_cast<SetpointRaiseLowerModeEnum>(0);
+    int8_t amount                   = static_cast<int8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -25629,8 +25629,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetpointRaiseLower::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    SetpointAdjustModeEnum mode = static_cast<SetpointAdjustModeEnum>(0);
-    int8_t amount               = static_cast<int8_t>(0);
+    SetpointRaiseLowerModeEnum mode = static_cast<SetpointRaiseLowerModeEnum>(0);
+    int8_t amount                   = static_cast<int8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetpointRaiseLower
