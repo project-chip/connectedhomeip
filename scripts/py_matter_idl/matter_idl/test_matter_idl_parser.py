@@ -27,10 +27,9 @@ except ModuleNotFoundError:
 import unittest
 
 from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeQuality,
-                                         AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandInstantiation,
-                                         CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority,
-                                         EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
-                                         StructTag)
+                                         AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
+                                         ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
+                                         Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructTag)
 
 
 def parseText(txt, skip_meta=True):
@@ -63,8 +62,7 @@ class TestParser(unittest.TestCase):
         """)
 
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER,
-                    name="MyCluster",
+            Cluster(name="MyCluster",
                     code=0x321,
                     attributes=[
                         Attribute(qualities=AttributeQuality.READABLE, definition=Field(
@@ -86,7 +84,7 @@ class TestParser(unittest.TestCase):
             }
 
             /** Documentation for MyCluster #2 */
-            client cluster MyCluster = 0x321 {
+            client cluster MyCluster2 = 0x322 {
                 /* NOT a doc comment */
                 command WithoutArg(): DefaultSuccess = 123;
 
@@ -115,8 +113,7 @@ class TestParser(unittest.TestCase):
         """)
 
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER,
-                    name="MyCluster",
+            Cluster(name="MyCluster",
                     code=1,
                     attributes=[
                         Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
@@ -138,8 +135,7 @@ class TestParser(unittest.TestCase):
         """)
 
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER,
-                    name="MyCluster",
+            Cluster(name="MyCluster",
                     code=1,
                     attributes=[
                         Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
@@ -166,8 +162,7 @@ class TestParser(unittest.TestCase):
         """)
 
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER,
-                    name="MyCluster",
+            Cluster(name="MyCluster",
                     code=1,
                     attributes=[
                         Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
@@ -212,8 +207,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER,
-                    name="WithCommands",
+            Cluster(name="WithCommands",
                     code=1,
                     structs=[
                         Struct(name="FreeStruct", fields=[]),
@@ -252,8 +246,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER,
-                    name="WithCommands",
+            Cluster(name="WithCommands",
                     code=1,
                     structs=[
                         Struct(name="InParam", fields=[],
@@ -287,8 +280,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.CLIENT,
-                    name="WithEnums",
+            Cluster(name="WithEnums",
                     code=0xab,
                     enums=[
                         Enum(name="TestEnum", base_type="ENUM16",
@@ -310,8 +302,7 @@ class TestParser(unittest.TestCase):
            }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER,
-                    name="MaturityTest",
+            Cluster(name="MaturityTest",
                     code=1,
                     events=[
                         Event(priority=EventPriority.CRITICAL, name="TestEvent", code=123, fields=[
@@ -338,8 +329,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.CLIENT,
-                    name="WithEnums",
+            Cluster(name="WithEnums",
                     code=0xab,
                     enums=[
                         Enum(name="TestEnum", base_type="ENUM16",
@@ -364,8 +354,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.CLIENT,
-                    name="Test",
+            Cluster(name="Test",
                     code=0xab,
                     bitmaps=[
                         Bitmap(name="TestBitmap", base_type="BITMAP32",
@@ -390,8 +379,7 @@ class TestParser(unittest.TestCase):
            }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER,
-                    name="MaturityTest",
+            Cluster(name="MaturityTest",
                     code=1,
                     structs=[
                         Struct(name="TestStruct", fields=[
@@ -450,8 +438,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.CLIENT,
-                    name="Test",
+            Cluster(name="Test",
                     code=0xab,
                     enums=[
                         Enum(name="StableEnum", base_type="ENUM16", entries=[]),
@@ -535,8 +522,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.CLIENT,
-                    name="Test",
+            Cluster(name="Test",
                     code=0xab,
                     bitmaps=[
                         Bitmap(name="TestBitmap", base_type="BITMAP32",
@@ -558,8 +544,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.CLIENT,
-                    name="EventTester",
+            Cluster(name="EventTester",
                     code=0x123,
                     events=[
                         Event(priority=EventPriority.CRITICAL, name="StartUp", code=0, fields=[
@@ -582,8 +567,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.CLIENT,
-                    name="EventTester",
+            Cluster(name="EventTester",
                     code=0x123,
                     events=[
                         Event(priority=EventPriority.INFO, readacl=AccessPrivilege.VIEW,
@@ -604,8 +588,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.CLIENT,
-                    name="EventTester",
+            Cluster(name="EventTester",
                     code=0x123,
                     events=[
                         Event(priority=EventPriority.INFO, readacl=AccessPrivilege.VIEW,
@@ -627,9 +610,9 @@ server cluster A = 1 { /* Test comment */ }
 
         expected = Idl(clusters=[
             Cluster(parse_meta=ParseMetaData(line=2, column=1, start_pos=1),
-                    side=ClusterSide.SERVER, name="A", code=1),
+                    name="A", code=1),
             Cluster(parse_meta=ParseMetaData(line=5, column=4, start_pos=87),
-                    side=ClusterSide.CLIENT, name="B", code=2),
+                    name="B", code=2),
         ])
         self.assertEqual(actual, expected)
 
@@ -641,9 +624,9 @@ server cluster A = 1 { /* Test comment */ }
         """)
 
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER, name="A", code=1),
-            Cluster(side=ClusterSide.CLIENT, name="B", code=2),
-            Cluster(side=ClusterSide.CLIENT, name="C", code=3),
+            Cluster(name="A", code=1),
+            Cluster(name="B", code=2),
+            Cluster(name="C", code=3),
         ])
         self.assertEqual(actual, expected)
 
@@ -736,11 +719,9 @@ server cluster A = 1 { /* Test comment */ }
         """)
 
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER, name="A", code=1,
-                    api_maturity=ApiMaturity.PROVISIONAL),
-            Cluster(side=ClusterSide.CLIENT, name="B", code=2,
-                    api_maturity=ApiMaturity.INTERNAL),
-            Cluster(side=ClusterSide.CLIENT, name="C", code=3),
+            Cluster(name="A", code=1, api_maturity=ApiMaturity.PROVISIONAL),
+            Cluster(name="B", code=2, api_maturity=ApiMaturity.INTERNAL),
+            Cluster(name="C", code=3),
         ])
         self.assertEqual(actual, expected)
 
@@ -783,10 +764,10 @@ server cluster A = 1 { /* Test comment */ }
         """)
 
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER, name="A", code=1, revision=1),
-            Cluster(side=ClusterSide.CLIENT, name="B", code=2, revision=1),
-            Cluster(side=ClusterSide.CLIENT, name="C", code=3, revision=2),
-            Cluster(side=ClusterSide.CLIENT, name="D", code=4, revision=123),
+            Cluster(name="A", code=1, revision=1),
+            Cluster(name="B", code=2, revision=1),
+            Cluster(name="C", code=3, revision=2),
+            Cluster(name="D", code=4, revision=123),
         ])
         self.assertEqual(actual, expected)
 
