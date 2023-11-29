@@ -573,13 +573,14 @@ CHIP_ERROR CommandHandler::AddClusterSpecificFailure(const ConcreteCommandPath &
     return AddStatusInternal(aCommandPath, StatusIB(Status::Failure, aClusterStatus));
 }
 
-CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const CommandHandler::PrepareParameters & aPrepareParameters,
-                                                        const ConcreteCommandPath & aResponseCommandPath, bool aStartDataStruct)
+CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const ConcreteCommandPath & aResponseCommandPath,
+                                                        const CommandHandler::InvokeResponseParameters & aPrepareParameters)
 {
     auto commandPathRegistryEntry = GetCommandPathRegistry().Find(aPrepareParameters.mRequestCommandPath);
     VerifyOrReturnValue(commandPathRegistryEntry.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
-    return PrepareInvokeResponseCommand(commandPathRegistryEntry.Value(), aResponseCommandPath, aStartDataStruct);
+    return PrepareInvokeResponseCommand(commandPathRegistryEntry.Value(), aResponseCommandPath,
+                                        aPrepareParameters.mStartOrEndDataStruct);
 }
 
 CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aResponseCommandPath, bool aStartDataStruct)

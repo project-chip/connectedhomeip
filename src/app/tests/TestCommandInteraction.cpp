@@ -165,9 +165,9 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
         }
         else
         {
-            const CommandHandler::PrepareParameters prepareParams = { aRequestCommandPath };
-            const ConcreteCommandPath responseCommandPath         = aRequestCommandPath;
-            apCommandObj->PrepareInvokeResponseCommand(prepareParams, responseCommandPath);
+            const CommandHandler::InvokeResponseParameters prepareParams(aRequestCommandPath);
+            const ConcreteCommandPath responseCommandPath = aRequestCommandPath;
+            apCommandObj->PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
             chip::TLV::TLVWriter * writer = apCommandObj->GetCommandDataIBTLVWriter();
             writer->PutBoolean(chip::TLV::ContextTag(1), true);
             apCommandObj->FinishCommand();
@@ -491,9 +491,9 @@ void TestCommandInteraction::AddInvokeResponseData(nlTestSuite * apSuite, void *
     }
     else
     {
-        const CommandHandler::PrepareParameters prepareParams = { requestCommandPath };
+        const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
         ConcreteCommandPath responseCommandPath               = { kTestEndpointId, kTestClusterId, aCommandId };
-        err = apCommandHandler->PrepareInvokeResponseCommand(prepareParams, responseCommandPath);
+        err = apCommandHandler->PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         chip::TLV::TLVWriter * writer = apCommandHandler->GetCommandDataIBTLVWriter();
@@ -528,8 +528,8 @@ void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSu
     CommandHandlerWithOutstandingCommand commandHandler(&mockCommandHandlerDelegate, requestCommandPath,
                                                         /* aRef = */ NullOptional);
 
-    const CommandHandler::PrepareParameters prepareParams = { requestCommandPath };
-    err = commandHandler.PrepareInvokeResponseCommand(prepareParams, responseCommandPath);
+    const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
+    err = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     TestExchangeDelegate delegate;
@@ -585,8 +585,8 @@ void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite 
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
     commandHandler.mExchangeCtx.Grab(exchange);
 
-    const CommandHandler::PrepareParameters prepareParams = { requestCommandPath };
-    err = commandHandler.PrepareInvokeResponseCommand(prepareParams, responseCommandPath);
+    const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
+    err = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = commandHandler.FinishCommand();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);

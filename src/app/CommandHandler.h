@@ -153,12 +153,18 @@ public:
         uint32_t mMagic            = 0;
     };
 
-    // While this only contains one field for now, this is done in order to future proof if more information
-    // is needed when calling PrepareInvokeResponseCommand. Previously we wanted to add aRequestCommandPath but
-    // could not, as code outside of SDK is calling PrepareCommand. Now we can extend as needed a little easier.
-    struct PrepareParameters
+    // Previously we kept adding arguments with default values individually as parameters. This is because there
+    // is legacy code outside of the SDK that would call PrepareCommand. With the new PrepareInvokeResponseCommand
+    // replacing PrepareCommand, we took this opportunity to create a new parameter structure to make it easier to
+    // add new parameters without there needing to be an ever increase parameter list with defaults.
+    struct InvokeResponseParameters
     {
+        InvokeResponseParameters(ConcreteCommandPath aRequestCommandPath, bool aStartOrEndDataStruct = true) :
+            mRequestCommandPath(aRequestCommandPath), mStartOrEndDataStruct(aStartOrEndDataStruct)
+        {}
+
         ConcreteCommandPath mRequestCommandPath;
+        bool mStartOrEndDataStruct;
     };
 
     class TestOnlyMarker
@@ -233,13 +239,11 @@ public:
      * Upon success, the caller is expected to call `FinishCommand` once they have added
      * all Data into Fields element of CommandDataIB.
      *
-     * @param [in] aPrepareParameters struct containing paramters needs for preparing a command, such as request path.
      * @param [in] aResponseCommandPath the concrete response path that we are sending to Requester.
-     * @param [in] aStartDataStruct starts the TLV container for the CommandFields element within
-     *             CommandDataIB.
+     * @param [in] aPrepareParameters struct containing paramters needs for preparing a command, such as request path.
      */
-    CHIP_ERROR PrepareInvokeResponseCommand(const PrepareParameters & aPrepareParameters,
-                                            const ConcreteCommandPath & aResponseCommandPath, bool aStartDataStruct = true);
+    CHIP_ERROR PrepareInvokeResponseCommand(const ConcreteCommandPath & aResponseCommandPath,
+                                            const InvokeResponseParameters & aPrepareParameters);
 
     [[deprecated("PrepareCommand now needs the requested command path. Please use PrepareInvokeResponseCommand")]] CHIP_ERROR
     PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct = true);
@@ -499,9 +503,10 @@ private:
         // Return early in case of requests targeted to a group, since they should not add a response.
         VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
 
-        PrepareParameters prepareParams = { aRequestCommandPath };
-        ConcreteCommandPath path = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId, CommandData::GetCommandId() };
-        ReturnErrorOnFailure(PrepareInvokeResponseCommand(prepareParams, path, false));
+        InvokeResponseParameters prepareParams(aRequestCommandPath, /* aStartOrEndDataStruct = */ false);
+        ConcreteCommandPath responsePath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId,
+                                             CommandData::GetCommandId() };
+        ReturnErrorOnFailure(PrepareInvokeResponseCommand(responsePath, prepareParams));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
