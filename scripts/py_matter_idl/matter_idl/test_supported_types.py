@@ -26,7 +26,7 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.generators.type_definitions import ParseDataType
 
-from matter_idl.generators.type_definitions import BasicInteger, FundamentalType, TypeLookupContext
+from matter_idl.generators.type_definitions import BasicInteger, TypeLookupContext
 from matter_idl.matter_idl_types import DataType, Idl
 
 
