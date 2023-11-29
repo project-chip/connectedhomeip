@@ -144,7 +144,7 @@ extern NSString * const MTREventPriorityKey MTR_AVAILABLE(ios(16.5), macos(13.4)
 extern NSString * const MTREventTimeTypeKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 extern NSString * const MTREventSystemUpTimeKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 extern NSString * const MTREventTimestampDateKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-extern NSString * const MTREventIsHistoricalKey MTR_NEWLY_AVAILABLE;
+extern NSString * const MTREventIsHistoricalKey MTR_AVAILABLE(ios(17.3), macos(14.3), watchos(10.3), tvos(17.3));
 
 @class MTRClusterStateCacheContainer;
 @class MTRAttributeCacheContainer;
