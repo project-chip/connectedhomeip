@@ -38,8 +38,6 @@
 #include <setup_payload/SetupPayload.h>
 #include <system/TimeSource.h>
 
-#include <app/server/Server.h>
-
 namespace chip {
 namespace app {
 namespace {
@@ -149,11 +147,13 @@ CHIP_ERROR DnssdServer::SetEphemeralDiscriminator(Optional<uint16_t> discriminat
 template <class AdvertisingParams>
 void DnssdServer::AddICDKeyToAdvertisement(AdvertisingParams & advParams)
 {
+    VerifyOrDieWithMsg(mICDManager != nullptr, Discovery,
+                       "Invalid pointer to the ICDManager which is required for the LIT operating mode");
+
     // Only advertise the ICD key if the device can operate as a LIT
-    if (Server::GetInstance().GetICDManager().SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
+    if (mICDManager->SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
     {
-        advParams.SetICDOperatingAsLIT(
-            Optional<bool>(Server::GetInstance().GetICDManager().GetICDMode() == ICDManager::ICDMode::LIT));
+        advParams.SetICDOperatingAsLIT(Optional<bool>(mICDManager->GetICDMode() == ICDConfigurationData::ICDMode::LIT));
     }
 }
 #endif

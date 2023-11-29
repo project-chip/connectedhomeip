@@ -63,11 +63,12 @@ command: command_qualities command_with_access "(" id? ")" ":" id "=" positive_i
 
 cluster_revision: "revision"i positive_integer ";"
 
-cluster: [maturity] cluster_side "cluster"i id "=" positive_integer "{" [cluster_revision] cluster_content* "}"
-?cluster_side: "server"i -> server_cluster
-             | "client"i -> client_cluster
-?cluster_content: [maturity] (enum|bitmap|event|attribute|struct|request_struct|response_struct|command)
+// NOTE:
+//   Client or server cluster entries are for backwards compatibility only and have
+//   no direct meaning currently
+cluster: [maturity] ( "client" | "server" )? "cluster"i id "=" positive_integer "{" [cluster_revision] cluster_content* "}"
 
+?cluster_content: [maturity] (enum|bitmap|event|attribute|struct|request_struct|response_struct|command)
 
 endpoint: "endpoint"i positive_integer "{" endpoint_content* "}"
 ?endpoint_content: endpoint_cluster_binding | endpoint_server_cluster | endpoint_device_type
