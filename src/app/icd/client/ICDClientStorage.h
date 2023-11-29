@@ -83,7 +83,7 @@ public:
     virtual CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex) = 0;
 
     /**
-     * Process received ICD Check-in message payload.  The implementation needs to parse the payload, 
+     * Process received ICD Check-in message payload.  The implementation needs to parse the payload,
      * look for a key that allows successfully decrypting the payload, verify that the counter in the payload is valid,
      * and populate the clientInfo with the stored information corresponding to the key.
      * @param[in] payload received checkIn Message payload
