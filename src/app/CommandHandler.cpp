@@ -593,7 +593,7 @@ CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aResponseC
     // At this point application supports Batch Invoke Commands since CommandPathRegistry has more than 1 entry,
     // but application is calling the deprecated PrepareCommand. We have no way to determine the associated CommandRef
     // to put into the InvokeResponse.
-    VerifyOrDieWithMsg(countOfPathRegistryEntries > 1, DataManagement,
+    VerifyOrDieWithMsg(countOfPathRegistryEntries == 1, DataManagement,
                        "Seemingly device supports batch commands, but is calling the deprecated PrepareCommand API");
 
     auto commandPathRegistryEntry = GetCommandPathRegistry().GetFirstEntry();
@@ -614,6 +614,8 @@ CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const CommandPathRegistr
     //
     VerifyOrReturnError(mState == State::Idle || mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
 
+    // TODO(#30453): See if we can pass this back up the stack so caller can provide this instead of taking up
+    // space in CommandHanlder.
     mRefForResponse = apCommandPathRegistryEntry.ref;
 
     MoveToState(State::Preparing);

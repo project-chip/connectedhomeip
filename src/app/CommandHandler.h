@@ -156,15 +156,25 @@ public:
     // Previously we kept adding arguments with default values individually as parameters. This is because there
     // is legacy code outside of the SDK that would call PrepareCommand. With the new PrepareInvokeResponseCommand
     // replacing PrepareCommand, we took this opportunity to create a new parameter structure to make it easier to
-    // add new parameters without there needing to be an ever increase parameter list with defaults.
+    // add new parameters without there needing to be an ever increasing parameter list with defaults.
     struct InvokeResponseParameters
     {
-        InvokeResponseParameters(ConcreteCommandPath aRequestCommandPath, bool aStartOrEndDataStruct = true) :
-            mRequestCommandPath(aRequestCommandPath), mStartOrEndDataStruct(aStartOrEndDataStruct)
+        InvokeResponseParameters(ConcreteCommandPath aRequestCommandPath) :
+            mRequestCommandPath(aRequestCommandPath)
         {}
 
+        InvokeResponseParameters & SetStartOrEndDataStruct(bool aStartOrEndDataStruct)
+        {
+            mStartOrEndDataStruct = aStartOrEndDataStruct;
+            return *this;
+        }
+
         ConcreteCommandPath mRequestCommandPath;
-        bool mStartOrEndDataStruct;
+        /**
+         * Should the method this is being provided to start/end the TLV container for the CommandFields element
+         * within CommandDataIB.
+         */
+        bool mStartOrEndDataStruct = true;
     };
 
     class TestOnlyMarker
@@ -200,7 +210,8 @@ public:
                                 System::PacketBufferHandle && payload, bool isTimedInvoke);
 
     /**
-     * Checks that all CommandDataIB within InvokeRequests is correct as per spec.
+     * Checks that all CommandDataIB within InvokeRequests satisfy the spec's general
+     * constraints for CommandDataIB.
      *
      * This also builds a registry that to ensure that all commands can be responded
      * to with the data required as per spec.
@@ -233,14 +244,16 @@ public:
      * `CommandDataIB`.
      *
      * This call will fail if CommandHandler is already in the middle of building a
-     * CommandStatusIB or CommandDataID (ei something has called Perpare*, without
+     * CommandStatusIB or CommandDataIB (i.e. something has called Prepare*, without
      * calling Finish*), or is already sending InvokeResponseMessage.
      *
      * Upon success, the caller is expected to call `FinishCommand` once they have added
-     * all Data into Fields element of CommandDataIB.
+     * all the fields into the CommandFields element of CommandDataIB.
      *
      * @param [in] aResponseCommandPath the concrete response path that we are sending to Requester.
-     * @param [in] aPrepareParameters struct containing paramters needs for preparing a command, such as request path.
+     * @param [in] aPrepareParameters struct containing paramters needs for preparing a command. Data
+     *             such as request path, and if method should start the CommandField element within
+     *             CommandDataIB.
      */
     CHIP_ERROR PrepareInvokeResponseCommand(const ConcreteCommandPath & aResponseCommandPath,
                                             const InvokeResponseParameters & aPrepareParameters);
@@ -254,12 +267,12 @@ public:
      * Caller must have first successfully called `PrepareInvokeResponseCommand`.
      *
      * @param [in] aEndDataStruct end the TLV container for the CommandFields element within
-     *             CommandDataIB.
+     *             CommandDataIB. This should match the boolean passed into Prepare*.
      *
      * @return CHIP_ERROR_INCORRECT_STATE
      *                      If device has not previously successfully called
      *                      `PrepareInvokeResponseCommand`.
-     * @retval CHIP_ERROR_BUFFER_TOO_SMALL
+     * @return CHIP_ERROR_BUFFER_TOO_SMALL
      *                      If writing the values needed to finish the InvokeReponseIB
      *                      with the current contents of the InvokeResponseMessage
      *                      would exceed the limit. When this error occurs, it is possible
@@ -271,6 +284,8 @@ public:
      * @return other        Other TLVWriter related errors. Typically occurs if
      *                      `GetCommandDataIBTLVWriter()` was called and used incorrectly.
      */
+    // TODO(#30453): We should be able to eliminate the chances of OOM issues with reserve.
+    // This will be completed in a follow up PR.
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
 
     /**
@@ -278,11 +293,11 @@ public:
      * aCommandPath into the CommandPath element within CommandStatusIB.
      *
      * This call will fail if CommandHandler is already in the middle of building a
-     * CommandStatusIB or CommandDataID (ei something has called Perpare*, without
+     * CommandStatusIB or CommandDataIB (i.e. something has called Prepare*, without
      * calling Finish*), or is already sending InvokeResponseMessage.
      *
-     * Upon success, the caller is expected to call `FinishStatus` once they have added
-     * data into Fields element of CommandStatusIB.
+     * Upon success, the caller is expected to call `FinishStatus` once they have encoded
+     * StatusIB.
      *
      * @param [in] aCommandPath the concrete path of the command we are responding to.
      */
