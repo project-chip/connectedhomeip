@@ -244,9 +244,11 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
     mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
 #endif
 
+#if CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
     static GenericDeviceInstanceInfoProvider<ConfigClass> sGenericDeviceInstanceInfoProvider(*this);
 
     SetDeviceInstanceInfoProvider(&sGenericDeviceInstanceInfoProvider);
+#endif
 
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
     // Using a temporary singleton here because the overall GenericConfigurationManagerImpl is
