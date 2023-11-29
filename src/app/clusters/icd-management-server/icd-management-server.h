@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/icd/ICDConfigurationData.h>
@@ -37,16 +38,14 @@ public:
 
     static void Init(chip::PersistentStorageDelegate & storage, chip::Crypto::SymmetricKeystore * symmetricKeystore,
                      chip::ICDConfigurationData & ICDConfigurationData);
-    Status RegisterClient(chip::FabricIndex fabric_index, chip::NodeId node_id, uint64_t monitored_subject, chip::ByteSpan key,
-                          chip::Optional<chip::ByteSpan> verification_key, bool is_admin, uint32_t & icdCounter);
+    Status RegisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                          const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData,
+                          uint32_t & icdCounter);
 
-    Status UnregisterClient(chip::FabricIndex fabric_index, chip::NodeId node_id, chip::Optional<chip::ByteSpan> verificationKey,
-                            bool is_admin);
+    Status UnregisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                            const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
 
     Status StayActiveRequest(chip::FabricIndex fabric_index);
-
-    CHIP_ERROR CheckAdmin(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                          bool & is_admin);
 
 private:
     /**
@@ -54,6 +53,9 @@ private:
      *        from the ICDMonitoringTable.
      */
     void TriggerICDMTableUpdatedEvent();
+
+    CHIP_ERROR CheckAdmin(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                          bool & is_admin);
 
     static chip::PersistentStorageDelegate * mStorage;
     static chip::Crypto::SymmetricKeystore * mSymmetricKeystore;

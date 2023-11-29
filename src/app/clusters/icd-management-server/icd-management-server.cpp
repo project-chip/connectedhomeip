@@ -198,9 +198,19 @@ PersistentStorageDelegate * ICDManagementServer::mStorage           = nullptr;
 Crypto::SymmetricKeystore * ICDManagementServer::mSymmetricKeystore = nullptr;
 ICDConfigurationData * ICDManagementServer::mICDConfigurationData   = nullptr;
 
-Status ICDManagementServer::RegisterClient(FabricIndex fabric_index, NodeId node_id, uint64_t monitored_subject, ByteSpan key,
-                                           Optional<ByteSpan> verification_key, bool isAdmin, uint32_t & icdCounter)
+Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                           const Commands::RegisterClient::DecodableType & commandData, uint32_t & icdCounter)
 {
+    FabricIndex fabric_index            = commandObj->GetAccessingFabricIndex();
+    NodeId node_id                      = commandData.checkInNodeID;
+    uint64_t monitored_subject          = commandData.monitoredSubject;
+    ByteSpan key                        = commandData.key;
+    Optional<ByteSpan> verification_key = commandData.verificationKey;
+    bool isAdmin                        = false;
+
+    // Check if client is admin
+    VerifyOrReturnError(CHIP_NO_ERROR == CheckAdmin(commandObj, commandPath, isAdmin), InteractionModel::Status::Failure);
+
     bool isFirstEntryForFabric = false;
     ICDMonitoringTable table(*mStorage, fabric_index, mICDConfigurationData->GetClientsSupportedPerFabric(), mSymmetricKeystore);
 
@@ -262,9 +272,17 @@ Status ICDManagementServer::RegisterClient(FabricIndex fabric_index, NodeId node
     return InteractionModel::Status::Success;
 }
 
-Status ICDManagementServer::UnregisterClient(FabricIndex fabric_index, NodeId node_id, Optional<ByteSpan> verificationKey,
-                                             bool isAdmin)
+Status ICDManagementServer::UnregisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                             const Commands::UnregisterClient::DecodableType & commandData)
 {
+    FabricIndex fabric_index            = commandObj->GetAccessingFabricIndex();
+    NodeId node_id                      = commandData.checkInNodeID;
+    Optional<ByteSpan> verification_key = commandData.verificationKey;
+    bool isAdmin                        = false;
+
+    // Check if client is admin
+    VerifyOrReturnError(CHIP_NO_ERROR == CheckAdmin(commandObj, commandPath, isAdmin), InteractionModel::Status::Failure);
+
     ICDMonitoringTable table(*mStorage, fabric_index, mICDConfigurationData->GetClientsSupportedPerFabric(), mSymmetricKeystore);
 
     // Get current entry, if exists
@@ -276,8 +294,8 @@ Status ICDManagementServer::UnregisterClient(FabricIndex fabric_index, NodeId no
     // Existing entry: Validate Key if, and only if, the ISD has NOT administrator permissions
     if (!isAdmin)
     {
-        VerifyOrReturnError(verificationKey.HasValue(), InteractionModel::Status::Failure);
-        VerifyOrReturnError(entry.IsKeyEquivalent(verificationKey.Value()), InteractionModel::Status::Failure);
+        VerifyOrReturnError(verification_key.HasValue(), InteractionModel::Status::Failure);
+        VerifyOrReturnError(entry.IsKeyEquivalent(verification_key.Value()), InteractionModel::Status::Failure);
     }
 
     err = table.Remove(entry.index);
@@ -339,17 +357,10 @@ void ICDManagementServer::Init(PersistentStorageDelegate & storage, Crypto::Symm
 bool emberAfIcdManagementClusterRegisterClientCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                        const Commands::RegisterClient::DecodableType & commandData)
 {
-    InteractionModel::Status status = InteractionModel::Status::Failure;
-    bool isAdmin                    = false;
-    uint32_t icdCounter             = 0;
-    ICDManagementServer server;
+    uint32_t icdCounter = 0;
 
-    if (CHIP_NO_ERROR == server.CheckAdmin(commandObj, commandPath, isAdmin))
-    {
-        status =
-            server.RegisterClient(commandObj->GetAccessingFabricIndex(), commandData.checkInNodeID, commandData.monitoredSubject,
-                                  commandData.key, commandData.verificationKey, isAdmin, icdCounter);
-    }
+    ICDManagementServer server;
+    InteractionModel::Status status = server.RegisterClient(commandObj, commandPath, commandData, icdCounter);
 
     if (InteractionModel::Status::Success == status)
     {
@@ -371,15 +382,8 @@ bool emberAfIcdManagementClusterRegisterClientCallback(CommandHandler * commandO
 bool emberAfIcdManagementClusterUnregisterClientCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                          const Commands::UnregisterClient::DecodableType & commandData)
 {
-    InteractionModel::Status status = InteractionModel::Status::Failure;
-    bool isAdmin                    = false;
     ICDManagementServer server;
-
-    if (CHIP_NO_ERROR == server.CheckAdmin(commandObj, commandPath, isAdmin))
-    {
-        status = server.UnregisterClient(commandObj->GetAccessingFabricIndex(), commandData.checkInNodeID,
-                                         commandData.verificationKey, isAdmin);
-    }
+    InteractionModel::Status status = server.UnregisterClient(commandObj, commandPath, commandData);
 
     commandObj->AddStatus(commandPath, status);
     return true;
