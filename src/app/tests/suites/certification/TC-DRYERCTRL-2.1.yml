@@ -1,0 +1,86 @@
+name: 3.2.1. [TC-DRYERCTRL-2.1]  Optional Dryness attributes with server as DUT
+
+PICS:
+    - DRYERCTRL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Laundry Dryer Controls"
+    endpoint: 1
+
+ unsupportedSelectedDrynessLevel:
+  type: int8u
+  defaultValue: 4
+
+  SupportedDrynessLevel:
+    type: int8u
+    defaultValue: 1
+    
+
+  
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+     - label: "Step 2: Read the mandatory attribute: SupportedDrynessLevels"
+      PICS: DRYERCTRL.S.A0000
+      command: "readAttribute"
+      attribute: "SupportedDrynessLevels"
+      response:
+          constraints:
+              type: list
+              maxLength: 16
+
+
+    - label: "Step 3: Read the mandatory attribute: SelectedDrynessLevel"
+      PICS: DRYERCTRL.S.A0001
+      command: "readAttribute"
+      attribute: "SelectedDrynessLevel"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 15
+    
+    - label:
+          "Step 4:TH writes a supported SelectedDrynessLevel attribute that is within the list of SupportedDrynessLevels"
+      PICS: DRYERCTRL.S.A0001
+      command: "writeAttribute"
+      attribute: "SelectedDrynessLevel"
+      arguments:
+          value: SupportedDrynessLevel
+
+    - label: "Wait 2 seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
+    - label:
+          "Step 5: after a few seconds, TH reads SelectedDrynessLevel attribute"
+      PICS: DRYERCTRL.S.A0001
+      command: "readAttribute"
+      attribute: "SelectedDrynessLevel"
+      response:
+          value: SupportedDrynessLevel
+          constraints:
+              type: int8u
+
+
+    - label:
+          "Step 6: TH writes an unsupported SelectedDrynessLevel attribute that is not in list of SupportedDrynessLevels to DUT"
+      PICS: DRYERCTRL.S.A0001
+      command: "writeAttribute"
+      attribute: "SelectedDrynessLevel"
+      arguments:
+          value:  unsupportedSelectedDrynessLevel
+      response:
+          error: InvalidInState
+    
