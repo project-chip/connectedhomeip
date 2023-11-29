@@ -65,7 +65,7 @@ private:
     };
 
 
-    //Operational States 
+    //Operational States
     const OperationalState::GenericOperationalState opStateList[4] = {
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
@@ -98,7 +98,7 @@ public:
      */
     void MicrowaveOvenInit(EndpointId aEndpoint);
 
-    //delegates from MicrowaveOvenControl cluster 
+    //delegates from MicrowaveOvenControl cluster
     /**
      * handle command for microwave oven control: set cooking parameters
      */

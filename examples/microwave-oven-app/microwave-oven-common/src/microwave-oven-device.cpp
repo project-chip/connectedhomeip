@@ -49,7 +49,7 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(Optional<uint8_t>
     uint8_t reqCookMode;
     if(cookMode.HasValue()){
         reqCookMode = cookMode.Value();
-        
+
     }
     else
     {

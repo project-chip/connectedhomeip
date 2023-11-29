@@ -41,7 +41,7 @@ namespace MicrowaveOvenControl {
 
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, Clusters::OperationalState::Instance * aOpStateInstance, Clusters::ModeBase::Instance * aMicrowaveOvenModeInstance) :
     CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId), AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId),
-    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), 
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId),
     mOpStateInstance(aOpStateInstance), mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {
     mDelegate->SetInstance(this);
@@ -192,8 +192,8 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         ChipLogError(Zcl, "Failed to set cookPower, cookPower value is out of range");
         goto exit;
     }
-    
-    //get current operational state 
+
+    //get current operational state
     opState = mOpStateInstance->GetCurrentOperationalState();
     if(opState != to_underlying(OperationalStateEnum::kStopped))
     {
@@ -237,7 +237,7 @@ void Instance::HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTi
     Status status;
     uint8_t opState;
 
-    //get current operational state 
+    //get current operational state
     opState = mOpStateInstance->GetCurrentOperationalState();
     if (opState == to_underlying(OperationalStateEnum::kStopped) || opState == to_underlying(OperationalStateEnum::kRunning) ||
         opState == to_underlying(OperationalStateEnum::kPaused))

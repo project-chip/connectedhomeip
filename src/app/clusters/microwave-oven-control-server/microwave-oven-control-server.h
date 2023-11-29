@@ -48,10 +48,10 @@ public:
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aClusterId The ID of the Microwave Oven Control cluster to be instantiated.
-     * @param aOpStateInstance The pointer of Operational State Instance. 
-     * @param aMicrowaveOvenModeInstance The pointer of Microwave Oven Mode Instance. 
-     * Note: a MicrowaveOvenControl instance must live relying on an Operational State instance and a Microwave Oven Mode instance, 
-     * caller should be initialized that 2 instances before initializing MicorwaveOvenControl instance. 
+     * @param aOpStateInstance The pointer of Operational State Instance.
+     * @param aMicrowaveOvenModeInstance The pointer of Microwave Oven Mode Instance.
+     * Note: a MicrowaveOvenControl instance must live relying on an Operational State instance and a Microwave Oven Mode instance,
+     * caller should be initialized that 2 instances before initializing MicorwaveOvenControl instance.
      */
     Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, Clusters::OperationalState::Instance * aOpStateInstance, Clusters::ModeBase::Instance * aMicrowaveOvenModeInstance);
 
@@ -79,11 +79,11 @@ private:
     EndpointId mEndpointId;
     ClusterId mClusterId;
     /**
-     * Operational State instance 
+     * Operational State instance
      */
     Clusters::OperationalState::Instance * mOpStateInstance = nullptr;
     /**
-     * Microwave Oven Mode instance 
+     * Microwave Oven Mode instance
      */
     Clusters::ModeBase::Instance * mMicrowaveOvenModeInstance = nullptr;
 
@@ -140,7 +140,7 @@ public:
     /**
      *   @brief Handle Command Callback in application: AddMoreTime
      *   @return Returns the Interaction Model status code which was user determined in the business logic
-     *   @param  finalCookTime: the cook time value after adding input time 
+     *   @param  finalCookTime: the cook time value after adding input time
      */
     virtual Protocols::InteractionModel::Status HandleModifyCookTimeCallback(uint32_t finalCookTime) = 0;
 
