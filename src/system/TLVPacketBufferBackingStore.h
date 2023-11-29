@@ -80,6 +80,11 @@ public:
     CHIP_ERROR OnInit(chip::TLV::TLVWriter & writer, uint8_t *& bufStart, uint32_t & bufLen) override;
     CHIP_ERROR GetNewBuffer(chip::TLV::TLVWriter & writer, uint8_t *& bufStart, uint32_t & bufLen) override;
     CHIP_ERROR FinalizeBuffer(chip::TLV::TLVWriter & writer, uint8_t * bufStart, uint32_t bufLen) override;
+    virtual bool IsSafeToReserve() override
+    {
+        // It is safe to reserve if there is not chained buffers.
+        return !mUseChainedBuffers;
+    }
 
 protected:
     chip::System::PacketBufferHandle mHeadBuffer;
