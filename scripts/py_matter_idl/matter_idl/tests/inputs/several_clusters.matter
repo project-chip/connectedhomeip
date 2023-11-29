@@ -1,8 +1,8 @@
-client cluster First = 1 {
+cluster First = 1 {
     attribute int16u someInteger = 1;
 }
 
-client cluster Second = 2 {
+cluster Second = 2 {
     fabric_scoped struct FabricDescriptorStruct {
       octet_string<65> rootPublicKey = 1;
       vendor_id vendorID = 2;
@@ -16,7 +16,7 @@ client cluster Second = 2 {
     readonly attribute octet_string<32> someBytes = 123;
 }
 
-client cluster Third = 3 {
+cluster Third = 3 {
     enum MyEnum : enum8 {
       kUnknown = 0;
       kKnown = 100;
@@ -29,16 +29,6 @@ client cluster Third = 3 {
 
     attribute MyEnum someEnum = 10;
     attribute LevelControlOptions options = 20;
-}
-
-server cluster Third = 3 {
-    enum MyEnum : enum8 {
-      kUnknown = 0;
-      kKnown = 100;
-    }
-
-    attribute MyEnum someEnum = 10;
-    readonly attribute int16u clusterRevision = 65533;
 }
 
 endpoint 0 {

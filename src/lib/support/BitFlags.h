@@ -102,7 +102,7 @@ public:
      */
     BitFlags & Clear(const BitFlags & other)
     {
-        mValue &= ~other.mValue;
+        mValue &= static_cast<IntegerType>(~static_cast<IntegerType>(other.mValue));
         return *this;
     }
 

@@ -2,5 +2,5 @@
 // It is for view/code review purposes only.
 
 {{#zcl_clusters~}}
-{{>idl_cluster_definition generateClientCluster=1}}
+{{>idl_cluster_definition}}
 {{/zcl_clusters}}
