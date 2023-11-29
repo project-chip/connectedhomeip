@@ -134,8 +134,8 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeLaundryWasherModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000051,
     MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000052,
     MTRClusterIDTypeLaundryWasherControlsID MTR_PROVISIONALLY_AVAILABLE = 0x00000053,
-    MTRClusterIDTypeRVCRunModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000054,
-    MTRClusterIDTypeRVCCleanModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000055,
+    MTRClusterIDTypeRVCRunModeID MTR_NEWLY_AVAILABLE = 0x00000054,
+    MTRClusterIDTypeRVCCleanModeID MTR_NEWLY_AVAILABLE = 0x00000055,
     MTRClusterIDTypeTemperatureControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000056,
     MTRClusterIDTypeRefrigeratorAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x00000057,
     MTRClusterIDTypeDishwasherModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000059,
@@ -145,7 +145,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeMicrowaveOvenModeID MTR_PROVISIONALLY_AVAILABLE = 0x0000005E,
     MTRClusterIDTypeMicrowaveOvenControlID MTR_PROVISIONALLY_AVAILABLE = 0x0000005F,
     MTRClusterIDTypeOperationalStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000060,
-    MTRClusterIDTypeRVCOperationalStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000061,
+    MTRClusterIDTypeRVCOperationalStateID MTR_NEWLY_AVAILABLE = 0x00000061,
     MTRClusterIDTypeHEPAFilterMonitoringID MTR_PROVISIONALLY_AVAILABLE = 0x00000071,
     MTRClusterIDTypeActivatedCarbonFilterMonitoringID MTR_PROVISIONALLY_AVAILABLE = 0x00000072,
     MTRClusterIDTypeBooleanSensorConfigurationID MTR_PROVISIONALLY_AVAILABLE = 0x00000080,
@@ -2393,26 +2393,26 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterLaundryWasherControlsAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster RVCRunMode attributes
-    MTRAttributeIDTypeClusterRVCRunModeAttributeSupportedModesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterRVCRunModeAttributeCurrentModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterRVCRunModeAttributeOnModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterRVCRunModeAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterRVCRunModeAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterRVCRunModeAttributeSupportedModesID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterRVCRunModeAttributeCurrentModeID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterRVCRunModeAttributeOnModeID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterRVCRunModeAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterRVCRunModeAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterRVCRunModeAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
-    MTRAttributeIDTypeClusterRVCRunModeAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterRVCRunModeAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterRVCRunModeAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+    MTRAttributeIDTypeClusterRVCRunModeAttributeAttributeListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterRVCRunModeAttributeFeatureMapID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterRVCRunModeAttributeClusterRevisionID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster RVCCleanMode attributes
-    MTRAttributeIDTypeClusterRVCCleanModeAttributeSupportedModesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterRVCCleanModeAttributeCurrentModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterRVCCleanModeAttributeOnModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterRVCCleanModeAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterRVCCleanModeAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterRVCCleanModeAttributeSupportedModesID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterRVCCleanModeAttributeCurrentModeID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterRVCCleanModeAttributeOnModeID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterRVCCleanModeAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterRVCCleanModeAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterRVCCleanModeAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
-    MTRAttributeIDTypeClusterRVCCleanModeAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterRVCCleanModeAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterRVCCleanModeAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+    MTRAttributeIDTypeClusterRVCCleanModeAttributeAttributeListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterRVCCleanModeAttributeFeatureMapID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterRVCCleanModeAttributeClusterRevisionID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster TemperatureControl attributes
     MTRAttributeIDTypeClusterTemperatureControlAttributeTemperatureSetpointID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -2531,18 +2531,18 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterOperationalStateAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster RVCOperationalState attributes
-    MTRAttributeIDTypeClusterRVCOperationalStateAttributePhaseListID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterRVCOperationalStateAttributeCurrentPhaseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterRVCOperationalStateAttributeCountdownTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterRVCOperationalStateAttributeOperationalStateListID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterRVCOperationalStateAttributeOperationalStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterRVCOperationalStateAttributeOperationalErrorID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterRVCOperationalStateAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterRVCOperationalStateAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterRVCOperationalStateAttributePhaseListID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterRVCOperationalStateAttributeCurrentPhaseID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterRVCOperationalStateAttributeCountdownTimeID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterRVCOperationalStateAttributeOperationalStateListID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterRVCOperationalStateAttributeOperationalStateID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterRVCOperationalStateAttributeOperationalErrorID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterRVCOperationalStateAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterRVCOperationalStateAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterRVCOperationalStateAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
-    MTRAttributeIDTypeClusterRVCOperationalStateAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterRVCOperationalStateAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterRVCOperationalStateAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+    MTRAttributeIDTypeClusterRVCOperationalStateAttributeAttributeListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterRVCOperationalStateAttributeFeatureMapID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterRVCOperationalStateAttributeClusterRevisionID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster HEPAFilterMonitoring attributes
     MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeConditionID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -6141,12 +6141,12 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeCommandChangeToModeResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
 
     // Cluster RVCRunMode commands
-    MTRCommandIDTypeClusterRVCRunModeCommandChangeToModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterRVCRunModeCommandChangeToModeResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterRVCRunModeCommandChangeToModeID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterRVCRunModeCommandChangeToModeResponseID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster RVCCleanMode commands
-    MTRCommandIDTypeClusterRVCCleanModeCommandChangeToModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterRVCCleanModeCommandChangeToModeResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterRVCCleanModeCommandChangeToModeID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterRVCCleanModeCommandChangeToModeResponseID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster TemperatureControl commands
     MTRCommandIDTypeClusterTemperatureControlCommandSetTemperatureID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -6174,11 +6174,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterOperationalStateCommandOperationalCommandResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
 
     // Cluster RVCOperationalState commands
-    MTRCommandIDTypeClusterRVCOperationalStateCommandPauseID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterRVCOperationalStateCommandPauseID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterRVCOperationalStateCommandStopID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterRVCOperationalStateCommandStartID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterRVCOperationalStateCommandResumeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRCommandIDTypeClusterRVCOperationalStateCommandOperationalCommandResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterRVCOperationalStateCommandResumeID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterRVCOperationalStateCommandOperationalCommandResponseID MTR_NEWLY_AVAILABLE = 0x00000004,
 
     // Cluster HEPAFilterMonitoring commands
     MTRCommandIDTypeClusterHEPAFilterMonitoringCommandResetConditionID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -7048,8 +7048,8 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterOperationalStateEventOperationCompletionID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
 
     // Cluster RVCOperationalState events
-    MTREventIDTypeClusterRVCOperationalStateEventOperationalErrorID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTREventIDTypeClusterRVCOperationalStateEventOperationCompletionID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTREventIDTypeClusterRVCOperationalStateEventOperationalErrorID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterRVCOperationalStateEventOperationCompletionID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster BooleanSensorConfiguration events
     MTREventIDTypeClusterBooleanSensorConfigurationEventAlarmsStateChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,

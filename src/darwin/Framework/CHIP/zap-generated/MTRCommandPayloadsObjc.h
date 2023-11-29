@@ -4940,10 +4940,10 @@ MTR_PROVISIONALLY_AVAILABLE
                                          error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRRVCRunModeClusterChangeToModeParams : NSObject <NSCopying>
 
-@property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4970,12 +4970,12 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRRVCRunModeClusterChangeToModeResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull status MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable statusText MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable statusText MTR_NEWLY_AVAILABLE;
 
 /**
  * Initialize an MTRRVCRunModeClusterChangeToModeResponseParams with a response-value dictionary
@@ -4988,13 +4988,13 @@ MTR_PROVISIONALLY_AVAILABLE
  * schema for this command.
  */
 - (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRRVCCleanModeClusterChangeToModeParams : NSObject <NSCopying>
 
-@property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5021,12 +5021,12 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRRVCCleanModeClusterChangeToModeResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull status MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable statusText MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable statusText MTR_NEWLY_AVAILABLE;
 
 /**
  * Initialize an MTRRVCCleanModeClusterChangeToModeResponseParams with a response-value dictionary
@@ -5039,7 +5039,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * schema for this command.
  */
 - (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -5408,7 +5408,7 @@ MTR_PROVISIONALLY_AVAILABLE
                                          error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRRVCOperationalStateClusterPauseParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -5492,7 +5492,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRRVCOperationalStateClusterResumeParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -5520,10 +5520,10 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRRVCOperationalStateClusterOperationalCommandResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRRVCOperationalStateClusterErrorStateStruct * _Nonnull commandResponseState MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRRVCOperationalStateClusterErrorStateStruct * _Nonnull commandResponseState MTR_NEWLY_AVAILABLE;
 
 /**
  * Initialize an MTRRVCOperationalStateClusterOperationalCommandResponseParams with a response-value dictionary
@@ -5536,7 +5536,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * schema for this command.
  */
 - (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

@@ -873,30 +873,30 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_PROVISIONALLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRRVCRunModeClusterModeTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull value MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRRVCRunModeClusterModeOptionStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull label MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRRVCCleanModeClusterModeTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull value MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRRVCCleanModeClusterModeOptionStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull label MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -1015,29 +1015,29 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nullable pausedTime MTR_PROVISIONALLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRRVCOperationalStateClusterErrorStateStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable errorStateLabel MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable errorStateDetails MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable errorStateLabel MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable errorStateDetails MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRRVCOperationalStateClusterOperationalStateStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable operationalStateLabel MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable operationalStateLabel MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRRVCOperationalStateClusterOperationalErrorEvent : NSObject <NSCopying>
-@property (nonatomic, copy) MTRRVCOperationalStateClusterErrorStateStruct * _Nonnull errorState MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRRVCOperationalStateClusterErrorStateStruct * _Nonnull errorState MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRRVCOperationalStateClusterOperationCompletionEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull completionErrorCode MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable totalOperationalTime MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable pausedTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull completionErrorCode MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable totalOperationalTime MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable pausedTime MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
