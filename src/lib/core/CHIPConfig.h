@@ -1433,6 +1433,62 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @brief The maximum number bytes taken by a scene. This needs to be increased if the number of clusters per scene is increased.
+ * @note The default number (256) is based on the assumption that the maximum number of clusters per scene is 3 and that those
+ * clusers are onOff, level control and color control cluster.
+ * @warning Changing this value will not only affect the RAM usage of a scene but also the size of the scene table in the flash.
+ *  A scene's size can be calculated based on the following structure:
+ *  Scene TLV (struct)
+ *  {
+ *  	2 bytes GroupID,
+ *  	1 byte SceneID,
+ *  	0 - 16 bytes SceneName,
+ *  	4 bytes Transition time in miliseconds,
+ *
+ *  	Extension field sets TLV (array)
+ *  	[
+ *  		EFS TLV (struct)
+ *  		{
+ *  			4 bytes for the cluster ID,
+ *  			Attribute Value List TLV (array)
+ *  			[
+ *  				AttributeValue Pair TLV (struct)
+ *  				{
+ *  					Attribute ID
+ *  					4 bytes attributeID,
+ *  					AttributeValue
+ *  					1 - 8 bytes AttributeValue,
+ *  				},
+ *  				.
+ *  				.
+ *  				.
+ *
+ *  			],
+ *
+ *  		},
+ *  		.
+ *  		.
+ *  		.
+ *  	],
+ *  }
+ *
+ *  Including all the TLV fields, the following values can help estimate the needed size for a scenes given a number of clusters:
+ *  Empty EFS Scene Max name size: 33bytes
+ *  Scene Max name size + OnOff : 51 bytes
+ *  Scene Max name size + LevelControl : 60 bytes
+ *  Scene Max name size + ColorControl : 126 bytes
+ *  Scene Max name size + OnOff + LevelControl + ColoControl : 171 bytes
+ *
+ *  Cluster Sizes:
+ *  OnOff Cluster Max Size: 18 bytes
+ *  LevelControl Cluster Max Size: 27 bytes
+ *  Color Control Cluster Max Size: 93 bytes
+ * */
+#ifndef CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES
+#define CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES 256
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS
  *
  * @brief Defines the number of simultaneous Scenes iterators that can be allocated

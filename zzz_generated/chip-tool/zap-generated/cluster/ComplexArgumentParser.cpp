@@ -2593,6 +2593,47 @@ void ComplexArgumentParser::Finalize(
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::EnergyEvse::Structs::ChargingTargetStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ChargingTargetStruct.targetTime", "targetTime", value.isMember("targetTime")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "targetTime");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.targetTime, value["targetTime"]));
+    valueCopy.removeMember("targetTime");
+
+    if (value.isMember("targetSoC"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "targetSoC");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.targetSoC, value["targetSoC"]));
+    }
+    valueCopy.removeMember("targetSoC");
+
+    if (value.isMember("addedEnergy"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "addedEnergy");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.addedEnergy, value["addedEnergy"]));
+    }
+    valueCopy.removeMember("addedEnergy");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyEvse::Structs::ChargingTargetStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.targetTime);
+    ComplexArgumentParser::Finalize(request.targetSoC);
+    ComplexArgumentParser::Finalize(request.addedEnergy);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
                                         Json::Value & value)
 {

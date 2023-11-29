@@ -35,7 +35,7 @@
 {%  for cluster in idl.clusters %}
 {% if cluster.description %}/** {{cluster.description}} */
 {% endif %}
-{{cluster.api_maturity | idltxt}}{{cluster.side | idltxt}} cluster {{cluster.name}} = {{cluster.code}} {
+{{cluster.api_maturity | idltxt}}cluster {{cluster.name}} = {{cluster.code}} {
   revision {{cluster.revision}};
 
   {% for enum in cluster.enums %}

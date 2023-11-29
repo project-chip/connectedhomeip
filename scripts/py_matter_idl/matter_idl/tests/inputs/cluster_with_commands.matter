@@ -1,5 +1,4 @@
-
-server cluster OnOff = 6 {
+cluster OnOff = 6 {
   enum DelayedAllOffEffectVariantEnum : ENUM8 {
     kDelayedOffFastFade = 0;
     kNoFade = 1;

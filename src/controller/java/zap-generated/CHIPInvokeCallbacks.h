@@ -509,6 +509,22 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback
+    : public Callback::Callback<CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallbackType>
+{
+public:
+    CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback(jobject javaCallback);
+
+    ~CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback();
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPOvenModeClusterChangeToModeResponseCallback
     : public Callback::Callback<CHIPOvenModeClusterChangeToModeResponseCallbackType>
 {
@@ -627,6 +643,21 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPEnergyEvseClusterGetTargetsResponseCallback
+    : public Callback::Callback<CHIPEnergyEvseClusterGetTargetsResponseCallbackType>
+{
+public:
+    CHIPEnergyEvseClusterGetTargetsResponseCallback(jobject javaCallback);
+
+    ~CHIPEnergyEvseClusterGetTargetsResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::EnergyEvse::Commands::GetTargetsResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
