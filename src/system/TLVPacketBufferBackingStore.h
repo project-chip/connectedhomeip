@@ -82,7 +82,7 @@ public:
     CHIP_ERROR FinalizeBuffer(chip::TLV::TLVWriter & writer, uint8_t * bufStart, uint32_t bufLen) override;
     virtual bool IsSafeToReserve() override
     {
-        // It is safe to reserve if there is not chained buffers.
+        // It is safe to reserve if there is no chained buffers.
         return !mUseChainedBuffers;
     }
 

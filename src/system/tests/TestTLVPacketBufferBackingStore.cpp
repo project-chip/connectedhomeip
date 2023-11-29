@@ -268,7 +268,8 @@ void TLVPacketBufferBackingStoreTest::NonChainedBufferCanReserve(nlTestSuite * i
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 }
 
-// This test previously was created to show that there was an overflow bug
+// This test previously was created to show that there was an overflow bug, now this test mainly
+// just checks that you cannot reserve this type of TLVBackingStorage buffer.
 void TLVPacketBufferBackingStoreTest::TestWriterReserveUnreserveDoesNotOverflow(nlTestSuite * inSuite, void * inContext)
 {
     // Start with a too-small buffer.
@@ -281,7 +282,6 @@ void TLVPacketBufferBackingStoreTest::TestWriterReserveUnreserveDoesNotOverflow(
     writer.Init(std::move(buffer), /* useChainedBuffers = */ true);
 
     CHIP_ERROR error = writer.ReserveBuffer(smallerSizeToReserver);
-    // Previously
     if (error == CHIP_NO_ERROR)
     {
         uint32_t lengthRemaining = writer.GetRemainingFreeLength();
