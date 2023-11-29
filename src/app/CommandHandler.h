@@ -159,9 +159,7 @@ public:
     // add new parameters without there needing to be an ever increasing parameter list with defaults.
     struct InvokeResponseParameters
     {
-        InvokeResponseParameters(ConcreteCommandPath aRequestCommandPath) :
-            mRequestCommandPath(aRequestCommandPath)
-        {}
+        InvokeResponseParameters(ConcreteCommandPath aRequestCommandPath) : mRequestCommandPath(aRequestCommandPath) {}
 
         InvokeResponseParameters & SetStartOrEndDataStruct(bool aStartOrEndDataStruct)
         {
@@ -518,7 +516,9 @@ private:
         // Return early in case of requests targeted to a group, since they should not add a response.
         VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
 
-        InvokeResponseParameters prepareParams(aRequestCommandPath, /* aStartOrEndDataStruct = */ false);
+        InvokeResponseParameters prepareParams(aRequestCommandPath);
+        prepareParams.SetStartOrEndDataStruct(false);
+
         ConcreteCommandPath responsePath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId,
                                              CommandData::GetCommandId() };
         ReturnErrorOnFailure(PrepareInvokeResponseCommand(responsePath, prepareParams));
