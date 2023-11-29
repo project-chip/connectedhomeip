@@ -50,6 +50,7 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ScopedBuffer.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
 
@@ -455,9 +456,9 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
         System::Clock::Milliseconds32(aSleepTimeMilliseconds), [](System::Layer *, void *) -> void {}, nullptr);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    DeviceLayer::SystemLayer().PrepareEvents();
-    DeviceLayer::SystemLayer().WaitForEvents();
-    DeviceLayer::SystemLayer().HandleEvents();
+    static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).PrepareEvents();
+    static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).WaitForEvents();
+    static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).HandleEvents();
 #endif
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

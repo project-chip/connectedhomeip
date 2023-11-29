@@ -44,6 +44,8 @@
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 
+#include <platform/CHIPDeviceLayer.h>
+
 #include <system/SystemError.h>
 
 #include <nlunit-test.h>
@@ -92,7 +94,7 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
 
     // Deinit system layer and network
     ShutdownNetwork();
-    if (gSystemLayer.IsInitialized())
+    if (DeviceLayer::SystemLayer().IsInitialized())
     {
         ShutdownSystemLayer();
     }
@@ -107,7 +109,7 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
-    err = gSystemLayer.StartTimer(10_ms32, HandleTimer, nullptr);
+    err = DeviceLayer::SystemLayer().StartTimer(10_ms32, HandleTimer, nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     // then init network
@@ -404,13 +406,13 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     // Verify same aComplete and aAppState args do not exhaust timer pool
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
     {
-        err = gSystemLayer.StartTimer(10_ms32, HandleTimer, nullptr);
+        err = DeviceLayer::SystemLayer().StartTimer(10_ms32, HandleTimer, nullptr);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
 
     char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
-        err = gSystemLayer.StartTimer(10_ms32, HandleTimer, &numTimersTest[i]);
+        err = DeviceLayer::SystemLayer().StartTimer(10_ms32, HandleTimer, &numTimersTest[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
 #endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
 
