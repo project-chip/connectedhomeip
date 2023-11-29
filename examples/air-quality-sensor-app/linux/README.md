@@ -1,8 +1,8 @@
-# CHIP Linux Air Quality Example
+# Matter Linux Air Quality Example
 
 An example showing the use of Matter on the Linux. The document will describe
-how to build and run Matter Linux Lighting Example on Raspberry Pi. This doc is
-tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu
+how to build and run Matter Linux Air Quality Example on Raspberry Pi. This doc
+is tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu
 for Raspberry Pi Desktop 20.10 (aarch64)**
 
 To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
@@ -11,7 +11,7 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 
 <hr>
 
--   [CHIP Linux Air Quality Example](#chip-linux-air-quality-example)
+-   [Matter Linux Air Quality Example](#matter-linux-air-quality-example)
     -   [Building](#building)
     -   [Commandline Arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
