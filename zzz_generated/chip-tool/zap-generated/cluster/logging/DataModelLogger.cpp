@@ -16264,12 +16264,12 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case AccessControl::Events::AccessControlEntryChanged::Id: {
-            AccessControl::Events::AccessControlEntryChanged::DecodableType value;
+            chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AccessControlEntryChanged", 1, value);
         }
         case AccessControl::Events::AccessControlExtensionChanged::Id: {
-            AccessControl::Events::AccessControlExtensionChanged::DecodableType value;
+            chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AccessControlExtensionChanged", 1, value);
         }
@@ -16280,12 +16280,12 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case Actions::Events::StateChanged::Id: {
-            Actions::Events::StateChanged::DecodableType value;
+            chip::app::Clusters::Actions::Events::StateChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StateChanged", 1, value);
         }
         case Actions::Events::ActionFailed::Id: {
-            Actions::Events::ActionFailed::DecodableType value;
+            chip::app::Clusters::Actions::Events::ActionFailed::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActionFailed", 1, value);
         }
@@ -16296,22 +16296,22 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case BasicInformation::Events::StartUp::Id: {
-            BasicInformation::Events::StartUp::DecodableType value;
+            chip::app::Clusters::BasicInformation::Events::StartUp::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUp", 1, value);
         }
         case BasicInformation::Events::ShutDown::Id: {
-            BasicInformation::Events::ShutDown::DecodableType value;
+            chip::app::Clusters::BasicInformation::Events::ShutDown::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ShutDown", 1, value);
         }
         case BasicInformation::Events::Leave::Id: {
-            BasicInformation::Events::Leave::DecodableType value;
+            chip::app::Clusters::BasicInformation::Events::Leave::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Leave", 1, value);
         }
         case BasicInformation::Events::ReachableChanged::Id: {
-            BasicInformation::Events::ReachableChanged::DecodableType value;
+            chip::app::Clusters::BasicInformation::Events::ReachableChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ReachableChanged", 1, value);
         }
@@ -16322,17 +16322,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case OtaSoftwareUpdateRequestor::Events::StateTransition::Id: {
-            OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType value;
+            chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StateTransition", 1, value);
         }
         case OtaSoftwareUpdateRequestor::Events::VersionApplied::Id: {
-            OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType value;
+            chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("VersionApplied", 1, value);
         }
         case OtaSoftwareUpdateRequestor::Events::DownloadError::Id: {
-            OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType value;
+            chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DownloadError", 1, value);
         }
@@ -16343,17 +16343,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case PowerSource::Events::WiredFaultChange::Id: {
-            PowerSource::Events::WiredFaultChange::DecodableType value;
+            chip::app::Clusters::PowerSource::Events::WiredFaultChange::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WiredFaultChange", 1, value);
         }
         case PowerSource::Events::BatFaultChange::Id: {
-            PowerSource::Events::BatFaultChange::DecodableType value;
+            chip::app::Clusters::PowerSource::Events::BatFaultChange::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BatFaultChange", 1, value);
         }
         case PowerSource::Events::BatChargeFaultChange::Id: {
-            PowerSource::Events::BatChargeFaultChange::DecodableType value;
+            chip::app::Clusters::PowerSource::Events::BatChargeFaultChange::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BatChargeFaultChange", 1, value);
         }
@@ -16364,22 +16364,22 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case GeneralDiagnostics::Events::HardwareFaultChange::Id: {
-            GeneralDiagnostics::Events::HardwareFaultChange::DecodableType value;
+            chip::app::Clusters::GeneralDiagnostics::Events::HardwareFaultChange::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("HardwareFaultChange", 1, value);
         }
         case GeneralDiagnostics::Events::RadioFaultChange::Id: {
-            GeneralDiagnostics::Events::RadioFaultChange::DecodableType value;
+            chip::app::Clusters::GeneralDiagnostics::Events::RadioFaultChange::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RadioFaultChange", 1, value);
         }
         case GeneralDiagnostics::Events::NetworkFaultChange::Id: {
-            GeneralDiagnostics::Events::NetworkFaultChange::DecodableType value;
+            chip::app::Clusters::GeneralDiagnostics::Events::NetworkFaultChange::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NetworkFaultChange", 1, value);
         }
         case GeneralDiagnostics::Events::BootReason::Id: {
-            GeneralDiagnostics::Events::BootReason::DecodableType value;
+            chip::app::Clusters::GeneralDiagnostics::Events::BootReason::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BootReason", 1, value);
         }
@@ -16390,7 +16390,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case SoftwareDiagnostics::Events::SoftwareFault::Id: {
-            SoftwareDiagnostics::Events::SoftwareFault::DecodableType value;
+            chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SoftwareFault", 1, value);
         }
@@ -16401,12 +16401,12 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case ThreadNetworkDiagnostics::Events::ConnectionStatus::Id: {
-            ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType value;
+            chip::app::Clusters::ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ConnectionStatus", 1, value);
         }
         case ThreadNetworkDiagnostics::Events::NetworkFaultChange::Id: {
-            ThreadNetworkDiagnostics::Events::NetworkFaultChange::DecodableType value;
+            chip::app::Clusters::ThreadNetworkDiagnostics::Events::NetworkFaultChange::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NetworkFaultChange", 1, value);
         }
@@ -16417,17 +16417,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case WiFiNetworkDiagnostics::Events::Disconnection::Id: {
-            WiFiNetworkDiagnostics::Events::Disconnection::DecodableType value;
+            chip::app::Clusters::WiFiNetworkDiagnostics::Events::Disconnection::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Disconnection", 1, value);
         }
         case WiFiNetworkDiagnostics::Events::AssociationFailure::Id: {
-            WiFiNetworkDiagnostics::Events::AssociationFailure::DecodableType value;
+            chip::app::Clusters::WiFiNetworkDiagnostics::Events::AssociationFailure::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AssociationFailure", 1, value);
         }
         case WiFiNetworkDiagnostics::Events::ConnectionStatus::Id: {
-            WiFiNetworkDiagnostics::Events::ConnectionStatus::DecodableType value;
+            chip::app::Clusters::WiFiNetworkDiagnostics::Events::ConnectionStatus::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ConnectionStatus", 1, value);
         }
@@ -16438,27 +16438,27 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case TimeSynchronization::Events::DSTTableEmpty::Id: {
-            TimeSynchronization::Events::DSTTableEmpty::DecodableType value;
+            chip::app::Clusters::TimeSynchronization::Events::DSTTableEmpty::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DSTTableEmpty", 1, value);
         }
         case TimeSynchronization::Events::DSTStatus::Id: {
-            TimeSynchronization::Events::DSTStatus::DecodableType value;
+            chip::app::Clusters::TimeSynchronization::Events::DSTStatus::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DSTStatus", 1, value);
         }
         case TimeSynchronization::Events::TimeZoneStatus::Id: {
-            TimeSynchronization::Events::TimeZoneStatus::DecodableType value;
+            chip::app::Clusters::TimeSynchronization::Events::TimeZoneStatus::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TimeZoneStatus", 1, value);
         }
         case TimeSynchronization::Events::TimeFailure::Id: {
-            TimeSynchronization::Events::TimeFailure::DecodableType value;
+            chip::app::Clusters::TimeSynchronization::Events::TimeFailure::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TimeFailure", 1, value);
         }
         case TimeSynchronization::Events::MissingTrustedTimeSource::Id: {
-            TimeSynchronization::Events::MissingTrustedTimeSource::DecodableType value;
+            chip::app::Clusters::TimeSynchronization::Events::MissingTrustedTimeSource::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MissingTrustedTimeSource", 1, value);
         }
@@ -16469,22 +16469,22 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case BridgedDeviceBasicInformation::Events::StartUp::Id: {
-            BridgedDeviceBasicInformation::Events::StartUp::DecodableType value;
+            chip::app::Clusters::BridgedDeviceBasicInformation::Events::StartUp::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUp", 1, value);
         }
         case BridgedDeviceBasicInformation::Events::ShutDown::Id: {
-            BridgedDeviceBasicInformation::Events::ShutDown::DecodableType value;
+            chip::app::Clusters::BridgedDeviceBasicInformation::Events::ShutDown::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ShutDown", 1, value);
         }
         case BridgedDeviceBasicInformation::Events::Leave::Id: {
-            BridgedDeviceBasicInformation::Events::Leave::DecodableType value;
+            chip::app::Clusters::BridgedDeviceBasicInformation::Events::Leave::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Leave", 1, value);
         }
         case BridgedDeviceBasicInformation::Events::ReachableChanged::Id: {
-            BridgedDeviceBasicInformation::Events::ReachableChanged::DecodableType value;
+            chip::app::Clusters::BridgedDeviceBasicInformation::Events::ReachableChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ReachableChanged", 1, value);
         }
@@ -16495,37 +16495,37 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case Switch::Events::SwitchLatched::Id: {
-            Switch::Events::SwitchLatched::DecodableType value;
+            chip::app::Clusters::Switch::Events::SwitchLatched::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SwitchLatched", 1, value);
         }
         case Switch::Events::InitialPress::Id: {
-            Switch::Events::InitialPress::DecodableType value;
+            chip::app::Clusters::Switch::Events::InitialPress::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InitialPress", 1, value);
         }
         case Switch::Events::LongPress::Id: {
-            Switch::Events::LongPress::DecodableType value;
+            chip::app::Clusters::Switch::Events::LongPress::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LongPress", 1, value);
         }
         case Switch::Events::ShortRelease::Id: {
-            Switch::Events::ShortRelease::DecodableType value;
+            chip::app::Clusters::Switch::Events::ShortRelease::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ShortRelease", 1, value);
         }
         case Switch::Events::LongRelease::Id: {
-            Switch::Events::LongRelease::DecodableType value;
+            chip::app::Clusters::Switch::Events::LongRelease::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LongRelease", 1, value);
         }
         case Switch::Events::MultiPressOngoing::Id: {
-            Switch::Events::MultiPressOngoing::DecodableType value;
+            chip::app::Clusters::Switch::Events::MultiPressOngoing::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MultiPressOngoing", 1, value);
         }
         case Switch::Events::MultiPressComplete::Id: {
-            Switch::Events::MultiPressComplete::DecodableType value;
+            chip::app::Clusters::Switch::Events::MultiPressComplete::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MultiPressComplete", 1, value);
         }
@@ -16536,7 +16536,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case BooleanState::Events::StateChange::Id: {
-            BooleanState::Events::StateChange::DecodableType value;
+            chip::app::Clusters::BooleanState::Events::StateChange::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StateChange", 1, value);
         }
@@ -16547,12 +16547,12 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case OvenCavityOperationalState::Events::OperationalError::Id: {
-            OvenCavityOperationalState::Events::OperationalError::DecodableType value;
+            chip::app::Clusters::OvenCavityOperationalState::Events::OperationalError::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalError", 1, value);
         }
         case OvenCavityOperationalState::Events::OperationCompletion::Id: {
-            OvenCavityOperationalState::Events::OperationCompletion::DecodableType value;
+            chip::app::Clusters::OvenCavityOperationalState::Events::OperationCompletion::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationCompletion", 1, value);
         }
@@ -16563,7 +16563,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case RefrigeratorAlarm::Events::Notify::Id: {
-            RefrigeratorAlarm::Events::Notify::DecodableType value;
+            chip::app::Clusters::RefrigeratorAlarm::Events::Notify::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Notify", 1, value);
         }
@@ -16574,57 +16574,57 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case SmokeCoAlarm::Events::SmokeAlarm::Id: {
-            SmokeCoAlarm::Events::SmokeAlarm::DecodableType value;
+            chip::app::Clusters::SmokeCoAlarm::Events::SmokeAlarm::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SmokeAlarm", 1, value);
         }
         case SmokeCoAlarm::Events::COAlarm::Id: {
-            SmokeCoAlarm::Events::COAlarm::DecodableType value;
+            chip::app::Clusters::SmokeCoAlarm::Events::COAlarm::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("COAlarm", 1, value);
         }
         case SmokeCoAlarm::Events::LowBattery::Id: {
-            SmokeCoAlarm::Events::LowBattery::DecodableType value;
+            chip::app::Clusters::SmokeCoAlarm::Events::LowBattery::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LowBattery", 1, value);
         }
         case SmokeCoAlarm::Events::HardwareFault::Id: {
-            SmokeCoAlarm::Events::HardwareFault::DecodableType value;
+            chip::app::Clusters::SmokeCoAlarm::Events::HardwareFault::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("HardwareFault", 1, value);
         }
         case SmokeCoAlarm::Events::EndOfService::Id: {
-            SmokeCoAlarm::Events::EndOfService::DecodableType value;
+            chip::app::Clusters::SmokeCoAlarm::Events::EndOfService::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EndOfService", 1, value);
         }
         case SmokeCoAlarm::Events::SelfTestComplete::Id: {
-            SmokeCoAlarm::Events::SelfTestComplete::DecodableType value;
+            chip::app::Clusters::SmokeCoAlarm::Events::SelfTestComplete::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SelfTestComplete", 1, value);
         }
         case SmokeCoAlarm::Events::AlarmMuted::Id: {
-            SmokeCoAlarm::Events::AlarmMuted::DecodableType value;
+            chip::app::Clusters::SmokeCoAlarm::Events::AlarmMuted::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AlarmMuted", 1, value);
         }
         case SmokeCoAlarm::Events::MuteEnded::Id: {
-            SmokeCoAlarm::Events::MuteEnded::DecodableType value;
+            chip::app::Clusters::SmokeCoAlarm::Events::MuteEnded::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MuteEnded", 1, value);
         }
         case SmokeCoAlarm::Events::InterconnectSmokeAlarm::Id: {
-            SmokeCoAlarm::Events::InterconnectSmokeAlarm::DecodableType value;
+            chip::app::Clusters::SmokeCoAlarm::Events::InterconnectSmokeAlarm::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InterconnectSmokeAlarm", 1, value);
         }
         case SmokeCoAlarm::Events::InterconnectCOAlarm::Id: {
-            SmokeCoAlarm::Events::InterconnectCOAlarm::DecodableType value;
+            chip::app::Clusters::SmokeCoAlarm::Events::InterconnectCOAlarm::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InterconnectCOAlarm", 1, value);
         }
         case SmokeCoAlarm::Events::AllClear::Id: {
-            SmokeCoAlarm::Events::AllClear::DecodableType value;
+            chip::app::Clusters::SmokeCoAlarm::Events::AllClear::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AllClear", 1, value);
         }
@@ -16635,7 +16635,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case DishwasherAlarm::Events::Notify::Id: {
-            DishwasherAlarm::Events::Notify::DecodableType value;
+            chip::app::Clusters::DishwasherAlarm::Events::Notify::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Notify", 1, value);
         }
@@ -16646,12 +16646,12 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case OperationalState::Events::OperationalError::Id: {
-            OperationalState::Events::OperationalError::DecodableType value;
+            chip::app::Clusters::OperationalState::Events::OperationalError::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalError", 1, value);
         }
         case OperationalState::Events::OperationCompletion::Id: {
-            OperationalState::Events::OperationCompletion::DecodableType value;
+            chip::app::Clusters::OperationalState::Events::OperationCompletion::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationCompletion", 1, value);
         }
@@ -16662,12 +16662,12 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case RvcOperationalState::Events::OperationalError::Id: {
-            RvcOperationalState::Events::OperationalError::DecodableType value;
+            chip::app::Clusters::RvcOperationalState::Events::OperationalError::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalError", 1, value);
         }
         case RvcOperationalState::Events::OperationCompletion::Id: {
-            RvcOperationalState::Events::OperationCompletion::DecodableType value;
+            chip::app::Clusters::RvcOperationalState::Events::OperationCompletion::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationCompletion", 1, value);
         }
@@ -16678,12 +16678,12 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case BooleanSensorConfiguration::Events::AlarmsStateChanged::Id: {
-            BooleanSensorConfiguration::Events::AlarmsStateChanged::DecodableType value;
+            chip::app::Clusters::BooleanSensorConfiguration::Events::AlarmsStateChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AlarmsStateChanged", 1, value);
         }
         case BooleanSensorConfiguration::Events::SensorFault::Id: {
-            BooleanSensorConfiguration::Events::SensorFault::DecodableType value;
+            chip::app::Clusters::BooleanSensorConfiguration::Events::SensorFault::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SensorFault", 1, value);
         }
@@ -16694,12 +16694,12 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case ValveConfigurationAndControl::Events::ValveStateChanged::Id: {
-            ValveConfigurationAndControl::Events::ValveStateChanged::DecodableType value;
+            chip::app::Clusters::ValveConfigurationAndControl::Events::ValveStateChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ValveStateChanged", 1, value);
         }
         case ValveConfigurationAndControl::Events::ValveFault::Id: {
-            ValveConfigurationAndControl::Events::ValveFault::DecodableType value;
+            chip::app::Clusters::ValveConfigurationAndControl::Events::ValveFault::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ValveFault", 1, value);
         }
@@ -16710,7 +16710,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case DemandResponseLoadControl::Events::LoadControlEventStatusChange::Id: {
-            DemandResponseLoadControl::Events::LoadControlEventStatusChange::DecodableType value;
+            chip::app::Clusters::DemandResponseLoadControl::Events::LoadControlEventStatusChange::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LoadControlEventStatusChange", 1, value);
         }
@@ -16747,32 +16747,32 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case EnergyEvse::Events::EVConnected::Id: {
-            EnergyEvse::Events::EVConnected::DecodableType value;
+            chip::app::Clusters::EnergyEvse::Events::EVConnected::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EVConnected", 1, value);
         }
         case EnergyEvse::Events::EVNotDetected::Id: {
-            EnergyEvse::Events::EVNotDetected::DecodableType value;
+            chip::app::Clusters::EnergyEvse::Events::EVNotDetected::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EVNotDetected", 1, value);
         }
         case EnergyEvse::Events::EnergyTransferStarted::Id: {
-            EnergyEvse::Events::EnergyTransferStarted::DecodableType value;
+            chip::app::Clusters::EnergyEvse::Events::EnergyTransferStarted::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EnergyTransferStarted", 1, value);
         }
         case EnergyEvse::Events::EnergyTransferStopped::Id: {
-            EnergyEvse::Events::EnergyTransferStopped::DecodableType value;
+            chip::app::Clusters::EnergyEvse::Events::EnergyTransferStopped::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EnergyTransferStopped", 1, value);
         }
         case EnergyEvse::Events::Fault::Id: {
-            EnergyEvse::Events::Fault::DecodableType value;
+            chip::app::Clusters::EnergyEvse::Events::Fault::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Fault", 1, value);
         }
         case EnergyEvse::Events::Rfid::Id: {
-            EnergyEvse::Events::Rfid::DecodableType value;
+            chip::app::Clusters::EnergyEvse::Events::Rfid::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RFID", 1, value);
         }
@@ -16783,27 +16783,27 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case DoorLock::Events::DoorLockAlarm::Id: {
-            DoorLock::Events::DoorLockAlarm::DecodableType value;
+            chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DoorLockAlarm", 1, value);
         }
         case DoorLock::Events::DoorStateChange::Id: {
-            DoorLock::Events::DoorStateChange::DecodableType value;
+            chip::app::Clusters::DoorLock::Events::DoorStateChange::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DoorStateChange", 1, value);
         }
         case DoorLock::Events::LockOperation::Id: {
-            DoorLock::Events::LockOperation::DecodableType value;
+            chip::app::Clusters::DoorLock::Events::LockOperation::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LockOperation", 1, value);
         }
         case DoorLock::Events::LockOperationError::Id: {
-            DoorLock::Events::LockOperationError::DecodableType value;
+            chip::app::Clusters::DoorLock::Events::LockOperationError::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LockOperationError", 1, value);
         }
         case DoorLock::Events::LockUserChange::Id: {
-            DoorLock::Events::LockUserChange::DecodableType value;
+            chip::app::Clusters::DoorLock::Events::LockUserChange::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LockUserChange", 1, value);
         }
@@ -16814,87 +16814,87 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case PumpConfigurationAndControl::Events::SupplyVoltageLow::Id: {
-            PumpConfigurationAndControl::Events::SupplyVoltageLow::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageLow::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupplyVoltageLow", 1, value);
         }
         case PumpConfigurationAndControl::Events::SupplyVoltageHigh::Id: {
-            PumpConfigurationAndControl::Events::SupplyVoltageHigh::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageHigh::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupplyVoltageHigh", 1, value);
         }
         case PumpConfigurationAndControl::Events::PowerMissingPhase::Id: {
-            PumpConfigurationAndControl::Events::PowerMissingPhase::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::PowerMissingPhase::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PowerMissingPhase", 1, value);
         }
         case PumpConfigurationAndControl::Events::SystemPressureLow::Id: {
-            PumpConfigurationAndControl::Events::SystemPressureLow::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureLow::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SystemPressureLow", 1, value);
         }
         case PumpConfigurationAndControl::Events::SystemPressureHigh::Id: {
-            PumpConfigurationAndControl::Events::SystemPressureHigh::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureHigh::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SystemPressureHigh", 1, value);
         }
         case PumpConfigurationAndControl::Events::DryRunning::Id: {
-            PumpConfigurationAndControl::Events::DryRunning::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::DryRunning::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DryRunning", 1, value);
         }
         case PumpConfigurationAndControl::Events::MotorTemperatureHigh::Id: {
-            PumpConfigurationAndControl::Events::MotorTemperatureHigh::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::MotorTemperatureHigh::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MotorTemperatureHigh", 1, value);
         }
         case PumpConfigurationAndControl::Events::PumpMotorFatalFailure::Id: {
-            PumpConfigurationAndControl::Events::PumpMotorFatalFailure::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::PumpMotorFatalFailure::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PumpMotorFatalFailure", 1, value);
         }
         case PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::Id: {
-            PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ElectronicTemperatureHigh", 1, value);
         }
         case PumpConfigurationAndControl::Events::PumpBlocked::Id: {
-            PumpConfigurationAndControl::Events::PumpBlocked::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::PumpBlocked::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PumpBlocked", 1, value);
         }
         case PumpConfigurationAndControl::Events::SensorFailure::Id: {
-            PumpConfigurationAndControl::Events::SensorFailure::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::SensorFailure::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SensorFailure", 1, value);
         }
         case PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::Id: {
-            PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ElectronicNonFatalFailure", 1, value);
         }
         case PumpConfigurationAndControl::Events::ElectronicFatalFailure::Id: {
-            PumpConfigurationAndControl::Events::ElectronicFatalFailure::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicFatalFailure::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ElectronicFatalFailure", 1, value);
         }
         case PumpConfigurationAndControl::Events::GeneralFault::Id: {
-            PumpConfigurationAndControl::Events::GeneralFault::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::GeneralFault::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneralFault", 1, value);
         }
         case PumpConfigurationAndControl::Events::Leakage::Id: {
-            PumpConfigurationAndControl::Events::Leakage::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::Leakage::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Leakage", 1, value);
         }
         case PumpConfigurationAndControl::Events::AirDetection::Id: {
-            PumpConfigurationAndControl::Events::AirDetection::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::AirDetection::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AirDetection", 1, value);
         }
         case PumpConfigurationAndControl::Events::TurbineOperation::Id: {
-            PumpConfigurationAndControl::Events::TurbineOperation::DecodableType value;
+            chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TurbineOperation", 1, value);
         }
@@ -16905,12 +16905,12 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case UnitTesting::Events::TestEvent::Id: {
-            UnitTesting::Events::TestEvent::DecodableType value;
+            chip::app::Clusters::UnitTesting::Events::TestEvent::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestEvent", 1, value);
         }
         case UnitTesting::Events::TestFabricScopedEvent::Id: {
-            UnitTesting::Events::TestFabricScopedEvent::DecodableType value;
+            chip::app::Clusters::UnitTesting::Events::TestFabricScopedEvent::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestFabricScopedEvent", 1, value);
         }
