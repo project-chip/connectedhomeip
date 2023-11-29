@@ -136,6 +136,11 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
             });
         }
         break;
+    case QueuedPreset::Id:
+        {
+            chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::Type> value;
+            return aEncoder.Encode(value);
+        }
     default: // return CHIP_NO_ERROR and just read from the attribute store in default
         break;
     }
@@ -174,6 +179,10 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
     break;
 
     case Schedules::Id: {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    break;
+    case QueuedPreset::Id: {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
     break;
