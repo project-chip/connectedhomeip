@@ -63,7 +63,7 @@ public:
      *
      * @param[in] aICDClientInfo the updated ICD Client Info.
      */
-    virtual CHIP_ERROR StoreEntry(ICDClientInfo & clientInfo) = 0;
+    virtual CHIP_ERROR StoreEntry(const ICDClientInfo & clientInfo) = 0;
 
     /**
      * Delete ICD Client persistent information associated with the specified scoped node Id.
@@ -83,13 +83,13 @@ public:
     virtual CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex) = 0;
 
     /**
-     * Validate received ICD Check-in message payload, consumer has to provide keys and see whether it's the right key,
+     * Process received ICD Check-in message payload, consumer has to provide keys and see whether it's the right key,
      * further check its received counter value is valid, then return the matched ICDClientInfo. If anything wrong,
-     * return false, ICDClientInfo cannot be updated.
+     * return CHIP_ERROR, ICDClientInfo cannot be updated.
      * @param[in] payload received checkIn Message payload
      * @param[out] clientInfo retrieved matched clientInfo from storage
      */
-    virtual bool ValidateCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) = 0;
+    virtual CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) = 0;
 };
 } // namespace app
 } // namespace chip

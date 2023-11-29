@@ -56,13 +56,13 @@ public:
 
     CHIP_ERROR SetKey(ICDClientInfo & clientInfo, const ByteSpan keyData) override;
 
-    CHIP_ERROR StoreEntry(ICDClientInfo & clientInfo) override;
+    CHIP_ERROR StoreEntry(const ICDClientInfo & clientInfo) override;
 
     CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNodeId) override;
 
     CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex) override;
 
-    bool ValidateCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) override;
+    CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) override;
 
 protected:
     enum class ClientInfoTag : uint8_t

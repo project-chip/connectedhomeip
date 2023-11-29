@@ -305,7 +305,7 @@ CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, cons
     return writer.EndContainer(arrayType);
 }
 
-CHIP_ERROR DefaultICDClientStorage::StoreEntry(ICDClientInfo & clientInfo)
+CHIP_ERROR DefaultICDClientStorage::StoreEntry(const ICDClientInfo & clientInfo)
 {
     std::vector<ICDClientInfo> clientInfoVector;
     size_t clientInfoSize = MaxICDClientInfoSize();
@@ -438,10 +438,10 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     return mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricIndex).KeyName());
 }
 
-bool DefaultICDClientStorage::ValidateCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo)
+CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo)
 {
     // TODO: Need to implement default decription code using CheckinMessage::ParseCheckinMessagePayload
-    return false;
+    return CHIP_NO_ERROR;
 }
 } // namespace app
 } // namespace chip
