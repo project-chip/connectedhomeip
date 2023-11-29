@@ -13,13 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import unittest
 import xml.etree.ElementTree as ET
 
 try:
     from matter_idl.generators.type_definitions import ParseDataType
 except ImportError:
-    import os
     import sys
 
     sys.path.append(os.path.abspath(
