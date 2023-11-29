@@ -26,8 +26,9 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.generators.type_definitions import ParseDataType
 
-from matter_idl.generators.type_definitions import TypeLookupContext, BasicInteger, FundamentalType
+from matter_idl.generators.type_definitions import BasicInteger, FundamentalType, TypeLookupContext
 from matter_idl.matter_idl_types import DataType, Idl
+
 
 class TestSupportedTypes(unittest.TestCase):
 
@@ -82,7 +83,7 @@ class TestSupportedTypes(unittest.TestCase):
 
             parsed = ParseDataType(data_type, empty_lookup)
 
-            self.assertTrue(parsed is not None) # this should always pass.
+            self.assertTrue(parsed is not None)  # this should always pass.
             fail_message = f"{data_type.name} was parsed as {parsed}"
 
             self.assertIs(type(parsed), BasicInteger, fail_message)
@@ -94,10 +95,10 @@ class TestSupportedTypes(unittest.TestCase):
                 self.assertTrue(parsed.is_signed, fail_message)
 
             if "size" in t.attrib:
-                self.assertEqual(parsed.byte_count, int(t.attrib["size"]), fail_message)
+                self.assertEqual(parsed.byte_count, int(
+                    t.attrib["size"]), fail_message)
 
             # TODO: we could validate size here...
-
 
 
 if __name__ == '__main__':
