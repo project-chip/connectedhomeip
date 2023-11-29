@@ -98,8 +98,6 @@ class TestSupportedTypes(unittest.TestCase):
                 self.assertEqual(parsed.byte_count, int(
                     t.attrib["size"]), fail_message)
 
-            # TODO: we could validate size here...
-
 
 if __name__ == '__main__':
     unittest.main()
