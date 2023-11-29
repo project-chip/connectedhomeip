@@ -38,6 +38,14 @@ public:
 
     static void Init(chip::PersistentStorageDelegate & storage, chip::Crypto::SymmetricKeystore * symmetricKeystore,
                      chip::ICDConfigurationData & ICDConfigurationData);
+
+    /**
+     * @brief Function that executes the business logic of the RegisterClient Command
+     *
+     * @param[out] icdCounter If function succeeds, icdCounter will have the current value of the ICDCounter stored in the
+     * ICDConfigurationData If function fails, icdCounter will be unchanged
+     * @return Status
+     */
     Status RegisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                           const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData,
                           uint32_t & icdCounter);
@@ -45,7 +53,7 @@ public:
     Status UnregisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                             const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
 
-    Status StayActiveRequest(chip::FabricIndex fabric_index);
+    Status StayActiveRequest(chip::FabricIndex fabricIndex);
 
 private:
     /**
@@ -55,7 +63,7 @@ private:
     void TriggerICDMTableUpdatedEvent();
 
     CHIP_ERROR CheckAdmin(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                          bool & is_admin);
+                          bool & isClientAdmin);
 
     static chip::PersistentStorageDelegate * mStorage;
     static chip::Crypto::SymmetricKeystore * mSymmetricKeystore;

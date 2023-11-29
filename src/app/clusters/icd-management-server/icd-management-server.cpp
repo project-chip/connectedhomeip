@@ -201,29 +201,29 @@ ICDConfigurationData * ICDManagementServer::mICDConfigurationData   = nullptr;
 Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                            const Commands::RegisterClient::DecodableType & commandData, uint32_t & icdCounter)
 {
-    FabricIndex fabric_index            = commandObj->GetAccessingFabricIndex();
-    NodeId node_id                      = commandData.checkInNodeID;
-    uint64_t monitored_subject          = commandData.monitoredSubject;
-    ByteSpan key                        = commandData.key;
-    Optional<ByteSpan> verification_key = commandData.verificationKey;
-    bool isAdmin                        = false;
+    FabricIndex fabricIndex            = commandObj->GetAccessingFabricIndex();
+    NodeId nodeId                      = commandData.checkInNodeID;
+    uint64_t monitoredSubject          = commandData.monitoredSubject;
+    ByteSpan key                       = commandData.key;
+    Optional<ByteSpan> verificationKey = commandData.verificationKey;
+    bool isClientAdmin                 = false;
 
     // Check if client is admin
-    VerifyOrReturnError(CHIP_NO_ERROR == CheckAdmin(commandObj, commandPath, isAdmin), InteractionModel::Status::Failure);
+    VerifyOrReturnError(CHIP_NO_ERROR == CheckAdmin(commandObj, commandPath, isClientAdmin), InteractionModel::Status::Failure);
 
     bool isFirstEntryForFabric = false;
-    ICDMonitoringTable table(*mStorage, fabric_index, mICDConfigurationData->GetClientsSupportedPerFabric(), mSymmetricKeystore);
+    ICDMonitoringTable table(*mStorage, fabricIndex, mICDConfigurationData->GetClientsSupportedPerFabric(), mSymmetricKeystore);
 
     // Get current entry, if exists
     ICDMonitoringEntry entry(mSymmetricKeystore);
-    CHIP_ERROR err = table.Find(node_id, entry);
+    CHIP_ERROR err = table.Find(nodeId, entry);
     if (CHIP_NO_ERROR == err)
     {
         // Existing entry: Validate Key if, and only if, the ISD does NOT have administrator permissions
-        if (!isAdmin)
+        if (!isClientAdmin)
         {
-            VerifyOrReturnError(verification_key.HasValue(), InteractionModel::Status::Failure);
-            VerifyOrReturnError(entry.IsKeyEquivalent(verification_key.Value()), InteractionModel::Status::Failure);
+            VerifyOrReturnError(verificationKey.HasValue(), InteractionModel::Status::Failure);
+            VerifyOrReturnError(entry.IsKeyEquivalent(verificationKey.Value()), InteractionModel::Status::Failure);
         }
     }
     else if (CHIP_ERROR_NOT_FOUND == err)
@@ -241,8 +241,8 @@ Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const Co
     }
 
     // Save
-    entry.checkInNodeID    = node_id;
-    entry.monitoredSubject = monitored_subject;
+    entry.checkInNodeID    = nodeId;
+    entry.monitoredSubject = monitoredSubject;
     if (entry.keyHandleValid)
     {
         entry.DeleteKey();
@@ -275,27 +275,27 @@ Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const Co
 Status ICDManagementServer::UnregisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                              const Commands::UnregisterClient::DecodableType & commandData)
 {
-    FabricIndex fabric_index            = commandObj->GetAccessingFabricIndex();
-    NodeId node_id                      = commandData.checkInNodeID;
-    Optional<ByteSpan> verification_key = commandData.verificationKey;
-    bool isAdmin                        = false;
+    FabricIndex fabricIndex            = commandObj->GetAccessingFabricIndex();
+    NodeId nodeId                      = commandData.checkInNodeID;
+    Optional<ByteSpan> verificationKey = commandData.verificationKey;
+    bool isClientAdmin                 = false;
 
     // Check if client is admin
-    VerifyOrReturnError(CHIP_NO_ERROR == CheckAdmin(commandObj, commandPath, isAdmin), InteractionModel::Status::Failure);
+    VerifyOrReturnError(CHIP_NO_ERROR == CheckAdmin(commandObj, commandPath, isClientAdmin), InteractionModel::Status::Failure);
 
-    ICDMonitoringTable table(*mStorage, fabric_index, mICDConfigurationData->GetClientsSupportedPerFabric(), mSymmetricKeystore);
+    ICDMonitoringTable table(*mStorage, fabricIndex, mICDConfigurationData->GetClientsSupportedPerFabric(), mSymmetricKeystore);
 
     // Get current entry, if exists
     ICDMonitoringEntry entry(mSymmetricKeystore);
-    CHIP_ERROR err = table.Find(node_id, entry);
+    CHIP_ERROR err = table.Find(nodeId, entry);
     VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, InteractionModel::Status::NotFound);
     VerifyOrReturnError(CHIP_NO_ERROR == err, InteractionModel::Status::Failure);
 
     // Existing entry: Validate Key if, and only if, the ISD has NOT administrator permissions
-    if (!isAdmin)
+    if (!isClientAdmin)
     {
-        VerifyOrReturnError(verification_key.HasValue(), InteractionModel::Status::Failure);
-        VerifyOrReturnError(entry.IsKeyEquivalent(verification_key.Value()), InteractionModel::Status::Failure);
+        VerifyOrReturnError(verificationKey.HasValue(), InteractionModel::Status::Failure);
+        VerifyOrReturnError(entry.IsKeyEquivalent(verificationKey.Value()), InteractionModel::Status::Failure);
     }
 
     err = table.Remove(entry.index);
@@ -309,7 +309,7 @@ Status ICDManagementServer::UnregisterClient(CommandHandler * commandObj, const 
     return InteractionModel::Status::Success;
 }
 
-Status ICDManagementServer::StayActiveRequest(FabricIndex fabric_index)
+Status ICDManagementServer::StayActiveRequest(FabricIndex fabricIndex)
 {
     // TODO: Implementent stay awake logic for end device
     // https://github.com/project-chip/connectedhomeip/issues/24259
@@ -322,18 +322,19 @@ void ICDManagementServer::TriggerICDMTableUpdatedEvent()
     ICDNotifier::GetInstance().BroadcastICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
 }
 
-CHIP_ERROR ICDManagementServer::CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, bool & isAdmin)
+CHIP_ERROR ICDManagementServer::CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                           bool & isClientAdmin)
 {
     RequestPath requestPath{ .cluster = commandPath.mClusterId, .endpoint = commandPath.mEndpointId };
     CHIP_ERROR err = GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, Privilege::kAdminister);
     if (CHIP_NO_ERROR == err)
     {
-        isAdmin = true;
+        isClientAdmin = true;
     }
     else if (CHIP_ERROR_ACCESS_DENIED == err)
     {
-        isAdmin = false;
-        err     = CHIP_NO_ERROR;
+        isClientAdmin = false;
+        err           = CHIP_NO_ERROR;
     }
     return err;
 }
