@@ -78,8 +78,6 @@
 using namespace chip;
 using namespace chip::Inet;
 
-System::LayerImpl gSystemLayer;
-
 Inet::UDPEndPointManagerImpl gUDP;
 Inet::TCPEndPointManagerImpl gTCP;
 
@@ -170,13 +168,13 @@ void InitSystemLayer()
 #endif // !CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    gSystemLayer.Init();
+    DeviceLayer::SystemLayer().Init();
 }
 
 void ShutdownSystemLayer()
 {
 
-    gSystemLayer.Shutdown();
+  DeviceLayer::SystemLayer().Shutdown();
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // LwIP implementation uses the event loop for servicing events.
@@ -432,8 +430,8 @@ void InitNetwork()
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
-    gTCP.Init(gSystemLayer);
-    gUDP.Init(gSystemLayer);
+    gTCP.Init(DeviceLayer::SystemLayer());
+    gUDP.Init(DeviceLayer::SystemLayer());
 }
 
 void ServiceEvents(uint32_t aSleepTimeMilliseconds)
@@ -453,17 +451,17 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
     }
 
     // Start a timer (with a no-op callback) to ensure that WaitForEvents() does not block longer than aSleepTimeMilliseconds.
-    gSystemLayer.StartTimer(
+    DeviceLayer::SystemLayer().StartTimer(
         System::Clock::Milliseconds32(aSleepTimeMilliseconds), [](System::Layer *, void *) -> void {}, nullptr);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    gSystemLayer.PrepareEvents();
-    gSystemLayer.WaitForEvents();
-    gSystemLayer.HandleEvents();
+    DeviceLayer::SystemLayer().PrepareEvents();
+    DeviceLayer::SystemLayer().WaitForEvents();
+    DeviceLayer::SystemLayer().HandleEvents();
 #endif
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    if (gSystemLayer.IsInitialized())
+    if (DeviceLayer::SystemLayer().IsInitialized())
     {
         static uint32_t sRemainingSystemLayerEventDelay = 0;
 
@@ -482,7 +480,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
         else
             sRemainingSystemLayerEventDelay--;
 
-        gSystemLayer.HandlePlatformTimer();
+        DeviceLayer::SystemLayer().HandlePlatformTimer();
     }
 #if CHIP_TARGET_STYLE_UNIX
     // TapAddrAutoconf and TapInterface are only needed for LwIP on

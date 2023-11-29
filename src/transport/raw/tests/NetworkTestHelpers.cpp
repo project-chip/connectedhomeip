@@ -35,7 +35,7 @@ CHIP_ERROR IOContext::Init()
     InitSystemLayer();
     InitNetwork();
 
-    mSystemLayer        = &gSystemLayer;
+    mSystemLayer        = &DeviceLayer::SystemLayer();
     mTCPEndPointManager = &gTCP;
     mUDPEndPointManager = &gUDP;
 
