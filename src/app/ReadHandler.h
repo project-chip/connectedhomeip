@@ -254,6 +254,16 @@ public:
         return CHIP_NO_ERROR;
     }
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    /**
+     *
+     *  @brief Initialize a ReadHandler for a resumed subsciption
+     *
+     *  Used after the SubscriptionResumptionHelper establishs the CASE session
+     */
+    void OnSubscriptionResumed(const SessionHandle & sessionHandle, SubscriptionResumptionHelper & helper);
+#endif
+
 private:
     PriorityLevel GetCurrentPriority() const { return mCurrentPriority; }
     EventNumber & GetEventMin() { return mEventMin; }
@@ -302,16 +312,6 @@ private:
      *
      */
     void OnInitialRequest(System::PacketBufferHandle && aPayload);
-
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    /**
-     *
-     *  @brief Initialize a ReadHandler for a resumed subsciption
-     *
-     *  Used after the SubscriptionResumptionHelper establishs the CASE session
-     */
-    void OnSubscriptionResumed(const SessionHandle & sessionHandle, SubscriptionResumptionHelper & helper);
-#endif
 
     /**
      *  Send ReportData to initiator
@@ -428,7 +428,6 @@ private:
     //
     friend class chip::app::reporting::Engine;
     friend class chip::app::InteractionModelEngine;
-    friend class chip::app::SubscriptionResumptionHelper;
 
     // The report scheduler needs to be able to access StateFlag private functions ShouldStartReporting(), CanStartReporting(),
     // ForceDirtyState() and IsDirty() to know when to schedule a run so it is declared as a friend class.

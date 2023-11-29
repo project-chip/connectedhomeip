@@ -23,23 +23,27 @@
 
 namespace chip {
 namespace app {
-class InteractionModelEngine;
-class ReadHandler;
 
-class SubscriptionResumptionHelper : private SubscriptionResumptionStorage::SubscriptionInfo
+/**
+ *  Helper to resume persistent subscription. A CASE session will be established upon invoking ResumeSubscription(),
+ *  followed by the creation and intialization of a ReadHandler. This class helps prevent a scenario where all
+ *  ReadHandlers in the pool grab the invalid session handle. In such scenario, if the device receives a new
+ *  subscription request, it will crash as there is no evictable ReadHandler.
+ */
+
+class SubscriptionResumptionHelper
 {
 public:
     SubscriptionResumptionHelper();
 
     ~SubscriptionResumptionHelper() {}
 
-private:
-    friend class InteractionModelEngine;
-    friend class ReadHandler;
-
     CHIP_ERROR ResumeSubscription(CASESessionManager & caseSessionManager,
-                                  SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo);
+                                  const SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo);
 
+    SubscriptionResumptionStorage::SubscriptionInfo mSubscriptionInfo;
+
+private:
     // Callback funstions for continuing the subscription resumption
     static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
                                       const SessionHandle & sessionHandle);

@@ -90,16 +90,16 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
 
 void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle, SubscriptionResumptionHelper & helper)
 {
-    mSubscriptionId          = helper.mSubscriptionId;
-    mMinIntervalFloorSeconds = helper.mMinInterval;
-    mMaxInterval             = helper.mMaxInterval;
-    SetStateFlag(ReadHandlerFlags::FabricFiltered, helper.mFabricFiltered);
+    mSubscriptionId          = helper.mSubscriptionInfo.mSubscriptionId;
+    mMinIntervalFloorSeconds = helper.mSubscriptionInfo.mMinInterval;
+    mMaxInterval             = helper.mSubscriptionInfo.mMaxInterval;
+    SetStateFlag(ReadHandlerFlags::FabricFiltered, helper.mSubscriptionInfo.mFabricFiltered);
 
     // Move dynamically allocated attributes and events from the SubscriptionInfo struct into
     // the object pool managed by the IM engine
-    for (size_t i = 0; i < helper.mAttributePaths.AllocatedSize(); i++)
+    for (size_t i = 0; i < helper.mSubscriptionInfo.mAttributePaths.AllocatedSize(); i++)
     {
-        AttributePathParams params = helper.mAttributePaths[i].GetParams();
+        AttributePathParams params = helper.mSubscriptionInfo.mAttributePaths[i].GetParams();
         CHIP_ERROR err             = InteractionModelEngine::GetInstance()->PushFrontAttributePathList(mpAttributePathList, params);
         if (err != CHIP_NO_ERROR)
         {
@@ -107,9 +107,9 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle, Sub
             return;
         }
     }
-    for (size_t i = 0; i < helper.mEventPaths.AllocatedSize(); i++)
+    for (size_t i = 0; i < helper.mSubscriptionInfo.mEventPaths.AllocatedSize(); i++)
     {
-        EventPathParams params = helper.mEventPaths[i].GetParams();
+        EventPathParams params = helper.mSubscriptionInfo.mEventPaths[i].GetParams();
         CHIP_ERROR err         = InteractionModelEngine::GetInstance()->PushFrontEventPathParamsList(mpEventPathList, params);
         if (err != CHIP_NO_ERROR)
         {
