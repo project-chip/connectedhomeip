@@ -16,11 +16,9 @@
  */
 #pragma once
 
-#include <app/AppConfig.h>
+#include <app/icd/ICDConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
-
-class ICDListener;
 
 namespace chip {
 namespace app {
