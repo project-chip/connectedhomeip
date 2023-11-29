@@ -188,7 +188,7 @@ __CHIP_SIZED_TYPES__ = {
     "int8s": BasicInteger(idl_name="int8s", byte_count=1, is_signed=True),
     "int8u": BasicInteger(idl_name="int8u", byte_count=1, is_signed=False),
     # Derived types
-    # Specification describes them in section '7.18.2. Derived Data Types'
+    # Specification describes them in section '7.19.2. Derived Data Types'
     "action_id": BasicInteger(idl_name="action_id", byte_count=1, is_signed=False),
     "attrib_id": BasicInteger(idl_name="attrib_id", byte_count=4, is_signed=False),
     "cluster_id": BasicInteger(idl_name="cluster_id", byte_count=4, is_signed=False),
@@ -213,7 +213,7 @@ __CHIP_SIZED_TYPES__ = {
     "percent100ths": BasicInteger(idl_name="percent100ths", byte_count=2, is_signed=False),
     "posix_ms": BasicInteger(idl_name="posix_ms", byte_count=8, is_signed=False),
     "priority": BasicInteger(idl_name="priority", byte_count=1, is_signed=False),
-    "status": BasicInteger(idl_name="status", byte_count=2, is_signed=False),
+    "status": BasicInteger(idl_name="status", byte_count=1, is_signed=False),
     "systime_ms": BasicInteger(idl_name="systime_ms", byte_count=8, is_signed=False),
     "systime_us": BasicInteger(idl_name="systime_us", byte_count=8, is_signed=False),
     "tag": BasicInteger(idl_name="tag", byte_count=1, is_signed=False),
@@ -386,7 +386,7 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
         return BasicString(idl_name=lowercase_name, is_binary=True, max_length=data_type.max_length)
     elif lowercase_name in ['enum8', 'enum16', 'enum32']:
         return IdlEnumType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
-    elif lowercase_name in ['bitmap8', 'bitmap16', 'bitmap24', 'bitmap32']:
+    elif lowercase_name in ['bitmap8', 'bitmap16', 'bitmap24', 'bitmap32', 'bitmap64']:
         return IdlBitmapType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
 
     int_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
