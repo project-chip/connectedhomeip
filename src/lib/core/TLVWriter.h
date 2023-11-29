@@ -130,7 +130,8 @@ public:
      * @retval #CHIP_ERROR_NO_MEMORY The reserved buffer size cannot fits into the remaining buffer size.
      * @retval #CHIP_ERROR_INCORRECT_STATE
      *                               Uses TLVBackingStore and is in a state where it might allocate
-     *                               additional non-contigious memory, thus making it impossible to
+     *                               additional non-contigious memory, thus making it difficult/impossible
+     *                               to properly reserve space.
      */
     CHIP_ERROR ReserveBuffer(uint32_t aBufferSize);
 
