@@ -51,7 +51,7 @@ namespace SecureMessageCodec {
  * @return A CHIP_ERROR value consistent with the result of the encryption operation
  */
 CHIP_ERROR Encrypt(const CryptoContext & context, CryptoContext::ConstNonceView nonce, PayloadHeader & payloadHeader,
-                   PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf, size_t inputMaxLength);
+                   PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf, size_t inputMaxLength = kMaxAppMessageLen);
 
 /**
  * @brief
