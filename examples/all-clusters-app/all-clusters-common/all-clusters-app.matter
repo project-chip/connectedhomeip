@@ -7289,7 +7289,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x03A3;
+    ram      attribute featureMap default = 0x0023;
     ram      attribute clusterRevision default = 6;
 
     handle command SetpointRaiseLower;

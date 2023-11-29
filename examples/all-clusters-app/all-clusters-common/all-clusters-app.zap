@@ -12580,7 +12580,7 @@
               "mfgCode": null,
               "source": "server",
               "isIncoming": 0,
-              "isEnabled": 1
+              "isEnabled": 0
             },
             {
               "name": "GetRelayStatusLog",
@@ -12588,7 +12588,7 @@
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
-              "isEnabled": 1
+              "isEnabled": 0
             },
             {
               "name": "SetActiveScheduleRequest",
@@ -12596,7 +12596,7 @@
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
-              "isEnabled": 1
+              "isEnabled": 0
             },
             {
               "name": "SetActivePresetRequest",
@@ -12604,7 +12604,7 @@
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
-              "isEnabled": 1
+              "isEnabled": 0
             },
             {
               "name": "StartPresetsSchedulesEditRequest",
@@ -12612,7 +12612,7 @@
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
-              "isEnabled": 1
+              "isEnabled": 0
             },
             {
               "name": "CancelPresetsSchedulesEditRequest",
@@ -12620,7 +12620,7 @@
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
-              "isEnabled": 1
+              "isEnabled": 0
             },
             {
               "name": "CommitPresetsSchedulesRequest",
@@ -12628,7 +12628,7 @@
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
-              "isEnabled": 1
+              "isEnabled": 0
             },
             {
               "name": "CancelSetActivePresetRequest",
@@ -12636,7 +12636,7 @@
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
-              "isEnabled": 1
+              "isEnabled": 0
             },
             {
               "name": "SetTemperatureSetpointHoldPolicy",
@@ -12644,7 +12644,7 @@
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
-              "isEnabled": 1
+              "isEnabled": 0
             }
           ],
           "attributes": [
@@ -13154,7 +13154,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x03A3",
+              "defaultValue": "0x0023",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
