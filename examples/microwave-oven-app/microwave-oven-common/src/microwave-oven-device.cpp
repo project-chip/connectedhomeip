@@ -21,29 +21,75 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalState;
+using namespace chip::app::Clusters::ModeBase;
 using namespace chip::app::Clusters::MicrowaveOvenControl;
 using OperationalStateEnum = chip::app::Clusters::OperationalState::OperationalStateEnum;
 using Status               = Protocols::InteractionModel::Status;
 
+
+void ExampleMicrowaveOvenDevice::MicrowaveOvenInit(EndpointId aEndpoint)
+{
+    mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
+    mOperationalStateInstance.Init();
+    mMicrowaveOvenModeInstance.Init();
+    mMicrowaveOvenControlInstance.Init();
+}
+
+/**
+ * MicrowaveOvenControl cluster
+*/
 Protocols::InteractionModel::Status
-MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCommandCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                            uint8_t powerSetting)
+ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime, uint8_t powerSetting)
 {
     // placeholder implementation
-    // TODO(#30609): set Microwave Oven cooking mode by cookMode.Value().
+    Status status;
+    if((status = mMicrowaveOvenModeInstance.UpdateCurrentMode(cookMode) != Status::Success))
+    {
+        return status;
+    }
     mMicrowaveOvenControlInstance.SetCookTime(cookTime);
     mMicrowaveOvenControlInstance.SetPowerSetting(powerSetting);
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status MicrowaveOvenDevice::HandleMicrowaveOvenSetCookTimeCommandCallback(uint32_t finalCookTime)
+Protocols::InteractionModel::Status ExampleMicrowaveOvenDevice::HandleSetCookTimeCommandCallback(uint32_t finalCookTime)
 {
     // placeholder implementation
     mMicrowaveOvenControlInstance.SetCookTime(finalCookTime);
     return Status::Success;
 }
 
-void MicrowaveOvenDevice::HandleMicrowaveOvenOpStatePauseCallback(OperationalState::GenericOperationalError & err)
+
+
+/**
+ * OperationalState cluster
+*/
+app::DataModel::Nullable<uint32_t> ExampleMicrowaveOvenDevice::GetCountdownTime()
+{
+    return static_cast<app::DataModel::Nullable<uint32_t>>(mMicrowaveOvenControlInstance.GetCookTime());
+}
+
+CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
+{
+    if (index > mOperationalStateList.size() - 1)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    operationalState = mOperationalStateList[index];
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase)
+{
+    if (index > mOperationalPhaseList.size() - 1)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    operationalPhase = mOperationalPhaseList[index];
+    return CHIP_NO_ERROR;
+}
+
+void ExampleMicrowaveOvenDevice::HandlePauseStateCallback(OperationalState::GenericOperationalError & err)
 {
     // placeholder implementation
     auto error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kPaused));
@@ -57,7 +103,7 @@ void MicrowaveOvenDevice::HandleMicrowaveOvenOpStatePauseCallback(OperationalSta
     }
 }
 
-void MicrowaveOvenDevice::HandleMicrowaveOvenOpStateResumeCallback(OperationalState::GenericOperationalError & err)
+void ExampleMicrowaveOvenDevice::HandleResumeStateCallback(OperationalState::GenericOperationalError & err)
 {
     // placeholder implementation
     auto error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
@@ -71,7 +117,7 @@ void MicrowaveOvenDevice::HandleMicrowaveOvenOpStateResumeCallback(OperationalSt
     }
 }
 
-void MicrowaveOvenDevice::HandleMicrowaveOvenOpStateStartCallback(OperationalState::GenericOperationalError & err)
+void ExampleMicrowaveOvenDevice::HandleStartStateCallback(OperationalState::GenericOperationalError & err)
 {
     // placeholder implementation
     auto error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
@@ -85,7 +131,7 @@ void MicrowaveOvenDevice::HandleMicrowaveOvenOpStateStartCallback(OperationalSta
     }
 }
 
-void MicrowaveOvenDevice::HandleMicrowaveOvenOpStateStopCallback(OperationalState::GenericOperationalError & err)
+void ExampleMicrowaveOvenDevice::HandleStopStateCallback(OperationalState::GenericOperationalError & err)
 {
     // placeholder implementation
     auto error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
@@ -99,15 +145,55 @@ void MicrowaveOvenDevice::HandleMicrowaveOvenOpStateStopCallback(OperationalStat
     }
 }
 
-app::DataModel::Nullable<uint32_t> MicrowaveOvenDevice::HandleMicrowaveOvenOpStateGetCountdownTime()
+
+/**
+ * MicrowaveOvenMode Cluster
+*/
+CHIP_ERROR ExampleMicrowaveOvenDevice::Init()
 {
-    return static_cast<app::DataModel::Nullable<uint32_t>>(mMicrowaveOvenControlInstance.GetCookTime());
+    return CHIP_NO_ERROR;
 }
 
-void MicrowaveOvenDevice::Init(EndpointId aEndpoint)
+// todo refactor code by making a parent class for all ModeInstance classes to reduce flash usage.
+void ExampleMicrowaveOvenDevice::HandleChangeToMode(uint8_t NewMode,
+                                                          ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
-    mOperationalStateInstance.Init();
-    MicrowaveOvenControl::SetOPInstance(aEndpoint, &mOperationalStateInstance);
-    mMicrowaveOvenControlInstance.Init();
+    response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+}
+
+CHIP_ERROR ExampleMicrowaveOvenDevice::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
+{
+    if (modeIndex >= ArraySize(kModeOptions))
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+    return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
+}
+
+CHIP_ERROR ExampleMicrowaveOvenDevice::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
+{
+    if (modeIndex >= ArraySize(kModeOptions))
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+    value = kModeOptions[modeIndex].mode;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExampleMicrowaveOvenDevice::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
+{
+    if (modeIndex >= ArraySize(kModeOptions))
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+
+    if (tags.size() < kModeOptions[modeIndex].modeTags.size())
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    std::copy(kModeOptions[modeIndex].modeTags.begin(), kModeOptions[modeIndex].modeTags.end(), tags.begin());
+    tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
+
+    return CHIP_NO_ERROR;
 }

@@ -1,22 +1,86 @@
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #pragma once
 
-#include "microwave-oven-control-delegate.h"
-#include "operational-state-delegate.h"
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
+#include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/util/af-enums.h>
+#include <protocols/interaction_model/StatusCode.h>
+#include <app/util/config.h>
+#include <cstring>
+#include <utility>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-class MicrowaveOvenDevice
+/**
+ * set default value for the optional attributes
+*/
+constexpr uint8_t kDefaultMinPower  = 10u;
+constexpr uint8_t kDefaultMaxPower  = 100u;
+constexpr uint8_t kDefaultPowerStep = 10u;
+
+constexpr uint8_t ModeNormal  = 0;
+constexpr uint8_t ModeDefrost = 1;
+
+class ExampleMicrowaveOvenDevice : public MicrowaveOvenControl::Delegate, public ModeBase::Delegate, public OperationalState::Delegate
 {
 private:
-    MicrowaveOvenControl::ExampleMicrowaveOvenControlDelegate mMicrowaveOvenControlDelegate;
+    //define delegates and instances for Microwave Oven device
     MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
-
-    OperationalState::OperationalStateDelegate mOperationalStateDelegate;
     OperationalState::Instance mOperationalStateInstance;
+    ModeBase::Instance mMicrowaveOvenModeInstance;
+
+    //MicrowaveOvenMode types
+    using ModeTagStructType              = detail::Structs::ModeTagStruct::Type;
+    ModeTagStructType modeTagsNormal[1]  = { { .value = to_underlying(ModeTag::kNormal) } };
+    ModeTagStructType modeTagsDefrost[1] = { { .value = to_underlying(ModeTag::kDefrost) } };
+
+    const detail::Structs::ModeOptionStruct::Type kModeOptions[2] = {
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),
+                                                 .mode     = ModeNormal,
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Defrost"),
+                                                 .mode     = ModeDefrost,
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsDefrost) }
+    };
+
+
+    //Operational States 
+    const GenericOperationalState opStateList[4] = {
+        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+        GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
+        GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
+        GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
+    };
+
+    app::DataModel::List<const GenericOperationalState> mOperationalStateList = Span<const GenericOperationalState>(opStateList);
+
+    const GenericOperationalPhase opPhaseList[1] = {
+        // Phase List is null
+        GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
+    };
+
+    Span<const GenericOperationalPhase> mOperationalPhaseList = Span<const GenericOperationalPhase>(opPhaseList);
 
 public:
     /**
@@ -24,82 +88,144 @@ public:
      * as required by the specific "business logic". See the state machine diagram.
      * @param aClustersEndpoint The endpoint ID where all the microwave oven clusters exist.
      */
-    explicit MicrowaveOvenDevice(EndpointId aClustersEndpoint) :
-        mMicrowaveOvenControlDelegate(),
-        mMicrowaveOvenControlInstance(&mMicrowaveOvenControlDelegate, aClustersEndpoint, MicrowaveOvenControl::Id),
-        mOperationalStateDelegate(), mOperationalStateInstance(&mOperationalStateDelegate, aClustersEndpoint, OperationalState::Id)
-    {
-        // set callback functions
-        mMicrowaveOvenControlDelegate.SetMicrowaveOvenControlSetCookingParametersCallback(
-            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenSetCookingParametersCommandCallback, this, std::placeholders::_1,
-                      std::placeholders::_2, std::placeholders::_3));
-        mMicrowaveOvenControlDelegate.SetMicrowaveOvenControlSetCookTimeCallback(
-            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenSetCookTimeCommandCallback, this, std::placeholders::_1));
-        mOperationalStateDelegate.SetOpStatePauseCallback(
-            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStatePauseCallback, this, std::placeholders::_1));
-        mOperationalStateDelegate.SetOpStateResumeCallback(
-            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateResumeCallback, this, std::placeholders::_1));
-        mOperationalStateDelegate.SetOpStateStartCallback(
-            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateStartCallback, this, std::placeholders::_1));
-        mOperationalStateDelegate.SetOpStateStopCallback(
-            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateStopCallback, this, std::placeholders::_1));
-        mOperationalStateDelegate.SetOpStateGetCountdownTimeCallback(
-            std::bind(&MicrowaveOvenDevice::HandleMicrowaveOvenOpStateGetCountdownTime, this));
-    }
+    explicit ExampleMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
+        mOperationalStateInstance(this, aClustersEndpoint, OperationalState::Id),
+        mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id, chip::to_underlying(MicrowaveOvenMode::Feature::kOnOff),
+        mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, &mOperationalStateInstance, &mMicrowaveOvenModeInstance)){}
 
     /**
      * Init all the clusters used by this device.
      */
-    void Init(EndpointId aEndpoint);
+    void MicrowaveOvenInit(EndpointId aEndpoint);
 
+    //delegates from MicrowaveOvenControl cluster 
     /**
      * handle command for microwave oven control: set cooking parameters
      */
-    Protocols::InteractionModel::Status HandleMicrowaveOvenSetCookingParametersCommandCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                                               uint8_t powerSetting);
+    Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
+                                                                           uint8_t powerSetting) override;
 
     /**
      * handle command for microwave oven control: add more time
      */
-    Protocols::InteractionModel::Status HandleMicrowaveOvenSetCookTimeCommandCallback(uint32_t finalCookTime);
+    Protocols::InteractionModel::Status HandleSetCookTimeCallback(uint32_t finalCookTime) override;
 
     /**
-     * handle command for operational state: pause
-     * @param[out] err: get operational error after callback.
-     * this method is called to set operational state to target state.
-     * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
+     * Get the value of MinPower.
      */
-    void HandleMicrowaveOvenOpStatePauseCallback(OperationalState::GenericOperationalError & err);
+    uint8_t GetMinPower() const override { return kDefaultMinPower; }
 
     /**
-     * handle command for operational state: resume
-     * @param[out] err: get operational error after callback.
-     * this method is called to set operational state to target state.
-     * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
+     * Get the value of MaxPower.
      */
-    void HandleMicrowaveOvenOpStateResumeCallback(OperationalState::GenericOperationalError & err);
+    uint8_t GetMaxPower() const override { return kDefaultMaxPower; }
 
     /**
-     * handle command for operational state: start
-     * @param[out] err: get operational error after callback.
-     * this method is called to set operational state to target state.
-     * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
+     * Get the value of PowerStep.
      */
-    void HandleMicrowaveOvenOpStateStartCallback(OperationalState::GenericOperationalError & err);
+    uint8_t GetPowerStep() const override { return kDefaultPowerStep; }
 
-    /**
-     * handle command for operational state: stop
-     * @param[out] err: get operational error after callback.
-     * this method is called to set operational state to target state.
-     * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
-     */
-    void HandleMicrowaveOvenOpStateStopCallback(OperationalState::GenericOperationalError & err);
 
+
+    //delegates from OperationalState cluster
     /**
-     * handle command for operational state: get count down time
+     * Get the countdown time.
      * return actual cook time.
      */
-    app::DataModel::Nullable<uint32_t> HandleMicrowaveOvenOpStateGetCountdownTime();
+    app::DataModel::Nullable<uint32_t> GetCountdownTime() override;
+
+    /**
+     * Fills in the provided GenericOperationalState with the state at index `index` if there is one,
+     * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
+     * Note: This is used by the SDK to populate the operational state list attribute. If the contents of this list changes,
+     * the device SHALL call the Instance's ReportOperationalStateListChange method to report that this attribute has changed.
+     * @param index The index of the state, with 0 representing the first state.
+     * @param operationalState  The GenericOperationalState is filled.
+     */
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) override;
+
+    /**
+     * Fills in the provided GenericOperationalPhase with the phase at index `index` if there is one,
+     * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of phases.
+     * Note: This is used by the SDK to populate the phase list attribute. If the contents of this list changes, the
+     * device SHALL call the Instance's ReportPhaseListChange method to report that this attribute has changed.
+     * @param index The index of the phase, with 0 representing the first phase.
+     * @param operationalPhase  The GenericOperationalPhase is filled.
+     */
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase) override;
+
+    /**
+     * Handle Command Callback in application: Pause
+     * @param[out] err: get operational error after callback.
+     * this method is called to set operational state to target state.
+     * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
+     */
+    void HandlePauseStateCallback(GenericOperationalError & err) override;
+
+    /**
+     * Handle Command Callback in application: Resume
+     * @param[out] err: get operational error after callback.
+     * this method is called to set operational state to target state.
+     * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
+     */
+    void HandleResumeStateCallback(GenericOperationalError & err) override;
+
+    /**
+     * Handle Command Callback in application: Start
+     * @param[out] err: get operational error after callback.
+     * this method is called to set operational state to target state.
+     * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
+     */
+    void HandleStartStateCallback(GenericOperationalError & err) override;
+
+    /**
+     * Handle Command Callback in application: Stop
+     * @param[out] err: get operational error after callback.
+     * this method is called to set operational state to target state.
+     * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
+     */
+    void HandleStopStateCallback(GenericOperationalError & err) override;
+
+
+
+    //delegates from mode-base cluster
+    CHIP_ERROR Init() override;
+
+    /**
+     * Handle application logic when the mode is changing.
+     * @param mode The new mode that the device is requested to transition to.
+     * @param response A reference to a response that will be sent to the client. The contents of which con be modified by the
+     * application.
+     */
+    void HandleChangeToMode(uint8_t mode, ModeBase::Commands::ChangeToModeResponse::Type & response) override;
+
+    /**
+     * Get the mode label of the Nth mode in the list of modes.
+     * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
+     * @param label A reference to the mutable char span which will be mutated to receive the label on success. Use
+     * CopyCharSpanToMutableCharSpan to copy into the MutableCharSpan.
+     * @return Returns a CHIP_NO_ERROR if there was no error and the label was returned successfully.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available labels.
+     */
+    CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override;
+    /**
+     * Get the mode value of the Nth mode in the list of modes.
+     * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
+     * @param value a reference to the uint8_t variable that is to contain the mode value.
+     * @return Returns a CHIP_NO_ERROR if there was no error and the value was returned successfully.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available values.
+     */
+    CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
+
+    /**
+     * Get the mode tags of the Nth mode in the list of modes.
+     * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
+     * @param tags a reference to an existing and initialised buffer that is to contain the mode tags. std::copy can be used
+     * to copy into the buffer.
+     * @return Returns a CHIP_NO_ERROR if there was no error and the mode tags were returned successfully.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available mode tags.
+     */
+    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
 };
 
 } // namespace Clusters

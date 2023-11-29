@@ -32,9 +32,6 @@ namespace MicrowaveOvenControl {
 
 constexpr uint32_t kDefaultCookTime    = 30;
 constexpr uint8_t kDefaultPowerSetting = 100;
-constexpr uint8_t kDefaultMinPower     = 10;
-constexpr uint8_t kDefaultMaxPower     = 100;
-constexpr uint8_t kDefaultPowerStep    = 10;
 constexpr uint32_t kMaxCookTime        = 65535;
 constexpr uint32_t kMinCookTime        = 1;
 
@@ -49,9 +46,14 @@ public:
      * @param aDelegate A pointer to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId The ID of the operational state derived cluster to be instantiated.
+     * @param aClusterId The ID of the Microwave Oven Control cluster to be instantiated.
+     * @param aOpStateInstance The pointer of Operational State Instance. 
+     * @param aMicrowaveOvenModeInstance The pointer of Microwave Oven Mode Instance. 
+     * Note: a MicrowaveOvenControl instance must live relying on an Operational State instance and a Microwave Oven Mode instance, 
+     * caller should be initialized the 2 instances before initializing MicorwaveOvenControl instance. 
      */
-    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId);
+    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, 
+            Clusters::OperationalState::Instance * aOpStateInstance, Cluster::ModeBase::Instance * aMicrowaveOvenModeInstance);
 
     ~Instance() override;
 
@@ -76,6 +78,14 @@ private:
     Delegate * mDelegate;
     EndpointId mEndpointId;
     ClusterId mClusterId;
+    /**
+     * Operational State instance 
+     */
+    Clusters::OperationalState::Instance * mOpStateInstance;
+    /**
+     * Microwave Oven Mode instance 
+     */
+    Cluster::ModeBase::Instance * mMicrowaveOvenModeInstance;
 
     /**
      * set default values
@@ -159,12 +169,6 @@ private:
 protected:
     Instance * GetInstance() const { return mInstance; }
 
-    /**
-     * set default values
-     */
-    uint8_t mMinPower  = kDefaultMinPower;
-    uint8_t mMaxPower  = kDefaultMaxPower;
-    uint8_t mPowerStep = kDefaultPowerStep;
 };
 
 /**
@@ -181,15 +185,7 @@ bool IsCookTimeInRange(uint32_t cookTime);
  */
 bool IsPowerSettingInRange(uint8_t powerSetting, uint8_t minCookPower, uint8_t maxCookPower);
 
-/**
- *  @brief Set Operational State Cluster instance by endpoint id.
- */
-void SetOPInstance(EndpointId aEndpoint, OperationalState::Instance * aInstance);
 
-/**
- *  @brief Get Operational State Cluster instance by endpoint id.
- */
-OperationalState::Instance * GetOPInstance(EndpointId aEndpoint);
 
 } // namespace MicrowaveOvenControl
 } // namespace Clusters
