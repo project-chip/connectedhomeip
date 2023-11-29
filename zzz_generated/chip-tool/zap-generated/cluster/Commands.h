@@ -6903,8 +6903,8 @@ public:
     EnergyEvseEnableCharging(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("enable-charging", credsIssuerConfig)
     {
         AddArgument("ChargingEnabledUntil", 0, UINT32_MAX, &mRequest.chargingEnabledUntil);
-        AddArgument("MinimumChargeCurrent", INT64_MIN, INT64_MAX, &mRequest.minimumChargeCurrent);
-        AddArgument("MaximumChargeCurrent", INT64_MIN, INT64_MAX, &mRequest.maximumChargeCurrent);
+        AddArgument("MinimumChargeCurrent", 0, UINT64_MAX, &mRequest.minimumChargeCurrent);
+        AddArgument("MaximumChargeCurrent", 0, UINT64_MAX, &mRequest.maximumChargeCurrent);
         ClusterCommand::AddArguments();
     }
 
@@ -6943,7 +6943,7 @@ public:
         ClusterCommand("enable-discharging", credsIssuerConfig)
     {
         AddArgument("DischargingEnabledUntil", 0, UINT32_MAX, &mRequest.dischargingEnabledUntil);
-        AddArgument("MaximumDischargeCurrent", INT64_MIN, INT64_MAX, &mRequest.maximumDischargeCurrent);
+        AddArgument("MaximumDischargeCurrent", 0, UINT64_MAX, &mRequest.maximumDischargeCurrent);
         ClusterCommand::AddArguments();
     }
 
@@ -18446,18 +18446,16 @@ void registerClusterEnergyEvse(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "discharging-enabled-until", 0, UINT32_MAX,
                                                                               Attributes::DischargingEnabledUntil::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "circuit-capacity", INT64_MIN, INT64_MAX, Attributes::CircuitCapacity::Id,
+        make_unique<WriteAttribute<int64_t>>(Id, "circuit-capacity", 0, UINT64_MAX, Attributes::CircuitCapacity::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "minimum-charge-current", INT64_MIN, INT64_MAX,
-                                             Attributes::MinimumChargeCurrent::Id, WriteCommandType::kForceWrite,
-                                             credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "maximum-charge-current", INT64_MIN, INT64_MAX,
-                                             Attributes::MaximumChargeCurrent::Id, WriteCommandType::kForceWrite,
-                                             credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "maximum-discharge-current", INT64_MIN, INT64_MAX,
+        make_unique<WriteAttribute<int64_t>>(Id, "minimum-charge-current", 0, UINT64_MAX, Attributes::MinimumChargeCurrent::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<int64_t>>(Id, "maximum-charge-current", 0, UINT64_MAX, Attributes::MaximumChargeCurrent::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<int64_t>>(Id, "maximum-discharge-current", 0, UINT64_MAX,
                                              Attributes::MaximumDischargeCurrent::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "user-maximum-charge-current", INT64_MIN, INT64_MAX,
+        make_unique<WriteAttribute<int64_t>>(Id, "user-maximum-charge-current", 0, UINT64_MAX,
                                              Attributes::UserMaximumChargeCurrent::Id, WriteCommandType::kWrite,
                                              credsIssuerConfig), //
         make_unique<WriteAttribute<uint32_t>>(Id, "randomization-delay-window", 0, UINT32_MAX,
@@ -18473,8 +18471,8 @@ void registerClusterEnergyEvse(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "next-charge-target-time", 0, UINT32_MAX,
                                                                               Attributes::NextChargeTargetTime::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "next-charge-required-energy", INT64_MIN,
-                                                                             INT64_MAX, Attributes::NextChargeRequiredEnergy::Id,
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "next-charge-required-energy", 0, UINT64_MAX,
+                                                                             Attributes::NextChargeRequiredEnergy::Id,
                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
             Id, "next-charge-target-so-c", 0, UINT8_MAX, Attributes::NextChargeTargetSoC::Id, WriteCommandType::kForceWrite,
@@ -18485,7 +18483,7 @@ void registerClusterEnergyEvse(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
             Id, "state-of-charge", 0, UINT8_MAX, Attributes::StateOfCharge::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "battery-capacity", INT64_MIN, INT64_MAX,
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "battery-capacity", 0, UINT64_MAX,
                                                                              Attributes::BatteryCapacity::Id,
                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::CharSpan>>>(
@@ -18494,10 +18492,9 @@ void registerClusterEnergyEvse(Commands & commands, CredentialIssuerCommands * c
             Id, "session-id", 0, UINT32_MAX, Attributes::SessionID::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint32_t>>(Id, "session-duration", 0, UINT32_MAX, Attributes::SessionDuration::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "session-energy-charged", INT64_MIN, INT64_MAX,
-                                             Attributes::SessionEnergyCharged::Id, WriteCommandType::kForceWrite,
-                                             credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "session-energy-discharged", INT64_MIN, INT64_MAX,
+        make_unique<WriteAttribute<int64_t>>(Id, "session-energy-charged", 0, UINT64_MAX, Attributes::SessionEnergyCharged::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<int64_t>>(Id, "session-energy-discharged", 0, UINT64_MAX,
                                              Attributes::SessionEnergyDischarged::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
