@@ -73,19 +73,19 @@ public:
     virtual CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNodeId) = 0;
 
     /**
-     * Remove all ICDClient persistent informations associated with the specified
+     * Remove all ICDClient persistent information associated with the specified
      * fabric index.  If no entries for the fabric index exist, this is a no-op
      * and is considered successful.
-     * When the whole fabric is removed, all entries from persistent storage in current fabric index is removed.
+     * When the whole fabric is removed, all entries from persistent storage in current fabric index are removed.
      *
      * @param[in] fabricIndex the index of the fabric for which to remove ICDClient persistent information
      */
     virtual CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex) = 0;
 
     /**
-     * Process received ICD Check-in message payload, consumer has to provide keys and see whether it's the right key,
-     * further check its received counter value is valid, then return the matched ICDClientInfo. If anything wrong,
-     * return CHIP_ERROR, ICDClientInfo cannot be updated.
+     * Process received ICD Check-in message payload.  The implementation needs to parse the payload, 
+     * look for a key that allows successfully decrypting the payload, verify that the counter in the payload is valid,
+     * and populate the clientInfo with the stored information corresponding to the key.
      * @param[in] payload received checkIn Message payload
      * @param[out] clientInfo retrieved matched clientInfo from storage
      */

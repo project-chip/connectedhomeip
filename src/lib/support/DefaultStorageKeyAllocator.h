@@ -234,6 +234,9 @@ public:
 
     static StorageKeyName ICDClientInfoKey(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/icdk", fabric); }
 
+    // ICDFabricList is only used by DefaultICDClientStorage
+    // when new fabric is created, this list needs to be updated,
+    // when client init DefaultICDClientStorage, this table needs to be loaded.
     static StorageKeyName ICDFabricList() { return StorageKeyName::FromConst("g/icdfl"); }
 };
 
