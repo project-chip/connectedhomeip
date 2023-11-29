@@ -319,8 +319,7 @@ public:
             else if (name == "RunningMode")
             {
                 // Get the system mode
-                chip::app::Clusters::Thermostat::SystemModeEnum systemMode =
-                    chip::app::Clusters::Thermostat::SystemModeEnum::kOff;
+                chip::app::Clusters::Thermostat::SystemModeEnum systemMode = chip::app::Clusters::Thermostat::SystemModeEnum::kOff;
                 app::Clusters::Thermostat::Attributes::SystemMode::Get(1, &systemMode);
                 if (systemMode != chip::app::Clusters::Thermostat::SystemModeEnum::kAuto)
                 {

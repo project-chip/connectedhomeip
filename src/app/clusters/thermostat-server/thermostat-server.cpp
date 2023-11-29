@@ -108,39 +108,26 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
             return aEncoder.Encode(valueRemoteSensing);
         }
         break;
-    case PresetTypes::Id:
-        {
-            return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-                return CHIP_NO_ERROR;
-            });
-        }
-        break;
-    case Presets::Id:
-        {
-            return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-                return CHIP_NO_ERROR;
-            });
-        }
-        break;
-    case ScheduleTypes::Id:
-        {
-            return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-                return CHIP_NO_ERROR;
-            });
-        }
-        break;
-    case Schedules::Id:
-        {
-            return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-                return CHIP_NO_ERROR;
-            });
-        }
-        break;
-    case QueuedPreset::Id:
-        {
-            chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::Type> value;
-            return aEncoder.Encode(value);
-        }
+    case PresetTypes::Id: {
+        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    }
+    break;
+    case Presets::Id: {
+        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    }
+    break;
+    case ScheduleTypes::Id: {
+        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    }
+    break;
+    case Schedules::Id: {
+        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    }
+    break;
+    case QueuedPreset::Id: {
+        chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::Type> value;
+        return aEncoder.Encode(value);
+    }
     default: // return CHIP_NO_ERROR and just read from the attribute store in default
         break;
     }
@@ -464,16 +451,14 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         {
         case ControlSequenceOfOperationEnum::kCoolingOnly:
         case ControlSequenceOfOperationEnum::kCoolingWithReheat:
-            if (RequestedSystemMode == SystemModeEnum::kHeat ||
-                RequestedSystemMode == SystemModeEnum::kEmergencyHeat)
+            if (RequestedSystemMode == SystemModeEnum::kHeat || RequestedSystemMode == SystemModeEnum::kEmergencyHeat)
                 return imcode::InvalidValue;
             else
                 return imcode::Success;
 
         case ControlSequenceOfOperationEnum::kHeatingOnly:
         case ControlSequenceOfOperationEnum::kHeatingWithReheat:
-            if (RequestedSystemMode == SystemModeEnum::kCool ||
-                RequestedSystemMode == SystemModeEnum::kPrecooling)
+            if (RequestedSystemMode == SystemModeEnum::kCool || RequestedSystemMode == SystemModeEnum::kPrecooling)
                 return imcode::InvalidValue;
             else
                 return imcode::Success;
