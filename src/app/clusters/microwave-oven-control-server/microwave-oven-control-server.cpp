@@ -197,7 +197,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         }
         else
         {
-            // TODO: set Microwave Oven cooking mode to normal mode(default).
+            // set Microwave Oven cooking mode to normal mode(default).
             reqCookMode = Clusters::ModeNormal;
         }
 

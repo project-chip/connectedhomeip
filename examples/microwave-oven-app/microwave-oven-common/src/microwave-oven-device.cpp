@@ -69,7 +69,7 @@ app::DataModel::Nullable<uint32_t> ExampleMicrowaveOvenDevice::GetCountdownTime(
     return static_cast<app::DataModel::Nullable<uint32_t>>(mMicrowaveOvenControlInstance.GetCookTime());
 }
 
-CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
+CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalStateAtIndex(size_t index, OperationalState::GenericOperationalState & operationalState)
 {
     if (index > mOperationalStateList.size() - 1)
     {
@@ -79,7 +79,7 @@ CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalStateAtIndex(size_t index, 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase)
+CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalPhaseAtIndex(size_t index, OperationalState::GenericOperationalPhase & operationalPhase)
 {
     if (index > mOperationalPhaseList.size() - 1)
     {

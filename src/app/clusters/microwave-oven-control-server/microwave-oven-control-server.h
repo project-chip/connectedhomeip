@@ -22,6 +22,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
+#include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/util/af-enums.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -52,8 +53,7 @@ public:
      * Note: a MicrowaveOvenControl instance must live relying on an Operational State instance and a Microwave Oven Mode instance, 
      * caller should be initialized the 2 instances before initializing MicorwaveOvenControl instance. 
      */
-    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, 
-            Clusters::OperationalState::Instance * aOpStateInstance, Cluster::ModeBase::Instance * aMicrowaveOvenModeInstance);
+    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, Clusters::OperationalState::Instance * aOpStateInstance, Clusters::ModeBase::Instance * aMicrowaveOvenModeInstance);
 
     ~Instance() override;
 
@@ -85,7 +85,7 @@ private:
     /**
      * Microwave Oven Mode instance 
      */
-    Cluster::ModeBase::Instance * mMicrowaveOvenModeInstance;
+    Clusters::ModeBase::Instance * mMicrowaveOvenModeInstance;
 
     /**
      * set default values

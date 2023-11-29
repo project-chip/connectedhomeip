@@ -52,8 +52,8 @@ private:
 
     //MicrowaveOvenMode types
     using ModeTagStructType              = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsNormal[1]  = { { .value = to_underlying(ModeTag::kNormal) } };
-    ModeTagStructType modeTagsDefrost[1] = { { .value = to_underlying(ModeTag::kDefrost) } };
+    ModeTagStructType modeTagsNormal[1]  = { { .value = to_underlying(MicrowaveOvenMode::ModeTag::kNormal) } };
+    ModeTagStructType modeTagsDefrost[1] = { { .value = to_underlying(MicrowaveOvenMode::ModeTag::kDefrost) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[2] = {
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),
@@ -66,21 +66,21 @@ private:
 
 
     //Operational States 
-    const GenericOperationalState opStateList[4] = {
-        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
-        GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
-        GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
-        GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
+    const OperationalState::GenericOperationalState opStateList[4] = {
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)),
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)),
     };
 
-    app::DataModel::List<const GenericOperationalState> mOperationalStateList = Span<const GenericOperationalState>(opStateList);
+    app::DataModel::List<const OperationalState::GenericOperationalState> mOperationalStateList = Span<const OperationalState::GenericOperationalState>(opStateList);
 
-    const GenericOperationalPhase opPhaseList[1] = {
+    const OperationalState::GenericOperationalPhase opPhaseList[1] = {
         // Phase List is null
-        GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
+        OperationalState::GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
     };
 
-    Span<const GenericOperationalPhase> mOperationalPhaseList = Span<const GenericOperationalPhase>(opPhaseList);
+    Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList = Span<const OperationalState::GenericOperationalPhase>(opPhaseList);
 
 public:
     /**
@@ -89,9 +89,9 @@ public:
      * @param aClustersEndpoint The endpoint ID where all the microwave oven clusters exist.
      */
     explicit ExampleMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
+        mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, &mOperationalStateInstance, &mMicrowaveOvenModeInstance),
         mOperationalStateInstance(this, aClustersEndpoint, OperationalState::Id),
-        mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id, chip::to_underlying(MicrowaveOvenMode::Feature::kOnOff),
-        mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, &mOperationalStateInstance, &mMicrowaveOvenModeInstance)){}
+        mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id, chip::to_underlying(MicrowaveOvenMode::Feature::kOnOff)){}
 
     /**
      * Init all the clusters used by this device.
@@ -142,7 +142,7 @@ public:
      * @param index The index of the state, with 0 representing the first state.
      * @param operationalState  The GenericOperationalState is filled.
      */
-    CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) override;
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index, OperationalState::GenericOperationalState & operationalState) override;
 
     /**
      * Fills in the provided GenericOperationalPhase with the phase at index `index` if there is one,
@@ -152,7 +152,7 @@ public:
      * @param index The index of the phase, with 0 representing the first phase.
      * @param operationalPhase  The GenericOperationalPhase is filled.
      */
-    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase) override;
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, OperationalState::GenericOperationalPhase & operationalPhase) override;
 
     /**
      * Handle Command Callback in application: Pause
@@ -160,7 +160,7 @@ public:
      * this method is called to set operational state to target state.
      * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
      */
-    void HandlePauseStateCallback(GenericOperationalError & err) override;
+    void HandlePauseStateCallback(OperationalState::GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Resume
@@ -168,7 +168,7 @@ public:
      * this method is called to set operational state to target state.
      * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
      */
-    void HandleResumeStateCallback(GenericOperationalError & err) override;
+    void HandleResumeStateCallback(OperationalState::GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Start
@@ -176,7 +176,7 @@ public:
      * this method is called to set operational state to target state.
      * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
      */
-    void HandleStartStateCallback(GenericOperationalError & err) override;
+    void HandleStartStateCallback(OperationalState::GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Stop
@@ -184,7 +184,7 @@ public:
      * this method is called to set operational state to target state.
      * if success, 'err' is set to NoError, otherwise it will be set to UnableToCompleteOperation.
      */
-    void HandleStopStateCallback(GenericOperationalError & err) override;
+    void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override;
 
 
 
