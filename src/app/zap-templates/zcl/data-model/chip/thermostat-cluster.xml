@@ -118,7 +118,7 @@ limitations under the License.
     <attribute side="server" code="0x0006" define="ABS_MAX_COOL_SETPOINT_LIMIT" type="temperature" min="0x954D" max="0x7FFF" writable="false" optional="true">AbsMaxCoolSetpointLimit</attribute>
     <attribute side="server" code="0x0007" define="PI_COOLING_DEMAND" type="int8u" min="0" max="100" writable="false" reportable="true" optional="true">PICoolingDemand</attribute>
     <attribute side="server" code="0x0008" define="PI_HEATING_DEMAND" type="int8u" min="0" max="100" writable="false" reportable="true" optional="true">PIHeatingDemand</attribute>
-    <attribute side="server" code="0x0010" define="LOCAL_TEMPERATURE_CALIBRATION" type="int8s" min="0xFFFFFFFFFFFFFF06" max="0xFA" writable="true" optional="true">
+    <attribute side="server" code="0x0010" define="LOCAL_TEMPERATURE_CALIBRATION" type="int8s" min="0xE7" max="0xFA" writable="true" optional="true">
       <description>LocalTemperatureCalibration</description>
       <access op="write" privilege="manage"/>
     </attribute>
