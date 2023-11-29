@@ -213,6 +213,7 @@ __CHIP_SIZED_TYPES__ = {
     "percent100ths": BasicInteger(idl_name="percent100ths", byte_count=2, is_signed=False),
     "posix_ms": BasicInteger(idl_name="posix_ms", byte_count=8, is_signed=False),
     "priority": BasicInteger(idl_name="priority", byte_count=1, is_signed=False),
+    "semtag": BasicInteger(idl_name="semtag", byte_count=4, is_signed=False),
     "status": BasicInteger(idl_name="status", byte_count=1, is_signed=False),
     "systime_ms": BasicInteger(idl_name="systime_ms", byte_count=8, is_signed=False),
     "systime_us": BasicInteger(idl_name="systime_us", byte_count=8, is_signed=False),

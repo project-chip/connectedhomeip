@@ -77,7 +77,7 @@ class TestSupportedTypes(unittest.TestCase):
                     "enum8", "enum16", "enum24", "enum32",
 
                     # TODO: these may be bugs to fix
-                    "semtag", "unknown"
+                    "unknown"
             }:
                 continue
 
