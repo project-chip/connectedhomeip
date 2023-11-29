@@ -42,11 +42,21 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit(EndpointId aEndpoint)
  * MicrowaveOvenControl cluster
 */
 Protocols::InteractionModel::Status
-ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime, uint8_t powerSetting)
+ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(Optional<uint8_t> cookMode, uint32_t cookTime, uint8_t powerSetting)
 {
     // placeholder implementation
     Status status;
-    if((status = mMicrowaveOvenModeInstance.UpdateCurrentMode(cookMode)) != Status::Success)
+    uint8_t reqCookMode;
+    if(cookMode.HasValue()){
+        reqCookMode = cookMode.Value();
+    }
+    else
+    {
+        // set Microwave Oven cooking mode to normal mode(default).
+        reqCookMode = ModeNormal;
+    }
+
+    if((status = mMicrowaveOvenModeInstance.UpdateCurrentMode(reqCookMode)) != Status::Success)
     {
         return status;
     }
@@ -55,7 +65,7 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode,
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ExampleMicrowaveOvenDevice::HandleSetCookTimeCallback(uint32_t finalCookTime)
+Protocols::InteractionModel::Status ExampleMicrowaveOvenDevice::HandleModifyCookTimeCallback(uint32_t finalCookTime)
 {
     // placeholder implementation
     mMicrowaveOvenControlInstance.SetCookTime(finalCookTime);

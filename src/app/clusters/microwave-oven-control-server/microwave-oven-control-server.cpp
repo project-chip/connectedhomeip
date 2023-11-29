@@ -61,7 +61,16 @@ CHIP_ERROR Instance::Init()
         ChipLogError(Zcl, "Microwave Oven Control: The cluster with ID %lu was not enabled in zap.", long(mClusterId));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
+    if(!mOpStateInstance)
+    {
+        ChipLogError(Zcl, "Microwave Oven Control: Operational State instance is NULL");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if(!mMicrowaveOvenModeInstance)
+    {
+        ChipLogError(Zcl, "Microwave Oven Control: Microwave Oven Mode instance is NULL");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
 
@@ -183,23 +192,18 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         ChipLogError(Zcl, "Failed to set cookPower, cookPower value is out of range");
         goto exit;
     }
-
+    
     //get current operational state 
     opState = mOpStateInstance->GetCurrentOperationalState();
-    if (opState == to_underlying(OperationalStateEnum::kStopped))
+    if(opState != to_underlying(OperationalStateEnum::kStopped))
     {
-        uint8_t reqCookMode     = 0;
+        status = Status::InvalidInState;
+        goto exit;
+    }
+    else
+    {
         uint32_t reqCookTime    = 0;
         uint8_t reqPowerSetting = 0;
-        if (cookMode.HasValue())
-        {
-            reqCookMode = cookMode.Value();
-        }
-        else
-        {
-            // set Microwave Oven cooking mode to normal mode(default).
-            reqCookMode = Clusters::ModeNormal;
-        }
 
         if (cookTime.HasValue())
         {
@@ -220,13 +224,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
             // set Microwave Oven cooking power to max power(default).
             reqPowerSetting = mDelegate->GetMaxPower();
         }
-        status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTime, reqPowerSetting);
-        goto exit;
-    }
-    else
-    {
-        status = Status::InvalidInState;
-        goto exit;
+        status = mDelegate->HandleSetCookingParametersCallback(cookMode, reqCookTime, reqPowerSetting);
     }
 
 exit:
@@ -250,7 +248,7 @@ void Instance::HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTi
         // if the added cooking time is greater than the max cooking time, the cooking time stay unchanged.
         if (finalCookTime < kMaxCookTime)
         {
-            status = mDelegate->HandleSetCookTimeCallback(finalCookTime);
+            status = mDelegate->HandleModifyCookTimeCallback(finalCookTime);
             goto exit;
         }
         else
@@ -260,7 +258,7 @@ void Instance::HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTi
             goto exit;
         }
     }
-    else // operational state is in error
+    else // operational state is 'Error'
     {
         status = Status::InvalidInState;
         goto exit;

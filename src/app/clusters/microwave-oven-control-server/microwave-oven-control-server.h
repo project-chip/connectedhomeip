@@ -81,11 +81,11 @@ private:
     /**
      * Operational State instance 
      */
-    Clusters::OperationalState::Instance * mOpStateInstance;
+    Clusters::OperationalState::Instance * mOpStateInstance = nullptr;
     /**
      * Microwave Oven Mode instance 
      */
-    Clusters::ModeBase::Instance * mMicrowaveOvenModeInstance;
+    Clusters::ModeBase::Instance * mMicrowaveOvenModeInstance = nullptr;
 
     /**
      * set default values
@@ -130,15 +130,19 @@ public:
     /**
      *   @brief Handle Command Callback in application: SetCookingParameters
      *   @return Returns the Interaction Model status code which was user determined in the business logic
+     *   @param  cookMode: the user defined modes which from the Microwave Oven Mode application level
+     *   @param  cookTime: the input cook time value
+     *   @param  powerSetting: the input power setting value
      */
-    virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
+    virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(Optional<uint8_t>  cookMode, uint32_t cookTime,
                                                                                    uint8_t powerSetting) = 0;
 
     /**
      *   @brief Handle Command Callback in application: AddMoreTime
      *   @return Returns the Interaction Model status code which was user determined in the business logic
+     *   @param  finalCookTime: the cook time value after adding input time 
      */
-    virtual Protocols::InteractionModel::Status HandleSetCookTimeCallback(uint32_t finalCookTime) = 0;
+    virtual Protocols::InteractionModel::Status HandleModifyCookTimeCallback(uint32_t finalCookTime) = 0;
 
     /**
      *   @brief get the MinPower

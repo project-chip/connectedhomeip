@@ -102,13 +102,13 @@ public:
     /**
      * handle command for microwave oven control: set cooking parameters
      */
-    Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
+    Protocols::InteractionModel::Status HandleSetCookingParametersCallback(Optional<uint8_t> cookMode, uint32_t cookTime,
                                                                            uint8_t powerSetting) override;
 
     /**
      * handle command for microwave oven control: add more time
      */
-    Protocols::InteractionModel::Status HandleSetCookTimeCallback(uint32_t finalCookTime) override;
+    Protocols::InteractionModel::Status HandleModifyCookTimeCallback(uint32_t finalCookTime) override;
 
     /**
      * Get the value of MinPower.
