@@ -47,10 +47,11 @@ namespace SecureMessageCodec {
  * @param msgBuf        The message buffer that contains the unencrypted message. If
  *                      the operation is successful, this buffer will be mutated to contain
  *                      the encrypted message.
+ * @param inputMaxLength Max size for input
  * @return A CHIP_ERROR value consistent with the result of the encryption operation
  */
 CHIP_ERROR Encrypt(const CryptoContext & context, CryptoContext::ConstNonceView nonce, PayloadHeader & payloadHeader,
-                   PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf);
+                   PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf, size_t inputMaxLength);
 
 /**
  * @brief
