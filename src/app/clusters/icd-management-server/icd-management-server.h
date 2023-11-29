@@ -62,9 +62,6 @@ private:
      */
     void TriggerICDMTableUpdatedEvent();
 
-    CHIP_ERROR CheckAdmin(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                          bool & isClientAdmin);
-
     static chip::PersistentStorageDelegate * mStorage;
     static chip::Crypto::SymmetricKeystore * mSymmetricKeystore;
     static chip::ICDConfigurationData * mICDConfigurationData;

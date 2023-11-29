@@ -188,6 +188,30 @@ private:
 IcdManagementFabricDelegate gFabricDelegate;
 IcdManagementAttributeAccess gAttribute;
 
+/**
+ * @brief Function checks if the client as admin permissions to the cluster in the commandPath
+ *
+ * @param[out] isClientAdmin True : Client has admin permissions
+ *                           False : Client does not have admin permissions
+ *                           If an error ocurs, isClientAdmin is not changed
+ * @return CHIP_ERROR
+ */
+CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, bool & isClientAdmin)
+{
+    RequestPath requestPath{ .cluster = commandPath.mClusterId, .endpoint = commandPath.mEndpointId };
+    CHIP_ERROR err = GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, Privilege::kAdminister);
+    if (CHIP_NO_ERROR == err)
+    {
+        isClientAdmin = true;
+    }
+    else if (CHIP_ERROR_ACCESS_DENIED == err)
+    {
+        isClientAdmin = false;
+        err           = CHIP_NO_ERROR;
+    }
+    return err;
+}
+
 } // namespace
 
 /*
@@ -320,23 +344,6 @@ Status ICDManagementServer::StayActiveRequest(FabricIndex fabricIndex)
 void ICDManagementServer::TriggerICDMTableUpdatedEvent()
 {
     ICDNotifier::GetInstance().BroadcastICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
-}
-
-CHIP_ERROR ICDManagementServer::CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                           bool & isClientAdmin)
-{
-    RequestPath requestPath{ .cluster = commandPath.mClusterId, .endpoint = commandPath.mEndpointId };
-    CHIP_ERROR err = GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, Privilege::kAdminister);
-    if (CHIP_NO_ERROR == err)
-    {
-        isClientAdmin = true;
-    }
-    else if (CHIP_ERROR_ACCESS_DENIED == err)
-    {
-        isClientAdmin = false;
-        err           = CHIP_NO_ERROR;
-    }
-    return err;
 }
 
 void ICDManagementServer::Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
