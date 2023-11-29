@@ -383,6 +383,15 @@ static BOOL CommandNeedsTimedInvokeInTimerCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInOvenCavityOperationalStateCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::OvenCavityOperationalState;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInOvenModeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OvenMode;
@@ -585,6 +594,36 @@ static BOOL CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(AttributeI
 {
     using namespace Clusters::DemandResponseLoadControl;
     switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInEnergyEVSECluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::EnergyEvse;
+    switch (aAttributeId) {
+    case Commands::Disable::Id: {
+        return YES;
+    }
+    case Commands::EnableCharging::Id: {
+        return YES;
+    }
+    case Commands::EnableDischarging::Id: {
+        return YES;
+    }
+    case Commands::StartDiagnostics::Id: {
+        return YES;
+    }
+    case Commands::SetTargets::Id: {
+        return YES;
+    }
+    case Commands::GetTargets::Id: {
+        return YES;
+    }
+    case Commands::ClearTargets::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -1110,6 +1149,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::Timer::Id: {
         return CommandNeedsTimedInvokeInTimerCluster(commandID);
     }
+    case Clusters::OvenCavityOperationalState::Id: {
+        return CommandNeedsTimedInvokeInOvenCavityOperationalStateCluster(commandID);
+    }
     case Clusters::OvenMode::Id: {
         return CommandNeedsTimedInvokeInOvenModeCluster(commandID);
     }
@@ -1178,6 +1220,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::DemandResponseLoadControl::Id: {
         return CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(commandID);
+    }
+    case Clusters::EnergyEvse::Id: {
+        return CommandNeedsTimedInvokeInEnergyEVSECluster(commandID);
     }
     case Clusters::DoorLock::Id: {
         return CommandNeedsTimedInvokeInDoorLockCluster(commandID);

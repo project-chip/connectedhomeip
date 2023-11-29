@@ -266,6 +266,21 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::FeatureMap::Id:
         return aEncoder.Encode(mFeatureFlags);
 
+    case Attributes::SupportedWiFiBands::Id:
+        VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), CHIP_NO_ERROR);
+        VerifyOrReturnError(mpDriver.Valid(), CHIP_NO_ERROR);
+        return aEncoder.Encode(mpDriver.Get<WiFiDriver *>()->GetSupportedWiFiBands());
+
+    case Attributes::SupportedThreadFeatures::Id:
+        VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_NO_ERROR);
+        VerifyOrReturnError(mpDriver.Valid(), CHIP_NO_ERROR);
+        return aEncoder.Encode(mpDriver.Get<ThreadDriver *>()->GetSupportedThreadFeatures());
+
+    case Attributes::ThreadVersion::Id:
+        VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_NO_ERROR);
+        VerifyOrReturnError(mpDriver.Valid(), CHIP_NO_ERROR);
+        return aEncoder.Encode(mpDriver.Get<ThreadDriver *>()->GetThreadVersion());
+
     default:
         return CHIP_NO_ERROR;
     }

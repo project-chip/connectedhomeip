@@ -255,15 +255,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // This initializes clusters, so should come after lower level initialization.
     InitDataModelHandler();
 
-// ICD Init needs to be after data model init
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore);
-    // Register the ICDStateObservers. All observers are released at mICDManager.Shutdown()
-    // They can be released individually with ReleaseObserver
-    mICDManager.RegisterObserver(mReportScheduler);
-    mICDManager.RegisterObserver(&app::DnssdServer::Instance());
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&mExchangeMgr);
     SuccessOrExit(err);
@@ -279,6 +270,13 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     app::DnssdServer::Instance().SetUnsecuredPort(mUserDirectedCommissioningPort);
     app::DnssdServer::Instance().SetInterfaceId(mInterfaceId);
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // We set the ICDManager reference betfore calling the ICDManager init due to the init ordering limitations.
+    // DnssdServer will use the default value initially and will update advertisement once ICDManager
+    // init is called.
+    app::DnssdServer::Instance().SetICDManager(&mICDManager);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     if (GetFabricTable().FabricCount() != 0)
     {
@@ -327,6 +325,18 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), mReportScheduler,
                                                                  &mCASESessionManager, mSubscriptionResumptionStorage);
     SuccessOrExit(err);
+
+    // ICD Init needs to be after data model init and InteractionModel Init
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+
+    // Register the ICDStateObservers.
+    // Call register before init so that observers are notified of any state change during the init.
+    // All observers are released at mICDManager.Shutdown(). They can be released individually with ReleaseObserver
+    mICDManager.RegisterObserver(mReportScheduler);
+    mICDManager.RegisterObserver(&app::DnssdServer::Instance());
+
+    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // This code is necessary to restart listening to existing groups after a reboot
     // Each manufacturer needs to validate that they can rejoin groups by placing this code at the appropriate location for them
@@ -495,9 +505,11 @@ void Server::Shutdown()
     PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
     mCASEServer.Shutdown();
     mCASESessionManager.Shutdown();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    app::DnssdServer::Instance().SetICDManager(nullptr);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
-
     chip::Dnssd::Resolver::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     mCommissioningWindowManager.Shutdown();
