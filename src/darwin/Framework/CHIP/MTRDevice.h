@@ -245,7 +245,16 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * This set of functions allows clients to store metadata for either an entire device or for a specific endpoint.
  * Values must conform to NSSecureCoding
  *
+ * Notes:
+ *   • Client data will be removed automatically when devices are deleted from the fabric
  */
+
+/**
+ *
+ * List of all client data keys stored
+ *
+ */
+- (NSArray * _Nullable)clientDataKeys MTR_NEWLY_AVAILABLE;
 
 /**
  *
@@ -271,6 +280,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param key           NSString * for the key to store the value as
  */
 - (void)removeClientDataForKey:(NSString *)key MTR_NEWLY_AVAILABLE;
+
+/**
+ *
+ * List of all client data keys stored
+ *
+ */
+- (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID MTR_NEWLY_AVAILABLE;
 
 /**
  *

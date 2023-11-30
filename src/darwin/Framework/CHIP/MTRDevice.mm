@@ -1729,6 +1729,10 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 // Client Metadata Storage
 
+- (NSArray * _Nullable)clientDataKeys {
+    return [self.temporaryMetaDataCache allKeys];
+}
+
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key
 {
     if ( key == nil ) return nil;
@@ -1751,6 +1755,13 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     if ( key == nil ) return;
 
     [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:-1", key]];
+}
+
+- (NSArray * _Nullable)clientDataKeys {
+    if ( endpointID == nil ) return nil;
+    // TODO: When hooked up to storage, enumerate this better
+    
+    return [self.temporaryMetaDataCache allKeys];
 }
 
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
