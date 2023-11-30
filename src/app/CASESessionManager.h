@@ -28,8 +28,6 @@
 #include <transport/SessionDelegate.h>
 #include <transport/SessionUpdateDelegate.h>
 
-#include <lib/dnssd/ResolverProxy.h>
-
 namespace chip {
 
 class OperationalSessionSetupPoolDelegate;

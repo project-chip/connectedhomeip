@@ -27,9 +27,9 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.zapxml import ParseSource, ParseXmls
 
-from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command,
-                                         ConstantEntry, DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality,
-                                         Idl, Struct, StructQuality, StructTag)
+from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, Command, ConstantEntry,
+                                         DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct,
+                                         StructQuality, StructTag)
 
 
 def XmlToIdl(what: Union[str, List[str]]) -> Idl:
@@ -90,7 +90,6 @@ class TestXmlParser(unittest.TestCase):
         self.assertEqual(idl,
                          Idl(clusters=[
                              Cluster(
-                                 side=ClusterSide.CLIENT,
                                  name='Test',
                                  code=0x1234,
                                  description="Test",
@@ -174,10 +173,8 @@ class TestXmlParser(unittest.TestCase):
 
         self.assertEqual(idl,
                          Idl(clusters=[
-                             Cluster(side=ClusterSide.CLIENT,
-                                     name='Test1', code=1, bitmaps=[bitmap]),
-                             Cluster(side=ClusterSide.CLIENT,
-                                     name='Test2', code=2, bitmaps=[bitmap]),
+                             Cluster(name='Test1', code=1, bitmaps=[bitmap]),
+                             Cluster(name='Test2', code=2, bitmaps=[bitmap]),
                          ]))
 
     def testFabricScopedAndSensitive(self):
@@ -206,8 +203,7 @@ class TestXmlParser(unittest.TestCase):
             </configurator>
         ''')
         self.assertEqual(idl,
-                         Idl(clusters=[Cluster(side=ClusterSide.CLIENT,
-                                               name='Test',
+                         Idl(clusters=[Cluster(name='Test',
                                                code=1,
                                                events=[Event(priority=EventPriority.INFO,
                                                              name='FabricEvent',
@@ -274,10 +270,8 @@ class TestXmlParser(unittest.TestCase):
         )
         self.assertEqual(idl,
                          Idl(clusters=[
-                             Cluster(side=ClusterSide.CLIENT,
-                                     name='Test1', code=10, enums=[e2, e3]),
-                             Cluster(side=ClusterSide.CLIENT,
-                                     name='Test2', code=20, enums=[e3])],
+                             Cluster(name='Test1', code=10, enums=[e2, e3]),
+                             Cluster(name='Test2', code=20, enums=[e3])],
                              ))
 
     def testStruct(self):
@@ -314,9 +308,8 @@ class TestXmlParser(unittest.TestCase):
         )
         self.assertEqual(idl,
                          Idl(clusters=[
-                             Cluster(side=ClusterSide.CLIENT,
-                                     name='Test1', code=10, structs=[struct]),
-                             Cluster(side=ClusterSide.CLIENT, name='Test2', code=20,
+                             Cluster(name='Test1', code=10, structs=[struct]),
+                             Cluster(name='Test2', code=20,
                                      structs=[struct],
                                      attributes=[
                                          Attribute(
@@ -366,7 +359,7 @@ Some copyright here... testing that we skip over comments
         ''')
         self.assertEqual(idl,
                          Idl(clusters=[
-                             Cluster(side=ClusterSide.CLIENT, name='WindowCovering', code=0x102,
+                             Cluster(name='WindowCovering', code=0x102,
                                      description='Provides an interface for controlling and adjusting automatic window coverings. ',
                                      structs=[],
                                      attributes=[

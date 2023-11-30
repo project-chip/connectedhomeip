@@ -65,9 +65,6 @@
 #include <app/data-model/Encode.h>
 
 #include <limits>
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-#include <app/server/Server.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
 
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
@@ -209,15 +206,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
                 ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
             }
         }
-
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-        if (event->ThreadStateChange.AddressChanged && isThreadAttached)
-        {
-            // Refresh Multicast listening
-            ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
-            Server::GetInstance().RejoinExistingMulticastGroups();
-        }
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 #if CHIP_DETAIL_LOGGING
         LogOpenThreadStateChange(mOTInst, event->ThreadStateChange.OpenThread.Flags);
