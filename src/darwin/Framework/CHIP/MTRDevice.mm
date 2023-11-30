@@ -1745,16 +1745,16 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (id<NSSecureCoding>)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
 {
+    return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
+}
+
+- (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value
+{
     if (self.temporaryMetaDataCache == nil) {
         self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
     }
 
     [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
-}
-
-- (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value
-{
-    return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
 }
 
 @end
