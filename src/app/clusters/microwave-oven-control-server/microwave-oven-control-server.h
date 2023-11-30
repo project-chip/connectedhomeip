@@ -79,7 +79,7 @@ private:
     Delegate * mDelegate;
     EndpointId mEndpointId;
     ClusterId mClusterId;
-    Clusters::OperationalState::Instance * mOpStateInstance = nullptr;
+    Clusters::OperationalState::Instance * mOpStateInstance   = nullptr;
     Clusters::ModeBase::Instance * mMicrowaveOvenModeInstance = nullptr;
 
     uint32_t mCookTime    = kDefaultCookTime;

@@ -95,7 +95,7 @@ public:
         mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, &mOperationalStateInstance,
                                       &mMicrowaveOvenModeInstance),
         mOperationalStateInstance(this, aClustersEndpoint, OperationalState::Id),
-        mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id,0)
+        mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id, 0)
     {}
 
     /**
