@@ -240,6 +240,49 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
     MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
+/**
+ *
+ * These set of functions allow clients to set metadata on a MTRDevice level, as well as per endpoint as well.
+ * Values must conform to NSSecureCoding
+ *
+ */
+
+/**
+ *
+ * Retrieve client metadata for a key, returns nil if no value is set
+ *
+ * @param key           NSString * for the key to store the value as
+ */
+- (id<NSSecureCoding>)clientDataForKey:(NSString *)key MTR_NEWLY_AVAILABLE;
+
+/**
+ *
+ * Set client metadata for a key. The value must conform to NSSecureCoding
+ *
+ * @param key           NSString * for the key to store the value as
+ * @param value         id <NSSecureCoding> for the value to store
+ */
+- (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value MTR_NEWLY_AVAILABLE;
+
+/**
+ *
+ * Retrieve client metadata for a key, returns nil if no value is set
+ *
+ * @param key           NSString * for the key to store the value as
+ * @param endpointID    NSNumber * for the endpoint to associate the metadata with
+ */
+- (id<NSSecureCoding>)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_NEWLY_AVAILABLE;
+
+/**
+ *
+ * Set client metadata for a key. The value must conform to NSSecureCoding.
+ *
+ * @param key           NSString * for the key to store the value as.
+ * @param endpointID    NSNumber * for the endpoint to associate the metadata with
+ * @param value         id <NSSecureCoding> for the value to store
+ */
+- (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value MTR_NEWLY_AVAILABLE;
+
 @end
 
 @protocol MTRDeviceDelegate <NSObject>

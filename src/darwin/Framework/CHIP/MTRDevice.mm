@@ -190,6 +190,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 @property (nonatomic) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
 
+@property (nonatomic) NSMutableDictionary *temporaryMetaDataCache;
+
 /**
  * If currentReadClient is non-null, that means that we successfully
  * called SendAutoResubscribeRequest on the ReadClient and have not yet gotten
@@ -1723,6 +1725,32 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (MTRBaseDevice *)newBaseDevice
 {
     return [MTRBaseDevice deviceWithNodeID:self.nodeID controller:self.deviceController];
+}
+
+// Client Metadata Storage
+
+- (id<NSSecureCoding>)clientDataForKey:(NSString *)key {
+    return [self.temporaryMetaDataCache objectForKey: [NSString stringWithFormat: @"%@:-1", key]];
+}
+
+- (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value {
+    if ( self.temporaryMetaDataCache == nil ) {
+        self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
+    }
+
+    [self.temporaryMetaDataCache setObject: value forKey: [NSString stringWithFormat: @"%@:-1", key]];
+}
+
+- (id<NSSecureCoding>)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID {
+    if ( self.temporaryMetaDataCache == nil ) {
+        self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
+    }
+
+    [self.temporaryMetaDataCache setObject: value forKey: [NSString stringWithFormat: @"%@:%@", key, endpointID]];
+}
+
+- (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value {
+    return [self.temporaryMetaDataCache objectForKey: [NSString stringWithFormat: @"%@:%@", key, endpointID]];
 }
 
 @end
