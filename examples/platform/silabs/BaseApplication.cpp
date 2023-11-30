@@ -664,7 +664,7 @@ void BaseApplication::UpdateLCDStatusScreen(void)
     bool enabled, attached;
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 #ifdef SL_WIFI
-    enabled = ConnectivityMgr().IsWiFiStationEnabled();
+    enabled  = ConnectivityMgr().IsWiFiStationEnabled();
     attached = ConnectivityMgr().IsWiFiStationConnected();
 #endif /* SL_WIFI */
 #if CHIP_ENABLE_OPENTHREAD
@@ -674,8 +674,11 @@ void BaseApplication::UpdateLCDStatusScreen(void)
     status.connected   = enabled && attached;
     status.advertising = chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen();
     status.nbFabric    = chip::Server::GetInstance().GetFabricTable().FabricCount();
-    status.icdMode     = (ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::SIT) ? SilabsLCD::ICDMode_e::SIT : SilabsLCD::ICDMode_e::LIT;
-
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    status.icdMode = (ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::SIT)
+        ? SilabsLCD::ICDMode_e::SIT
+        : SilabsLCD::ICDMode_e::LIT;
+#endif
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     slLCD.SetStatus(status);
 }
@@ -743,7 +746,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
     }
 
 #ifdef DISPLAY_ENABLED
-        UpdateLCDStatusScreen();
+    UpdateLCDStatusScreen();
 #endif
 }
 
