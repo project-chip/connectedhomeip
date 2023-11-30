@@ -233,8 +233,12 @@ public:
     static StorageKeyName TSTimeZone() { return StorageKeyName::FromConst("g/ts/tz"); }
     static StorageKeyName TSDSTOffset() { return StorageKeyName::FromConst("g/ts/dsto"); }
 
+    // FabricICDClientInfoCounter is only used by DefaultICDClientStorage
+    // Records the number of ClientInfos for a particular fabric
     static StorageKeyName FabricICDClientInfoCounter(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/icdc", fabric); }
 
+    // ICDClientInfoKey is only used by DefaultICDClientStorage
+    // Stores/Loads all ICD clientInfos for a particular fabric
     static StorageKeyName ICDClientInfoKey(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/icdk", fabric); }
 
     // ICDFabricList is only used by DefaultICDClientStorage
