@@ -206,6 +206,8 @@ bool emberAfContentLauncherClusterLaunchContentCallback(CommandHandler * command
     auto & autoplay               = commandData.autoPlay;
     auto & data                   = commandData.data;
     auto & decodableParameterList = commandData.search.parameterList;
+    auto & playbackPreferences    = commandData.playbackPreferences;
+    auto & useCurrentContext      = commandData.useCurrentContext;
 
     app::CommandResponseHelper<Commands::LauncherResponse::Type> responder(commandObj, commandPath);
 
@@ -214,7 +216,9 @@ bool emberAfContentLauncherClusterLaunchContentCallback(CommandHandler * command
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true && delegate->HasFeature(endpoint, Feature::kContentSearch),
                  err = CHIP_ERROR_INCORRECT_STATE);
 
-    delegate->HandleLaunchContent(responder, decodableParameterList, autoplay, data.HasValue() ? data.Value() : CharSpan());
+    // note assume if client does not send useCurrentContext then it's set to false
+    delegate->HandleLaunchContent(responder, decodableParameterList, autoplay, data.HasValue() ? data.Value() : CharSpan(),
+                                  playbackPreferences, useCurrentContext.HasValue() ? useCurrentContext.Value() : false);
 
 exit:
     if (err != CHIP_NO_ERROR)
