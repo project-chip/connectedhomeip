@@ -242,7 +242,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 
 /**
  *
- * These set of functions allow clients to set metadata on a MTRDevice level, as well as per endpoint as well.
+ * This set of functions allows clients to store metadata for either an entire device or for a specific endpoint.
  * Values must conform to NSSecureCoding
  *
  */
