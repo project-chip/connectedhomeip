@@ -211,7 +211,8 @@ void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
         buffer       = MutableByteSpan(b);
 
         counter += chip::Crypto::GetRandU32() + 1;
-        keystore.DestroyKey(keyHandle);
+        keystore.DestroyKey(keyHandle1);
+        keystore.DestroyKey(keyHandle2);
     }
 }
 
