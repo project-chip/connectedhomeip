@@ -143,7 +143,6 @@ void startRemainingDurationTick(EndpointId ep)
     {
         (void) chip::DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onValveConfigurationAndControlTick,
                                                            delegate);
-        return;
     }
     else
     {
