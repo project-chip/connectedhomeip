@@ -24,7 +24,7 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for controlling the current Channel on a device.</description>
-    <attribute side="server" code="0x0000" define="CHANNEL_LIST"            type="ARRAY" entryType="ChannelInfoStruct" length="254"                    writable="false" optional="true">ChannelList</attribute>
+    <attribute side="server" code="0x0000" define="CHANNEL_LIST"            type="array" entryType="ChannelInfoStruct" length="254"                    writable="false" optional="true">ChannelList</attribute>
     <attribute side="server" code="0x0001" define="CHANNEL_LINEUP"          type="LineupInfoStruct"                    default="0x0" isNullable="true" writable="false" optional="true">Lineup</attribute>
     <attribute side="server" code="0x0002" define="CHANNEL_CURRENT_CHANNEL" type="ChannelInfoStruct"                   default="0x0" isNullable="true" writable="false" optional="true">CurrentChannel</attribute>
 
